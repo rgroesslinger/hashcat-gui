@@ -20,6 +20,5 @@ OR
 
 	Use "-static" if you want to statically link Qt into hashcat-gui, you can
 	run the hashcat-gui executable without having any Qt libraries around then.
-	This is how hashcat-gui releases available on the hashcat website are built.
 
 3. Build hashcat-gui: qmake -config release && make
