@@ -2,6 +2,10 @@ If you implement any of these features please remove it
 from this list and in case it was suggested by someone
 else give proper credit in the ChangeLog file!
 
+- CI: Add clang additionally to gcc
+
+- CI: Add Windows run
+
 - All file chooser dialogs: save last folder (suggested by boris_)
 
 - remember hardware device choice (suggested by K9_)
