@@ -6,6 +6,7 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 
 ## Current status
 ✅ Compatibility with Qt6
+
 ❌ Compatibility with hashcat 7.x (WIP)
 
 ## Compile from source
