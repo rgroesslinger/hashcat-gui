@@ -176,6 +176,8 @@ private slots:
 
     void on_checkBox_hc_custom4_toggled(bool checked);
 
+    void on_actionAbout_Qt_triggered();
+
 private:
     Ui::MainWindow *ui;
 

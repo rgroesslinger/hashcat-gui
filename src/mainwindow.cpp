@@ -288,6 +288,11 @@ void MainWindow::on_actionOclHashcatLite_EULA_triggered()
     eula->show();
 }
 
+void MainWindow::on_actionAbout_Qt_triggered()
+{
+    QApplication::aboutQt();
+}
+
 void MainWindow::on_actionHelp_About_triggered()
 {
     aboutDialog *about = new aboutDialog();
@@ -1452,4 +1457,5 @@ void MainWindow::on_pushButton_oclhclite_execute_clicked()
 }
 
 /**********************************************************/
+
 
