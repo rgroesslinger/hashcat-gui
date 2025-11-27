@@ -22,6 +22,6 @@ jobs:
       - name: Compile
         run: |
           cd src/
-          qmake6
+          qmake6 -config release
           make
 
