@@ -1,5 +1,6 @@
 hashcat-gui-0.5.2-dev
 	- show scrollbars if necessary
+	- compatibility with Qt6
 
 hashcat-gui-0.5.1 (25 March 2012)
 	- update to hashcat v0.39
