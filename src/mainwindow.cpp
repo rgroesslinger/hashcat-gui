@@ -554,7 +554,7 @@ void MainWindow::on_toolButton_hc_wordlist_sort_desc_clicked()
     ui->listWidget_hc_wordlist->setCurrentRow(currentRow + 1);
 }
 
-void MainWindow::on_listWidget_hc_wordlist_itemClicked(QListWidgetItem* item)
+void MainWindow::on_listWidget_hc_wordlist_itemClicked([[maybe_unused]] QListWidgetItem* item)
 {
     ui->pushButton_hc_remove_wordlist->setEnabled(true);
     ui->toolButton_hc_wordlist_sort_asc->setEnabled(true);
@@ -610,7 +610,7 @@ void MainWindow::on_pushButton_hc_output_clicked()
     }
 }
 
-void MainWindow::on_comboBox_hc_attack_currentIndexChanged(int index)
+void MainWindow::on_comboBox_hc_attack_currentIndexChanged([[maybe_unused]] int index)
 {
     hc_update_view_attack_mode();
 }
@@ -723,7 +723,7 @@ void MainWindow::on_radioButton_hc_rules_generated_toggled(bool checked)
     ui->spinBox_hc_rules->setEnabled(checked);
 }
 
-void MainWindow::on_lineEdit_hc_open_hashfile_textChanged(const QString &arg1)
+void MainWindow::on_lineEdit_hc_open_hashfile_textChanged([[maybe_unused]] const QString &arg1)
 {
     this->set_outfile_path(0);
 }
@@ -871,7 +871,7 @@ void MainWindow::on_pushButton_hc_execute_clicked()
 
 /********* oclHashcat-plus / cudaHashcat-plus *********************/
 
-void MainWindow::on_comboBox_oclhcplus_attack_currentIndexChanged(int index)
+void MainWindow::on_comboBox_oclhcplus_attack_currentIndexChanged([[maybe_unused]] int index)
 {
     oclhcplus_update_view_attack_mode();
 }
@@ -983,7 +983,7 @@ void MainWindow::on_toolButton_oclhcplus_wordlist_sort_desc_clicked()
     ui->listWidget_oclhcplus_wordlist->setCurrentRow(currentRow + 1);
 }
 
-void MainWindow::on_listWidget_oclhcplus_wordlist_itemClicked(QListWidgetItem* item)
+void MainWindow::on_listWidget_oclhcplus_wordlist_itemClicked([[maybe_unused]] QListWidgetItem* item)
 {
     ui->pushButton_oclhcplus_remove_wordlist->setEnabled(true);
     ui->toolButton_oclhcplus_wordlist_sort_asc->setEnabled(true);
@@ -1081,7 +1081,7 @@ void MainWindow::on_checkBox_oclhcplus_outfile_toggled(bool checked)
     ui->pushButton_oclhcplus_output->setEnabled(checked);
 }
 
-void MainWindow::on_lineEdit_oclhcplus_open_hashfile_textChanged(const QString &arg1)
+void MainWindow::on_lineEdit_oclhcplus_open_hashfile_textChanged([[maybe_unused]] const QString &arg1)
 {
     this->set_outfile_path(1);
 }
@@ -1321,7 +1321,7 @@ void MainWindow::on_checkBox_oclhclite_limit_plain_toggled(bool checked)
     ui->lineEdit_oclhclite_limit_plain->setEnabled(checked);
 }
 
-void MainWindow::on_lineEdit_oclhclite_hash_textChanged(const QString &arg1)
+void MainWindow::on_lineEdit_oclhclite_hash_textChanged([[maybe_unused]] const QString &arg1)
 {
     this->set_outfile_path(2);
 }
