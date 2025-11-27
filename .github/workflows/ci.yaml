@@ -21,6 +21,7 @@ jobs:
 
       - name: Compile
         run: |
+          cd src/
           qmake6
           make
 
