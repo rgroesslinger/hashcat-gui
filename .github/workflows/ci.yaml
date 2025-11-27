@@ -16,7 +16,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt install -y qt6-base-dev
+          sudo apt install -y qt6-base-dev qmake6
 
       - name: Compile
         run: |
