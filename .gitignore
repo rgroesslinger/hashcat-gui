@@ -1,1 +1,9 @@
+src/.qmake.stash
+src/qrc_resources.cpp
 src/hashcat-gui.pro.user
+src/hashcat-gui
+src/Makefile
+src/build/
+src/*.o
+src/moc_*
+src/ui_*
