@@ -1,8 +1,15 @@
 ![hashcat-gui](/screenshot.png)
 
-hashcat-gui is a graphical user interface for the hashcat tools "hashcat",
-"oclHashcat-plus" and "oclHashcat-lite" available at http://hashcat.net/
+# hashcat-gui
 
-It merely acts as a command line generator and starts the appropriate hashcat
-executable with certain parameters. It does not include any source code from hashcat
-itself or link against any hashcat libraries.
+A graphical user interface for the password recovery utility [hashcat](https://github.com/hashcat/hashcat/).
+
+## Current status
+✅ Compatibility with Qt6
+❌ Compatibility with hashcat 7.x (WIP)
+
+## Compile from source
+```
+qmake -config release
+make
+```
