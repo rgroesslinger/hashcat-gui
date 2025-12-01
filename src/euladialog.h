@@ -48,7 +48,7 @@ private slots:
 private:
     Ui::eulaDialog *ui;
 
-    QProcess *proc;
+    QProcess *proc_hc;
 };
 
 #endif // EULADIALOG_H

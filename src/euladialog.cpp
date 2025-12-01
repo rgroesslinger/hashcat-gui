@@ -45,34 +45,30 @@ void eulaDialog::get_eula(QMap <QString, QString> &info, quint16 hc_type) {
 #if defined(Q_WS_WIN)
     switch(hc_type) {
     case 0: exec = info.value("dir_hc") + info.value("cmd_hc"); workDir = info.value("dir_hc"); break;
-    case 1: exec = info.value("dir_oclhcplus") + info.value("cmd_oclhcplus"); workDir = info.value("dir_oclhcplus"); break;
-    case 2: exec = info.value("dir_oclhclite") + info.value("cmd_oclhclite"); workDir = info.value("dir_oclhclite"); break;
     }
 #else
     switch(hc_type) {
     case 0: exec = info.value("dir_current") + info.value("cmd_hc"); workDir = info.value("dir_hc"); break;
-    case 1: exec = info.value("dir_current") + info.value("cmd_oclhcplus"); workDir = info.value("dir_oclhcplus"); break;
-    case 2: exec = info.value("dir_current") + info.value("cmd_oclhclite"); workDir = info.value("dir_oclhclite"); break;
     }
 #endif
 
     ui->textEdit_eula_text->clear();
-    proc = new QProcess(this);
-    proc->setWorkingDirectory(workDir);
-    connect(proc, SIGNAL(readyRead()), this, SLOT(readFromStdout()) );
-    connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished_proc()) );
-    connect(proc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(proc_error(QProcess::ProcessError)) );
-    proc->start(exec, QStringList() << "--eula");
+    proc_hc = new QProcess(this);
+    proc_hc->setWorkingDirectory(workDir);
+    connect(proc_hc, SIGNAL(readyRead()), this, SLOT(readFromStdout()) );
+    connect(proc_hc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished_proc()) );
+    connect(proc_hc, SIGNAL(error(QProcess::ProcessError)), this, SLOT(proc_error(QProcess::ProcessError)) );
+    proc_hc->start(exec, QStringList() << "--eula");
 }
 
 void eulaDialog::readFromStdout()
 {
-    while (proc->canReadLine())
-        ui->textEdit_eula_text->insertPlainText(proc->readLine());
+    while (proc_hc->canReadLine())
+        ui->textEdit_eula_text->insertPlainText(proc_hc->readLine());
 }
 
 void eulaDialog::finished_proc() {
-    this->proc = NULL;
+    this->proc_hc = NULL;
 }
 
 void eulaDialog::proc_error(QProcess::ProcessError error) {

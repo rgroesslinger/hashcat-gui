@@ -3140,8 +3140,6 @@
      <string>Help</string>
     </property>
     <addaction name="actionHashcat_EULA"/>
-    <addaction name="actionOclHashcatPlus_EULA"/>
-    <addaction name="actionOclHashcatLite_EULA"/>
     <addaction name="separator"/>
     <addaction name="actionAbout_Qt"/>
     <addaction name="actionHelp_About"/>
@@ -3180,22 +3178,6 @@
   <action name="actionHashcat_EULA">
    <property name="text">
     <string>hashcat EULA</string>
-   </property>
-  </action>
-  <action name="actionOclHashcatPlus_EULA">
-   <property name="text">
-    <string>oclHashcat-plus EULA</string>
-   </property>
-   <property name="toolTip">
-    <string>oclHashcat-plus EULA</string>
-   </property>
-  </action>
-  <action name="actionOclHashcatLite_EULA">
-   <property name="text">
-    <string>oclHashcat-lite EULA</string>
-   </property>
-   <property name="toolTip">
-    <string>oclHashcat-lite EULA</string>
    </property>
   </action>
   <action name="actionAbout_Qt">
@@ -4880,7 +4862,7 @@
   <slot>oclhcliteCommandChanged()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="buttonGroup_hc_rules"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_hc_rules"/>
  </buttongroups>
 </ui>

@@ -65,8 +65,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         envInfo.insert("cmd_oclhclite", "oclHashcat-lite" + envInfo.value("wordsize") + fileExt);
         ui->tabWidget_main->setTabText(1, "oclHashcat-plus");
         ui->tabWidget_main->setTabText(2, "oclHashcat-lite");
-        ui->actionOclHashcatPlus_EULA->setText("oclHashcat-plus EULA");
-        ui->actionOclHashcatLite_EULA->setText("oclHashcat-lite EULA");
         ui->checkBox_oclhcplus_async->setVisible(false);
         ui->checkBox_oclhclite_async->setVisible(false);
     } else if (msgBox.clickedButton() == nvidiaButton) {
@@ -74,13 +72,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         envInfo.insert("cmd_oclhclite", "cudaHashcat-lite" + envInfo.value("wordsize") + fileExt);
         ui->tabWidget_main->setTabText(1, "cudaHashcat-plus");
         ui->tabWidget_main->setTabText(2, "cudaHashcat-lite");
-        ui->actionOclHashcatPlus_EULA->setText("cudaHashcat-plus EULA");
-        ui->actionOclHashcatLite_EULA->setText("cudaHashcat-lite EULA");
     } else if (msgBox.clickedButton() == otherButton) {
         ui->tab_oclhcplus->setEnabled(false);
         ui->tab_oclhclite->setEnabled(false);
-        ui->actionOclHashcatPlus_EULA->setVisible(false);
-        ui->actionOclHashcatLite_EULA->setVisible(false);
     }
 
     this->init_hash_and_attack_modes();
@@ -269,22 +263,6 @@ void MainWindow::on_actionHashcat_EULA_triggered()
     eulaDialog *eula = new eulaDialog();
     QMap <QString, QString> &info = envInfo;
     eula->get_eula(info, 0);
-    eula->show();
-}
-
-void MainWindow::on_actionOclHashcatPlus_EULA_triggered()
-{
-    eulaDialog *eula = new eulaDialog();
-    QMap <QString, QString> &info = envInfo;
-    eula->get_eula(info, 1);
-    eula->show();
-}
-
-void MainWindow::on_actionOclHashcatLite_EULA_triggered()
-{
-    eulaDialog *eula = new eulaDialog();
-    QMap <QString, QString> &info = envInfo;
-    eula->get_eula(info, 2);
     eula->show();
 }
 

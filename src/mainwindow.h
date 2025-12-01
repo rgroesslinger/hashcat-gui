@@ -68,10 +68,6 @@ private slots:
 
     void on_actionHashcat_EULA_triggered();
 
-    void on_actionOclHashcatPlus_EULA_triggered();
-
-    void on_actionOclHashcatLite_EULA_triggered();
-
     void on_toolButton_hc_wordlist_sort_asc_clicked();
 
     void on_toolButton_hc_wordlist_sort_desc_clicked();
