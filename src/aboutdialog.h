@@ -40,20 +40,12 @@ private slots:
 
     void read_hc();
 
-    void read_oclhcplus();
-
-    void read_oclhclite();
-
     void finished_proc_hc();
-
-    void finished_proc_oclhcplus();
-
-    void finished_proc_oclhclite();
 
 private:
     Ui::aboutdialog *ui;
 
-    QProcess *proc_hc, *proc_oclhc, *proc_oclhcplus, *proc_oclhclite;
+    QProcess *proc_hc;
 };
 
 #endif // ABOUTDIALOG_H

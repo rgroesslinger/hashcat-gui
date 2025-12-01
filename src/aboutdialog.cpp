@@ -43,12 +43,8 @@ void aboutDialog::get_versions(QMap <QString, QString> &info) {
 
 #if defined(Q_WS_WIN)
     QString exec_hc = info.value("dir_hc") + info.value("cmd_hc");
-    QString exec_oclhcplus = info.value("dir_oclhcplus") + info.value("cmd_oclhcplus");
-    QString exec_oclhclite = info.value("dir_oclhclite") + info.value("cmd_oclhclite");
 #else
     QString exec_hc = info.value("dir_current") + info.value("cmd_hc");
-    QString exec_oclhcplus = info.value("dir_current") + info.value("cmd_oclhcplus");
-    QString exec_oclhclite = info.value("dir_current") + info.value("cmd_oclhclite");
 #endif
 
 
@@ -62,28 +58,6 @@ void aboutDialog::get_versions(QMap <QString, QString> &info) {
         proc_hc->start(exec_hc, QStringList() << "--version");
         ui->label_hc_version_text->setText(info.value("cmd_hc"));
     }
-
-    if(info.value("cmd_oclhcplus").length() > 0) {
-        proc_oclhcplus = new QProcess(this);
-        proc_oclhcplus->setWorkingDirectory(info.value("dir_oclhcplus"));
-
-        connect(proc_oclhcplus, SIGNAL(readyRead()), this, SLOT(read_oclhcplus()) );
-        connect(proc_oclhcplus, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished_proc_oclhcplus()) );
-
-        proc_oclhcplus->start(exec_oclhcplus, QStringList() << "--version");
-        ui->label_oclhcplus_version_text->setText(info.value("cmd_oclhcplus"));
-    }
-
-    if(info.value("cmd_oclhclite").length() > 0) {
-        proc_oclhclite = new QProcess(this);
-        proc_oclhclite->setWorkingDirectory(info.value("dir_oclhclite"));
-
-        connect(proc_oclhclite, SIGNAL(readyRead()), this, SLOT(read_oclhclite()) );
-        connect(proc_oclhclite, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished_proc_oclhclite()) );
-
-        proc_oclhclite->start(exec_oclhclite, QStringList() << "--version");
-        ui->label_oclhclite_version_text->setText(info.value("cmd_oclhclite"));
-    }
 }
 
 void aboutDialog::read_hc()
@@ -92,26 +66,6 @@ void aboutDialog::read_hc()
         ui->label_hc_version->setText(proc_hc->readLine().replace("\n", ""));
 }
 
-void aboutDialog::read_oclhcplus()
-{
-    while (proc_oclhcplus->canReadLine())
-        ui->label_oclhcplus_version->setText(proc_oclhcplus->readLine().replace("\n", ""));
-}
-
-void aboutDialog::read_oclhclite()
-{
-    while (proc_oclhclite->canReadLine())
-        ui->label_oclhclite_version->setText(proc_oclhclite->readLine().replace("\n", ""));
-}
-
 void aboutDialog::finished_proc_hc() {
     this->proc_hc = NULL;
-}
-
-void aboutDialog::finished_proc_oclhcplus() {
-    this->proc_oclhcplus = NULL;
-}
-
-void aboutDialog::finished_proc_oclhclite() {
-    this->proc_oclhclite = NULL;
 }
