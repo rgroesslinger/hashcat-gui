@@ -13,6 +13,7 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 
 ## Compile from source
 ```
+cd src/
 qmake -config release
 make
 ```
