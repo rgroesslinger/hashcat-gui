@@ -47,7 +47,6 @@ void aboutDialog::get_versions(QMap <QString, QString> &info) {
     QString exec_hc = info.value("dir_current") + info.value("cmd_hc");
 #endif
 
-
     if(info.value("cmd_hc").length() > 0) {
         proc_hc = new QProcess(this);
         proc_hc->setWorkingDirectory(info.value("dir_hc"));
@@ -58,6 +57,8 @@ void aboutDialog::get_versions(QMap <QString, QString> &info) {
         proc_hc->start(exec_hc, QStringList() << "--version");
         ui->label_hc_version_text->setText(info.value("cmd_hc"));
     }
+
+    ui->label_hc_gui_version->setText(APP_VERSION);
 }
 
 void aboutDialog::read_hc()
