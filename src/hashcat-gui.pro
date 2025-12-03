@@ -1,8 +1,10 @@
+VERSION = 0.6-dev
+DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+
 QT       += core gui widgets
 
 TARGET = hashcat-gui
 TEMPLATE = app
-
 
 SOURCES += main.cpp\
         mainwindow.cpp \
