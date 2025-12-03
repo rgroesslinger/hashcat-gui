@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     envInfo.insert("dir_oclhcplus", "./oclHashcat-plus/");
     envInfo.insert("dir_oclhclite", "./oclHashcat-lite/");
 #endif
-    envInfo.insert("cmd_hc", "hashcat-cli" + envInfo.value("wordsize") + fileExt);
+    envInfo.insert("cmd_hc", "hashcat" + fileExt);
 
     ui->setupUi(this);
 
