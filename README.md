@@ -15,7 +15,7 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 ```
 git clone https://github.com/rgroesslinger/hashcat-gui
 ```
-or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/).
+or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working development environment with QtCreator you can open `hashcat-gui.pro` in QtCreator and `Build ➔ Run`
 
 ### Linux
 #### Debian/Ubuntu
@@ -42,7 +42,7 @@ aqt.exe install-qt windows desktop 6.10.1 win64_msvc2022_64
 
 #### Install C++ compiler and Windows SDK
 - You may have to adjust version numbers in directories to match your local installation. Also make sure to run all commands in the same cmd session to keep environment variables!
-- Download [Build Tools for Visual Studio](https://visualstudio.microsoft.com/downloads/) (All Downloads -> Tools for Visual Studio -> Build Tools for Visual Studio)
+- Download [Build Tools for Visual Studio](https://visualstudio.microsoft.com/downloads/) (All Downloads ➔ Tools for Visual Studio ➔ Build Tools for Visual Studio)
 - Select "Desktop development with C++" or needed components only:
 	- MSVC Build Tools for x64/x86 (Latest)
 	- Windows 11 SDK
