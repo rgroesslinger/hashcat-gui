@@ -273,7 +273,7 @@ void MainWindow::on_actionAbout_Qt_triggered()
 
 void MainWindow::on_actionHelp_About_triggered()
 {
-    aboutDialog *about = new aboutDialog();
+    aboutDialog *about = new aboutDialog(this);
     QMap <QString, QString> &info = envInfo;
     about->get_versions(info);
     about->show();
