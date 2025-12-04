@@ -1,21 +1,26 @@
 VERSION = 0.6-dev
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
-QT       += core gui widgets
+QT += core gui widgets
+CONFIG += c++17
+QMAKE_CXXFLAGS += -Wall
 
 TARGET = hashcat-gui
 TEMPLATE = app
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
+SOURCES += \
+    main.cpp\
+    mainwindow.cpp \
     euladialog.cpp \
     aboutdialog.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS += \
+    mainwindow.h \
     euladialog.h \
     aboutdialog.h
 
-FORMS    += mainwindow.ui \
+FORMS += \
+    mainwindow.ui \
     euladialog.ui \
     aboutdialog.ui
 

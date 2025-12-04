@@ -1,13 +1,19 @@
 name: CI Build
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
 jobs:
   build:
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
+        include:
+          - compiler: gcc
+            qmake_spec: linux-g++
+          - compiler: clang
+            qmake_spec: linux-clang
     runs-on: ubuntu-latest
 
     steps:
@@ -17,11 +23,11 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential qt6-base-dev qmake6
+          sudo apt install -y build-essential clang qt6-base-dev qmake6
 
-      - name: Compile
+      - name: Build with ${matrix.compiler}
         run: |
           cd src/
-          qmake6 -config release
+          qmake6 -config release -spec ${{ matrix.qmake_spec }}
           make
 
