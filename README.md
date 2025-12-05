@@ -1,7 +1,6 @@
 ![hashcat-gui](/screenshot.png)
 
 # hashcat-gui
-
 A graphical user interface for the password recovery utility [hashcat](https://github.com/hashcat/hashcat/).
 
 ## Current status
@@ -11,7 +10,7 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 
 ❌ Compatibility with hashcat 7.x (WIP)
 
-## Compile from source
+## Build from source
 ```
 git clone https://github.com/rgroesslinger/hashcat-gui
 ```
@@ -25,6 +24,7 @@ cd hashcat-gui/src/
 qmake6 -config release
 make
 ```
+
 #### Fedora
 ```
 dnf install qt6-qtbase-devel
@@ -34,31 +34,22 @@ make
 ```
 
 ### Windows
-#### Install Qt
-- Download [Qt for Open Source](https://www.qt.io/development/download-qt-installer-oss/) or install Qt via [aqt.exe](https://github.com/miurahr/aqtinstall/releases/)
+- open cmd.exe
+- install Qt via [aqt](https://github.com/miurahr/aqtinstall/)
 ```
-aqt.exe install-qt windows desktop 6.10.1 win64_msvc2022_64
+winget install -e --id miurahr.aqtinstall
+aqt.exe install-qt windows desktop 6.10.1 win64_msvc2022_64 -O C:\Qt
 ```
-
-#### Install C++ compiler and Windows SDK
-- You may have to adjust version numbers in directories to match your local installation. Also make sure to run all commands in the same cmd session to keep environment variables!
-- Download [Build Tools for Visual Studio](https://visualstudio.microsoft.com/downloads/) (All Downloads ➔ Tools for Visual Studio ➔ Build Tools for Visual Studio)
-- Select "Desktop development with C++" or needed components only:
-	- MSVC Build Tools for x64/x86 (Latest)
-	- Windows 11 SDK
-- Open cmd.exe
-- Run *vcvars64.bat* in terminal to prepare development environment
+- Install MSVC Build Tools and Windows SDK
 ```
-"C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+winget install -e --id Microsoft.VisualStudio.Community --custom "--add Microsoft.VisualStudio.Component.Windows11SDK.26100 --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 ```
-- Set PATH, INCLUDE and LIBPATH environment
+- Add Qt to PATH and run *vcvars64.bat* to prepare development environment
 ```
 set PATH=%PATH%;C:\Qt\6.10.1\msvc2022_64\bin
-set PATH=%PATH%;C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64
-set INCLUDE=%INCLUDE%;C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt
-set LIBPATH=%LIBPATH%;C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\x64
+"C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
 ```
-- Compile
+- Build
 ```
 cd hashcat-gui\src
 qmake -config release
