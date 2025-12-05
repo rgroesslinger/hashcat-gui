@@ -1,7 +1,7 @@
-![hashcat-gui](/screenshot.png)
-
 # hashcat-gui
 A graphical user interface for the password recovery utility [hashcat](https://github.com/hashcat/hashcat/).
+
+![hashcat-gui](/screenshot.png)
 
 ## Current status
 [![CI Build](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yaml/badge.svg)](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yaml)
@@ -14,22 +14,21 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 ```
 git clone https://github.com/rgroesslinger/hashcat-gui
 ```
-or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working development environment with QtCreator you can open `hashcat-gui.pro` in QtCreator and `Build ➔ Run`
+or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working development environment with QtCreator you can open `hashcat-gui.pro` in QtCreator and `Build ➔ Run`.
 
 ### Linux
-#### Debian/Ubuntu
+- Install dependencies
+
+| Distribution | Package installation command |
+| - | ----- |
+| Debian/Ubuntu | `apt install build-essential qt6-base-dev qmake6` |
+| Fedora | `dnf install @c-development qt6-qtbase-devel` |
+| openSUSE | `zypper install -t pattern devel_basis && zypper install qt6-base-devel` |
+
+- Build
 ```
-apt install build-essential qt6-base-dev qmake6
 cd hashcat-gui/src/
 qmake6 -config release
-make
-```
-
-#### Fedora
-```
-dnf install qt6-qtbase-devel
-cd hashcat-gui/src/
-qmake -config release
 make
 ```
 
