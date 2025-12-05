@@ -1,6 +1,3 @@
-VERSION = 0.6-dev
-DEFINES += APP_VERSION=\\\"$$VERSION\\\"
-
 QT += core gui widgets
 CONFIG += c++17
 QMAKE_CXXFLAGS += -Wall

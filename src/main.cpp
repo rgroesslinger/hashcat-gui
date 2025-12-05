@@ -22,6 +22,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setApplicationVersion("0.6.0-dev");
     MainWindow w;
     w.show();
 

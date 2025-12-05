@@ -58,7 +58,7 @@ void aboutDialog::get_versions(QMap <QString, QString> &info) {
         ui->label_hc_version_text->setText(info.value("cmd_hc"));
     }
 
-    ui->label_hc_gui_version->setText(APP_VERSION);
+    ui->label_hc_gui_version->setText(QApplication::applicationVersion());
 }
 
 void aboutDialog::read_hc()
