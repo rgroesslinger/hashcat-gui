@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential g++ clang qt6-base-dev qmake6
+          sudo apt install -y build-essential g++ clang qt6-base-dev
 
       - name: Build with ${{ matrix.compiler }}
         run: |

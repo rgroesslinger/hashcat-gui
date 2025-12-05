@@ -21,9 +21,10 @@ or download latest [source release](https://github.com/rgroesslinger/hashcat-gui
 
 | Distribution | Package installation command |
 | - | ----- |
-| Debian/Ubuntu | `apt install build-essential qt6-base-dev qmake6` |
+| Debian/Ubuntu | `apt install build-essential qt6-base-dev` |
 | Fedora | `dnf install @c-development qt6-qtbase-devel` |
 | openSUSE | `zypper install -t pattern devel_basis && zypper install qt6-base-devel` |
+| Arch | `pacman -S --needed base-devel qt6-base` |
 
 - Build
 ```
