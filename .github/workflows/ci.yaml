@@ -29,5 +29,5 @@ jobs:
         run: |
           cd src/
           qmake6 -config release -spec ${{ matrix.qmake_spec }}
-          make -j4
+          make
 

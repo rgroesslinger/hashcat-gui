@@ -1,6 +1,5 @@
 QT += core gui widgets
-CONFIG += c++17
-QMAKE_CXXFLAGS += -Wall
+CONFIG += c++17 warn_on
 
 TARGET = hashcat-gui
 TEMPLATE = app
