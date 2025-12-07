@@ -34,24 +34,18 @@ make
 ```
 
 ### Windows
-- open cmd.exe
-- install Qt via [aqt](https://github.com/miurahr/aqtinstall/)
+- Install [msys2](https://www.msys2.org/) and launch the `MSYS2 UCRT64` terminal
+
+- Install dependencies
 ```
-winget install -e --id miurahr.aqtinstall
-aqt.exe install-qt windows desktop 6.10.1 win64_msvc2022_64 -O C:\Qt
+pacman -S mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-qt6-base
 ```
-- Install MSVC Build Tools and Windows SDK
-```
-winget install -e --id Microsoft.VisualStudio.Community --custom "--add Microsoft.VisualStudio.Component.Windows11SDK.26100 --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
-```
-- Add Qt to PATH and prepare MSVC development environment
-```
-setx PATH "%PATH%;C:\Qt\6.10.1\msvc2022_64\bin"
-call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
-```
+
 - Build
 ```
-cd hashcat-gui\src
+cd hashcat-gui/src/
 qmake6 -config release
-nmake
+make
 ```
+
+If you want to launch `hashcat-gui.exe` from outside the MSYS2 terminal you need to add `C:\msys64\ucrt64\bin` to your PATH.

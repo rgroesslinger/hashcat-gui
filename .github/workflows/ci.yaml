@@ -8,13 +8,13 @@ jobs:
   build:
     strategy:
       matrix:
-        qmake_spec: [linux-g++, linux-clang, win32-msvc]
+        qmake_spec: [linux-g++, linux-clang, win32-g++]
         include:
           - qmake_spec: linux-g++
             runs-on: ubuntu-latest
           - qmake_spec: linux-clang
             runs-on: ubuntu-latest
-          - qmake_spec: win32-msvc
+          - qmake_spec: win32-g++
             runs-on: windows-latest
     runs-on: ${{ matrix.runs-on }}
 
@@ -37,18 +37,21 @@ jobs:
           make
 
       # ----- Windows jobs -----
-      - name: Install Qt (Windows)
+      - name: Set up MSYS2 with UCRT64 (Windows)
         if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v4
+        uses: msys2/setup-msys2@v2
         with:
-          target: 'desktop'
-          arch: 'win64_msvc2022_64'
+          msystem: 'UCRT64'
+          update: true
+          install: |
+            mingw-w64-ucrt-x86_64-make
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-qt6-base
 
       - name: Build with ${{ matrix.qmake_spec }} (Windows)
         if: runner.os == 'Windows'
-        shell: cmd
+        shell: msys2 {0}
         run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd src/
           qmake6 -config release -spec ${{ matrix.qmake_spec }}
-          nmake
+          make
