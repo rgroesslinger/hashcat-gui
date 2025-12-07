@@ -8,26 +8,47 @@ jobs:
   build:
     strategy:
       matrix:
-        compiler: [gcc, clang]
+        qmake_spec: [linux-g++, linux-clang, win32-msvc]
         include:
-          - compiler: gcc
-            qmake_spec: linux-g++
-          - compiler: clang
-            qmake_spec: linux-clang
-    runs-on: ubuntu-latest
+          - qmake_spec: linux-g++
+            runs-on: ubuntu-latest
+          - qmake_spec: linux-clang
+            runs-on: ubuntu-latest
+          - qmake_spec: win32-msvc
+            runs-on: windows-latest
+    runs-on: ${{ matrix.runs-on }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install dependencies
+      # ----- Linux jobs -----
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
         run: |
           sudo apt update
           sudo apt install -y build-essential g++ clang qt6-base-dev
 
-      - name: Build with ${{ matrix.compiler }}
+      - name: Build with ${{ matrix.qmake_spec }} (Linux)
+        if: runner.os == 'Linux'
         run: |
           cd src/
           qmake6 -config release -spec ${{ matrix.qmake_spec }}
           make
 
+      # ----- Windows jobs -----
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        uses: jurplel/install-qt-action@v4
+        with:
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+
+      - name: Build with ${{ matrix.qmake_spec }} (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cd src/
+          qmake6 -config release -spec ${{ matrix.qmake_spec }}
+          nmake

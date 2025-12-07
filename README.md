@@ -44,16 +44,14 @@ aqt.exe install-qt windows desktop 6.10.1 win64_msvc2022_64 -O C:\Qt
 ```
 winget install -e --id Microsoft.VisualStudio.Community --custom "--add Microsoft.VisualStudio.Component.Windows11SDK.26100 --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 ```
-- Add Qt to PATH and run *vcvars64.bat* to prepare development environment
+- Add Qt to PATH and prepare MSVC development environment
 ```
-set PATH=%PATH%;C:\Qt\6.10.1\msvc2022_64\bin
-"C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
+setx PATH "%PATH%;C:\Qt\6.10.1\msvc2022_64\bin"
+call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvars64.bat"
 ```
 - Build
 ```
 cd hashcat-gui\src
-qmake -config release
+qmake6 -config release
 nmake
-cd release
-hashcat-gui.exe
 ```
