@@ -41,7 +41,7 @@ jobs:
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: 'UCRT64'
+          msystem: UCRT64
           update: true
           install: |
             mingw-w64-ucrt-x86_64-make
@@ -54,4 +54,4 @@ jobs:
         run: |
           cd src/
           qmake6 -config release -spec ${{ matrix.qmake_spec }}
-          make
+          mingw32-make

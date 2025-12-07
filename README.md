@@ -45,7 +45,7 @@ pacman -S mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x8
 ```
 cd hashcat-gui/src/
 qmake6 -config release
-make
+mingw32-make
 ```
 
 If you want to launch `hashcat-gui.exe` from outside the MSYS2 terminal you need to add `C:\msys64\ucrt64\bin` to your PATH.
