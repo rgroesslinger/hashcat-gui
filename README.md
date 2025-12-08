@@ -34,11 +34,11 @@ make
 ```
 
 ### Windows
-- Install [msys2](https://www.msys2.org/) and launch the `MSYS2 UCRT64` terminal
+- Install [MSYS2](https://www.msys2.org/) and launch the `MSYS2 UCRT64` terminal
 
 - Install dependencies
 ```
-pacman -S mingw-w64-ucrt-x86_64-make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-qt6-base
+pacman -S mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-qt6-base
 ```
 
 - Build
@@ -48,4 +48,4 @@ qmake6 -config release
 mingw32-make
 ```
 
-If you want to launch `hashcat-gui.exe` from outside the MSYS2 terminal you need to add `C:\msys64\ucrt64\bin` to your PATH.
+To launch `hashcat-gui.exe` from outside the MSYS2 terminal you need to add `C:\msys64\ucrt64\bin` to your PATH.
