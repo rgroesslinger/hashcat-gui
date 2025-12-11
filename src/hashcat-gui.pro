@@ -8,12 +8,14 @@ SOURCES += \
     main.cpp\
     mainwindow.cpp \
     euladialog.cpp \
-    aboutdialog.cpp
+    aboutdialog.cpp \
+    settingsmanager.cpp
 
 HEADERS += \
     mainwindow.h \
     euladialog.h \
-    aboutdialog.h
+    aboutdialog.h \
+    settingsmanager.h
 
 FORMS += \
     mainwindow.ui \
