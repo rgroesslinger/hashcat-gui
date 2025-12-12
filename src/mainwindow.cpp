@@ -15,7 +15,6 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QProcess>
-#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {

@@ -12,7 +12,7 @@ class HelperUtils
 {
 public:
     HelperUtils();
-    static QString executeHashcat(const QStringList& args);
+    static QString executeHashcat(QStringList& args);
 };
 
 #endif // HELPERUTILS_H

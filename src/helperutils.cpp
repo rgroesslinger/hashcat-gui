@@ -11,14 +11,19 @@
 HelperUtils::HelperUtils() {}
 
 // Execute hashcat and return its output
-QString HelperUtils::executeHashcat(const QStringList& args) {
+QString HelperUtils::executeHashcat(QStringList& args) {
     QProcess process;
     QString output;
 
     auto& settings = SettingsManager::instance();
 
+    // Always run in quiet mode when reading output
+    args << "--quiet";
+
     if (!settings.hashcatPath().isEmpty()) {
-        process.start(settings.hashcatPath(), args);
+        process.setProgram(settings.hashcatPath());
+        process.setArguments(args);
+        process.start();
         process.waitForFinished();
         output = process.readAllStandardOutput();
     }

@@ -14,7 +14,7 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 ```
 git clone https://github.com/rgroesslinger/hashcat-gui
 ```
-or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working development environment with QtCreator you can open `hashcat-gui.pro` in QtCreator and `Build ➔ Run`.
+or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working development environment with Qt Creator you can open `hashcat-gui.pro` and `Build ➔ Run`.
 
 ### Linux
 - Install dependencies
