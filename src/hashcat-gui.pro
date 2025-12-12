@@ -5,22 +5,24 @@ TARGET = hashcat-gui
 TEMPLATE = app
 
 SOURCES += \
+    helperutils.cpp \
     main.cpp\
     mainwindow.cpp \
-    euladialog.cpp \
     aboutdialog.cpp \
+    settingsdialog.cpp \
     settingsmanager.cpp
 
 HEADERS += \
+    helperutils.h \
     mainwindow.h \
-    euladialog.h \
     aboutdialog.h \
+    settingsdialog.h \
     settingsmanager.h
 
 FORMS += \
     mainwindow.ui \
-    euladialog.ui \
-    aboutdialog.ui
+    aboutdialog.ui \
+    settingsdialog.ui
 
 RESOURCES += \
     resources.qrc
