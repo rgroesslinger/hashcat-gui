@@ -5,8 +5,9 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "euladialog.h"
 #include "aboutdialog.h"
+#include "settingsdialog.h"
+#include "settingsmanager.h"
 #include <QDateTime>
 #include <QDir>
 #include <QFileDialog>
@@ -14,55 +15,13 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QProcess>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
-    envInfo.insert("wordsize", QString::number(QSysInfo::WordSize));
-#if defined(Q_WS_WIN)
-    envInfo.insert("terminal", "cmd.exe");
-    QString fileExt = ".exe";
-    envInfo.insert("dir_current", ".\\");
-    envInfo.insert("dir_hc", ".\\hashcat\\");
-    envInfo.insert("dir_oclhcplus", ".\\oclHashcat-plus\\");
-    envInfo.insert("dir_oclhclite", ".\\oclHashcat-lite\\");
-#else
-    envInfo.insert("terminal", "xterm");
-    QString fileExt = ".bin";
-    envInfo.insert("dir_current", "./");
-    envInfo.insert("dir_hc", "./hashcat/");
-    envInfo.insert("dir_oclhcplus", "./oclHashcat-plus/");
-    envInfo.insert("dir_oclhclite", "./oclHashcat-lite/");
-#endif
-    envInfo.insert("cmd_hc", "hashcat" + fileExt);
-
     ui->setupUi(this);
 
-    QMessageBox msgBox(this);
-    QPushButton *otherButton = msgBox.addButton(tr("CPU only"), QMessageBox::AcceptRole);
-    QPushButton *nvidiaButton = msgBox.addButton(tr("NVIDIA (CUDA)"), QMessageBox::AcceptRole);
-    QPushButton *amdButton = msgBox.addButton(tr("AMD (OpenCL)"), QMessageBox::AcceptRole);
-
-    msgBox.setModal(true);
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.setText("What hardware device would you like to use?");
-    msgBox.exec();
-
-    if (msgBox.clickedButton() == amdButton) {
-        envInfo.insert("cmd_oclhcplus", "oclHashcat-plus" + envInfo.value("wordsize") + fileExt);
-        envInfo.insert("cmd_oclhclite", "oclHashcat-lite" + envInfo.value("wordsize") + fileExt);
-        ui->tabWidget_main->setTabText(1, "oclHashcat-plus");
-        ui->tabWidget_main->setTabText(2, "oclHashcat-lite");
-        ui->checkBox_oclhcplus_async->setVisible(false);
-        ui->checkBox_oclhclite_async->setVisible(false);
-    } else if (msgBox.clickedButton() == nvidiaButton) {
-        envInfo.insert("cmd_oclhcplus", "cudaHashcat-plus" + envInfo.value("wordsize") + fileExt);
-        envInfo.insert("cmd_oclhclite", "cudaHashcat-lite" + envInfo.value("wordsize") + fileExt);
-        ui->tabWidget_main->setTabText(1, "cudaHashcat-plus");
-        ui->tabWidget_main->setTabText(2, "cudaHashcat-lite");
-    } else if (msgBox.clickedButton() == otherButton) {
-        ui->tab_oclhcplus->setEnabled(false);
-        ui->tab_oclhclite->setEnabled(false);
-    }
+    auto& settings = SettingsManager::instance();
 
     this->init_hash_and_attack_modes();
     this->hc_update_view_attack_mode();
@@ -75,6 +34,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->listWidget_oclhcplus_wordlist->model(), SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(oclhcplusCommandChanged()));
     connect(ui->listWidget_oclhcplus_wordlist->model(), SIGNAL(rowsRemoved(const QModelIndex &, int, int)), this, SLOT(oclhcplusCommandChanged()));
     connect(ui->listWidget_oclhcplus_wordlist->model(), SIGNAL(rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)), this, SLOT(oclhcplusCommandChanged()));
+
+    // Show Settings dialog if path to hashcat has not been configured yet
+    if (settings.hashcatPath().isEmpty()) {
+        QMetaObject::invokeMethod(this, [this]() {
+            ui->actionSettings->triggered();
+        }, Qt::QueuedConnection);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -240,17 +206,16 @@ void MainWindow::on_actionReset_fields_triggered()
     }
 }
 
+void MainWindow::on_actionSettings_triggered()
+{
+    SettingsDialog *settings = new SettingsDialog(this);
+    settings->show();
+}
+
+
 void MainWindow::on_actionQuit_triggered()
 {
     qApp->quit();
-}
-
-void MainWindow::on_actionHashcat_EULA_triggered()
-{
-    eulaDialog *eula = new eulaDialog();
-    QMap <QString, QString> &info = envInfo;
-    eula->get_eula(info, 0);
-    eula->show();
 }
 
 void MainWindow::on_actionAbout_Qt_triggered()
@@ -261,8 +226,7 @@ void MainWindow::on_actionAbout_Qt_triggered()
 void MainWindow::on_actionHelp_About_triggered()
 {
     aboutDialog *about = new aboutDialog(this);
-    QMap <QString, QString> &info = envInfo;
-    about->get_versions(info);
+    about->get_versions();
     about->show();
 }
 
@@ -1422,5 +1386,4 @@ void MainWindow::on_pushButton_oclhclite_execute_clicked()
 }
 
 /**********************************************************/
-
 

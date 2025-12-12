@@ -31,7 +31,7 @@
        <enum>QTabWidget::TabShape::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="usesScrollButtons">
        <bool>true</bool>
@@ -1279,7 +1279,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-148</y>
              <width>712</width>
              <height>958</height>
             </rect>
@@ -3139,7 +3139,6 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionHashcat_EULA"/>
     <addaction name="separator"/>
     <addaction name="actionAbout_Qt"/>
     <addaction name="actionHelp_About"/>
@@ -3154,6 +3153,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionSettings"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -3175,14 +3175,14 @@
     <string>Quit</string>
    </property>
   </action>
-  <action name="actionHashcat_EULA">
-   <property name="text">
-    <string>hashcat EULA</string>
-   </property>
-  </action>
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>
