@@ -9,23 +9,23 @@
 #include <QDialog>
 
 namespace Ui {
-    class aboutdialog;
+    class AboutDialog;
 }
 
-class aboutDialog : public QDialog
+class AboutDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit aboutDialog(QWidget *parent = nullptr);
-    ~aboutDialog();
+    explicit AboutDialog(QWidget *parent = nullptr);
+    ~AboutDialog();
     void get_versions();
 
 private slots:
     void on_pushButton_about_ok_clicked();
 
 private:
-    Ui::aboutdialog *ui;
+    Ui::AboutDialog *ui;
 };
 
 #endif // ABOUTDIALOG_H

@@ -10,24 +10,24 @@
 #include <QMessageBox>
 #include <QFileInfo>
 
-aboutDialog::aboutDialog(QWidget *parent) :
+AboutDialog::AboutDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::aboutdialog)
+    ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
 }
 
-aboutDialog::~aboutDialog()
+AboutDialog::~AboutDialog()
 {
     delete ui;
 }
 
-void aboutDialog::on_pushButton_about_ok_clicked()
+void AboutDialog::on_pushButton_about_ok_clicked()
 {
     this->close();
 }
 
-void aboutDialog::get_versions() {
+void AboutDialog::get_versions() {
     auto& settings = SettingsManager::instance();
     QFileInfo fileInfo(settings.hashcatPath());
 

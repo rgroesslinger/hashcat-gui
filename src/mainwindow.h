@@ -24,7 +24,6 @@ public:
     ~MainWindow();
 
 private slots:
-
     void on_actionHelp_About_triggered();
 
     void on_pushButton_oclhcplus_execute_clicked();

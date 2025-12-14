@@ -136,7 +136,7 @@ void MainWindow::on_actionAbout_Qt_triggered()
 
 void MainWindow::on_actionHelp_About_triggered()
 {
-    aboutDialog *about = new aboutDialog(this);
+    AboutDialog *about = new AboutDialog(this);
     about->get_versions();
     about->show();
 }
