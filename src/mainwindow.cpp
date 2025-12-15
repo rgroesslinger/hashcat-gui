@@ -8,6 +8,7 @@
 #include "aboutdialog.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
+#include "helperutils.h"
 #include <QDateTime>
 #include <QDir>
 #include <QFileDialog>
@@ -15,6 +16,8 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <QProcess>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -71,58 +74,60 @@ void MainWindow::oclhcplusCommandChanged(QString arg) {
 
 void MainWindow::on_actionReset_fields_triggered()
 {
-//    switch(ui->tabWidget_main->currentIndex()) {
-//    case 1:
-        ui->lineEdit_oclhcplus_open_hashfile->clear();
-        ui->checkBox_oclhcplus_ignoreusername->setChecked(false);
-        ui->checkBox_oclhcplus_remove->setChecked(false);
-        ui->listWidget_oclhcplus_wordlist->clear();
-        ui->comboBox_oclhcplus_attack->setCurrentIndex(0);
-        ui->comboBox_oclhcplus_hash->setCurrentIndex(0);
-        ui->radioButton_oclhcplus_use_rules_file->setChecked(true);
-        ui->checkBox_oclhcplus_rulesfile_1->setChecked(false);
-        ui->checkBox_oclhcplus_rulesfile_2->setChecked(false);
-        ui->checkBox_oclhcplus_rulesfile_3->setChecked(false);
-        ui->lineEdit_oclhcplus_open_rulesfile_1->clear();
-        ui->lineEdit_oclhcplus_open_rulesfile_2->clear();
-        ui->lineEdit_oclhcplus_open_rulesfile_3->clear();
-        ui->spinBox_oclhcplus_generate_rules->setValue(1);
-        ui->spinBox_oclhcplus_password_min->setValue(ui->spinBox_oclhcplus_password_min->minimum());
-        ui->spinBox_oclhcplus_password_max->setValue(ui->spinBox_oclhcplus_password_max->maximum());
-        ui->lineEdit_oclhcplus_mask->clear();
-        ui->checkBox_oclhcplus_custom1->setChecked(false);
-        ui->lineEdit_oclhcplus_custom1->clear();
-        ui->checkBox_oclhcplus_custom2->setChecked(false);
-        ui->lineEdit_oclhcplus_custom2->clear();
-        ui->checkBox_oclhcplus_custom3->setChecked(false);
-        ui->lineEdit_oclhcplus_custom3->clear();
-        ui->checkBox_oclhcplus_custom4->setChecked(false);
-        ui->lineEdit_oclhcplus_custom4->clear();
-        ui->checkBox_oclhcplus_hex_hash->setChecked(false);
-        ui->checkBox_oclhcplus_hex_salt->setChecked(false);
-        ui->spinBox_oclhcplus_password_min->setValue(1);
-        ui->spinBox_oclhcplus_password_max->setValue(16);
-        ui->checkBox_oclhcplus_outfile->setChecked(false);
-        ui->lineEdit_oclhcplus_outfile->clear();
-        ui->comboBox_oclhcplus_outfile_format->setCurrentIndex(2);
-        ui->checkBox_oclhcplus_async->setChecked(false);
-        ui->lineEdit_oclhcplus_cpu_affinity->clear();
-        ui->lineEdit_oclhcplus_devices->setText("0");
-        ui->spinBox_oclhcplus_accel->setValue(8);
-        ui->spinBox_oclhcplus_loops->setValue(256);
-        ui->spinBox_oclhcplus_watchdog->setValue(90);
-        ui->spinBox_oclhcplus_segment->setValue(32);
-        this->oclhcplusCommandChanged();
-//        break;
-//    }
+    ui->lineEdit_oclhcplus_open_hashfile->clear();
+    ui->checkBox_oclhcplus_ignoreusername->setChecked(false);
+    ui->checkBox_oclhcplus_remove->setChecked(false);
+    ui->listWidget_oclhcplus_wordlist->clear();
+    ui->comboBox_oclhcplus_attack->setCurrentIndex(0);
+    ui->comboBox_oclhcplus_hash->setCurrentIndex(0);
+    ui->radioButton_oclhcplus_use_rules_file->setChecked(true);
+    ui->checkBox_oclhcplus_rulesfile_1->setChecked(false);
+    ui->checkBox_oclhcplus_rulesfile_2->setChecked(false);
+    ui->checkBox_oclhcplus_rulesfile_3->setChecked(false);
+    ui->lineEdit_oclhcplus_open_rulesfile_1->clear();
+    ui->lineEdit_oclhcplus_open_rulesfile_2->clear();
+    ui->lineEdit_oclhcplus_open_rulesfile_3->clear();
+    ui->spinBox_oclhcplus_generate_rules->setValue(1);
+    ui->spinBox_oclhcplus_password_min->setValue(ui->spinBox_oclhcplus_password_min->minimum());
+    ui->spinBox_oclhcplus_password_max->setValue(ui->spinBox_oclhcplus_password_max->maximum());
+    ui->lineEdit_oclhcplus_mask->clear();
+    ui->checkBox_oclhcplus_custom1->setChecked(false);
+    ui->lineEdit_oclhcplus_custom1->clear();
+    ui->checkBox_oclhcplus_custom2->setChecked(false);
+    ui->lineEdit_oclhcplus_custom2->clear();
+    ui->checkBox_oclhcplus_custom3->setChecked(false);
+    ui->lineEdit_oclhcplus_custom3->clear();
+    ui->checkBox_oclhcplus_custom4->setChecked(false);
+    ui->lineEdit_oclhcplus_custom4->clear();
+    ui->checkBox_oclhcplus_hex_hash->setChecked(false);
+    ui->checkBox_oclhcplus_hex_salt->setChecked(false);
+    ui->spinBox_oclhcplus_password_min->setValue(1);
+    ui->spinBox_oclhcplus_password_max->setValue(16);
+    ui->checkBox_oclhcplus_outfile->setChecked(false);
+    ui->lineEdit_oclhcplus_outfile->clear();
+    ui->comboBox_oclhcplus_outfile_format->setCurrentIndex(2);
+    ui->checkBox_oclhcplus_async->setChecked(false);
+    ui->lineEdit_oclhcplus_cpu_affinity->clear();
+    ui->lineEdit_oclhcplus_devices->setText("0");
+    ui->spinBox_oclhcplus_accel->setValue(8);
+    ui->spinBox_oclhcplus_loops->setValue(256);
+    ui->spinBox_oclhcplus_watchdog->setValue(90);
+    ui->spinBox_oclhcplus_segment->setValue(32);
+    this->oclhcplusCommandChanged();
 }
 
 void MainWindow::on_actionSettings_triggered()
 {
-    SettingsDialog *settings = new SettingsDialog(this);
-    settings->show();
-}
+    SettingsDialog* settings = new SettingsDialog(this);
+    int result = settings->exec();
 
+    if (result == QDialog::Accepted) {
+        // If SettingsDialog was saved and there are no hash types yet maybe we can populate them now
+        if (ui->comboBox_oclhcplus_hash->count() == 0) {
+            this->init_hash_and_attack_modes();
+        }
+    }
+}
 
 void MainWindow::on_actionQuit_triggered()
 {
@@ -136,7 +141,7 @@ void MainWindow::on_actionAbout_Qt_triggered()
 
 void MainWindow::on_actionHelp_About_triggered()
 {
-    AboutDialog *about = new AboutDialog(this);
+    AboutDialog* about = new AboutDialog(this);
     about->get_versions();
     about->show();
 }
@@ -150,6 +155,13 @@ void MainWindow::add_hash_and_attack_modes(QComboBox *&combobox, QMap <quint32, 
 }
 
 void MainWindow::init_hash_and_attack_modes() {
+
+    ui->comboBox_oclhcplus_attack->clear();
+    ui->comboBox_oclhcplus_hash->clear();
+    oclhcplus_attackModes.clear();
+    oclhcplus_hashModes.clear();
+
+    // Attack modes
     oclhcplus_attackModes.insert(0, "Straight");
     oclhcplus_attackModes.insert(1, "Combination");
     oclhcplus_attackModes.insert(3, "Brute-force");
@@ -157,37 +169,24 @@ void MainWindow::init_hash_and_attack_modes() {
     oclhcplus_attackModes.insert(7, "Hybrid Mask + Wordlist");
     oclhcplus_attackModes.insert(9, "Association");
 
-    oclhcplus_hashModes.insert(0, "MD5");
-    oclhcplus_hashModes.insert(11, "Joomla");
-    oclhcplus_hashModes.insert(21, "osCommerce, xt:Commerce");
-    oclhcplus_hashModes.insert(100, "SHA1");
-    oclhcplus_hashModes.insert(101, "nsldap, SHA-1(Base64), Netscape LDAP SHA");
-    oclhcplus_hashModes.insert(111, "nsldaps, SSHA-1(Base64), Netscape LDAP SSHA");
-    oclhcplus_hashModes.insert(112, "Oracle 11g");
-    oclhcplus_hashModes.insert(121, "SMF > v1.1");
-    oclhcplus_hashModes.insert(122, "OSX v10.4, v10.5, v10.6");
-    oclhcplus_hashModes.insert(131, "MSSQL(2000)");
-    oclhcplus_hashModes.insert(132, "MSSQL(2005)");
-    oclhcplus_hashModes.insert(300, "MySQL > v4.1");
-    oclhcplus_hashModes.insert(400, "phpass, MD5(Wordpress), MD5(phpBB3)");
-    oclhcplus_hashModes.insert(500, "md5crypt, MD5(Unix), FreeBSD MD5, Cisco-IOS MD5");
-    oclhcplus_hashModes.insert(900, "MD4");
-    oclhcplus_hashModes.insert(1000, "NTLM");
-    oclhcplus_hashModes.insert(1100, "Domain Cached Credentials, mscash");
-    oclhcplus_hashModes.insert(1400, "SHA256");
-    oclhcplus_hashModes.insert(1500, "descrypt, DES(Unix), Traditional DES");
-    oclhcplus_hashModes.insert(1600, "md5apr1, MD5(APR), Apache MD5");
-    oclhcplus_hashModes.insert(1700, "SHA512");
-    oclhcplus_hashModes.insert(1722, "OS X v10.7");
-    oclhcplus_hashModes.insert(2100, "Domain Cached Credentials2, mscash2");
-    oclhcplus_hashModes.insert(2400, "Cisco-PIX MD5");
-    oclhcplus_hashModes.insert(2500, "WPA/WPA2");
-    oclhcplus_hashModes.insert(2600, "Double MD5");
-    oclhcplus_hashModes.insert(2611, "vBulletin < v3.8.5");
-    oclhcplus_hashModes.insert(2711, "vBulletin > v3.8.5");
-    oclhcplus_hashModes.insert(2811, "IPB2+, MyBB 1.2+");
-    oclhcplus_hashModes.insert(3000, "LM");
-    oclhcplus_hashModes.insert(3100, "Oracle 7-10g, DES(Oracle)");
+    // Hash types
+    auto& settings = SettingsManager::instance();
+    QString hashTypes;
+
+    // Read list of example hashes, returns JSON
+    if (!settings.hashcatPath().isEmpty()) {
+        hashTypes = HelperUtils::executeHashcat(QStringList() << "--example-hashes" << "--machine-readable").remove('\n').remove('\r');
+    }
+
+    // Fill QComboBox with available hash types
+    QJsonDocument doc = QJsonDocument::fromJson(hashTypes.toUtf8());
+    if (doc.isObject()) {
+        QJsonObject rootObj = doc.object();
+
+        for (auto it = rootObj.begin(); it != rootObj.end(); ++it) {
+            oclhcplus_hashModes.insert(it.key().toInt(), QString(it.key() + " | " + it.value().toObject().value("name").toString()));
+        }
+    }
 
     this->add_hash_and_attack_modes(ui->comboBox_oclhcplus_attack, oclhcplus_attackModes);
     this->add_hash_and_attack_modes(ui->comboBox_oclhcplus_hash, oclhcplus_hashModes);

@@ -7,7 +7,6 @@
 #include "ui_settingsdialog.h"
 #include "settingsmanager.h"
 
-
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SettingsDialog)
@@ -36,12 +35,14 @@ void SettingsDialog::on_pushButton_settings_select_path_clicked()
     }
 }
 
-// Save selected path in persistent settings
 void SettingsDialog::on_pushButton_save_clicked()
 {
+    // Save values in persistent settings
     auto& settings = SettingsManager::instance();
     settings.hashcatPath(ui->lineEdit_hc_path->text());
 
+    // accept() signals our parent that settings might have changed
+    this->accept();
     this->close();
 }
 

@@ -241,6 +241,12 @@
               </item>
               <item>
                <widget class="QComboBox" name="comboBox_oclhcplus_attack">
+                <property name="minimumSize">
+                 <size>
+                  <width>150</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <property name="currentIndex">
                  <number>-1</number>
                 </property>
@@ -273,7 +279,17 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox_oclhcplus_hash"/>
+               <widget class="QComboBox" name="comboBox_oclhcplus_hash">
+                <property name="minimumSize">
+                 <size>
+                  <width>300</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Configure path to hashcat binary in Settings to get available hash types</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
