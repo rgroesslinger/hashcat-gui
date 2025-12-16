@@ -26,11 +26,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     auto& settings = SettingsManager::instance();
 
     this->init_hash_and_attack_modes();
-    this->oclhcplus_update_view_attack_mode();
+    this->update_view_attack_mode();
 
-    connect(ui->listWidget_oclhcplus_wordlist->model(), SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(oclhcplusCommandChanged()));
-    connect(ui->listWidget_oclhcplus_wordlist->model(), SIGNAL(rowsRemoved(const QModelIndex &, int, int)), this, SLOT(oclhcplusCommandChanged()));
-    connect(ui->listWidget_oclhcplus_wordlist->model(), SIGNAL(rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)), this, SLOT(oclhcplusCommandChanged()));
+    connect(ui->listWidget_wordlist->model(), SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(CommandChanged()));
+    connect(ui->listWidget_wordlist->model(), SIGNAL(rowsRemoved(const QModelIndex &, int, int)), this, SLOT(CommandChanged()));
+    connect(ui->listWidget_wordlist->model(), SIGNAL(rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)), this, SLOT(CommandChanged()));
 
     // Show Settings dialog if path to hashcat has not been configured yet
     if (settings.hashcatPath().isEmpty()) {
@@ -47,15 +47,13 @@ MainWindow::~MainWindow()
 
 /********* MainWindow *************************************/
 
-QStringList MainWindow::generate_terminal_env(qint16 hc_type) {
-
+QStringList MainWindow::generate_terminal_env() {
     QStringList arguments;
     QString path;
 
-    switch(hc_type) {
-    case 0: path = envInfo.value("dir_current") + envInfo.value("cmd_hc"); break;
-    case 1: path = envInfo.value("dir_current") + envInfo.value("cmd_oclhcplus"); break;
-    case 2: path = envInfo.value("dir_current") + envInfo.value("cmd_oclhclite"); break;
+    auto& settings = SettingsManager::instance();
+    if (!settings.hashcatPath().isEmpty()) {
+        path = settings.hashcatPath();
     }
 
 #if defined(Q_WS_WIN)
@@ -67,53 +65,64 @@ QStringList MainWindow::generate_terminal_env(qint16 hc_type) {
     return arguments;
 }
 
-void MainWindow::oclhcplusCommandChanged(QString arg) {
-    ui->lineEdit_oclhcplus_command->setText(envInfo.value("cmd_oclhcplus") + " " + (arg.length() ? arg : oclhcplus_generate_arguments().join(" ")));
-    ui->lineEdit_oclhcplus_command->setCursorPosition(0);
+void MainWindow::CommandChanged(QString arg) {
+    auto& settings = SettingsManager::instance();
+    QFileInfo fileInfo(settings.hashcatPath());
+
+    ui->lineEdit_command->clear();
+
+    // prepend hashcat binary name if it has already been configured in settings
+    if (!settings.hashcatPath().isEmpty()) {
+        ui->lineEdit_command->setText(fileInfo.fileName());
+    }
+
+    // command line arguments for hashcat
+    ui->lineEdit_command->insert(" " + (arg.length() ? arg : generate_arguments().join(" ")));
+    ui->lineEdit_command->setCursorPosition(0);
 }
 
 void MainWindow::on_actionReset_fields_triggered()
 {
-    ui->lineEdit_oclhcplus_open_hashfile->clear();
-    ui->checkBox_oclhcplus_ignoreusername->setChecked(false);
-    ui->checkBox_oclhcplus_remove->setChecked(false);
-    ui->listWidget_oclhcplus_wordlist->clear();
-    ui->comboBox_oclhcplus_attack->setCurrentIndex(0);
-    ui->comboBox_oclhcplus_hash->setCurrentIndex(0);
-    ui->radioButton_oclhcplus_use_rules_file->setChecked(true);
-    ui->checkBox_oclhcplus_rulesfile_1->setChecked(false);
-    ui->checkBox_oclhcplus_rulesfile_2->setChecked(false);
-    ui->checkBox_oclhcplus_rulesfile_3->setChecked(false);
-    ui->lineEdit_oclhcplus_open_rulesfile_1->clear();
-    ui->lineEdit_oclhcplus_open_rulesfile_2->clear();
-    ui->lineEdit_oclhcplus_open_rulesfile_3->clear();
-    ui->spinBox_oclhcplus_generate_rules->setValue(1);
-    ui->spinBox_oclhcplus_password_min->setValue(ui->spinBox_oclhcplus_password_min->minimum());
-    ui->spinBox_oclhcplus_password_max->setValue(ui->spinBox_oclhcplus_password_max->maximum());
-    ui->lineEdit_oclhcplus_mask->clear();
-    ui->checkBox_oclhcplus_custom1->setChecked(false);
-    ui->lineEdit_oclhcplus_custom1->clear();
-    ui->checkBox_oclhcplus_custom2->setChecked(false);
-    ui->lineEdit_oclhcplus_custom2->clear();
-    ui->checkBox_oclhcplus_custom3->setChecked(false);
-    ui->lineEdit_oclhcplus_custom3->clear();
-    ui->checkBox_oclhcplus_custom4->setChecked(false);
-    ui->lineEdit_oclhcplus_custom4->clear();
-    ui->checkBox_oclhcplus_hex_hash->setChecked(false);
-    ui->checkBox_oclhcplus_hex_salt->setChecked(false);
-    ui->spinBox_oclhcplus_password_min->setValue(1);
-    ui->spinBox_oclhcplus_password_max->setValue(16);
-    ui->checkBox_oclhcplus_outfile->setChecked(false);
-    ui->lineEdit_oclhcplus_outfile->clear();
-    ui->comboBox_oclhcplus_outfile_format->setCurrentIndex(2);
-    ui->checkBox_oclhcplus_async->setChecked(false);
-    ui->lineEdit_oclhcplus_cpu_affinity->clear();
-    ui->lineEdit_oclhcplus_devices->setText("0");
-    ui->spinBox_oclhcplus_accel->setValue(8);
-    ui->spinBox_oclhcplus_loops->setValue(256);
-    ui->spinBox_oclhcplus_watchdog->setValue(90);
-    ui->spinBox_oclhcplus_segment->setValue(32);
-    this->oclhcplusCommandChanged();
+    ui->lineEdit_open_hashfile->clear();
+    ui->checkBox_ignoreusername->setChecked(false);
+    ui->checkBox_remove->setChecked(false);
+    ui->listWidget_wordlist->clear();
+    ui->comboBox_attack->setCurrentIndex(0);
+    ui->comboBox_hash->setCurrentIndex(0);
+    ui->radioButton_use_rules_file->setChecked(true);
+    ui->checkBox_rulesfile_1->setChecked(false);
+    ui->checkBox_rulesfile_2->setChecked(false);
+    ui->checkBox_rulesfile_3->setChecked(false);
+    ui->lineEdit_open_rulesfile_1->clear();
+    ui->lineEdit_open_rulesfile_2->clear();
+    ui->lineEdit_open_rulesfile_3->clear();
+    ui->spinBox_generate_rules->setValue(1);
+    ui->spinBox_password_min->setValue(ui->spinBox_password_min->minimum());
+    ui->spinBox_password_max->setValue(ui->spinBox_password_max->maximum());
+    ui->lineEdit_mask->clear();
+    ui->checkBox_custom1->setChecked(false);
+    ui->lineEdit_custom1->clear();
+    ui->checkBox_custom2->setChecked(false);
+    ui->lineEdit_custom2->clear();
+    ui->checkBox_custom3->setChecked(false);
+    ui->lineEdit_custom3->clear();
+    ui->checkBox_custom4->setChecked(false);
+    ui->lineEdit_custom4->clear();
+    ui->checkBox_hex_hash->setChecked(false);
+    ui->checkBox_hex_salt->setChecked(false);
+    ui->spinBox_password_min->setValue(1);
+    ui->spinBox_password_max->setValue(16);
+    ui->checkBox_outfile->setChecked(false);
+    ui->lineEdit_outfile->clear();
+    ui->comboBox_outfile_format->setCurrentIndex(2);
+    ui->checkBox_async->setChecked(false);
+    ui->lineEdit_cpu_affinity->clear();
+    ui->lineEdit_devices->setText("0");
+    ui->spinBox_accel->setValue(8);
+    ui->spinBox_loops->setValue(256);
+    ui->spinBox_watchdog->setValue(90);
+    ui->spinBox_segment->setValue(32);
+    this->CommandChanged();
 }
 
 void MainWindow::on_actionSettings_triggered()
@@ -123,7 +132,7 @@ void MainWindow::on_actionSettings_triggered()
 
     if (result == QDialog::Accepted) {
         // If SettingsDialog was saved and there are no hash types yet maybe we can populate them now
-        if (ui->comboBox_oclhcplus_hash->count() == 0) {
+        if (ui->comboBox_hash->count() == 0) {
             this->init_hash_and_attack_modes();
         }
     }
@@ -156,18 +165,18 @@ void MainWindow::add_hash_and_attack_modes(QComboBox *&combobox, QMap <quint32, 
 
 void MainWindow::init_hash_and_attack_modes() {
 
-    ui->comboBox_oclhcplus_attack->clear();
-    ui->comboBox_oclhcplus_hash->clear();
-    oclhcplus_attackModes.clear();
-    oclhcplus_hashModes.clear();
+    ui->comboBox_attack->clear();
+    ui->comboBox_hash->clear();
+    attackModes.clear();
+    hashModes.clear();
 
     // Attack modes
-    oclhcplus_attackModes.insert(0, "Straight");
-    oclhcplus_attackModes.insert(1, "Combination");
-    oclhcplus_attackModes.insert(3, "Brute-force");
-    oclhcplus_attackModes.insert(6, "Hybrid Wordlist + Mask");
-    oclhcplus_attackModes.insert(7, "Hybrid Mask + Wordlist");
-    oclhcplus_attackModes.insert(9, "Association");
+    attackModes.insert(0, "Straight");
+    attackModes.insert(1, "Combination");
+    attackModes.insert(3, "Brute-force");
+    attackModes.insert(6, "Hybrid Wordlist + Mask");
+    attackModes.insert(7, "Hybrid Mask + Wordlist");
+    attackModes.insert(9, "Association");
 
     // Hash types
     auto& settings = SettingsManager::instance();
@@ -184,19 +193,19 @@ void MainWindow::init_hash_and_attack_modes() {
         QJsonObject rootObj = doc.object();
 
         for (auto it = rootObj.begin(); it != rootObj.end(); ++it) {
-            oclhcplus_hashModes.insert(it.key().toInt(), QString(it.key() + " | " + it.value().toObject().value("name").toString()));
+            hashModes.insert(it.key().toInt(), QString(it.key() + " | " + it.value().toObject().value("name").toString()));
         }
     }
 
-    this->add_hash_and_attack_modes(ui->comboBox_oclhcplus_attack, oclhcplus_attackModes);
-    this->add_hash_and_attack_modes(ui->comboBox_oclhcplus_hash, oclhcplus_hashModes);
+    this->add_hash_and_attack_modes(ui->comboBox_attack, attackModes);
+    this->add_hash_and_attack_modes(ui->comboBox_hash, hashModes);
 }
 
 void MainWindow::add_wordlist_item(QString &wordlist) {
     QListWidget *w;
     bool duplicate = false;
 
-    w = ui->listWidget_oclhcplus_wordlist;
+    w = ui->listWidget_wordlist;
 
     for (int j=0; j<w->count(); ++j) {
         if (w->item(j)->text() == wordlist) {
@@ -216,7 +225,7 @@ void MainWindow::add_wordlist_item(QStringList &wordlist) {
     QListWidget *w;
     bool duplicate = false;
 
-    w = ui->listWidget_oclhcplus_wordlist;
+    w = ui->listWidget_wordlist;
 
     for (int i=0; i<wordlist.length(); i++) {
         duplicate = false;
@@ -237,24 +246,22 @@ void MainWindow::add_wordlist_item(QStringList &wordlist) {
 void MainWindow::set_outfile_path() {
     QLineEdit *hash, *out;
 
-    hash = ui->lineEdit_oclhcplus_open_hashfile;
-    out = ui->lineEdit_oclhcplus_outfile;
+    hash = ui->lineEdit_open_hashfile;
+    out = ui->lineEdit_outfile;
 
     if (hash->text().length()) {
         out->setText(hash->text() + ".out");
     }
 }
 
-/********* oclHashcat-plus / cudaHashcat-plus *********************/
-
-void MainWindow::on_comboBox_oclhcplus_attack_currentIndexChanged([[maybe_unused]] int index)
+void MainWindow::on_comboBox_attack_currentIndexChanged([[maybe_unused]] int index)
 {
-    oclhcplus_update_view_attack_mode();
+    update_view_attack_mode();
 }
 
-void MainWindow::oclhcplus_update_view_attack_mode()
+void MainWindow::update_view_attack_mode()
 {
-    int attackMode = oclhcplus_attackModes.key(ui->comboBox_oclhcplus_attack->currentText());
+    int attackMode = attackModes.key(ui->comboBox_attack->currentText());
     bool groupWordlists = false, groupRules = false, groupPassword = false, groupMask = false;
 
     switch(attackMode) {
@@ -296,313 +303,313 @@ void MainWindow::oclhcplus_update_view_attack_mode()
         break;
     }
 
-    ui->groupBox_oclhcplus_wordlists->setDisabled(!groupWordlists);
-    ui->groupBox_oclhcplus_rules->setDisabled(!groupRules);
-    ui->groupBox_oclhcplus_password->setDisabled(!groupPassword);
-    ui->groupBox_oclhcplus_custom_charset->setDisabled(!groupMask);
-    ui->groupBox_oclhcplus_mask->setDisabled(!groupMask);
-    this->oclhcplusCommandChanged();
+    ui->groupBox_wordlists->setDisabled(!groupWordlists);
+    ui->groupBox_rules->setDisabled(!groupRules);
+    ui->groupBox_password->setDisabled(!groupPassword);
+    ui->groupBox_custom_charset->setDisabled(!groupMask);
+    ui->groupBox_mask->setDisabled(!groupMask);
+    this->CommandChanged();
 }
 
-void MainWindow::on_pushButton_oclhcplus_open_hashfile_clicked()
+void MainWindow::on_pushButton_open_hashfile_clicked()
 {
     QString hashfile = QFileDialog::getOpenFileName();
     if (!hashfile.isNull()) {
-        ui->lineEdit_oclhcplus_open_hashfile->setText(QDir::toNativeSeparators(hashfile));
+        ui->lineEdit_open_hashfile->setText(QDir::toNativeSeparators(hashfile));
     }
 }
 
-void MainWindow::on_pushButton_oclhcplus_output_clicked()
+void MainWindow::on_pushButton_output_clicked()
 {
     QString outfile = QFileDialog::getSaveFileName();
     if (!outfile.isNull()) {
-        ui->lineEdit_oclhcplus_outfile->setText(QDir::toNativeSeparators(outfile));
+        ui->lineEdit_outfile->setText(QDir::toNativeSeparators(outfile));
     }
 }
 
-void MainWindow::on_pushButton_oclhcplus_remove_wordlist_clicked()
+void MainWindow::on_pushButton_remove_wordlist_clicked()
 {
-    qDeleteAll(ui->listWidget_oclhcplus_wordlist->selectedItems());
-    ui->pushButton_oclhcplus_remove_wordlist->setEnabled(false);
-    ui->toolButton_oclhcplus_wordlist_sort_asc->setEnabled(false);
-    ui->toolButton_oclhcplus_wordlist_sort_desc->setEnabled(false);
-    ui->listWidget_oclhcplus_wordlist->clearSelection();
+    qDeleteAll(ui->listWidget_wordlist->selectedItems());
+    ui->pushButton_remove_wordlist->setEnabled(false);
+    ui->toolButton_wordlist_sort_asc->setEnabled(false);
+    ui->toolButton_wordlist_sort_desc->setEnabled(false);
+    ui->listWidget_wordlist->clearSelection();
 }
 
-void MainWindow::on_pushButton_oclhcplus_add_wordlist_clicked()
+void MainWindow::on_pushButton_add_wordlist_clicked()
 {
     QStringList wordlist = QFileDialog::getOpenFileNames();
     this->add_wordlist_item(wordlist);
 }
 
-void MainWindow::on_pushButton_oclhcplus_add_wordlist_folder_clicked()
+void MainWindow::on_pushButton_add_wordlist_folder_clicked()
 {
     QString wordlist = QFileDialog::getExistingDirectory();
     this->add_wordlist_item(wordlist);
 }
 
-void MainWindow::on_toolButton_oclhcplus_wordlist_sort_asc_clicked()
+void MainWindow::on_toolButton_wordlist_sort_asc_clicked()
 {
-    int currentRow = ui->listWidget_oclhcplus_wordlist->currentRow();
+    int currentRow = ui->listWidget_wordlist->currentRow();
     if (currentRow == 0) return;
-    QListWidgetItem *currentItem = ui->listWidget_oclhcplus_wordlist->takeItem(currentRow);
-    ui->listWidget_oclhcplus_wordlist->insertItem(currentRow - 1, currentItem);
-    ui->listWidget_oclhcplus_wordlist->setCurrentRow(currentRow - 1);
+    QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
+    ui->listWidget_wordlist->insertItem(currentRow - 1, currentItem);
+    ui->listWidget_wordlist->setCurrentRow(currentRow - 1);
 }
 
-void MainWindow::on_toolButton_oclhcplus_wordlist_sort_desc_clicked()
+void MainWindow::on_toolButton_wordlist_sort_desc_clicked()
 {
-    int currentRow = ui->listWidget_oclhcplus_wordlist->currentRow();
-    if (currentRow >= ui->listWidget_oclhcplus_wordlist->count()-1) return;
-    QListWidgetItem *currentItem = ui->listWidget_oclhcplus_wordlist->takeItem(currentRow);
-    ui->listWidget_oclhcplus_wordlist->insertItem(currentRow + 1, currentItem);
-    ui->listWidget_oclhcplus_wordlist->setCurrentRow(currentRow + 1);
+    int currentRow = ui->listWidget_wordlist->currentRow();
+    if (currentRow >= ui->listWidget_wordlist->count()-1) return;
+    QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
+    ui->listWidget_wordlist->insertItem(currentRow + 1, currentItem);
+    ui->listWidget_wordlist->setCurrentRow(currentRow + 1);
 }
 
-void MainWindow::on_listWidget_oclhcplus_wordlist_itemClicked([[maybe_unused]] QListWidgetItem* item)
+void MainWindow::on_listWidget_wordlist_itemClicked([[maybe_unused]] QListWidgetItem* item)
 {
-    ui->pushButton_oclhcplus_remove_wordlist->setEnabled(true);
-    ui->toolButton_oclhcplus_wordlist_sort_asc->setEnabled(true);
-    ui->toolButton_oclhcplus_wordlist_sort_desc->setEnabled(true);
+    ui->pushButton_remove_wordlist->setEnabled(true);
+    ui->toolButton_wordlist_sort_asc->setEnabled(true);
+    ui->toolButton_wordlist_sort_desc->setEnabled(true);
 }
 
-void MainWindow::on_checkBox_oclhcplus_rulesfile_1_toggled(bool checked)
+void MainWindow::on_checkBox_rulesfile_1_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_open_rulesfile_1->setEnabled(checked);
-    ui->pushButton_oclhcplus_open_rulesfile_1->setEnabled(checked);
+    ui->lineEdit_open_rulesfile_1->setEnabled(checked);
+    ui->pushButton_open_rulesfile_1->setEnabled(checked);
 }
 
-void MainWindow::on_checkBox_oclhcplus_rulesfile_2_toggled(bool checked)
+void MainWindow::on_checkBox_rulesfile_2_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_open_rulesfile_2->setEnabled(checked);
-    ui->pushButton_oclhcplus_open_rulesfile_2->setEnabled(checked);
+    ui->lineEdit_open_rulesfile_2->setEnabled(checked);
+    ui->pushButton_open_rulesfile_2->setEnabled(checked);
 }
 
-void MainWindow::on_checkBox_oclhcplus_rulesfile_3_toggled(bool checked)
+void MainWindow::on_checkBox_rulesfile_3_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_open_rulesfile_3->setEnabled(checked);
-    ui->pushButton_oclhcplus_open_rulesfile_3->setEnabled(checked);
+    ui->lineEdit_open_rulesfile_3->setEnabled(checked);
+    ui->pushButton_open_rulesfile_3->setEnabled(checked);
 }
 
-void MainWindow::on_radioButton_oclhcplus_use_rules_file_toggled(bool checked)
+void MainWindow::on_radioButton_use_rules_file_toggled(bool checked)
 {
-    ui->checkBox_oclhcplus_rulesfile_1->setEnabled(checked);
-    ui->checkBox_oclhcplus_rulesfile_2->setEnabled(checked);
-    ui->checkBox_oclhcplus_rulesfile_3->setEnabled(checked);
+    ui->checkBox_rulesfile_1->setEnabled(checked);
+    ui->checkBox_rulesfile_2->setEnabled(checked);
+    ui->checkBox_rulesfile_3->setEnabled(checked);
     if (checked) {
-        this->on_checkBox_oclhcplus_rulesfile_1_toggled(ui->checkBox_oclhcplus_rulesfile_1->isChecked());
-        this->on_checkBox_oclhcplus_rulesfile_2_toggled(ui->checkBox_oclhcplus_rulesfile_2->isChecked());
-        this->on_checkBox_oclhcplus_rulesfile_3_toggled(ui->checkBox_oclhcplus_rulesfile_3->isChecked());
+        this->on_checkBox_rulesfile_1_toggled(ui->checkBox_rulesfile_1->isChecked());
+        this->on_checkBox_rulesfile_2_toggled(ui->checkBox_rulesfile_2->isChecked());
+        this->on_checkBox_rulesfile_3_toggled(ui->checkBox_rulesfile_3->isChecked());
     }
 }
 
-void MainWindow::on_radioButton_oclhcplus_generate_rules_toggled(bool checked)
+void MainWindow::on_radioButton_generate_rules_toggled(bool checked)
 {
-    ui->spinBox_oclhcplus_generate_rules->setEnabled(checked);
+    ui->spinBox_generate_rules->setEnabled(checked);
     if (checked) {
-        this->on_radioButton_oclhcplus_use_rules_file_toggled(false);
-        this->on_checkBox_oclhcplus_rulesfile_1_toggled(false);
-        this->on_checkBox_oclhcplus_rulesfile_2_toggled(false);
-        this->on_checkBox_oclhcplus_rulesfile_3_toggled(false);
+        this->on_radioButton_use_rules_file_toggled(false);
+        this->on_checkBox_rulesfile_1_toggled(false);
+        this->on_checkBox_rulesfile_2_toggled(false);
+        this->on_checkBox_rulesfile_3_toggled(false);
     }
 }
 
-void MainWindow::on_pushButton_oclhcplus_open_rulesfile_1_clicked()
+void MainWindow::on_pushButton_open_rulesfile_1_clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
     if (!rulesfile.isNull()) {
-        ui->lineEdit_oclhcplus_open_rulesfile_1->setText(QDir::toNativeSeparators(rulesfile));
+        ui->lineEdit_open_rulesfile_1->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
 
-void MainWindow::on_pushButton_oclhcplus_open_rulesfile_2_clicked()
+void MainWindow::on_pushButton_open_rulesfile_2_clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
     if (!rulesfile.isNull()) {
-        ui->lineEdit_oclhcplus_open_rulesfile_2->setText(QDir::toNativeSeparators(rulesfile));
+        ui->lineEdit_open_rulesfile_2->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
 
-void MainWindow::on_pushButton_oclhcplus_open_rulesfile_3_clicked()
+void MainWindow::on_pushButton_open_rulesfile_3_clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
     if (!rulesfile.isNull()) {
-        ui->lineEdit_oclhcplus_open_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
+        ui->lineEdit_open_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
 
-void MainWindow::on_checkBox_oclhcplus_custom1_toggled(bool checked)
+void MainWindow::on_checkBox_custom1_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_custom1->setEnabled(checked);
+    ui->lineEdit_custom1->setEnabled(checked);
 }
 
-void MainWindow::on_checkBox_oclhcplus_custom2_toggled(bool checked)
+void MainWindow::on_checkBox_custom2_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_custom2->setEnabled(checked);
+    ui->lineEdit_custom2->setEnabled(checked);
 }
 
-void MainWindow::on_checkBox_oclhcplus_custom3_toggled(bool checked)
+void MainWindow::on_checkBox_custom3_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_custom3->setEnabled(checked);
+    ui->lineEdit_custom3->setEnabled(checked);
 }
 
-void MainWindow::on_checkBox_oclhcplus_custom4_toggled(bool checked)
+void MainWindow::on_checkBox_custom4_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_custom4->setEnabled(checked);
+    ui->lineEdit_custom4->setEnabled(checked);
 }
 
-void MainWindow::on_checkBox_oclhcplus_outfile_toggled(bool checked)
+void MainWindow::on_checkBox_outfile_toggled(bool checked)
 {
-    ui->lineEdit_oclhcplus_outfile->setEnabled(checked);
-    ui->pushButton_oclhcplus_output->setEnabled(checked);
+    ui->lineEdit_outfile->setEnabled(checked);
+    ui->pushButton_output->setEnabled(checked);
 }
 
-void MainWindow::on_lineEdit_oclhcplus_open_hashfile_textChanged([[maybe_unused]] const QString &arg1)
+void MainWindow::on_lineEdit_open_hashfile_textChanged([[maybe_unused]] const QString &arg1)
 {
     this->set_outfile_path();
 }
 
-QStringList MainWindow::oclhcplus_generate_arguments()
+QStringList MainWindow::generate_arguments()
 {
     QStringList arguments;
     QString mask_before_dict = "";
     QString mask_after_dict = "";
 
-    int attackMode = oclhcplus_attackModes.key(ui->comboBox_oclhcplus_attack->currentText());
+    int attackMode = attackModes.key(ui->comboBox_attack->currentText());
 
-    if(oclhcplus_hashModes.key(ui->comboBox_oclhcplus_hash->currentText()) != 0) {
-        arguments << "--hash-type" << QString::number(oclhcplus_hashModes.key(ui->comboBox_oclhcplus_hash->currentText()));
+    if(hashModes.key(ui->comboBox_hash->currentText()) != 0) {
+        arguments << "--hash-type" << QString::number(hashModes.key(ui->comboBox_hash->currentText()));
     }
 
     if ( attackMode != 0 ) {
         arguments << "--attack-mode" << QString::number(attackMode);
     }
 
-    if (ui->checkBox_oclhcplus_remove->isChecked()) {
+    if (ui->checkBox_remove->isChecked()) {
         arguments << "--remove";
     }
 
-    if (ui->checkBox_oclhcplus_ignoreusername->isChecked()) {
+    if (ui->checkBox_ignoreusername->isChecked()) {
         arguments << "--username";
     }
 
     switch(attackMode) {
     case 0:
-        if ( ui->radioButton_oclhcplus_use_rules_file->isChecked()) {
-            if (ui->checkBox_oclhcplus_rulesfile_1->isChecked() && !ui->lineEdit_oclhcplus_open_rulesfile_1->text().isEmpty()) {
-                arguments << "--rules-file" << ui->lineEdit_oclhcplus_open_rulesfile_1->text();
+        if ( ui->radioButton_use_rules_file->isChecked()) {
+            if (ui->checkBox_rulesfile_1->isChecked() && !ui->lineEdit_open_rulesfile_1->text().isEmpty()) {
+                arguments << "--rules-file" << ui->lineEdit_open_rulesfile_1->text();
             }
 
-            if (ui->checkBox_oclhcplus_rulesfile_2->isChecked() && !ui->lineEdit_oclhcplus_open_rulesfile_2->text().isEmpty()) {
-                arguments << "--rules-file" << ui->lineEdit_oclhcplus_open_rulesfile_2->text();
+            if (ui->checkBox_rulesfile_2->isChecked() && !ui->lineEdit_open_rulesfile_2->text().isEmpty()) {
+                arguments << "--rules-file" << ui->lineEdit_open_rulesfile_2->text();
             }
 
-            if (ui->checkBox_oclhcplus_rulesfile_3->isChecked() && !ui->lineEdit_oclhcplus_open_rulesfile_3->text().isEmpty()) {
-                arguments << "--rules-file" << ui->lineEdit_oclhcplus_open_rulesfile_3->text();
+            if (ui->checkBox_rulesfile_3->isChecked() && !ui->lineEdit_open_rulesfile_3->text().isEmpty()) {
+                arguments << "--rules-file" << ui->lineEdit_open_rulesfile_3->text();
             }
-        } else if (ui->radioButton_oclhcplus_generate_rules->isChecked() && !ui->spinBox_oclhcplus_generate_rules->cleanText().isEmpty()) {
-            arguments << "--generate-rules" << ui->spinBox_oclhcplus_generate_rules->cleanText();
+        } else if (ui->radioButton_generate_rules->isChecked() && !ui->spinBox_generate_rules->cleanText().isEmpty()) {
+            arguments << "--generate-rules" << ui->spinBox_generate_rules->cleanText();
         }
         break;
     case 1:
         break;
     case 3:
-        mask_before_dict = ui->lineEdit_oclhcplus_mask->text();
+        mask_before_dict = ui->lineEdit_mask->text();
         break;
     case 4:
-        arguments << "--perm-min" << ui->spinBox_oclhcplus_password_min->cleanText();
-        arguments << "--perm-max" << ui->spinBox_oclhcplus_password_max->cleanText();
+        arguments << "--perm-min" << ui->spinBox_password_min->cleanText();
+        arguments << "--perm-max" << ui->spinBox_password_max->cleanText();
         break;
     case 6:
-        if (!ui->lineEdit_oclhcplus_mask->text().isEmpty()) {
-            mask_after_dict = ui->lineEdit_oclhcplus_mask->text();
+        if (!ui->lineEdit_mask->text().isEmpty()) {
+            mask_after_dict = ui->lineEdit_mask->text();
         }
         break;
     case 7:
-        if (!ui->lineEdit_oclhcplus_mask->text().isEmpty()) {
-            mask_before_dict = ui->lineEdit_oclhcplus_mask->text();
+        if (!ui->lineEdit_mask->text().isEmpty()) {
+            mask_before_dict = ui->lineEdit_mask->text();
         }
         break;
     }
 
-    if (ui->groupBox_oclhcplus_custom_charset->isEnabled()) {
-        if (ui->checkBox_oclhcplus_custom1->isChecked() && !ui->lineEdit_oclhcplus_custom1->text().isEmpty()) {
-            arguments << "--custom-charset1" << ui->lineEdit_oclhcplus_custom1->text();
+    if (ui->groupBox_custom_charset->isEnabled()) {
+        if (ui->checkBox_custom1->isChecked() && !ui->lineEdit_custom1->text().isEmpty()) {
+            arguments << "--custom-charset1" << ui->lineEdit_custom1->text();
         }
 
-        if (ui->checkBox_oclhcplus_custom2->isChecked() && !ui->lineEdit_oclhcplus_custom2->text().isEmpty()) {
-            arguments << "--custom-charset2" << ui->lineEdit_oclhcplus_custom2->text();
+        if (ui->checkBox_custom2->isChecked() && !ui->lineEdit_custom2->text().isEmpty()) {
+            arguments << "--custom-charset2" << ui->lineEdit_custom2->text();
         }
 
-        if (ui->checkBox_oclhcplus_custom3->isChecked() && !ui->lineEdit_oclhcplus_custom3->text().isEmpty()) {
-            arguments << "--custom-charset3" << ui->lineEdit_oclhcplus_custom3->text();
+        if (ui->checkBox_custom3->isChecked() && !ui->lineEdit_custom3->text().isEmpty()) {
+            arguments << "--custom-charset3" << ui->lineEdit_custom3->text();
         }
 
-        if (ui->checkBox_oclhcplus_custom4->isChecked() && !ui->lineEdit_oclhcplus_custom4->text().isEmpty()) {
-            arguments << "--custom-charset4" << ui->lineEdit_oclhcplus_custom4->text();
+        if (ui->checkBox_custom4->isChecked() && !ui->lineEdit_custom4->text().isEmpty()) {
+            arguments << "--custom-charset4" << ui->lineEdit_custom4->text();
         }
     }
 
-    if (ui->checkBox_oclhcplus_hex_hash->isChecked()) {
+    if (ui->checkBox_hex_hash->isChecked()) {
         arguments << "--hex-charset";
     }
 
-    if (ui->checkBox_oclhcplus_hex_salt->isChecked()) {
+    if (ui->checkBox_hex_salt->isChecked()) {
         arguments << "--hex-salt";
     }
 
-    if(ui->checkBox_oclhcplus_outfile->isChecked() && !ui->lineEdit_oclhcplus_outfile->text().isEmpty()) {
-        QFileInfo hash_fi(ui->lineEdit_oclhcplus_open_hashfile->text());
-        QString outfile = ui->lineEdit_oclhcplus_outfile->text();
+    if(ui->checkBox_outfile->isChecked() && !ui->lineEdit_outfile->text().isEmpty()) {
+        QFileInfo hash_fi(ui->lineEdit_open_hashfile->text());
+        QString outfile = ui->lineEdit_outfile->text();
         outfile.replace("<unixtime>", QString::number(QDateTime::currentMSecsSinceEpoch() / 1000));
         outfile.replace("<hash>", hash_fi.fileName(), Qt::CaseInsensitive);
         arguments << "--outfile" << outfile;
     }
 
-    if (ui->comboBox_oclhcplus_outfile_format->currentIndex() != 2) {
-        arguments << "--outfile-format" << QString::number(ui->comboBox_oclhcplus_outfile_format->currentIndex()+1);
+    if (ui->comboBox_outfile_format->currentIndex() != 2) {
+        arguments << "--outfile-format" << QString::number(ui->comboBox_outfile_format->currentIndex()+1);
     }
 
-    if (ui->checkBox_oclhcplus_async->isChecked()) {
+    if (ui->checkBox_async->isChecked()) {
         arguments << "--gpu-async";
     }
 
-    if (!ui->lineEdit_oclhcplus_cpu_affinity->text().isEmpty()) {
-        arguments << "--cpu-affinity" << ui->lineEdit_oclhcplus_cpu_affinity->text();
+    if (!ui->lineEdit_cpu_affinity->text().isEmpty()) {
+        arguments << "--cpu-affinity" << ui->lineEdit_cpu_affinity->text();
     }
 
-    if (!ui->lineEdit_oclhcplus_devices->text().isEmpty() && ui->lineEdit_oclhcplus_devices->text() != "0") {
-        arguments << "--gpu-devices" << ui->lineEdit_oclhcplus_devices->text();
+    if (!ui->lineEdit_devices->text().isEmpty() && ui->lineEdit_devices->text() != "0") {
+        arguments << "--gpu-devices" << ui->lineEdit_devices->text();
     }
 
-    if (!ui->spinBox_oclhcplus_accel->cleanText().isEmpty() && ui->spinBox_oclhcplus_accel->cleanText() != "8") {
-        arguments << "--gpu-accel" << ui->spinBox_oclhcplus_accel->cleanText();
+    if (!ui->spinBox_accel->cleanText().isEmpty() && ui->spinBox_accel->cleanText() != "8") {
+        arguments << "--gpu-accel" << ui->spinBox_accel->cleanText();
     }
 
-    if (!ui->spinBox_oclhcplus_loops->cleanText().isEmpty() && ui->spinBox_oclhcplus_loops->cleanText() != "256") {
-        arguments << "--gpu-loops" << ui->spinBox_oclhcplus_loops->cleanText();
+    if (!ui->spinBox_loops->cleanText().isEmpty() && ui->spinBox_loops->cleanText() != "256") {
+        arguments << "--gpu-loops" << ui->spinBox_loops->cleanText();
     }
 
-    if (!ui->spinBox_oclhcplus_watchdog->cleanText().isEmpty() && ui->spinBox_oclhcplus_watchdog->cleanText() != "90") {
-        arguments << "--gpu-watchdog" << ui->spinBox_oclhcplus_watchdog->cleanText();
+    if (!ui->spinBox_watchdog->cleanText().isEmpty() && ui->spinBox_watchdog->cleanText() != "90") {
+        arguments << "--gpu-watchdog" << ui->spinBox_watchdog->cleanText();
     }
 
-    if (!ui->spinBox_oclhcplus_segment->cleanText().isEmpty() && ui->spinBox_oclhcplus_segment->cleanText() != "32") {
-        arguments << "--segment-size" << ui->spinBox_oclhcplus_segment->cleanText();
+    if (!ui->spinBox_segment->cleanText().isEmpty() && ui->spinBox_segment->cleanText() != "32") {
+        arguments << "--segment-size" << ui->spinBox_segment->cleanText();
     }
 
-    if (!ui->lineEdit_oclhcplus_open_hashfile->text().isEmpty()) {
-        arguments << ui->lineEdit_oclhcplus_open_hashfile->text();
+    if (!ui->lineEdit_open_hashfile->text().isEmpty()) {
+        arguments << ui->lineEdit_open_hashfile->text();
     }
 
     if (mask_before_dict.length()) {
         arguments << mask_before_dict;
     }
 
-    if (ui->groupBox_oclhcplus_wordlists->isEnabled()) {
-        for(int i=0; i<ui->listWidget_oclhcplus_wordlist->count(); i++) {
-            if(ui->listWidget_oclhcplus_wordlist->item(i)->checkState() == Qt::Checked) {
-                arguments << ui->listWidget_oclhcplus_wordlist->item(i)->text();
+    if (ui->groupBox_wordlists->isEnabled()) {
+        for(int i=0; i<ui->listWidget_wordlist->count(); i++) {
+            if(ui->listWidget_wordlist->item(i)->checkState() == Qt::Checked) {
+                arguments << ui->listWidget_wordlist->item(i)->text();
             }
         }
     }
@@ -614,13 +621,13 @@ QStringList MainWindow::oclhcplus_generate_arguments()
     return arguments;
 }
 
-void MainWindow::on_pushButton_oclhcplus_execute_clicked()
+void MainWindow::on_pushButton_execute_clicked()
 {
-    QStringList env = generate_terminal_env(1);
-    QStringList arguments = oclhcplus_generate_arguments();
-    oclhcplusCommandChanged(arguments.join(" "));
+    QStringList env = generate_terminal_env();
+    QStringList arguments = generate_arguments();
+    CommandChanged(arguments.join(" "));
 
-    if (ui->lineEdit_oclhcplus_open_hashfile->text().isEmpty()) {
+    if (ui->lineEdit_open_hashfile->text().isEmpty()) {
         QMessageBox msgBox(this);
         msgBox.setIcon(QMessageBox::Information);
         msgBox.setText("Please choose a hash file.");
@@ -629,6 +636,7 @@ void MainWindow::on_pushButton_oclhcplus_execute_clicked()
     }
 
     QProcess proc;
-    proc.startDetached(envInfo.value("terminal"), env << arguments, envInfo.value("dir_oclhcplus"));
+    //TODO
+    //proc.startDetached(TERMINAL, env << arguments);
 }
 

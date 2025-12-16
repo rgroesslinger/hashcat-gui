@@ -68,14 +68,14 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_27">
               <item>
-               <widget class="QLabel" name="label_oclhcplus_hashfile">
+               <widget class="QLabel" name="label_hashfile">
                 <property name="text">
                  <string>Hash file or hash:</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_oclhcplus_open_hashfile">
+               <widget class="QLineEdit" name="lineEdit_open_hashfile">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
@@ -85,7 +85,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_oclhcplus_open_hashfile">
+               <widget class="QPushButton" name="pushButton_open_hashfile">
                 <property name="text">
                  <string>Open...</string>
                 </property>
@@ -96,14 +96,14 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_65">
               <item>
-               <widget class="QCheckBox" name="checkBox_oclhcplus_remove">
+               <widget class="QCheckBox" name="checkBox_remove">
                 <property name="text">
                  <string>Remove hash from hash list once it is cracked</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="checkBox_oclhcplus_ignoreusername">
+               <widget class="QCheckBox" name="checkBox_ignoreusername">
                 <property name="text">
                  <string>Ignore username in hashfile</string>
                 </property>
@@ -112,7 +112,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QGroupBox" name="groupBox_oclhcplus_wordlists">
+             <widget class="QGroupBox" name="groupBox_wordlists">
               <property name="title">
                <string>Word lists</string>
               </property>
@@ -122,7 +122,7 @@
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_69">
                    <item>
-                    <widget class="QToolButton" name="toolButton_oclhcplus_wordlist_sort_asc">
+                    <widget class="QToolButton" name="toolButton_wordlist_sort_asc">
                      <property name="enabled">
                       <bool>false</bool>
                      </property>
@@ -141,7 +141,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QToolButton" name="toolButton_oclhcplus_wordlist_sort_desc">
+                    <widget class="QToolButton" name="toolButton_wordlist_sort_desc">
                      <property name="enabled">
                       <bool>false</bool>
                      </property>
@@ -162,7 +162,7 @@
                   </layout>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_oclhcplus_add_wordlist">
+                  <widget class="QPushButton" name="pushButton_add_wordlist">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -175,14 +175,14 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_oclhcplus_add_wordlist_folder">
+                  <widget class="QPushButton" name="pushButton_add_wordlist_folder">
                    <property name="text">
                     <string>Add folder...</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButton_oclhcplus_remove_wordlist">
+                  <widget class="QPushButton" name="pushButton_remove_wordlist">
                    <property name="enabled">
                     <bool>false</bool>
                    </property>
@@ -200,7 +200,7 @@
                 </layout>
                </item>
                <item>
-                <widget class="QListWidget" name="listWidget_oclhcplus_wordlist">
+                <widget class="QListWidget" name="listWidget_wordlist">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                    <horstretch>0</horstretch>
@@ -233,14 +233,14 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_29">
               <item>
-               <widget class="QLabel" name="label_oclhcplus_mode">
+               <widget class="QLabel" name="label_mode">
                 <property name="text">
                  <string>Mode:</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox_oclhcplus_attack">
+               <widget class="QComboBox" name="comboBox_attack">
                 <property name="minimumSize">
                  <size>
                   <width>150</width>
@@ -266,7 +266,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="label_oclhcplus_hash">
+               <widget class="QLabel" name="label_hash">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -279,7 +279,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox_oclhcplus_hash">
+               <widget class="QComboBox" name="comboBox_hash">
                 <property name="minimumSize">
                  <size>
                   <width>300</width>
@@ -298,13 +298,13 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_10">
                 <item>
-                 <widget class="QGroupBox" name="groupBox_oclhcplus_rules">
+                 <widget class="QGroupBox" name="groupBox_rules">
                   <property name="title">
                    <string>Rules</string>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_18">
                    <item>
-                    <widget class="QRadioButton" name="radioButton_oclhcplus_use_rules_file">
+                    <widget class="QRadioButton" name="radioButton_use_rules_file">
                      <property name="text">
                       <string>Use rules files:</string>
                      </property>
@@ -319,14 +319,14 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_28">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_oclhcplus_rulesfile_1">
+                      <widget class="QCheckBox" name="checkBox_rulesfile_1">
                        <property name="text">
                         <string>Rules file:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_open_rulesfile_1">
+                      <widget class="QLineEdit" name="lineEdit_open_rulesfile_1">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -348,7 +348,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="pushButton_oclhcplus_open_rulesfile_1">
+                      <widget class="QPushButton" name="pushButton_open_rulesfile_1">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -362,14 +362,14 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_37">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_oclhcplus_rulesfile_2">
+                      <widget class="QCheckBox" name="checkBox_rulesfile_2">
                        <property name="text">
                         <string>Rules file:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_open_rulesfile_2">
+                      <widget class="QLineEdit" name="lineEdit_open_rulesfile_2">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -391,7 +391,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="pushButton_oclhcplus_open_rulesfile_2">
+                      <widget class="QPushButton" name="pushButton_open_rulesfile_2">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -405,14 +405,14 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_44">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_oclhcplus_rulesfile_3">
+                      <widget class="QCheckBox" name="checkBox_rulesfile_3">
                        <property name="text">
                         <string>Rules file:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_open_rulesfile_3">
+                      <widget class="QLineEdit" name="lineEdit_open_rulesfile_3">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -434,7 +434,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="pushButton_oclhcplus_open_rulesfile_3">
+                      <widget class="QPushButton" name="pushButton_open_rulesfile_3">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -448,7 +448,7 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_30">
                      <item>
-                      <widget class="QRadioButton" name="radioButton_oclhcplus_generate_rules">
+                      <widget class="QRadioButton" name="radioButton_generate_rules">
                        <property name="text">
                         <string>Generate rules:</string>
                        </property>
@@ -458,7 +458,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_oclhcplus_generate_rules">
+                      <widget class="QSpinBox" name="spinBox_generate_rules">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -498,7 +498,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QGroupBox" name="groupBox_oclhcplus_password">
+                 <widget class="QGroupBox" name="groupBox_password">
                   <property name="title">
                    <string>Password length</string>
                   </property>
@@ -506,14 +506,14 @@
                    <item row="0" column="0">
                     <layout class="QHBoxLayout" name="horizontalLayout_66">
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_password">
+                      <widget class="QLabel" name="label_password">
                        <property name="text">
                         <string>Length:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_oclhcplus_password_min">
+                      <widget class="QSpinBox" name="spinBox_password_min">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -529,14 +529,14 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_password_to">
+                      <widget class="QLabel" name="label_password_to">
                        <property name="text">
                         <string>-</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_oclhcplus_password_max">
+                      <widget class="QSpinBox" name="spinBox_password_max">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -577,21 +577,21 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_7">
                 <item>
-                 <widget class="QCheckBox" name="checkBox_oclhcplus_hex_hash">
+                 <widget class="QCheckBox" name="checkBox_hex_hash">
                   <property name="text">
                    <string>Assume charset is given in hex</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QCheckBox" name="checkBox_oclhcplus_hex_salt">
+                 <widget class="QCheckBox" name="checkBox_hex_salt">
                   <property name="text">
                    <string>Assume salt is given in hex</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QGroupBox" name="groupBox_oclhcplus_mask">
+                 <widget class="QGroupBox" name="groupBox_mask">
                   <property name="title">
                    <string>Mask</string>
                   </property>
@@ -600,7 +600,7 @@
                   </property>
                   <layout class="QGridLayout" name="gridLayout_7">
                    <item row="0" column="0">
-                    <widget class="QLineEdit" name="lineEdit_oclhcplus_mask">
+                    <widget class="QLineEdit" name="lineEdit_mask">
                      <property name="toolTip">
                       <string>Built-in charsets:
 
@@ -625,7 +625,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QGroupBox" name="groupBox_oclhcplus_custom_charset">
+                 <widget class="QGroupBox" name="groupBox_custom_charset">
                   <property name="title">
                    <string>Custom charsets</string>
                   </property>
@@ -633,7 +633,7 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_64">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_oclhcplus_custom1">
+                      <widget class="QCheckBox" name="checkBox_custom1">
                        <property name="text">
                         <string>Charset 1:</string>
                        </property>
@@ -643,7 +643,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_custom1">
+                      <widget class="QLineEdit" name="lineEdit_custom1">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -675,7 +675,7 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_68">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_oclhcplus_custom2">
+                      <widget class="QCheckBox" name="checkBox_custom2">
                        <property name="text">
                         <string>Charset 2:</string>
                        </property>
@@ -685,7 +685,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_custom2">
+                      <widget class="QLineEdit" name="lineEdit_custom2">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -717,7 +717,7 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_70">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_oclhcplus_custom3">
+                      <widget class="QCheckBox" name="checkBox_custom3">
                        <property name="text">
                         <string>Charset 3:</string>
                        </property>
@@ -727,7 +727,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_custom3">
+                      <widget class="QLineEdit" name="lineEdit_custom3">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -759,14 +759,14 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_71">
                      <item>
-                      <widget class="QCheckBox" name="checkBox_oclhcplus_custom4">
+                      <widget class="QCheckBox" name="checkBox_custom4">
                        <property name="text">
                         <string>Charset 4:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_custom4">
+                      <widget class="QLineEdit" name="lineEdit_custom4">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -802,7 +802,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_25">
               <item>
-               <widget class="QGroupBox" name="groupBox_oclhcplus_resources">
+               <widget class="QGroupBox" name="groupBox_resources">
                 <property name="title">
                  <string>Resources</string>
                 </property>
@@ -812,42 +812,42 @@
                    <item>
                     <layout class="QVBoxLayout" name="verticalLayout_26">
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_cpu_affinity">
+                      <widget class="QLabel" name="label_cpu_affinity">
                        <property name="text">
                         <string>CPU affinity:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_devices">
+                      <widget class="QLabel" name="label_devices">
                        <property name="text">
                         <string>GPU devices:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_accel">
+                      <widget class="QLabel" name="label_accel">
                        <property name="text">
                         <string>GPU workload tuning:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_loops">
+                      <widget class="QLabel" name="label_loops">
                        <property name="text">
                         <string>GPU loops:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_watchdog">
+                      <widget class="QLabel" name="label_watchdog">
                        <property name="text">
                         <string>GPU watchdog:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_segment">
+                      <widget class="QLabel" name="label_segment">
                        <property name="text">
                         <string>Segment size:</string>
                        </property>
@@ -858,14 +858,14 @@
                    <item>
                     <layout class="QVBoxLayout" name="verticalLayout_27">
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_cpu_affinity">
+                      <widget class="QLineEdit" name="lineEdit_cpu_affinity">
                        <property name="toolTip">
                         <string>locks to CPU devices, seperate with comma</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_devices">
+                      <widget class="QLineEdit" name="lineEdit_devices">
                        <property name="toolTip">
                         <string>devices to use, seperate with comma</string>
                        </property>
@@ -875,7 +875,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_oclhcplus_accel">
+                      <widget class="QSpinBox" name="spinBox_accel">
                        <property name="toolTip">
                         <string>workload tuning: 1, 8, 40, 80, 160</string>
                        </property>
@@ -888,7 +888,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_oclhcplus_loops">
+                      <widget class="QSpinBox" name="spinBox_loops">
                        <property name="maximum">
                         <number>999999999</number>
                        </property>
@@ -898,7 +898,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_oclhcplus_watchdog">
+                      <widget class="QSpinBox" name="spinBox_watchdog">
                        <property name="toolTip">
                         <string>automatically abort session at NUM celsius</string>
                        </property>
@@ -911,7 +911,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_oclhcplus_segment">
+                      <widget class="QSpinBox" name="spinBox_segment">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -937,7 +937,7 @@
                   </layout>
                  </item>
                  <item row="0" column="0">
-                  <widget class="QCheckBox" name="checkBox_oclhcplus_async">
+                  <widget class="QCheckBox" name="checkBox_async">
                    <property name="text">
                     <string>Use non-blocking async calls</string>
                    </property>
@@ -947,7 +947,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_oclhcplus_output">
+               <widget class="QGroupBox" name="groupBox_output">
                 <property name="title">
                  <string>Output</string>
                 </property>
@@ -955,7 +955,7 @@
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
                    <item>
-                    <widget class="QCheckBox" name="checkBox_oclhcplus_outfile">
+                    <widget class="QCheckBox" name="checkBox_outfile">
                      <property name="text">
                       <string>Write recovered hashes to file:</string>
                      </property>
@@ -964,7 +964,7 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_63">
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_oclhcplus_outfile">
+                      <widget class="QLineEdit" name="lineEdit_outfile">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -980,7 +980,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="pushButton_oclhcplus_output">
+                      <widget class="QPushButton" name="pushButton_output">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -994,7 +994,7 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_38">
                      <item>
-                      <widget class="QLabel" name="label_oclhcplus_outfile_format">
+                      <widget class="QLabel" name="label_outfile_format">
                        <property name="enabled">
                         <bool>true</bool>
                        </property>
@@ -1007,7 +1007,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QComboBox" name="comboBox_oclhcplus_outfile_format">
+                      <widget class="QComboBox" name="comboBox_outfile_format">
                        <property name="enabled">
                         <bool>true</bool>
                        </property>
@@ -1082,14 +1082,14 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_42">
               <item>
-               <widget class="QPushButton" name="pushButton_oclhcplus_execute">
+               <widget class="QPushButton" name="pushButton_execute">
                 <property name="text">
                  <string>Start</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_oclhcplus_command">
+               <widget class="QLineEdit" name="lineEdit_command">
                 <property name="readOnly">
                  <bool>true</bool>
                 </property>
@@ -1214,10 +1214,10 @@
  </resources>
  <connections>
   <connection>
-   <sender>spinBox_oclhcplus_password_min</sender>
+   <sender>spinBox_password_min</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>160</x>
@@ -1230,10 +1230,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_oclhcplus_attack</sender>
+   <sender>comboBox_attack</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>146</x>
@@ -1246,10 +1246,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_outfile</sender>
+   <sender>checkBox_outfile</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>683</x>
@@ -1262,10 +1262,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_open_rulesfile_1</sender>
+   <sender>lineEdit_open_rulesfile_1</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
@@ -1278,10 +1278,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_oclhcplus_generate_rules</sender>
+   <sender>radioButton_generate_rules</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>95</x>
@@ -1294,10 +1294,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_mask</sender>
+   <sender>lineEdit_mask</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>628</x>
@@ -1310,10 +1310,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_custom1</sender>
+   <sender>lineEdit_custom1</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1326,10 +1326,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_remove</sender>
+   <sender>checkBox_remove</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>131</x>
@@ -1342,10 +1342,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_rulesfile_3</sender>
+   <sender>checkBox_rulesfile_3</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>115</x>
@@ -1358,10 +1358,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_cpu_affinity</sender>
+   <sender>lineEdit_cpu_affinity</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1374,10 +1374,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_oclhcplus_watchdog</sender>
+   <sender>spinBox_watchdog</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1390,10 +1390,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>radioButton_oclhcplus_use_rules_file</sender>
+   <sender>radioButton_use_rules_file</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>100</x>
@@ -1406,10 +1406,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_hex_hash</sender>
+   <sender>checkBox_hex_hash</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>639</x>
@@ -1422,10 +1422,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_devices</sender>
+   <sender>lineEdit_devices</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1438,10 +1438,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_custom1</sender>
+   <sender>checkBox_custom1</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1454,10 +1454,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_open_hashfile</sender>
+   <sender>lineEdit_open_hashfile</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>210</x>
@@ -1470,10 +1470,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_custom3</sender>
+   <sender>checkBox_custom3</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1486,10 +1486,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_hex_salt</sender>
+   <sender>checkBox_hex_salt</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>639</x>
@@ -1502,10 +1502,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_custom4</sender>
+   <sender>lineEdit_custom4</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1518,10 +1518,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_open_rulesfile_2</sender>
+   <sender>lineEdit_open_rulesfile_2</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
@@ -1534,10 +1534,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_oclhcplus_password_max</sender>
+   <sender>spinBox_password_max</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>260</x>
@@ -1550,10 +1550,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_open_rulesfile_3</sender>
+   <sender>lineEdit_open_rulesfile_3</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
@@ -1566,10 +1566,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_custom4</sender>
+   <sender>checkBox_custom4</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1582,10 +1582,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_rulesfile_1</sender>
+   <sender>checkBox_rulesfile_1</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>117</x>
@@ -1598,10 +1598,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_custom3</sender>
+   <sender>lineEdit_custom3</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1614,10 +1614,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_oclhcplus_hash</sender>
+   <sender>comboBox_hash</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>730</x>
@@ -1630,10 +1630,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_custom2</sender>
+   <sender>checkBox_custom2</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1646,10 +1646,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_custom2</sender>
+   <sender>lineEdit_custom2</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1662,10 +1662,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_oclhcplus_accel</sender>
+   <sender>spinBox_accel</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1678,10 +1678,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_oclhcplus_outfile</sender>
+   <sender>lineEdit_outfile</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>596</x>
@@ -1694,10 +1694,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_oclhcplus_segment</sender>
+   <sender>spinBox_segment</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1710,10 +1710,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_oclhcplus_outfile_format</sender>
+   <sender>comboBox_outfile_format</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>636</x>
@@ -1726,10 +1726,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_rulesfile_2</sender>
+   <sender>checkBox_rulesfile_2</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>90</x>
@@ -1742,10 +1742,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_oclhcplus_loops</sender>
+   <sender>spinBox_loops</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1758,10 +1758,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_oclhcplus_generate_rules</sender>
+   <sender>spinBox_generate_rules</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>243</x>
@@ -1774,10 +1774,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_ignoreusername</sender>
+   <sender>checkBox_ignoreusername</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>640</x>
@@ -1790,10 +1790,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_oclhcplus_async</sender>
+   <sender>checkBox_async</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>oclhcplusCommandChanged()</slot>
+   <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>153</x>
@@ -1807,9 +1807,7 @@
   </connection>
  </connections>
  <slots>
-  <slot>hcCommandChanged()</slot>
-  <slot>oclhcplusCommandChanged()</slot>
-  <slot>oclhcliteCommandChanged()</slot>
+  <slot>CommandChanged()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="buttonGroup"/>
