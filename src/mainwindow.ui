@@ -604,14 +604,14 @@
                      <property name="toolTip">
                       <string>Built-in charsets:
 
-  ?l = abcdefghijklmnopqrstuvwxyz
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ
-  ?d = 0123456789
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[\]^_`{|}~
-  ?h = 8 bit characters from 0xc0 - 0xff
-  ?D = 8 bit characters from german alphabet
-  ?F = 8 bit characters from french alphabet
-  ?R = 8 bit characters from russian alphabet</string>
+  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
+  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
+  ?d = 0123456789 [0-9]
+  ?h = 0123456789abcdef [0-9a-f]
+  ?H = 0123456789ABCDEF [0-9A-F]
+  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
+  ?a = ?l?u?d?s
+  ?b = 0x00 - 0xff</string>
                      </property>
                      <property name="text">
                       <string/>
@@ -656,14 +656,14 @@
                        <property name="toolTip">
                         <string>Built-in charsets:
 
-  ?l = abcdefghijklmnopqrstuvwxyz
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ
-  ?d = 0123456789
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[\]^_`{|}~
-  ?h = 8 bit characters from 0xc0 - 0xff
-  ?D = 8 bit characters from german alphabet
-  ?F = 8 bit characters from french alphabet
-  ?R = 8 bit characters from russian alphabet</string>
+  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
+  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
+  ?d = 0123456789 [0-9]
+  ?h = 0123456789abcdef [0-9a-f]
+  ?H = 0123456789ABCDEF [0-9A-F]
+  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
+  ?a = ?l?u?d?s
+  ?b = 0x00 - 0xff</string>
                        </property>
                        <property name="text">
                         <string/>
@@ -698,14 +698,14 @@
                        <property name="toolTip">
                         <string>Built-in charsets:
 
-  ?l = abcdefghijklmnopqrstuvwxyz
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ
-  ?d = 0123456789
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[\]^_`{|}~
-  ?h = 8 bit characters from 0xc0 - 0xff
-  ?D = 8 bit characters from german alphabet
-  ?F = 8 bit characters from french alphabet
-  ?R = 8 bit characters from russian alphabet</string>
+  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
+  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
+  ?d = 0123456789 [0-9]
+  ?h = 0123456789abcdef [0-9a-f]
+  ?H = 0123456789ABCDEF [0-9A-F]
+  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
+  ?a = ?l?u?d?s
+  ?b = 0x00 - 0xff</string>
                        </property>
                        <property name="text">
                         <string/>
@@ -740,14 +740,14 @@
                        <property name="toolTip">
                         <string>Built-in charsets:
 
-  ?l = abcdefghijklmnopqrstuvwxyz
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ
-  ?d = 0123456789
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[\]^_`{|}~
-  ?h = 8 bit characters from 0xc0 - 0xff
-  ?D = 8 bit characters from german alphabet
-  ?F = 8 bit characters from french alphabet
-  ?R = 8 bit characters from russian alphabet</string>
+  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
+  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
+  ?d = 0123456789 [0-9]
+  ?h = 0123456789abcdef [0-9a-f]
+  ?H = 0123456789ABCDEF [0-9A-F]
+  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
+  ?a = ?l?u?d?s
+  ?b = 0x00 - 0xff</string>
                        </property>
                        <property name="text">
                         <string/>
@@ -779,14 +779,14 @@
                        <property name="toolTip">
                         <string>Built-in charsets:
 
-  ?l = abcdefghijklmnopqrstuvwxyz
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ
-  ?d = 0123456789
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[\]^_`{|}~
-  ?h = 8 bit characters from 0xc0 - 0xff
-  ?D = 8 bit characters from german alphabet
-  ?F = 8 bit characters from french alphabet
-  ?R = 8 bit characters from russian alphabet</string>
+  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
+  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
+  ?d = 0123456789 [0-9]
+  ?h = 0123456789abcdef [0-9a-f]
+  ?H = 0123456789ABCDEF [0-9A-F]
+  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
+  ?a = ?l?u?d?s
+  ?b = 0x00 - 0xff</string>
                        </property>
                       </widget>
                      </item>
@@ -1812,7 +1812,6 @@
   <slot>oclhcliteCommandChanged()</slot>
  </slots>
  <buttongroups>
-  <buttongroup name="buttonGroup_hc_rules"/>
   <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
