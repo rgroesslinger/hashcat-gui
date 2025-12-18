@@ -13,11 +13,9 @@ class SettingsManager
 public:
     static SettingsManager& instance();
 
-    // Getters
-    QString hashcatPath() const;
+    QString getKey(const QString& key) const;
 
-    // Setters
-    void hashcatPath(const QString& path);
+    void setKey(const QString& key, const QString& value);
 
 private:
     SettingsManager();

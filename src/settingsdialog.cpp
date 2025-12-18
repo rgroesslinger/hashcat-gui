@@ -6,6 +6,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include "settingsmanager.h"
+#include "helperutils.h"
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
@@ -23,7 +24,20 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::readSettings() {
     auto& settings = SettingsManager::instance();
 
-    ui->lineEdit_hc_path->setText(settings.hashcatPath());
+    // hashcat path
+    ui->lineEdit_hc_path->setText(settings.getKey("hashcatPath"));
+
+    // available terminals
+    QMap <QString, QStringList> availableTermins = HelperUtils::getAvailableTerminals();
+
+    for (const QString& key : availableTermins.keys()) {
+        ui->comboBox_terminal->addItem(key);
+        // Pre-select a terminal if we have one in the config
+        if (key == settings.getKey("terminal")) {
+            int lastIndex = ui->comboBox_terminal->count() - 1;
+            ui->comboBox_terminal->setCurrentIndex(lastIndex);
+        }
+    }
 }
 
 // Configure path to hashcat binary
@@ -39,7 +53,8 @@ void SettingsDialog::on_pushButton_save_clicked()
 {
     // Save values in persistent settings
     auto& settings = SettingsManager::instance();
-    settings.hashcatPath(ui->lineEdit_hc_path->text());
+    settings.setKey("hashcatPath", ui->lineEdit_hc_path->text());
+    settings.setKey("terminal", ui->comboBox_terminal->currentText());
 
     // accept() signals our parent that settings might have changed
     this->accept();

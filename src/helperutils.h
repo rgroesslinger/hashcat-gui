@@ -13,6 +13,7 @@ class HelperUtils
 public:
     HelperUtils();
     static QString executeHashcat(QStringList& args);
+    static QMap<QString, QStringList> getAvailableTerminals();
 };
 
 #endif // HELPERUTILS_H

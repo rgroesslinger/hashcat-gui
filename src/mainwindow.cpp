@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->listWidget_wordlist->model(), SIGNAL(rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)), this, SLOT(CommandChanged()));
 
     // Show Settings dialog if path to hashcat has not been configured yet
-    if (settings.hashcatPath().isEmpty()) {
+    if (settings.getKey("hashcatPath").isEmpty()) {
         QMetaObject::invokeMethod(this, [this]() {
             ui->actionSettings->triggered();
         }, Qt::QueuedConnection);
@@ -47,32 +47,14 @@ MainWindow::~MainWindow()
 
 /********* MainWindow *************************************/
 
-QStringList MainWindow::generate_terminal_env() {
-    QStringList arguments;
-    QString path;
-
-    auto& settings = SettingsManager::instance();
-    if (!settings.hashcatPath().isEmpty()) {
-        path = settings.hashcatPath();
-    }
-
-#if defined(Q_WS_WIN)
-    arguments << "/k" << path;
-#else
-    arguments << "-hold" << "-e" << path;
-#endif
-
-    return arguments;
-}
-
 void MainWindow::CommandChanged(QString arg) {
     auto& settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.hashcatPath());
+    QFileInfo fileInfo(settings.getKey("hashcatPath"));
 
     ui->lineEdit_command->clear();
 
     // prepend hashcat binary name if it has already been configured in settings
-    if (!settings.hashcatPath().isEmpty()) {
+    if (!settings.getKey("hashcatPath").isEmpty()) {
         ui->lineEdit_command->setText(fileInfo.fileName());
     }
 
@@ -183,7 +165,7 @@ void MainWindow::init_hash_and_attack_modes() {
     QString hashTypes;
 
     // Read list of example hashes, returns JSON
-    if (!settings.hashcatPath().isEmpty()) {
+    if (!settings.getKey("hashcatPath").isEmpty()) {
         hashTypes = HelperUtils::executeHashcat(QStringList() << "--example-hashes" << "--machine-readable").remove('\n').remove('\r');
     }
 
@@ -477,13 +459,8 @@ QStringList MainWindow::generate_arguments()
 
     int attackMode = attackModes.key(ui->comboBox_attack->currentText());
 
-    if(hashModes.key(ui->comboBox_hash->currentText()) != 0) {
-        arguments << "--hash-type" << QString::number(hashModes.key(ui->comboBox_hash->currentText()));
-    }
-
-    if ( attackMode != 0 ) {
-        arguments << "--attack-mode" << QString::number(attackMode);
-    }
+    arguments << "--hash-type" << QString::number(hashModes.key(ui->comboBox_hash->currentText()));
+    arguments << "--attack-mode" << QString::number(attackMode);
 
     if (ui->checkBox_remove->isChecked()) {
         arguments << "--remove";
@@ -623,9 +600,10 @@ QStringList MainWindow::generate_arguments()
 
 void MainWindow::on_pushButton_execute_clicked()
 {
-    QStringList env = generate_terminal_env();
-    QStringList arguments = generate_arguments();
-    CommandChanged(arguments.join(" "));
+    auto& settings = SettingsManager::instance();
+    QProcess proc;
+    QString terminal;
+    QStringList arguments;
 
     if (ui->lineEdit_open_hashfile->text().isEmpty()) {
         QMessageBox msgBox(this);
@@ -635,8 +613,41 @@ void MainWindow::on_pushButton_execute_clicked()
         return;
     }
 
-    QProcess proc;
-    //TODO
-    //proc.startDetached(TERMINAL, env << arguments);
+    if (settings.getKey("hashcatPath").isEmpty()) {
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Please configure the path to the hashcat binary in settings first.");
+        msgBox.exec();
+        return;
+    }
+
+    if (settings.getKey("terminal").isEmpty()) {
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Please configure a terminal in settings first.");
+        msgBox.exec();
+        return;
+    }
+
+    // 1. Get arguments needed for the selected terminal
+    QMap <QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
+    for (const QString& key : availableTerminals.keys()) {
+        // The configured terminal has a known configuration
+        if (key == settings.getKey("terminal")) {
+            terminal = key;
+            arguments << availableTerminals.value(key);
+        }
+    }
+
+    // 2. append hashcat binary to launch comand
+    arguments << settings.getKey("hashcatPath");
+
+    // 3. append arguments set in gui elements
+    arguments << generate_arguments();
+
+    qInfo() << terminal;
+    qInfo() << arguments;
+
+    proc.startDetached(terminal, arguments, QFileInfo(settings.getKey("hascatPath")).absolutePath());
 }
 

@@ -18,14 +18,14 @@ SettingsManager& SettingsManager::instance()
     return instance;
 }
 
-// Getters
-QString SettingsManager::hashcatPath() const
+// Getter
+QString SettingsManager::getKey(const QString& key) const
 {
-    return settings.value(QStringLiteral("hashcatPath"), QString()).toString();
+    return settings.value(key, QString()).toString();
 }
 
-// Setters
-void SettingsManager::hashcatPath(const QString& path)
+// Setter
+void SettingsManager::setKey(const QString& key, const QString& value)
 {
-    settings.setValue(QStringLiteral("hashcatPath"), path);
+    settings.setValue(key, value);
 }

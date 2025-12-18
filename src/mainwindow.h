@@ -93,7 +93,6 @@ private:
     void init_hash_and_attack_modes();
     void update_view_attack_mode();
 
-    QStringList generate_terminal_env();
     QStringList generate_arguments();
 
     void add_hash_and_attack_modes(QComboBox *&, QMap <quint32, QString> &);

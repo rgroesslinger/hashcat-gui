@@ -7,6 +7,7 @@
 #include "settingsmanager.h"
 #include <QProcess>
 #include <QString>
+#include <QStandardPaths>
 
 HelperUtils::HelperUtils() {}
 
@@ -20,8 +21,8 @@ QString HelperUtils::executeHashcat(QStringList& args) {
     // Always run in quiet mode when reading output
     args << "--quiet";
 
-    if (!settings.hashcatPath().isEmpty()) {
-        process.setProgram(settings.hashcatPath());
+    if (!settings.getKey("hashcatPath").isEmpty()) {
+        process.setProgram(settings.getKey("hashcatPath"));
         process.setArguments(args);
         process.start();
         process.waitForFinished();
@@ -32,5 +33,30 @@ QString HelperUtils::executeHashcat(QStringList& args) {
         return output;
     }
 
-    return QString("Error executing " + settings.hashcatPath() + " " + args.join(" "));
+    return QString("Error executing " + settings.getKey("hashcatPath") + " " + args.join(" "));
+}
+
+// Returns all supported terminals
+QMap<QString, QStringList> HelperUtils::getAvailableTerminals() {
+    QMap<QString, QStringList> terminals;
+
+    // List of terminals and needed arguments to launch them with an external command
+    QMap<QString, QStringList> terminalMap = {
+        {"cmd.exe", {"/k"}},
+        {"xterm", {"-hold", "-e"}},
+        {"gnome-terminal", {"--wait", "--"}},
+        {"ptyxis", {"--"}},
+        {"konsole", {"--hold", "-e"}},
+        {"xfce4-terminal", {"--hold", "-e"}},
+    };
+
+    // Check which ones are actually available
+    for (auto it = terminalMap.begin(); it != terminalMap.end(); ++it) {
+        QString fullPath = QStandardPaths::findExecutable(it.key());
+        if (!fullPath.isEmpty()) {
+            terminals.insert(it.key(), it.value());
+        }
+    }
+
+    return terminals;
 }

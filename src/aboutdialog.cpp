@@ -29,9 +29,9 @@ void AboutDialog::on_pushButton_about_ok_clicked()
 
 void AboutDialog::get_versions() {
     auto& settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.hashcatPath());
+    QFileInfo fileInfo(settings.getKey("hashcatPath"));
 
-    if (!settings.hashcatPath().isEmpty()) {
+    if (!settings.getKey("hashcatPath").isEmpty()) {
         ui->label_hc_version_text->setText(fileInfo.fileName());
         ui->label_hc_version->setText(HelperUtils::executeHashcat(QStringList() << "--version").remove('\n').remove('\r'));
     }
