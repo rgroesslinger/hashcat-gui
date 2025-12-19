@@ -18,6 +18,10 @@
 #include <QProcess>
 #include <QJsonDocument>
 #include <QJsonObject>
+#if defined(Q_WS_WIN)
+#include <process.h>
+#include <windows.h>
+#endif
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -645,9 +649,16 @@ void MainWindow::on_pushButton_execute_clicked()
     // 3. append arguments set in gui elements
     arguments << generate_arguments();
 
-    qInfo() << terminal;
-    qInfo() << arguments;
+#if defined(Q_WS_WIN)
+    // Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal
+    proc.setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments *args)
+    {
+        args->flags |= CREATE_NEW_CONSOLE;
+    });
+#endif
 
-    proc.startDetached(terminal, arguments, QFileInfo(settings.getKey("hascatPath")).absolutePath());
+    proc.setProgram(terminal);
+    proc.setArguments(arguments);
+    proc.setWorkingDirectory(QFileInfo(settings.getKey("hashcatPath")).absolutePath());
+    proc.startDetached();
 }
-

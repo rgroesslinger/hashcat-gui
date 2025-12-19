@@ -8,6 +8,7 @@
 #include <QProcess>
 #include <QString>
 #include <QStandardPaths>
+#include <QFileInfo>
 
 HelperUtils::HelperUtils() {}
 
@@ -24,6 +25,7 @@ QString HelperUtils::executeHashcat(QStringList& args) {
     if (!settings.getKey("hashcatPath").isEmpty()) {
         process.setProgram(settings.getKey("hashcatPath"));
         process.setArguments(args);
+        process.setWorkingDirectory(QFileInfo(settings.getKey("hashcatPath")).absolutePath());
         process.start();
         process.waitForFinished();
         output = process.readAllStandardOutput();
