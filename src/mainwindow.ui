@@ -59,9 +59,9 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-20</y>
              <width>712</width>
-             <height>958</height>
+             <height>830</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_38">
@@ -807,7 +807,7 @@
                  <string>Resources</string>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_12">
-                 <item row="1" column="0">
+                 <item row="0" column="0">
                   <layout class="QHBoxLayout" name="horizontalLayout_31">
                    <item>
                     <layout class="QVBoxLayout" name="verticalLayout_26">
@@ -821,28 +821,7 @@
                      <item>
                       <widget class="QLabel" name="label_devices">
                        <property name="text">
-                        <string>GPU devices:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_accel">
-                       <property name="text">
-                        <string>GPU workload tuning:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_loops">
-                       <property name="text">
-                        <string>GPU loops:</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QLabel" name="label_watchdog">
-                       <property name="text">
-                        <string>GPU watchdog:</string>
+                        <string>Backend devices:</string>
                        </property>
                       </widget>
                      </item>
@@ -875,42 +854,6 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_accel">
-                       <property name="toolTip">
-                        <string>workload tuning: 1, 8, 40, 80, 160</string>
-                       </property>
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                       <property name="value">
-                        <number>8</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QSpinBox" name="spinBox_loops">
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                       <property name="value">
-                        <number>256</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QSpinBox" name="spinBox_watchdog">
-                       <property name="toolTip">
-                        <string>automatically abort session at NUM celsius</string>
-                       </property>
-                       <property name="maximum">
-                        <number>999999999</number>
-                       </property>
-                       <property name="value">
-                        <number>90</number>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
                       <widget class="QSpinBox" name="spinBox_segment">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -935,13 +878,6 @@
                     </layout>
                    </item>
                   </layout>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QCheckBox" name="checkBox_async">
-                   <property name="text">
-                    <string>Use non-blocking async calls</string>
-                   </property>
-                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -1007,54 +943,21 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QComboBox" name="comboBox_outfile_format">
-                       <property name="enabled">
-                        <bool>true</bool>
+                      <widget class="QLineEdit" name="lineEdit_outfile_format">
+                       <property name="toolTip">
+                        <string>Outfile format to use, separated with commas.
+default: 1,2
+
+  1 = hash[:salt]
+  2 = plain
+  3 = hex_plain
+  4 = crack_pos
+  5 = timestamp absolute
+  6 = timestamp relative</string>
                        </property>
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
+                       <property name="text">
+                        <string>1,2</string>
                        </property>
-                       <property name="currentIndex">
-                        <number>2</number>
-                       </property>
-                       <item>
-                        <property name="text">
-                         <string>hash[:salt]</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>plain</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>hash[:salt]:plain</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>hex_plain</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>hash[:salt]:hex_plain</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>plain:hex_plain</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>hash[:salt]:plain:hex_plain</string>
-                        </property>
-                       </item>
                       </widget>
                      </item>
                      <item>
@@ -1374,22 +1277,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_watchdog</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>304</x>
-     <y>932</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>3</x>
-     <y>781</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>radioButton_use_rules_file</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -1662,22 +1549,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_accel</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>304</x>
-     <y>862</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>262</x>
-     <y>781</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>lineEdit_outfile</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
@@ -1710,22 +1581,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>comboBox_outfile_format</sender>
-   <signal>currentIndexChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>636</x>
-     <y>932</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>606</x>
-     <y>568</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>checkBox_rulesfile_2</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
@@ -1738,22 +1593,6 @@
     <hint type="destinationlabel">
      <x>7</x>
      <y>395</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox_loops</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>304</x>
-     <y>897</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>340</x>
-     <y>781</y>
     </hint>
    </hints>
   </connection>
@@ -1790,18 +1629,18 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBox_async</sender>
-   <signal>toggled(bool)</signal>
+   <sender>lineEdit_outfile_format</sender>
+   <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
    <slot>CommandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>153</x>
-     <y>755</y>
+     <x>510</x>
+     <y>802</y>
     </hint>
     <hint type="destinationlabel">
-     <x>2</x>
-     <y>424</y>
+     <x>382</x>
+     <y>450</y>
     </hint>
    </hints>
   </connection>

@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-or-later
- * SPDX-FileCopyrightText: 2012-2025 Rainer Größlinger
+ * SPDX-FileCopyrightText: 2012-2026 Rainer Größlinger
  */
 
 #include "mainwindow.h"
@@ -100,13 +100,9 @@ void MainWindow::on_actionReset_fields_triggered()
     ui->spinBox_password_max->setValue(16);
     ui->checkBox_outfile->setChecked(false);
     ui->lineEdit_outfile->clear();
-    ui->comboBox_outfile_format->setCurrentIndex(2);
-    ui->checkBox_async->setChecked(false);
+    ui->lineEdit_outfile_format->setText("1,2");
     ui->lineEdit_cpu_affinity->clear();
     ui->lineEdit_devices->setText("0");
-    ui->spinBox_accel->setValue(8);
-    ui->spinBox_loops->setValue(256);
-    ui->spinBox_watchdog->setValue(90);
     ui->spinBox_segment->setValue(32);
     this->CommandChanged();
 }
@@ -466,7 +462,7 @@ QStringList MainWindow::generate_arguments()
     }
 
     switch(attackMode) {
-    case 0:
+    case AttackMode::Straight:
         if ( ui->radioButton_use_rules_file->isChecked()) {
             if (ui->checkBox_rulesfile_1->isChecked() && !ui->lineEdit_open_rulesfile_1->text().isEmpty()) {
                 arguments << "--rules-file" << ui->lineEdit_open_rulesfile_1->text();
@@ -483,24 +479,22 @@ QStringList MainWindow::generate_arguments()
             arguments << "--generate-rules" << ui->spinBox_generate_rules->cleanText();
         }
         break;
-    case 1:
+    case AttackMode::Combination:
         break;
-    case 3:
+    case AttackMode::BruteForce:
         mask_before_dict = ui->lineEdit_mask->text();
         break;
-    case 4:
-        arguments << "--perm-min" << ui->spinBox_password_min->cleanText();
-        arguments << "--perm-max" << ui->spinBox_password_max->cleanText();
-        break;
-    case 6:
+    case AttackMode::HybridWordMask:
         if (!ui->lineEdit_mask->text().isEmpty()) {
             mask_after_dict = ui->lineEdit_mask->text();
         }
         break;
-    case 7:
+    case AttackMode::HybridMaskWord:
         if (!ui->lineEdit_mask->text().isEmpty()) {
             mask_before_dict = ui->lineEdit_mask->text();
         }
+        break;
+    case AttackMode::Association:
         break;
     }
 
@@ -538,12 +532,8 @@ QStringList MainWindow::generate_arguments()
         arguments << "--outfile" << outfile;
     }
 
-    if (ui->comboBox_outfile_format->currentIndex() != 2) {
-        arguments << "--outfile-format" << QString::number(ui->comboBox_outfile_format->currentIndex()+1);
-    }
-
-    if (ui->checkBox_async->isChecked()) {
-        arguments << "--gpu-async";
+    if (ui->lineEdit_outfile_format->text() != "1,2") {
+        arguments << "--outfile-format" << ui->lineEdit_outfile_format->text();
     }
 
     if (!ui->lineEdit_cpu_affinity->text().isEmpty()) {
@@ -551,19 +541,7 @@ QStringList MainWindow::generate_arguments()
     }
 
     if (!ui->lineEdit_devices->text().isEmpty() && ui->lineEdit_devices->text() != "0") {
-        arguments << "--gpu-devices" << ui->lineEdit_devices->text();
-    }
-
-    if (!ui->spinBox_accel->cleanText().isEmpty() && ui->spinBox_accel->cleanText() != "8") {
-        arguments << "--gpu-accel" << ui->spinBox_accel->cleanText();
-    }
-
-    if (!ui->spinBox_loops->cleanText().isEmpty() && ui->spinBox_loops->cleanText() != "256") {
-        arguments << "--gpu-loops" << ui->spinBox_loops->cleanText();
-    }
-
-    if (!ui->spinBox_watchdog->cleanText().isEmpty() && ui->spinBox_watchdog->cleanText() != "90") {
-        arguments << "--gpu-watchdog" << ui->spinBox_watchdog->cleanText();
+      arguments << "--backend-devices" << ui->lineEdit_devices->text();
     }
 
     if (!ui->spinBox_segment->cleanText().isEmpty() && ui->spinBox_segment->cleanText() != "32") {
