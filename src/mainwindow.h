@@ -99,6 +99,17 @@ private:
     void add_wordlist_item(QString &);
     void add_wordlist_item(QStringList &);
     void set_outfile_path();
+
+    // Supported attack modes
+    enum AttackMode
+    {
+        Straight       = 0,
+        Combination    = 1,
+        BruteForce     = 3,
+        HybridWordMask = 6,
+        HybridMaskWord = 7,
+        Association    = 9
+    };
 };
 
 #endif // MAINWINDOW_H

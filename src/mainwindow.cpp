@@ -157,12 +157,12 @@ void MainWindow::init_hash_and_attack_modes() {
     hashModes.clear();
 
     // Attack modes
-    attackModes.insert(0, "Straight");
-    attackModes.insert(1, "Combination");
-    attackModes.insert(3, "Brute-force");
-    attackModes.insert(6, "Hybrid Wordlist + Mask");
-    attackModes.insert(7, "Hybrid Mask + Wordlist");
-    attackModes.insert(9, "Association");
+    attackModes.insert(AttackMode::Straight, "Straight");
+    attackModes.insert(AttackMode::Combination, "Combination");
+    attackModes.insert(AttackMode::BruteForce, "Brute-force");
+    attackModes.insert(AttackMode::HybridWordMask, "Hybrid Wordlist + Mask");
+    attackModes.insert(AttackMode::HybridMaskWord, "Hybrid Mask + Wordlist");
+    attackModes.insert(AttackMode::Association, "Association");
 
     // Hash types
     auto& settings = SettingsManager::instance();
@@ -251,41 +251,32 @@ void MainWindow::update_view_attack_mode()
     bool groupWordlists = false, groupRules = false, groupPassword = false, groupMask = false;
 
     switch(attackMode) {
-    case 0:
-        // Straight
+    case AttackMode::Straight:
         groupWordlists = true;
         groupRules = true;
         groupPassword = false;
         groupMask = false;
         break;
-    case 1:
-        // Combination
+    case AttackMode::Combination:
         groupWordlists = true;
         groupRules = false;
         groupPassword = false;
         groupMask = false;
         break;
-    case 3:
-        // Brute-force
+    case AttackMode::BruteForce:
         groupWordlists = false;
         groupRules = false;
         groupPassword = false;
         groupMask = true;
         break;
-    case 4:
-        // Permutation
-        groupWordlists = true;
-        groupRules = false;
-        groupPassword = true;
-        groupMask = false;
-        break;
-    case 6:
-    case 7:
-        // Hybrid dict + mask
+    case AttackMode::HybridWordMask:
+    case AttackMode::HybridMaskWord:
         groupWordlists = true;
         groupRules = false;
         groupPassword = false;
         groupMask = true;
+        break;
+    case AttackMode::Association:
         break;
     }
 
