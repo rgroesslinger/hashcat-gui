@@ -18,7 +18,7 @@
 #include <QProcess>
 #include <QJsonDocument>
 #include <QJsonObject>
-#if defined(Q_WS_WIN)
+#if defined(Q_OS_WIN)
 #include <process.h>
 #include <windows.h>
 #endif
@@ -609,7 +609,7 @@ void MainWindow::on_pushButton_execute_clicked()
     // 3. append arguments set in gui elements
     arguments << generate_arguments();
 
-#if defined(Q_WS_WIN)
+#if defined(Q_OS_WIN)
     // Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal
     proc.setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments *args)
     {
