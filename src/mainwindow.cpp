@@ -83,8 +83,6 @@ void MainWindow::on_actionReset_fields_triggered()
     ui->lineEdit_open_rulesfile_2->clear();
     ui->lineEdit_open_rulesfile_3->clear();
     ui->spinBox_generate_rules->setValue(1);
-    ui->spinBox_password_min->setValue(ui->spinBox_password_min->minimum());
-    ui->spinBox_password_max->setValue(ui->spinBox_password_max->maximum());
     ui->lineEdit_mask->clear();
     ui->checkBox_custom1->setChecked(false);
     ui->lineEdit_custom1->clear();
@@ -96,8 +94,6 @@ void MainWindow::on_actionReset_fields_triggered()
     ui->lineEdit_custom4->clear();
     ui->checkBox_hex_hash->setChecked(false);
     ui->checkBox_hex_salt->setChecked(false);
-    ui->spinBox_password_min->setValue(1);
-    ui->spinBox_password_max->setValue(16);
     ui->checkBox_outfile->setChecked(false);
     ui->lineEdit_outfile->clear();
     ui->lineEdit_outfile_format->setText("1,2");
@@ -244,32 +240,28 @@ void MainWindow::on_comboBox_attack_currentIndexChanged([[maybe_unused]] int ind
 void MainWindow::update_view_attack_mode()
 {
     int attackMode = attackModes.key(ui->comboBox_attack->currentText());
-    bool groupWordlists = false, groupRules = false, groupPassword = false, groupMask = false;
+    bool groupWordlists = false, groupRules = false, groupMask = false;
 
     switch(attackMode) {
     case AttackMode::Straight:
         groupWordlists = true;
         groupRules = true;
-        groupPassword = false;
         groupMask = false;
         break;
     case AttackMode::Combination:
         groupWordlists = true;
         groupRules = false;
-        groupPassword = false;
         groupMask = false;
         break;
     case AttackMode::BruteForce:
         groupWordlists = false;
         groupRules = false;
-        groupPassword = false;
         groupMask = true;
         break;
     case AttackMode::HybridWordMask:
     case AttackMode::HybridMaskWord:
         groupWordlists = true;
         groupRules = false;
-        groupPassword = false;
         groupMask = true;
         break;
     case AttackMode::Association:
@@ -278,7 +270,6 @@ void MainWindow::update_view_attack_mode()
 
     ui->groupBox_wordlists->setDisabled(!groupWordlists);
     ui->groupBox_rules->setDisabled(!groupRules);
-    ui->groupBox_password->setDisabled(!groupPassword);
     ui->groupBox_custom_charset->setDisabled(!groupMask);
     ui->groupBox_mask->setDisabled(!groupMask);
     this->CommandChanged();
