@@ -18,6 +18,8 @@
 #include <QProcess>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QAbstractItemModel>
+
 #if defined(Q_OS_WIN)
 #include <process.h>
 #include <windows.h>
@@ -32,9 +34,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->init_hash_and_attack_modes();
     this->update_view_attack_mode();
 
-    connect(ui->listWidget_wordlist->model(), SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(CommandChanged()));
-    connect(ui->listWidget_wordlist->model(), SIGNAL(rowsRemoved(const QModelIndex &, int, int)), this, SLOT(CommandChanged()));
-    connect(ui->listWidget_wordlist->model(), SIGNAL(rowsMoved(const QModelIndex &, int, int, const QModelIndex &, int)), this, SLOT(CommandChanged()));
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this]() { CommandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this]() { CommandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this]() { CommandChanged(); });
 
     // Show Settings dialog if path to hashcat has not been configured yet
     if (settings.getKey("hashcatPath").isEmpty()) {
