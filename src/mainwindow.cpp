@@ -107,10 +107,8 @@ void MainWindow::on_actionReset_fields_triggered()
 
 void MainWindow::on_actionSettings_triggered()
 {
-    SettingsDialog* settings = new SettingsDialog(this);
-    int result = settings->exec();
-
-    if (result == QDialog::Accepted) {
+    SettingsDialog settingsDialog(this);
+    if (settingsDialog.exec() == QDialog::Accepted) {
         // If SettingsDialog was saved and there are no hash types yet maybe we can populate them now
         if (ui->comboBox_hash->count() == 0) {
             this->init_hash_and_attack_modes();
@@ -130,9 +128,8 @@ void MainWindow::on_actionAbout_Qt_triggered()
 
 void MainWindow::on_actionHelp_About_triggered()
 {
-    AboutDialog* about = new AboutDialog(this);
-    about->get_versions();
-    about->show();
+    AboutDialog about(this);
+    about.exec();
 }
 
 void MainWindow::add_hash_and_attack_modes(QComboBox *&combobox, QMap <quint32, QString> &map) {

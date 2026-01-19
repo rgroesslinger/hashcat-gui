@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-or-later
- * SPDX-FileCopyrightText: 2012-2025 Rainer Größlinger
+ * SPDX-FileCopyrightText: 2012-2026 Rainer Größlinger
  */
 
 #include "aboutdialog.h"
@@ -15,6 +15,7 @@ AboutDialog::AboutDialog(QWidget *parent) :
     ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
+    this->updateVersionLabel();
 }
 
 AboutDialog::~AboutDialog()
@@ -27,7 +28,7 @@ void AboutDialog::on_pushButton_about_ok_clicked()
     this->close();
 }
 
-void AboutDialog::get_versions() {
+void AboutDialog::updateVersionLabel() {
     auto& settings = SettingsManager::instance();
     QFileInfo fileInfo(settings.getKey("hashcatPath"));
 
