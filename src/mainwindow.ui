@@ -27,6 +27,9 @@
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget_main">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="tabShape">
        <enum>QTabWidget::TabShape::Rounded</enum>
       </property>
@@ -961,6 +964,9 @@ default: 1,2
        </layout>
       </widget>
       <widget class="QWidget" name="tab_advanced">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <attribute name="title">
         <string>Advanced</string>
        </attribute>
@@ -982,7 +988,100 @@ default: 1,2
              <height>810</height>
             </rect>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_39"/>
+           <layout class="QVBoxLayout" name="verticalLayout_39">
+            <item>
+             <widget class="QGroupBox" name="groupBox_workload_tuning">
+              <property name="title">
+               <string>Workload tuning</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <item>
+                  <widget class="QCheckBox" name="checkBox_override_workload_profile">
+                   <property name="text">
+                    <string>Override workload profile</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboBox_workload_profile">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="toolTip">
+                    <string> # | Performance | Runtime | Power Consumption | Desktop Impact
+ ===+=============+=========+===================+=========
+  1 | Low               |   2 ms    | Low               | Minimal
+  2 | Default         |  12 ms   | Economic     | Noticeable
+  3 | High              |  96 ms   | High              | Unresponsive
+  4 | Nightmare   | 480 ms  | Insane          | Headless
+
+</string>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>2</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>3</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>4</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Policy::Expanding</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
           </widget>
          </widget>
         </item>
@@ -1546,6 +1645,38 @@ default: 1,2
     <hint type="sourcelabel">
      <x>510</x>
      <y>802</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>382</x>
+     <y>450</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox_workload_profile</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>CommandChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>247</x>
+     <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>382</x>
+     <y>450</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_override_workload_profile</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>CommandChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>126</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>

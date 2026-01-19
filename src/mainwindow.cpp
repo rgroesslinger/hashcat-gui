@@ -34,9 +34,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->init_hash_and_attack_modes();
     this->update_view_attack_mode();
 
+    // Signals/Slots for wordlist
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this]() { CommandChanged(); });
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this]() { CommandChanged(); });
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this]() { CommandChanged(); });
+
+    // Signals/Slots for workload tuning
+    connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled, ui->comboBox_workload_profile, &QComboBox::setEnabled);
 
     // Show Settings dialog if path to hashcat has not been configured yet
     if (settings.getKey("hashcatPath").isEmpty()) {
@@ -71,6 +75,7 @@ void MainWindow::CommandChanged(QString arg) {
 
 void MainWindow::on_actionReset_fields_triggered()
 {
+    // Main tab
     ui->lineEdit_open_hashfile->clear();
     ui->checkBox_ignoreusername->setChecked(false);
     ui->checkBox_remove->setChecked(false);
@@ -102,6 +107,11 @@ void MainWindow::on_actionReset_fields_triggered()
     ui->lineEdit_cpu_affinity->clear();
     ui->lineEdit_devices->setText("0");
     ui->spinBox_segment->setValue(32);
+
+    // Advanced tab
+    ui->checkBox_override_workload_profile->setChecked(false);
+    ui->comboBox_workload_profile->setCurrentIndex(0);
+
     this->CommandChanged();
 }
 
@@ -486,6 +496,10 @@ QStringList MainWindow::generate_arguments()
         break;
     case AttackMode::Association:
         break;
+    }
+
+    if (ui->checkBox_override_workload_profile->isChecked()) {
+        arguments << "-w" << ui->comboBox_workload_profile->currentText();
     }
 
     if (ui->groupBox_custom_charset->isEnabled()) {
