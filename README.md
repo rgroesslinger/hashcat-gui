@@ -6,9 +6,7 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 ## Current status
 [![CI Build](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yaml/badge.svg)](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yaml)
 
-✅ Compatibility with Qt6
-
-❌ Compatibility with hashcat 7.x (WIP)
+✅ Compatible with hashcat v7.1.2
 
 ## Build from source
 ```
