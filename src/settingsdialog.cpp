@@ -43,9 +43,13 @@ void SettingsDialog::readSettings() {
 // Configure path to hashcat binary
 void SettingsDialog::on_pushButton_settings_select_path_clicked()
 {
-    QString hashcatPath = QFileDialog::getOpenFileName();
-    if (!hashcatPath.isNull()) {
-        ui->lineEdit_hc_path->setText(QDir::toNativeSeparators(hashcatPath));
+    QFileDialog fileDialog;
+    fileDialog.setFileMode(QFileDialog::ExistingFile);
+    fileDialog.setNameFilter("Executable Files (*.exe *.bin);;All Files (*)");
+
+    if (fileDialog.exec() == QDialog::Accepted) {
+        QString fileName = fileDialog.selectedFiles().first();
+        ui->lineEdit_hc_path->setText(QDir::toNativeSeparators(fileName));
     }
 }
 
