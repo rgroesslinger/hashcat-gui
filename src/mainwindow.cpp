@@ -597,12 +597,11 @@ void MainWindow::on_pushButton_execute_clicked()
 
     // 1. Get arguments needed for the selected terminal
     QMap <QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
-    for (const QString& key : availableTerminals.keys()) {
-        // The configured terminal has a known configuration
-        if (key == settings.getKey("terminal")) {
-            terminal = key;
-            arguments << availableTerminals.value(key);
-        }
+
+    // The configured terminal has a known configuration
+    if (availableTerminals.contains(settings.getKey("terminal"))) {
+        terminal = settings.getKey("terminal");
+        arguments << availableTerminals.value(terminal);
     }
 
     // 2. append hashcat binary to launch comand
