@@ -32,20 +32,31 @@ jobs:
       - name: Copy executable and dependencies
         shell: msys2 {0}
         run: |
+          cd src/
           mkdir "hashcat-gui-${{ github.ref_name }}"
           cp hashcat-gui.exe "hashcat-gui-${{ github.ref_name }}/"
           cd "hashcat-gui-${{ github.ref_name }}/"
           # bundle needed libraries
           ldd hashcat-gui.exe | grep /ucrt64 | awk '{print $3}' | xargs -i cp {} .
           # Run Qt's windows deployment tool
-          windeployqt6.exe hashcat-gui.exe --release --no-libraries --no-translations --no-quick-import --no-system-d3d-compiler --no-system-dxc-compiler --no-compiler-runtime --no-opengl-sw --no-ffmpeg
+          windeployqt6.exe hashcat-gui.exe \
+            --release \
+            --no-libraries \
+            --no-translations \
+            --no-quick-import \
+            --no-system-d3d-compiler \
+            --no-system-dxc-compiler \
+            --no-compiler-runtime \
+            --no-opengl-sw \
+            --no-ffmpeg
 
       - name: Zip release artifacts
         shell: msys2 {0}
         run: |
+          cd src/
           zip -r "hashcat-gui-${{ github.ref_name }}-windows.zip" "hashcat-gui-${{ github.ref_name }}"
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
         with:
-          files: "hashcat-gui-${{ github.ref_name }}-windows.zip"
+          files: "src/hashcat-gui-${{ github.ref_name }}-windows.zip"
