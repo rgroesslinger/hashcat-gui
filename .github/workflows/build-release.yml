@@ -34,7 +34,7 @@ jobs:
         run: |
           cd src/
           mkdir "hashcat-gui-${{ github.ref_name }}"
-          cp hashcat-gui.exe "hashcat-gui-${{ github.ref_name }}/"
+          cp release/hashcat-gui.exe "hashcat-gui-${{ github.ref_name }}/"
           cd "hashcat-gui-${{ github.ref_name }}/"
           # bundle needed libraries
           ldd hashcat-gui.exe | grep /ucrt64 | awk '{print $3}' | xargs -i cp {} .
