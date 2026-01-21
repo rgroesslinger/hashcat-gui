@@ -9,7 +9,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    a.setApplicationVersion("0.6.0");
+    a.setApplicationVersion("0.6.1");
     MainWindow w;
     w.show();
 
