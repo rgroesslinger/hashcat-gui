@@ -179,7 +179,7 @@ void MainWindow::init_hash_and_attack_modes() {
     if (doc.isObject()) {
         QJsonObject rootObj = doc.object();
 
-        for (auto it = rootObj.begin(); it != rootObj.end(); ++it) {
+        for (auto it = rootObj.constBegin(); it != rootObj.constEnd(); ++it) {
             hashModes.insert(it.key().toInt(), QString(it.key() + " | " + it.value().toObject().value("name").toString()));
         }
     }
