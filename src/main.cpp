@@ -1,6 +1,6 @@
 /*
  * SPDX-License-Identifier: GPL-3.0-or-later
- * SPDX-FileCopyrightText: 2012-2025 Rainer Größlinger
+ * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
 #include <QApplication>
