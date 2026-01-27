@@ -84,6 +84,8 @@ private slots:
 
     void on_actionSettings_triggered();
 
+    void copyCommandToClipboard();
+
 private:
     Ui::MainWindow *ui;
 

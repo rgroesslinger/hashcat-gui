@@ -936,6 +936,19 @@ default: 1,2
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="pushButton_copy_clipboard">
+                <property name="toolTip">
+                 <string>Copy command to clipboard</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="icon">
+                 <iconset theme="QIcon::ThemeIcon::EditCopy"/>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QLineEdit" name="lineEdit_command">
                 <property name="readOnly">
                  <bool>true</bool>

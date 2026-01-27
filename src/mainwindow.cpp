@@ -19,6 +19,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QAbstractItemModel>
+#include <QClipboard>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
@@ -34,13 +35,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->init_hash_and_attack_modes();
     this->update_view_attack_mode();
 
-    // Signals/Slots for wordlist
+    /***** Signals/Slots *****/
+
+    // wordlist
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this]() { CommandChanged(); });
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this]() { CommandChanged(); });
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this]() { CommandChanged(); });
 
-    // Signals/Slots for workload tuning
+    // workload tuning
     connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled, ui->comboBox_workload_profile, &QComboBox::setEnabled);
+
+    // copy to clipboard
+    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this, [this]() { copyCommandToClipboard(); });
 
     // Show Settings dialog if path to hashcat has not been configured yet
     if (settings.getKey("hashcatPath").isEmpty()) {
@@ -440,6 +446,12 @@ void MainWindow::on_checkBox_outfile_toggled(bool checked)
 void MainWindow::on_lineEdit_open_hashfile_textChanged([[maybe_unused]] const QString &arg1)
 {
     this->set_outfile_path();
+}
+
+void MainWindow::copyCommandToClipboard() {
+    QString text = ui->lineEdit_command->text();
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(text);
 }
 
 QStringList MainWindow::generate_arguments()
