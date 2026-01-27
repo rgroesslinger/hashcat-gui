@@ -54,9 +54,9 @@ jobs:
         shell: msys2 {0}
         run: |
           cd src/
-          zip -r "hashcat-gui-${{ github.ref_name }}-windows.zip" "hashcat-gui-${{ github.ref_name }}"
+          zip -r "hashcat-gui-${{ github.ref_name }}-windows-x64.zip" "hashcat-gui-${{ github.ref_name }}"
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
         with:
-          files: "src/hashcat-gui-${{ github.ref_name }}-windows.zip"
+          files: "src/hashcat-gui-${{ github.ref_name }}-windows-x64.zip"
