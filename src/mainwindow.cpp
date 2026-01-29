@@ -607,16 +607,24 @@ void MainWindow::on_pushButton_execute_clicked()
 
     if (settings.getKey("hashcatPath").isEmpty()) {
         QMessageBox msgBox(this);
+        QString message = tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
+                              .arg(ui->menuFile->menuAction()->text())
+                              .arg(ui->actionSettings->text());
+        msgBox.setText(message);
+        msgBox.setTextFormat(Qt::RichText);
         msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText("Please configure the path to the hashcat binary in settings first.");
         msgBox.exec();
         return;
     }
 
     if (settings.getKey("terminal").isEmpty()) {
         QMessageBox msgBox(this);
+        QString message = tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
+                              .arg(ui->menuFile->menuAction()->text())
+                              .arg(ui->actionSettings->text());
+        msgBox.setText(message);
+        msgBox.setTextFormat(Qt::RichText);
         msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText("Please configure a terminal in settings first.");
         msgBox.exec();
         return;
     }
