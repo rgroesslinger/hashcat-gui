@@ -280,6 +280,9 @@ void MainWindow::update_view_attack_mode()
         groupMask = true;
         break;
     case AttackMode::Association:
+        groupWordlists = true;
+        groupRules = true;
+        groupMask = false;
         break;
     }
 
