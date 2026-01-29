@@ -1113,15 +1113,14 @@ default: 1,2
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAbout">
+   <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="separator"/>
     <addaction name="actionAbout_Qt"/>
     <addaction name="actionHelp_About"/>
    </widget>
-   <widget class="QMenu" name="menuAction">
+   <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
@@ -1135,8 +1134,8 @@ default: 1,2
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuAction"/>
-   <addaction name="menuAbout"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
   </widget>
   <action name="actionHelp_About">
    <property name="text">
