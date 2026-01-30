@@ -8,6 +8,11 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 
 ✅ Compatible with hashcat v7.1.2
 
+## Installation
+
+### Windows
+Windows packages are available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/)
+
 ## Build from source
 ```
 git clone https://github.com/rgroesslinger/hashcat-gui
