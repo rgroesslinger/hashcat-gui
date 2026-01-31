@@ -286,10 +286,10 @@ void MainWindow::update_view_attack_mode()
         break;
     }
 
-    ui->groupBox_wordlists->setDisabled(!groupWordlists);
-    ui->groupBox_rules->setDisabled(!groupRules);
-    ui->groupBox_custom_charset->setDisabled(!groupMask);
-    ui->groupBox_mask->setDisabled(!groupMask);
+    ui->groupBox_wordlists->setEnabled(groupWordlists);
+    ui->groupBox_rules->setEnabled(groupRules);
+    ui->groupBox_custom_charset->setEnabled(groupMask);
+    ui->groupBox_mask->setEnabled(groupMask);
     this->CommandChanged();
 }
 
