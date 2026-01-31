@@ -14,7 +14,6 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QPixmap>
 #include <QProcess>
 #include <QJsonDocument>
 #include <QJsonObject>
