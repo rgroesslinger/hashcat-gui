@@ -30,6 +30,7 @@ jobs:
             cc: clang
             cxx: clang++
             build_type: Release
+    runs-on: ${{ matrix.runs-on }}
 
     steps:
       - name: Checkout
