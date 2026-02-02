@@ -6,6 +6,7 @@ on:
     branches: [ master ]
 jobs:
   build:
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       matrix:
         compiler: [linux-gcc, linux-clang, windows-gcc, windows-clang]
@@ -15,37 +16,41 @@ jobs:
             cc: gcc
             cxx: g++
             build_type: Release
-            build_shell: bash
           - compiler: linux-clang
             runs-on: ubuntu-latest
             cc: clang
             cxx: clang++
             build_type: Release
-            build_shell: bash
           - compiler: windows-gcc
             runs-on: windows-latest
             cc: gcc
             cxx: g++
             build_type: Release
-            build_shell: msys2
           - compiler: windows-clang
             runs-on: windows-latest
             cc: clang
             cxx: clang++
             build_type: Release
-            build_shell: msys2
-    runs-on: ${{ matrix.runs-on }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      # ----- Linux setup -----
+      # ----- Linux -----
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt update
           sudo apt install -y build-essential g++ clang cmake qt6-base-dev
+
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          cmake --build build
 
       # ----- Windows setup -----
       - name: Set up MSYS2 with UCRT64 (Windows)
@@ -60,9 +65,9 @@ jobs:
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-qt6-base
 
-      # ----- CMake -----
-      - name: CMake build
-        shell: ${{ matrix.build_shell }}
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
         run: |
           cmake -S . -B build \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
