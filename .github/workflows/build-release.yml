@@ -26,7 +26,7 @@ jobs:
       - name: Build
         shell: msys2 {0}
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake -B build
           cmake --build build
 
       - name: Copy executable and dependencies

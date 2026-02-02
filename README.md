@@ -32,7 +32,7 @@ or download latest [source release](https://github.com/rgroesslinger/hashcat-gui
 - Build
 ```
 cd hashcat-gui/
-cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake -B build
 cmake --build build
 ```
 
@@ -47,7 +47,7 @@ pacman -S mingw-w64-ucrt-x86_64-{gcc,cmake,qt6-base}
 - Build
 ```
 cd hashcat-gui/
-cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake -B build
 cmake --build build
 ```
 

@@ -15,22 +15,18 @@ jobs:
             runs-on: ubuntu-latest
             cc: gcc
             cxx: g++
-            build_type: Release
           - compiler: linux-clang
             runs-on: ubuntu-latest
             cc: clang
             cxx: clang++
-            build_type: Release
           - compiler: windows-gcc
             runs-on: windows-latest
             cc: gcc
             cxx: g++
-            build_type: Release
           - compiler: windows-clang
             runs-on: windows-latest
             cc: clang
             cxx: clang++
-            build_type: Release
 
     steps:
       - name: Checkout
@@ -47,7 +43,6 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           cmake -B build \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           cmake --build build
@@ -58,7 +53,6 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
-          update: true
           install: |
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-clang
@@ -70,7 +64,6 @@ jobs:
         shell: msys2 {0}
         run: |
           cmake -B build \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           cmake --build build

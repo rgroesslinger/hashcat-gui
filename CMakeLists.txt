@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 3.20)
 project(hashcat-gui)
 
-# Force C++23 standard
-set(CMAKE_CXX_STANDARD 23)
+# Build in Release mode by default
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "No build type specified - defaulting to Release")
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+message(STATUS "Building with CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+
+# Need at least C++17
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
