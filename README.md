@@ -11,29 +11,29 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 ## Installation
 
 ### Windows
-Windows packages are available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/)
+Windows packages are available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/).
 
 ## Build from source
 ```
 git clone https://github.com/rgroesslinger/hashcat-gui
 ```
-or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working development environment with Qt Creator you can open `hashcat-gui.pro` and `Build ➔ Run`.
+or download latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working development environment with Qt Creator you can open `CMakeLists.txt` and `Build ➔ Run`.
 
 ### Linux
 - Install dependencies
 
 | Distribution | Package installation command |
 | - | ----- |
-| Debian/Ubuntu | `apt install build-essential qt6-base-dev` |
-| Fedora | `dnf install @c-development qt6-qtbase-devel` |
-| openSUSE | `zypper install -t pattern devel_basis && zypper install qt6-base-devel` |
-| Arch | `pacman -S --needed base-devel qt6-base` |
+| Debian/Ubuntu | `apt install build-essential cmake qt6-base-dev` |
+| Fedora | `dnf install gcc-c++ cmake qt6-qtbase-devel` |
+| openSUSE | `zypper install gcc-c++ cmake qt6-base-devel` |
+| Arch | `pacman -S --needed gcc cmake qt6-base` |
 
 - Build
 ```
-cd hashcat-gui/src/
-qmake6 -config release
-make
+cd hashcat-gui/
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
 
 ### Windows
@@ -41,14 +41,14 @@ make
 
 - Install dependencies
 ```
-pacman -S mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-qt6-base
+pacman -S mingw-w64-ucrt-x86_64-{gcc,cmake,qt6-base}
 ```
 
 - Build
 ```
-cd hashcat-gui/src/
-qmake6 -config release
-mingw32-make
+cd hashcat-gui/
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
 ```
 
 To launch `hashcat-gui.exe` from outside the MSYS2 terminal you need to add `C:\msys64\ucrt64\bin` to your PATH.
