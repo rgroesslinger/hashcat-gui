@@ -18,23 +18,22 @@ jobs:
           msystem: UCRT64
           update: true
           install: |
-            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-qt6-base
             zip
 
       - name: Build
         shell: msys2 {0}
         run: |
-          cd src/
-          qmake6 -config release
-          mingw32-make
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
 
       - name: Copy executable and dependencies
         shell: msys2 {0}
         run: |
-          cd src/
           mkdir "hashcat-gui-${{ github.ref_name }}"
-          cp release/hashcat-gui.exe "hashcat-gui-${{ github.ref_name }}/"
+          cp build/hashcat-gui.exe "hashcat-gui-${{ github.ref_name }}/"
           cd "hashcat-gui-${{ github.ref_name }}/"
           # bundle needed libraries
           ldd hashcat-gui.exe | grep /ucrt64 | awk '{print $3}' | xargs -i cp {} .
@@ -53,10 +52,9 @@ jobs:
       - name: Zip release artifacts
         shell: msys2 {0}
         run: |
-          cd src/
           zip -r "hashcat-gui-${{ github.ref_name }}-windows-x64.zip" "hashcat-gui-${{ github.ref_name }}"
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
         with:
-          files: "src/hashcat-gui-${{ github.ref_name }}-windows-x64.zip"
+          files: "hashcat-gui-${{ github.ref_name }}-windows-x64.zip"
