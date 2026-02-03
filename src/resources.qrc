@@ -1,7 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file>images/icon_hashcat.png</file>
-        <file>images/icon_dir.png</file>
-        <file>images/icon_file.png</file>
     </qresource>
 </RCC>
