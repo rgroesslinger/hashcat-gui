@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(hashcat-gui)
+project(hashcat-gui CXX)
 
 # Build in Release mode by default
 if(NOT CMAKE_BUILD_TYPE)
@@ -22,13 +22,23 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(hashcat-gui
+    src/aboutdialog.h
+    src/aboutdialog.cpp
+    src/helperutils.h
     src/helperutils.cpp
     src/main.cpp
+    src/mainwindow.h
     src/mainwindow.cpp
-    src/aboutdialog.cpp
+    src/settingsdialog.h
     src/settingsdialog.cpp
+    src/settingsmanager.h
     src/settingsmanager.cpp
+    src/widgetstateserializer.h
+    src/widgetstateserializer.cpp
     src/resources.qrc
+    src/aboutdialog.ui
+    src/mainwindow.ui
+    src/settingsdialog.ui
 )
 
 target_compile_options(hashcat-gui PRIVATE -Wall -Wextra -Wpedantic)
