@@ -9,6 +9,7 @@
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "helperutils.h"
+#include "widgetstateserializer.h"
 #include <QDateTime>
 #include <QDir>
 #include <QFileDialog>
@@ -60,28 +61,48 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/********* MainWindow *************************************/
+/*************** Menu Bar ***************/
 
-void MainWindow::CommandChanged(QString arg) {
-    auto& settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.getKey("hashcatPath"));
+// File -> Export
+// Export QWidget state to a JSON file
+void MainWindow::on_actionExport_triggered()
+{
+    QString file = QFileDialog::getSaveFileName(
+        this, tr("Save Profile"),
+        QString(),
+        tr("JSON Files (*.json)"));
 
-    ui->lineEdit_command->clear();
-
-    // prepend hashcat binary name if it has already been configured in settings
-    if (!settings.getKey("hashcatPath").isEmpty()) {
-        ui->lineEdit_command->setText(fileInfo.fileName());
+    if (!file.isEmpty()) {
+        WidgetStateSerializer s;
+        s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file);
+        QMessageBox::information(this, tr("Saved"), tr("Profile saved to %1.").arg(file));
     }
-
-    // command line arguments for hashcat
-    ui->lineEdit_command->insert(" " + (arg.length() ? arg : generate_arguments().join(" ")));
-    ui->lineEdit_command->setCursorPosition(0);
 }
 
+// File -> Import
+// Import QWidget state from a JSON file
+void MainWindow::on_actionImport_triggered()
+{
+    QString file = QFileDialog::getOpenFileName(
+        this, tr("Load Profile"),
+        QString(),
+        tr("JSON Files (*.json)"));
+
+    if (!file.isEmpty()) {
+        WidgetStateSerializer s;
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file)) {
+            this->CommandChanged();
+            QMessageBox::information(this, tr("Loaded"), tr("Profile loaded from %1.").arg(file));
+        }
+    }
+}
+
+
+// Tools -> Reset field
 void MainWindow::on_actionReset_fields_triggered()
 {
     // Main tab
-    ui->lineEdit_open_hashfile->clear();
+    ui->lineEdit_hashfile->clear();
     ui->checkBox_ignoreusername->setChecked(false);
     ui->checkBox_remove->setChecked(false);
     ui->listWidget_wordlist->clear();
@@ -120,6 +141,8 @@ void MainWindow::on_actionReset_fields_triggered()
     this->CommandChanged();
 }
 
+// File -> Settings
+// Open Settings dialog
 void MainWindow::on_actionSettings_triggered()
 {
     SettingsDialog settingsDialog(this);
@@ -131,21 +154,26 @@ void MainWindow::on_actionSettings_triggered()
     }
 }
 
+// File -> Quit
 void MainWindow::on_actionQuit_triggered()
 {
     qApp->quit();
 }
 
+// Help -> About Qt
 void MainWindow::on_actionAbout_Qt_triggered()
 {
     QApplication::aboutQt();
 }
 
+// Help -> About
 void MainWindow::on_actionHelp_About_triggered()
 {
     AboutDialog about(this);
     about.exec();
 }
+
+/*************** MainWindow ***************/
 
 void MainWindow::add_hash_and_attack_modes(QComboBox *&combobox, QMap <quint32, QString> &map) {
     QMapIterator<quint32, QString> iter(map);
@@ -191,59 +219,6 @@ void MainWindow::init_hash_and_attack_modes() {
 
     this->add_hash_and_attack_modes(ui->comboBox_attack, attackModes);
     this->add_hash_and_attack_modes(ui->comboBox_hash, hashModes);
-}
-
-void MainWindow::add_wordlist_item(QString &wordlist) {
-    QListWidget *w;
-    bool duplicate = false;
-
-    w = ui->listWidget_wordlist;
-
-    for (int j=0; j<w->count(); ++j) {
-        if (w->item(j)->text() == wordlist) {
-            duplicate = true;
-        }
-    }
-
-    if (!wordlist.isNull() && !duplicate) {
-        QListWidgetItem *newItem = new QListWidgetItem(QIcon(":/images/icon_dir.png"), wordlist, w);
-        newItem->setCheckState(Qt::Checked);
-        w->addItem(newItem);
-    }
-
-}
-
-void MainWindow::add_wordlist_item(QStringList &wordlist) {
-    QListWidget *w;
-    bool duplicate = false;
-
-    w = ui->listWidget_wordlist;
-
-    for (int i=0; i<wordlist.length(); i++) {
-        duplicate = false;
-        for (int j=0; j<w->count(); ++j) {
-            if (w->item(j)->text() == wordlist.at(i)) {
-                duplicate = true;
-            }
-        }
-
-        if (!wordlist.at(i).isNull() && !duplicate) {
-            QListWidgetItem *newItem = new QListWidgetItem(QIcon(":/images/icon_file.png"), wordlist.at(i), w);
-            newItem->setCheckState(Qt::Checked);
-            w->addItem(newItem);
-        }
-    }
-}
-
-void MainWindow::set_outfile_path() {
-    QLineEdit *hash, *out;
-
-    hash = ui->lineEdit_open_hashfile;
-    out = ui->lineEdit_outfile;
-
-    if (hash->text().length()) {
-        out->setText(hash->text() + ".out");
-    }
 }
 
 void MainWindow::on_comboBox_attack_currentIndexChanged([[maybe_unused]] int index)
@@ -296,7 +271,7 @@ void MainWindow::on_pushButton_open_hashfile_clicked()
 {
     QString hashfile = QFileDialog::getOpenFileName();
     if (!hashfile.isNull()) {
-        ui->lineEdit_open_hashfile->setText(QDir::toNativeSeparators(hashfile));
+        ui->lineEdit_hashfile->setText(QDir::toNativeSeparators(hashfile));
     }
 }
 
@@ -320,13 +295,24 @@ void MainWindow::on_pushButton_remove_wordlist_clicked()
 void MainWindow::on_pushButton_add_wordlist_clicked()
 {
     QStringList wordlist = QFileDialog::getOpenFileNames();
-    this->add_wordlist_item(wordlist);
-}
+    QListWidget *w;
+    bool duplicate = false;
 
-void MainWindow::on_pushButton_add_wordlist_folder_clicked()
-{
-    QString wordlist = QFileDialog::getExistingDirectory();
-    this->add_wordlist_item(wordlist);
+    w = ui->listWidget_wordlist;
+
+    for (int i=0; i<wordlist.length(); i++) {
+        duplicate = false;
+        for (int j=0; j<w->count(); ++j) {
+            if (w->item(j)->text() == wordlist.at(i)) {
+                duplicate = true;
+            }
+        }
+
+        if (!wordlist.at(i).isNull() && !duplicate) {
+            QListWidgetItem *newItem = new QListWidgetItem(wordlist.at(i), w);
+            newItem->setCheckState(Qt::Checked);
+        }
+    }
 }
 
 void MainWindow::on_toolButton_wordlist_sort_asc_clicked()
@@ -445,15 +431,103 @@ void MainWindow::on_checkBox_outfile_toggled(bool checked)
     ui->pushButton_output->setEnabled(checked);
 }
 
-void MainWindow::on_lineEdit_open_hashfile_textChanged([[maybe_unused]] const QString &arg1)
+void MainWindow::on_lineEdit_hashfile_textChanged(const QString &text)
 {
-    this->set_outfile_path();
+    if (!text.isEmpty()) {
+        ui->lineEdit_outfile->setText(text + ".out");
+    }
 }
 
 void MainWindow::copyCommandToClipboard() {
     QString text = ui->lineEdit_command->text();
     QClipboard *clipboard = QApplication::clipboard();
     clipboard->setText(text);
+}
+
+void MainWindow::on_pushButton_execute_clicked()
+{
+    auto& settings = SettingsManager::instance();
+    QProcess proc;
+    QString terminal;
+    QStringList arguments;
+
+    if (ui->lineEdit_hashfile->text().isEmpty()) {
+        QMessageBox msgBox(this);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setText("Please choose a hash file.");
+        msgBox.exec();
+        return;
+    }
+
+    if (settings.getKey("hashcatPath").isEmpty()) {
+        QMessageBox msgBox(this);
+        QString message = tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
+                              .arg(ui->menuFile->menuAction()->text())
+                              .arg(ui->actionSettings->text());
+        msgBox.setText(message);
+        msgBox.setTextFormat(Qt::RichText);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+        return;
+    }
+
+    if (settings.getKey("terminal").isEmpty()) {
+        QMessageBox msgBox(this);
+        QString message = tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
+                              .arg(ui->menuFile->menuAction()->text())
+                              .arg(ui->actionSettings->text());
+        msgBox.setText(message);
+        msgBox.setTextFormat(Qt::RichText);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+        return;
+    }
+
+    // 1. Get arguments needed for the selected terminal
+    QMap <QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
+
+    // The configured terminal has a known configuration
+    if (availableTerminals.contains(settings.getKey("terminal"))) {
+        terminal = settings.getKey("terminal");
+        arguments << availableTerminals.value(terminal);
+    }
+
+    // 2. append hashcat binary to launch comand
+    arguments << settings.getKey("hashcatPath");
+
+    // 3. append arguments set in gui elements
+    arguments << generate_arguments();
+
+#if defined(Q_OS_WIN)
+    // Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal
+    proc.setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments *args)
+    {
+        args->flags |= CREATE_NEW_CONSOLE;
+    });
+#endif
+
+    proc.setProgram(terminal);
+    proc.setArguments(arguments);
+    proc.setWorkingDirectory(QFileInfo(settings.getKey("hashcatPath")).absolutePath());
+    proc.startDetached();
+}
+
+/*************** Helper ***************/
+
+void MainWindow::CommandChanged(QString arg) {
+    auto& settings = SettingsManager::instance();
+    QFileInfo fileInfo(settings.getKey("hashcatPath"));
+
+    ui->lineEdit_command->clear();
+
+    // prepend hashcat binary name if it has already been configured in settings
+    if (!settings.getKey("hashcatPath").isEmpty()) {
+        ui->lineEdit_command->setText(fileInfo.fileName());
+    }
+
+    // command line arguments for hashcat
+    ui->lineEdit_command->insert(" " + (arg.length() ? arg : generate_arguments().join(" ")));
+    ui->lineEdit_command->setCursorPosition(0);
 }
 
 QStringList MainWindow::generate_arguments()
@@ -543,7 +617,7 @@ QStringList MainWindow::generate_arguments()
     }
 
     if(ui->checkBox_outfile->isChecked() && !ui->lineEdit_outfile->text().isEmpty()) {
-        QFileInfo hash_fi(ui->lineEdit_open_hashfile->text());
+        QFileInfo hash_fi(ui->lineEdit_hashfile->text());
         QString outfile = ui->lineEdit_outfile->text();
         outfile.replace("<unixtime>", QString::number(QDateTime::currentMSecsSinceEpoch() / 1000));
         outfile.replace("<hash>", hash_fi.fileName(), Qt::CaseInsensitive);
@@ -559,15 +633,15 @@ QStringList MainWindow::generate_arguments()
     }
 
     if (!ui->lineEdit_devices->text().isEmpty() && ui->lineEdit_devices->text() != "0") {
-      arguments << "--backend-devices" << ui->lineEdit_devices->text();
+        arguments << "--backend-devices" << ui->lineEdit_devices->text();
     }
 
     if (!ui->spinBox_segment->cleanText().isEmpty() && ui->spinBox_segment->cleanText() != "32") {
         arguments << "--segment-size" << ui->spinBox_segment->cleanText();
     }
 
-    if (!ui->lineEdit_open_hashfile->text().isEmpty()) {
-        arguments << ui->lineEdit_open_hashfile->text();
+    if (!ui->lineEdit_hashfile->text().isEmpty()) {
+        arguments << ui->lineEdit_hashfile->text();
     }
 
     if (mask_before_dict.length()) {
@@ -587,72 +661,4 @@ QStringList MainWindow::generate_arguments()
     }
 
     return arguments;
-}
-
-void MainWindow::on_pushButton_execute_clicked()
-{
-    auto& settings = SettingsManager::instance();
-    QProcess proc;
-    QString terminal;
-    QStringList arguments;
-
-    if (ui->lineEdit_open_hashfile->text().isEmpty()) {
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText("Please choose a hash file.");
-        msgBox.exec();
-        return;
-    }
-
-    if (settings.getKey("hashcatPath").isEmpty()) {
-        QMessageBox msgBox(this);
-        QString message = tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
-                              .arg(ui->menuFile->menuAction()->text())
-                              .arg(ui->actionSettings->text());
-        msgBox.setText(message);
-        msgBox.setTextFormat(Qt::RichText);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-        return;
-    }
-
-    if (settings.getKey("terminal").isEmpty()) {
-        QMessageBox msgBox(this);
-        QString message = tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
-                              .arg(ui->menuFile->menuAction()->text())
-                              .arg(ui->actionSettings->text());
-        msgBox.setText(message);
-        msgBox.setTextFormat(Qt::RichText);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-        return;
-    }
-
-    // 1. Get arguments needed for the selected terminal
-    QMap <QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
-
-    // The configured terminal has a known configuration
-    if (availableTerminals.contains(settings.getKey("terminal"))) {
-        terminal = settings.getKey("terminal");
-        arguments << availableTerminals.value(terminal);
-    }
-
-    // 2. append hashcat binary to launch comand
-    arguments << settings.getKey("hashcatPath");
-
-    // 3. append arguments set in gui elements
-    arguments << generate_arguments();
-
-#if defined(Q_OS_WIN)
-    // Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal
-    proc.setCreateProcessArgumentsModifier([] (QProcess::CreateProcessArguments *args)
-    {
-        args->flags |= CREATE_NEW_CONSOLE;
-    });
-#endif
-
-    proc.setProgram(terminal);
-    proc.setArguments(arguments);
-    proc.setWorkingDirectory(QFileInfo(settings.getKey("hashcatPath")).absolutePath());
-    proc.startDetached();
 }

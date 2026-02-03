@@ -48,8 +48,6 @@ private slots:
 
     void on_checkBox_outfile_toggled(bool checked);
 
-    void on_pushButton_add_wordlist_folder_clicked();
-
     void CommandChanged(QString arg="");
 
     void on_comboBox_attack_currentIndexChanged(int index);
@@ -62,7 +60,7 @@ private slots:
 
     void on_checkBox_custom4_toggled(bool checked);
 
-    void on_lineEdit_open_hashfile_textChanged(const QString &arg1);
+    void on_lineEdit_hashfile_textChanged(const QString &text);
 
     void on_checkBox_rulesfile_1_toggled(bool checked);
 
@@ -86,6 +84,10 @@ private slots:
 
     void copyCommandToClipboard();
 
+    void on_actionExport_triggered();
+
+    void on_actionImport_triggered();
+
 private:
     Ui::MainWindow *ui;
 
@@ -98,7 +100,6 @@ private:
     QStringList generate_arguments();
 
     void add_hash_and_attack_modes(QComboBox *&, QMap <quint32, QString> &);
-    void add_wordlist_item(QString &);
     void add_wordlist_item(QStringList &);
     void set_outfile_path();
 

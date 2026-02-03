@@ -78,7 +78,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLineEdit" name="lineEdit_open_hashfile">
+               <widget class="QLineEdit" name="lineEdit_hashfile">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
@@ -174,13 +174,6 @@
                    </property>
                    <property name="text">
                     <string>Add files...</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_add_wordlist_folder">
-                   <property name="text">
-                    <string>Add folder...</string>
                    </property>
                   </widget>
                  </item>
@@ -1130,7 +1123,10 @@ default: 1,2
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionImport"/>
+    <addaction name="actionExport"/>
     <addaction name="actionSettings"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -1160,6 +1156,16 @@ default: 1,2
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export Profile</string>
+   </property>
+  </action>
+  <action name="actionImport">
+   <property name="text">
+    <string>Import Profile</string>
    </property>
   </action>
  </widget>
@@ -1377,7 +1383,7 @@ default: 1,2
    </hints>
   </connection>
   <connection>
-   <sender>lineEdit_open_hashfile</sender>
+   <sender>lineEdit_hashfile</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
    <slot>CommandChanged()</slot>
