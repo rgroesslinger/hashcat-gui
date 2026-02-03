@@ -13,19 +13,15 @@ jobs:
         include:
           - compiler: linux-gcc
             runs-on: ubuntu-latest
-            cc: gcc
             cxx: g++
           - compiler: linux-clang
             runs-on: ubuntu-latest
-            cc: clang
             cxx: clang++
           - compiler: windows-gcc
             runs-on: windows-latest
-            cc: gcc
             cxx: g++
           - compiler: windows-clang
             runs-on: windows-latest
-            cc: clang
             cxx: clang++
 
     steps:
@@ -42,9 +38,7 @@ jobs:
       - name: Build (Linux)
         if: runner.os == 'Linux'
         run: |
-          cmake -B build \
-            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
-            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           cmake --build build
 
       # ----- Windows setup -----
@@ -63,7 +57,5 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: |
-          cmake -B build \
-            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
-            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
+          cmake -B build -DCMAKE_CXX_COMPILER=${{ matrix.cxx }}
           cmake --build build
