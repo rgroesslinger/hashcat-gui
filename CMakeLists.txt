@@ -34,3 +34,5 @@ add_executable(hashcat-gui
 target_compile_options(hashcat-gui PRIVATE -Wall -Wextra -Wpedantic)
 
 target_link_libraries(hashcat-gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
+
+install(TARGETS hashcat-gui RUNTIME DESTINATION bin)
