@@ -38,15 +38,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /***** Signals/Slots *****/
 
     // wordlist
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this]() { CommandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this]() { CommandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this]() { CommandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this] { CommandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this] { CommandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this] { CommandChanged(); });
+    connect(ui->listWidget_wordlist, &QListWidget::itemChanged, this, [this] { CommandChanged(); });
+
+    // copy to clipboard
+    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this, [this] { copyCommandToClipboard(); });
 
     // workload tuning
     connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled, ui->comboBox_workload_profile, &QComboBox::setEnabled);
-
-    // copy to clipboard
-    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this, [this]() { copyCommandToClipboard(); });
 
     // Show Settings dialog if path to hashcat has not been configured yet
     if (settings.getKey("hashcatPath").isEmpty()) {
