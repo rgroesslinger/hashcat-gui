@@ -15,9 +15,9 @@ class WidgetStateSerializer : public QObject
 public:
     explicit WidgetStateSerializer(QObject *parent = nullptr);
 
-    bool saveStateToFile(const QString &key, const QWidget *widget, const QString &filename) const;
+    bool saveStateToFile(const QString &key, const QWidget *widget, const QString &filename, const QStringList &ignoredWidgets = {}) const;
 
-    bool loadStateFromFile(const QString &key, QWidget *widget, const QString &filename) const;
+    bool loadStateFromFile(const QString &key, QWidget *widget, const QString &filenam, const QStringList &ignoredWidgets = {}) const;
 };
 
 #endif // WIDGETSTATESERIALIZER_H
