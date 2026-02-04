@@ -68,6 +68,8 @@ MainWindow::~MainWindow()
 // Export QWidget state to a JSON file
 void MainWindow::on_actionExport_triggered()
 {
+    QStringList ignoreWidgets = { "lineEdit_command" };
+
     QString file = QFileDialog::getSaveFileName(
         this, tr("Save Profile"),
         QString(),
@@ -75,7 +77,7 @@ void MainWindow::on_actionExport_triggered()
 
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
-        s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file);
+        s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets);
         QMessageBox::information(this, tr("Saved"), tr("Profile saved to %1.").arg(file));
     }
 }
@@ -176,14 +178,6 @@ void MainWindow::on_actionHelp_About_triggered()
 
 /*************** MainWindow ***************/
 
-void MainWindow::add_hash_and_attack_modes(QComboBox *&combobox, QMap <quint32, QString> &map) {
-    QMapIterator<quint32, QString> iter(map);
-    while (iter.hasNext()) {
-        iter.next();
-        combobox->addItem(iter.value());
-    }
-}
-
 void MainWindow::init_hash_and_attack_modes() {
 
     ui->comboBox_attack->clear();
@@ -218,8 +212,14 @@ void MainWindow::init_hash_and_attack_modes() {
         }
     }
 
-    this->add_hash_and_attack_modes(ui->comboBox_attack, attackModes);
-    this->add_hash_and_attack_modes(ui->comboBox_hash, hashModes);
+    // Fill combo boxes
+    for (const QString &value : attackModes) {
+        ui->comboBox_attack->addItem(value);
+    }
+
+    for (const QString &value : hashModes) {
+        ui->comboBox_hash->addItem(value);
+    }
 }
 
 void MainWindow::on_comboBox_attack_currentIndexChanged([[maybe_unused]] int index)

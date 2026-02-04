@@ -99,7 +99,6 @@ private:
 
     QStringList generate_arguments();
 
-    void add_hash_and_attack_modes(QComboBox *&, QMap <quint32, QString> &);
     void add_wordlist_item(QStringList &);
     void set_outfile_path();
 
