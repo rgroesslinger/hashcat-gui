@@ -213,11 +213,11 @@ void MainWindow::init_hash_and_attack_modes() {
     }
 
     // Fill combo boxes
-    for (const QString &value : attackModes) {
+    for (const QString &value : attackModes.values()) {
         ui->comboBox_attack->addItem(value);
     }
 
-    for (const QString &value : hashModes) {
+    for (const QString &value : hashModes.values()) {
         ui->comboBox_hash->addItem(value);
     }
 }
