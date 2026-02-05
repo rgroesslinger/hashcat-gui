@@ -298,7 +298,7 @@ void MainWindow::on_pushButton_add_wordlist_clicked()
     QStringList files = QFileDialog::getOpenFileNames();
     QListWidget *w = ui->listWidget_wordlist;
 
-    for (const QString &wordlist : files) {
+    for (const QString &wordlist : std::as_const(files)) {
         // A file has been selected and it is not already in the list
         if (!wordlist.isNull() && w->findItems(wordlist, Qt::MatchExactly).isEmpty()) {
             QListWidgetItem *newItem = new QListWidgetItem(wordlist, w);
