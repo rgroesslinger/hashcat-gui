@@ -24,20 +24,15 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::readSettings() {
     auto& settings = SettingsManager::instance();
 
-    // hashcat path
+    // hashcat path from saved settings
     ui->lineEdit_hc_path->setText(settings.getKey("hashcatPath"));
 
     // available terminals
     QMap <QString, QStringList> availableTermins = HelperUtils::getAvailableTerminals();
+    ui->comboBox_terminal->addItems(availableTermins.keys());
 
-    for (const QString& key : availableTermins.keys()) {
-        ui->comboBox_terminal->addItem(key);
-        // Pre-select a terminal if we have one in the config
-        if (key == settings.getKey("terminal")) {
-            int lastIndex = ui->comboBox_terminal->count() - 1;
-            ui->comboBox_terminal->setCurrentIndex(lastIndex);
-        }
-    }
+    // terminal from saved settings
+    ui->comboBox_terminal->setCurrentIndex(ui->comboBox_terminal->findText(settings.getKey("terminal")));
 }
 
 // Configure path to hashcat binary
