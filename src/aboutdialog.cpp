@@ -10,12 +10,14 @@
 #include <QMessageBox>
 #include <QFileInfo>
 
-AboutDialog::AboutDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::AboutDialog)
+AboutDialog::AboutDialog(QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
-    this->updateVersionLabel();
+    updateVersionLabel();
+
+    connect(ui->pushButton_ok, &QPushButton::clicked, this, &AboutDialog::okClicked);
 }
 
 AboutDialog::~AboutDialog()
@@ -23,9 +25,9 @@ AboutDialog::~AboutDialog()
     delete ui;
 }
 
-void AboutDialog::on_pushButton_about_ok_clicked()
+void AboutDialog::okClicked()
 {
-    this->close();
+    close();
 }
 
 void AboutDialog::updateVersionLabel() {
@@ -34,7 +36,9 @@ void AboutDialog::updateVersionLabel() {
 
     if (!settings.getKey("hashcatPath").isEmpty()) {
         ui->label_hc_version_text->setText(fileInfo.fileName());
-        ui->label_hc_version->setText(HelperUtils::executeHashcat(QStringList() << "--version").remove('\n').remove('\r'));
+        ui->label_hc_version->setText(HelperUtils::executeHashcat(QStringList() << "--version")
+                                          .remove('\n')
+                                          .remove('\r'));
     }
     ui->label_hc_gui_version->setText(QApplication::applicationVersion());
 }

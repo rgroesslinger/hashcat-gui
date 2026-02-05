@@ -1178,7 +1178,7 @@ default: 1,2
    <sender>comboBox_attack</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>146</x>
@@ -1194,7 +1194,7 @@ default: 1,2
    <sender>checkBox_outfile</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>683</x>
@@ -1210,7 +1210,7 @@ default: 1,2
    <sender>lineEdit_open_rulesfile_1</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
@@ -1226,7 +1226,7 @@ default: 1,2
    <sender>radioButton_generate_rules</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>95</x>
@@ -1242,7 +1242,7 @@ default: 1,2
    <sender>lineEdit_mask</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>628</x>
@@ -1258,7 +1258,7 @@ default: 1,2
    <sender>lineEdit_custom1</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1274,7 +1274,7 @@ default: 1,2
    <sender>checkBox_remove</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>131</x>
@@ -1290,7 +1290,7 @@ default: 1,2
    <sender>checkBox_rulesfile_3</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>115</x>
@@ -1306,7 +1306,7 @@ default: 1,2
    <sender>lineEdit_cpu_affinity</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1322,7 +1322,7 @@ default: 1,2
    <sender>radioButton_use_rules_file</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>100</x>
@@ -1338,7 +1338,7 @@ default: 1,2
    <sender>checkBox_hex_hash</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>639</x>
@@ -1354,7 +1354,7 @@ default: 1,2
    <sender>lineEdit_devices</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1370,7 +1370,7 @@ default: 1,2
    <sender>checkBox_custom1</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1386,7 +1386,7 @@ default: 1,2
    <sender>lineEdit_hashfile</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>210</x>
@@ -1402,7 +1402,7 @@ default: 1,2
    <sender>checkBox_custom3</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1418,7 +1418,7 @@ default: 1,2
    <sender>checkBox_hex_salt</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>639</x>
@@ -1434,7 +1434,7 @@ default: 1,2
    <sender>lineEdit_custom4</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1450,7 +1450,7 @@ default: 1,2
    <sender>lineEdit_open_rulesfile_2</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
@@ -1466,7 +1466,7 @@ default: 1,2
    <sender>lineEdit_open_rulesfile_3</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
@@ -1482,7 +1482,7 @@ default: 1,2
    <sender>checkBox_custom4</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1498,7 +1498,7 @@ default: 1,2
    <sender>checkBox_rulesfile_1</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>117</x>
@@ -1514,7 +1514,7 @@ default: 1,2
    <sender>lineEdit_custom3</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1530,7 +1530,7 @@ default: 1,2
    <sender>comboBox_hash</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>730</x>
@@ -1546,7 +1546,7 @@ default: 1,2
    <sender>checkBox_custom2</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>478</x>
@@ -1562,7 +1562,7 @@ default: 1,2
    <sender>lineEdit_custom2</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>650</x>
@@ -1578,7 +1578,7 @@ default: 1,2
    <sender>lineEdit_outfile</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>596</x>
@@ -1594,7 +1594,7 @@ default: 1,2
    <sender>spinBox_segment</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
@@ -1610,7 +1610,7 @@ default: 1,2
    <sender>checkBox_rulesfile_2</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>90</x>
@@ -1626,7 +1626,7 @@ default: 1,2
    <sender>spinBox_generate_rules</sender>
    <signal>valueChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>243</x>
@@ -1642,7 +1642,7 @@ default: 1,2
    <sender>checkBox_ignoreusername</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>640</x>
@@ -1658,7 +1658,7 @@ default: 1,2
    <sender>lineEdit_outfile_format</sender>
    <signal>textChanged(QString)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>510</x>
@@ -1674,7 +1674,7 @@ default: 1,2
    <sender>comboBox_workload_profile</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>247</x>
@@ -1690,7 +1690,7 @@ default: 1,2
    <sender>checkBox_override_workload_profile</sender>
    <signal>toggled(bool)</signal>
    <receiver>MainWindow</receiver>
-   <slot>CommandChanged()</slot>
+   <slot>commandChanged()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>132</x>
@@ -1704,7 +1704,7 @@ default: 1,2
   </connection>
  </connections>
  <slots>
-  <slot>CommandChanged()</slot>
+  <slot>commandChanged()</slot>
  </slots>
  <buttongroups>
   <buttongroup name="buttonGroup"/>

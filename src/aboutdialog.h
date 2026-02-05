@@ -22,7 +22,7 @@ public:
     void updateVersionLabel();
 
 private slots:
-    void on_pushButton_about_ok_clicked();
+    void okClicked();
 
 private:
     Ui::AboutDialog *ui;

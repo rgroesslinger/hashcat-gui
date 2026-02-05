@@ -191,7 +191,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_about_ok">
+      <widget class="QPushButton" name="pushButton_ok">
        <property name="text">
         <string>OK</string>
        </property>

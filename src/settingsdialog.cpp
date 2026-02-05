@@ -13,7 +13,11 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     , ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
-    this->readSettings();
+    readSettings();
+
+    connect(ui->pushButton_settings_select_path, &QPushButton::clicked, this, &SettingsDialog::selectPathClicked);
+    connect(ui->pushButton_save, &QPushButton::clicked, this, &SettingsDialog::saveClicked);
+    connect(ui->pushButton_cancel, &QPushButton::clicked, this, &SettingsDialog::cancelClicked);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -28,7 +32,7 @@ void SettingsDialog::readSettings() {
     ui->lineEdit_hc_path->setText(settings.getKey("hashcatPath"));
 
     // available terminals
-    QMap <QString, QStringList> availableTermins = HelperUtils::getAvailableTerminals();
+    QMap<QString, QStringList> availableTermins = HelperUtils::getAvailableTerminals();
     ui->comboBox_terminal->addItems(availableTermins.keys());
 
     // terminal from saved settings
@@ -36,7 +40,7 @@ void SettingsDialog::readSettings() {
 }
 
 // Configure path to hashcat binary
-void SettingsDialog::on_pushButton_settings_select_path_clicked()
+void SettingsDialog::selectPathClicked()
 {
     QFileDialog fileDialog;
     fileDialog.setFileMode(QFileDialog::ExistingFile);
@@ -48,7 +52,7 @@ void SettingsDialog::on_pushButton_settings_select_path_clicked()
     }
 }
 
-void SettingsDialog::on_pushButton_save_clicked()
+void SettingsDialog::saveClicked()
 {
     // Save values in persistent settings
     auto& settings = SettingsManager::instance();
@@ -56,13 +60,13 @@ void SettingsDialog::on_pushButton_save_clicked()
     settings.setKey("terminal", ui->comboBox_terminal->currentText());
 
     // accept() signals our parent that settings might have changed
-    this->accept();
-    this->close();
+    accept();
+    close();
 }
 
 
-void SettingsDialog::on_pushButton_cancel_clicked()
+void SettingsDialog::cancelClicked()
 {
-    this->close();
+    close();
 }
 

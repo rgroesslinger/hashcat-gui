@@ -24,83 +24,64 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_actionHelp_About_triggered();
+    // menu actions
+    void settingsTriggered();
+    void importTriggered();
+    void exportTriggered();
+    void quitTriggered();
+    void resetFieldsTriggered();
+    void aboutQtTriggered();
+    void aboutTriggered();
 
-    void on_pushButton_execute_clicked();
+    // main‑tab buttons
+    void executeClicked();
+    void openHashfileClicked();
+    void outputClicked();
+    void removeWordlistClicked();
+    void addWordlistClicked();
+    void wordlistSortAscClicked();
+    void wordlistSortDescClicked();
+    void wordlistItemClicked(QListWidgetItem *item);
 
-    void on_pushButton_open_hashfile_clicked();
+    // checkboxes / radio buttons
+    void outfileToggled(bool checked);
+    void rulesfile1Toggled(bool checked);
+    void rulesfile2Toggled(bool checked);
+    void rulesfile3Toggled(bool checked);
+    void generateRulesToggled(bool checked);
+    void useRulesFileToggled(bool checked);
+    void custom1Toggled(bool checked);
+    void custom2Toggled(bool checked);
+    void custom3Toggled(bool checked);
+    void custom4Toggled(bool checked);
 
-    void on_actionReset_fields_triggered();
+    // line edits
+    void hashfileTextChanged(const QString &text);
 
-    void on_actionQuit_triggered();
+    // rule‑file buttons
+    void openRulesfile1Clicked();
+    void openRulesfile2Clicked();
+    void openRulesfile3Clicked();
 
-    void on_pushButton_output_clicked();
+    // combobox
+    void attackIndexChanged(int index);
 
-    void on_pushButton_remove_wordlist_clicked();
-
-    void on_pushButton_add_wordlist_clicked();
-
-    void on_toolButton_wordlist_sort_asc_clicked();
-
-    void on_toolButton_wordlist_sort_desc_clicked();
-
-    void on_listWidget_wordlist_itemClicked(QListWidgetItem* item);
-
-    void on_checkBox_outfile_toggled(bool checked);
-
-    void CommandChanged(QString arg="");
-
-    void on_comboBox_attack_currentIndexChanged(int index);
-
-    void on_checkBox_custom1_toggled(bool checked);
-
-    void on_checkBox_custom2_toggled(bool checked);
-
-    void on_checkBox_custom3_toggled(bool checked);
-
-    void on_checkBox_custom4_toggled(bool checked);
-
-    void on_lineEdit_hashfile_textChanged(const QString &text);
-
-    void on_checkBox_rulesfile_1_toggled(bool checked);
-
-    void on_checkBox_rulesfile_2_toggled(bool checked);
-
-    void on_checkBox_rulesfile_3_toggled(bool checked);
-
-    void on_radioButton_generate_rules_toggled(bool checked);
-
-    void on_radioButton_use_rules_file_toggled(bool checked);
-
-    void on_pushButton_open_rulesfile_1_clicked();
-
-    void on_pushButton_open_rulesfile_2_clicked();
-
-    void on_pushButton_open_rulesfile_3_clicked();
-
-    void on_actionAbout_Qt_triggered();
-
-    void on_actionSettings_triggered();
-
+    void commandChanged();
     void copyCommandToClipboard();
-
-    void on_actionExport_triggered();
-
-    void on_actionImport_triggered();
 
 private:
     Ui::MainWindow *ui;
 
-    QMap <quint32, QString> hashModes;
-    QMap <quint32, QString> attackModes;
+    QMap<quint32, QString> hashModes;
+    QMap<quint32, QString> attackModes;
 
-    void init_hash_and_attack_modes();
-    void update_view_attack_mode();
+    void initHashAndAttackModes();
+    void updateViewAttackMode();
 
-    QStringList generate_arguments();
+    QStringList generateArguments();
 
-    void add_wordlist_item(QStringList &);
-    void set_outfile_path();
+    void addWordlistItem(QStringList &);
+    void setOutfilePath();
 
     // Supported attack modes
     enum AttackMode

@@ -22,14 +22,10 @@ public:
     ~SettingsDialog();
 
 private slots:
-    void on_pushButton_settings_select_path_clicked();
-
     void readSettings();
-
-    void on_pushButton_save_clicked();
-
-    void on_pushButton_cancel_clicked();
-
+    void selectPathClicked();
+    void saveClicked();
+    void cancelClicked();
 private:
     Ui::SettingsDialog *ui;
 };
