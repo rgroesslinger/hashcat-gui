@@ -31,32 +31,39 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
     QJsonObject obj;
 
     // simple widgets
-    for (const QLineEdit *lineEdit : w->findChildren<const QLineEdit *>()) {
+    auto lineEdits = w->findChildren<const QLineEdit *>();
+    for (const QLineEdit *lineEdit : std::as_const(lineEdits)) {
         obj[lineEdit->objectName()] = lineEdit->text();
     }
 
-    for (const QCheckBox *checkBox : w->findChildren<const QCheckBox *>()) {
+    auto checkBoxes = w->findChildren<const QCheckBox *>();
+    for (const QCheckBox *checkBox : std::as_const(checkBoxes)) {
         obj[checkBox->objectName()] = checkBox->isChecked();
     }
 
-    for (const QComboBox *comboBox : w->findChildren<const QComboBox *>()) {
+    auto comboBoxes = w->findChildren<const QComboBox *>();
+    for (const QComboBox *comboBox : std::as_const(comboBoxes)) {
         obj[comboBox->objectName()] = comboBox->currentIndex();
     }
 
-    for (const QRadioButton *radioButton : w->findChildren<const QRadioButton *>()) {
+    auto radioButtons = w->findChildren<const QRadioButton *>();
+    for (const QRadioButton *radioButton : std::as_const(radioButtons)) {
         obj[radioButton->objectName()] = radioButton->isChecked();
     }
 
-    for (const QSpinBox *spinBox : w->findChildren<const QSpinBox *>()) {
+    auto spinBoxes = w->findChildren<const QSpinBox *>();
+    for (const QSpinBox *spinBox : std::as_const(spinBoxes)) {
         obj[spinBox->objectName()] = spinBox->value();
     }
 
-    for (const QDoubleSpinBox *doubleSpinBox : w->findChildren<const QDoubleSpinBox *>()) {
+    auto doubleSpinBoxes = w->findChildren<const QDoubleSpinBox *>();
+    for (const QDoubleSpinBox *doubleSpinBox : std::as_const(doubleSpinBoxes)) {
         obj[doubleSpinBox->objectName()] = doubleSpinBox->value();
     }
 
     // list widgets
-    for (const QListWidget *listWidget : w->findChildren<const QListWidget *>()) {
+    auto listWidgets = w->findChildren<const QListWidget *>();
+    for (const QListWidget *listWidget : std::as_const(listWidgets)) {
         QJsonArray list;
         for (int i = 0; i < listWidget->count(); ++i) {
             const QListWidgetItem *item = listWidget->item(i);
@@ -87,38 +94,45 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
     }
 
     // simple widgets
-    for (QLineEdit *lineEdit : w->findChildren<QLineEdit *>()) {
+    auto lineEdits = w->findChildren<QLineEdit *>();
+    for (QLineEdit *lineEdit : std::as_const(lineEdits)) {
         if (mutableObj.contains(lineEdit->objectName()))
             lineEdit->setText(mutableObj[lineEdit->objectName()].toString());
     }
 
-    for (QCheckBox *checkBox : w->findChildren<QCheckBox *>()) {
+    auto checkBoxes = w->findChildren<QCheckBox *>();
+    for (QCheckBox *checkBox : std::as_const(checkBoxes)) {
         if (mutableObj.contains(checkBox->objectName()))
             checkBox->setChecked(mutableObj[checkBox->objectName()].toBool());
     }
 
-    for (QComboBox *comboBox : w->findChildren<QComboBox *>()) {
+    auto comboBoxes = w->findChildren<QComboBox *>();
+    for (QComboBox *comboBox : std::as_const(comboBoxes)) {
         if (mutableObj.contains(comboBox->objectName()))
             comboBox->setCurrentIndex(mutableObj[comboBox->objectName()].toInt());
     }
 
-    for (QRadioButton *radioButton : w->findChildren<QRadioButton *>()) {
+    auto radioButtons = w->findChildren<QRadioButton *>();
+    for (QRadioButton *radioButton : std::as_const(radioButtons)) {
         if (mutableObj.contains(radioButton->objectName()))
             radioButton->setChecked(mutableObj[radioButton->objectName()].toBool());
     }
 
-    for (QSpinBox *spinBox : w->findChildren<QSpinBox *>()) {
+    auto spinBoxes = w->findChildren<QSpinBox *>();
+    for (QSpinBox *spinBox : std::as_const(spinBoxes)) {
         if (mutableObj.contains(spinBox->objectName()))
             spinBox->setValue(mutableObj[spinBox->objectName()].toInt());
     }
 
-    for (QDoubleSpinBox *doubleSpinBox : w->findChildren<QDoubleSpinBox *>()) {
+    auto doubleSpinBoxes = w->findChildren<QDoubleSpinBox *>();
+    for (QDoubleSpinBox *doubleSpinBox : std::as_const(doubleSpinBoxes)) {
         if (mutableObj.contains(doubleSpinBox->objectName()))
             doubleSpinBox->setValue(mutableObj[doubleSpinBox->objectName()].toDouble());
     }
 
     // list widgets
-    for (QListWidget *listWidget : w->findChildren<QListWidget *>()) {
+    auto listWidgets = w->findChildren<QListWidget *>();
+    for (QListWidget *listWidget : std::as_const(listWidgets)) {
         if (mutableObj.contains(listWidget->objectName())) {
             listWidget->clear();
             QJsonArray list = mutableObj[listWidget->objectName()].toArray();
