@@ -454,8 +454,7 @@ void MainWindow::on_pushButton_execute_clicked()
     if (settings.getKey("hashcatPath").isEmpty()) {
         QMessageBox msgBox(this);
         QString message = tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
-                              .arg(ui->menuFile->menuAction()->text())
-                              .arg(ui->actionSettings->text());
+                              .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
         msgBox.setText(message);
         msgBox.setTextFormat(Qt::RichText);
         msgBox.setIcon(QMessageBox::Information);
@@ -466,8 +465,7 @@ void MainWindow::on_pushButton_execute_clicked()
     if (settings.getKey("terminal").isEmpty()) {
         QMessageBox msgBox(this);
         QString message = tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
-                              .arg(ui->menuFile->menuAction()->text())
-                              .arg(ui->actionSettings->text());
+                              .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
         msgBox.setText(message);
         msgBox.setTextFormat(Qt::RichText);
         msgBox.setIcon(QMessageBox::Information);
