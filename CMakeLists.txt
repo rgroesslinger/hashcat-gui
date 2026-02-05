@@ -1,5 +1,13 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.24)
 project(hashcat-gui CXX)
+
+# Set version
+set(GUI_VERSION 0.6.1)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h
+    @ONLY
+)
 
 # Build in Release mode by default
 if(NOT CMAKE_BUILD_TYPE)

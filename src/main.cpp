@@ -5,11 +5,12 @@
 
 #include <QApplication>
 #include "mainwindow.h"
+#include "config.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    a.setApplicationVersion("0.6.1");
+    a.setApplicationVersion(GUI_VERSION);
     MainWindow w;
     w.show();
 

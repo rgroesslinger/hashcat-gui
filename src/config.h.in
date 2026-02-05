@@ -1,0 +1,2 @@
+#pragma once
+#define GUI_VERSION "@GUI_VERSION@"
