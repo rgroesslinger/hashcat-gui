@@ -48,7 +48,7 @@ void SettingsDialog::on_pushButton_settings_select_path_clicked()
     fileDialog.setNameFilter("Executable Files (*.exe *.bin);;All Files (*)");
 
     if (fileDialog.exec() == QDialog::Accepted) {
-        QString fileName = fileDialog.selectedFiles().first();
+        QString fileName = fileDialog.selectedFiles().constFirst();
         ui->lineEdit_hc_path->setText(QDir::toNativeSeparators(fileName));
     }
 }
