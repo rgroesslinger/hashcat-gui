@@ -295,22 +295,13 @@ void MainWindow::on_pushButton_remove_wordlist_clicked()
 
 void MainWindow::on_pushButton_add_wordlist_clicked()
 {
-    QStringList wordlist = QFileDialog::getOpenFileNames();
-    QListWidget *w;
-    bool duplicate = false;
+    QStringList files = QFileDialog::getOpenFileNames();
+    QListWidget *w = ui->listWidget_wordlist;
 
-    w = ui->listWidget_wordlist;
-
-    for (int i=0; i<wordlist.length(); i++) {
-        duplicate = false;
-        for (int j=0; j<w->count(); ++j) {
-            if (w->item(j)->text() == wordlist.at(i)) {
-                duplicate = true;
-            }
-        }
-
-        if (!wordlist.at(i).isNull() && !duplicate) {
-            QListWidgetItem *newItem = new QListWidgetItem(wordlist.at(i), w);
+    for (const QString &wordlist : files) {
+        // A file has been selected and it is not already in the list
+        if (!wordlist.isNull() && w->findItems(wordlist, Qt::MatchExactly).isEmpty()) {
+            QListWidgetItem *newItem = new QListWidgetItem(wordlist, w);
             newItem->setCheckState(Qt::Checked);
         }
     }
