@@ -122,7 +122,7 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
         if (mutableObj.contains(listWidget->objectName())) {
             listWidget->clear();
             QJsonArray list = mutableObj[listWidget->objectName()].toArray();
-            for (const QJsonValue &v : list) {
+            for (const QJsonValue &v : std::as_const(list)) {
                 QJsonObject li = v.toObject();
                 QListWidgetItem *item = new QListWidgetItem(li["text"].toString(), listWidget);
                 item->setCheckState(li["checked"].toBool() ? Qt::Checked : Qt::Unchecked);
