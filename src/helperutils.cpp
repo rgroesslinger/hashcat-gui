@@ -36,7 +36,7 @@ HelperUtils::HelperUtils() {}
 
 QString HelperUtils::getParameter(Parameter key, bool useShort)
 {
-    auto it = parameterMap.find(key);
+    auto it = parameterMap.constFind(key);
     const auto &pair = it.value();
 
     if (useShort && !pair.first.isEmpty()) {
