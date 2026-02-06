@@ -675,9 +675,10 @@ QStringList MainWindow::generateArguments()
     }
 
     if (ui->groupBox_wordlists->isEnabled()) {
-        for (int i = 0; i < ui->listWidget_wordlist->count(); i++) {
-            if (ui->listWidget_wordlist->item(i)->checkState() == Qt::Checked) {
-                arguments << ui->listWidget_wordlist->item(i)->text();
+        auto const wordlists = ui->listWidget_wordlist->findItems(QString("*"), Qt::MatchWildcard);
+        for (QListWidgetItem *item : wordlists) {
+            if (item->checkState() == Qt::Checked) {
+                arguments << item->text();
             }
         }
     }
