@@ -26,17 +26,20 @@ SettingsDialog::~SettingsDialog()
 }
 
 void SettingsDialog::readSettings() {
-    auto& settings = SettingsManager::instance();
+    auto &settings = SettingsManager::instance();
 
     // hashcat path from saved settings
-    ui->lineEdit_hc_path->setText(settings.getKey("hashcatPath"));
+    ui->lineEdit_hc_path->setText(settings.getKey<QString>("hashcatPath"));
 
     // available terminals
     QMap<QString, QStringList> availableTermins = HelperUtils::getAvailableTerminals();
     ui->comboBox_terminal->addItems(availableTermins.keys());
 
     // terminal from saved settings
-    ui->comboBox_terminal->setCurrentIndex(ui->comboBox_terminal->findText(settings.getKey("terminal")));
+    ui->comboBox_terminal->setCurrentIndex(ui->comboBox_terminal->findText(settings.getKey<QString>("terminal")));
+
+    // use short parameters
+    ui->checkBox_use_short_parameters->setChecked(settings.getKey<bool>("useShortParameters"));
 }
 
 // Configure path to hashcat binary
@@ -55,9 +58,10 @@ void SettingsDialog::selectPathClicked()
 void SettingsDialog::saveClicked()
 {
     // Save values in persistent settings
-    auto& settings = SettingsManager::instance();
+    auto &settings = SettingsManager::instance();
     settings.setKey("hashcatPath", ui->lineEdit_hc_path->text());
     settings.setKey("terminal", ui->comboBox_terminal->currentText());
+    settings.setKey("useShortParameters", ui->checkBox_use_short_parameters->isChecked());
 
     // accept() signals our parent that settings might have changed
     accept();

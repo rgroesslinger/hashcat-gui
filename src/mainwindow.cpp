@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* ---------- main‑tab buttons ---------- */
     connect(ui->pushButton_execute, &QPushButton::clicked, this, &MainWindow::executeClicked);
-    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this, &MainWindow::openHashfileClicked);
+    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this, &MainWindow::openHashFileClicked);
     connect(ui->pushButton_output, &QPushButton::clicked, this, &MainWindow::outputClicked);
     connect(ui->pushButton_remove_wordlist, &QPushButton::clicked, this, &MainWindow::removeWordlistClicked);
     connect(ui->pushButton_add_wordlist, &QPushButton::clicked, this, &MainWindow::addWordlistClicked);
@@ -81,18 +81,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->checkBox_custom4, &QCheckBox::toggled, this, &MainWindow::custom4Toggled);
 
     /* ---------- line edits ---------- */
-    connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashfileTextChanged);
+    connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
 
     /* ---------- rule‑file buttons ---------- */
-    connect(ui->pushButton_open_rulesfile_1, &QPushButton::clicked, this, &MainWindow::openRulesfile1Clicked);
-    connect(ui->pushButton_open_rulesfile_2, &QPushButton::clicked, this, &MainWindow::openRulesfile2Clicked);
-    connect(ui->pushButton_open_rulesfile_3, &QPushButton::clicked, this, &MainWindow::openRulesfile3Clicked);
+    connect(ui->pushButton_open_rulesfile_1, &QPushButton::clicked, this, &MainWindow::openRulesFile1Clicked);
+    connect(ui->pushButton_open_rulesfile_2, &QPushButton::clicked, this, &MainWindow::openRulesFile2Clicked);
+    connect(ui->pushButton_open_rulesfile_3, &QPushButton::clicked, this, &MainWindow::openRulesFile3Clicked);
 
     /* ---------- combobox ---------- */
     connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this, &MainWindow::attackIndexChanged);
 
     /* ---------- show Settings if hashcatPath not set ---------- */
-    if (settings.getKey("hashcatPath").isEmpty()) {
+    if (settings.getKey<QString>("hashcatPath").isEmpty()) {
         QMetaObject::invokeMethod(this, &MainWindow::settingsTriggered, Qt::QueuedConnection);
     }
 }
@@ -234,7 +234,7 @@ void MainWindow::initHashAndAttackModes()
     QString hashTypes;
 
     // Read list of example hashes, returns JSON
-    if (!settings.getKey("hashcatPath").isEmpty()) {
+    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
         hashTypes = HelperUtils::executeHashcat(QStringList() << "--example-hashes" << "--machine-readable")
                         .remove('\n')
                         .remove('\r');
@@ -307,7 +307,7 @@ void MainWindow::updateViewAttackMode()
     commandChanged();
 }
 
-void MainWindow::openHashfileClicked()
+void MainWindow::openHashFileClicked()
 {
     QString hashfile = QFileDialog::getOpenFileName();
     if (!hashfile.isNull()) {
@@ -412,7 +412,7 @@ void MainWindow::generateRulesToggled(bool checked)
     }
 }
 
-void MainWindow::openRulesfile1Clicked()
+void MainWindow::openRulesFile1Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
     if (!rulesfile.isNull()) {
@@ -420,7 +420,7 @@ void MainWindow::openRulesfile1Clicked()
     }
 }
 
-void MainWindow::openRulesfile2Clicked()
+void MainWindow::openRulesFile2Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
     if (!rulesfile.isNull()) {
@@ -428,7 +428,7 @@ void MainWindow::openRulesfile2Clicked()
     }
 }
 
-void MainWindow::openRulesfile3Clicked()
+void MainWindow::openRulesFile3Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
     if (!rulesfile.isNull()) {
@@ -462,7 +462,7 @@ void MainWindow::outfileToggled(bool checked)
     ui->pushButton_output->setEnabled(checked);
 }
 
-void MainWindow::hashfileTextChanged(const QString &text)
+void MainWindow::hashFileTextChanged(const QString &text)
 {
     if (!text.isEmpty()) {
         ui->lineEdit_outfile->setText(text + ".out");
@@ -491,7 +491,7 @@ void MainWindow::executeClicked()
         return;
     }
 
-    if (settings.getKey("hashcatPath").isEmpty()) {
+    if (settings.getKey<QString>("hashcatPath").isEmpty()) {
         QMessageBox msgBox(this);
         QString message = tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
                               .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
@@ -502,7 +502,7 @@ void MainWindow::executeClicked()
         return;
     }
 
-    if (settings.getKey("terminal").isEmpty()) {
+    if (settings.getKey<QString>("terminal").isEmpty()) {
         QMessageBox msgBox(this);
         QString message = tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
                               .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
@@ -517,13 +517,13 @@ void MainWindow::executeClicked()
     QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
 
     // The configured terminal has a known configuration
-    if (availableTerminals.contains(settings.getKey("terminal"))) {
-        terminal = settings.getKey("terminal");
+    if (availableTerminals.contains(settings.getKey<QString>("terminal"))) {
+        terminal = settings.getKey<QString>("terminal");
         arguments << availableTerminals.value(terminal);
     }
 
     /* 2. append hashcat binary to launch command */
-    arguments << settings.getKey("hashcatPath");
+    arguments << settings.getKey<QString>("hashcatPath");
 
     /* 3. append arguments set in gui elements */
     arguments << generateArguments();
@@ -537,7 +537,7 @@ void MainWindow::executeClicked()
 
     proc.setProgram(terminal);
     proc.setArguments(arguments);
-    proc.setWorkingDirectory(QFileInfo(settings.getKey("hashcatPath")).absolutePath());
+    proc.setWorkingDirectory(QFileInfo(settings.getKey<QString>("hashcatPath")).absolutePath());
     proc.startDetached();
 }
 
@@ -546,12 +546,12 @@ void MainWindow::executeClicked()
 void MainWindow::commandChanged()
 {
     auto &settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.getKey("hashcatPath"));
+    QFileInfo fileInfo(settings.getKey<QString>("hashcatPath"));
 
     ui->lineEdit_command->clear();
 
     // prepend hashcat binary name if it has already been configured in settings
-    if (!settings.getKey("hashcatPath").isEmpty()) {
+    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
         ui->lineEdit_command->setText(fileInfo.fileName());
     }
 
@@ -562,37 +562,40 @@ void MainWindow::commandChanged()
 
 QStringList MainWindow::generateArguments()
 {
+    auto &settings = SettingsManager::instance();
     QStringList arguments;
     QString mask_before_dict = "";
     QString mask_after_dict = "";
 
+    bool useShort = settings.getKey<bool>("useShortParameters");
     int attackMode = attackModes.key(ui->comboBox_attack->currentText());
 
-    arguments << "--hash-type" << QString::number(hashModes.key(ui->comboBox_hash->currentText()));
-    arguments << "--attack-mode" << QString::number(attackMode);
+    arguments << HelperUtils::getParameter(HelperUtils::Parameter::HashType, useShort) << QString::number(hashModes.key(ui->comboBox_hash->currentText()));
+    arguments << HelperUtils::getParameter(HelperUtils::Parameter::AttackMode, useShort) << QString::number(attackMode);
 
     if (ui->checkBox_remove->isChecked()) {
-        arguments << "--remove";
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::Remove, useShort);
     }
 
     if (ui->checkBox_ignoreusername->isChecked()) {
-        arguments << "--username";
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::Username, useShort);
     }
 
     switch (attackMode) {
     case AttackMode::Straight:
+    case AttackMode::Association:
         if (ui->radioButton_use_rules_file->isChecked()) {
             if (ui->checkBox_rulesfile_1->isChecked() && !ui->lineEdit_open_rulesfile_1->text().isEmpty()) {
-                arguments << "--rules-file" << ui->lineEdit_open_rulesfile_1->text();
+                arguments << HelperUtils::getParameter(HelperUtils::Parameter::RulesFile, useShort) << ui->lineEdit_open_rulesfile_1->text();
             }
             if (ui->checkBox_rulesfile_2->isChecked() && !ui->lineEdit_open_rulesfile_2->text().isEmpty()) {
-                arguments << "--rules-file" << ui->lineEdit_open_rulesfile_2->text();
+                arguments << HelperUtils::getParameter(HelperUtils::Parameter::RulesFile, useShort) << ui->lineEdit_open_rulesfile_2->text();
             }
             if (ui->checkBox_rulesfile_3->isChecked() && !ui->lineEdit_open_rulesfile_3->text().isEmpty()) {
-                arguments << "--rules-file" << ui->lineEdit_open_rulesfile_3->text();
+                arguments << HelperUtils::getParameter(HelperUtils::Parameter::RulesFile, useShort) << ui->lineEdit_open_rulesfile_3->text();
             }
         } else if (ui->radioButton_generate_rules->isChecked() && !ui->spinBox_generate_rules->cleanText().isEmpty()) {
-            arguments << "--generate-rules" << ui->spinBox_generate_rules->cleanText();
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::GenerateRules, useShort) << ui->spinBox_generate_rules->cleanText();
         }
         break;
     case AttackMode::Combination:
@@ -610,35 +613,33 @@ QStringList MainWindow::generateArguments()
             mask_before_dict = ui->lineEdit_mask->text();
         }
         break;
-    case AttackMode::Association:
-        break;
     }
 
     if (ui->checkBox_override_workload_profile->isChecked()) {
-        arguments << "-w" << ui->comboBox_workload_profile->currentText();
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::WorkloadProfile, useShort) << ui->comboBox_workload_profile->currentText();
     }
 
     if (ui->groupBox_custom_charset->isEnabled()) {
         if (ui->checkBox_custom1->isChecked() && !ui->lineEdit_custom1->text().isEmpty()) {
-            arguments << "--custom-charset1" << ui->lineEdit_custom1->text();
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset1, useShort) << ui->lineEdit_custom1->text();
         }
         if (ui->checkBox_custom2->isChecked() && !ui->lineEdit_custom2->text().isEmpty()) {
-            arguments << "--custom-charset2" << ui->lineEdit_custom2->text();
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset2, useShort) << ui->lineEdit_custom2->text();
         }
         if (ui->checkBox_custom3->isChecked() && !ui->lineEdit_custom3->text().isEmpty()) {
-            arguments << "--custom-charset3" << ui->lineEdit_custom3->text();
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset3, useShort) << ui->lineEdit_custom3->text();
         }
         if (ui->checkBox_custom4->isChecked() && !ui->lineEdit_custom4->text().isEmpty()) {
-            arguments << "--custom-charset4" << ui->lineEdit_custom4->text();
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset4, useShort) << ui->lineEdit_custom4->text();
         }
     }
 
     if (ui->checkBox_hex_hash->isChecked()) {
-        arguments << "--hex-charset";
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::HexCharset, useShort);
     }
 
     if (ui->checkBox_hex_salt->isChecked()) {
-        arguments << "--hex-salt";
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::HexSalt, useShort);
     }
 
     if (ui->checkBox_outfile->isChecked() && !ui->lineEdit_outfile->text().isEmpty()) {
@@ -646,23 +647,23 @@ QStringList MainWindow::generateArguments()
         QString outfile = ui->lineEdit_outfile->text();
         outfile.replace("<unixtime>", QString::number(QDateTime::currentMSecsSinceEpoch() / 1000));
         outfile.replace("<hash>", hash_fi.fileName(), Qt::CaseInsensitive);
-        arguments << "--outfile" << outfile;
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::Outfile, useShort) << outfile;
     }
 
     if (ui->lineEdit_outfile_format->text() != "1,2") {
-        arguments << "--outfile-format" << ui->lineEdit_outfile_format->text();
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::OutfileFormat, useShort) << ui->lineEdit_outfile_format->text();
     }
 
     if (!ui->lineEdit_cpu_affinity->text().isEmpty()) {
-        arguments << "--cpu-affinity" << ui->lineEdit_cpu_affinity->text();
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::CpuAffinity, useShort) << ui->lineEdit_cpu_affinity->text();
     }
 
     if (!ui->lineEdit_devices->text().isEmpty() && ui->lineEdit_devices->text() != "0") {
-        arguments << "--backend-devices" << ui->lineEdit_devices->text();
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::BackendDevices, useShort) << ui->lineEdit_devices->text();
     }
 
     if (!ui->spinBox_segment->cleanText().isEmpty() && ui->spinBox_segment->cleanText() != "32") {
-        arguments << "--segment-size" << ui->spinBox_segment->cleanText();
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::SegmentSize, useShort) << ui->spinBox_segment->cleanText();
     }
 
     if (!ui->lineEdit_hashfile->text().isEmpty()) {

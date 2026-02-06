@@ -31,10 +31,10 @@ void AboutDialog::okClicked()
 }
 
 void AboutDialog::updateVersionLabel() {
-    auto& settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.getKey("hashcatPath"));
+    auto &settings = SettingsManager::instance();
+    QFileInfo fileInfo(settings.getKey<QString>("hashcatPath"));
 
-    if (!settings.getKey("hashcatPath").isEmpty()) {
+    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
         ui->label_hc_version_text->setText(fileInfo.fileName());
         ui->label_hc_version->setText(HelperUtils::executeHashcat(QStringList() << "--version")
                                           .remove('\n')

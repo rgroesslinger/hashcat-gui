@@ -11,11 +11,17 @@
 class SettingsManager
 {
 public:
-    static SettingsManager& instance();
+    static SettingsManager &instance();
 
-    QString getKey(const QString& key) const;
+    /* returns the value converted to T */
+    template <typename T>
+    T getKey(const QString &key, const T &defaultValue = T()) const
+    {
+        // QSettings::value() returns a QVariant – we convert it to T
+        return settings.value(key, QVariant::fromValue(defaultValue)).template value<T>();
+    }
 
-    void setKey(const QString& key, const QString& value);
+    void setKey(const QString &key, const QVariant &value);
 
 private:
     SettingsManager();

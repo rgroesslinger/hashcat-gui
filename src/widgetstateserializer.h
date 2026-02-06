@@ -17,7 +17,7 @@ public:
 
     bool saveStateToFile(const QString &key, const QWidget *widget, const QString &filename, const QStringList &ignoredWidgets = {}) const;
 
-    bool loadStateFromFile(const QString &key, QWidget *widget, const QString &filenam, const QStringList &ignoredWidgets = {}) const;
+    bool loadStateFromFile(const QString &key, QWidget *widget, const QString &filename, const QStringList &ignoredWidgets = {}) const;
 };
 
 #endif // WIDGETSTATESERIALIZER_H

@@ -35,7 +35,7 @@ private slots:
 
     // main‑tab buttons
     void executeClicked();
-    void openHashfileClicked();
+    void openHashFileClicked();
     void outputClicked();
     void removeWordlistClicked();
     void addWordlistClicked();
@@ -56,12 +56,12 @@ private slots:
     void custom4Toggled(bool checked);
 
     // line edits
-    void hashfileTextChanged(const QString &text);
+    void hashFileTextChanged(const QString &text);
 
     // rule‑file buttons
-    void openRulesfile1Clicked();
-    void openRulesfile2Clicked();
-    void openRulesfile3Clicked();
+    void openRulesFile1Clicked();
+    void openRulesFile2Clicked();
+    void openRulesFile3Clicked();
 
     // combobox
     void attackIndexChanged(int index);

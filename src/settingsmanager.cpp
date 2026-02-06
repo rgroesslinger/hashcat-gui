@@ -4,28 +4,24 @@
  */
 
 #include "settingsmanager.h"
+#include <QApplication>
 
 SettingsManager::SettingsManager()
-    : settings(QSettings::NativeFormat, QSettings::UserScope,
-                 QStringLiteral("hashcat-gui"), QStringLiteral("settings"))
+    : settings(QSettings::NativeFormat,
+                QSettings::UserScope,
+                QCoreApplication::applicationName(),
+                QStringLiteral("settings"))
 {
 
 }
 
-SettingsManager& SettingsManager::instance()
+SettingsManager &SettingsManager::instance()
 {
     static SettingsManager instance;
     return instance;
 }
 
-// Getter
-QString SettingsManager::getKey(const QString& key) const
-{
-    return settings.value(key, QString()).toString();
-}
-
-// Setter
-void SettingsManager::setKey(const QString& key, const QString& value)
+void SettingsManager::setKey(const QString &key, const QVariant &value)
 {
     settings.setValue(key, value);
 }
