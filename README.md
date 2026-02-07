@@ -5,13 +5,14 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 
 ## Current status
 [![CI Build](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yaml/badge.svg)](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yaml)
+[![build result](https://build.opensuse.org/projects/home:rgroesslinger/packages/hashcat-gui/badge.svg?type=default)](https://build.opensuse.org/package/show/home:rgroesslinger/hashcat-gui)
 
 ✅ Compatible with hashcat v7.1.2
 
 ## Installation
 
 ### Linux
-Packages for various Linux distributions are available from [openSUSE Build Service (OBS)](https://build.opensuse.org/project/show/home:rgroesslinger).
+Packages for various Linux distributions are available from the [openSUSE Build Service (OBS)](https://build.opensuse.org/project/show/home:rgroesslinger). You can either download the RPM package directly or integrate the repository into your package manager to ensure you receive automatic updates for future releases. The OpenPGP key fingerprint can be found on the [project's signing keys page](https://build.opensuse.org/projects/home:rgroesslinger/signing_keys).
 
 ### Windows
 Windows packages are available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/).
