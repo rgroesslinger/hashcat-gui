@@ -7,6 +7,7 @@
 #include "ui_settingsdialog.h"
 #include "settingsmanager.h"
 #include "helperutils.h"
+#include <QMessageBox>
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
@@ -51,6 +52,12 @@ void SettingsDialog::selectPathClicked()
 
     if (fileDialog.exec() == QDialog::Accepted) {
         QString fileName = fileDialog.selectedFiles().constFirst();
+        QFileInfo file(fileName);
+        if (!file.isFile() || !file.isExecutable()) {
+            QMessageBox::warning(this, tr("Invalid file"),
+                                 tr("The selected file is not an executable."));
+            return;
+        }
         ui->lineEdit_hc_path->setText(QDir::toNativeSeparators(fileName));
     }
 }
