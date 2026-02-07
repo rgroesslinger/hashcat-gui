@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(hashcat-gui CXX)
 
 # Set version
-set(GUI_VERSION 0.6.1)
+set(GUI_VERSION 0.7.0)
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h

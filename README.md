@@ -10,6 +10,9 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 
 ## Installation
 
+### Linux
+Packages for various Linux distributions are available from [openSUSE Build Service (OBS)](https://build.opensuse.org/project/show/home:rgroesslinger).
+
 ### Windows
 Windows packages are available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/).
 
