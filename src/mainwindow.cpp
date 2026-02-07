@@ -310,7 +310,7 @@ void MainWindow::updateViewAttackMode()
 void MainWindow::openHashFileClicked()
 {
     QString hashfile = QFileDialog::getOpenFileName();
-    if (!hashfile.isNull()) {
+    if (!hashfile.isEmpty()) {
         ui->lineEdit_hashfile->setText(QDir::toNativeSeparators(hashfile));
     }
 }
@@ -318,7 +318,7 @@ void MainWindow::openHashFileClicked()
 void MainWindow::outputClicked()
 {
     QString outfile = QFileDialog::getSaveFileName();
-    if (!outfile.isNull()) {
+    if (!outfile.isEmpty()) {
         ui->lineEdit_outfile->setText(QDir::toNativeSeparators(outfile));
     }
 }
@@ -339,7 +339,7 @@ void MainWindow::addWordlistClicked()
 
     for (const QString &wordlist : std::as_const(files)) {
         // A file has been selected and it is not already in the list
-        if (!wordlist.isNull() && w->findItems(wordlist, Qt::MatchExactly).isEmpty()) {
+        if (!wordlist.isEmpty() && w->findItems(wordlist, Qt::MatchExactly).isEmpty()) {
             QListWidgetItem *newItem = new QListWidgetItem(wordlist, w);
             newItem->setCheckState(Qt::Checked);
         }
@@ -415,7 +415,7 @@ void MainWindow::generateRulesToggled(bool checked)
 void MainWindow::openRulesFile1Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
-    if (!rulesfile.isNull()) {
+    if (!rulesfile.isEmpty()) {
         ui->lineEdit_open_rulesfile_1->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
@@ -423,7 +423,7 @@ void MainWindow::openRulesFile1Clicked()
 void MainWindow::openRulesFile2Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
-    if (!rulesfile.isNull()) {
+    if (!rulesfile.isEmpty()) {
         ui->lineEdit_open_rulesfile_2->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
@@ -431,7 +431,7 @@ void MainWindow::openRulesFile2Clicked()
 void MainWindow::openRulesFile3Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName();
-    if (!rulesfile.isNull()) {
+    if (!rulesfile.isEmpty()) {
         ui->lineEdit_open_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
