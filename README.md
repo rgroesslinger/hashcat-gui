@@ -12,7 +12,7 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 ## Installation
 
 ### Linux
-Packages for various Linux distributions are available from the [openSUSE Build Service (OBS)](https://build.opensuse.org/project/show/home:rgroesslinger). You can either download the RPM package directly or integrate the repository into your package manager to ensure you receive automatic updates for future releases. The OpenPGP key fingerprint can be found on the [project's signing keys page](https://build.opensuse.org/projects/home:rgroesslinger/signing_keys).
+Packages for openSUSE, Fedora, Debian and Ubuntu are hosted on the [openSUSE Build Service (OBS)](https://build.opensuse.org/package/show/home:rgroesslinger/hashcat-gui). You have the option to download the package directly or configure your package manager to automatically receive updates for future releases by adding the OBS repository. Instructions on how to add the repository can be found on the [download page](https://software.opensuse.org//download.html?project=home:rgroesslinger&package=hashcat-gui). You can verify the fingerprint of the OpenPGP key used for signing these packages on the [Signing keys page](https://build.opensuse.org/projects/home:rgroesslinger/signing_keys).
 
 ### Windows
 Windows packages are available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/).
