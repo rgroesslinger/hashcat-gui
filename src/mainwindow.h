@@ -50,10 +50,10 @@ private slots:
     void rulesfile3Toggled(bool checked);
     void generateRulesToggled(bool checked);
     void useRulesFileToggled(bool checked);
-    void custom1Toggled(bool checked);
-    void custom2Toggled(bool checked);
-    void custom3Toggled(bool checked);
-    void custom4Toggled(bool checked);
+    void customCharset1Toggled(bool checked);
+    void customCharset2Toggled(bool checked);
+    void customCharset3Toggled(bool checked);
+    void customCharset4Toggled(bool checked);
 
     // line edits
     void hashFileTextChanged(const QString &text);

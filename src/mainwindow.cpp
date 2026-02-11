@@ -37,18 +37,6 @@ MainWindow::MainWindow(QWidget *parent)
     initHashAndAttackModes();
     updateViewAttackMode();
 
-    /* ---------- wordlist ---------- */
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist, &QListWidget::itemChanged, this, [this] { commandChanged(); });
-
-    /* ---------- copy to clipboard ---------- */
-    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this, &MainWindow::copyCommandToClipboard);
-
-    /* ---------- workload tuning ---------- */
-    connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled, ui->comboBox_workload_profile, &QComboBox::setEnabled);
-
     /* ---------- menu actions ---------- */
     connect(ui->actionHelp_About, &QAction::triggered, this, &MainWindow::aboutTriggered);
     connect(ui->actionReset_fields, &QAction::triggered, this, &MainWindow::resetFieldsTriggered);
@@ -58,38 +46,42 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::settingsTriggered);
     connect(ui->actionAbout_Qt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
 
-    /* ---------- main‑tab buttons ---------- */
-    connect(ui->pushButton_execute, &QPushButton::clicked, this, &MainWindow::executeClicked);
-    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this, &MainWindow::openHashFileClicked);
-    connect(ui->pushButton_output, &QPushButton::clicked, this, &MainWindow::outputClicked);
+    /* ---------- wordlist ---------- */
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this] { commandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this] { commandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this] { commandChanged(); });
+    connect(ui->listWidget_wordlist, &QListWidget::itemChanged, this, [this] { commandChanged(); });
+    connect(ui->listWidget_wordlist, &QListWidget::itemClicked, this, &MainWindow::wordlistItemClicked);
     connect(ui->pushButton_remove_wordlist, &QPushButton::clicked, this, &MainWindow::removeWordlistClicked);
     connect(ui->pushButton_add_wordlist, &QPushButton::clicked, this, &MainWindow::addWordlistClicked);
     connect(ui->toolButton_wordlist_sort_asc, &QToolButton::clicked, this, &MainWindow::wordlistSortAscClicked);
     connect(ui->toolButton_wordlist_sort_desc, &QToolButton::clicked, this, &MainWindow::wordlistSortDescClicked);
-    connect(ui->listWidget_wordlist, &QListWidget::itemClicked, this, &MainWindow::wordlistItemClicked);
 
-    /* ---------- checkboxes ---------- */
-    connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
+    /* ---------- rules ---------- */
     connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesfile1Toggled);
     connect(ui->checkBox_rulesfile_2, &QCheckBox::toggled, this, &MainWindow::rulesfile2Toggled);
     connect(ui->checkBox_rulesfile_3, &QCheckBox::toggled, this, &MainWindow::rulesfile3Toggled);
-    connect(ui->radioButton_generate_rules, &QRadioButton::toggled, this, &MainWindow::generateRulesToggled);
-    connect(ui->radioButton_use_rules_file, &QRadioButton::toggled, this, &MainWindow::useRulesFileToggled);
-    connect(ui->checkBox_custom1, &QCheckBox::toggled, this, &MainWindow::custom1Toggled);
-    connect(ui->checkBox_custom2, &QCheckBox::toggled, this, &MainWindow::custom2Toggled);
-    connect(ui->checkBox_custom3, &QCheckBox::toggled, this, &MainWindow::custom3Toggled);
-    connect(ui->checkBox_custom4, &QCheckBox::toggled, this, &MainWindow::custom4Toggled);
-
-    /* ---------- line edits ---------- */
-    connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
-
-    /* ---------- rule‑file buttons ---------- */
     connect(ui->pushButton_open_rulesfile_1, &QPushButton::clicked, this, &MainWindow::openRulesFile1Clicked);
     connect(ui->pushButton_open_rulesfile_2, &QPushButton::clicked, this, &MainWindow::openRulesFile2Clicked);
     connect(ui->pushButton_open_rulesfile_3, &QPushButton::clicked, this, &MainWindow::openRulesFile3Clicked);
+    connect(ui->radioButton_generate_rules, &QRadioButton::toggled, this, &MainWindow::generateRulesToggled);
+    connect(ui->radioButton_use_rules_file, &QRadioButton::toggled, this, &MainWindow::useRulesFileToggled);
 
-    /* ---------- combobox ---------- */
+    /* ---------- custom charset ---------- */
+    connect(ui->checkBox_custom_charset1, &QCheckBox::toggled, this, &MainWindow::customCharset1Toggled);
+    connect(ui->checkBox_custom_charset2, &QCheckBox::toggled, this, &MainWindow::customCharset2Toggled);
+    connect(ui->checkBox_custom_charset3, &QCheckBox::toggled, this, &MainWindow::customCharset3Toggled);
+    connect(ui->checkBox_custom_charset4, &QCheckBox::toggled, this, &MainWindow::customCharset4Toggled);
+
+    /* ---------- stand-alone widgets ---------- */
+    connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
+    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this, &MainWindow::openHashFileClicked);
+    connect(ui->pushButton_output, &QPushButton::clicked, this, &MainWindow::outputClicked);
+    connect(ui->pushButton_execute, &QPushButton::clicked, this, &MainWindow::executeClicked);
+    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this, &MainWindow::copyCommandToClipboard);
+    connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled, ui->comboBox_workload_profile, &QComboBox::setEnabled);
     connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this, &MainWindow::attackIndexChanged);
+    connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
 
     /* ---------- show Settings if hashcatPath not set ---------- */
     if (settings.getKey<QString>("hashcatPath").isEmpty()) {
@@ -157,14 +149,14 @@ void MainWindow::resetFieldsTriggered()
     ui->lineEdit_open_rulesfile_3->clear();
     ui->spinBox_generate_rules->setValue(1);
     ui->lineEdit_mask->clear();
-    ui->checkBox_custom1->setChecked(false);
-    ui->lineEdit_custom1->clear();
-    ui->checkBox_custom2->setChecked(false);
-    ui->lineEdit_custom2->clear();
-    ui->checkBox_custom3->setChecked(false);
-    ui->lineEdit_custom3->clear();
-    ui->checkBox_custom4->setChecked(false);
-    ui->lineEdit_custom4->clear();
+    ui->checkBox_custom_charset1->setChecked(false);
+    ui->lineEdit_custom_charset1->clear();
+    ui->checkBox_custom_charset2->setChecked(false);
+    ui->lineEdit_custom_charset2->clear();
+    ui->checkBox_custom_charset3->setChecked(false);
+    ui->lineEdit_custom_charset3->clear();
+    ui->checkBox_custom_charset4->setChecked(false);
+    ui->lineEdit_custom_charset4->clear();
     ui->checkBox_hex_hash->setChecked(false);
     ui->checkBox_hex_salt->setChecked(false);
     ui->checkBox_outfile->setChecked(false);
@@ -436,24 +428,24 @@ void MainWindow::openRulesFile3Clicked()
     }
 }
 
-void MainWindow::custom1Toggled(bool checked)
+void MainWindow::customCharset1Toggled(bool checked)
 {
-    ui->lineEdit_custom1->setEnabled(checked);
+    ui->lineEdit_custom_charset1->setEnabled(checked);
 }
 
-void MainWindow::custom2Toggled(bool checked)
+void MainWindow::customCharset2Toggled(bool checked)
 {
-    ui->lineEdit_custom2->setEnabled(checked);
+    ui->lineEdit_custom_charset2->setEnabled(checked);
 }
 
-void MainWindow::custom3Toggled(bool checked)
+void MainWindow::customCharset3Toggled(bool checked)
 {
-    ui->lineEdit_custom3->setEnabled(checked);
+    ui->lineEdit_custom_charset3->setEnabled(checked);
 }
 
-void MainWindow::custom4Toggled(bool checked)
+void MainWindow::customCharset4Toggled(bool checked)
 {
-    ui->lineEdit_custom4->setEnabled(checked);
+    ui->lineEdit_custom_charset4->setEnabled(checked);
 }
 
 void MainWindow::outfileToggled(bool checked)
@@ -619,18 +611,22 @@ QStringList MainWindow::generateArguments()
         arguments << HelperUtils::getParameter(HelperUtils::Parameter::WorkloadProfile, useShort) << ui->comboBox_workload_profile->currentText();
     }
 
+    if (ui->checkBox_optimized_kernel->isChecked()) {
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::OptimizedKernel, useShort);
+    }
+
     if (ui->groupBox_custom_charset->isEnabled()) {
-        if (ui->checkBox_custom1->isChecked() && !ui->lineEdit_custom1->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset1, useShort) << ui->lineEdit_custom1->text();
+        if (ui->checkBox_custom_charset1->isChecked() && !ui->lineEdit_custom_charset1->text().isEmpty()) {
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset1, useShort) << ui->lineEdit_custom_charset1->text();
         }
-        if (ui->checkBox_custom2->isChecked() && !ui->lineEdit_custom2->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset2, useShort) << ui->lineEdit_custom2->text();
+        if (ui->checkBox_custom_charset2->isChecked() && !ui->lineEdit_custom_charset2->text().isEmpty()) {
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset2, useShort) << ui->lineEdit_custom_charset2->text();
         }
-        if (ui->checkBox_custom3->isChecked() && !ui->lineEdit_custom3->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset3, useShort) << ui->lineEdit_custom3->text();
+        if (ui->checkBox_custom_charset3->isChecked() && !ui->lineEdit_custom_charset3->text().isEmpty()) {
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset3, useShort) << ui->lineEdit_custom_charset3->text();
         }
-        if (ui->checkBox_custom4->isChecked() && !ui->lineEdit_custom4->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset4, useShort) << ui->lineEdit_custom4->text();
+        if (ui->checkBox_custom_charset4->isChecked() && !ui->lineEdit_custom_charset4->text().isEmpty()) {
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset4, useShort) << ui->lineEdit_custom_charset4->text();
         }
     }
 

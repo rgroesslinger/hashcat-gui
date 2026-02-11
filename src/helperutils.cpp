@@ -23,6 +23,7 @@ QMap<HelperUtils::Parameter, QPair<QString, QString>> HelperUtils::parameterMap 
     {HelperUtils::Parameter::HashType,          {"-m",  "--hash-type"}},
     {HelperUtils::Parameter::HexCharset,        {"",    "--hex-charset"}},
     {HelperUtils::Parameter::HexSalt,           {"",    "--hex-salt"}},
+    {HelperUtils::Parameter::OptimizedKernel,   {"-O",  "--optimized-kernel-enable"}},
     {HelperUtils::Parameter::Outfile,           {"-o",  "--outfile"}},
     {HelperUtils::Parameter::OutfileFormat,     {"",    "--outfile-format"}},
     {HelperUtils::Parameter::Remove,            {"",    "--remove"}},

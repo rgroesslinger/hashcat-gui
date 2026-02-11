@@ -27,6 +27,7 @@ public:
         HashType,
         HexCharset,
         HexSalt,
+        OptimizedKernel,
         Outfile,
         OutfileFormat,
         Remove,
