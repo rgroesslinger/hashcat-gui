@@ -167,6 +167,7 @@ void MainWindow::resetFieldsTriggered()
     ui->spinBox_segment->setValue(32);
 
     // Advanced tab
+    ui->checkBox_optimized_kernel->setChecked(true);
     ui->checkBox_override_workload_profile->setChecked(false);
     ui->comboBox_workload_profile->setCurrentIndex(0);
 
