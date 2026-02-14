@@ -20,6 +20,7 @@
 #include <QJsonObject>
 #include <QAbstractItemModel>
 #include <QClipboard>
+#include <QStandardPaths>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
@@ -36,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     initHashAndAttackModes();
     updateViewAttackMode();
+
+    /* ---------- save default profile on quit ---------- */
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::saveDefaultProfile);
 
     /* ---------- menu actions ---------- */
     connect(ui->actionHelp_About, &QAction::triggered, this, &MainWindow::aboutTriggered);
@@ -82,6 +86,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled, ui->comboBox_workload_profile, &QComboBox::setEnabled);
     connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this, &MainWindow::attackIndexChanged);
     connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
+
+    loadDefaultProfile();
 
     /* ---------- show Settings if hashcatPath not set ---------- */
     if (settings.getKey<QString>("hashcatPath").isEmpty()) {
@@ -167,7 +173,7 @@ void MainWindow::resetFieldsTriggered()
     ui->spinBox_segment->setValue(32);
 
     // Advanced tab
-    ui->checkBox_optimized_kernel->setChecked(true);
+    ui->checkBox_optimized_kernel->setChecked(false);
     ui->checkBox_override_workload_profile->setChecked(false);
     ui->comboBox_workload_profile->setCurrentIndex(0);
 
@@ -205,7 +211,36 @@ void MainWindow::aboutTriggered()
     about.exec();
 }
 
-/*************** MainWindow ***************/
+// Path to the default profile JSON
+QString MainWindow::defaultProfileFile() const
+{
+    QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir d(dir);
+    return d.filePath("default_profile.json");
+}
+
+// Load the default profile – called from the constructor
+void MainWindow::loadDefaultProfile()
+{
+    QString file = defaultProfileFile();
+    if (QFile::exists(file)) {
+        WidgetStateSerializer s;
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file)) {
+            commandChanged();
+        }
+    }
+}
+
+// Save the default profile – called by aboutToQuit signal
+void MainWindow::saveDefaultProfile()
+{
+    QStringList ignoreWidgets = { "lineEdit_command" };
+    QString file = defaultProfileFile();
+    WidgetStateSerializer s;
+    if (!s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets)) {
+        QMessageBox::warning(this, tr("Save failed"), tr("Could not write default profile to %1.").arg(file));
+    }
+}
 
 void MainWindow::initHashAndAttackModes()
 {
