@@ -279,12 +279,12 @@ void MainWindow::initHashAndAttackModes()
 
             // Check if the command failed
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                QMessageBox::warning(this, tr("hashcat error"), tr("Failed to obtain supported hash types.\nError: %1").arg(result.stderr));
+                QMessageBox::warning(this, tr("hashcat error"), tr("Failed to obtain supported hash types.\nError: %1").arg(result.standardError));
                 return;
             }
 
             // The output is machine-readable JSON - strip newlines and parse
-            QString output = result.stdout.simplified();
+            QString output = result.standardOutput.simplified();
 
             QJsonDocument doc = QJsonDocument::fromJson(output.toUtf8());
             if (!doc.isObject()) {

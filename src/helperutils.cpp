@@ -73,7 +73,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
         const auto &settings = SettingsManager::instance();
 
         if (settings.getKey<QString>("hashcatPath").isEmpty()) {
-            result.stderr = "hashcatPath not configured";
+            result.standardError = "hashcatPath not configured";
             return result;
         }
 
@@ -87,20 +87,20 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
         proc.start();
 
         if (!proc.waitForStarted()) {
-            result.stderr = "Failed to start hashcat";
+            result.standardError = "Failed to start hashcat";
             return result;
         }
 
         if (!proc.waitForFinished(timeoutMs)) {
             proc.kill();
-            result.stderr = "hashcat timed out";
+            result.standardError = "hashcat timed out";
             return result;
         }
 
         result.exitStatus = proc.exitStatus();
         result.exitCode = proc.exitCode();
-        result.stdout = proc.readAllStandardOutput();
-        result.stderr = proc.readAllStandardError();
+        result.standardOutput = proc.readAllStandardOutput();
+        result.standardError = proc.readAllStandardError();
 
         return result;
     });

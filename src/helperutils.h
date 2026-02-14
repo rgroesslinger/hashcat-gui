@@ -14,8 +14,8 @@
 struct HashcatResult {
     QProcess::ExitStatus exitStatus;
     int exitCode;
-    QString stdout;
-    QString stderr;
+    QString standardOutput;
+    QString standardError;
 };
 
 class HelperUtils

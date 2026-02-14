@@ -44,9 +44,9 @@ void AboutDialog::updateVersionLabel()
             const HashcatResult &result = watcher->result();
 
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                ui->label_hc_version->setText(tr("Error: %1").arg(result.stderr.simplified()));
+                ui->label_hc_version->setText(tr("Error: %1").arg(result.standardError.simplified()));
             } else {
-                ui->label_hc_version->setText(result.stdout.simplified());
+                ui->label_hc_version->setText(result.standardOutput.simplified());
             }
 
             watcher->deleteLater();
