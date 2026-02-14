@@ -9,6 +9,8 @@
 #include <QString>
 #include <QStandardPaths>
 #include <QFileInfo>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentRun>
 
 // Mapping of supported command line options
 QMap<HelperUtils::Parameter, QPair<QString, QString>> HelperUtils::parameterMap = {
@@ -49,34 +51,64 @@ QString HelperUtils::getParameter(Parameter key, bool useShort)
     return pair.second;
 }
 
-// Execute hashcat and return its output
-QString HelperUtils::executeHashcat(QStringList &args) {
-    QProcess process;
-    QString output;
+/**
+ * This method runs hashcat asynchronously using QtConcurrent and returns a future
+ * that will contain the execution results.
+ *
+ * Usage Example:
+ *
+ * QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>();
+ * connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
+ *     const HashcatResult &result = watcher->result();
+ *     // process contents of "result"
+ *     watcher->deleteLater();
+ * });
+ * watcher->setFuture(HelperUtils::executeHashcat(QStringList() << "--help"));
+ */
+QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int timeoutMs) {
+    return QtConcurrent::run([args, timeoutMs]() -> HashcatResult {
+        HashcatResult result;
+        QProcess proc;
+        QStringList cmdArgs = args;
+        const auto &settings = SettingsManager::instance();
 
-    auto &settings = SettingsManager::instance();
+        if (settings.getKey<QString>("hashcatPath").isEmpty()) {
+            result.stderr = "hashcatPath not configured";
+            return result;
+        }
 
-    // Always run in quiet mode when reading output
-    args << "--quiet";
+        // Always run in quiet mode when reading output
+        cmdArgs << "--quiet";
 
-    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
-        process.setProgram(settings.getKey<QString>("hashcatPath"));
-        process.setArguments(args);
-        process.setWorkingDirectory(QFileInfo(settings.getKey<QString>("hashcatPath")).absolutePath());
-        process.start();
-        process.waitForFinished();
-        output = process.readAllStandardOutput();
-    }
+        proc.setProgram(settings.getKey<QString>("hashcatPath"));
+        proc.setArguments(cmdArgs);
+        proc.setWorkingDirectory(QFileInfo(settings.getKey<QString>("hashcatPath")).absolutePath());
 
-    if (process.exitCode() == QProcess::NormalExit && process.exitStatus() == QProcess::NormalExit) {
-        return output;
-    }
+        proc.start();
 
-    return QString("Error executing " + settings.getKey<QString>("hashcatPath") + " " + args.join(" "));
+        if (!proc.waitForStarted()) {
+            result.stderr = "Failed to start hashcat";
+            return result;
+        }
+
+        if (!proc.waitForFinished(timeoutMs)) {
+            proc.kill();
+            result.stderr = "hashcat timed out";
+            return result;
+        }
+
+        result.exitStatus = proc.exitStatus();
+        result.exitCode = proc.exitCode();
+        result.stdout = proc.readAllStandardOutput();
+        result.stderr = proc.readAllStandardError();
+
+        return result;
+    });
 }
 
 // Returns all supported terminals
-QMap<QString, QStringList> HelperUtils::getAvailableTerminals() {
+QMap<QString, QStringList> HelperUtils::getAvailableTerminals()
+{
     QMap<QString, QStringList> terminals;
 
     // List of terminals and needed arguments to launch them with an external command

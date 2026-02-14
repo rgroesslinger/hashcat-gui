@@ -26,7 +26,8 @@ SettingsDialog::~SettingsDialog()
     delete ui;
 }
 
-void SettingsDialog::readSettings() {
+void SettingsDialog::readSettings()
+{
     auto &settings = SettingsManager::instance();
 
     // hashcat path from saved settings

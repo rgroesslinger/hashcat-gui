@@ -21,6 +21,7 @@
 #include <QAbstractItemModel>
 #include <QClipboard>
 #include <QStandardPaths>
+#include <QFutureWatcher>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
@@ -257,35 +258,62 @@ void MainWindow::initHashAndAttackModes()
     attackModes.insert(AttackMode::HybridMaskWord, "Hybrid Mask + Wordlist");
     attackModes.insert(AttackMode::Association, "Association");
 
-    // Hash types
-    auto &settings = SettingsManager::instance();
-    QString hashTypes;
-
-    // Read list of example hashes, returns JSON
-    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
-        hashTypes = HelperUtils::executeHashcat(QStringList() << "--example-hashes" << "--machine-readable")
-                        .remove('\n')
-                        .remove('\r');
-    }
-
-    // Fill QComboBox with available hash types
-    QJsonDocument doc = QJsonDocument::fromJson(hashTypes.toUtf8());
-    if (doc.isObject()) {
-        QJsonObject rootObj = doc.object();
-
-        for (auto it = rootObj.constBegin(); it != rootObj.constEnd(); ++it) {
-            hashModes.insert(it.key().toInt(),
-                             QString(it.key() + " | " + it.value().toObject().value("name").toString()));
-        }
-    }
-
-    // Fill combo boxes
     for (const auto &value : std::as_const(attackModes)) {
         ui->comboBox_attack->addItem(value);
     }
 
-    for (const auto &value : std::as_const(hashModes)) {
-        ui->comboBox_hash->addItem(value);
+    // Hash types
+    auto &settings = SettingsManager::instance();
+
+    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
+        ui->comboBox_hash->setToolTip("Updating...");
+        ui->comboBox_hash->setEnabled(false);
+
+        // Create a watcher that will be destroyed once finished
+        QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
+
+        // When the future is finished parse the JSON and fill hashModes
+        connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
+            const HashcatResult &result = watcher->result();
+            watcher->deleteLater();
+
+            // Check if the command failed
+            if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
+                QMessageBox::warning(this, tr("hashcat error"), tr("Failed to obtain supported hash types.\nError: %1").arg(result.stderr));
+                return;
+            }
+
+            // The output is machine-readable JSON - strip newlines and parse
+            QString output = result.stdout.simplified();
+
+            QJsonDocument doc = QJsonDocument::fromJson(output.toUtf8());
+            if (!doc.isObject()) {
+                QMessageBox::warning(this, tr("hashcat error"), tr("Invalid JSON returned from hashcat."));
+                return;
+            }
+
+            QJsonObject rootObj = doc.object();
+
+            hashModes.clear();
+
+            for (auto it = rootObj.constBegin(); it != rootObj.constEnd(); ++it) {
+                hashModes.insert(it.key().toInt(),
+                                 QString(it.key() + " | " + it.value().toObject().value("name").toString()));
+            }
+
+            ui->comboBox_hash->clear();
+
+            // fill the combobox
+            for (const QString &value : std::as_const(hashModes)) {
+                ui->comboBox_hash->addItem(value);
+            }
+
+            ui->comboBox_hash->setEnabled(true);
+            ui->comboBox_hash->setToolTip(QString());
+        });
+
+        // Kick off the asynchronous process
+        watcher->setFuture(HelperUtils::executeHashcat(QStringList() << "--example-hashes" << "--machine-readable"));
     }
 }
 

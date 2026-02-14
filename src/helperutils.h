@@ -7,6 +7,16 @@
 #define HELPERUTILS_H
 
 #include <QString>
+#include <QStringList>
+#include <QProcess>
+#include <QFuture>
+
+struct HashcatResult {
+    QProcess::ExitStatus exitStatus;
+    int exitCode;
+    QString stdout;
+    QString stderr;
+};
 
 class HelperUtils
 {
@@ -37,7 +47,7 @@ public:
         WorkloadProfile,
     };
 
-    static QString executeHashcat(QStringList &args);
+    static QFuture<HashcatResult> executeHashcat(const QStringList &args, int timeoutMs = 20000);
     static QMap<QString, QStringList> getAvailableTerminals();
     static QString getParameter(Parameter key, bool useShort = false);
 

@@ -27,7 +27,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
 
 add_executable(hashcat-gui
     src/aboutdialog.h
@@ -51,6 +51,6 @@ add_executable(hashcat-gui
 
 target_compile_options(hashcat-gui PRIVATE -Wall -Wextra -Wpedantic)
 
-target_link_libraries(hashcat-gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets)
+target_link_libraries(hashcat-gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
 
 install(TARGETS hashcat-gui RUNTIME DESTINATION bin)
