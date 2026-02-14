@@ -214,9 +214,9 @@ void MainWindow::aboutTriggered()
 // Path to the default profile JSON
 QString MainWindow::defaultProfileFile() const
 {
-    QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir d(dir);
-    return d.filePath("default_profile.json");
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir().mkpath(dirPath);
+    return QDir(dirPath).filePath("default_profile.json");
 }
 
 // Load the default profile – called from the constructor
