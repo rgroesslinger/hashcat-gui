@@ -1015,6 +1015,13 @@ default: 1,2
                 </widget>
                </item>
                <item>
+                <widget class="QCheckBox" name="checkBox_speed_only">
+                 <property name="text">
+                  <string>Return expected speed of the attack, then quit</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <layout class="QHBoxLayout" name="horizontalLayout">
                  <item>
                   <widget class="QCheckBox" name="checkBox_override_workload_profile">
@@ -1718,6 +1725,22 @@ default: 1,2
     <hint type="sourcelabel">
      <x>382</x>
      <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>382</x>
+     <y>450</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBox_speed_only</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>commandChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>382</x>
+     <y>153</y>
     </hint>
     <hint type="destinationlabel">
      <x>382</x>

@@ -175,6 +175,7 @@ void MainWindow::resetFieldsTriggered()
 
     // Advanced tab
     ui->checkBox_optimized_kernel->setChecked(false);
+    ui->checkBox_speed_only->setChecked(false);
     ui->checkBox_override_workload_profile->setChecked(false);
     ui->comboBox_workload_profile->setCurrentIndex(0);
 
@@ -669,6 +670,10 @@ QStringList MainWindow::generateArguments()
             mask_before_dict = ui->lineEdit_mask->text();
         }
         break;
+    }
+
+    if (ui->checkBox_speed_only->isChecked()) {
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::SpeedOnly, useShort);
     }
 
     if (ui->checkBox_override_workload_profile->isChecked()) {

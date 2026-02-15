@@ -43,6 +43,7 @@ public:
         Remove,
         RulesFile,
         SegmentSize,
+        SpeedOnly,
         Username,
         WorkloadProfile,
     };

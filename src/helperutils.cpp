@@ -31,6 +31,7 @@ QMap<HelperUtils::Parameter, QPair<QString, QString>> HelperUtils::parameterMap 
     {HelperUtils::Parameter::Remove,            {"",    "--remove"}},
     {HelperUtils::Parameter::RulesFile,         {"-r",  "--rules-file"}},
     {HelperUtils::Parameter::SegmentSize,       {"-c",  "--segment-size"}},
+    {HelperUtils::Parameter::SpeedOnly,         {"",    "--speed-only"}},
     {HelperUtils::Parameter::Username,          {"",    "--username"}},
     {HelperUtils::Parameter::WorkloadProfile,   {"-w",  "--workload-profile"}},
 };
