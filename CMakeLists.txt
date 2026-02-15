@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 project(hashcat-gui CXX)
 
 # Set version
-set(GUI_VERSION 0.7.0)
+set(GUI_VERSION 0.7.1)
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h
@@ -29,7 +29,7 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
 
-add_executable(hashcat-gui
+add_executable(hashcat-gui WIN32
     src/aboutdialog.h
     src/aboutdialog.cpp
     src/helperutils.h
