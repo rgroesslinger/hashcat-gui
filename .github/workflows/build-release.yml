@@ -1,4 +1,4 @@
-name: Build and publish binary release
+name: Publish Windows binary
 
 on:
   release:
@@ -33,9 +33,13 @@ jobs:
         shell: msys2 {0}
         run: |
           mkdir "hashcat-gui-${{ github.ref_name }}"
+          mkdir "hashcat-gui-${{ github.ref_name }}/docs"
+          # copy binary
           cp build/hashcat-gui.exe "hashcat-gui-${{ github.ref_name }}/"
-          cd "hashcat-gui-${{ github.ref_name }}/"
+          # copy docs
+          cp README.md CHANGELOG.md FAQ.md LICENSE "hashcat-gui-${{ github.ref_name }}/docs/"
           # bundle needed libraries
+          cd "hashcat-gui-${{ github.ref_name }}/"
           ldd hashcat-gui.exe | grep /ucrt64 | awk '{print $3}' | xargs -i cp {} .
           # Run Qt's windows deployment tool
           windeployqt6.exe hashcat-gui.exe \
