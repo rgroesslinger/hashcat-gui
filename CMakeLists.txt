@@ -5,7 +5,7 @@ project(hashcat-gui CXX)
 set(GUI_VERSION 0.7.1)
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h
+    ${CMAKE_CURRENT_BINARY_DIR}/config.h
     @ONLY
 )
 
@@ -49,6 +49,9 @@ add_executable(hashcat-gui WIN32
     src/mainwindow.ui
     src/settingsdialog.ui
 )
+
+# config.h is generated, it lives in the build tree
+target_include_directories(hashcat-gui PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 target_compile_options(hashcat-gui PRIVATE -Wall -Wextra -Wpedantic)
 
