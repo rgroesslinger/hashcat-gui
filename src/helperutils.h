@@ -11,9 +11,15 @@
 #include <QProcess>
 #include <QFuture>
 
+// Result of a single hashcat invocation.
+//
+// The status members are initialised to values that mean "no process ran":
+// every consumer checks `exitStatus != NormalExit || exitCode != 0` before
+// looking at the output, so an early return (missing configuration, process
+// never started, timeout) must not be able to look like a successful run.
 struct HashcatResult {
-    QProcess::ExitStatus exitStatus;
-    int exitCode;
+    QProcess::ExitStatus exitStatus = QProcess::CrashExit;
+    int exitCode = -1;
     QString standardOutput;
     QString standardError;
 };
