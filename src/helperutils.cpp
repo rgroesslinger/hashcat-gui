@@ -13,7 +13,7 @@
 #include <QtConcurrent/QtConcurrentRun>
 
 // Mapping of supported command line options
-QMap<HelperUtils::Parameter, QPair<QString, QString>> HelperUtils::parameterMap = {
+const QMap<HelperUtils::Parameter, QPair<QString, QString>> HelperUtils::parameterMap = {
     {HelperUtils::Parameter::AttackMode,        {"-a",  "--attack-mode"}},
     {HelperUtils::Parameter::BackendDevices,    {"-d",  "--backend-devices"}},
     {HelperUtils::Parameter::CpuAffinity,       {"",    "--cpu-affinity"}},
@@ -41,6 +41,11 @@ HelperUtils::HelperUtils() {}
 QString HelperUtils::getParameter(Parameter key, bool useShort)
 {
     auto it = parameterMap.constFind(key);
+    if (it == parameterMap.constEnd()) {
+        // Every enumerator has an entry above, but dereferencing end() would
+        // be undefined behaviour, so fail soft instead.
+        return {};
+    }
     const auto &pair = it.value();
 
     if (useShort && !pair.first.isEmpty()) {

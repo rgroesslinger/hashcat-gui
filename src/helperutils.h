@@ -59,7 +59,7 @@ public:
     static QString getParameter(Parameter key, bool useShort = false);
 
 private:
-    static QMap<Parameter, QPair<QString, QString>> parameterMap;
+    static const QMap<Parameter, QPair<QString, QString>> parameterMap;
 };
 
 #endif // HELPERUTILS_H
