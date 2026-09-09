@@ -72,13 +72,17 @@ QString HelperUtils::getParameter(Parameter key, bool useShort)
  * watcher->setFuture(HelperUtils::executeHashcat(QStringList() << "--help"));
  */
 QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int timeoutMs) {
-    return QtConcurrent::run([args, timeoutMs]() -> HashcatResult {
+    // QSettings is only reentrant. The lambda below runs on the thread pool,
+    // where reading the settings could race with the GUI thread writing them,
+    // so read the path once on the calling thread and capture it by value.
+    const QString hashcatPath = SettingsManager::instance().getKey<QString>("hashcatPath");
+
+    return QtConcurrent::run([args, timeoutMs, hashcatPath]() -> HashcatResult {
         HashcatResult result;
         QProcess proc;
         QStringList cmdArgs = args;
-        const auto &settings = SettingsManager::instance();
 
-        if (settings.getKey<QString>("hashcatPath").isEmpty()) {
+        if (hashcatPath.isEmpty()) {
             result.standardError = "hashcatPath not configured";
             return result;
         }
@@ -86,9 +90,9 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
         // Always run in quiet mode when reading output
         cmdArgs << "--quiet";
 
-        proc.setProgram(settings.getKey<QString>("hashcatPath"));
+        proc.setProgram(hashcatPath);
         proc.setArguments(cmdArgs);
-        proc.setWorkingDirectory(QFileInfo(settings.getKey<QString>("hashcatPath")).absolutePath());
+        proc.setWorkingDirectory(QFileInfo(hashcatPath).absolutePath());
 
         proc.start();
 
@@ -99,6 +103,9 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
 
         if (!proc.waitForFinished(timeoutMs)) {
             proc.kill();
+            // Reap the killed child instead of letting QProcess::waitForFinished
+            // return immediately and destroy a still-running process.
+            proc.waitForFinished(5000);
             result.standardError = "hashcat timed out\n" + proc.errorString();
             return result;
         }
