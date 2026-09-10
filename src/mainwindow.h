@@ -72,6 +72,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    // Last outfile name generated from the hash file name, see
+    // hashFileTextChanged(). Empty when the field holds a user-chosen value.
+    QString suggestedOutfile;
+
     QMap<quint32, QString> hashModes;
     QMap<quint32, QString> attackModes;
 

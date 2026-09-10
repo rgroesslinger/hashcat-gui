@@ -523,8 +523,20 @@ void MainWindow::outfileToggled(bool checked)
 
 void MainWindow::hashFileTextChanged(const QString &text)
 {
-    if (!text.isEmpty()) {
-        ui->lineEdit_outfile->setText(text + ".out");
+    if (text.isEmpty()) {
+        return;
+    }
+
+    // Suggest "<hash file>.out", but never overwrite a value that is no
+    // longer ours: the user may have picked a different outfile, or a profile
+    // may just have been loaded. The suggestion only follows the hash file
+    // name while the field still contains the suggestion generated for the
+    // previous one.
+    const QString suggestion = text + QStringLiteral(".out");
+    QLineEdit *outfile = ui->lineEdit_outfile;
+    if (outfile->text().isEmpty() || outfile->text() == suggestedOutfile) {
+        suggestedOutfile = suggestion;
+        outfile->setText(suggestion);
     }
 }
 
