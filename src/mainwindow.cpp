@@ -405,8 +405,10 @@ void MainWindow::addWordlistClicked()
 
 void MainWindow::wordlistSortAscClicked()
 {
+    // currentRow() is -1 when nothing is selected: without the guard below
+    // takeItem(-1) returns nullptr and the list ends up with a null entry.
     int currentRow = ui->listWidget_wordlist->currentRow();
-    if (currentRow == 0) return;
+    if (currentRow <= 0) return;
     QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
     ui->listWidget_wordlist->insertItem(currentRow - 1, currentItem);
     ui->listWidget_wordlist->setCurrentRow(currentRow - 1);
@@ -415,7 +417,7 @@ void MainWindow::wordlistSortAscClicked()
 void MainWindow::wordlistSortDescClicked()
 {
     int currentRow = ui->listWidget_wordlist->currentRow();
-    if (currentRow >= ui->listWidget_wordlist->count() - 1) return;
+    if (currentRow < 0 || currentRow >= ui->listWidget_wordlist->count() - 1) return;
     QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
     ui->listWidget_wordlist->insertItem(currentRow + 1, currentItem);
     ui->listWidget_wordlist->setCurrentRow(currentRow + 1);
