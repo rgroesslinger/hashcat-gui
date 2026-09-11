@@ -278,39 +278,46 @@ void MainWindow::initHashAndAttackModes()
             const HashcatResult &result = watcher->result();
             watcher->deleteLater();
 
+            QString error;
+
             // Check if the command failed
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                QMessageBox::warning(this, tr("hashcat error"), tr("Failed to obtain supported hash types.\nError: %1").arg(result.standardError));
-                return;
+                error = tr("Failed to obtain supported hash types.\nError: %1").arg(result.standardError);
+            } else {
+                // The output is machine-readable JSON - strip newlines and parse
+                QString output = result.standardOutput.simplified();
+
+                QJsonDocument doc = QJsonDocument::fromJson(output.toUtf8());
+                if (!doc.isObject()) {
+                    error = tr("Invalid JSON returned from hashcat.");
+                } else {
+                    QJsonObject rootObj = doc.object();
+
+                    hashModes.clear();
+
+                    for (auto it = rootObj.constBegin(); it != rootObj.constEnd(); ++it) {
+                        hashModes.insert(it.key().toInt(),
+                                         QString(it.key() + " | " + it.value().toObject().value("name").toString()));
+                    }
+
+                    ui->comboBox_hash->clear();
+
+                    // fill the combobox
+                    for (const QString &value : std::as_const(hashModes)) {
+                        ui->comboBox_hash->addItem(value);
+                    }
+                }
             }
 
-            // The output is machine-readable JSON - strip newlines and parse
-            QString output = result.standardOutput.simplified();
-
-            QJsonDocument doc = QJsonDocument::fromJson(output.toUtf8());
-            if (!doc.isObject()) {
-                QMessageBox::warning(this, tr("hashcat error"), tr("Invalid JSON returned from hashcat."));
-                return;
-            }
-
-            QJsonObject rootObj = doc.object();
-
-            hashModes.clear();
-
-            for (auto it = rootObj.constBegin(); it != rootObj.constEnd(); ++it) {
-                hashModes.insert(it.key().toInt(),
-                                 QString(it.key() + " | " + it.value().toObject().value("name").toString()));
-            }
-
-            ui->comboBox_hash->clear();
-
-            // fill the combobox
-            for (const QString &value : std::as_const(hashModes)) {
-                ui->comboBox_hash->addItem(value);
-            }
-
+            // The combo was disabled while the query ran. Restore it on every
+            // path so a failed or malformed reply does not leave it stuck on
+            // the "Updating..." tooltip forever.
             ui->comboBox_hash->setEnabled(true);
             ui->comboBox_hash->setToolTip(QString());
+
+            if (!error.isEmpty()) {
+                QMessageBox::warning(this, tr("hashcat error"), error);
+            }
         });
 
         // Kick off the asynchronous process
