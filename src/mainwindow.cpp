@@ -616,7 +616,11 @@ void MainWindow::executeClicked()
     proc.setProgram(terminal);
     proc.setArguments(arguments);
     proc.setWorkingDirectory(QFileInfo(settings.getKey<QString>("hashcatPath")).absolutePath());
-    proc.startDetached();
+
+    if (!proc.startDetached()) {
+        QMessageBox::warning(this, tr("Launch failed"),
+                             tr("Could not start %1: %2").arg(terminal, proc.errorString()));
+    }
 }
 
 /*************** Helper ***************/
