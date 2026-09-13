@@ -550,8 +550,11 @@ void MainWindow::hashFileTextChanged(const QString &text)
 void MainWindow::copyCommandToClipboard()
 {
     QString text = ui->lineEdit_command->text();
+    // QApplication::clipboard() is null on platforms without clipboard support
     QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(text);
+    if (clipboard) {
+        clipboard->setText(text);
+    }
 }
 
 void MainWindow::executeClicked()
