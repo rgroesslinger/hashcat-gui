@@ -157,10 +157,18 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key,
     QFile f(filename);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         QMessageBox::warning(nullptr, tr("Save failed"),
-                             tr("Could not open %1 for writing.").arg(filename));
+                             tr("Could not open %1 for writing: %2").arg(filename, f.errorString()));
         return false;
     }
-    f.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+
+    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Indented);
+    if (f.write(data) != data.size() || !f.flush()) {
+        QMessageBox::warning(nullptr, tr("Save failed"),
+                             tr("Could not write to %1: %2").arg(filename, f.errorString()));
+        return false;
+    }
+
+    f.close();
     return true;
 }
 

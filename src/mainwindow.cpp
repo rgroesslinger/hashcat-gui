@@ -115,8 +115,10 @@ void MainWindow::exportTriggered()
 
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
-        s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets);
-        QMessageBox::information(this, tr("Saved"), tr("Profile saved to %1.").arg(file));
+        const QString key = QString::fromUtf8(metaObject()->className());
+        if (s.saveStateToFile(key, this, file, ignoreWidgets)) {
+            QMessageBox::information(this, tr("Saved"), tr("Profile saved to %1.").arg(file));
+        }
     }
 }
 
