@@ -18,7 +18,14 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QDir>
-#include <QMessageBox>
+
+// Report a failure through errorMessage when the caller asked for it
+static void setError(QString *errorMessage, const QString &text)
+{
+    if (errorMessage) {
+        *errorMessage = text;
+    }
+}
 
 WidgetStateSerializer::WidgetStateSerializer(QObject *parent)
     : QObject(parent)
@@ -149,26 +156,26 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
 bool WidgetStateSerializer::saveStateToFile(const QString &key,
                                             const QWidget *widget,
                                             const QString &filename,
-                                            const QStringList &ignoredWidgets) const
+                                            const QStringList &ignoredWidgets,
+                                            QString *errorMessage) const
 {
     QJsonObject root;
     root[key] = widgetToJson(widget, ignoredWidgets);
 
     QFile f(filename);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        QMessageBox::warning(nullptr, tr("Save failed"),
-                             tr("Could not open %1 for writing: %2").arg(filename, f.errorString()));
+        setError(errorMessage, tr("Could not open %1 for writing: %2").arg(filename, f.errorString()));
         return false;
     }
 
     const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Indented);
     if (f.write(data) != data.size() || !f.flush()) {
-        QMessageBox::warning(nullptr, tr("Save failed"),
-                             tr("Could not write to %1: %2").arg(filename, f.errorString()));
+        setError(errorMessage, tr("Could not write to %1: %2").arg(filename, f.errorString()));
         return false;
     }
 
     f.close();
+    setError(errorMessage, QString());
     return true;
 }
 
@@ -176,12 +183,12 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key,
 bool WidgetStateSerializer::loadStateFromFile(const QString &key,
                                               QWidget *widget,
                                               const QString &filename,
-                                              const QStringList &ignoredWidgets) const
+                                              const QStringList &ignoredWidgets,
+                                              QString *errorMessage) const
 {
     QFile f(filename);
     if (!f.open(QIODevice::ReadOnly)) {
-        QMessageBox::warning(nullptr, tr("Load failed"),
-                             tr("Could not open %1 for reading.").arg(filename));
+        setError(errorMessage, tr("Could not open %1 for reading: %2").arg(filename, f.errorString()));
         return false;
     }
 
@@ -189,18 +196,17 @@ bool WidgetStateSerializer::loadStateFromFile(const QString &key,
     QJsonParseError err;
     QJsonDocument doc = QJsonDocument::fromJson(data, &err);
     if (err.error != QJsonParseError::NoError || !doc.isObject()) {
-        QMessageBox::warning(nullptr, tr("Load failed"),
-                             tr("The file is not a valid JSON file."));
+        setError(errorMessage, tr("The file is not a valid JSON file: %1").arg(err.errorString()));
         return false;
     }
 
     QJsonObject root = doc.object();
     if (!root.contains(key)) {
-        QMessageBox::warning(nullptr, tr("Load failed"),
-                             tr("The file does not contain a profile for \"%1\".").arg(key));
+        setError(errorMessage, tr("The file does not contain a profile for \"%1\".").arg(key));
         return false;
     }
 
     jsonToWidget(root[key].toObject(), widget, ignoredWidgets);
+    setError(errorMessage, QString());
     return true;
 }

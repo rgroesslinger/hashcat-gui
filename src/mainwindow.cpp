@@ -116,8 +116,11 @@ void MainWindow::exportTriggered()
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
         const QString key = QString::fromUtf8(metaObject()->className());
-        if (s.saveStateToFile(key, this, file, ignoreWidgets)) {
+        QString error;
+        if (s.saveStateToFile(key, this, file, ignoreWidgets, &error)) {
             QMessageBox::information(this, tr("Saved"), tr("Profile saved to %1.").arg(file));
+        } else {
+            QMessageBox::warning(this, tr("Save failed"), error);
         }
     }
 }
@@ -132,9 +135,12 @@ void MainWindow::importTriggered()
 
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file)) {
+        QString error;
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error)) {
             commandChanged();
             QMessageBox::information(this, tr("Loaded"), tr("Profile loaded from %1.").arg(file));
+        } else {
+            QMessageBox::warning(this, tr("Load failed"), error);
         }
     }
 }
@@ -229,8 +235,11 @@ void MainWindow::loadDefaultProfile()
     QString file = defaultProfileFile();
     if (QFile::exists(file)) {
         WidgetStateSerializer s;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file)) {
+        QString error;
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error)) {
             commandChanged();
+        } else {
+            QMessageBox::warning(this, tr("Load failed"), error);
         }
     }
 }
@@ -241,8 +250,9 @@ void MainWindow::saveDefaultProfile()
     QStringList ignoreWidgets = { "lineEdit_command" };
     QString file = defaultProfileFile();
     WidgetStateSerializer s;
-    if (!s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets)) {
-        QMessageBox::warning(this, tr("Save failed"), tr("Could not write default profile to %1.").arg(file));
+    QString error;
+    if (!s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets, &error)) {
+        QMessageBox::warning(this, tr("Save failed"), error);
     }
 }
 
