@@ -124,7 +124,12 @@ QMap<QString, QStringList> HelperUtils::getAvailableTerminals()
 {
     QMap<QString, QStringList> terminals;
 
-    // List of terminals and needed arguments to launch them with an external command
+    // List of terminals and needed arguments to launch them with an external
+    // command. The arguments end up between the terminal program and the
+    // hashcat command line, so each entry states exactly what that terminal's
+    // own parser expects. Terminals whose option takes a single shell-quoted
+    // string instead of an argument vector (terminator -e) cannot be
+    // expressed here and are deliberately not listed.
     QMap<QString, QStringList> terminalMap = {
         {"cmd.exe", {"/k"}},
         {"xterm", {"-hold", "-e"}},
@@ -132,6 +137,11 @@ QMap<QString, QStringList> HelperUtils::getAvailableTerminals()
         {"ptyxis", {"--"}},
         {"konsole", {"--hold", "-e"}},
         {"xfce4-terminal", {"--hold", "-e"}},
+        {"alacritty", {"-e"}},        // -e consumes the rest of the arguments
+        {"kitty", {}},                // the program is the first positional argument
+        {"foot", {}},                 // trailing arguments are run as the command
+        {"wezterm", {"start", "--"}}, // wezterm start -- <program>
+        {"wt.exe", {"-d", "."}},      // Windows Terminal
     };
 
     // Check which ones are actually available
