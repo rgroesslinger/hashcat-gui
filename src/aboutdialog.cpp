@@ -7,6 +7,7 @@
 #include "ui_aboutdialog.h"
 #include "helperutils.h"
 #include "settingsmanager.h"
+#include "appconstants.h"
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QFutureWatcher>
@@ -34,9 +35,9 @@ void AboutDialog::okClicked()
 void AboutDialog::updateVersionLabel()
 {
     auto &settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.getKey<QString>("hashcatPath"));
+    QFileInfo fileInfo(settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
 
-    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
+    if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
         ui->label_hc_version_text->setText(fileInfo.fileName());
 
         QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
@@ -52,7 +53,7 @@ void AboutDialog::updateVersionLabel()
             watcher->deleteLater();
         });
 
-        watcher->setFuture(HelperUtils::executeHashcat(QStringList() << "--version"));
+        watcher->setFuture(HelperUtils::executeHashcat(QStringList() << AppConstants::Hashcat::Version));
     }
 
     ui->label_hc_gui_version->setText(QApplication::applicationVersion());

@@ -31,6 +31,7 @@ find_package(Qt6 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
 
 add_executable(hashcat-gui WIN32
     src/aboutdialog.h
+    src/appconstants.h
     src/aboutdialog.cpp
     src/helperutils.h
     src/helperutils.cpp

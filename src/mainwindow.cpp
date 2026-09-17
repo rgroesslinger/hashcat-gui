@@ -8,6 +8,7 @@
 #include "aboutdialog.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
+#include "appconstants.h"
 #include "helperutils.h"
 #include "widgetstateserializer.h"
 #include <QDateTime>
@@ -91,7 +92,7 @@ MainWindow::MainWindow(QWidget *parent)
     loadDefaultProfile();
 
     /* ---------- show Settings if hashcatPath not set ---------- */
-    if (settings.getKey<QString>("hashcatPath").isEmpty()) {
+    if (settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
         QMetaObject::invokeMethod(this, &MainWindow::settingsTriggered, Qt::QueuedConnection);
     }
 }
@@ -106,7 +107,7 @@ MainWindow::~MainWindow()
 // File → Export
 void MainWindow::exportTriggered()
 {
-    QStringList ignoreWidgets = { "lineEdit_command" };
+    QStringList ignoreWidgets = { AppConstants::Files::PreviewWidget };
 
     QString file = QFileDialog::getSaveFileName(
         this, tr("Save Profile"),
@@ -226,7 +227,7 @@ QString MainWindow::defaultProfileFile() const
 {
     const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QDir().mkpath(dirPath);
-    return QDir(dirPath).filePath("default_profile.json");
+    return QDir(dirPath).filePath(AppConstants::Files::DefaultProfile);
 }
 
 // Load the default profile – called from the constructor
@@ -247,7 +248,7 @@ void MainWindow::loadDefaultProfile()
 // Save the default profile – called by aboutToQuit signal
 void MainWindow::saveDefaultProfile()
 {
-    QStringList ignoreWidgets = { "lineEdit_command" };
+    QStringList ignoreWidgets = { AppConstants::Files::PreviewWidget };
     QString file = defaultProfileFile();
     WidgetStateSerializer s;
     QString error;
@@ -278,7 +279,7 @@ void MainWindow::initHashAndAttackModes()
     // Hash types
     auto &settings = SettingsManager::instance();
 
-    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
+    if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
         ui->comboBox_hash->setToolTip("Updating...");
         ui->comboBox_hash->setEnabled(false);
 
@@ -333,7 +334,7 @@ void MainWindow::initHashAndAttackModes()
         });
 
         // Kick off the asynchronous process
-        watcher->setFuture(HelperUtils::executeHashcat(QStringList() << "--example-hashes" << "--machine-readable"));
+        watcher->setFuture(HelperUtils::executeHashcat(QStringList() << AppConstants::Hashcat::ExampleHashes << AppConstants::Hashcat::MachineReadable));
     }
 }
 
@@ -551,7 +552,7 @@ void MainWindow::hashFileTextChanged(const QString &text)
     // may just have been loaded. The suggestion only follows the hash file
     // name while the field still contains the suggestion generated for the
     // previous one.
-    const QString suggestion = text + QStringLiteral(".out");
+    const QString suggestion = text + AppConstants::Defaults::OutfileSuffix;
     QLineEdit *outfile = ui->lineEdit_outfile;
     if (outfile->text().isEmpty() || outfile->text() == suggestedOutfile) {
         suggestedOutfile = suggestion;
@@ -584,7 +585,7 @@ void MainWindow::executeClicked()
         return;
     }
 
-    if (settings.getKey<QString>("hashcatPath").isEmpty()) {
+    if (settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
         QMessageBox msgBox(this);
         QString message = tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
                               .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
@@ -595,7 +596,7 @@ void MainWindow::executeClicked()
         return;
     }
 
-    if (settings.getKey<QString>("terminal").isEmpty()) {
+    if (settings.getKey<QString>(AppConstants::SettingsKeys::Terminal).isEmpty()) {
         QMessageBox msgBox(this);
         QString message = tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
                               .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
@@ -610,13 +611,13 @@ void MainWindow::executeClicked()
     QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
 
     // The configured terminal has a known configuration
-    if (availableTerminals.contains(settings.getKey<QString>("terminal"))) {
-        terminal = settings.getKey<QString>("terminal");
+    if (availableTerminals.contains(settings.getKey<QString>(AppConstants::SettingsKeys::Terminal))) {
+        terminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
         arguments << availableTerminals.value(terminal);
     }
 
     /* 2. append hashcat binary to launch command */
-    arguments << settings.getKey<QString>("hashcatPath");
+    arguments << settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 
     /* 3. append arguments set in gui elements */
     arguments << generateArguments();
@@ -630,7 +631,7 @@ void MainWindow::executeClicked()
 
     proc.setProgram(terminal);
     proc.setArguments(arguments);
-    proc.setWorkingDirectory(QFileInfo(settings.getKey<QString>("hashcatPath")).absolutePath());
+    proc.setWorkingDirectory(QFileInfo(settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath)).absolutePath());
 
     if (!proc.startDetached()) {
         QMessageBox::warning(this, tr("Launch failed"),
@@ -643,12 +644,12 @@ void MainWindow::executeClicked()
 void MainWindow::commandChanged()
 {
     auto &settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.getKey<QString>("hashcatPath"));
+    QFileInfo fileInfo(settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
 
     ui->lineEdit_command->clear();
 
     // prepend hashcat binary name if it has already been configured in settings
-    if (!settings.getKey<QString>("hashcatPath").isEmpty()) {
+    if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
         ui->lineEdit_command->setText(fileInfo.fileName());
     }
 
@@ -664,7 +665,7 @@ QStringList MainWindow::generateArguments()
     QString mask_before_dict = "";
     QString mask_after_dict = "";
 
-    bool useShort = settings.getKey<bool>("useShortParameters");
+    bool useShort = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
     int attackMode = attackModes.key(ui->comboBox_attack->currentText());
 
     arguments << HelperUtils::getParameter(HelperUtils::Parameter::HashType, useShort) << QString::number(hashModes.key(ui->comboBox_hash->currentText()));
@@ -691,8 +692,8 @@ QStringList MainWindow::generateArguments()
             if (ui->checkBox_rulesfile_3->isChecked() && !ui->lineEdit_open_rulesfile_3->text().isEmpty()) {
                 arguments << HelperUtils::getParameter(HelperUtils::Parameter::RulesFile, useShort) << ui->lineEdit_open_rulesfile_3->text();
             }
-        } else if (ui->radioButton_generate_rules->isChecked() && !ui->spinBox_generate_rules->cleanText().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::GenerateRules, useShort) << ui->spinBox_generate_rules->cleanText();
+        } else if (ui->radioButton_generate_rules->isChecked()) {
+            arguments << HelperUtils::getParameter(HelperUtils::Parameter::GenerateRules, useShort) << QString::number(ui->spinBox_generate_rules->value());
         }
         break;
     case AttackMode::Combination:
@@ -750,12 +751,12 @@ QStringList MainWindow::generateArguments()
     if (ui->checkBox_outfile->isChecked() && !ui->lineEdit_outfile->text().isEmpty()) {
         QFileInfo hash_fi(ui->lineEdit_hashfile->text());
         QString outfile = ui->lineEdit_outfile->text();
-        outfile.replace("<unixtime>", QString::number(QDateTime::currentMSecsSinceEpoch() / 1000));
-        outfile.replace("<hash>", hash_fi.fileName(), Qt::CaseInsensitive);
+        outfile.replace(AppConstants::Placeholders::UnixTime, QString::number(QDateTime::currentMSecsSinceEpoch() / AppConstants::MsecsPerSecond));
+        outfile.replace(AppConstants::Placeholders::Hash, hash_fi.fileName(), Qt::CaseInsensitive);
         arguments << HelperUtils::getParameter(HelperUtils::Parameter::Outfile, useShort) << outfile;
     }
 
-    if (ui->lineEdit_outfile_format->text() != "1,2") {
+    if (ui->lineEdit_outfile_format->text() != AppConstants::Defaults::OutfileFormat) {
         arguments << HelperUtils::getParameter(HelperUtils::Parameter::OutfileFormat, useShort) << ui->lineEdit_outfile_format->text();
     }
 
@@ -763,12 +764,12 @@ QStringList MainWindow::generateArguments()
         arguments << HelperUtils::getParameter(HelperUtils::Parameter::CpuAffinity, useShort) << ui->lineEdit_cpu_affinity->text();
     }
 
-    if (!ui->lineEdit_devices->text().isEmpty() && ui->lineEdit_devices->text() != "0") {
+    if (!ui->lineEdit_devices->text().isEmpty() && ui->lineEdit_devices->text() != AppConstants::Defaults::BackendDevices) {
         arguments << HelperUtils::getParameter(HelperUtils::Parameter::BackendDevices, useShort) << ui->lineEdit_devices->text();
     }
 
-    if (!ui->spinBox_segment->cleanText().isEmpty() && ui->spinBox_segment->cleanText() != "32") {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::SegmentSize, useShort) << ui->spinBox_segment->cleanText();
+    if (ui->spinBox_segment->value() != AppConstants::Defaults::SegmentSize) {
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::SegmentSize, useShort) << QString::number(ui->spinBox_segment->value());
     }
 
     if (!ui->lineEdit_hashfile->text().isEmpty()) {

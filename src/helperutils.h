@@ -11,6 +11,8 @@
 #include <QProcess>
 #include <QFuture>
 
+#include "appconstants.h"
+
 // Result of a single hashcat invocation.
 //
 // The status members are initialised to values that mean "no process ran":
@@ -54,7 +56,7 @@ public:
         WorkloadProfile,
     };
 
-    static QFuture<HashcatResult> executeHashcat(const QStringList &args, int timeoutMs = 20000);
+    static QFuture<HashcatResult> executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
     static QMap<QString, QStringList> getAvailableTerminals();
     static QString getParameter(Parameter key, bool useShort = false);
 

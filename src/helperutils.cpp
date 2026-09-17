@@ -5,6 +5,7 @@
 
 #include "helperutils.h"
 #include "settingsmanager.h"
+#include "appconstants.h"
 #include <QProcess>
 #include <QString>
 #include <QStandardPaths>
@@ -75,7 +76,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
     // QSettings is only reentrant. The lambda below runs on the thread pool,
     // where reading the settings could race with the GUI thread writing them,
     // so read the path once on the calling thread and capture it by value.
-    const QString hashcatPath = SettingsManager::instance().getKey<QString>("hashcatPath");
+    const QString hashcatPath = SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 
     return QtConcurrent::run([args, timeoutMs, hashcatPath]() -> HashcatResult {
         HashcatResult result;
@@ -88,7 +89,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
         }
 
         // Always run in quiet mode when reading output
-        cmdArgs << "--quiet";
+        cmdArgs << AppConstants::Hashcat::Quiet;
 
         proc.setProgram(hashcatPath);
         proc.setArguments(cmdArgs);
