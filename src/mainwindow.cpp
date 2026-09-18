@@ -272,8 +272,10 @@ void MainWindow::initHashAndAttackModes()
     attackModes.insert(AttackMode::HybridMaskWord, "Hybrid Mask + Wordlist");
     attackModes.insert(AttackMode::Association, "Association");
 
-    for (const auto &value : std::as_const(attackModes)) {
-        ui->comboBox_attack->addItem(value);
+    // The numeric id travels as item data: the displayed text is what a
+    // translation changes, the id is what has to end up on the command line.
+    for (auto it = attackModes.constBegin(); it != attackModes.constEnd(); ++it) {
+        ui->comboBox_attack->addItem(it.value(), static_cast<int>(it.key()));
     }
 
     // Hash types
@@ -315,9 +317,9 @@ void MainWindow::initHashAndAttackModes()
 
                     ui->comboBox_hash->clear();
 
-                    // fill the combobox
-                    for (const QString &value : std::as_const(hashModes)) {
-                        ui->comboBox_hash->addItem(value);
+                    // fill the combobox, hash type id as item data
+                    for (auto it = hashModes.constBegin(); it != hashModes.constEnd(); ++it) {
+                        ui->comboBox_hash->addItem(it.value(), it.key());
                     }
                 }
             }
@@ -345,7 +347,7 @@ void MainWindow::attackIndexChanged([[maybe_unused]] int index)
 
 void MainWindow::updateViewAttackMode()
 {
-    int attackMode = attackModes.key(ui->comboBox_attack->currentText());
+    int attackMode = ui->comboBox_attack->currentData().toInt();
     bool groupWordlists = false, groupRules = false, groupMask = false;
 
     switch (attackMode) {
@@ -666,9 +668,9 @@ QStringList MainWindow::generateArguments()
     QString mask_after_dict = "";
 
     bool useShort = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
-    int attackMode = attackModes.key(ui->comboBox_attack->currentText());
+    int attackMode = ui->comboBox_attack->currentData().toInt();
 
-    arguments << HelperUtils::getParameter(HelperUtils::Parameter::HashType, useShort) << QString::number(hashModes.key(ui->comboBox_hash->currentText()));
+    arguments << HelperUtils::getParameter(HelperUtils::Parameter::HashType, useShort) << QString::number(ui->comboBox_hash->currentData().toInt());
     arguments << HelperUtils::getParameter(HelperUtils::Parameter::AttackMode, useShort) << QString::number(attackMode);
 
     if (ui->checkBox_remove->isChecked()) {
