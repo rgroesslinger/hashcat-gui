@@ -9,6 +9,7 @@
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "appconstants.h"
+#include "commandbuilder.h"
 #include "helperutils.h"
 #include "widgetstateserializer.h"
 #include <QDateTime>
@@ -347,42 +348,17 @@ void MainWindow::attackIndexChanged([[maybe_unused]] int index)
 
 void MainWindow::updateViewAttackMode()
 {
-    int attackMode = ui->comboBox_attack->currentData().toInt();
-    bool groupWordlists = false, groupRules = false, groupMask = false;
+    const AttackMode mode = static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
 
-    switch (attackMode) {
-    case AttackMode::Straight:
-        groupWordlists = true;
-        groupRules = true;
-        groupMask = false;
-        break;
-    case AttackMode::Combination:
-        groupWordlists = true;
-        groupRules = false;
-        groupMask = false;
-        break;
-    case AttackMode::BruteForce:
-        groupWordlists = false;
-        groupRules = false;
-        groupMask = true;
-        break;
-    case AttackMode::HybridWordMask:
-    case AttackMode::HybridMaskWord:
-        groupWordlists = true;
-        groupRules = false;
-        groupMask = true;
-        break;
-    case AttackMode::Association:
-        groupWordlists = true;
-        groupRules = true;
-        groupMask = false;
-        break;
-    }
+    // Use the very predicates CommandBuilder applies, so the group boxes show
+    // exactly the options that end up in the command line and the two can
+    // never drift apart.
+    const bool usesMask = CommandBuilder::attackUsesMask(mode);
+    ui->groupBox_wordlists->setEnabled(CommandBuilder::attackUsesWordlists(mode));
+    ui->groupBox_rules->setEnabled(CommandBuilder::attackUsesRules(mode));
+    ui->groupBox_custom_charset->setEnabled(usesMask);
+    ui->groupBox_mask->setEnabled(usesMask);
 
-    ui->groupBox_wordlists->setEnabled(groupWordlists);
-    ui->groupBox_rules->setEnabled(groupRules);
-    ui->groupBox_custom_charset->setEnabled(groupMask);
-    ui->groupBox_mask->setEnabled(groupMask);
     commandChanged();
 }
 
@@ -660,148 +636,82 @@ void MainWindow::commandChanged()
     ui->lineEdit_command->setCursorPosition(0);
 }
 
-QStringList MainWindow::generateArguments()
+HashcatOptions MainWindow::collectHashcatOptions()
 {
     auto &settings = SettingsManager::instance();
-    QStringList arguments;
-    QString mask_before_dict = "";
-    QString mask_after_dict = "";
 
-    bool useShort = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
-    int attackMode = ui->comboBox_attack->currentData().toInt();
+    HashcatOptions options;
+    options.useShortParameters = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
 
-    // Only pass a hash type when one is actually selected. The combo box is
-    // empty until hashcat has answered --example-hashes (and stays empty when
-    // that query failed); reading a missing id used to yield 0 and quietly
-    // command hashcat to use MD5.
+    // currentData() is invalid while the hash type list has not been filled -
+    // no hashcat configured, or the query failed. CommandBuilder then leaves
+    // -m out entirely instead of asking for hash type 0.
     const QVariant hashType = ui->comboBox_hash->currentData();
-    if (hashType.isValid()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::HashType, useShort) << hashType.toString();
-    }
+    options.hashType = hashType.isValid() ? hashType.toInt() : -1;
 
-    arguments << HelperUtils::getParameter(HelperUtils::Parameter::AttackMode, useShort) << QString::number(attackMode);
+    options.attackMode = static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
 
-    if (ui->checkBox_remove->isChecked()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::Remove, useShort);
-    }
+    options.remove = ui->checkBox_remove->isChecked();
+    options.ignoreUsername = ui->checkBox_ignoreusername->isChecked();
 
-    if (ui->checkBox_ignoreusername->isChecked()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::Username, useShort);
-    }
-
-    switch (attackMode) {
-    case AttackMode::Straight:
-    case AttackMode::Association:
-        if (ui->radioButton_use_rules_file->isChecked()) {
-            if (ui->checkBox_rulesfile_1->isChecked() && !ui->lineEdit_open_rulesfile_1->text().isEmpty()) {
-                arguments << HelperUtils::getParameter(HelperUtils::Parameter::RulesFile, useShort) << ui->lineEdit_open_rulesfile_1->text();
+    if (ui->radioButton_use_rules_file->isChecked()) {
+        QCheckBox *boxes[3] = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2, ui->checkBox_rulesfile_3};
+        QLineEdit *edits[3] = {ui->lineEdit_open_rulesfile_1, ui->lineEdit_open_rulesfile_2, ui->lineEdit_open_rulesfile_3};
+        for (int i = 0; i < 3; ++i) {
+            if (boxes[i]->isChecked() && !edits[i]->text().isEmpty()) {
+                options.rulesFiles << edits[i]->text();
             }
-            if (ui->checkBox_rulesfile_2->isChecked() && !ui->lineEdit_open_rulesfile_2->text().isEmpty()) {
-                arguments << HelperUtils::getParameter(HelperUtils::Parameter::RulesFile, useShort) << ui->lineEdit_open_rulesfile_2->text();
-            }
-            if (ui->checkBox_rulesfile_3->isChecked() && !ui->lineEdit_open_rulesfile_3->text().isEmpty()) {
-                arguments << HelperUtils::getParameter(HelperUtils::Parameter::RulesFile, useShort) << ui->lineEdit_open_rulesfile_3->text();
-            }
-        } else if (ui->radioButton_generate_rules->isChecked()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::GenerateRules, useShort) << QString::number(ui->spinBox_generate_rules->value());
         }
-        break;
-    case AttackMode::Combination:
-        break;
-    case AttackMode::BruteForce:
-        mask_before_dict = ui->lineEdit_mask->text();
-        break;
-    case AttackMode::HybridWordMask:
-        if (!ui->lineEdit_mask->text().isEmpty()) {
-            mask_after_dict = ui->lineEdit_mask->text();
-        }
-        break;
-    case AttackMode::HybridMaskWord:
-        if (!ui->lineEdit_mask->text().isEmpty()) {
-            mask_before_dict = ui->lineEdit_mask->text();
-        }
-        break;
+    } else if (ui->radioButton_generate_rules->isChecked()) {
+        options.generateRules = ui->spinBox_generate_rules->value();
     }
 
-    if (ui->checkBox_speed_only->isChecked()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::SpeedOnly, useShort);
-    }
-
+    options.mask = ui->lineEdit_mask->text();
+    options.speedOnly = ui->checkBox_speed_only->isChecked();
     if (ui->checkBox_override_workload_profile->isChecked()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::WorkloadProfile, useShort) << ui->comboBox_workload_profile->currentText();
+        options.workloadProfile = ui->comboBox_workload_profile->currentText();
+    }
+    options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
+
+    // checkBox_hex_hash is named after nothing in particular: it reads
+    // "Assume charset is given in hex" and maps to --hex-charset. Renaming it
+    // would change its object name, which is also the key under which a
+    // saved profile stores it.
+    QCheckBox *charsetBoxes[4] = {
+        ui->checkBox_custom_charset1, ui->checkBox_custom_charset2,
+        ui->checkBox_custom_charset3, ui->checkBox_custom_charset4,
+    };
+    QLineEdit *charsetEdits[4] = {
+        ui->lineEdit_custom_charset1, ui->lineEdit_custom_charset2,
+        ui->lineEdit_custom_charset3, ui->lineEdit_custom_charset4,
+    };
+    for (int i = 0; i < 4; ++i) {
+        options.customCharsets[i].enabled = charsetBoxes[i]->isChecked();
+        options.customCharsets[i].value = charsetEdits[i]->text();
     }
 
-    if (ui->checkBox_optimized_kernel->isChecked()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::OptimizedKernel, useShort);
-    }
+    options.hexCharset = ui->checkBox_hex_hash->isChecked();
+    options.hexSalt = ui->checkBox_hex_salt->isChecked();
 
-    if (ui->groupBox_custom_charset->isEnabled()) {
-        if (ui->checkBox_custom_charset1->isChecked() && !ui->lineEdit_custom_charset1->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset1, useShort) << ui->lineEdit_custom_charset1->text();
-        }
-        if (ui->checkBox_custom_charset2->isChecked() && !ui->lineEdit_custom_charset2->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset2, useShort) << ui->lineEdit_custom_charset2->text();
-        }
-        if (ui->checkBox_custom_charset3->isChecked() && !ui->lineEdit_custom_charset3->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset3, useShort) << ui->lineEdit_custom_charset3->text();
-        }
-        if (ui->checkBox_custom_charset4->isChecked() && !ui->lineEdit_custom_charset4->text().isEmpty()) {
-            arguments << HelperUtils::getParameter(HelperUtils::Parameter::CustomCharset4, useShort) << ui->lineEdit_custom_charset4->text();
-        }
-    }
+    options.outfileEnabled = ui->checkBox_outfile->isChecked();
+    options.outfile = ui->lineEdit_outfile->text();
+    options.outfileFormat = ui->lineEdit_outfile_format->text();
+    options.cpuAffinity = ui->lineEdit_cpu_affinity->text();
+    options.backendDevices = ui->lineEdit_devices->text();
+    options.segmentSize = ui->spinBox_segment->value();
+    options.hashFile = ui->lineEdit_hashfile->text();
 
-    if (ui->checkBox_hex_hash->isChecked()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::HexCharset, useShort);
-    }
-
-    if (ui->checkBox_hex_salt->isChecked()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::HexSalt, useShort);
-    }
-
-    if (ui->checkBox_outfile->isChecked() && !ui->lineEdit_outfile->text().isEmpty()) {
-        QFileInfo hash_fi(ui->lineEdit_hashfile->text());
-        QString outfile = ui->lineEdit_outfile->text();
-        outfile.replace(AppConstants::Placeholders::UnixTime, QString::number(QDateTime::currentMSecsSinceEpoch() / AppConstants::MsecsPerSecond));
-        outfile.replace(AppConstants::Placeholders::Hash, hash_fi.fileName(), Qt::CaseInsensitive);
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::Outfile, useShort) << outfile;
-    }
-
-    if (ui->lineEdit_outfile_format->text() != AppConstants::Defaults::OutfileFormat) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::OutfileFormat, useShort) << ui->lineEdit_outfile_format->text();
-    }
-
-    if (!ui->lineEdit_cpu_affinity->text().isEmpty()) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::CpuAffinity, useShort) << ui->lineEdit_cpu_affinity->text();
-    }
-
-    if (!ui->lineEdit_devices->text().isEmpty() && ui->lineEdit_devices->text() != AppConstants::Defaults::BackendDevices) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::BackendDevices, useShort) << ui->lineEdit_devices->text();
-    }
-
-    if (ui->spinBox_segment->value() != AppConstants::Defaults::SegmentSize) {
-        arguments << HelperUtils::getParameter(HelperUtils::Parameter::SegmentSize, useShort) << QString::number(ui->spinBox_segment->value());
-    }
-
-    if (!ui->lineEdit_hashfile->text().isEmpty()) {
-        arguments << ui->lineEdit_hashfile->text();
-    }
-
-    if (!mask_before_dict.isEmpty()) {
-        arguments << mask_before_dict;
-    }
-
-    if (ui->groupBox_wordlists->isEnabled()) {
-        auto const wordlists = ui->listWidget_wordlist->findItems(QString("*"), Qt::MatchWildcard);
-        for (QListWidgetItem *item : wordlists) {
-            if (item->checkState() == Qt::Checked) {
-                arguments << item->text();
-            }
+    const auto wordlists = ui->listWidget_wordlist->findItems(QStringLiteral("*"), Qt::MatchWildcard);
+    for (const QListWidgetItem *item : wordlists) {
+        if (item->checkState() == Qt::Checked) {
+            options.wordlists << item->text();
         }
     }
 
-    if (!mask_after_dict.isEmpty()) {
-        arguments << mask_after_dict;
-    }
+    return options;
+}
 
-    return arguments;
+QStringList MainWindow::generateArguments()
+{
+    return CommandBuilder::build(collectHashcatOptions());
 }

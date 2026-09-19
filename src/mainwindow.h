@@ -11,6 +11,8 @@
 #include <QComboBox>
 #include <QProcess>
 
+#include "hashcatoptions.h"
+
 namespace Ui {
     class MainWindow;
 }
@@ -77,27 +79,20 @@ private:
     QString suggestedOutfile;
 
     QMap<quint32, QString> hashModes;
-    QMap<quint32, QString> attackModes;
+    QMap<AttackMode, QString> attackModes;
 
     void initHashAndAttackModes();
     void updateViewAttackMode();
 
+    // Reads the current widget state. Everything the command line is built
+    // from goes through here, so CommandBuilder never has to know about
+    // widgets.
+    HashcatOptions collectHashcatOptions();
     QStringList generateArguments();
 
     QString defaultProfileFile() const;
     void loadDefaultProfile();
     void saveDefaultProfile();
-
-    // Supported attack modes
-    enum AttackMode
-    {
-        Straight       = 0,
-        Combination    = 1,
-        BruteForce     = 3,
-        HybridWordMask = 6,
-        HybridMaskWord = 7,
-        Association    = 9
-    };
 };
 
 #endif // MAINWINDOW_H
