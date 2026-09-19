@@ -670,7 +670,15 @@ QStringList MainWindow::generateArguments()
     bool useShort = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
     int attackMode = ui->comboBox_attack->currentData().toInt();
 
-    arguments << HelperUtils::getParameter(HelperUtils::Parameter::HashType, useShort) << QString::number(ui->comboBox_hash->currentData().toInt());
+    // Only pass a hash type when one is actually selected. The combo box is
+    // empty until hashcat has answered --example-hashes (and stays empty when
+    // that query failed); reading a missing id used to yield 0 and quietly
+    // command hashcat to use MD5.
+    const QVariant hashType = ui->comboBox_hash->currentData();
+    if (hashType.isValid()) {
+        arguments << HelperUtils::getParameter(HelperUtils::Parameter::HashType, useShort) << hashType.toString();
+    }
+
     arguments << HelperUtils::getParameter(HelperUtils::Parameter::AttackMode, useShort) << QString::number(attackMode);
 
     if (ui->checkBox_remove->isChecked()) {
