@@ -56,6 +56,29 @@ public:
         WorkloadProfile,
     };
 
+    // What can keep the Execute button from starting anything
+    enum class LaunchError
+    {
+        None,
+        NoHashFile,         // no hash file selected
+        NoHashcatPath,      // the hashcat path was never configured
+        HashcatPathMissing, // configured, but the file is not there (anymore)
+        NoTerminal,         // no terminal selected
+        NoTerminals,        // this system has no supported terminal at all
+        UnknownTerminal,    // the configured terminal is not installed
+    };
+
+    // Checks everything that has to hold before hashcat can be started.
+    //
+    // detail receives the offending value - the missing path, or the
+    // terminals that would work - when it is not nullptr. Keeping this out of
+    // MainWindow means the conditions can be tested without showing dialogs.
+    static LaunchError validateLaunch(const QString &hashFile,
+                                      const QString &hashcatPath,
+                                      const QString &configuredTerminal,
+                                      const QStringList &availableTerminals,
+                                      QString *detail = nullptr);
+
     static QFuture<HashcatResult> executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
     static QMap<QString, QStringList> getAvailableTerminals();
     static QString getParameter(Parameter key, bool useShort = false);

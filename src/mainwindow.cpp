@@ -538,54 +538,28 @@ void MainWindow::copyCommandToClipboard()
 void MainWindow::executeClicked()
 {
     auto &settings = SettingsManager::instance();
+
+    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    const QString configuredTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
+    const QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
+
+    // Nothing is started unless the configuration is known to be complete.
+    // Previously a terminal that was no longer installed simply left the
+    // program empty and startDetached() failed without a word.
+    QString detail;
+    const HelperUtils::LaunchError error = HelperUtils::validateLaunch(
+        ui->lineEdit_hashfile->text(), hashcatPath, configuredTerminal, availableTerminals.keys(), &detail);
+    if (error != HelperUtils::LaunchError::None) {
+        showLaunchError(error, detail);
+        return;
+    }
+
     QProcess proc;
-    QString terminal;
-    QStringList arguments;
 
-    if (ui->lineEdit_hashfile->text().isEmpty()) {
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText("Please choose a hash file.");
-        msgBox.exec();
-        return;
-    }
-
-    if (settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
-        QMessageBox msgBox(this);
-        QString message = tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
-                              .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
-        msgBox.setText(message);
-        msgBox.setTextFormat(Qt::RichText);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-        return;
-    }
-
-    if (settings.getKey<QString>(AppConstants::SettingsKeys::Terminal).isEmpty()) {
-        QMessageBox msgBox(this);
-        QString message = tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
-                              .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text());
-        msgBox.setText(message);
-        msgBox.setTextFormat(Qt::RichText);
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.exec();
-        return;
-    }
-
-    /* 1. Get arguments needed for the selected terminal */
-    QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
-
-    // The configured terminal has a known configuration
-    if (availableTerminals.contains(settings.getKey<QString>(AppConstants::SettingsKeys::Terminal))) {
-        terminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
-        arguments << availableTerminals.value(terminal);
-    }
-
-    /* 2. append hashcat binary to launch command */
-    arguments << settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-
-    /* 3. append arguments set in gui elements */
-    arguments << generateArguments();
+    /* 1. arguments needed for the selected terminal, 2. the hashcat binary,
+     * 3. the arguments collected from the gui elements */
+    QStringList arguments = availableTerminals.value(configuredTerminal);
+    arguments << hashcatPath << generateArguments();
 
 #if defined(Q_OS_WIN)
     /* Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal */
@@ -594,14 +568,70 @@ void MainWindow::executeClicked()
     });
 #endif
 
-    proc.setProgram(terminal);
+    proc.setProgram(configuredTerminal);
     proc.setArguments(arguments);
-    proc.setWorkingDirectory(QFileInfo(settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath)).absolutePath());
+    proc.setWorkingDirectory(QFileInfo(hashcatPath).absolutePath());
 
     if (!proc.startDetached()) {
         QMessageBox::warning(this, tr("Launch failed"),
-                             tr("Could not start %1: %2").arg(terminal, proc.errorString()));
+                             tr("Could not start %1: %2").arg(configuredTerminal, proc.errorString()));
     }
+}
+
+void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &detail)
+{
+    const QString menu = ui->menuFile->menuAction()->text();
+    const QString settingsEntry = ui->actionSettings->text();
+    const QString configuredTerminal = SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal);
+
+    QMessageBox box(this);
+    box.setIcon(QMessageBox::Warning);
+
+    switch (error) {
+    case HelperUtils::LaunchError::NoHashFile:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("Please choose a hash file."));
+        break;
+
+    case HelperUtils::LaunchError::NoHashcatPath:
+        box.setIcon(QMessageBox::Information);
+        box.setTextFormat(Qt::RichText);
+        box.setText(tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
+                        .arg(menu, settingsEntry));
+        break;
+
+    // The two messages below interpolate user supplied strings, so they stay
+    // plain text - a path or a terminal name containing a '<' or '&' would
+    // otherwise be taken for markup.
+    case HelperUtils::LaunchError::HashcatPathMissing:
+        box.setText(tr("The configured hashcat executable does not exist:\n%1\n"
+                       "Navigate to %2 → %3 to change it.")
+                        .arg(detail, menu, settingsEntry));
+        break;
+
+    case HelperUtils::LaunchError::NoTerminal:
+        box.setIcon(QMessageBox::Information);
+        box.setTextFormat(Qt::RichText);
+        box.setText(tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
+                        .arg(menu, settingsEntry));
+        break;
+
+    case HelperUtils::LaunchError::NoTerminals:
+        box.setText(tr("No supported terminal was found on this system. "
+                       "hashcat-gui needs one to show the hashcat output."));
+        break;
+
+    case HelperUtils::LaunchError::UnknownTerminal:
+        box.setText(tr("The configured terminal \"%1\" is not available. Available terminals: %2\n"
+                       "Navigate to %3 → %4 to change it.")
+                        .arg(configuredTerminal, detail, menu, settingsEntry));
+        break;
+
+    case HelperUtils::LaunchError::None:
+        return;
+    }
+
+    box.exec();
 }
 
 /*************** Helper ***************/

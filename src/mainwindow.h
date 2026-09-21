@@ -12,6 +12,7 @@
 #include <QProcess>
 
 #include "hashcatoptions.h"
+#include "helperutils.h"
 
 namespace Ui {
     class MainWindow;
@@ -89,6 +90,9 @@ private:
     // widgets.
     HashcatOptions collectHashcatOptions();
     QStringList generateArguments();
+
+    // Presents what HelperUtils::validateLaunch() reported
+    void showLaunchError(HelperUtils::LaunchError error, const QString &detail);
 
     QString defaultProfileFile() const;
     void loadDefaultProfile();

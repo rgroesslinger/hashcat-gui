@@ -120,6 +120,54 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
     });
 }
 
+// Returns what keeps a launch from happening, if anything
+HelperUtils::LaunchError HelperUtils::validateLaunch(const QString &hashFile,
+                                                     const QString &hashcatPath,
+                                                     const QString &configuredTerminal,
+                                                     const QStringList &availableTerminals,
+                                                     QString *detail)
+{
+    if (detail) {
+        detail->clear();
+    }
+
+    if (hashFile.isEmpty()) {
+        return LaunchError::NoHashFile;
+    }
+
+    if (hashcatPath.isEmpty()) {
+        return LaunchError::NoHashcatPath;
+    }
+
+    // Only absolute paths are checked here. A bare name is left to the shell
+    // search of the terminal, and checking it would need the executable bit,
+    // which QFileInfo does not report reliably for .exe files.
+    const QFileInfo hashcatInfo(hashcatPath);
+    if (hashcatInfo.isAbsolute() && !hashcatInfo.isFile()) {
+        if (detail) {
+            *detail = hashcatPath;
+        }
+        return LaunchError::HashcatPathMissing;
+    }
+
+    if (configuredTerminal.isEmpty()) {
+        return LaunchError::NoTerminal;
+    }
+
+    if (availableTerminals.isEmpty()) {
+        return LaunchError::NoTerminals;
+    }
+
+    if (!availableTerminals.contains(configuredTerminal)) {
+        if (detail) {
+            *detail = availableTerminals.join(QStringLiteral(", "));
+        }
+        return LaunchError::UnknownTerminal;
+    }
+
+    return LaunchError::None;
+}
+
 // Returns all supported terminals
 QMap<QString, QStringList> HelperUtils::getAvailableTerminals()
 {
