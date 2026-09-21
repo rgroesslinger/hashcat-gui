@@ -35,6 +35,8 @@ add_executable(hashcat-gui WIN32
     src/appconstants.h
     src/commandbuilder.h
     src/commandbuilder.cpp
+    src/hashcatinfoparser.h
+    src/hashcatinfoparser.cpp
     src/hashcatoptions.h
     src/helperutils.h
     src/helperutils.cpp

@@ -10,6 +10,7 @@
 #include "settingsmanager.h"
 #include "appconstants.h"
 #include "commandbuilder.h"
+#include "hashcatinfoparser.h"
 #include "helperutils.h"
 #include "widgetstateserializer.h"
 #include <QDateTime>
@@ -18,8 +19,6 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QProcess>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QAbstractItemModel>
 #include <QClipboard>
 #include <QStandardPaths>
@@ -300,21 +299,9 @@ void MainWindow::initHashAndAttackModes()
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
                 error = tr("Failed to obtain supported hash types.\nError: %1").arg(result.standardError);
             } else {
-                // The output is machine-readable JSON - strip newlines and parse
-                QString output = result.standardOutput.simplified();
-
-                QJsonDocument doc = QJsonDocument::fromJson(output.toUtf8());
-                if (!doc.isObject()) {
-                    error = tr("Invalid JSON returned from hashcat.");
-                } else {
-                    QJsonObject rootObj = doc.object();
-
-                    hashModes.clear();
-
-                    for (auto it = rootObj.constBegin(); it != rootObj.constEnd(); ++it) {
-                        hashModes.insert(it.key().toInt(),
-                                         QString(it.key() + " | " + it.value().toObject().value("name").toString()));
-                    }
+                QMap<quint32, QString> parsed;
+                if (HashcatInfoParser::parseExampleHashes(result.standardOutput, parsed, &error)) {
+                    hashModes = std::move(parsed);
 
                     ui->comboBox_hash->clear();
 
