@@ -177,10 +177,10 @@ void MainWindow::resetFieldsTriggered()
     ui->checkBox_hex_salt->setChecked(false);
     ui->checkBox_outfile->setChecked(false);
     ui->lineEdit_outfile->clear();
-    ui->lineEdit_outfile_format->setText("1,2");
+    ui->lineEdit_outfile_format->setText(AppConstants::Defaults::OutfileFormat);
     ui->lineEdit_cpu_affinity->clear();
-    ui->lineEdit_devices->setText("0");
-    ui->spinBox_segment->setValue(32);
+    ui->lineEdit_devices->setText(AppConstants::Defaults::BackendDevices);
+    ui->spinBox_segment->setValue(AppConstants::Defaults::SegmentSize);
 
     // Advanced tab
     ui->checkBox_optimized_kernel->setChecked(false);
