@@ -48,9 +48,9 @@ void SettingsDialog::readSettings()
 // Configure path to hashcat binary
 void SettingsDialog::selectPathClicked()
 {
-    QFileDialog fileDialog;
+    QFileDialog fileDialog(this, tr("Select the hashcat executable"));
     fileDialog.setFileMode(QFileDialog::ExistingFile);
-    fileDialog.setNameFilter("Executable Files (*.exe *.bin);;All Files (*)");
+    fileDialog.setNameFilter(tr("Executable Files (*.exe *.bin);;All Files (*)"));
 
     if (fileDialog.exec() == QDialog::Accepted) {
         QString fileName = fileDialog.selectedFiles().constFirst();

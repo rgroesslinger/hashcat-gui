@@ -265,12 +265,12 @@ void MainWindow::initHashAndAttackModes()
     hashModes.clear();
 
     // Attack modes
-    attackModes.insert(AttackMode::Straight, "Straight");
-    attackModes.insert(AttackMode::Combination, "Combination");
-    attackModes.insert(AttackMode::BruteForce, "Brute-force");
-    attackModes.insert(AttackMode::HybridWordMask, "Hybrid Wordlist + Mask");
-    attackModes.insert(AttackMode::HybridMaskWord, "Hybrid Mask + Wordlist");
-    attackModes.insert(AttackMode::Association, "Association");
+    attackModes.insert(AttackMode::Straight, tr("Straight"));
+    attackModes.insert(AttackMode::Combination, tr("Combination"));
+    attackModes.insert(AttackMode::BruteForce, tr("Brute-force"));
+    attackModes.insert(AttackMode::HybridWordMask, tr("Hybrid Wordlist + Mask"));
+    attackModes.insert(AttackMode::HybridMaskWord, tr("Hybrid Mask + Wordlist"));
+    attackModes.insert(AttackMode::Association, tr("Association"));
 
     // The numeric id travels as item data: the displayed text is what a
     // translation changes, the id is what has to end up on the command line.
@@ -282,7 +282,7 @@ void MainWindow::initHashAndAttackModes()
     auto &settings = SettingsManager::instance();
 
     if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
-        ui->comboBox_hash->setToolTip("Updating...");
+        ui->comboBox_hash->setToolTip(tr("Updating..."));
         ui->comboBox_hash->setEnabled(false);
 
         // Create a watcher that will be destroyed once finished
@@ -351,7 +351,7 @@ void MainWindow::updateViewAttackMode()
 
 void MainWindow::openHashFileClicked()
 {
-    QString hashfile = QFileDialog::getOpenFileName();
+    QString hashfile = QFileDialog::getOpenFileName(this, tr("Open Hash File"));
     if (!hashfile.isEmpty()) {
         ui->lineEdit_hashfile->setText(QDir::toNativeSeparators(hashfile));
     }
@@ -359,7 +359,7 @@ void MainWindow::openHashFileClicked()
 
 void MainWindow::outputClicked()
 {
-    QString outfile = QFileDialog::getSaveFileName();
+    QString outfile = QFileDialog::getSaveFileName(this, tr("Save Output File"));
     if (!outfile.isEmpty()) {
         ui->lineEdit_outfile->setText(QDir::toNativeSeparators(outfile));
     }
@@ -376,7 +376,7 @@ void MainWindow::removeWordlistClicked()
 
 void MainWindow::addWordlistClicked()
 {
-    QStringList files = QFileDialog::getOpenFileNames();
+    QStringList files = QFileDialog::getOpenFileNames(this, tr("Add Wordlists"));
     QListWidget *w = ui->listWidget_wordlist;
 
     for (const QString &wordlist : std::as_const(files)) {
@@ -458,7 +458,7 @@ void MainWindow::generateRulesToggled(bool checked)
 
 void MainWindow::openRulesFile1Clicked()
 {
-    QString rulesfile = QFileDialog::getOpenFileName();
+    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
     if (!rulesfile.isEmpty()) {
         ui->lineEdit_open_rulesfile_1->setText(QDir::toNativeSeparators(rulesfile));
     }
@@ -466,7 +466,7 @@ void MainWindow::openRulesFile1Clicked()
 
 void MainWindow::openRulesFile2Clicked()
 {
-    QString rulesfile = QFileDialog::getOpenFileName();
+    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
     if (!rulesfile.isEmpty()) {
         ui->lineEdit_open_rulesfile_2->setText(QDir::toNativeSeparators(rulesfile));
     }
@@ -474,7 +474,7 @@ void MainWindow::openRulesFile2Clicked()
 
 void MainWindow::openRulesFile3Clicked()
 {
-    QString rulesfile = QFileDialog::getOpenFileName();
+    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
     if (!rulesfile.isEmpty()) {
         ui->lineEdit_open_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
     }

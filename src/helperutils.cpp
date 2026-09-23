@@ -37,8 +37,6 @@ const QMap<HelperUtils::Parameter, QPair<QString, QString>> HelperUtils::paramet
     {HelperUtils::Parameter::WorkloadProfile,   {"-w",  "--workload-profile"}},
 };
 
-HelperUtils::HelperUtils() {}
-
 QString HelperUtils::getParameter(Parameter key, bool useShort)
 {
     auto it = parameterMap.constFind(key);
@@ -84,7 +82,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
         QStringList cmdArgs = args;
 
         if (hashcatPath.isEmpty()) {
-            result.standardError = "hashcatPath not configured";
+            result.standardError = tr("The hashcat path is not configured.");
             return result;
         }
 
@@ -98,7 +96,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
         proc.start();
 
         if (!proc.waitForStarted()) {
-            result.standardError = "Failed to start hashcat\n" + proc.errorString();
+            result.standardError = tr("Failed to start hashcat\n") + proc.errorString();
             return result;
         }
 
@@ -107,7 +105,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
             // Reap the killed child instead of letting QProcess::waitForFinished
             // return immediately and destroy a still-running process.
             proc.waitForFinished(5000);
-            result.standardError = "hashcat timed out\n" + proc.errorString();
+            result.standardError = tr("hashcat timed out\n") + proc.errorString();
             return result;
         }
 

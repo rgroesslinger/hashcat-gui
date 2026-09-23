@@ -6,6 +6,7 @@
 #ifndef HELPERUTILS_H
 #define HELPERUTILS_H
 
+#include <QCoreApplication>
 #include <QString>
 #include <QStringList>
 #include <QProcess>
@@ -28,9 +29,10 @@ struct HashcatResult {
 
 class HelperUtils
 {
-public:
-    HelperUtils();
+    // The messages below end up in dialogs opened by the caller
+    Q_DECLARE_TR_FUNCTIONS(HelperUtils)
 
+public:
     // Valid command line parameters
     enum class Parameter
     {
