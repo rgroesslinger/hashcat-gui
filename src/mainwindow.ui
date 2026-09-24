@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>hashcat-gui</string>
+   <string notr="true">hashcat-gui</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
@@ -47,7 +47,7 @@
       </property>
       <widget class="QWidget" name="tab_hc">
        <attribute name="title">
-        <string>Hashcat</string>
+        <string notr="true">Hashcat</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
@@ -133,7 +133,7 @@
                       <string>Move item up</string>
                      </property>
                      <property name="text">
-                      <string>...</string>
+                      <string notr="true">...</string>
                      </property>
                      <property name="autoRaise">
                       <bool>true</bool>
@@ -152,7 +152,7 @@
                       <string>Move item down</string>
                      </property>
                      <property name="text">
-                      <string>...</string>
+                      <string notr="true">...</string>
                      </property>
                      <property name="autoRaise">
                       <bool>true</bool>
@@ -786,7 +786,7 @@
                         <string>devices to use, seperate with comma</string>
                        </property>
                        <property name="text">
-                        <string>0</string>
+                        <string notr="true">0</string>
                        </property>
                       </widget>
                      </item>
@@ -893,7 +893,7 @@ default: 1,2
   6 = timestamp relative</string>
                        </property>
                        <property name="text">
-                        <string>1,2</string>
+                        <string notr="true">1,2</string>
                        </property>
                       </widget>
                      </item>
@@ -1047,22 +1047,22 @@ default: 1,2
                    </property>
                    <item>
                     <property name="text">
-                     <string>1</string>
+                     <string notr="true">1</string>
                     </property>
                    </item>
                    <item>
                     <property name="text">
-                     <string>2</string>
+                     <string notr="true">2</string>
                     </property>
                    </item>
                    <item>
                     <property name="text">
-                     <string>3</string>
+                     <string notr="true">3</string>
                     </property>
                    </item>
                    <item>
                     <property name="text">
-                     <string>4</string>
+                     <string notr="true">4</string>
                     </property>
                    </item>
                   </widget>

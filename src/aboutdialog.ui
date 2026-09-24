@@ -57,7 +57,7 @@
             <item>
              <widget class="QLabel" name="label_hc_version_text">
               <property name="text">
-               <string>hashcat</string>
+               <string notr="true">hashcat</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -119,7 +119,7 @@
             <item>
              <widget class="QLabel" name="label_hc_gui_version_text">
               <property name="text">
-               <string>hashcat-gui</string>
+               <string notr="true">hashcat-gui</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
