@@ -63,4 +63,22 @@ target_compile_options(hashcat-gui PRIVATE -Wall -Wextra -Wpedantic)
 
 target_link_libraries(hashcat-gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
 
+# Translations.
+#
+# LinguistTools is optional on purpose: a machine without qt6-tools still
+# builds, it just gets the untranslated source strings and no .qm files.
+# SOURCE_TARGETS keeps lupdate on this target - a future test target would
+# otherwise contribute its own strings, including the expected command lines.
+find_package(Qt6 COMPONENTS LinguistTools QUIET)
+if(Qt6LinguistTools_FOUND)
+    qt_add_translations(hashcat-gui
+        SOURCE_TARGETS hashcat-gui
+        TS_FILES
+            translations/hashcat-gui_de.ts
+            translations/hashcat-gui_sr.ts
+    )
+else()
+    message(STATUS "Qt6 LinguistTools not found - building without translations")
+endif()
+
 install(TARGETS hashcat-gui RUNTIME DESTINATION bin)
