@@ -4,6 +4,8 @@
  */
 
 #include <QApplication>
+#include <QLocale>
+#include <QTranslator>
 #include "mainwindow.h"
 #include "config.h"
 
@@ -24,6 +26,17 @@ int main(int argc, char *argv[])
     // ~/.local/share/hashcat-gui/hashcat-gui.
     a.setApplicationName(QStringLiteral("hashcat-gui"));
     a.setApplicationVersion(GUI_VERSION);
+
+    // Load the translation before the first widget exists. qt_add_translations()
+    // embeds the catalogs under :/i18n; a build without LinguistTools has
+    // nothing there and stays on the source strings. The locale's UI languages
+    // are tried from most to least specific, so hashcat-gui_de.qm answers for
+    // de, de_DE and de_AT alike.
+    QTranslator translator;
+    if (translator.load(QLocale(), QStringLiteral("hashcat-gui"), QStringLiteral("_"),
+                        QStringLiteral(":/i18n"), QStringLiteral(".qm"))) {
+        a.installTranslator(&translator);
+    }
 
     MainWindow w;
     w.show();
