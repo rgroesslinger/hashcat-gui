@@ -6,28 +6,28 @@
     <message>
         <location filename="../src/aboutdialog.ui" line="32"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Über</translation>
     </message>
     <message>
         <location filename="../src/aboutdialog.ui" line="45"/>
         <source>Version information</source>
-        <translation type="unfinished"></translation>
+        <translation>Versionsinformationen</translation>
     </message>
     <message>
         <location filename="../src/aboutdialog.ui" line="90"/>
         <location filename="../src/aboutdialog.ui" line="152"/>
         <source>[unknown]</source>
-        <translation type="unfinished"></translation>
+        <translation>[unbekannt]</translation>
     </message>
     <message>
         <location filename="../src/aboutdialog.ui" line="196"/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <location filename="../src/aboutdialog.cpp" line="48"/>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Fehler: %1</translation>
     </message>
 </context>
 <context>
@@ -35,12 +35,12 @@
     <message>
         <location filename="../src/hashcatinfoparser.cpp" line="31"/>
         <source>Invalid JSON returned from hashcat.</source>
-        <translation type="unfinished"></translation>
+        <translation>hashcat hat ungültiges JSON zurückgegeben.</translation>
     </message>
     <message>
         <location filename="../src/hashcatinfoparser.cpp" line="53"/>
         <source>hashcat did not report any hash types.</source>
-        <translation type="unfinished"></translation>
+        <translation>hashcat hat keine Hash-Typen gemeldet.</translation>
     </message>
 </context>
 <context>
@@ -48,19 +48,21 @@
     <message>
         <location filename="../src/helperutils.cpp" line="85"/>
         <source>The hashcat path is not configured.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Pfad zu hashcat ist nicht konfiguriert.</translation>
     </message>
     <message>
         <location filename="../src/helperutils.cpp" line="99"/>
         <source>Failed to start hashcat
 </source>
-        <translation type="unfinished"></translation>
+        <translation>hashcat konnte nicht gestartet werden
+</translation>
     </message>
     <message>
         <location filename="../src/helperutils.cpp" line="108"/>
         <source>hashcat timed out
 </source>
-        <translation type="unfinished"></translation>
+        <translation>hashcat hat das Zeitlimit erreicht
+</translation>
     </message>
 </context>
 <context>
@@ -68,7 +70,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="76"/>
         <source>Hash file or hash:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash-Datei oder Hash:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="93"/>
@@ -77,94 +79,94 @@
         <location filename="../src/mainwindow.ui" line="438"/>
         <location filename="../src/mainwindow.ui" line="861"/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffnen...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="104"/>
         <source>Remove hash from hash list once it is cracked</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash nach dem Knacken aus der Liste entfernen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="111"/>
         <source>Ignore username in hashfile</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzernamen in der Hash-Datei ignorieren</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="120"/>
         <source>Word lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Wortlisten</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="133"/>
         <source>Move item up</source>
-        <translation type="unfinished"></translation>
+        <translation>Eintrag nach oben verschieben</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="152"/>
         <source>Move item down</source>
-        <translation type="unfinished"></translation>
+        <translation>Eintrag nach unten verschieben</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="176"/>
         <source>Add files...</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateien hinzufügen...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="192"/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="234"/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Modus:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="273"/>
         <source>Hash type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash-Typ:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="286"/>
         <source>Configure path to hashcat binary in Settings to get available hash types</source>
-        <translation type="unfinished"></translation>
+        <translation>Pfad zum hashcat-Programm in den Einstellungen festlegen, um verfügbare Hash-Typen zu erhalten</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="299"/>
         <source>Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Regeln</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="305"/>
         <source>Use rules files:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regeldateien verwenden:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="320"/>
         <location filename="../src/mainwindow.ui" line="363"/>
         <location filename="../src/mainwindow.ui" line="406"/>
         <source>Rules file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regeldatei:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="449"/>
         <source>Generate rules:</source>
-        <translation type="unfinished"></translation>
+        <translation>Regeln erzeugen:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="519"/>
         <source>Assume charset is given in hex</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichensatz als Hexadezimal annehmen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="526"/>
         <source>Assume salt is given in hex</source>
-        <translation type="unfinished"></translation>
+        <translation>Salt als Hexadezimal annehmen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="533"/>
         <source>Mask</source>
-        <translation type="unfinished"></translation>
+        <translation>Maske</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="542"/>
@@ -182,77 +184,86 @@
   ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
   ?a = ?l?u?d?s
   ?b = 0x00 - 0xff</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingebaute Zeichensätze:
+
+  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
+  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
+  ?d = 0123456789 [0-9]
+  ?h = 0123456789abcdef [0-9a-f]
+  ?H = 0123456789ABCDEF [0-9A-F]
+  ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
+  ?a = ?l?u?d?s
+  ?b = 0x00 - 0xff</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="567"/>
         <source>Custom charsets</source>
-        <translation type="unfinished"></translation>
+        <translation>Eigene Zeichensätze</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="575"/>
         <source>Charset 1:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichensatz 1:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="617"/>
         <source>Charset 2:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichensatz 2:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="659"/>
         <source>Charset 3:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichensatz 3:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="701"/>
         <source>Charset 4:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeichensatz 4:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="744"/>
         <source>Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Ressourcen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="754"/>
         <source>CPU affinity:</source>
-        <translation type="unfinished"></translation>
+        <translation>CPU-Affinität:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="761"/>
         <source>Backend devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>Backend-Geräte:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="768"/>
         <source>Segment size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Segmentgröße:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="779"/>
         <source>locks to CPU devices, seperate with comma</source>
-        <translation type="unfinished"></translation>
+        <translation>bindet an CPU-Geräte, mit Komma trennen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="786"/>
         <source>devices to use, seperate with comma</source>
-        <translation type="unfinished"></translation>
+        <translation>zu verwendende Geräte, mit Komma trennen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="802"/>
         <source> MB</source>
-        <translation type="unfinished"></translation>
+        <translation> MB</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="825"/>
         <source>Output</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgabe</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="833"/>
         <source>Write recovered hashes to file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gefundene Hashes in Datei schreiben:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="845"/>
@@ -260,12 +271,15 @@
 
   &lt;hash&gt; = current hash filename or hash
   &lt;unixtime&gt; = current unix timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingebaute Variablen:
+
+  &lt;hash&gt; = aktueller Hash-Dateiname oder Hash
+  &lt;unixtime&gt; = aktueller Unix-Zeitstempel</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="875"/>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>Format:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="885"/>
@@ -278,42 +292,50 @@ default: 1,2
   4 = crack_pos
   5 = timestamp absolute
   6 = timestamp relative</source>
-        <translation type="unfinished"></translation>
+        <translation>Zu verwendendes Ausgabeformat, mit Komma getrennt.
+Standard: 1,2
+
+  1 = hash[:salt]
+  2 = plain
+  3 = hex_plain
+  4 = crack_pos
+  5 = timestamp absolute
+  6 = timestamp relative</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="927"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="934"/>
         <source>Copy command to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Befehl in die Zwischenablage kopieren</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="977"/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Erweitert</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1001"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Allgemein</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1013"/>
         <source>Enable optimized kernels (limits password length)</source>
-        <translation type="unfinished"></translation>
+        <translation>Optimierte Kerne verwenden (begrenzt die Passwortlänge)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1020"/>
         <source>Return expected speed of the attack, then quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Erwartete Angriffsgeschwindigkeit ausgeben und beenden</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1029"/>
         <source>Override workload profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Workload-Profil überschreiben</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1039"/>
@@ -325,216 +347,227 @@ default: 1,2
   4 | Nightmare   | 480 ms  | Insane          | Headless
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation> # | Leistung | Laufzeit | Stromverbrauch | Einfluss auf den Desktop
+ ===+=============+=========+===================+=========
+  1 | Niedrig            |   2 ms   | Niedrig           | Minimal
+  2 | Standard        |  12 ms   | Sparsam       | Spürbar
+  3 | Hoch               |  96 ms   | Hoch                | Reagiert nicht
+  4 | Alptraum     | 480 ms  | Wahnsinn     | Ohne Desktop
+
+</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1125"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Hilfe</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1132"/>
         <source>Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>Werkzeuge</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1138"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1152"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Über</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1157"/>
         <source>Reset fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Felder zurücksetzen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1162"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Beenden</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1167"/>
         <source>About Qt</source>
-        <translation type="unfinished"></translation>
+        <translation>Über Qt</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1172"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1177"/>
         <source>Export Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil exportieren</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="1182"/>
         <source>Import Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil importieren</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="113"/>
         <source>Save Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil speichern</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="115"/>
         <location filename="../src/mainwindow.cpp" line="135"/>
         <source>JSON Files (*.json)</source>
-        <translation type="unfinished"></translation>
+        <translation>JSON-Dateien (*.json)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="122"/>
         <source>Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Gespeichert</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="122"/>
         <source>Profile saved to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil wurde in %1 gespeichert.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="124"/>
         <location filename="../src/mainwindow.cpp" line="256"/>
         <source>Save failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="133"/>
         <source>Load Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil laden</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="142"/>
         <source>Loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Geladen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="142"/>
         <source>Profile loaded from %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil wurde aus %1 geladen.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="144"/>
         <location filename="../src/mainwindow.cpp" line="243"/>
         <source>Load failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Laden fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="268"/>
         <source>Straight</source>
-        <translation type="unfinished"></translation>
+        <translation>Wörterbuch</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="269"/>
         <source>Combination</source>
-        <translation type="unfinished"></translation>
+        <translation>Kombination</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="270"/>
         <source>Brute-force</source>
-        <translation type="unfinished"></translation>
+        <translation>Brute-Force</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="271"/>
         <source>Hybrid Wordlist + Mask</source>
-        <translation type="unfinished"></translation>
+        <translation>Hybrid: Wortliste + Maske</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="272"/>
         <source>Hybrid Mask + Wordlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Hybrid: Maske + Wortliste</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="273"/>
         <source>Association</source>
-        <translation type="unfinished"></translation>
+        <translation>Assoziation</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="285"/>
         <source>Updating...</source>
-        <translation type="unfinished"></translation>
+        <translation>Wird aktualisiert...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="300"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Die unterstützten Hash-Typen konnten nicht ermittelt werden.
+Fehler: %1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="322"/>
         <source>hashcat error</source>
-        <translation type="unfinished"></translation>
+        <translation>hashcat-Fehler</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="354"/>
         <source>Open Hash File</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash-Datei öffnen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="362"/>
         <source>Save Output File</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausgabedatei speichern</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="379"/>
         <source>Add Wordlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Wortlisten hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="461"/>
         <location filename="../src/mainwindow.cpp" line="469"/>
         <location filename="../src/mainwindow.cpp" line="477"/>
         <source>Open Rules File</source>
-        <translation type="unfinished"></translation>
+        <translation>Regeldatei öffnen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="576"/>
         <source>Launch failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Start fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="577"/>
         <source>Could not start %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 konnte nicht gestartet werden: %2</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="593"/>
         <source>Please choose a hash file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte wählen Sie eine Hash-Datei aus.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="599"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gehen Sie zu &lt;b&gt;%1 → %2&lt;/b&gt;, um den Pfad zum hashcat-Programm festzulegen.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="607"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das konfigurierte hashcat-Programm existiert nicht:
+%1
+Gehen Sie zu %2 → %3, um es zu ändern.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="615"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gehen Sie zu &lt;b&gt;%1 → %2&lt;/b&gt;, um das zum Starten verwendete Terminal auszuwählen.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="620"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation type="unfinished"></translation>
+        <translation>Auf diesem System wurde kein unterstütztes Terminal gefunden. hashcat-gui benötigt eines, um die Ausgabe von hashcat anzuzeigen.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="625"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das konfigurierte Terminal &quot;%1&quot; ist nicht verfügbar. Verfügbare Terminals: %2
+Gehen Sie zu %3 → %4, um es zu ändern.</translation>
     </message>
 </context>
 <context>
@@ -542,67 +575,67 @@ Navigate to %3 → %4 to change it.</source>
     <message>
         <location filename="../src/settingsdialog.ui" line="32"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="57"/>
         <source>Hashcat executable</source>
-        <translation type="unfinished"></translation>
+        <translation>hashcat-Programm</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="69"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Download from &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Download von &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="88"/>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswählen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="109"/>
         <source>Terminal</source>
-        <translation type="unfinished"></translation>
+        <translation>Terminal</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="149"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Allgemein</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="155"/>
         <source>Use short parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurze Parameter verwenden</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="180"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="187"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.cpp" line="51"/>
         <source>Select the hashcat executable</source>
-        <translation type="unfinished"></translation>
+        <translation>hashcat-Programm auswählen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.cpp" line="53"/>
         <source>Executable Files (*.exe *.bin);;All Files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmdateien (*.exe *.bin);;Alle Dateien (*)</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.cpp" line="59"/>
         <source>Invalid file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültige Datei</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.cpp" line="60"/>
         <source>The selected file is not an executable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die ausgewählte Datei ist kein Programm.</translation>
     </message>
 </context>
 <context>
@@ -610,27 +643,27 @@ Navigate to %3 → %4 to change it.</source>
     <message>
         <location filename="../src/widgetstateserializer.cpp" line="167"/>
         <source>Could not open %1 for writing: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 konnte zum Schreiben nicht geöffnet werden: %2</translation>
     </message>
     <message>
         <location filename="../src/widgetstateserializer.cpp" line="173"/>
         <source>Could not write to %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>In %1 konnte nicht geschrieben werden: %2</translation>
     </message>
     <message>
         <location filename="../src/widgetstateserializer.cpp" line="191"/>
         <source>Could not open %1 for reading: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 konnte zum Lesen nicht geöffnet werden: %2</translation>
     </message>
     <message>
         <location filename="../src/widgetstateserializer.cpp" line="199"/>
         <source>The file is not a valid JSON file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Datei ist keine gültige JSON-Datei: %1</translation>
     </message>
     <message>
         <location filename="../src/widgetstateserializer.cpp" line="205"/>
         <source>The file does not contain a profile for &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Datei enthält kein Profil für &quot;%1&quot;.</translation>
     </message>
 </context>
 </TS>
