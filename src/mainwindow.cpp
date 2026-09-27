@@ -639,17 +639,22 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
 void MainWindow::commandChanged()
 {
     auto &settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
+    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 
     ui->lineEdit_command->clear();
 
-    // prepend hashcat binary name if it has already been configured in settings
-    if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
-        ui->lineEdit_command->setText(fileInfo.fileName());
-    }
+    // Prepend the hashcat binary name if it has already been configured in
+    // settings. Without one the preview is the bare argument list, which must
+    // not start with a blank - that blank used to end up in the clipboard as
+    // well.
+    const QString binary = hashcatPath.isEmpty() ? QString() : QFileInfo(hashcatPath).fileName();
+    ui->lineEdit_command->setText(binary);
 
-    // command line arguments for hashcat
-    ui->lineEdit_command->insert(" " + generateArguments().join(" "));
+    const QString arguments = generateArguments().join(QLatin1Char(' '));
+    if (!arguments.isEmpty()) {
+        ui->lineEdit_command->insert((binary.isEmpty() ? QString() : QStringLiteral(" "))
+                                     + arguments);
+    }
     ui->lineEdit_command->setCursorPosition(0);
 }
 
