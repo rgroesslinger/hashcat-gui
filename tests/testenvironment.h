@@ -1,0 +1,100 @@
+/*
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * SPDX-FileCopyrightText: Rainer Größlinger
+ */
+
+#ifndef TESTENVIRONMENT_H
+#define TESTENVIRONMENT_H
+
+#include <QApplication>
+#include <QCoreApplication>
+#include <QFile>
+#include <QTemporaryDir>
+#include <QtTest>
+
+// Scratch base directories for a test process.
+//
+// QSettings and QStandardPaths resolve XDG_CONFIG_HOME / XDG_DATA_HOME when
+// they are first used. Redirecting them here means no test can read, and
+// above all no test can overwrite, the settings, default profile or window
+// geometry of whoever runs ctest.
+//
+// The three accessors hold function local statics that are first touched from
+// main(), before SettingsManager's singleton exists. Both are therefore
+// destroyed in reverse order of that: the singleton first, the directories
+// last, so nothing ever writes into a directory that is already gone.
+namespace TestEnvironment {
+
+inline QTemporaryDir &configHome()
+{
+    static QTemporaryDir dir;
+    return dir;
+}
+
+inline QTemporaryDir &dataHome()
+{
+    static QTemporaryDir dir;
+    return dir;
+}
+
+inline QTemporaryDir &cacheHome()
+{
+    static QTemporaryDir dir;
+    return dir;
+}
+
+// Has to run before the first QSettings or QStandardPaths call.
+inline void redirectBaseDirectories()
+{
+    qputenv("XDG_CONFIG_HOME", configHome().path().toUtf8());
+    qputenv("XDG_DATA_HOME", dataHome().path().toUtf8());
+    qputenv("XDG_CACHE_HOME", cacheHome().path().toUtf8());
+}
+
+// A hashcat stand-in the tests can actually execute. Returns an empty path on
+// a platform with no shell to run it, which callers turn into a QSKIP.
+inline QString writeShellStub(const QString &name, const QByteArray &content)
+{
+    static QTemporaryDir dir;
+    if (!dir.isValid()) {
+        return {};
+    }
+
+    const QString path = dir.filePath(name);
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return {};
+    }
+    file.write(content);
+    file.close();
+    QFile::setPermissions(path, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
+    return path;
+}
+
+// Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behaviour, plus the redirect
+// above. needsGui decides between QApplication and QCoreApplication - the
+// command builder and helper utils tests never need a display.
+inline int run(QObject *test, int argc, char *argv[], bool needsGui)
+{
+    redirectBaseDirectories();
+
+    int result = 0;
+    if (needsGui) {
+        QApplication app(argc, argv);
+        // The application name is the organization QSettings writes under, so
+        // this is a second, independent guard on top of the XDG redirect - and
+        // on Windows, where XDG plays no part, the only one.
+        app.setApplicationName(QStringLiteral("hashcat-gui-tests"));
+        result = QTest::qExec(test, argc, argv);
+    } else {
+        QCoreApplication app(argc, argv);
+        app.setApplicationName(QStringLiteral("hashcat-gui-tests"));
+        result = QTest::qExec(test, argc, argv);
+    }
+
+    return result;
+}
+
+} // namespace TestEnvironment
+
+#endif // TESTENVIRONMENT_H

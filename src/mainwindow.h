@@ -73,6 +73,11 @@ private slots:
     void copyCommandToClipboard();
 
 private:
+    // The tests read the widget state through collectHashcatOptions() and
+    // generateArguments(); making them a friend keeps those two private
+    // instead of widening the window's public surface for the sake of tests.
+    friend class TestMainWindow;
+
     Ui::MainWindow *ui;
 
     // Last outfile name generated from the hash file name, see

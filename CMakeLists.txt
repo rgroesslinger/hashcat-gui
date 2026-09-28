@@ -26,10 +26,14 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
+# The tests live in tests/ but include ui_*.h generated from src/*.ui
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 find_package(Qt6 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
 
-add_executable(hashcat-gui WIN32
+# Everything the application is made of except main(). The tests link the very
+# same list, so they exercise the real code instead of a copy of it.
+set(HASHCAT_GUI_SOURCES
     src/aboutdialog.h
     src/aboutdialog.cpp
     src/appconstants.h
@@ -40,7 +44,6 @@ add_executable(hashcat-gui WIN32
     src/hashcatoptions.h
     src/helperutils.h
     src/helperutils.cpp
-    src/main.cpp
     src/mainwindow.h
     src/mainwindow.cpp
     src/settingsdialog.h
@@ -50,10 +53,15 @@ add_executable(hashcat-gui WIN32
     src/widgetstateserializer.h
     src/widgetstateserializer.cpp
     src/resources.qrc
-    src/hashcat-gui.rc
     src/aboutdialog.ui
     src/mainwindow.ui
     src/settingsdialog.ui
+)
+
+add_executable(hashcat-gui WIN32
+    src/main.cpp
+    src/hashcat-gui.rc
+    ${HASHCAT_GUI_SOURCES}
 )
 
 # config.h is generated, it lives in the build tree
@@ -79,6 +87,30 @@ if(Qt6LinguistTools_FOUND)
     )
 else()
     message(STATUS "Qt6 LinguistTools not found - building without translations")
+endif()
+
+# Tests.
+#
+# Qt6::Test ships with qtbase, but not every installation has the development
+# files for it. Without them the build still works and simply runs no tests -
+# which a CI job notices, because it asserts that ctest found something.
+find_package(Qt6 COMPONENTS Test QUIET)
+if(Qt6Test_FOUND)
+    enable_testing()
+
+    foreach(test IN ITEMS tst_commandbuilder tst_helperutils tst_mainwindow)
+        add_executable(${test} tests/${test}.cpp ${HASHCAT_GUI_SOURCES})
+        target_include_directories(${test} PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
+        target_compile_options(${test} PRIVATE -Wall -Wextra -Wpedantic)
+        target_link_libraries(${test} PRIVATE
+            Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::Test)
+        add_test(NAME ${test} COMMAND ${test})
+        # The CI runners have no display and none is needed: nothing the tests
+        # do shows a window, not even the main window they construct.
+        set_tests_properties(${test} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+    endforeach()
+else()
+    message(STATUS "Qt6 Test module not found - building without tests")
 endif()
 
 install(TARGETS hashcat-gui RUNTIME DESTINATION bin)
