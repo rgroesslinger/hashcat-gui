@@ -105,10 +105,15 @@ if(Qt6Test_FOUND)
         target_link_libraries(${test} PRIVATE
             Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::Test)
         add_test(NAME ${test} COMMAND ${test})
-        # The CI runners have no display and none is needed: nothing the tests
-        # do shows a window, not even the main window they construct.
-        set_tests_properties(${test} PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
     endforeach()
+
+    # The CI runners have no display and none is needed: nothing the tests
+    # show, not even the main window they construct. Windows keeps its
+    # default platform plugin, which is the one that is certainly installed.
+    if(NOT WIN32)
+        set_tests_properties(tst_commandbuilder tst_helperutils tst_mainwindow
+            PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+    endif()
 else()
     message(STATUS "Qt6 Test module not found - building without tests")
 endif()

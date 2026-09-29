@@ -21,6 +21,7 @@ jobs:
             mingw-w64-ucrt-x86_64-gcc
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-qt6-base
+            mingw-w64-ucrt-x86_64-qt6-tools
             zip
 
       - name: Build
@@ -28,6 +29,16 @@ jobs:
         run: |
           cmake -B build
           cmake --build build
+
+      # The .qm files are embedded in the executable, so a build without
+      # qt6-tools would quietly ship an untranslated binary. Check that
+      # lrelease really ran and produced the catalog rather than an empty
+      # placeholder.
+      - name: Check the translations were built
+        shell: msys2 {0}
+        run: |
+          test "$(wc -c < build/hashcat-gui_de.qm)" -gt 1000
+          test "$(wc -c < build/hashcat-gui_sr.qm)" -gt 0
 
       - name: Copy executable and dependencies
         shell: msys2 {0}
