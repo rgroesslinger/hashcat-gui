@@ -28,10 +28,12 @@ or download latest [source release](https://github.com/rgroesslinger/hashcat-gui
 
 | Distribution | Package installation command |
 | - | ----- |
-| Debian/Ubuntu | `apt install build-essential cmake qt6-base-dev` |
-| Fedora | `dnf install gcc-c++ cmake qt6-qtbase-devel` |
-| openSUSE | `zypper install gcc-c++ cmake qt6-base-devel` |
-| Arch | `pacman -S --needed gcc cmake qt6-base` |
+| Debian/Ubuntu | `apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-l10n-tools` |
+| Fedora | `dnf install gcc-c++ cmake qt6-qtbase-devel qt6-qttools-devel` |
+| openSUSE | `zypper install gcc-c++ cmake qt6-base-devel qt6-tools-devel` |
+| Arch | `pacman -S --needed gcc cmake qt6-base qt6-tools` |
+
+The `qt6-tools` packages are only needed for the translation tooling (Qt Linguist). Leaving them out still builds hashcat-gui, it just ships without the `.qm` files.
 
 - Build
 ```
@@ -45,7 +47,7 @@ cmake --build build
 
 - Install dependencies
 ```
-pacman -S mingw-w64-ucrt-x86_64-{gcc,cmake,qt6-base}
+pacman -S mingw-w64-ucrt-x86_64-{gcc,cmake,qt6-base,qt6-tools}
 ```
 
 - Build
@@ -56,3 +58,23 @@ cmake --build build
 ```
 
 To launch `hashcat-gui.exe` from outside the MSYS2 terminal you need to add `C:\msys64\ucrt64\bin` to your PATH.
+
+### Tests
+
+```
+ctest --test-dir build --output-on-failure
+```
+
+The tests need the Qt6 Test module, which is part of `qt6-base` / `qt6-base-dev`. If it is missing the build says so and simply has no tests to run. They need no display: on Linux they run with `QT_QPA_PLATFORM=offscreen`.
+
+### Translations
+
+The catalogs live in `translations/` and are compiled into the executable, so there is nothing to install at run time.
+
+After adding or changing a `tr()` string, refresh them:
+
+```
+cmake --build build --target update_translations
+```
+
+A normal build already recompiles them to `.qm`. `hashcat-gui_de.ts` carries the German translation, `hashcat-gui_sr.ts` is the Serbian skeleton, still untranslated. CI runs the refresh and fails if it changes anything committed, which is what keeps the catalogs in step with the sources.
