@@ -77,4 +77,4 @@ After adding or changing a `tr()` string, refresh them:
 cmake --build build --target update_translations
 ```
 
-A normal build already recompiles them to `.qm`. `hashcat-gui_de.ts` carries the German translation, `hashcat-gui_sr.ts` is the Serbian skeleton, still untranslated. CI runs the refresh and fails if it changes anything committed, which is what keeps the catalogs in step with the sources.
+A normal build already recompiles them to `.qm`. CI runs the refresh and fails if it changes anything committed, which is what keeps the catalogs in step with the sources.
