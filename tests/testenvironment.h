@@ -52,9 +52,17 @@ inline void redirectBaseDirectories()
 }
 
 // A hashcat stand-in the tests can actually execute. Returns an empty path on
-// a platform with no shell to run it, which callers turn into a QSKIP.
-inline QString writeShellStub(const QString &name, const QByteArray &content)
+// a platform that cannot run it - no shell to interpret the #! line, or
+// Windows, which starts no such file at all - which callers turn into a QSKIP.
+inline QString writeShellStub([[maybe_unused]] const QString &name,
+                              [[maybe_unused]] const QByteArray &content)
 {
+#ifdef Q_OS_WIN
+    // Windows only starts real images: CreateProcess cannot run a #! script,
+    // so a stub written here would never answer and the query built on it
+    // would fail. Skip the stub tests instead of reporting that failure.
+    return {};
+#else
     static QTemporaryDir dir;
     if (!dir.isValid()) {
         return {};
@@ -69,6 +77,7 @@ inline QString writeShellStub(const QString &name, const QByteArray &content)
     file.close();
     QFile::setPermissions(path, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
     return path;
+#endif
 }
 
 // Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behaviour, plus the redirect
