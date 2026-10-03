@@ -65,7 +65,7 @@ To launch `hashcat-gui.exe` from outside the MSYS2 terminal you need to add `C:\
 ctest --test-dir build --output-on-failure
 ```
 
-The tests need the Qt6 Test module, which is part of `qt6-base` / `qt6-base-dev`. If it is missing the build says so and simply has no tests to run. They need no display: on Linux they run with `QT_QPA_PLATFORM=offscreen`.
+The tests need the Qt6 Test module, which is part of `qt6-base` / `qt6-base-dev`. If it is missing the build says so and simply has no tests to run. They need no display: they run with `QT_QPA_PLATFORM=offscreen`.
 
 ### Translations
 

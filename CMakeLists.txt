@@ -108,12 +108,12 @@ if(Qt6Test_FOUND)
     endforeach()
 
     # The CI runners have no display and none is needed: nothing the tests
-    # show, not even the main window they construct. Windows keeps its
-    # default platform plugin, which is the one that is certainly installed.
-    if(NOT WIN32)
-        set_tests_properties(tst_commandbuilder tst_helperutils tst_mainwindow
-            PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
-    endif()
+    # show, not even the main window they construct. The offscreen plugin
+    # ships with qt6-base on every platform we build for - on MSYS2 it is
+    # ucrt64/share/qt6/plugins/platforms/qoffscreen.dll - so it is set
+    # unconditionally instead of being skipped on Windows.
+    set_tests_properties(tst_commandbuilder tst_helperutils tst_mainwindow
+        PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 else()
     message(STATUS "Qt6 Test module not found - building without tests")
 endif()
