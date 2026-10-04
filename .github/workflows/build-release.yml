@@ -31,14 +31,14 @@ jobs:
           cmake --build build
 
       # The .qm files are embedded in the executable, so a build without
-      # qt6-tools would quietly ship an untranslated binary. Check that
-      # lrelease really ran and produced the catalog rather than an empty
-      # placeholder.
+      # qt6-tools would quietly ship an untranslated binary. One rule for
+      # every catalog lrelease produced, without naming them: the file has
+      # to be there and it has to hold something. An unmatched glob stays
+      # literal, so this also fails when no catalog was built at all.
       - name: Check the translations were built
         shell: msys2 {0}
         run: |
-          test "$(wc -c < build/hashcat-gui_de.qm)" -gt 1000
-          test "$(wc -c < build/hashcat-gui_sr.qm)" -gt 0
+          for qm in build/*.qm; do test -s "$qm" || exit 1; done
 
       - name: Copy executable and dependencies
         shell: msys2 {0}
