@@ -30,10 +30,10 @@ or download latest [source release](https://github.com/rgroesslinger/hashcat-gui
 | - | ----- |
 | Debian/Ubuntu | `apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-l10n-tools` |
 | Fedora | `dnf install gcc-c++ cmake qt6-qtbase-devel qt6-qttools-devel` |
-| openSUSE | `zypper install gcc-c++ cmake qt6-base-devel qt6-tools-devel` |
+| openSUSE | `zypper install gcc-c++ cmake qt6-base-devel qt6-linguist-devel` |
 | Arch | `pacman -S --needed gcc cmake qt6-base qt6-tools` |
 
-The `qt6-tools` packages are only needed for the translation tooling (Qt Linguist). Leaving them out still builds hashcat-gui, it just ships without the `.qm` files.
+The translation packages in each row - `qt6-tools-dev` and `qt6-l10n-tools` (Debian/Ubuntu), `qt6-qttools-devel` (Fedora), `qt6-linguist-devel` (openSUSE), `qt6-tools` (Arch) - are only needed for the translation tooling (Qt Linguist). Leaving them out still builds hashcat-gui, it just ships without the `.qm` files.
 
 - Build
 ```
