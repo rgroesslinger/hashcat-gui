@@ -51,7 +51,7 @@ jobs:
 
       - name: Test (Linux)
         if: runner.os == 'Linux'
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure --no-tests=error
 
       # A source string added without refreshing the catalogs would only be
       # noticed the next time somebody ran lupdate. Refresh them here and
@@ -85,4 +85,4 @@ jobs:
       - name: Test (Windows)
         if: runner.os == 'Windows'
         shell: msys2 {0}
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure --no-tests=error

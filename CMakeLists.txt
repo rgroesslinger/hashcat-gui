@@ -93,7 +93,9 @@ endif()
 #
 # Qt6::Test ships with qtbase, but not every installation has the development
 # files for it. Without them the build still works and simply runs no tests -
-# which a CI job notices, because it asserts that ctest found something.
+# which a CI job notices, because its ctest runs with --no-tests=error. ctest
+# on its own exits 0 both for "no test configuration file found" and for "no
+# tests were found", so without that flag a green build would prove nothing.
 find_package(Qt6 COMPONENTS Test QUIET)
 if(Qt6Test_FOUND)
     enable_testing()
