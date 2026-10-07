@@ -22,6 +22,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Flags for everything this file builds - the application and the tests
+add_compile_options(-Wall -Wextra -Wpedantic)
+
 # Qt specific preprocessing
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOMOC ON)
@@ -67,8 +70,6 @@ add_executable(hashcat-gui WIN32
 # config.h is generated, it lives in the build tree
 target_include_directories(hashcat-gui PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-target_compile_options(hashcat-gui PRIVATE -Wall -Wextra -Wpedantic)
-
 target_link_libraries(hashcat-gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
 
 # Translations.
@@ -93,9 +94,7 @@ endif()
 #
 # Qt6::Test ships with qtbase, but not every installation has the development
 # files for it. Without them the build still works and simply runs no tests -
-# which a CI job notices, because its ctest runs with --no-tests=error. ctest
-# on its own exits 0 both for "no test configuration file found" and for "no
-# tests were found", so without that flag a green build would prove nothing.
+# which a CI job notices, because its ctest runs with --no-tests=error.
 find_package(Qt6 COMPONENTS Test QUIET)
 if(Qt6Test_FOUND)
     enable_testing()
@@ -103,7 +102,6 @@ if(Qt6Test_FOUND)
     foreach(test IN ITEMS tst_commandbuilder tst_helperutils tst_mainwindow)
         add_executable(${test} tests/${test}.cpp ${HASHCAT_GUI_SOURCES})
         target_include_directories(${test} PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
-        target_compile_options(${test} PRIVATE -Wall -Wextra -Wpedantic)
         target_link_libraries(${test} PRIVATE
             Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::Test)
         add_test(NAME ${test} COMMAND ${test})
@@ -111,9 +109,7 @@ if(Qt6Test_FOUND)
 
     # The CI runners have no display and none is needed: nothing the tests
     # show, not even the main window they construct. The offscreen plugin
-    # ships with qt6-base on every platform we build for - on MSYS2 it is
-    # ucrt64/share/qt6/plugins/platforms/qoffscreen.dll - so it is set
-    # unconditionally instead of being skipped on Windows.
+    # ships with qt6-base on every platform we build for.
     set_tests_properties(tst_commandbuilder tst_helperutils tst_mainwindow
         PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
 else()
