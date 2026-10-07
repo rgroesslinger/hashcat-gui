@@ -3,6 +3,7 @@
 ## 0.8.0 (Unreleased)
 - Support for translations (#12)
   - The catalogs in `translations/` are now compiled into the executable and loaded when the program starts
+  - The language can be selected in the settings: System default follows the environment and lands on English whenever no catalog matches it
 - Support for more terminals (#7)
   - alacritty, kitty, foot, wezterm and Windows Terminal
 - Decoupled business logic from UI, enhancing codebase maintainability and enabling the creation of a robust and extensive test suite

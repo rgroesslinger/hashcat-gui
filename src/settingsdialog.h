@@ -28,6 +28,10 @@ private slots:
     void cancelClicked();
 private:
     Ui::SettingsDialog *ui;
+
+    // The language setting as it was when the dialog opened, so saveClicked()
+    // can tell an actual change from "the user pressed Save".
+    QString loadedLanguage;
 };
 
 #endif // SETTINGSDIALOG_H

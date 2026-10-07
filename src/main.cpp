@@ -7,6 +7,8 @@
 #include <QLocale>
 #include <QTranslator>
 #include "mainwindow.h"
+#include "settingsmanager.h"
+#include "appconstants.h"
 #include "config.h"
 
 int main(int argc, char *argv[])
@@ -32,8 +34,17 @@ int main(int argc, char *argv[])
     // nothing there and stays on the source strings. The locale's UI languages
     // are tried from most to least specific, so hashcat-gui_de.qm answers for
     // de, de_DE and de_AT alike.
+    //
+    // The language setting overrides that guess: an empty code (the "System
+    // default" entry) keeps the environment's locale, any other code asks for
+    // exactly that locale. English has no catalog, loading simply fails and
+    // the source strings - which are English - stay.
+    const QString language = SettingsManager::instance().getKey<QString>(
+        AppConstants::SettingsKeys::Language, QString::fromUtf8(AppConstants::Languages::Default));
+
     QTranslator translator;
-    if (translator.load(QLocale(), QStringLiteral("hashcat-gui"), QStringLiteral("_"),
+    if (translator.load(language.isEmpty() ? QLocale() : QLocale(language),
+                        QStringLiteral("hashcat-gui"), QStringLiteral("_"),
                         QStringLiteral(":/i18n"), QStringLiteral(".qm"))) {
         a.installTranslator(&translator);
     }

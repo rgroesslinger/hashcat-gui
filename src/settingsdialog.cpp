@@ -43,6 +43,28 @@ void SettingsDialog::readSettings()
 
     // use short parameters
     ui->checkBox_use_short_parameters->setChecked(settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters));
+
+    // Languages: the combo shows each language's own name and carries the
+    // locale code as item data - that code is what gets stored. "System
+    // default" (an empty code) means "whatever the environment says", it is
+    // the behavior the application had before language became a setting.
+    ui->comboBox_language->addItem(tr("System default"), QString());
+    for (const auto &language : AppConstants::Languages::Available) {
+        ui->comboBox_language->addItem(QString::fromUtf8(language.name),
+                                       QString::fromUtf8(language.code));
+    }
+
+    const QString stored = settings.getKey<QString>(
+        AppConstants::SettingsKeys::Language,
+        QString::fromUtf8(AppConstants::Languages::Default));
+    loadedLanguage = stored;
+    int index = ui->comboBox_language->findData(stored);
+    if (index < 0) {
+        // A code we no longer offer (or a hand-edited file): follow the
+        // environment again - English if no catalog answers for it.
+        index = ui->comboBox_language->findData(QString::fromUtf8(AppConstants::Languages::Default));
+    }
+    ui->comboBox_language->setCurrentIndex(index);
 }
 
 // Configure path to hashcat binary
@@ -71,6 +93,17 @@ void SettingsDialog::saveClicked()
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, ui->lineEdit_hc_path->text());
     settings.setKey(AppConstants::SettingsKeys::Terminal, ui->comboBox_terminal->currentText());
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, ui->checkBox_use_short_parameters->isChecked());
+    // The locale code, not the display text - see readSettings().
+    const QString language = ui->comboBox_language->currentData().toString();
+    settings.setKey(AppConstants::SettingsKeys::Language, language);
+
+    // The catalog is loaded once, in main(), before the first widget exists.
+    // Rather than rebuilding every open widget to swap it, tell the user the
+    // setting takes effect on the next start.
+    if (language != loadedLanguage) {
+        QMessageBox::information(this, tr("Restart required"),
+                                 tr("Restart hashcat-gui to apply the new language."));
+    }
 
     // accept() signals our parent that settings might have changed
     accept();

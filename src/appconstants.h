@@ -23,7 +23,32 @@ namespace SettingsKeys {
 inline constexpr const char *HashcatPath = "hashcatPath";
 inline constexpr const char *Terminal = "terminal";
 inline constexpr const char *UseShortParameters = "useShortParameters";
+// Locale code of the UI language, see the Languages namespace below.
+inline constexpr const char *Language = "language";
 } // namespace SettingsKeys
+
+// The languages the settings dialog offers.
+//
+// What gets stored is always the locale code, never the display text, so
+// relabeling an entry cannot orphan a saved setting. The names are each
+// language's own name on purpose: whoever reads "Deutsch" knows it is their
+// language, "German" only helps English speakers.
+namespace Languages {
+struct Language {
+    const char *code;
+    const char *name;
+};
+inline constexpr Language Available[] = {
+    {"en", "English"},
+    {"de", "Deutsch"},
+    {"sr", "Srpski"},
+};
+// What a fresh install gets before anything was ever saved, and what the
+// dialog falls back to when the key holds a code that is no longer offered:
+// System default - follow the environment's locale, which lands on English
+// whenever no catalog answers for it.
+inline constexpr const char *Default = "";
+} // namespace Languages
 
 namespace Files {
 // Saved by MainWindow::saveDefaultProfile(), relative to

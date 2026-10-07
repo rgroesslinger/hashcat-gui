@@ -71,6 +71,8 @@ The tests need the Qt6 Test module, which is part of `qt6-base` / `qt6-base-dev`
 
 The catalogs live in `translations/` and are compiled into the executable, so there is nothing to install at run time.
 
+The UI follows the environment's language by default; **Settings → Language** offers an explicit choice instead.
+
 After adding or changing a `tr()` string, refresh them:
 
 ```
