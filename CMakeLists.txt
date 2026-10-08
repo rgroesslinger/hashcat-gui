@@ -110,8 +110,13 @@ if(Qt6Test_FOUND)
     # The CI runners have no display and none is needed: nothing the tests
     # show, not even the main window they construct. The offscreen plugin
     # ships with qt6-base on every platform we build for.
+    #
+    # TIMEOUT caps each test at 60 s: a test that stumbles into a modal
+    # dialog nobody closes (or a hashcat query that never returns) must fail
+    # instead of hanging the whole CI job. The longest legitimate wait is
+    # AppConstants::Hashcat::QueryTimeoutMs (20 s).
     set_tests_properties(tst_commandbuilder tst_helperutils tst_mainwindow
-        PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+        PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
 else()
     message(STATUS "Qt6 Test module not found - building without tests")
 endif()
