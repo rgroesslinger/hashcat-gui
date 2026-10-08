@@ -55,12 +55,20 @@ jobs:
 
       # A source string added without refreshing the catalogs would only be
       # noticed the next time somebody ran lupdate. Refresh them here and
-      # insist the result is empty.
+      # insist the result is empty - on one matrix row rather than once per
+      # row, since the answer is identical everywhere.
+      #
+      # -I'<location'> keeps a pure line-number refresh (code moved above a
+      # tr() string) from failing the build; any real source or translation
+      # drift still leaves a non-matching line in the diff. What git diff
+      # cannot see at all is a file nobody ever added, so a catalog declared
+      # in CMakeLists.txt but missing from the repository is caught separately.
       - name: Check the translations are in step with the sources (Linux)
-        if: runner.os == 'Linux'
+        if: matrix.compiler == 'linux-gcc'
         run: |
           cmake --build build --target update_translations
-          git diff --exit-code -- translations/
+          git diff -I'<location' --exit-code -- translations/
+          test -z "$(git status --porcelain translations/ | grep '^??')"
 
       # ----- Windows setup -----
       - name: Set up MSYS2 with UCRT64 (Windows)
