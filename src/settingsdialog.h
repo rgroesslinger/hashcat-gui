@@ -27,6 +27,11 @@ private slots:
     void saveClicked();
     void cancelClicked();
 private:
+    // The tests read the widget state through the Ui the same way the main
+    // window's tests do: friendship keeps it private instead of widening the
+    // dialog's public surface for their sake.
+    friend class TestSettingsDialog;
+
     Ui::SettingsDialog *ui;
 
     // The language setting as it was when the dialog opened, so saveClicked()

@@ -106,6 +106,7 @@ if(Qt6Test_FOUND)
         tst_hashcatinfoparser
         tst_helperutils
         tst_mainwindow
+        tst_settingsdialog
         tst_widgetstateserializer)
         add_executable(${test} tests/${test}.cpp ${HASHCAT_GUI_SOURCES})
         target_include_directories(${test} PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
@@ -127,6 +128,7 @@ if(Qt6Test_FOUND)
         tst_hashcatinfoparser
         tst_helperutils
         tst_mainwindow
+        tst_settingsdialog
         tst_widgetstateserializer
         PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
 else()
