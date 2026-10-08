@@ -24,8 +24,26 @@ class TestMainWindow : public QObject
 {
     Q_OBJECT
 
+public:
+    TestMainWindow()
+    {
+        // Safety net for ctest, for the test that spins the event loop: a
+        // reply the stub cannot produce would open a modal warning, and a
+        // modal dialog must never be able to hang the run. Living as a member
+        // lets cleanup() stop it, so it cannot fire into a later test and
+        // close a modal that test legitimately opened.
+        m_watchdog.setSingleShot(true);
+        m_watchdog.setInterval(10000);
+        connect(&m_watchdog, &QTimer::timeout, this, [] {
+            if (QWidget *modal = QApplication::activeModalWidget()) {
+                modal->close();
+            }
+        });
+    }
+
 private slots:
-    void initTestCase();
+    void init();
+    void cleanup();
     void freshWindowMatchesTheDefaultOptions();
     void attackModeIdsTravelAsItemData();
     void groupBoxesFollowTheBuilderPredicates();
@@ -33,17 +51,39 @@ private slots:
     void checkedWordlistsEndUpInTheCommand();
     void hashTypeComesFromTheItemData();
     void hashTypesAreFilledFromHashcat();
+
+private:
+    QString m_savedHashcatPath;
+    QString m_savedTerminal;
+    bool m_savedShortParameters = false;
+    QTimer m_watchdog;
 };
 
-void TestMainWindow::initTestCase()
+// Every test starts from the same settings, and cleanup() puts back whatever
+// it found, so the order the slots run in stops mattering.
+void TestMainWindow::init()
 {
+    auto &settings = SettingsManager::instance();
+    m_savedHashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    m_savedTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
+    m_savedShortParameters = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
+
     // A deterministic starting point: no configured hashcat, no configured
     // terminal, long parameters. Everything else comes from the fresh XDG
     // directories, which hold no profile to load.
-    auto &settings = SettingsManager::instance();
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, QString());
     settings.setKey(AppConstants::SettingsKeys::Terminal, QString());
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
+}
+
+void TestMainWindow::cleanup()
+{
+    m_watchdog.stop();
+
+    auto &settings = SettingsManager::instance();
+    settings.setKey(AppConstants::SettingsKeys::HashcatPath, m_savedHashcatPath);
+    settings.setKey(AppConstants::SettingsKeys::Terminal, m_savedTerminal);
+    settings.setKey(AppConstants::SettingsKeys::UseShortParameters, m_savedShortParameters);
 }
 
 void TestMainWindow::freshWindowMatchesTheDefaultOptions()
@@ -188,7 +228,9 @@ void TestMainWindow::hashTypeComesFromTheItemData()
     QCOMPARE(window.generateArguments(), withoutHashType);
 }
 
-// Runs last: unlike the tests above it spins the event loop.
+// Unlike the tests above it spins the event loop while the async query runs;
+// init()/cleanup() have taken care of the settings, so it is free to run in
+// any position.
 void TestMainWindow::hashTypesAreFilledFromHashcat()
 {
     const QString stub = TestEnvironment::writeShellStub(
@@ -205,13 +247,7 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
-    // Safety net for ctest: a reply this stub cannot produce would open a
-    // modal warning, and a modal dialog must never be able to hang the run.
-    QTimer::singleShot(10000, qApp, [] {
-        if (QWidget *modal = QApplication::activeModalWidget()) {
-            modal->close();
-        }
-    });
+    m_watchdog.start();
 
     MainWindow window;
 
