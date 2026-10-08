@@ -53,16 +53,16 @@
     <message>
         <location filename="../src/helperutils.cpp" line="99"/>
         <source>Failed to start hashcat
-</source>
+%1</source>
         <translation>hashcat konnte nicht gestartet werden
-</translation>
+%1</translation>
     </message>
     <message>
         <location filename="../src/helperutils.cpp" line="108"/>
         <source>hashcat timed out
-</source>
+%1</source>
         <translation>hashcat hat das Zeitlimit erreicht
-</translation>
+%1</translation>
     </message>
 </context>
 <context>
@@ -544,7 +544,7 @@ Fehler: %1</translation>
         <translation>Gehen Sie zu &lt;b&gt;%1 → %2&lt;/b&gt;, um den Pfad zum hashcat-Programm festzulegen.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="607"/>
+        <location filename="../src/mainwindow.cpp" line="609"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -553,17 +553,17 @@ Navigate to %2 → %3 to change it.</source>
 Gehen Sie zu %2 → %3, um es zu ändern.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="615"/>
+        <location filename="../src/mainwindow.cpp" line="617"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>Gehen Sie zu &lt;b&gt;%1 → %2&lt;/b&gt;, um das zum Starten verwendete Terminal auszuwählen.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="620"/>
+        <location filename="../src/mainwindow.cpp" line="622"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Auf diesem System wurde kein unterstütztes Terminal gefunden. hashcat-gui benötigt eines, um die Ausgabe von hashcat anzuzeigen.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="625"/>
+        <location filename="../src/mainwindow.cpp" line="628"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>Das konfigurierte Terminal &quot;%1&quot; ist nicht verfügbar. Verfügbare Terminals: %2
@@ -610,7 +610,7 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
     <message>
         <location filename="../src/settingsdialog.ui" line="171"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprache</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="205"/>
@@ -625,37 +625,37 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
     <message>
         <location filename="../src/settingsdialog.cpp" line="51"/>
         <source>System default</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemstandard</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="73"/>
+        <location filename="../src/settingsdialog.cpp" line="79"/>
         <source>Select the hashcat executable</source>
         <translation>hashcat-Programm auswählen</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="75"/>
+        <location filename="../src/settingsdialog.cpp" line="81"/>
         <source>Executable Files (*.exe *.bin);;All Files (*)</source>
         <translation>Programmdateien (*.exe *.bin);;Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="81"/>
+        <location filename="../src/settingsdialog.cpp" line="87"/>
         <source>Invalid file</source>
         <translation>Ungültige Datei</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="82"/>
+        <location filename="../src/settingsdialog.cpp" line="88"/>
         <source>The selected file is not an executable.</source>
         <translation>Die ausgewählte Datei ist kein Programm.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="104"/>
+        <location filename="../src/settingsdialog.cpp" line="110"/>
         <source>Restart required</source>
-        <translation type="unfinished"></translation>
+        <translation>Neustart erforderlich</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="105"/>
+        <location filename="../src/settingsdialog.cpp" line="111"/>
         <source>Restart hashcat-gui to apply the new language.</source>
-        <translation type="unfinished"></translation>
+        <translation>Starten Sie hashcat-gui neu, um die neue Sprache zu übernehmen.</translation>
     </message>
 </context>
 <context>
