@@ -12,10 +12,10 @@ jobs:
         compiler: [linux-gcc, linux-clang, windows-gcc, windows-clang]
         include:
           - compiler: linux-gcc
-            runs-on: ubuntu-latest
+            runs-on: ubuntu-26.04
             cxx: g++
           - compiler: linux-clang
-            runs-on: ubuntu-latest
+            runs-on: ubuntu-26.04
             cxx: clang++
           - compiler: windows-gcc
             runs-on: windows-latest
