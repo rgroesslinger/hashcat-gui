@@ -48,7 +48,7 @@ void TestCommandBuilder::noHashTypeWhileNoneIsSelected()
 
     const QStringList arguments = CommandBuilder::build(options);
     QVERIFY(!arguments.contains(QStringLiteral("--hash-type")));
-    // -m is also the short form of --segment-size, so look for the exact word
+    // the short form of --hash-type is -m, so check that exact token too
     QVERIFY(!arguments.contains(QStringLiteral("-m")));
 }
 
@@ -63,11 +63,6 @@ void TestCommandBuilder::hashTypeComesBeforeTheAttackMode()
     options.useShortParameters = true;
     const QStringList shortForm{"-m", "1000", "-a", "0"};
     QCOMPARE(CommandBuilder::build(options), shortForm);
-
-    // hashcat reads -m wherever it sits, but the preview reads better the way
-    // the manual writes it
-    QVERIFY(CommandBuilder::build(options).indexOf(QStringLiteral("-m"))
-            < CommandBuilder::build(options).indexOf(QStringLiteral("-a")));
 }
 
 void TestCommandBuilder::fileRulesWinOverGeneratedRules()
