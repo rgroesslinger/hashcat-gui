@@ -27,13 +27,16 @@ class TestMainWindow : public QObject
 public:
     TestMainWindow()
     {
-        // Safety net for ctest, for the test that spins the event loop: a
-        // reply the stub cannot produce would open a modal warning, and a
-        // modal dialog must never be able to hang the run. Living as a member
-        // lets cleanup() stop it, so it cannot fire into a later test and
-        // close a modal that test legitimately opened.
-        m_watchdog.setSingleShot(true);
-        m_watchdog.setInterval(10000);
+        // Safety net for ctest, for the tests that spin the event loop: a
+        // reply the stub cannot produce opens a modal warning, and a modal
+        // dialog must never be able to hang the run. Repeating with a short
+        // interval, because a warning can only appear while an event loop
+        // is turning - which is when this timer ticks - and the failure-path
+        // tests below want it gone the moment it is there. Living as a
+        // member lets cleanup() stop it, so it cannot fire into a later
+        // test and close a modal that test legitimately opened.
+        m_watchdog.setSingleShot(false);
+        m_watchdog.setInterval(100);
         connect(&m_watchdog, &QTimer::timeout, this, [] {
             if (QWidget *modal = QApplication::activeModalWidget()) {
                 modal->close();
@@ -51,6 +54,11 @@ private slots:
     void checkedWordlistsEndUpInTheCommand();
     void hashTypeComesFromTheItemData();
     void hashTypesAreFilledFromHashcat();
+    void failedQueryReenablesTheHashTypeCombo_data();
+    void failedQueryReenablesTheHashTypeCombo();
+    void outfileSuggestionFollowsUntilTheUserTakesOver();
+    void wordlistSortSurvivesAMissingSelection();
+    void commandPreviewCarriesTheBinaryName();
 
 private:
     QString m_savedHashcatPath;
@@ -300,6 +308,132 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     const int hashType = arguments.indexOf(QStringLiteral("--hash-type"));
     QVERIFY(hashType >= 0);
     QCOMPARE(arguments.value(hashType + 1), QStringLiteral("0"));
+}
+
+// Every failure path owes the user the state the success path leaves behind:
+// the combo back under their control, no "Updating..." left on it, and no
+// hash type in it. Two ways for hashcat to not answer, both real.
+void TestMainWindow::failedQueryReenablesTheHashTypeCombo_data()
+{
+    QTest::addColumn<QByteArray>("script");
+
+    QTest::newRow("non-zero exit") << QByteArray(
+        "#!/bin/sh\n"
+        "printf 'no such option\\n' >&2\n"
+        "exit 1\n");
+    QTest::newRow("garbage output") << QByteArray(
+        "#!/bin/sh\n"
+        "printf 'this is not json at all\\n'\n"
+        "exit 0\n");
+}
+
+void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
+{
+    QFETCH(QByteArray, script);
+
+    const QString stub =
+        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-fails"), script);
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    // The failure raises a modal warning; the watchdog closes it so the
+    // assertions below get their turn (and the run cannot hang either way).
+    m_watchdog.start();
+
+    MainWindow window;
+
+    // The query starts out exactly like the successful one: parked on the
+    // reply, with the tooltip that says so.
+    QVERIFY(!window.ui->comboBox_hash->isEnabled());
+    QCOMPARE(window.ui->comboBox_hash->toolTip(), QStringLiteral("Updating..."));
+
+    // ... and when the reply turns out to be unusable, the combo comes back
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->isEnabled(),
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QVERIFY(window.ui->comboBox_hash->toolTip().isEmpty());
+    QCOMPARE(window.ui->comboBox_hash->count(), 0);
+}
+
+// The suggestion may follow the hash file name only as long as nobody else
+// has put something in the outfile field: what the user typed has to survive
+// every later hash file edit, and an empty field is nobody's value at all.
+void TestMainWindow::outfileSuggestionFollowsUntilTheUserTakesOver()
+{
+    MainWindow window;
+    QLineEdit *hashFile = window.ui->lineEdit_hashfile;
+    QLineEdit *outfile = window.ui->lineEdit_outfile;
+    QVERIFY(outfile->text().isEmpty());
+
+    hashFile->setText(QStringLiteral("/tmp/first.hash"));
+    QCOMPARE(outfile->text(), QStringLiteral("/tmp/first.hash.out"));
+
+    // still our own suggestion, so it keeps following
+    hashFile->setText(QStringLiteral("/tmp/second.hash"));
+    QCOMPARE(outfile->text(), QStringLiteral("/tmp/second.hash.out"));
+
+    // the user takes ownership - from here on the field is left alone
+    outfile->setText(QStringLiteral("/tmp/mine.txt"));
+    hashFile->setText(QStringLiteral("/tmp/third.hash"));
+    QCOMPARE(outfile->text(), QStringLiteral("/tmp/mine.txt"));
+
+    // an empty field is nobody's value, so suggesting starts afresh
+    outfile->clear();
+    hashFile->setText(QStringLiteral("/tmp/fourth.hash"));
+    QCOMPARE(outfile->text(), QStringLiteral("/tmp/fourth.hash.out"));
+}
+
+// The sort buttons only appear after an item was clicked, but the slots are
+// still slots: called with nothing current - or with nothing there at all -
+// they have to be a no-op instead of a walk through takeItem(-1).
+void TestMainWindow::wordlistSortSurvivesAMissingSelection()
+{
+    MainWindow window;
+    QListWidget *list = window.ui->listWidget_wordlist;
+
+    new QListWidgetItem(QStringLiteral("b.txt"), list);
+    new QListWidgetItem(QStringLiteral("a.txt"), list);
+    QCOMPARE(list->currentRow(), -1);
+
+    const auto texts = [list] {
+        QStringList result;
+        for (int i = 0; i < list->count(); ++i) {
+            result << list->item(i)->text();
+        }
+        return result;
+    };
+    const QStringList before{QStringLiteral("b.txt"), QStringLiteral("a.txt")};
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortAscClicked"));
+    QCOMPARE(texts(), before);
+    QCOMPARE(list->currentRow(), -1);
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortDescClicked"));
+    QCOMPARE(texts(), before);
+    QCOMPARE(list->currentRow(), -1);
+
+    // an empty list is the same no-op
+    list->clear();
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortAscClicked"));
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortDescClicked"));
+    QCOMPARE(list->count(), 0);
+}
+
+// With a hashcat binary configured the preview is [binary][separator][args]:
+// the file name, exactly one blank, the arguments - and nothing in front of
+// them, a leading blank used to ride into the clipboard with the copy.
+void TestMainWindow::commandPreviewCarriesTheBinaryName()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/hashcat/hashcat"));
+
+    MainWindow window;
+    QCOMPARE(window.ui->lineEdit_command->text(),
+             QStringLiteral("hashcat --attack-mode 0"));
 }
 
 int main(int argc, char *argv[])
