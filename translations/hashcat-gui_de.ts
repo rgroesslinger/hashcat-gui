@@ -407,144 +407,144 @@ Standard: 1,2
         <translation>Profil importieren</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="113"/>
+        <location filename="../src/mainwindow.cpp" line="112"/>
         <source>Save Profile</source>
         <translation>Profil speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="115"/>
-        <location filename="../src/mainwindow.cpp" line="135"/>
+        <location filename="../src/mainwindow.cpp" line="114"/>
+        <location filename="../src/mainwindow.cpp" line="134"/>
         <source>JSON Files (*.json)</source>
         <translation>JSON-Dateien (*.json)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="122"/>
+        <location filename="../src/mainwindow.cpp" line="121"/>
         <source>Saved</source>
         <translation>Gespeichert</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="122"/>
+        <location filename="../src/mainwindow.cpp" line="121"/>
         <source>Profile saved to %1.</source>
         <translation>Profil wurde in %1 gespeichert.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="124"/>
-        <location filename="../src/mainwindow.cpp" line="256"/>
+        <location filename="../src/mainwindow.cpp" line="123"/>
+        <location filename="../src/mainwindow.cpp" line="271"/>
         <source>Save failed</source>
         <translation>Speichern fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="133"/>
+        <location filename="../src/mainwindow.cpp" line="132"/>
         <source>Load Profile</source>
         <translation>Profil laden</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="142"/>
+        <location filename="../src/mainwindow.cpp" line="147"/>
         <source>Loaded</source>
         <translation>Geladen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="142"/>
+        <location filename="../src/mainwindow.cpp" line="147"/>
         <source>Profile loaded from %1.</source>
         <translation>Profil wurde aus %1 geladen.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="144"/>
-        <location filename="../src/mainwindow.cpp" line="243"/>
+        <location filename="../src/mainwindow.cpp" line="149"/>
+        <location filename="../src/mainwindow.cpp" line="258"/>
         <source>Load failed</source>
         <translation>Laden fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="268"/>
+        <location filename="../src/mainwindow.cpp" line="283"/>
         <source>Straight</source>
         <translation>Wörterbuch</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="269"/>
+        <location filename="../src/mainwindow.cpp" line="284"/>
         <source>Combination</source>
         <translation>Kombination</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="270"/>
+        <location filename="../src/mainwindow.cpp" line="285"/>
         <source>Brute-force</source>
         <translation>Brute-Force</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="271"/>
+        <location filename="../src/mainwindow.cpp" line="286"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>Hybrid: Wortliste + Maske</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="272"/>
+        <location filename="../src/mainwindow.cpp" line="287"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>Hybrid: Maske + Wortliste</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="273"/>
+        <location filename="../src/mainwindow.cpp" line="288"/>
         <source>Association</source>
         <translation>Assoziation</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="285"/>
+        <location filename="../src/mainwindow.cpp" line="300"/>
         <source>Updating...</source>
         <translation>Wird aktualisiert...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="300"/>
+        <location filename="../src/mainwindow.cpp" line="315"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Die unterstützten Hash-Typen konnten nicht ermittelt werden.
 Fehler: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="322"/>
+        <location filename="../src/mainwindow.cpp" line="348"/>
         <source>hashcat error</source>
         <translation>hashcat-Fehler</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="354"/>
+        <location filename="../src/mainwindow.cpp" line="380"/>
         <source>Open Hash File</source>
         <translation>Hash-Datei öffnen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="388"/>
         <source>Save Output File</source>
         <translation>Ausgabedatei speichern</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="379"/>
+        <location filename="../src/mainwindow.cpp" line="405"/>
         <source>Add Wordlists</source>
         <translation>Wortlisten hinzufügen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="461"/>
-        <location filename="../src/mainwindow.cpp" line="469"/>
-        <location filename="../src/mainwindow.cpp" line="477"/>
+        <location filename="../src/mainwindow.cpp" line="487"/>
+        <location filename="../src/mainwindow.cpp" line="495"/>
+        <location filename="../src/mainwindow.cpp" line="503"/>
         <source>Open Rules File</source>
         <translation>Regeldatei öffnen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="576"/>
+        <location filename="../src/mainwindow.cpp" line="602"/>
         <source>Launch failed</source>
         <translation>Start fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="577"/>
+        <location filename="../src/mainwindow.cpp" line="603"/>
         <source>Could not start %1: %2</source>
         <translation>%1 konnte nicht gestartet werden: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="593"/>
+        <location filename="../src/mainwindow.cpp" line="619"/>
         <source>Please choose a hash file.</source>
         <translation>Bitte wählen Sie eine Hash-Datei aus.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="599"/>
+        <location filename="../src/mainwindow.cpp" line="625"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>Gehen Sie zu &lt;b&gt;%1 → %2&lt;/b&gt;, um den Pfad zum hashcat-Programm festzulegen.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="609"/>
+        <location filename="../src/mainwindow.cpp" line="635"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -553,17 +553,17 @@ Navigate to %2 → %3 to change it.</source>
 Gehen Sie zu %2 → %3, um es zu ändern.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="617"/>
+        <location filename="../src/mainwindow.cpp" line="643"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>Gehen Sie zu &lt;b&gt;%1 → %2&lt;/b&gt;, um das zum Starten verwendete Terminal auszuwählen.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="622"/>
+        <location filename="../src/mainwindow.cpp" line="648"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Auf diesem System wurde kein unterstütztes Terminal gefunden. hashcat-gui benötigt eines, um die Ausgabe von hashcat anzuzeigen.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="628"/>
+        <location filename="../src/mainwindow.cpp" line="654"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>Das konfigurierte Terminal &quot;%1&quot; ist nicht verfügbar. Verfügbare Terminals: %2
@@ -671,17 +671,17 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
         <translation>In %1 konnte nicht geschrieben werden: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="191"/>
+        <location filename="../src/widgetstateserializer.cpp" line="192"/>
         <source>Could not open %1 for reading: %2</source>
         <translation>%1 konnte zum Lesen nicht geöffnet werden: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="199"/>
+        <location filename="../src/widgetstateserializer.cpp" line="200"/>
         <source>The file is not a valid JSON file: %1</source>
         <translation>Die Datei ist keine gültige JSON-Datei: %1</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="205"/>
+        <location filename="../src/widgetstateserializer.cpp" line="206"/>
         <source>The file does not contain a profile for &quot;%1&quot;.</source>
         <translation>Die Datei enthält kein Profil für &quot;%1&quot;.</translation>
     </message>

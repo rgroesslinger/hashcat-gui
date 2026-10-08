@@ -407,144 +407,144 @@ Podrazumevano: 1,2
         <translation>Uvezi profil</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="113"/>
+        <location filename="../src/mainwindow.cpp" line="112"/>
         <source>Save Profile</source>
         <translation>Sačuvaj profil</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="115"/>
-        <location filename="../src/mainwindow.cpp" line="135"/>
+        <location filename="../src/mainwindow.cpp" line="114"/>
+        <location filename="../src/mainwindow.cpp" line="134"/>
         <source>JSON Files (*.json)</source>
         <translation>JSON datoteke (*.json)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="122"/>
+        <location filename="../src/mainwindow.cpp" line="121"/>
         <source>Saved</source>
         <translation>Sačuvano</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="122"/>
+        <location filename="../src/mainwindow.cpp" line="121"/>
         <source>Profile saved to %1.</source>
         <translation>Profil je sačuvan u %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="124"/>
-        <location filename="../src/mainwindow.cpp" line="256"/>
+        <location filename="../src/mainwindow.cpp" line="123"/>
+        <location filename="../src/mainwindow.cpp" line="271"/>
         <source>Save failed</source>
         <translation>Čuvanje nije uspelo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="133"/>
+        <location filename="../src/mainwindow.cpp" line="132"/>
         <source>Load Profile</source>
         <translation>Učitaj profil</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="142"/>
+        <location filename="../src/mainwindow.cpp" line="147"/>
         <source>Loaded</source>
         <translation>Učitano</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="142"/>
+        <location filename="../src/mainwindow.cpp" line="147"/>
         <source>Profile loaded from %1.</source>
         <translation>Profil je učitan iz %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="144"/>
-        <location filename="../src/mainwindow.cpp" line="243"/>
+        <location filename="../src/mainwindow.cpp" line="149"/>
+        <location filename="../src/mainwindow.cpp" line="258"/>
         <source>Load failed</source>
         <translation>Učitanje nije uspelo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="268"/>
+        <location filename="../src/mainwindow.cpp" line="283"/>
         <source>Straight</source>
         <translation>Rečnik</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="269"/>
+        <location filename="../src/mainwindow.cpp" line="284"/>
         <source>Combination</source>
         <translation>Kombinacija</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="270"/>
+        <location filename="../src/mainwindow.cpp" line="285"/>
         <source>Brute-force</source>
         <translation>Brute-Force</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="271"/>
+        <location filename="../src/mainwindow.cpp" line="286"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>Hibrid: lista reči + maska</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="272"/>
+        <location filename="../src/mainwindow.cpp" line="287"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>Hibrid: maska + lista reči</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="273"/>
+        <location filename="../src/mainwindow.cpp" line="288"/>
         <source>Association</source>
         <translation>Asocijacija</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="285"/>
+        <location filename="../src/mainwindow.cpp" line="300"/>
         <source>Updating...</source>
         <translation>Ažuriranje...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="300"/>
+        <location filename="../src/mainwindow.cpp" line="315"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Preuzimanje podržanih vrsta hash-ova nije uspelo.
 Greška: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="322"/>
+        <location filename="../src/mainwindow.cpp" line="348"/>
         <source>hashcat error</source>
         <translation>hashcat greška</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="354"/>
+        <location filename="../src/mainwindow.cpp" line="380"/>
         <source>Open Hash File</source>
         <translation>Otvori datoteku sa hashom</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="388"/>
         <source>Save Output File</source>
         <translation>Sačuvaj izlaznu datoteku</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="379"/>
+        <location filename="../src/mainwindow.cpp" line="405"/>
         <source>Add Wordlists</source>
         <translation>Dodaj liste reči</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="461"/>
-        <location filename="../src/mainwindow.cpp" line="469"/>
-        <location filename="../src/mainwindow.cpp" line="477"/>
+        <location filename="../src/mainwindow.cpp" line="487"/>
+        <location filename="../src/mainwindow.cpp" line="495"/>
+        <location filename="../src/mainwindow.cpp" line="503"/>
         <source>Open Rules File</source>
         <translation>Otvori datoteku sa pravilima</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="576"/>
+        <location filename="../src/mainwindow.cpp" line="602"/>
         <source>Launch failed</source>
         <translation>Pokretanje nije uspelo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="577"/>
+        <location filename="../src/mainwindow.cpp" line="603"/>
         <source>Could not start %1: %2</source>
         <translation>Nije bilo moguće pokrenuti %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="593"/>
+        <location filename="../src/mainwindow.cpp" line="619"/>
         <source>Please choose a hash file.</source>
         <translation>Izaberite datoteku sa hashom.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="599"/>
+        <location filename="../src/mainwindow.cpp" line="625"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da podesite putanju do hashcat programa.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="609"/>
+        <location filename="../src/mainwindow.cpp" line="635"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -553,17 +553,17 @@ Navigate to %2 → %3 to change it.</source>
 Idite na %2 → %3 da to promenite.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="617"/>
+        <location filename="../src/mainwindow.cpp" line="643"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da izaberete terminal koji se koristi za pokretanje.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="622"/>
+        <location filename="../src/mainwindow.cpp" line="648"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Na ovom sistemu nije pronađen nijedan podržani terminal. hashcat-gui mu je potreban da bi prikazao izlaz hashcat-a.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="628"/>
+        <location filename="../src/mainwindow.cpp" line="654"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>Konfigurisani terminal &quot;%1&quot; nije dostupan. Dostupni terminali: %2
@@ -671,17 +671,17 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Nije bilo moguće upisati u %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="191"/>
+        <location filename="../src/widgetstateserializer.cpp" line="192"/>
         <source>Could not open %1 for reading: %2</source>
         <translation>Nije bilo moguće otvoriti %1 za čitanje: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="199"/>
+        <location filename="../src/widgetstateserializer.cpp" line="200"/>
         <source>The file is not a valid JSON file: %1</source>
         <translation>Datoteka nije važeći JSON fajl: %1</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="205"/>
+        <location filename="../src/widgetstateserializer.cpp" line="206"/>
         <source>The file does not contain a profile for &quot;%1&quot;.</source>
         <translation>Datoteka ne sadrži profil za &quot;%1&quot;.</translation>
     </message>
