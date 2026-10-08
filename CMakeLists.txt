@@ -101,7 +101,11 @@ find_package(Qt6 COMPONENTS Test QUIET)
 if(Qt6Test_FOUND)
     enable_testing()
 
-    foreach(test IN ITEMS tst_commandbuilder tst_helperutils tst_mainwindow)
+    foreach(test IN ITEMS
+        tst_commandbuilder
+        tst_hashcatinfoparser
+        tst_helperutils
+        tst_mainwindow)
         add_executable(${test} tests/${test}.cpp ${HASHCAT_GUI_SOURCES})
         target_include_directories(${test} PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
         target_link_libraries(${test} PRIVATE
