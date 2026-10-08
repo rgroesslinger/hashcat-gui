@@ -96,7 +96,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
         proc.start();
 
         if (!proc.waitForStarted()) {
-            result.standardError = tr("Failed to start hashcat\n") + proc.errorString();
+            result.standardError = tr("Failed to start hashcat\n%1").arg(proc.errorString());
             return result;
         }
 
@@ -105,7 +105,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
             // Reap the killed child instead of letting QProcess::waitForFinished
             // return immediately and destroy a still-running process.
             proc.waitForFinished(5000);
-            result.standardError = tr("hashcat timed out\n") + proc.errorString();
+            result.standardError = tr("hashcat timed out\n%1").arg(proc.errorString());
             return result;
         }
 
