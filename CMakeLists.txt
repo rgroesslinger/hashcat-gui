@@ -34,8 +34,7 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 find_package(Qt6 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
 
-# Everything the application is made of except main(). The tests link the very
-# same list, so they exercise the real code instead of a copy of it.
+# Everything the application is made of except main().
 set(HASHCAT_GUI_SOURCES
     src/aboutdialog.h
     src/aboutdialog.cpp
@@ -61,29 +60,37 @@ set(HASHCAT_GUI_SOURCES
     src/settingsdialog.ui
 )
 
+# The sources are built once, into an object library the application and
+# every test link against, instead of being compiled again for each target.
+# Object files rather than a static library: that puts the qrc objects and
+# the static initializers directly on the link line, where nothing can drop
+# them as unreferenced.
+add_library(hashcat-gui-core OBJECT ${HASHCAT_GUI_SOURCES})
+target_include_directories(hashcat-gui-core PUBLIC src)
+target_link_libraries(hashcat-gui-core PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
+
 add_executable(hashcat-gui WIN32
     src/main.cpp
     src/hashcat-gui.rc
-    ${HASHCAT_GUI_SOURCES}
 )
 
 # config.h is generated, it lives in the build tree
 target_include_directories(hashcat-gui PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-target_link_libraries(hashcat-gui PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
+target_link_libraries(hashcat-gui PRIVATE hashcat-gui-core)
 
 # Translations.
 #
 # LinguistTools is optional on purpose: a machine without qt6-tools still
 # builds, it just gets the untranslated source strings and no .qm files.
 #
-# SOURCE_TARGETS keeps lupdate on this target alone: without it Qt collects
-# every target in the project, the test executables included, and a tr()
-# added to a test would land in the catalogs.
+# SOURCE_TARGETS keeps lupdate on the application's own sources alone:
+# without it Qt collects every target in the project, the test executables
+# included, and a tr() added to a test would land in the catalogs.
 find_package(Qt6 COMPONENTS LinguistTools QUIET)
 if(Qt6LinguistTools_FOUND)
     qt_add_translations(hashcat-gui
-        SOURCE_TARGETS hashcat-gui
+        SOURCE_TARGETS hashcat-gui hashcat-gui-core
         TS_FILES
             translations/hashcat-gui_de.ts
             translations/hashcat-gui_sr.ts
@@ -109,10 +116,8 @@ if(Qt6Test_FOUND)
         tst_settingsdialog
         tst_translations
         tst_widgetstateserializer)
-        add_executable(${test} tests/${test}.cpp ${HASHCAT_GUI_SOURCES})
-        target_include_directories(${test} PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
-        target_link_libraries(${test} PRIVATE
-            Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::Test)
+        add_executable(${test} tests/${test}.cpp)
+        target_link_libraries(${test} PRIVATE hashcat-gui-core Qt6::Test)
         add_test(NAME ${test} COMMAND ${test})
     endforeach()
 
