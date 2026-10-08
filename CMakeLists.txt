@@ -104,10 +104,14 @@ endif()
 # Qt6::Test ships with qtbase, but not every installation has the development
 # files for it. Without them the build still works and simply runs no tests -
 # which a CI job notices, because its ctest runs with --no-tests=error.
+#
+# BUILD_TESTING is the standard CMake switch: -DBUILD_TESTING=OFF skips the
+# test binaries entirely.
+include(CTest)
 find_package(Qt6 COMPONENTS Test QUIET)
-if(Qt6Test_FOUND)
-    enable_testing()
-
+if(NOT BUILD_TESTING)
+    message(STATUS "BUILD_TESTING is off - building without tests")
+elseif(Qt6Test_FOUND)
     foreach(test IN ITEMS
         tst_commandbuilder
         tst_hashcatinfoparser
