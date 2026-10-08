@@ -90,13 +90,15 @@ void TestMainWindow::freshWindowMatchesTheDefaultOptions()
 {
     MainWindow window;
 
-    const HashcatOptions expected;
-    const QStringList arguments = CommandBuilder::build(expected);
+    // Ground truth spelled out: comparing build() against build() would let a
+    // builder that emits nothing pass every run
+    const QStringList expected{"--attack-mode", "0"};
 
-    QCOMPARE(window.generateArguments(), arguments);
+    QCOMPARE(CommandBuilder::build(HashcatOptions{}), expected);
+    QCOMPARE(window.generateArguments(), expected);
 
     // ... and that is what the preview shows, character for character
-    QCOMPARE(window.ui->lineEdit_command->text(), arguments.join(QLatin1Char(' ')));
+    QCOMPARE(window.ui->lineEdit_command->text(), expected.join(QLatin1Char(' ')));
 }
 
 void TestMainWindow::attackModeIdsTravelAsItemData()
@@ -123,6 +125,25 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
 {
     MainWindow window;
 
+    // What each mode owes the widgets, written down independently of the very
+    // predicates updateViewAttackMode() switches on: the same ground truth
+    // tst_commandbuilder::predicates pins for the builder, asserted here
+    // against the widgets. A wrong predicate now disagrees with this table.
+    struct Expectation {
+        AttackMode mode;
+        bool wordlists;
+        bool rules;
+        bool mask;
+    };
+    const QList<Expectation> expectations{
+        {AttackMode::Straight, true, true, false},
+        {AttackMode::Combination, true, false, false},
+        {AttackMode::BruteForce, false, false, true},
+        {AttackMode::HybridWordMask, true, false, true},
+        {AttackMode::HybridMaskWord, true, false, true},
+        {AttackMode::Association, true, true, false},
+    };
+
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
         // -1 first, so that every iteration really changes the index and runs
         // attackIndexChanged()
@@ -132,12 +153,18 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
         const AttackMode mode =
             static_cast<AttackMode>(window.ui->comboBox_attack->currentData().toInt());
 
-        QCOMPARE(window.ui->groupBox_wordlists->isEnabled(),
-                 CommandBuilder::attackUsesWordlists(mode));
-        QCOMPARE(window.ui->groupBox_rules->isEnabled(), CommandBuilder::attackUsesRules(mode));
-        QCOMPARE(window.ui->groupBox_mask->isEnabled(), CommandBuilder::attackUsesMask(mode));
-        QCOMPARE(window.ui->groupBox_custom_charset->isEnabled(),
-                 CommandBuilder::attackUsesMask(mode));
+        const Expectation *expected = nullptr;
+        for (const Expectation &candidate : expectations) {
+            if (candidate.mode == mode) {
+                expected = &candidate;
+            }
+        }
+        QVERIFY2(expected, "no expectation written down for this attack mode");
+
+        QCOMPARE(window.ui->groupBox_wordlists->isEnabled(), expected->wordlists);
+        QCOMPARE(window.ui->groupBox_rules->isEnabled(), expected->rules);
+        QCOMPARE(window.ui->groupBox_mask->isEnabled(), expected->mask);
+        QCOMPARE(window.ui->groupBox_custom_charset->isEnabled(), expected->mask);
     }
 }
 
