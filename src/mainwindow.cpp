@@ -13,7 +13,6 @@
 #include "hashcatinfoparser.h"
 #include "helperutils.h"
 #include "widgetstateserializer.h"
-#include <QDateTime>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
