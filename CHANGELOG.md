@@ -7,17 +7,21 @@
 - Support for more terminals (#7)
   - alacritty, kitty, foot, wezterm and Windows Terminal
 - Decoupled business logic from UI, enhancing codebase maintainability and enabling the creation of a robust and extensive test suite
-- Test suite: `tst_*` binaries wired into `ctest`, covering the argument rules, the launch checks, the hashcat helper process and the widget state of a freshly opened window
+- Test suite: `tst_*` binaries wired into `ctest`, covering the command line rules, the hash type parser, the hashcat launch and helper process, the profile serializer, the settings dialog, the main window and the embedded translation catalogs
 - Refactored default values and magic numbers in `src/appconstants.h` (#10)
 - `HashcatOptions` and `CommandBuilder`: the command line is built from a UI-independent description, and the gating rules (`attackUsesMask()`, `attackUsesWordlists()`, `attackUsesRules()`) live in one place that the main window's group boxes use too, so the visible options and the generated command cannot disagree
 - CI builds the translations, runs the tests and fails when the catalogs are out of step with the sources
 - The GUI now refuses to start hashcat when the configuration is incomplete instead of failing silently
+- A terminal that cannot be started (wrong path, permissions) now reports an error instead of failing silently
 - Profile errors are reported through an error message returned to the caller rather than the serializer opening its own dialog, so a failed profile load at start-up is reported as well
+- The hash type saved in a profile is applied once the background query has filled the selector; at start-up the selection used to be dropped
+- File → Export only announces success when the profile was actually written; a failed write used to be reported as saved
 - The hash type selector is re-enabled when the background query fails or returns malformed JSON; it used to stay on "Updating..." for the rest of the session
 - `--hash-type` is left out while no hash type is selected; an empty selector used to send `-m 0`
 - Attack mode and hash type ids travel as combo box item data, so a missing entry can no longer silently become mode or type `0`
 - Sorting the word list with nothing selected no longer hands a null item to `insertItem()`
 - The suggested outfile no longer overwrites a file name the user or a loaded profile chose
+- Copy to clipboard no longer crashes on platforms without clipboard support
 
 ## 0.7.1 (2026-02-15)
 - Added support for more command options
