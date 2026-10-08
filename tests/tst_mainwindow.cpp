@@ -196,9 +196,12 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
         "#!/bin/sh\n"
         "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
         "exit 0\n");
-    if (stub.isEmpty()) {
-        QSKIP("no shell stub on this platform");
-    }
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    // Same contract as the helper utils tests: on Linux the stub has to exist
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 

@@ -188,9 +188,13 @@ void TestHelperUtils::executeHashcatWithoutAPath()
 
 void TestHelperUtils::executeHashcatCapturesOutput()
 {
-    if (!stubsAvailable()) {
-        QSKIP("no shell stubs on this platform");
-    }
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs on this platform");
+#else
+    // A stub that never got written is a broken test environment, not a
+    // reason to report success without having run anything
+    QVERIFY2(stubsAvailable(), "the shell stub could not be written");
+#endif
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, m_okScript);
 
@@ -204,9 +208,11 @@ void TestHelperUtils::executeHashcatCapturesOutput()
 
 void TestHelperUtils::executeHashcatGivesUpOnTimeout()
 {
-    if (!stubsAvailable()) {
-        QSKIP("no shell stubs on this platform");
-    }
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs on this platform");
+#else
+    QVERIFY2(stubsAvailable(), "the shell stub could not be written");
+#endif
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, m_sleepingScript);
 

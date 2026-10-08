@@ -53,7 +53,8 @@ inline void redirectBaseDirectories()
 
 // A hashcat stand-in the tests can actually execute. Returns an empty path on
 // a platform that cannot run it - no shell to interpret the #! line, or
-// Windows, which starts no such file at all - which callers turn into a QSKIP.
+// Windows, which starts no such file at all. Callers QSKIP on Windows and
+// treat an empty path as a hard failure everywhere else.
 inline QString writeShellStub([[maybe_unused]] const QString &name,
                               [[maybe_unused]] const QByteArray &content)
 {
