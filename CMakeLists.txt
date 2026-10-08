@@ -105,7 +105,8 @@ if(Qt6Test_FOUND)
         tst_commandbuilder
         tst_hashcatinfoparser
         tst_helperutils
-        tst_mainwindow)
+        tst_mainwindow
+        tst_widgetstateserializer)
         add_executable(${test} tests/${test}.cpp ${HASHCAT_GUI_SOURCES})
         target_include_directories(${test} PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
         target_link_libraries(${test} PRIVATE
@@ -121,7 +122,12 @@ if(Qt6Test_FOUND)
     # dialog nobody closes (or a hashcat query that never returns) must fail
     # instead of hanging the whole CI job. The longest legitimate wait is
     # AppConstants::Hashcat::QueryTimeoutMs (20 s).
-    set_tests_properties(tst_commandbuilder tst_helperutils tst_mainwindow
+    set_tests_properties(
+        tst_commandbuilder
+        tst_hashcatinfoparser
+        tst_helperutils
+        tst_mainwindow
+        tst_widgetstateserializer
         PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
 else()
     message(STATUS "Qt6 Test module not found - building without tests")
