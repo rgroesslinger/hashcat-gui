@@ -136,7 +136,13 @@ void MainWindow::importTriggered()
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
         QString error;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error)) {
+        QJsonObject state;
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error,
+                                &state)) {
+            // Same deferred hash type as loadDefaultProfile(): while the
+            // query is in flight the combo cannot take the stored index.
+            if (ui->comboBox_hash->count() == 0)
+                m_pendingHashTypeIndex = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
             commandChanged();
             QMessageBox::information(this, tr("Loaded"), tr("Profile loaded from %1.").arg(file));
         } else {
@@ -155,6 +161,9 @@ void MainWindow::resetFieldsTriggered()
     ui->listWidget_wordlist->clear();
     ui->comboBox_attack->setCurrentIndex(0);
     ui->comboBox_hash->setCurrentIndex(0);
+    // A fresh form must not re-apply a hash type a profile is still waiting
+    // to deliver.
+    m_pendingHashTypeIndex = -1;
     ui->radioButton_use_rules_file->setChecked(true);
     ui->checkBox_rulesfile_1->setChecked(false);
     ui->checkBox_rulesfile_2->setChecked(false);
@@ -236,7 +245,14 @@ void MainWindow::loadDefaultProfile()
     if (QFile::exists(file)) {
         WidgetStateSerializer s;
         QString error;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error)) {
+        QJsonObject state;
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error,
+                                &state)) {
+            // The hash combo has no items yet - the query that fills it runs
+            // asynchronously. Remember the stored index; the reply applies
+            // it once the items exist.
+            if (ui->comboBox_hash->count() == 0)
+                m_pendingHashTypeIndex = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
             commandChanged();
         } else {
             QMessageBox::warning(this, tr("Load failed"), error);
@@ -308,6 +324,17 @@ void MainWindow::initHashAndAttackModes()
                     for (auto it = hashModes.constBegin(); it != hashModes.constEnd(); ++it) {
                         ui->comboBox_hash->addItem(it.value(), it.key());
                     }
+
+                    // A profile loaded while the combo was still empty could
+                    // not select its hash type then; now that the items
+                    // exist, apply the stored index once and consume it -
+                    // a failed fill never reaches this point, so a pending
+                    // index survives until a later query succeeds.
+                    if (m_pendingHashTypeIndex >= 0
+                        && m_pendingHashTypeIndex < ui->comboBox_hash->count()) {
+                        ui->comboBox_hash->setCurrentIndex(m_pendingHashTypeIndex);
+                    }
+                    m_pendingHashTypeIndex = -1;
                 }
             }
 

@@ -29,8 +29,14 @@ public:
                          const QStringList &ignoredWidgets = {}, QString *errorMessage = nullptr) const;
 
     // Restore the state of widget from a profile file.
+    //
+    // When profileState is not nullptr the profile object that was applied
+    // is copied there, so callers can read values the widgets could not take
+    // yet - a combobox that has no items until an asynchronous query fills
+    // it, see MainWindow::loadDefaultProfile().
     bool loadStateFromFile(const QString &key, QWidget *widget, const QString &filename,
-                           const QStringList &ignoredWidgets = {}, QString *errorMessage = nullptr) const;
+                           const QStringList &ignoredWidgets = {}, QString *errorMessage = nullptr,
+                           QJsonObject *profileState = nullptr) const;
 };
 
 #endif // WIDGETSTATESERIALIZER_H

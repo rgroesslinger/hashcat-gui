@@ -102,6 +102,12 @@ private:
     QString defaultProfileFile() const;
     void loadDefaultProfile();
     void saveDefaultProfile();
+
+    // A profile can name a hash type while comboBox_hash still has no items
+    // - the list arrives with the asynchronous hashcat query, after the
+    // constructor has already loaded the profile. The stored index waits
+    // here and is applied once the items exist, see initHashAndAttackModes().
+    int m_pendingHashTypeIndex = -1;
 };
 
 #endif // MAINWINDOW_H

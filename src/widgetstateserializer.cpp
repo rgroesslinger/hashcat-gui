@@ -184,7 +184,8 @@ bool WidgetStateSerializer::loadStateFromFile(const QString &key,
                                               QWidget *widget,
                                               const QString &filename,
                                               const QStringList &ignoredWidgets,
-                                              QString *errorMessage) const
+                                              QString *errorMessage,
+                                              QJsonObject *profileState) const
 {
     QFile f(filename);
     if (!f.open(QIODevice::ReadOnly)) {
@@ -206,7 +207,11 @@ bool WidgetStateSerializer::loadStateFromFile(const QString &key,
         return false;
     }
 
-    jsonToWidget(root[key].toObject(), widget, ignoredWidgets);
+    const QJsonObject state = root[key].toObject();
+    if (profileState)
+        *profileState = state;
+
+    jsonToWidget(state, widget, ignoredWidgets);
     setError(errorMessage, QString());
     return true;
 }
