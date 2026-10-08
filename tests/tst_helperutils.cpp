@@ -187,10 +187,7 @@ void TestHelperUtils::unknownParameterIsEmpty()
 }
 
 // The mapping executeClicked() builds its command line from: pin every
-// entry, because a wrong one is a terminal that starts and then never runs
-// hashcat. xfce4-terminal was checked against the installed binary - -e
-// takes exactly one value and parses everything after it itself, while -x
-// hands the whole remainder to the command as arguments.
+// entry, because a wrong one is a terminal that starts and then never runs hashcat.
 void TestHelperUtils::terminalArgumentsArePinned()
 {
     struct Expected {

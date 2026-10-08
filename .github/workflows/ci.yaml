@@ -33,15 +33,12 @@ jobs:
       # CMake package and the lupdate/lrelease binaries. Without them the
       # build still succeeds, it just produces no .qm - which would silently
       # defeat the translation check below.
-      # qt6-qpa-plugins supplies the offscreen platform plugin the tests run
-      # with; qt6-base-dev alone does not always pull it in.
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt update
           sudo apt install -y build-essential g++ clang cmake \
-            qt6-base-dev qt6-qpa-plugins \
-            qt6-tools-dev qt6-l10n-tools
+            qt6-base-dev qt6-tools-dev qt6-l10n-tools
 
       - name: Build (Linux)
         if: runner.os == 'Linux'

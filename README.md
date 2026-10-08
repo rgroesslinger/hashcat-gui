@@ -28,7 +28,7 @@ or download latest [source release](https://github.com/rgroesslinger/hashcat-gui
 
 | Distribution | Package installation command |
 | - | ----- |
-| Debian/Ubuntu | `apt install build-essential cmake qt6-base-dev qt6-qpa-plugins qt6-tools-dev qt6-l10n-tools` |
+| Debian/Ubuntu | `apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-l10n-tools` |
 | Fedora | `dnf install gcc-c++ cmake qt6-qtbase-devel qt6-qttools-devel` |
 | openSUSE | `zypper install gcc-c++ cmake qt6-base-devel qt6-linguist-devel` |
 | Arch | `pacman -S --needed gcc cmake qt6-base qt6-tools` |
