@@ -50,9 +50,10 @@ void TestHelperUtils::initTestCase()
         "exit 0\n");
     m_sleepingScript = TestEnvironment::writeShellStub(
         QStringLiteral("stub-hashcat-slow"),
+        // exec replaces the shell, so the process QProcess kills is the
+        // sleeper itself instead of a shell whose sleep child is orphaned
         "#!/bin/sh\n"
-        "sleep 30\n"
-        "printf 'too late\\n'\n");
+        "exec sleep 30\n");
 }
 
 void TestHelperUtils::init()

@@ -46,6 +46,14 @@ inline QTemporaryDir &cacheHome()
 // Has to run before the first QSettings or QStandardPaths call.
 inline void redirectBaseDirectories()
 {
+    // A scratch directory that could not be created would send QSettings and
+    // QStandardPaths back at the real ones - the exact leak this redirect
+    // exists to stop. Stop the run instead of testing against somebody's own
+    // configuration.
+    if (!configHome().isValid() || !dataHome().isValid() || !cacheHome().isValid()) {
+        qFatal("TestEnvironment: could not create the scratch base directories");
+    }
+
     qputenv("XDG_CONFIG_HOME", configHome().path().toUtf8());
     qputenv("XDG_DATA_HOME", dataHome().path().toUtf8());
     qputenv("XDG_CACHE_HOME", cacheHome().path().toUtf8());

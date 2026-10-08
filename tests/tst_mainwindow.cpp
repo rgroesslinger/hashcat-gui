@@ -283,7 +283,10 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     QVERIFY(!window.ui->comboBox_hash->isEnabled());
     QCOMPARE(window.ui->comboBox_hash->toolTip(), QStringLiteral("Updating..."));
 
-    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->count() > 0, 15000);
+    // Wait at least as long as the query's own deadline: giving up earlier
+    // would fail the test while hashcat could still have answered
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->count() > 0,
+                             AppConstants::Hashcat::QueryTimeoutMs);
 
     QCOMPARE(window.ui->comboBox_hash->count(), 2);
     QVERIFY(window.ui->comboBox_hash->isEnabled());
