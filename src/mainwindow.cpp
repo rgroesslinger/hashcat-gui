@@ -600,10 +600,12 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
                         .arg(menu, settingsEntry));
         break;
 
-    // The two messages below interpolate user supplied strings, so they stay
-    // plain text - a path or a terminal name containing a '<' or '&' would
-    // otherwise be taken for markup.
+    // The two messages below interpolate user supplied strings, so they are
+    // set to plain text explicitly: the default is AutoText, which would take
+    // a path or a terminal name containing a '<' for markup and display it
+    // mangled.
     case HelperUtils::LaunchError::HashcatPathMissing:
+        box.setTextFormat(Qt::PlainText);
         box.setText(tr("The configured hashcat executable does not exist:\n%1\n"
                        "Navigate to %2 → %3 to change it.")
                         .arg(detail, menu, settingsEntry));
@@ -622,6 +624,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         break;
 
     case HelperUtils::LaunchError::UnknownTerminal:
+        box.setTextFormat(Qt::PlainText);
         box.setText(tr("The configured terminal \"%1\" is not available. Available terminals: %2\n"
                        "Navigate to %3 → %4 to change it.")
                         .arg(configuredTerminal, detail, menu, settingsEntry));
