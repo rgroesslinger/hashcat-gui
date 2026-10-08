@@ -57,7 +57,6 @@ void SettingsDialog::readSettings()
     const QString stored = settings.getKey<QString>(
         AppConstants::SettingsKeys::Language,
         QString::fromUtf8(AppConstants::Languages::Default));
-    loadedLanguage = stored;
     int index = ui->comboBox_language->findData(stored);
     if (index < 0) {
         // A code we no longer offer (or a hand-edited file): follow the
@@ -65,6 +64,13 @@ void SettingsDialog::readSettings()
         index = ui->comboBox_language->findData(QString::fromUtf8(AppConstants::Languages::Default));
     }
     ui->comboBox_language->setCurrentIndex(index);
+
+    // What the combo shows is what Save will store, so that is what counts as
+    // "unchanged". Taking the raw stored value instead would make a stale code
+    // that fell back to "System default" read as a pending language change:
+    // Save would then announce a restart and rewrite the key behind the user's
+    // back, for a language the user never picked.
+    loadedLanguage = ui->comboBox_language->currentData().toString();
 }
 
 // Configure path to hashcat binary
