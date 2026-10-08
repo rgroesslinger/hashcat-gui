@@ -107,6 +107,7 @@ if(Qt6Test_FOUND)
         tst_helperutils
         tst_mainwindow
         tst_settingsdialog
+        tst_translations
         tst_widgetstateserializer)
         add_executable(${test} tests/${test}.cpp ${HASHCAT_GUI_SOURCES})
         target_include_directories(${test} PRIVATE src ${CMAKE_CURRENT_BINARY_DIR})
@@ -114,6 +115,21 @@ if(Qt6Test_FOUND)
             Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::Test)
         add_test(NAME ${test} COMMAND ${test})
     endforeach()
+
+    # tst_translations can only prove that :/i18n answers at runtime if its
+    # binary carries the catalogs the way the application carries them. The
+    # files are the ones qt_add_translations() derives from the .ts list
+    # above; a build without LinguistTools produces neither the files nor
+    # the definition, and the test skips instead of failing.
+    if(Qt6LinguistTools_FOUND)
+        target_compile_definitions(tst_translations PRIVATE HASHCAT_GUI_QM_EMBEDDED)
+        qt_add_resources(tst_translations "tst_translations_translations"
+            PREFIX "/i18n"
+            BASE ${CMAKE_CURRENT_BINARY_DIR}
+            FILES
+                ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui_de.qm
+                ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui_sr.qm)
+    endif()
 
     # The CI runners have no display and none is needed: nothing the tests
     # show, not even the main window they construct. The offscreen plugin
@@ -129,6 +145,7 @@ if(Qt6Test_FOUND)
         tst_helperutils
         tst_mainwindow
         tst_settingsdialog
+        tst_translations
         tst_widgetstateserializer
         PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
 else()
