@@ -7,6 +7,7 @@
 #define HELPERUTILS_H
 
 #include <QCoreApplication>
+#include <QMap>
 #include <QString>
 #include <QStringList>
 #include <QProcess>
@@ -82,6 +83,12 @@ public:
                                       QString *detail = nullptr);
 
     static QFuture<HashcatResult> executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
+
+    // Every supported terminal and the arguments that belong between the
+    // terminal program and the hashcat command line. Pure data - nothing
+    // here looks at the filesystem - so the tests can pin every entry.
+    static const QMap<QString, QStringList> &terminalArguments();
+
     static QMap<QString, QStringList> getAvailableTerminals();
     static QString getParameter(Parameter key, bool useShort = false);
 

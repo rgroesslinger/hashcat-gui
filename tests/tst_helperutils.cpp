@@ -10,12 +10,14 @@
 #include <QFileInfo>
 #include <QDir>
 
+#include <iterator>
+
 #include "appconstants.h"
 #include "helperutils.h"
 #include "settingsmanager.h"
 
-// The conditions that keep Execute from starting anything, the spelling of the
-// parameters, and the hashcat helper process itself.
+// The conditions that keep Execute from starting anything, the spelling of
+// the parameters, the terminal table, and the hashcat helper process itself.
 class TestHelperUtils : public QObject
 {
     Q_OBJECT
@@ -28,9 +30,11 @@ private slots:
     void validateLaunch();
     void parameterSpelling();
     void unknownParameterIsEmpty();
+    void terminalArgumentsArePinned();
     void executeHashcatWithoutAPath();
     void executeHashcatCapturesOutput();
     void executeHashcatGivesUpOnTimeout();
+    void executeHashcatAppendsQuietAndUsesBinaryDirectory();
 
 private:
     // The stubs only make sense where a #! line does
@@ -38,6 +42,7 @@ private:
 
     QString m_okScript;
     QString m_sleepingScript;
+    QString m_echoScript;
     QString m_savedHashcatPath;
 };
 
@@ -54,6 +59,12 @@ void TestHelperUtils::initTestCase()
         // sleeper itself instead of a shell whose sleep child is orphaned
         "#!/bin/sh\n"
         "exec sleep 30\n");
+    m_echoScript = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-echo"),
+        // reports where it ran and what it was given, one item per line
+        "#!/bin/sh\n"
+        "pwd\n"
+        "printf '%s\\n' \"$@\"\n");
 }
 
 void TestHelperUtils::init()
@@ -175,6 +186,38 @@ void TestHelperUtils::unknownParameterIsEmpty()
     QVERIFY(HelperUtils::getParameter(static_cast<HelperUtils::Parameter>(4711)).isEmpty());
 }
 
+// The mapping executeClicked() builds its command line from: pin every
+// entry, because a wrong one is a terminal that starts and then never runs
+// hashcat. xfce4-terminal was checked against the installed binary - -e
+// takes exactly one value and parses everything after it itself, while -x
+// hands the whole remainder to the command as arguments.
+void TestHelperUtils::terminalArgumentsArePinned()
+{
+    struct Expected {
+        const char *terminal;
+        QStringList arguments;
+    };
+    const Expected expected[] = {
+        {"cmd.exe", {"/k"}},
+        {"xterm", {"-hold", "-e"}},
+        {"gnome-terminal", {"--wait", "--"}},
+        {"ptyxis", {"--"}},
+        {"konsole", {"--hold", "-e"}},
+        {"xfce4-terminal", {"--hold", "-x"}},
+        {"alacritty", {"-e"}},
+        {"kitty", {}},
+        {"foot", {}},
+        {"wezterm", {"start", "--"}},
+        {"wt.exe", {"-d", "."}},
+    };
+
+    const QMap<QString, QStringList> table = HelperUtils::terminalArguments();
+    QCOMPARE(int(table.size()), int(std::size(expected)));
+    for (const Expected &entry : expected) {
+        QCOMPARE(table.value(QString::fromLatin1(entry.terminal)), entry.arguments);
+    }
+}
+
 void TestHelperUtils::executeHashcatWithoutAPath()
 {
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, QString());
@@ -228,6 +271,40 @@ void TestHelperUtils::executeHashcatGivesUpOnTimeout()
     QCOMPARE(int(result.exitStatus), int(QProcess::CrashExit));
     QCOMPARE(result.exitCode, -1);
     QVERIFY(result.standardError.contains(QStringLiteral("timed out")));
+}
+
+// The contract with every caller: the caller's arguments go first, --quiet
+// is appended so the output can be read, and the child runs next to its own
+// binary - that is where hashcat looks for its profiles and modules.
+void TestHelperUtils::executeHashcatAppendsQuietAndUsesBinaryDirectory()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs on this platform");
+#else
+    QVERIFY2(!m_echoScript.isEmpty(), "the shell stub could not be written");
+#endif
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, m_echoScript);
+
+    const HashcatResult result =
+        HelperUtils::executeHashcat({QStringLiteral("--version")}).result();
+
+    QCOMPARE(int(result.exitStatus), int(QProcess::NormalExit));
+    QCOMPARE(result.exitCode, 0);
+
+    const QStringList output =
+        result.standardOutput.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QCOMPARE(output.size(), 3);
+
+    // working directory = the directory of the binary (canonical, so a
+    // symlinked temp path cannot tell the two apart)
+    QCOMPARE(QDir(output.value(0)).canonicalPath(),
+             QDir(QFileInfo(m_echoScript).absolutePath()).canonicalPath());
+
+    // the caller's arguments, then --quiet - in that order
+    const QStringList expectedArguments{QStringLiteral("--version"),
+                                        QString::fromLatin1(AppConstants::Hashcat::Quiet)};
+    QCOMPARE(output.mid(1), expectedArguments);
 }
 
 int main(int argc, char *argv[])

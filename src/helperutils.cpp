@@ -166,33 +166,38 @@ HelperUtils::LaunchError HelperUtils::validateLaunch(const QString &hashFile,
     return LaunchError::None;
 }
 
-// Returns all supported terminals
-QMap<QString, QStringList> HelperUtils::getAvailableTerminals()
+// The arguments that belong between the terminal program and the hashcat
+// command line, for every supported terminal. The entries are pure data -
+// nothing here looks at the filesystem - so the tests can pin what each one
+// promises. Terminals whose option takes a single shell-quoted string
+// instead of an argument vector (terminator -e) cannot be expressed here
+// and are deliberately not listed.
+const QMap<QString, QStringList> &HelperUtils::terminalArguments()
 {
-    QMap<QString, QStringList> terminals;
-
-    // List of terminals and needed arguments to launch them with an external
-    // command. The arguments end up between the terminal program and the
-    // hashcat command line, so each entry states exactly what that terminal's
-    // own parser expects. Terminals whose option takes a single shell-quoted
-    // string instead of an argument vector (terminator -e) cannot be
-    // expressed here and are deliberately not listed.
-    QMap<QString, QStringList> terminalMap = {
+    static const QMap<QString, QStringList> table = {
         {"cmd.exe", {"/k"}},
         {"xterm", {"-hold", "-e"}},
         {"gnome-terminal", {"--wait", "--"}},
         {"ptyxis", {"--"}},
         {"konsole", {"--hold", "-e"}},
-        {"xfce4-terminal", {"--hold", "-e"}},
+        {"xfce4-terminal", {"--hold", "-x"}},
         {"alacritty", {"-e"}},        // -e consumes the rest of the arguments
         {"kitty", {}},                // the program is the first positional argument
         {"foot", {}},                 // trailing arguments are run as the command
         {"wezterm", {"start", "--"}}, // wezterm start -- <program>
         {"wt.exe", {"-d", "."}},      // Windows Terminal
     };
+    return table;
+}
+
+// Returns all supported terminals
+QMap<QString, QStringList> HelperUtils::getAvailableTerminals()
+{
+    QMap<QString, QStringList> terminals;
 
     // Check which ones are actually available
-    for (auto it = terminalMap.begin(); it != terminalMap.end(); ++it) {
+    const QMap<QString, QStringList> &table = terminalArguments();
+    for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
         QString fullPath = QStandardPaths::findExecutable(it.key());
         if (!fullPath.isEmpty()) {
             terminals.insert(it.key(), it.value());
