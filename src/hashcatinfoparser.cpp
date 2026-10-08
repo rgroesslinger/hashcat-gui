@@ -25,8 +25,8 @@ bool HashcatInfoParser::parseExampleHashes(const QString &rawOutput,
 {
     setError(errorMessage, QString());
 
-    // The output is machine readable JSON - strip newlines first
-    const QJsonDocument doc = QJsonDocument::fromJson(rawOutput.simplified().toUtf8());
+    // The output is machine readable JSON; fromJson skips any whitespace
+    const QJsonDocument doc = QJsonDocument::fromJson(rawOutput.toUtf8());
     if (!doc.isObject()) {
         setError(errorMessage, tr("Invalid JSON returned from hashcat."));
         return false;
