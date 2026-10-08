@@ -5,7 +5,12 @@
 
 #include "testenvironment.h"
 
+#include <QDir>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QListWidgetItem>
+#include <QStandardPaths>
 #include <QTimer>
 #include <QWidget>
 
@@ -59,6 +64,7 @@ private slots:
     void outfileSuggestionFollowsUntilTheUserTakesOver();
     void wordlistSortSurvivesAMissingSelection();
     void commandPreviewCarriesTheBinaryName();
+    void defaultProfileRoundTrips();
 
 private:
     QString m_savedHashcatPath;
@@ -87,6 +93,12 @@ void TestMainWindow::init()
 void TestMainWindow::cleanup()
 {
     m_watchdog.stop();
+
+    // The round-trip test writes a profile into the redirected data
+    // directory, and that directory lives for the whole run: every later
+    // window would silently load whatever was left there.
+    QFile::remove(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                      .filePath(AppConstants::Files::DefaultProfile));
 
     auto &settings = SettingsManager::instance();
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, m_savedHashcatPath);
@@ -434,6 +446,53 @@ void TestMainWindow::commandPreviewCarriesTheBinaryName()
     MainWindow window;
     QCOMPARE(window.ui->lineEdit_command->text(),
              QStringLiteral("hashcat --attack-mode 0"));
+}
+
+// The profile machinery as the application uses it: saveDefaultProfile()
+// (the aboutToQuit handler) and the loadDefaultProfile() every constructor
+// runs. Two things are pinned here that no other test reaches: the command
+// preview stays out of the file, and a new window starts from the stored
+// state instead of the widget defaults.
+void TestMainWindow::defaultProfileRoundTrips()
+{
+    // A failed save or load opens a modal warning; the watchdog must be
+    // able to close it so the test fails instead of hanging until ctest's
+    // timeout.
+    m_watchdog.start();
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/hashcat/hashcat"));
+
+    MainWindow writer;
+    writer.ui->comboBox_attack->setCurrentIndex(2); // brute-force, not the default straight
+    writer.ui->spinBox_segment->setValue(64);       // not the default 32
+    writer.saveDefaultProfile();
+
+    const QString profile = writer.defaultProfileFile();
+    QVERIFY(QFile::exists(profile));
+
+    // What gets stored: the window under its class name, and without the
+    // command preview - that one is regenerated from the state on load.
+    QFile file(profile);
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    const QJsonObject root = QJsonDocument::fromJson(file.readAll()).object();
+    file.close();
+
+    const QJsonObject state =
+        root.value(QString::fromUtf8(writer.metaObject()->className())).toObject();
+    QVERIFY(!state.isEmpty());
+    QVERIFY(!state.contains(QLatin1String(AppConstants::Files::PreviewWidget)));
+    QCOMPARE(state.value(QStringLiteral("comboBox_attack")).toInt(), 2);
+
+    // A new window runs loadDefaultProfile() in its constructor...
+    MainWindow reloaded;
+    QCOMPARE(reloaded.ui->comboBox_attack->currentIndex(), 2);
+    QCOMPARE(reloaded.ui->spinBox_segment->value(), 64);
+
+    // ...and the preview reflects the restored state, not the defaults the
+    // widgets held before the profile arrived.
+    QCOMPARE(reloaded.ui->lineEdit_command->text(),
+             QStringLiteral("hashcat --attack-mode 3 --segment-size 64"));
 }
 
 int main(int argc, char *argv[])
