@@ -17,8 +17,8 @@ endif()
 
 message(STATUS "Building with CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 
-# Need at least C++17
-set(CMAKE_CXX_STANDARD 17)
+# Need at least C++20
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
