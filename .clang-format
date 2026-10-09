@@ -1,0 +1,10 @@
+BasedOnStyle: LLVM
+Standard: c++20
+IndentWidth: 4
+AccessModifierOffset: -4                   # public:/private: at column 0
+BreakBeforeBraces: Linux                   # functions Allman, control statements attached (Qt house style)
+InsertBraces: true                         # keep readability-braces-around-statements quiet (clang-format >= 15)
+BreakBeforeBinaryOperators: NonAssignment  # wrapped binary operators start the line (Qt house style)
+AllowShortFunctionsOnASingleLine: InlineOnly  # only inline functions merge onto one line (Qt house style)
+SortIncludes: Never                        # keep the hand-grouped include order
+ColumnLimit: 100                           # Qt/KDE convention

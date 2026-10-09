@@ -22,6 +22,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# The compilation database the generators support (Ninja, Makefiles) feeds
+# clang-tidy and editor integrations such as clangd. Generators without
+# support ignore the variable, so it is safe to set unconditionally.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Flags for everything this file builds - the application and the tests
 add_compile_options(-Wall -Wextra -Wpedantic)
 
@@ -59,6 +64,17 @@ set(HASHCAT_GUI_SOURCES
     src/mainwindow.ui
     src/settingsdialog.ui
 )
+
+# clang-tidy runs as part of compilation when asked for, which applies to
+# every target below - the application object library and the tests alike.
+# Off by default: the analysis slows every compile down and produces noise
+# on toolchains whose system headers it cannot follow (MinGW).
+option(ENABLE_CLANG_TIDY "Run clang-tidy during compilation" OFF)
+if(ENABLE_CLANG_TIDY)
+    find_program(CLANG_TIDY NAMES clang-tidy REQUIRED)
+    set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY})
+    message(STATUS "clang-tidy enabled: ${CLANG_TIDY}")
+endif()
 
 # The sources are built once, into an object library the application and
 # every test link against, instead of being compiled again for each target.
@@ -159,6 +175,21 @@ elseif(Qt6Test_FOUND)
         PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
 else()
     message(STATUS "Qt6 Test module not found - building without tests")
+endif()
+
+# `cmake --build build --target format` reformats the sources in place with
+# the repository's .clang-format. A machine without clang-format simply has
+# no such target.
+find_program(CLANG_FORMAT NAMES clang-format)
+if(CLANG_FORMAT)
+    file(GLOB FORMAT_SOURCES CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h)
+    add_custom_target(format
+        COMMAND ${CLANG_FORMAT} -i ${FORMAT_SOURCES}
+        COMMENT "Formatting sources with clang-format")
 endif()
 
 install(TARGETS hashcat-gui RUNTIME DESTINATION bin)
