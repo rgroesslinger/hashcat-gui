@@ -10,7 +10,7 @@
 #include <QCoreApplication>
 #include <QFile>
 #include <QTemporaryDir>
-#include <QtTest>
+#include <QtTest/QTest>
 
 // Scratch base directories for a test process.
 //

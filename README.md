@@ -80,6 +80,18 @@ cmake -B build
 cmake --build build
 ```
 
+### Build targets
+
+The custom targets below are invoked with `cmake --build build --target <name>`. Each is only defined when the tool it needs is installed, so a build without them is unaffected.
+
+| Target | Effect | Requires |
+| - | - | - |
+| `update_translations` | Refresh the `translations/*.ts` catalogs after a `tr()` change | Qt6 LinguistTools |
+| `format` | Reformat all sources in place | clang-format |
+| `clazy` | Run the clazy Qt checks over the sources | clazy-standalone |
+
+Each target is described in more detail where it is used: [Translations](#translations) covers `update_translations`, [Code style](#code-style) covers `format` and `clazy`.
+
 ### Tests
 
 Run the tests after building:
@@ -122,3 +134,11 @@ cmake --build build
 ```
 
 Its findings are warnings rather than errors, so the build still succeeds. Editor tooling that understands a compile database is served by the `compile_commands.json` CMake already writes into the build directory.
+
+`clazy` analyzes the same sources for Qt-specific issues. It runs as a target instead of part of the build, so the analysis only happens on demand:
+
+```
+cmake --build build --target clazy
+```
+
+The `clazy` target exists only when `clazy-standalone` is installed and checks `level0` and `level1` by default. Building the whole project with `-DCMAKE_CXX_COMPILER=clazy` instead runs the same checks on every compilation.

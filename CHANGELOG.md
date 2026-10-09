@@ -11,7 +11,7 @@
 - Refactored default values and magic numbers in `src/appconstants.h` (#10)
 - `HashcatOptions` and `CommandBuilder`: the command line is built from a UI-independent description, and the gating rules (`attackUsesMask()`, `attackUsesWordlists()`, `attackUsesRules()`) live in one place that the main window's group boxes use too, so the visible options and the generated command cannot disagree
 - CI builds the translations, runs the tests and fails when the catalogs are out of step with the sources
-- Added `clang-format` and `clang-tidy` tooling
+- Added `clang-format`, `clang-tidy` and `clazy` tooling
 - The GUI now refuses to start hashcat when the configuration is incomplete instead of failing silently
 - A terminal that cannot be started (wrong path, permissions) now reports an error instead of failing silently
 - Profile errors are reported through an error message returned to the caller rather than the serializer opening its own dialog, so a failed profile load at start-up is reported as well

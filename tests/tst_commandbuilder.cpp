@@ -161,9 +161,10 @@ void TestCommandBuilder::shortFallsBackToLong()
     // empty argument, which hashcat would read as a stray operand
     const QStringList expected{"-m", "1000",           "-a", "0", "--remove", "--username", "-w",
                                "2",  "--cpu-affinity", "1-4"};
-    QCOMPARE(CommandBuilder::build(options), expected);
+    const QStringList arguments = CommandBuilder::build(options);
+    QCOMPARE(arguments, expected);
 
-    for (const QString &argument : CommandBuilder::build(options)) {
+    for (const QString &argument : arguments) {
         QVERIFY2(!argument.isEmpty(), "build() produced an empty argument");
     }
 }

@@ -177,19 +177,42 @@ else()
     message(STATUS "Qt6 Test module not found - building without tests")
 endif()
 
+# The source files the tooling targets. clazy analyzes headers as part of
+# their translation units, so its target uses the .cpp globs only.
+file(GLOB PROJECT_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h)
+file(GLOB CLAZY_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
+
 # `cmake --build build --target format` reformats the sources in place with
 # the repository's .clang-format. A machine without clang-format simply has
 # no such target.
 find_program(CLANG_FORMAT NAMES clang-format)
 if(CLANG_FORMAT)
-    file(GLOB FORMAT_SOURCES CONFIGURE_DEPENDS
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h)
     add_custom_target(format
-        COMMAND ${CLANG_FORMAT} -i ${FORMAT_SOURCES}
+        COMMAND ${CLANG_FORMAT} -i ${PROJECT_SOURCES}
         COMMENT "Formatting sources with clang-format")
+endif()
+
+# `cmake --build build --target clazy` runs clazy over the sources using the
+# compilation database, in the same spirit as the format target. clazy has no
+# config file of its own; the check selection lives in the CLAZY_CHECKS cache
+# variable, and CLAZY_IGNORE_DIRS keeps the report on this project's files
+# instead of Qt's headers. A machine without clazy simply has no such target.
+find_program(CLAZY_STANDALONE NAMES clazy-standalone)
+if(CLAZY_STANDALONE)
+    set(CLAZY_CHECKS "level0,level1" CACHE STRING
+        "clazy checks to run (levels and/or check names, comma-separated)")
+    add_custom_target(clazy
+        COMMAND ${CMAKE_COMMAND} -E env "CLAZY_IGNORE_DIRS=.*/usr/include.*"
+                ${CLAZY_STANDALONE} --checks=${CLAZY_CHECKS}
+                -p ${CMAKE_BINARY_DIR}/compile_commands.json
+                ${CLAZY_SOURCES}
+        COMMENT "Running clazy over the sources")
 endif()
 
 install(TARGETS hashcat-gui RUNTIME DESTINATION bin)

@@ -7,6 +7,7 @@
 
 #include <QDir>
 #include <QMessageBox>
+#include <QTimer>
 
 #include "appconstants.h"
 #include "settingsdialog.h"
