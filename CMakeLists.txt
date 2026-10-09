@@ -65,17 +65,6 @@ set(HASHCAT_GUI_SOURCES
     src/settingsdialog.ui
 )
 
-# clang-tidy runs as part of compilation when asked for, which applies to
-# every target below - the application object library and the tests alike.
-# Off by default: the analysis slows every compile down and produces noise
-# on toolchains whose system headers it cannot follow (MinGW).
-option(ENABLE_CLANG_TIDY "Run clang-tidy during compilation" OFF)
-if(ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY NAMES clang-tidy REQUIRED)
-    set(CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY})
-    message(STATUS "clang-tidy enabled: ${CLANG_TIDY}")
-endif()
-
 # The sources are built once, into an object library the application and
 # every test link against, instead of being compiled again for each target.
 # Object files rather than a static library: that puts the qrc objects and
@@ -177,23 +166,23 @@ else()
     message(STATUS "Qt6 Test module not found - building without tests")
 endif()
 
-# The source files the tooling targets. clazy analyzes headers as part of
-# their translation units, so its target uses the .cpp globs only.
+# The source files the tooling targets. The analyzers work on the .cpp globs
+# only - headers are analyzed as part of their translation units.
 file(GLOB PROJECT_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h)
-file(GLOB CLAZY_SOURCES CONFIGURE_DEPENDS
+file(GLOB ANALYSIS_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
 
-# `cmake --build build --target format` reformats the sources in place with
-# the repository's .clang-format. A machine without clang-format simply has
-# no such target.
+# `cmake --build build --target clang-format` reformats the sources in place
+# with the repository's .clang-format. A machine without clang-format simply
+# has no such target.
 find_program(CLANG_FORMAT NAMES clang-format)
 if(CLANG_FORMAT)
-    add_custom_target(format
+    add_custom_target(clang-format
         COMMAND ${CLANG_FORMAT} -i ${PROJECT_SOURCES}
         COMMENT "Formatting sources with clang-format")
 endif()
@@ -211,8 +200,19 @@ if(CLAZY_STANDALONE)
         COMMAND ${CMAKE_COMMAND} -E env "CLAZY_IGNORE_DIRS=.*/usr/include.*"
                 ${CLAZY_STANDALONE} --checks=${CLAZY_CHECKS}
                 -p ${CMAKE_BINARY_DIR}/compile_commands.json
-                ${CLAZY_SOURCES}
+                ${ANALYSIS_SOURCES}
         COMMENT "Running clazy over the sources")
+endif()
+
+# `cmake --build build --target clang-tidy` runs clang-tidy over the sources
+# using the compilation database. The .clang-tidy file selects the checks and
+# the header filter, so this target needs no cache variable of its own. A
+# machine without clang-tidy simply has no such target.
+find_program(CLANG_TIDY NAMES clang-tidy)
+if(CLANG_TIDY)
+    add_custom_target(clang-tidy
+        COMMAND ${CLANG_TIDY} -quiet -p ${CMAKE_BINARY_DIR} ${ANALYSIS_SOURCES}
+        COMMENT "Running clang-tidy over the sources")
 endif()
 
 install(TARGETS hashcat-gui RUNTIME DESTINATION bin)

@@ -26,25 +26,10 @@ Windows packages are available from the [release page](https://github.com/rgroes
 Clone the repository:
 
 ```
-git clone https://github.com/rgoesslinger/hashcat-gui
+git clone https://github.com/rgroesslinger/hashcat-gui
 ```
 
-Alternatively, download the latest [source release](https://github.com/rgoesslinger/hashcat-gui/releases/). If you have a working Qt Creator setup you can open `CMakeLists.txt` and choose `Build ➔ Run`.
-
-### Configuration options
-
-All options are passed at configure time (`cmake -B build -D...`). The defaults suit a normal build, so you only need to set them if you want something else.
-
-| Option | Values | Default | Effect |
-| - | - | - | - |
-| `BUILD_TESTING` | `ON`, `OFF` | `ON` | Build and register the test binaries. See [Tests](#tests). |
-| `ENABLE_CLANG_TIDY` | `ON`, `OFF` | `OFF` | Run clang-tidy during compilation. See [Code style](#code-style). |
-
-Example:
-
-```
-cmake -B build -DBUILD_TESTING=OFF
-```
+Alternatively, download the latest [source release](https://github.com/rgroesslinger/hashcat-gui/releases/). If you have a working Qt Creator setup you can open `CMakeLists.txt` and choose `Build ➔ Run`.
 
 ### Linux
 
@@ -87,10 +72,11 @@ The custom targets below are invoked with `cmake --build build --target <name>`.
 | Target | Effect | Requires |
 | - | - | - |
 | `update_translations` | Refresh the `translations/*.ts` catalogs after a `tr()` change | Qt6 LinguistTools |
-| `format` | Reformat all sources in place | clang-format |
+| `clang-format` | Reformat all sources in place | clang-format |
+| `clang-tidy` | Run the clang-tidy checks over the sources | clang-tidy |
 | `clazy` | Run the clazy Qt checks over the sources | clazy-standalone |
 
-Each target is described in more detail where it is used: [Translations](#translations) covers `update_translations`, [Code style](#code-style) covers `format` and `clazy`.
+Each target is described in more detail where it is used: [Translations](#translations) covers `update_translations`, [Code style](#code-style) covers `clang-format`, `clang-tidy` and `clazy`.
 
 ### Tests
 
@@ -121,24 +107,21 @@ A normal build already recompiles them to `.qm`. CI runs the refresh and fails i
 `.clang-format` encodes the project's style conventions. To reformat the sources in place:
 
 ```
-cmake --build build --target format
+cmake --build build --target clang-format
 ```
 
-The `format` target is only defined when `clang-format` is installed; without it the build is unaffected.
-
-`.clang-tidy` runs as part of compilation but is off by default. Turn it on when configuring:
+`.clang-tidy` runs over the whole tree from a target:
 
 ```
-cmake -B build -DENABLE_CLANG_TIDY=ON
-cmake --build build
+cmake --build build --target clang-tidy
 ```
 
 Its findings are warnings rather than errors, so the build still succeeds. Editor tooling that understands a compile database is served by the `compile_commands.json` CMake already writes into the build directory.
 
-`clazy` analyzes the same sources for Qt-specific issues. It runs as a target instead of part of the build, so the analysis only happens on demand:
+`clazy` analyzes the same sources for Qt-specific issues:
 
 ```
 cmake --build build --target clazy
 ```
 
-The `clazy` target exists only when `clazy-standalone` is installed and checks `level0` and `level1` by default. Building the whole project with `-DCMAKE_CXX_COMPILER=clazy` instead runs the same checks on every compilation.
+The `clazy` target checks `level0` and `level1` by default.
