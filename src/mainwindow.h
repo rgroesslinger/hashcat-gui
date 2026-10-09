@@ -14,8 +14,9 @@
 #include "hashcatoptions.h"
 #include "helperutils.h"
 
-namespace Ui {
-    class MainWindow;
+namespace Ui
+{
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -24,7 +25,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow() override;
 
 private slots:
     // menu actions

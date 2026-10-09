@@ -13,32 +13,34 @@
 #include <QFuture>
 #include <QtConcurrent/QtConcurrentRun>
 
-// Mapping of supported command line options
-const QMap<HelperUtils::Parameter, QPair<QString, QString>> HelperUtils::parameterMap = {
-    {HelperUtils::Parameter::AttackMode,        {"-a",  "--attack-mode"}},
-    {HelperUtils::Parameter::BackendDevices,    {"-d",  "--backend-devices"}},
-    {HelperUtils::Parameter::CpuAffinity,       {"",    "--cpu-affinity"}},
-    {HelperUtils::Parameter::CustomCharset1,    {"-1",  "--custom-charset1"}},
-    {HelperUtils::Parameter::CustomCharset2,    {"-2",  "--custom-charset2"}},
-    {HelperUtils::Parameter::CustomCharset3,    {"-3",  "--custom-charset3"}},
-    {HelperUtils::Parameter::CustomCharset4,    {"-4",  "--custom-charset4"}},
-    {HelperUtils::Parameter::GenerateRules,     {"-g",  "--generate-rules"}},
-    {HelperUtils::Parameter::HashType,          {"-m",  "--hash-type"}},
-    {HelperUtils::Parameter::HexCharset,        {"",    "--hex-charset"}},
-    {HelperUtils::Parameter::HexSalt,           {"",    "--hex-salt"}},
-    {HelperUtils::Parameter::OptimizedKernel,   {"-O",  "--optimized-kernel-enable"}},
-    {HelperUtils::Parameter::Outfile,           {"-o",  "--outfile"}},
-    {HelperUtils::Parameter::OutfileFormat,     {"",    "--outfile-format"}},
-    {HelperUtils::Parameter::Remove,            {"",    "--remove"}},
-    {HelperUtils::Parameter::RulesFile,         {"-r",  "--rules-file"}},
-    {HelperUtils::Parameter::SegmentSize,       {"-c",  "--segment-size"}},
-    {HelperUtils::Parameter::SpeedOnly,         {"",    "--speed-only"}},
-    {HelperUtils::Parameter::Username,          {"",    "--username"}},
-    {HelperUtils::Parameter::WorkloadProfile,   {"-w",  "--workload-profile"}},
-};
-
 QString HelperUtils::getParameter(Parameter key, bool useShort)
 {
+    // Built once, on first call: a namespace-scope QMap with runtime
+    // initialization could throw during pre-main static initialization and
+    // end in std::terminate, so the table is a deferred function-local static.
+    static const QMap<Parameter, QPair<QString, QString>> parameterMap = {
+        {Parameter::AttackMode, {"-a", "--attack-mode"}},
+        {Parameter::BackendDevices, {"-d", "--backend-devices"}},
+        {Parameter::CpuAffinity, {"", "--cpu-affinity"}},
+        {Parameter::CustomCharset1, {"-1", "--custom-charset1"}},
+        {Parameter::CustomCharset2, {"-2", "--custom-charset2"}},
+        {Parameter::CustomCharset3, {"-3", "--custom-charset3"}},
+        {Parameter::CustomCharset4, {"-4", "--custom-charset4"}},
+        {Parameter::GenerateRules, {"-g", "--generate-rules"}},
+        {Parameter::HashType, {"-m", "--hash-type"}},
+        {Parameter::HexCharset, {"", "--hex-charset"}},
+        {Parameter::HexSalt, {"", "--hex-salt"}},
+        {Parameter::OptimizedKernel, {"-O", "--optimized-kernel-enable"}},
+        {Parameter::Outfile, {"-o", "--outfile"}},
+        {Parameter::OutfileFormat, {"", "--outfile-format"}},
+        {Parameter::Remove, {"", "--remove"}},
+        {Parameter::RulesFile, {"-r", "--rules-file"}},
+        {Parameter::SegmentSize, {"-c", "--segment-size"}},
+        {Parameter::SpeedOnly, {"", "--speed-only"}},
+        {Parameter::Username, {"", "--username"}},
+        {Parameter::WorkloadProfile, {"-w", "--workload-profile"}},
+    };
+
     auto it = parameterMap.constFind(key);
     if (it == parameterMap.constEnd()) {
         // Every enumerator has an entry above, but dereferencing end() would
@@ -70,11 +72,13 @@ QString HelperUtils::getParameter(Parameter key, bool useShort)
  * });
  * watcher->setFuture(HelperUtils::executeHashcat(QStringList() << "--help"));
  */
-QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int timeoutMs) {
+QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int timeoutMs)
+{
     // QSettings is only reentrant. The lambda below runs on the thread pool,
     // where reading the settings could race with the GUI thread writing them,
     // so read the path once on the calling thread and capture it by value.
-    const QString hashcatPath = SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    const QString hashcatPath =
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 
     return QtConcurrent::run([args, timeoutMs, hashcatPath]() -> HashcatResult {
         HashcatResult result;

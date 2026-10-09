@@ -23,7 +23,8 @@
 // main(), before SettingsManager's singleton exists. Both are therefore
 // destroyed in reverse order of that: the singleton first, the directories
 // last, so nothing ever writes into a directory that is already gone.
-namespace TestEnvironment {
+namespace TestEnvironment
+{
 
 inline QTemporaryDir &configHome()
 {
@@ -77,7 +78,7 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
         return {};
     }
 
-    const QString path = dir.filePath(name);
+    QString path = dir.filePath(name);
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         return {};

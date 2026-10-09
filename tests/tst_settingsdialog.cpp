@@ -50,8 +50,9 @@ public:
                 // selectFile() leaves the file name alone while its edit has
                 // focus - and the dialog opens with exactly that focus - so
                 // let go of it first or the pick never takes.
-                if (QWidget *focused = fileDialog->focusWidget())
+                if (QWidget *focused = fileDialog->focusWidget()) {
                     focused->clearFocus();
+                }
                 if (!fileDialog->selectedFiles().contains(pickFile)) {
                     // A native file dialog applies the pick asynchronously and
                     // may still be offering what an earlier dialog in this
@@ -147,8 +148,7 @@ void TestSettingsDialog::languageComboStoresLocaleCodes()
         QCOMPARE(dialog.ui->comboBox_language->itemData(i + 1).toString(),
                  QString::fromUtf8(language.code));
         // shown in the language's own name, not an English word for it
-        QCOMPARE(dialog.ui->comboBox_language->itemText(i + 1),
-                 QString::fromUtf8(language.name));
+        QCOMPARE(dialog.ui->comboBox_language->itemText(i + 1), QString::fromUtf8(language.name));
     }
 
     // Move to "Deutsch" and save: the stored value is the code, not the
@@ -173,8 +173,7 @@ void TestSettingsDialog::languageComboStoresLocaleCodes()
 // dialog alone must not rewrite the stored value behind the user's back.
 void TestSettingsDialog::unknownLanguageCodeFallsBackToSystemDefault()
 {
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language,
-                                       QStringLiteral("fr"));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language, QStringLiteral("fr"));
 
     SettingsDialog dialog;
     QCOMPARE(dialog.ui->comboBox_language->currentIndex(), 0);
@@ -190,8 +189,7 @@ void TestSettingsDialog::unknownLanguageCodeFallsBackToSystemDefault()
 // of the key to something the user never picked.
 void TestSettingsDialog::staleLanguageCodeDoesNotDemandARestart()
 {
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language,
-                                       QStringLiteral("fr"));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language, QStringLiteral("fr"));
 
     SettingsDialog dialog;
     dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/opt/somewhere/hashcat"));
@@ -218,8 +216,7 @@ void TestSettingsDialog::selectPathClickedAcceptsAnExecutable()
     QSKIP("Windows opens a real file dialog that nothing here can drive");
 #else
     const QString stub =
-        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat.bin"),
-                                        "#!/bin/sh\nexit 0\n");
+        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat.bin"), "#!/bin/sh\nexit 0\n");
     QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
 
     SettingsDialog dialog;

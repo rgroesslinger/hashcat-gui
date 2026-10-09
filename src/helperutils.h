@@ -13,6 +13,8 @@
 #include <QProcess>
 #include <QFuture>
 
+#include <cstdint>
+
 #include "appconstants.h"
 
 // Result of a single hashcat invocation.
@@ -35,8 +37,7 @@ class HelperUtils
 
 public:
     // Valid command line parameters
-    enum class Parameter
-    {
+    enum class Parameter : std::uint8_t {
         AttackMode,
         BackendDevices,
         CpuAffinity,
@@ -60,8 +61,7 @@ public:
     };
 
     // What can keep the Execute button from starting anything
-    enum class LaunchError
-    {
+    enum class LaunchError : std::uint8_t {
         None,
         NoHashFile,         // no hash file selected
         NoHashcatPath,      // the hashcat path was never configured
@@ -76,13 +76,13 @@ public:
     // detail receives the offending value - the missing path, or the
     // terminals that would work - when it is not nullptr. Keeping this out of
     // MainWindow means the conditions can be tested without showing dialogs.
-    static LaunchError validateLaunch(const QString &hashFile,
-                                      const QString &hashcatPath,
+    static LaunchError validateLaunch(const QString &hashFile, const QString &hashcatPath,
                                       const QString &configuredTerminal,
                                       const QStringList &availableTerminals,
                                       QString *detail = nullptr);
 
-    static QFuture<HashcatResult> executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
+    static QFuture<HashcatResult>
+    executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
 
     // Every supported terminal and the arguments that belong between the
     // terminal program and the hashcat command line. Pure data - nothing
@@ -91,9 +91,6 @@ public:
 
     static QMap<QString, QStringList> getAvailableTerminals();
     static QString getParameter(Parameter key, bool useShort = false);
-
-private:
-    static const QMap<Parameter, QPair<QString, QString>> parameterMap;
 };
 
 #endif // HELPERUTILS_H

@@ -8,18 +8,18 @@
 
 #include <QString>
 #include <QStringList>
+#include <cstdint>
 
 #include "appconstants.h"
 
 // Supported attack modes, as numbered by hashcat (-a).
-enum class AttackMode : int
-{
-    Straight       = 0,
-    Combination    = 1,
-    BruteForce     = 3,
+enum class AttackMode : std::uint8_t {
+    Straight = 0,
+    Combination = 1,
+    BruteForce = 3,
     HybridWordMask = 6,
     HybridMaskWord = 7,
-    Association    = 9
+    Association = 9
 };
 
 // One UI independent description of a hashcat invocation.
@@ -34,8 +34,7 @@ enum class AttackMode : int
 // The member defaults are what the widgets in mainwindow.ui start with, so a
 // default constructed HashcatOptions produces exactly the command line the
 // freshly opened main window previews.
-struct HashcatOptions
-{
+struct HashcatOptions {
     bool useShortParameters = false;
 
     // -1 while no hash type is selected: -m is then left out
@@ -60,8 +59,7 @@ struct HashcatOptions
     QString workloadProfile;
     bool optimizedKernel = false;
 
-    struct Charset
-    {
+    struct Charset {
         bool enabled = false;
         QString value;
     };

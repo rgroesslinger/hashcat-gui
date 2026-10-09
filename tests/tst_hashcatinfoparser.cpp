@@ -55,8 +55,8 @@ void TestHashcatInfoParser::errorIsClearedOnSuccess()
     QString errorMessage = QStringLiteral("left over from an earlier failure");
     QMap<quint32, QString> hashModes;
 
-    QVERIFY(HashcatInfoParser::parseExampleHashes(
-        QStringLiteral(R"({"0":{"name":"MD5"}})"), hashModes, &errorMessage));
+    QVERIFY(HashcatInfoParser::parseExampleHashes(QStringLiteral(R"({"0":{"name":"MD5"}})"),
+                                                  hashModes, &errorMessage));
     QVERIFY(errorMessage.isEmpty());
 }
 
@@ -65,9 +65,9 @@ void TestHashcatInfoParser::errorIsClearedOnSuccess()
 // overflows - if it ever wrapped to 0 the value check below would catch it.
 void TestHashcatInfoParser::nonNumericKeysAreSkipped()
 {
-    const QString raw = QStringLiteral(
-        R"({"md5":{"name":"MD5"},"0":{"name":"MD5"},)"
-        R"("4294967295":{"name":"Top"},"4294967296":{"name":"Overflow"}})");
+    const QString raw =
+        QStringLiteral(R"({"md5":{"name":"MD5"},"0":{"name":"MD5"},)"
+                       R"("4294967295":{"name":"Top"},"4294967296":{"name":"Overflow"}})");
 
     QMap<quint32, QString> hashModes;
     QVERIFY(HashcatInfoParser::parseExampleHashes(raw, hashModes));
@@ -80,8 +80,7 @@ void TestHashcatInfoParser::nonNumericKeysAreSkipped()
 // or a whole entry that is not an object.
 void TestHashcatInfoParser::entriesWithoutANameAreSkipped()
 {
-    const QString raw = QStringLiteral(
-        R"({"0":{"name":"MD5"},"1":{"name":""},"2":{},"3":"MD5"})");
+    const QString raw = QStringLiteral(R"({"0":{"name":"MD5"},"1":{"name":""},"2":{},"3":"MD5"})");
 
     QMap<quint32, QString> hashModes;
     QVERIFY(HashcatInfoParser::parseExampleHashes(raw, hashModes));
@@ -94,8 +93,7 @@ void TestHashcatInfoParser::entriesWithoutANameAreSkipped()
 // combo box, so it has to be an error instead.
 void TestHashcatInfoParser::unusableReplyIsRejected()
 {
-    const QString raw = QStringLiteral(
-        R"({"abc":{"name":"MD5"},"1":{"name":""},"2":{}})");
+    const QString raw = QStringLiteral(R"({"abc":{"name":"MD5"},"1":{"name":""},"2":{}})");
 
     QMap<quint32, QString> hashModes;
     QString errorMessage;
@@ -113,12 +111,12 @@ void TestHashcatInfoParser::invalidReplyIsRejected()
     QMap<quint32, QString> hashModes;
     QString errorMessage;
 
-    QVERIFY(!HashcatInfoParser::parseExampleHashes(
-        QStringLiteral("Segmentation fault"), hashModes, &errorMessage));
+    QVERIFY(!HashcatInfoParser::parseExampleHashes(QStringLiteral("Segmentation fault"), hashModes,
+                                                   &errorMessage));
     QVERIFY(!errorMessage.isEmpty());
 
-    QVERIFY(!HashcatInfoParser::parseExampleHashes(
-        QStringLiteral(R"([{"0":{"name":"MD5"}}])"), hashModes, &errorMessage));
+    QVERIFY(!HashcatInfoParser::parseExampleHashes(QStringLiteral(R"([{"0":{"name":"MD5"}}])"),
+                                                   hashModes, &errorMessage));
 
     QVERIFY(!HashcatInfoParser::parseExampleHashes(QStringLiteral("nope"), hashModes));
 }
@@ -131,8 +129,8 @@ void TestHashcatInfoParser::failedParseKeepsThePreviousList()
     QMap<quint32, QString> hashModes{{quint32(0), QStringLiteral("0 | MD5")}};
     QString errorMessage;
 
-    QVERIFY(!HashcatInfoParser::parseExampleHashes(
-        QStringLiteral("garbage"), hashModes, &errorMessage));
+    QVERIFY(!HashcatInfoParser::parseExampleHashes(QStringLiteral("garbage"), hashModes,
+                                                   &errorMessage));
     QCOMPARE(hashModes.size(), 1);
     QCOMPARE(hashModes.value(0), QStringLiteral("0 | MD5"));
 }

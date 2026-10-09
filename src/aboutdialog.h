@@ -8,8 +8,9 @@
 
 #include <QDialog>
 
-namespace Ui {
-    class AboutDialog;
+namespace Ui
+{
+class AboutDialog;
 }
 
 class AboutDialog : public QDialog
@@ -18,7 +19,7 @@ class AboutDialog : public QDialog
 
 public:
     explicit AboutDialog(QWidget *parent = nullptr);
-    ~AboutDialog();
+    ~AboutDialog() override;
     void updateVersionLabel();
 
 private slots:

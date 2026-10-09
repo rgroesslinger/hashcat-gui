@@ -26,7 +26,8 @@ public:
     // does not open a dialog: callers decide how to present a failure, and
     // the class stays usable from unit tests.
     bool saveStateToFile(const QString &key, const QWidget *widget, const QString &filename,
-                         const QStringList &ignoredWidgets = {}, QString *errorMessage = nullptr) const;
+                         const QStringList &ignoredWidgets = {},
+                         QString *errorMessage = nullptr) const;
 
     // Restore the state of widget from a profile file.
     //

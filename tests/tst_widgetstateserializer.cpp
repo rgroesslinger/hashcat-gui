@@ -33,12 +33,12 @@ private slots:
     void errorIsClearedOnSuccess();
 };
 
-namespace {
+namespace
+{
 
 // One of every widget type the serializer understands, under object names a
 // real profile would carry.
-struct Form
-{
+struct Form {
     Form()
     {
         lineEdit = new QLineEdit(&widget);
@@ -49,8 +49,8 @@ struct Form
 
         comboBox = new QComboBox(&widget);
         comboBox->setObjectName(QStringLiteral("comboBox_language"));
-        comboBox->addItems({QStringLiteral("English"), QStringLiteral("Deutsch"),
-                            QStringLiteral("Srpski")});
+        comboBox->addItems(
+            {QStringLiteral("English"), QStringLiteral("Deutsch"), QStringLiteral("Srpski")});
 
         radioButton = new QRadioButton(&widget);
         radioButton->setObjectName(QStringLiteral("radioButton_plain"));
@@ -136,7 +136,8 @@ void TestWidgetStateSerializer::ignoredWidgetsAreNotSaved()
 
     WidgetStateSerializer serializer;
     QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("ignored-save.json"));
+    const QString file =
+        TestEnvironment::configHome().filePath(QStringLiteral("ignored-save.json"));
 
     QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file,
                                         {QStringLiteral("lineEdit_command")}, &errorMessage),
@@ -159,7 +160,8 @@ void TestWidgetStateSerializer::ignoredWidgetsAreNotRestored()
 
     WidgetStateSerializer serializer;
     QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("ignored-load.json"));
+    const QString file =
+        TestEnvironment::configHome().filePath(QStringLiteral("ignored-load.json"));
     QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
                                         &errorMessage),
              qPrintable(errorMessage));
@@ -222,7 +224,8 @@ void TestWidgetStateSerializer::missingProfileIsRejected()
 
     WidgetStateSerializer serializer;
     QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("other-profile.json"));
+    const QString file =
+        TestEnvironment::configHome().filePath(QStringLiteral("other-profile.json"));
     QVERIFY2(serializer.saveStateToFile(QStringLiteral("other"), &source.widget, file, {},
                                         &errorMessage),
              qPrintable(errorMessage));

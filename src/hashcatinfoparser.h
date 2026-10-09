@@ -26,8 +26,7 @@ public:
     // (when that is not nullptr) when the reply cannot be used. hashModes is
     // left untouched on failure so a failed refresh does not throw away a
     // list that is still on screen.
-    static bool parseExampleHashes(const QString &rawOutput,
-                                   QMap<quint32, QString> &hashModes,
+    static bool parseExampleHashes(const QString &rawOutput, QMap<quint32, QString> &hashModes,
                                    QString *errorMessage = nullptr);
 };
 

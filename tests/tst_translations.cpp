@@ -58,9 +58,9 @@ void TestTranslations::everyOfferedLanguageIsEmbedded()
         if (code == QStringLiteral("en")) {
             continue;
         }
-        QVERIFY2(QFile::exists(QStringLiteral(":/i18n/hashcat-gui_%1.qm").arg(code)),
-                 qPrintable(QStringLiteral("the offered language \"%1\" has no catalog")
-                                .arg(code)));
+        QVERIFY2(
+            QFile::exists(QStringLiteral(":/i18n/hashcat-gui_%1.qm").arg(code)),
+            qPrintable(QStringLiteral("the offered language \"%1\" has no catalog").arg(code)));
     }
 }
 
@@ -87,10 +87,9 @@ void TestTranslations::everyEmbeddedCatalogIsOffered()
                 break;
             }
         }
-        QVERIFY2(offered,
-                 qPrintable(QStringLiteral("the catalog \"%1\" is not offered by the "
-                                           "settings dialog")
-                                .arg(catalog)));
+        QVERIFY2(offered, qPrintable(QStringLiteral("the catalog \"%1\" is not offered by the "
+                                                    "settings dialog")
+                                         .arg(catalog)));
     }
 }
 

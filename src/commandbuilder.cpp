@@ -10,7 +10,8 @@
 #include <QDateTime>
 #include <QFileInfo>
 
-namespace {
+namespace
+{
 
 // Short or long form of a hashcat option
 QString parameter(HelperUtils::Parameter key, bool useShort)
@@ -23,9 +24,8 @@ QString parameter(HelperUtils::Parameter key, bool useShort)
 // True when the attack mode reads a mask
 bool CommandBuilder::attackUsesMask(AttackMode mode)
 {
-    return mode == AttackMode::BruteForce
-        || mode == AttackMode::HybridWordMask
-        || mode == AttackMode::HybridMaskWord;
+    return mode == AttackMode::BruteForce || mode == AttackMode::HybridWordMask
+           || mode == AttackMode::HybridMaskWord;
 }
 
 // True when the attack mode takes dictionaries (attack mode 3 takes only the
@@ -44,9 +44,11 @@ bool CommandBuilder::attackUsesRules(AttackMode mode)
 QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QString &hashFile)
 {
     QString outfile = tmplate;
-    outfile.replace(AppConstants::Placeholders::UnixTime,
-                     QString::number(QDateTime::currentMSecsSinceEpoch() / AppConstants::MsecsPerSecond));
-    outfile.replace(AppConstants::Placeholders::Hash, QFileInfo(hashFile).fileName(), Qt::CaseInsensitive);
+    outfile.replace(
+        AppConstants::Placeholders::UnixTime,
+        QString::number(QDateTime::currentMSecsSinceEpoch() / AppConstants::MsecsPerSecond));
+    outfile.replace(AppConstants::Placeholders::Hash, QFileInfo(hashFile).fileName(),
+                    Qt::CaseInsensitive);
     return outfile;
 }
 
@@ -58,10 +60,12 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
 
     // hash type - left out while none is selected
     if (options.hashType >= 0) {
-        arguments << parameter(HelperUtils::Parameter::HashType, useShort) << QString::number(options.hashType);
+        arguments << parameter(HelperUtils::Parameter::HashType, useShort)
+                  << QString::number(options.hashType);
     }
 
-    arguments << parameter(HelperUtils::Parameter::AttackMode, useShort) << QString::number(static_cast<int>(mode));
+    arguments << parameter(HelperUtils::Parameter::AttackMode, useShort)
+              << QString::number(static_cast<int>(mode));
 
     if (options.remove) {
         arguments << parameter(HelperUtils::Parameter::Remove, useShort);
@@ -77,7 +81,8 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
             arguments << parameter(HelperUtils::Parameter::RulesFile, useShort) << rulesFile;
         }
         if (options.rulesFiles.isEmpty() && options.generateRules > 0) {
-            arguments << parameter(HelperUtils::Parameter::GenerateRules, useShort) << QString::number(options.generateRules);
+            arguments << parameter(HelperUtils::Parameter::GenerateRules, useShort)
+                      << QString::number(options.generateRules);
         }
     }
 
@@ -103,7 +108,8 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     }
 
     if (!options.workloadProfile.isEmpty()) {
-        arguments << parameter(HelperUtils::Parameter::WorkloadProfile, useShort) << options.workloadProfile;
+        arguments << parameter(HelperUtils::Parameter::WorkloadProfile, useShort)
+                  << options.workloadProfile;
     }
 
     if (options.optimizedKernel) {
@@ -143,19 +149,24 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     }
 
     if (options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
-        arguments << parameter(HelperUtils::Parameter::OutfileFormat, useShort) << options.outfileFormat;
+        arguments << parameter(HelperUtils::Parameter::OutfileFormat, useShort)
+                  << options.outfileFormat;
     }
 
     if (!options.cpuAffinity.isEmpty()) {
-        arguments << parameter(HelperUtils::Parameter::CpuAffinity, useShort) << options.cpuAffinity;
+        arguments << parameter(HelperUtils::Parameter::CpuAffinity, useShort)
+                  << options.cpuAffinity;
     }
 
-    if (!options.backendDevices.isEmpty() && options.backendDevices != AppConstants::Defaults::BackendDevices) {
-        arguments << parameter(HelperUtils::Parameter::BackendDevices, useShort) << options.backendDevices;
+    if (!options.backendDevices.isEmpty()
+        && options.backendDevices != AppConstants::Defaults::BackendDevices) {
+        arguments << parameter(HelperUtils::Parameter::BackendDevices, useShort)
+                  << options.backendDevices;
     }
 
     if (options.segmentSize != AppConstants::Defaults::SegmentSize) {
-        arguments << parameter(HelperUtils::Parameter::SegmentSize, useShort) << QString::number(options.segmentSize);
+        arguments << parameter(HelperUtils::Parameter::SegmentSize, useShort)
+                  << QString::number(options.segmentSize);
     }
 
     if (!options.hashFile.isEmpty()) {

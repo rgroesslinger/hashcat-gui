@@ -27,8 +27,7 @@ static void setError(QString *errorMessage, const QString &text)
     }
 }
 
-WidgetStateSerializer::WidgetStateSerializer(QObject *parent)
-    : QObject(parent)
+WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent)
 {
 }
 
@@ -75,7 +74,7 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
         const auto items = listWidget->findItems(QString("*"), Qt::MatchWildcard);
         for (const QListWidgetItem *item : items) {
             QJsonObject li;
-            li["text"]    = item->text();
+            li["text"] = item->text();
             li["checked"] = (item->checkState() == Qt::Checked);
             list.append(li);
         }
@@ -103,38 +102,44 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
     // simple widgets
     auto const lineEdits = w->findChildren<QLineEdit *>();
     for (QLineEdit *lineEdit : lineEdits) {
-        if (mutableObj.contains(lineEdit->objectName()))
+        if (mutableObj.contains(lineEdit->objectName())) {
             lineEdit->setText(mutableObj[lineEdit->objectName()].toString());
+        }
     }
 
     auto const checkBoxes = w->findChildren<QCheckBox *>();
     for (QCheckBox *checkBox : checkBoxes) {
-        if (mutableObj.contains(checkBox->objectName()))
+        if (mutableObj.contains(checkBox->objectName())) {
             checkBox->setChecked(mutableObj[checkBox->objectName()].toBool());
+        }
     }
 
     auto const comboBoxes = w->findChildren<QComboBox *>();
     for (QComboBox *comboBox : comboBoxes) {
-        if (mutableObj.contains(comboBox->objectName()))
+        if (mutableObj.contains(comboBox->objectName())) {
             comboBox->setCurrentIndex(mutableObj[comboBox->objectName()].toInt());
+        }
     }
 
     auto const radioButtons = w->findChildren<QRadioButton *>();
     for (QRadioButton *radioButton : radioButtons) {
-        if (mutableObj.contains(radioButton->objectName()))
+        if (mutableObj.contains(radioButton->objectName())) {
             radioButton->setChecked(mutableObj[radioButton->objectName()].toBool());
+        }
     }
 
     auto const spinBoxes = w->findChildren<QSpinBox *>();
     for (QSpinBox *spinBox : spinBoxes) {
-        if (mutableObj.contains(spinBox->objectName()))
+        if (mutableObj.contains(spinBox->objectName())) {
             spinBox->setValue(mutableObj[spinBox->objectName()].toInt());
+        }
     }
 
     auto const doubleSpinBoxes = w->findChildren<QDoubleSpinBox *>();
     for (QDoubleSpinBox *doubleSpinBox : doubleSpinBoxes) {
-        if (mutableObj.contains(doubleSpinBox->objectName()))
+        if (mutableObj.contains(doubleSpinBox->objectName())) {
             doubleSpinBox->setValue(mutableObj[doubleSpinBox->objectName()].toDouble());
+        }
     }
 
     // list widgets
@@ -143,7 +148,7 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
         if (mutableObj.contains(listWidget->objectName())) {
             listWidget->clear();
             const QJsonArray list = mutableObj[listWidget->objectName()].toArray();
-            for (const QJsonValue &v : list) {
+            for (const auto &v : list) {
                 QJsonObject li = v.toObject();
                 QListWidgetItem *item = new QListWidgetItem(li["text"].toString(), listWidget);
                 item->setCheckState(li["checked"].toBool() ? Qt::Checked : Qt::Unchecked);
@@ -153,8 +158,7 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
 }
 
 // Write QWidget state to a file
-bool WidgetStateSerializer::saveStateToFile(const QString &key,
-                                            const QWidget *widget,
+bool WidgetStateSerializer::saveStateToFile(const QString &key, const QWidget *widget,
                                             const QString &filename,
                                             const QStringList &ignoredWidgets,
                                             QString *errorMessage) const
@@ -164,7 +168,8 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key,
 
     QFile f(filename);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        setError(errorMessage, tr("Could not open %1 for writing: %2").arg(filename, f.errorString()));
+        setError(errorMessage,
+                 tr("Could not open %1 for writing: %2").arg(filename, f.errorString()));
         return false;
     }
 
@@ -180,8 +185,7 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key,
 }
 
 // Read a file and restore a QWidget state
-bool WidgetStateSerializer::loadStateFromFile(const QString &key,
-                                              QWidget *widget,
+bool WidgetStateSerializer::loadStateFromFile(const QString &key, QWidget *widget,
                                               const QString &filename,
                                               const QStringList &ignoredWidgets,
                                               QString *errorMessage,
@@ -189,7 +193,8 @@ bool WidgetStateSerializer::loadStateFromFile(const QString &key,
 {
     QFile f(filename);
     if (!f.open(QIODevice::ReadOnly)) {
-        setError(errorMessage, tr("Could not open %1 for reading: %2").arg(filename, f.errorString()));
+        setError(errorMessage,
+                 tr("Could not open %1 for reading: %2").arg(filename, f.errorString()));
         return false;
     }
 
@@ -208,8 +213,9 @@ bool WidgetStateSerializer::loadStateFromFile(const QString &key,
     }
 
     const QJsonObject state = root[key].toObject();
-    if (profileState)
+    if (profileState) {
         *profileState = state;
+    }
 
     jsonToWidget(state, widget, ignoredWidgets);
     setError(errorMessage, QString());

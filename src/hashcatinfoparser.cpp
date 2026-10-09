@@ -8,7 +8,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-namespace {
+namespace
+{
 
 void setError(QString *errorMessage, const QString &text)
 {
@@ -20,8 +21,7 @@ void setError(QString *errorMessage, const QString &text)
 } // namespace
 
 bool HashcatInfoParser::parseExampleHashes(const QString &rawOutput,
-                                           QMap<quint32, QString> &hashModes,
-                                           QString *errorMessage)
+                                           QMap<quint32, QString> &hashModes, QString *errorMessage)
 {
     setError(errorMessage, QString());
 

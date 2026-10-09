@@ -9,8 +9,9 @@
 #include <QDialog>
 #include <QFileDialog>
 
-namespace Ui {
-    class SettingsDialog;
+namespace Ui
+{
+class SettingsDialog;
 }
 
 class SettingsDialog : public QDialog
@@ -19,13 +20,14 @@ class SettingsDialog : public QDialog
 
 public:
     explicit SettingsDialog(QWidget *parent = nullptr);
-    ~SettingsDialog();
+    ~SettingsDialog() override;
 
 private slots:
     void readSettings();
     void selectPathClicked();
     void saveClicked();
     void cancelClicked();
+
 private:
     // The tests read the widget state through the Ui the same way the main
     // window's tests do: friendship keeps it private instead of widening the

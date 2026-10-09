@@ -87,17 +87,24 @@ void TestCommandBuilder::argumentLayout_data()
     QTest::addColumn<QStringList>("expected");
 
     QTest::newRow("straight") << int(AttackMode::Straight)
-        << QStringList{"--attack-mode", "0", "--rules-file", "r.rule", "hash.txt", "dict.txt"};
+                              << QStringList{"--attack-mode", "0",        "--rules-file",
+                                             "r.rule",        "hash.txt", "dict.txt"};
     QTest::newRow("combination") << int(AttackMode::Combination)
-        << QStringList{"--attack-mode", "1", "hash.txt", "dict.txt"};
+                                 << QStringList{"--attack-mode", "1", "hash.txt", "dict.txt"};
     QTest::newRow("brute force") << int(AttackMode::BruteForce)
-        << QStringList{"--attack-mode", "3", "--custom-charset1", "abc", "hash.txt", "?d?d"};
-    QTest::newRow("hybrid wordlist + mask") << int(AttackMode::HybridWordMask)
-        << QStringList{"--attack-mode", "6", "--custom-charset1", "abc", "hash.txt", "dict.txt", "?d?d"};
-    QTest::newRow("hybrid mask + wordlist") << int(AttackMode::HybridMaskWord)
-        << QStringList{"--attack-mode", "7", "--custom-charset1", "abc", "hash.txt", "?d?d", "dict.txt"};
+                                 << QStringList{"--attack-mode", "3",        "--custom-charset1",
+                                                "abc",           "hash.txt", "?d?d"};
+    QTest::newRow("hybrid wordlist + mask")
+        << int(AttackMode::HybridWordMask)
+        << QStringList{"--attack-mode", "6",   "--custom-charset1", "abc", "hash.txt",
+                       "dict.txt",      "?d?d"};
+    QTest::newRow("hybrid mask + wordlist")
+        << int(AttackMode::HybridMaskWord)
+        << QStringList{"--attack-mode", "7",    "--custom-charset1", "abc",
+                       "hash.txt",      "?d?d", "dict.txt"};
     QTest::newRow("association") << int(AttackMode::Association)
-        << QStringList{"--attack-mode", "9", "--rules-file", "r.rule", "hash.txt", "dict.txt"};
+                                 << QStringList{"--attack-mode", "9",        "--rules-file",
+                                                "r.rule",        "hash.txt", "dict.txt"};
 }
 
 void TestCommandBuilder::argumentLayout()
@@ -135,10 +142,8 @@ void TestCommandBuilder::uiDefaultsAreNotRepeated()
     options.backendDevices = QStringLiteral("0,1");
     options.segmentSize = 64;
 
-    const QStringList full{"--attack-mode", "0",
-                           "--outfile-format", "1",
-                           "--backend-devices", "0,1",
-                           "--segment-size", "64"};
+    const QStringList full{"--attack-mode",     "0",   "--outfile-format", "1",
+                           "--backend-devices", "0,1", "--segment-size",   "64"};
     QCOMPARE(CommandBuilder::build(options), full);
 }
 
@@ -154,10 +159,8 @@ void TestCommandBuilder::shortFallsBackToLong()
 
     // --cpu-affinity has no short form; asking for one must not produce an
     // empty argument, which hashcat would read as a stray operand
-    const QStringList expected{"-m", "1000", "-a", "0",
-                               "--remove", "--username",
-                               "-w", "2",
-                               "--cpu-affinity", "1-4"};
+    const QStringList expected{"-m", "1000",           "-a", "0", "--remove", "--username", "-w",
+                               "2",  "--cpu-affinity", "1-4"};
     QCOMPARE(CommandBuilder::build(options), expected);
 
     for (const QString &argument : CommandBuilder::build(options)) {
@@ -194,8 +197,8 @@ void TestCommandBuilder::expandOutfileTemplateSubstitutesUnixTimeAndHash()
             == QStringLiteral("plain.txt"));
 
     const qint64 before = QDateTime::currentMSecsSinceEpoch() / 1000;
-    const QString stamped = CommandBuilder::expandOutfileTemplate(
-        QStringLiteral("<unixtime>"), QStringLiteral("/tmp/whatever"));
+    const QString stamped = CommandBuilder::expandOutfileTemplate(QStringLiteral("<unixtime>"),
+                                                                  QStringLiteral("/tmp/whatever"));
     const qint64 after = QDateTime::currentMSecsSinceEpoch() / 1000;
 
     bool isNumber = false;

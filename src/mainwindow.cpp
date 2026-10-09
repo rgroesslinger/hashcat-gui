@@ -28,9 +28,7 @@
 #include <windows.h>
 #endif
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
@@ -52,40 +50,61 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAbout_Qt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
 
     /* ---------- wordlist ---------- */
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this, [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this, [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this, [this] { commandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this,
+            [this] { commandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this,
+            [this] { commandChanged(); });
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this,
+            [this] { commandChanged(); });
     connect(ui->listWidget_wordlist, &QListWidget::itemChanged, this, [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist, &QListWidget::itemClicked, this, &MainWindow::wordlistItemClicked);
-    connect(ui->pushButton_remove_wordlist, &QPushButton::clicked, this, &MainWindow::removeWordlistClicked);
-    connect(ui->pushButton_add_wordlist, &QPushButton::clicked, this, &MainWindow::addWordlistClicked);
-    connect(ui->toolButton_wordlist_sort_asc, &QToolButton::clicked, this, &MainWindow::wordlistSortAscClicked);
-    connect(ui->toolButton_wordlist_sort_desc, &QToolButton::clicked, this, &MainWindow::wordlistSortDescClicked);
+    connect(ui->listWidget_wordlist, &QListWidget::itemClicked, this,
+            &MainWindow::wordlistItemClicked);
+    connect(ui->pushButton_remove_wordlist, &QPushButton::clicked, this,
+            &MainWindow::removeWordlistClicked);
+    connect(ui->pushButton_add_wordlist, &QPushButton::clicked, this,
+            &MainWindow::addWordlistClicked);
+    connect(ui->toolButton_wordlist_sort_asc, &QToolButton::clicked, this,
+            &MainWindow::wordlistSortAscClicked);
+    connect(ui->toolButton_wordlist_sort_desc, &QToolButton::clicked, this,
+            &MainWindow::wordlistSortDescClicked);
 
     /* ---------- rules ---------- */
     connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesfile1Toggled);
     connect(ui->checkBox_rulesfile_2, &QCheckBox::toggled, this, &MainWindow::rulesfile2Toggled);
     connect(ui->checkBox_rulesfile_3, &QCheckBox::toggled, this, &MainWindow::rulesfile3Toggled);
-    connect(ui->pushButton_open_rulesfile_1, &QPushButton::clicked, this, &MainWindow::openRulesFile1Clicked);
-    connect(ui->pushButton_open_rulesfile_2, &QPushButton::clicked, this, &MainWindow::openRulesFile2Clicked);
-    connect(ui->pushButton_open_rulesfile_3, &QPushButton::clicked, this, &MainWindow::openRulesFile3Clicked);
-    connect(ui->radioButton_generate_rules, &QRadioButton::toggled, this, &MainWindow::generateRulesToggled);
-    connect(ui->radioButton_use_rules_file, &QRadioButton::toggled, this, &MainWindow::useRulesFileToggled);
+    connect(ui->pushButton_open_rulesfile_1, &QPushButton::clicked, this,
+            &MainWindow::openRulesFile1Clicked);
+    connect(ui->pushButton_open_rulesfile_2, &QPushButton::clicked, this,
+            &MainWindow::openRulesFile2Clicked);
+    connect(ui->pushButton_open_rulesfile_3, &QPushButton::clicked, this,
+            &MainWindow::openRulesFile3Clicked);
+    connect(ui->radioButton_generate_rules, &QRadioButton::toggled, this,
+            &MainWindow::generateRulesToggled);
+    connect(ui->radioButton_use_rules_file, &QRadioButton::toggled, this,
+            &MainWindow::useRulesFileToggled);
 
     /* ---------- custom charset ---------- */
-    connect(ui->checkBox_custom_charset1, &QCheckBox::toggled, this, &MainWindow::customCharset1Toggled);
-    connect(ui->checkBox_custom_charset2, &QCheckBox::toggled, this, &MainWindow::customCharset2Toggled);
-    connect(ui->checkBox_custom_charset3, &QCheckBox::toggled, this, &MainWindow::customCharset3Toggled);
-    connect(ui->checkBox_custom_charset4, &QCheckBox::toggled, this, &MainWindow::customCharset4Toggled);
+    connect(ui->checkBox_custom_charset1, &QCheckBox::toggled, this,
+            &MainWindow::customCharset1Toggled);
+    connect(ui->checkBox_custom_charset2, &QCheckBox::toggled, this,
+            &MainWindow::customCharset2Toggled);
+    connect(ui->checkBox_custom_charset3, &QCheckBox::toggled, this,
+            &MainWindow::customCharset3Toggled);
+    connect(ui->checkBox_custom_charset4, &QCheckBox::toggled, this,
+            &MainWindow::customCharset4Toggled);
 
     /* ---------- stand-alone widgets ---------- */
     connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
-    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this, &MainWindow::openHashFileClicked);
+    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
+            &MainWindow::openHashFileClicked);
     connect(ui->pushButton_output, &QPushButton::clicked, this, &MainWindow::outputClicked);
     connect(ui->pushButton_execute, &QPushButton::clicked, this, &MainWindow::executeClicked);
-    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this, &MainWindow::copyCommandToClipboard);
-    connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled, ui->comboBox_workload_profile, &QComboBox::setEnabled);
-    connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this, &MainWindow::attackIndexChanged);
+    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this,
+            &MainWindow::copyCommandToClipboard);
+    connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled,
+            ui->comboBox_workload_profile, &QComboBox::setEnabled);
+    connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this,
+            &MainWindow::attackIndexChanged);
     connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
 
     loadDefaultProfile();
@@ -106,12 +125,10 @@ MainWindow::~MainWindow()
 // File → Export
 void MainWindow::exportTriggered()
 {
-    QStringList ignoreWidgets = { AppConstants::Files::PreviewWidget };
+    QStringList ignoreWidgets = {AppConstants::Files::PreviewWidget};
 
-    QString file = QFileDialog::getSaveFileName(
-        this, tr("Save Profile"),
-        QString(),
-        tr("JSON Files (*.json)"));
+    QString file = QFileDialog::getSaveFileName(this, tr("Save Profile"), QString(),
+                                                tr("JSON Files (*.json)"));
 
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
@@ -128,21 +145,20 @@ void MainWindow::exportTriggered()
 // File → Import
 void MainWindow::importTriggered()
 {
-    QString file = QFileDialog::getOpenFileName(
-        this, tr("Load Profile"),
-        QString(),
-        tr("JSON Files (*.json)"));
+    QString file = QFileDialog::getOpenFileName(this, tr("Load Profile"), QString(),
+                                                tr("JSON Files (*.json)"));
 
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
         QString error;
         QJsonObject state;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error,
-                                &state)) {
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
+                                &error, &state)) {
             // Same deferred hash type as loadDefaultProfile(): while the
             // query is in flight the combo cannot take the stored index.
-            if (ui->comboBox_hash->count() == 0)
+            if (ui->comboBox_hash->count() == 0) {
                 m_pendingHashTypeIndex = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
+            }
             commandChanged();
             QMessageBox::information(this, tr("Loaded"), tr("Profile loaded from %1.").arg(file));
         } else {
@@ -204,7 +220,8 @@ void MainWindow::settingsTriggered()
 {
     SettingsDialog settingsDialog(this);
     if (settingsDialog.exec() == QDialog::Accepted) {
-        // If SettingsDialog was saved and there are no hash types yet maybe we can populate them now
+        // If SettingsDialog was saved and there are no hash types yet maybe we can populate them
+        // now
         if (ui->comboBox_hash->count() == 0) {
             initHashAndAttackModes();
         }
@@ -246,13 +263,14 @@ void MainWindow::loadDefaultProfile()
         WidgetStateSerializer s;
         QString error;
         QJsonObject state;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {}, &error,
-                                &state)) {
+        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
+                                &error, &state)) {
             // The hash combo has no items yet - the query that fills it runs
             // asynchronously. Remember the stored index; the reply applies
             // it once the items exist.
-            if (ui->comboBox_hash->count() == 0)
+            if (ui->comboBox_hash->count() == 0) {
                 m_pendingHashTypeIndex = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
+            }
             commandChanged();
         } else {
             QMessageBox::warning(this, tr("Load failed"), error);
@@ -263,11 +281,12 @@ void MainWindow::loadDefaultProfile()
 // Save the default profile – called by aboutToQuit signal
 void MainWindow::saveDefaultProfile()
 {
-    QStringList ignoreWidgets = { AppConstants::Files::PreviewWidget };
+    QStringList ignoreWidgets = {AppConstants::Files::PreviewWidget};
     QString file = defaultProfileFile();
     WidgetStateSerializer s;
     QString error;
-    if (!s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets, &error)) {
+    if (!s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets,
+                           &error)) {
         QMessageBox::warning(this, tr("Save failed"), error);
     }
 }
@@ -312,7 +331,8 @@ void MainWindow::initHashAndAttackModes()
 
             // Check if the command failed
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                error = tr("Failed to obtain supported hash types.\nError: %1").arg(result.standardError);
+                error = tr("Failed to obtain supported hash types.\nError: %1")
+                            .arg(result.standardError);
             } else {
                 QMap<quint32, QString> parsed;
                 if (HashcatInfoParser::parseExampleHashes(result.standardOutput, parsed, &error)) {
@@ -350,7 +370,9 @@ void MainWindow::initHashAndAttackModes()
         });
 
         // Kick off the asynchronous process
-        watcher->setFuture(HelperUtils::executeHashcat(QStringList() << AppConstants::Hashcat::ExampleHashes << AppConstants::Hashcat::MachineReadable));
+        watcher->setFuture(HelperUtils::executeHashcat(QStringList()
+                                                       << AppConstants::Hashcat::ExampleHashes
+                                                       << AppConstants::Hashcat::MachineReadable));
     }
 }
 
@@ -419,7 +441,9 @@ void MainWindow::wordlistSortAscClicked()
     // currentRow() is -1 when nothing is selected: without the guard below
     // takeItem(-1) returns nullptr and the list ends up with a null entry.
     int currentRow = ui->listWidget_wordlist->currentRow();
-    if (currentRow <= 0) return;
+    if (currentRow <= 0) {
+        return;
+    }
     QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
     ui->listWidget_wordlist->insertItem(currentRow - 1, currentItem);
     ui->listWidget_wordlist->setCurrentRow(currentRow - 1);
@@ -428,7 +452,9 @@ void MainWindow::wordlistSortAscClicked()
 void MainWindow::wordlistSortDescClicked()
 {
     int currentRow = ui->listWidget_wordlist->currentRow();
-    if (currentRow < 0 || currentRow >= ui->listWidget_wordlist->count() - 1) return;
+    if (currentRow < 0 || currentRow >= ui->listWidget_wordlist->count() - 1) {
+        return;
+    }
     QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
     ui->listWidget_wordlist->insertItem(currentRow + 1, currentItem);
     ui->listWidget_wordlist->setCurrentRow(currentRow + 1);
@@ -566,15 +592,17 @@ void MainWindow::executeClicked()
     auto &settings = SettingsManager::instance();
 
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-    const QString configuredTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
+    const QString configuredTerminal =
+        settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
     const QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
 
     // Nothing is started unless the configuration is known to be complete.
     // Previously a terminal that was no longer installed simply left the
     // program empty and startDetached() failed without a word.
     QString detail;
-    const HelperUtils::LaunchError error = HelperUtils::validateLaunch(
-        ui->lineEdit_hashfile->text(), hashcatPath, configuredTerminal, availableTerminals.keys(), &detail);
+    const HelperUtils::LaunchError error =
+        HelperUtils::validateLaunch(ui->lineEdit_hashfile->text(), hashcatPath, configuredTerminal,
+                                    availableTerminals.keys(), &detail);
     if (error != HelperUtils::LaunchError::None) {
         showLaunchError(error, detail);
         return;
@@ -589,9 +617,8 @@ void MainWindow::executeClicked()
 
 #if defined(Q_OS_WIN)
     /* Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal */
-    proc.setCreateProcessArgumentsModifier([](QProcess::CreateProcessArguments *args) {
-        args->flags |= CREATE_NEW_CONSOLE;
-    });
+    proc.setCreateProcessArgumentsModifier(
+        [](QProcess::CreateProcessArguments *args) { args->flags |= CREATE_NEW_CONSOLE; });
 #endif
 
     proc.setProgram(configuredTerminal);
@@ -599,8 +626,9 @@ void MainWindow::executeClicked()
     proc.setWorkingDirectory(QFileInfo(hashcatPath).absolutePath());
 
     if (!proc.startDetached()) {
-        QMessageBox::warning(this, tr("Launch failed"),
-                             tr("Could not start %1: %2").arg(configuredTerminal, proc.errorString()));
+        QMessageBox::warning(
+            this, tr("Launch failed"),
+            tr("Could not start %1: %2").arg(configuredTerminal, proc.errorString()));
     }
 }
 
@@ -608,7 +636,8 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
 {
     const QString menu = ui->menuFile->menuAction()->text();
     const QString settingsEntry = ui->actionSettings->text();
-    const QString configuredTerminal = SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal);
+    const QString configuredTerminal =
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal);
 
     QMessageBox box(this);
     box.setIcon(QMessageBox::Warning);
@@ -622,8 +651,9 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
     case HelperUtils::LaunchError::NoHashcatPath:
         box.setIcon(QMessageBox::Information);
         box.setTextFormat(Qt::RichText);
-        box.setText(tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
-                        .arg(menu, settingsEntry));
+        box.setText(
+            tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
+                .arg(menu, settingsEntry));
         break;
 
     // The two messages below interpolate user supplied strings, so they are
@@ -692,7 +722,8 @@ HashcatOptions MainWindow::collectHashcatOptions()
     auto &settings = SettingsManager::instance();
 
     HashcatOptions options;
-    options.useShortParameters = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
+    options.useShortParameters =
+        settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
 
     // currentData() is invalid while the hash type list has not been filled -
     // no hashcat configured, or the query failed. CommandBuilder then leaves
@@ -706,8 +737,10 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.ignoreUsername = ui->checkBox_ignoreusername->isChecked();
 
     if (ui->radioButton_use_rules_file->isChecked()) {
-        QCheckBox *boxes[3] = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2, ui->checkBox_rulesfile_3};
-        QLineEdit *edits[3] = {ui->lineEdit_open_rulesfile_1, ui->lineEdit_open_rulesfile_2, ui->lineEdit_open_rulesfile_3};
+        QCheckBox *boxes[3] = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2,
+                               ui->checkBox_rulesfile_3};
+        QLineEdit *edits[3] = {ui->lineEdit_open_rulesfile_1, ui->lineEdit_open_rulesfile_2,
+                               ui->lineEdit_open_rulesfile_3};
         for (int i = 0; i < 3; ++i) {
             if (boxes[i]->isChecked() && !edits[i]->text().isEmpty()) {
                 options.rulesFiles << edits[i]->text();
@@ -729,12 +762,16 @@ HashcatOptions MainWindow::collectHashcatOptions()
     // would change its object name, which is also the key under which a
     // saved profile stores it.
     QCheckBox *charsetBoxes[4] = {
-        ui->checkBox_custom_charset1, ui->checkBox_custom_charset2,
-        ui->checkBox_custom_charset3, ui->checkBox_custom_charset4,
+        ui->checkBox_custom_charset1,
+        ui->checkBox_custom_charset2,
+        ui->checkBox_custom_charset3,
+        ui->checkBox_custom_charset4,
     };
     QLineEdit *charsetEdits[4] = {
-        ui->lineEdit_custom_charset1, ui->lineEdit_custom_charset2,
-        ui->lineEdit_custom_charset3, ui->lineEdit_custom_charset4,
+        ui->lineEdit_custom_charset1,
+        ui->lineEdit_custom_charset2,
+        ui->lineEdit_custom_charset3,
+        ui->lineEdit_custom_charset4,
     };
     for (int i = 0; i < 4; ++i) {
         options.customCharsets[i].enabled = charsetBoxes[i]->isChecked();
@@ -752,7 +789,8 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.segmentSize = ui->spinBox_segment->value();
     options.hashFile = ui->lineEdit_hashfile->text();
 
-    const auto wordlists = ui->listWidget_wordlist->findItems(QStringLiteral("*"), Qt::MatchWildcard);
+    const auto wordlists =
+        ui->listWidget_wordlist->findItems(QStringLiteral("*"), Qt::MatchWildcard);
     for (const QListWidgetItem *item : wordlists) {
         if (item->checkState() == Qt::Checked) {
             options.wordlists << item->text();

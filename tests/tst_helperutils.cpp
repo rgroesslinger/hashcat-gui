@@ -89,26 +89,26 @@ void TestHelperUtils::validateLaunch_data()
     QTest::addColumn<int>("expected");
     QTest::addColumn<QString>("expectedDetail");
 
-    const QString gone = QDir(QDir::tempPath())
-                             .filePath(QStringLiteral("hashcat-gui-test-no-such-binary"));
+    const QString gone =
+        QDir(QDir::tempPath()).filePath(QStringLiteral("hashcat-gui-test-no-such-binary"));
 
     const QStringList terminals{"konsole", "kitty"};
 
-    QTest::newRow("no hash file")
-        << QString() << QStringLiteral("/usr/bin/hashcat") << QStringLiteral("konsole")
-        << terminals << int(HelperUtils::LaunchError::NoHashFile) << QString();
+    QTest::newRow("no hash file") << QString() << QStringLiteral("/usr/bin/hashcat")
+                                  << QStringLiteral("konsole") << terminals
+                                  << int(HelperUtils::LaunchError::NoHashFile) << QString();
 
     QTest::newRow("hashcat never configured")
-        << QStringLiteral("hash.txt") << QString() << QStringLiteral("konsole")
-        << terminals << int(HelperUtils::LaunchError::NoHashcatPath) << QString();
+        << QStringLiteral("hash.txt") << QString() << QStringLiteral("konsole") << terminals
+        << int(HelperUtils::LaunchError::NoHashcatPath) << QString();
 
     QTest::newRow("hashcat is gone")
-        << QStringLiteral("hash.txt") << gone << QStringLiteral("konsole")
-        << terminals << int(HelperUtils::LaunchError::HashcatPathMissing) << gone;
+        << QStringLiteral("hash.txt") << gone << QStringLiteral("konsole") << terminals
+        << int(HelperUtils::LaunchError::HashcatPathMissing) << gone;
 
     QTest::newRow("no terminal selected")
-        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QString()
-        << terminals << int(HelperUtils::LaunchError::NoTerminal) << QString();
+        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QString() << terminals
+        << int(HelperUtils::LaunchError::NoTerminal) << QString();
 
     QTest::newRow("no terminal installed")
         << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QStringLiteral("konsole")
@@ -119,9 +119,9 @@ void TestHelperUtils::validateLaunch_data()
         << terminals << int(HelperUtils::LaunchError::UnknownTerminal)
         << QStringLiteral("konsole, kitty");
 
-    QTest::newRow("ready to go")
-        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QStringLiteral("konsole")
-        << terminals << int(HelperUtils::LaunchError::None) << QString();
+    QTest::newRow("ready to go") << QStringLiteral("hash.txt") << QStringLiteral("hashcat")
+                                 << QStringLiteral("konsole") << terminals
+                                 << int(HelperUtils::LaunchError::None) << QString();
 }
 
 void TestHelperUtils::validateLaunch()
@@ -160,20 +160,23 @@ void TestHelperUtils::parameterSpelling()
 
     // --cpu-affinity has no short form; asking for one must fall back to the
     // long one rather than produce an empty argument
-    QCOMPARE(HelperUtils::getParameter(Parameter::CpuAffinity, true), QStringLiteral("--cpu-affinity"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::CpuAffinity, false), QStringLiteral("--cpu-affinity"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::HexCharset, true), QStringLiteral("--hex-charset"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::CpuAffinity, true),
+             QStringLiteral("--cpu-affinity"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::CpuAffinity, false),
+             QStringLiteral("--cpu-affinity"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::HexCharset, true),
+             QStringLiteral("--hex-charset"));
 
     // every enumerator has to be spelled out, otherwise the option silently
     // vanishes from the command line
     const Parameter all[] = {
-        Parameter::AttackMode, Parameter::BackendDevices, Parameter::CpuAffinity,
-        Parameter::CustomCharset1, Parameter::CustomCharset2, Parameter::CustomCharset3,
-        Parameter::CustomCharset4, Parameter::GenerateRules, Parameter::HashType,
-        Parameter::HexCharset, Parameter::HexSalt, Parameter::OptimizedKernel,
-        Parameter::Outfile, Parameter::OutfileFormat, Parameter::Remove,
-        Parameter::RulesFile, Parameter::SegmentSize, Parameter::SpeedOnly,
-        Parameter::Username, Parameter::WorkloadProfile,
+        Parameter::AttackMode,     Parameter::BackendDevices,  Parameter::CpuAffinity,
+        Parameter::CustomCharset1, Parameter::CustomCharset2,  Parameter::CustomCharset3,
+        Parameter::CustomCharset4, Parameter::GenerateRules,   Parameter::HashType,
+        Parameter::HexCharset,     Parameter::HexSalt,         Parameter::OptimizedKernel,
+        Parameter::Outfile,        Parameter::OutfileFormat,   Parameter::Remove,
+        Parameter::RulesFile,      Parameter::SegmentSize,     Parameter::SpeedOnly,
+        Parameter::Username,       Parameter::WorkloadProfile,
     };
     for (const Parameter key : all) {
         QVERIFY2(!HelperUtils::getParameter(key).isEmpty(), "an enum has no long spelling");
@@ -208,7 +211,7 @@ void TestHelperUtils::terminalArgumentsArePinned()
         {"wt.exe", {"-d", "."}},
     };
 
-    const QMap<QString, QStringList> table = HelperUtils::terminalArguments();
+    const QMap<QString, QStringList> &table = HelperUtils::terminalArguments();
     QCOMPARE(int(table.size()), int(std::size(expected)));
     for (const Expected &entry : expected) {
         QCOMPARE(table.value(QString::fromLatin1(entry.terminal)), entry.arguments);
@@ -289,8 +292,7 @@ void TestHelperUtils::executeHashcatAppendsQuietAndUsesBinaryDirectory()
     QCOMPARE(int(result.exitStatus), int(QProcess::NormalExit));
     QCOMPARE(result.exitCode, 0);
 
-    const QStringList output =
-        result.standardOutput.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    const QStringList output = result.standardOutput.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     QCOMPARE(output.size(), 3);
 
     // working directory = the directory of the binary (canonical, so a

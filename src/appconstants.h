@@ -15,11 +15,13 @@
 // key would silently create a second key and a typo in a command line token
 // would silently change the command. Keeping them together also documents
 // which defaults are duplicated in the .ui files.
-namespace AppConstants {
+namespace AppConstants
+{
 
 // Keys passed to SettingsManager. SettingsManager takes plain strings, so a
 // mistyped key does not fail - it simply stores the value somewhere else.
-namespace SettingsKeys {
+namespace SettingsKeys
+{
 inline constexpr const char *HashcatPath = "hashcatPath";
 inline constexpr const char *Terminal = "terminal";
 inline constexpr const char *UseShortParameters = "useShortParameters";
@@ -33,7 +35,8 @@ inline constexpr const char *Language = "language";
 // relabeling an entry cannot orphan a saved setting. The names are each
 // language's own name on purpose: whoever reads "Deutsch" knows it is their
 // language, "German" only helps English speakers.
-namespace Languages {
+namespace Languages
+{
 struct Language {
     const char *code;
     const char *name;
@@ -50,7 +53,8 @@ inline constexpr Language Available[] = {
 inline constexpr const char *Default = "";
 } // namespace Languages
 
-namespace Files {
+namespace Files
+{
 // Saved by MainWindow::saveDefaultProfile(), relative to
 // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
 inline constexpr const char *DefaultProfile = "default_profile.json";
@@ -63,7 +67,8 @@ inline constexpr const char *PreviewWidget = "lineEdit_command";
 // .ui files (lineEdit_outfile_format = "1,2", lineEdit_devices = "0",
 // spinBox_segment = 32, comboBox_workload_profile items "1".."4"), so these
 // constants only describe what code constructing the widgets itself gets.
-namespace Defaults {
+namespace Defaults
+{
 inline constexpr const char *OutfileFormat = "1,2";
 inline constexpr const char *BackendDevices = "0";
 inline constexpr int SegmentSize = 32; // MB
@@ -71,13 +76,15 @@ inline constexpr const char *OutfileSuffix = ".out";
 } // namespace Defaults
 
 // Placeholders the user can type into the outfile field.
-namespace Placeholders {
+namespace Placeholders
+{
 inline constexpr const char *UnixTime = "<unixtime>";
 inline constexpr const char *Hash = "<hash>";
 } // namespace Placeholders
 
 // Command line tokens that belong to hashcat itself.
-namespace Hashcat {
+namespace Hashcat
+{
 inline constexpr const char *Quiet = "--quiet";
 inline constexpr const char *ExampleHashes = "--example-hashes";
 inline constexpr const char *MachineReadable = "--machine-readable";

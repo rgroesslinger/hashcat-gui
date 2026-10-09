@@ -318,7 +318,7 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     QCOMPARE(window.ui->comboBox_hash->itemData(1).toUInt(), 1000u);
 
     const QStringList arguments = window.generateArguments();
-    const int hashType = arguments.indexOf(QStringLiteral("--hash-type"));
+    const qsizetype hashType = arguments.indexOf(QStringLiteral("--hash-type"));
     QVERIFY(hashType >= 0);
     QCOMPARE(arguments.value(hashType + 1), QStringLiteral("0"));
 }
@@ -330,14 +330,12 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo_data()
 {
     QTest::addColumn<QByteArray>("script");
 
-    QTest::newRow("non-zero exit") << QByteArray(
-        "#!/bin/sh\n"
-        "printf 'no such option\\n' >&2\n"
-        "exit 1\n");
-    QTest::newRow("garbage output") << QByteArray(
-        "#!/bin/sh\n"
-        "printf 'this is not json at all\\n'\n"
-        "exit 0\n");
+    QTest::newRow("non-zero exit") << QByteArray("#!/bin/sh\n"
+                                                 "printf 'no such option\\n' >&2\n"
+                                                 "exit 1\n");
+    QTest::newRow("garbage output") << QByteArray("#!/bin/sh\n"
+                                                  "printf 'this is not json at all\\n'\n"
+                                                  "exit 0\n");
 }
 
 void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
@@ -445,8 +443,7 @@ void TestMainWindow::commandPreviewCarriesTheBinaryName()
                                        QStringLiteral("/opt/hashcat/hashcat"));
 
     MainWindow window;
-    QCOMPARE(window.ui->lineEdit_command->text(),
-             QStringLiteral("hashcat --attack-mode 0"));
+    QCOMPARE(window.ui->lineEdit_command->text(), QStringLiteral("hashcat --attack-mode 0"));
 }
 
 // The profile machinery as the application uses it: saveDefaultProfile()
