@@ -37,7 +37,7 @@ set(CMAKE_AUTOUIC ON)
 # The tests live in tests/ but include ui_*.h generated from src/*.ui
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-find_package(Qt6 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
+find_package(Qt6 6.8 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
 
 # Everything the application is made of except main().
 set(HASHCAT_GUI_SOURCES
