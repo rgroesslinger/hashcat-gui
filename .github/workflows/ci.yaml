@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y build-essential g++ clang cmake \
-            qt6-base-dev qt6-tools-dev qt6-l10n-tools
+            qt6-base-dev qt6-tools-dev qt6-l10n-tools desktop-file-utils
 
       - name: Build (Linux)
         if: runner.os == 'Linux'
@@ -66,6 +66,11 @@ jobs:
           cmake --build build --target update_translations
           git diff -I'<location' --exit-code -- translations/
           test -z "$(git status --porcelain translations/ | grep '^??')"
+
+      # Validate desktop file
+      - name: Validate the desktop entry (Linux)
+        if: matrix.compiler == 'linux-gcc'
+        run: desktop-file-validate hashcat-gui.desktop
 
       # ----- Windows setup -----
       - name: Set up MSYS2 with UCRT64 (Windows)
