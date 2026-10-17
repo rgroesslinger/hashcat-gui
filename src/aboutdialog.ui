@@ -31,10 +31,6 @@
   <property name="windowTitle">
    <string>About</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="resources.qrc">
-    <normaloff>:/images/icon_hashcat.png</normaloff>:/images/icon_hashcat.png</iconset>
-  </property>
   <property name="modal">
    <bool>true</bool>
   </property>

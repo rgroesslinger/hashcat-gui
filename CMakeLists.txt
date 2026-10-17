@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 project(hashcat-gui CXX)
 
+# The standard install destinations the install() rules below write to.
+include(GNUInstallDirs)
+
 # Set version
 set(GUI_VERSION 0.7.1)
 configure_file(
@@ -96,6 +99,7 @@ find_package(Qt6 COMPONENTS LinguistTools QUIET)
 if(Qt6LinguistTools_FOUND)
     qt_add_translations(hashcat-gui
         SOURCE_TARGETS hashcat-gui hashcat-gui-core
+        LUPDATE_OPTIONS -no-obsolete
         TS_FILES
             translations/hashcat-gui_de.ts
             translations/hashcat-gui_sr.ts
@@ -114,17 +118,24 @@ endif()
 # test binaries entirely.
 include(CTest)
 find_package(Qt6 COMPONENTS Test QUIET)
+
+# One executable per test source under tests/. This list is the single place a
+# test is added or removed: it drives both the executables built below and the
+# run properties they are registered with.
+set(HASHCAT_GUI_TESTS
+    tst_commandbuilder
+    tst_hashcatinfoparser
+    tst_helperutils
+    tst_mainwindow
+    tst_settingsdialog
+    tst_translations
+    tst_widgetstateserializer
+)
+
 if(NOT BUILD_TESTING)
     message(STATUS "BUILD_TESTING is off - building without tests")
 elseif(Qt6Test_FOUND)
-    foreach(test IN ITEMS
-        tst_commandbuilder
-        tst_hashcatinfoparser
-        tst_helperutils
-        tst_mainwindow
-        tst_settingsdialog
-        tst_translations
-        tst_widgetstateserializer)
+    foreach(test IN LISTS HASHCAT_GUI_TESTS)
         add_executable(${test} tests/${test}.cpp)
         target_link_libraries(${test} PRIVATE hashcat-gui-core Qt6::Test)
         add_test(NAME ${test} COMMAND ${test})
@@ -153,14 +164,7 @@ elseif(Qt6Test_FOUND)
     # dialog nobody closes (or a hashcat query that never returns) must fail
     # instead of hanging the whole CI job. The longest legitimate wait is
     # AppConstants::Hashcat::QueryTimeoutMs (20 s).
-    set_tests_properties(
-        tst_commandbuilder
-        tst_hashcatinfoparser
-        tst_helperutils
-        tst_mainwindow
-        tst_settingsdialog
-        tst_translations
-        tst_widgetstateserializer
+    set_tests_properties(${HASHCAT_GUI_TESTS}
         PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
 else()
     message(STATUS "Qt6 Test module not found - building without tests")
@@ -215,4 +219,17 @@ if(CLANG_TIDY)
         COMMENT "Running clang-tidy over the sources")
 endif()
 
-install(TARGETS hashcat-gui RUNTIME DESTINATION bin)
+# Install to the standard directories.
+#
+# The icon is kept in the source tree as a mirrored hicolor theme
+# (src/icons/hicolor/<size>/apps/), so one install(DIRECTORY) copies every size
+# the artwork exists for, already in the layout the icon theme spec expects.
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/icons/hicolor
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons)
+
+# The desktop entry itself: Icon=hashcat-gui is resolved by name through the
+# hicolor tree above when it is installed next to it.
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/hashcat-gui.desktop
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
+
+install(TARGETS hashcat-gui RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

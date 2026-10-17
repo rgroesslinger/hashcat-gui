@@ -2,8 +2,10 @@
 Type=Application
 Version=1.0
 Name=hashcat-gui
-Comment=Qt-based GUI for hashcat
+GenericName=Password Recovery Tool
+Comment=Graphical user interface for the hashcat password recovery tool
 Exec=hashcat-gui
-#Icon=hashcat-gui
+Icon=hashcat-gui
 Terminal=false
-Categories=Utility;Security;
+Categories=System;Security;
+Keywords=hashcat;password;hash;recovery;security;

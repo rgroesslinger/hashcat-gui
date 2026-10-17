@@ -1,5 +1,13 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/icon_hashcat.png</file>
+        <file>icons/hashcat-gui.ico</file>
+        <file>icons/hicolor/16x16/apps/hashcat-gui.png</file>
+        <file>icons/hicolor/22x22/apps/hashcat-gui.png</file>
+        <file>icons/hicolor/24x24/apps/hashcat-gui.png</file>
+        <file>icons/hicolor/32x32/apps/hashcat-gui.png</file>
+        <file>icons/hicolor/48x48/apps/hashcat-gui.png</file>
+        <file>icons/hicolor/64x64/apps/hashcat-gui.png</file>
+        <file>icons/hicolor/128x128/apps/hashcat-gui.png</file>
+        <file>icons/hicolor/256x256/apps/hashcat-gui.png</file>
     </qresource>
 </RCC>

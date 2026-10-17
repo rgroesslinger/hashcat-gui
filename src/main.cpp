@@ -4,6 +4,7 @@
  */
 
 #include <QApplication>
+#include <QIcon>
 #include <QLocale>
 #include <QTranslator>
 #include "mainwindow.h"
@@ -15,30 +16,49 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    // QSettings and QStandardPaths fall back to the executable name when no
-    // application name has been set. For the installed binary that happens to
-    // be "hashcat-gui", which is what the FAQ documents, but any other binary
-    // name would silently change the settings and profile locations. Set it
-    // explicitly so those paths stay valid.
-    //
     // The organization name is deliberately left unset: QSettings passes the
     // application name as its organization, and setting QCoreApplication's
     // organization in addition would change QStandardPaths::AppDataLocation
-    // (and with it the location of the default profile) to
-    // ~/.local/share/hashcat-gui/hashcat-gui.
+    // (and with it the location of the default profile)
     a.setApplicationName(QStringLiteral("hashcat-gui"));
     a.setApplicationVersion(GUI_VERSION);
+
+    // Let the desktop match the window to the XDG desktop entry
+    // to resolve the installed hicolor icon by name
+    a.setDesktopFileName(QStringLiteral("hashcat-gui"));
+
+    // Window and taskbar icon.
+    //
+    // Windows has no icon theme, so the full-bleed .ico is used directly: it
+    // carries every size Windows asks for and matches the icon Explorer and
+    // shortcuts show for the executable.
+    //
+    // Elsewhere the icon theme is preferred, because it resolves the installed
+    // hicolor icon at the size the desktop asks for and covers the sizes no
+    // bitmap exists for with the scalable SVG. QIcon::fromTheme() gives no hint
+    // when that entry cannot actually be rendered - the scalable SVG needs the
+    // qsvg image format plugin at runtime, and without it the icon is not null
+    // and advertises a size, but yields no pixmap - so the result is probed and
+    // the PNGs embedded below are used whenever it comes up empty.
+#if defined(Q_OS_WIN)
+    a.setWindowIcon(QIcon(QStringLiteral(":/icons/hashcat-gui.ico")));
+#else
+    QIcon windowIcon = QIcon::fromTheme(QStringLiteral("hashcat-gui"));
+    if (windowIcon.pixmap(32, 32).isNull()) {
+        static constexpr int iconSizes[] = {16, 22, 24, 32, 48, 64, 128, 256};
+        for (int size : iconSizes) {
+            windowIcon.addFile(
+                QStringLiteral(":/icons/hicolor/%1x%1/apps/hashcat-gui.png").arg(size));
+        }
+    }
+    a.setWindowIcon(windowIcon);
+#endif
 
     // Load the translation before the first widget exists. qt_add_translations()
     // embeds the catalogs under :/i18n; a build without LinguistTools has
     // nothing there and stays on the source strings. The locale's UI languages
     // are tried from most to least specific, so hashcat-gui_de.qm answers for
     // de, de_DE and de_AT alike.
-    //
-    // The language setting overrides that guess: an empty code (the "System
-    // default" entry) keeps the environment's locale, any other code asks for
-    // exactly that locale. English has no catalog, loading simply fails and
-    // the source strings - which are English - stay.
     const QString language = SettingsManager::instance().getKey<QString>(
         AppConstants::SettingsKeys::Language, QString::fromUtf8(AppConstants::Languages::Default));
 

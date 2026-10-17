@@ -16,10 +16,6 @@
   <property name="windowTitle">
    <string notr="true">hashcat-gui</string>
   </property>
-  <property name="windowIcon">
-   <iconset resource="resources.qrc">
-    <normaloff>:/images/icon_hashcat.png</normaloff>:/images/icon_hashcat.png</iconset>
-  </property>
   <property name="tabShape">
    <enum>QTabWidget::TabShape::Rounded</enum>
   </property>
