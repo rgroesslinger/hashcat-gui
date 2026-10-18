@@ -71,11 +71,11 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
     auto const listWidgets = w->findChildren<const QListWidget *>();
     for (const QListWidget *listWidget : listWidgets) {
         QJsonArray list;
-        const auto items = listWidget->findItems(QString("*"), Qt::MatchWildcard);
+        const auto items = listWidget->findItems(QStringLiteral("*"), Qt::MatchWildcard);
         for (const QListWidgetItem *item : items) {
             QJsonObject li;
-            li["text"] = item->text();
-            li["checked"] = (item->checkState() == Qt::Checked);
+            li[QStringLiteral("text")] = item->text();
+            li[QStringLiteral("checked")] = (item->checkState() == Qt::Checked);
             list.append(li);
         }
         obj[listWidget->objectName()] = list;
@@ -150,8 +150,10 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
             const QJsonArray list = mutableObj[listWidget->objectName()].toArray();
             for (const auto &v : list) {
                 QJsonObject li = v.toObject();
-                QListWidgetItem *item = new QListWidgetItem(li["text"].toString(), listWidget);
-                item->setCheckState(li["checked"].toBool() ? Qt::Checked : Qt::Unchecked);
+                QListWidgetItem *item =
+                    new QListWidgetItem(li[QStringLiteral("text")].toString(), listWidget);
+                item->setCheckState(li[QStringLiteral("checked")].toBool() ? Qt::Checked
+                                                                           : Qt::Unchecked);
             }
         }
     }

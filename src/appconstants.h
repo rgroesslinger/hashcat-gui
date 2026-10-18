@@ -6,6 +6,7 @@
 #ifndef APPCONSTANTS_H
 #define APPCONSTANTS_H
 
+#include <QLatin1StringView>
 #include <QtGlobal>
 
 // Application wide constants.
@@ -15,6 +16,14 @@
 // key would silently create a second key and a typo in a command line token
 // would silently change the command. Keeping them together also documents
 // which defaults are duplicated in the .ui files.
+//
+// Everything that is a protocol token - a settings key, a file name, a
+// hashcat option, a placeholder - is declared as QLatin1StringView. Each one
+// of those is ASCII, so the type states that explicitly, needs no allocation
+// and still converts to QString where a QString is wanted. Text a user reads
+// that may legitimately carry non-ASCII characters (the language names below)
+// stays a const char * holding UTF-8, converted with QString::fromUtf8() at
+// the use site.
 namespace AppConstants
 {
 
@@ -22,11 +31,11 @@ namespace AppConstants
 // mistyped key does not fail - it simply stores the value somewhere else.
 namespace SettingsKeys
 {
-inline constexpr const char *HashcatPath = "hashcatPath";
-inline constexpr const char *Terminal = "terminal";
-inline constexpr const char *UseShortParameters = "useShortParameters";
+inline constexpr QLatin1StringView HashcatPath{"hashcatPath"};
+inline constexpr QLatin1StringView Terminal{"terminal"};
+inline constexpr QLatin1StringView UseShortParameters{"useShortParameters"};
 // Locale code of the UI language, see the Languages namespace below.
-inline constexpr const char *Language = "language";
+inline constexpr QLatin1StringView Language{"language"};
 } // namespace SettingsKeys
 
 // The languages the settings dialog offers.
@@ -34,7 +43,10 @@ inline constexpr const char *Language = "language";
 // What gets stored is always the locale code, never the display text, so
 // relabeling an entry cannot orphan a saved setting. The names are each
 // language's own name on purpose: whoever reads "Deutsch" knows it is their
-// language, "German" only helps English speakers.
+// language, "German" only helps English speakers. Both members hold UTF-8 and
+// are converted with QString::fromUtf8() where they are shown, because an
+// autonym such as a future "Čeština" is not ASCII and must not travel through
+// a Latin-1 view.
 namespace Languages
 {
 struct Language {
@@ -57,10 +69,10 @@ namespace Files
 {
 // Saved by MainWindow::saveDefaultProfile(), relative to
 // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-inline constexpr const char *DefaultProfile = "default_profile.json";
+inline constexpr QLatin1StringView DefaultProfile{"default_profile.json"};
 // The command preview: it is regenerated on every change, so it must never
 // be part of a stored profile.
-inline constexpr const char *PreviewWidget = "lineEdit_command";
+inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 } // namespace Files
 
 // Values the widgets start with. The identical defaults are baked into the
@@ -69,26 +81,26 @@ inline constexpr const char *PreviewWidget = "lineEdit_command";
 // constants only describe what code constructing the widgets itself gets.
 namespace Defaults
 {
-inline constexpr const char *OutfileFormat = "1,2";
-inline constexpr const char *BackendDevices = "0";
+inline constexpr QLatin1StringView OutfileFormat{"1,2"};
+inline constexpr QLatin1StringView BackendDevices{"0"};
 inline constexpr int SegmentSize = 32; // MB
-inline constexpr const char *OutfileSuffix = ".out";
+inline constexpr QLatin1StringView OutfileSuffix{".out"};
 } // namespace Defaults
 
 // Placeholders the user can type into the outfile field.
 namespace Placeholders
 {
-inline constexpr const char *UnixTime = "<unixtime>";
-inline constexpr const char *Hash = "<hash>";
+inline constexpr QLatin1StringView UnixTime{"<unixtime>"};
+inline constexpr QLatin1StringView Hash{"<hash>"};
 } // namespace Placeholders
 
 // Command line tokens that belong to hashcat itself.
 namespace Hashcat
 {
-inline constexpr const char *Quiet = "--quiet";
-inline constexpr const char *ExampleHashes = "--example-hashes";
-inline constexpr const char *MachineReadable = "--machine-readable";
-inline constexpr const char *Version = "--version";
+inline constexpr QLatin1StringView Quiet{"--quiet"};
+inline constexpr QLatin1StringView ExampleHashes{"--example-hashes"};
+inline constexpr QLatin1StringView MachineReadable{"--machine-readable"};
+inline constexpr QLatin1StringView Version{"--version"};
 // How long hashcat is given to answer a query such as --example-hashes
 inline constexpr int QueryTimeoutMs = 20000;
 } // namespace Hashcat

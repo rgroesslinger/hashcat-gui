@@ -9,6 +9,7 @@
 - Decoupled business logic from UI, enhancing codebase maintainability and enabling the creation of a robust and extensive test suite
 - Test suite: `tst_*` binaries wired into `ctest`, covering the command line rules, the hash type parser, the hashcat launch and helper process, the profile serializer, the settings dialog, the main window and the embedded translation catalogs
 - Refactored default values and magic numbers in `src/appconstants.h` (#10)
+- Hardened UTF-8 handling and handling of all strings by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`
 - `HashcatOptions` and `CommandBuilder`: the command line is built from a UI-independent description, and the gating rules (`attackUsesMask()`, `attackUsesWordlists()`, `attackUsesRules()`) live in one place that the main window's group boxes use too, so the visible options and the generated command cannot disagree
 - CI builds the translations, runs the tests and fails when the catalogs are out of step with the sources
 - Added `clang-format`, `clang-tidy` and `clazy` tooling

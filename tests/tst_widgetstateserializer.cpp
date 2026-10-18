@@ -24,6 +24,7 @@ class TestWidgetStateSerializer : public QObject
 
 private slots:
     void roundTrip();
+    void nonAsciiValuesSurviveTheFile();
     void ignoredWidgetsAreNotSaved();
     void ignoredWidgetsAreNotRestored();
     void corruptJsonIsRejected();
@@ -125,6 +126,46 @@ void TestWidgetStateSerializer::roundTrip()
     QCOMPARE(restored.listWidget->item(0)->checkState(), Qt::Checked);
     QCOMPARE(restored.listWidget->item(1)->text(), QStringLiteral("best64.rule"));
     QCOMPARE(restored.listWidget->item(1)->checkState(), Qt::Unchecked);
+}
+
+// A field may hold non-ASCII text - a mask, a wordlist path, anything the
+// user typed. The profile is written as UTF-8 and read back as UTF-8, so the
+// exact characters have to survive the round trip, and the file itself has to
+// carry them encoded rather than escaped away. The literals are \u escapes so
+// the test does not depend on the encoding of its own source file.
+void TestWidgetStateSerializer::nonAsciiValuesSurviveTheFile()
+{
+    const QString text = QStringLiteral("W\u00f6rterbuch \u2013 \u00e4\u00f6\u00fc\u00df");
+    const QString entry = QStringLiteral("\u65e5\u672c\u8a9e.txt"); // 日本語.txt
+
+    Form source;
+    source.lineEdit->setText(text);
+    auto *item = new QListWidgetItem(entry, source.listWidget);
+    item->setCheckState(Qt::Checked);
+
+    WidgetStateSerializer serializer;
+    QString errorMessage;
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("utf8.json"));
+    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
+                                        &errorMessage),
+             qPrintable(errorMessage));
+
+    // UTF-8 on disk: the bytes are the encoded characters, so a reader that is
+    // not this serializer sees the same text this process holds.
+    QFile saved(file);
+    QVERIFY(saved.open(QIODevice::ReadOnly));
+    const QByteArray bytes = saved.readAll();
+    QVERIFY(bytes.contains(text.toUtf8()));
+    QVERIFY(bytes.contains(entry.toUtf8()));
+
+    Form restored;
+    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
+                                          &errorMessage),
+             qPrintable(errorMessage));
+    QCOMPARE(restored.lineEdit->text(), text);
+    QCOMPARE(restored.listWidget->count(), 1);
+    QCOMPARE(restored.listWidget->item(0)->text(), entry);
+    QCOMPARE(restored.listWidget->item(0)->checkState(), Qt::Checked);
 }
 
 // The caller named lineEdit_command; its key and its value must not reach

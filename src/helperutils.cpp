@@ -19,26 +19,27 @@ QString HelperUtils::getParameter(Parameter key, bool useShort)
     // initialization could throw during pre-main static initialization and
     // end in std::terminate, so the table is a deferred function-local static.
     static const QMap<Parameter, QPair<QString, QString>> parameterMap = {
-        {Parameter::AttackMode, {"-a", "--attack-mode"}},
-        {Parameter::BackendDevices, {"-d", "--backend-devices"}},
-        {Parameter::CpuAffinity, {"", "--cpu-affinity"}},
-        {Parameter::CustomCharset1, {"-1", "--custom-charset1"}},
-        {Parameter::CustomCharset2, {"-2", "--custom-charset2"}},
-        {Parameter::CustomCharset3, {"-3", "--custom-charset3"}},
-        {Parameter::CustomCharset4, {"-4", "--custom-charset4"}},
-        {Parameter::GenerateRules, {"-g", "--generate-rules"}},
-        {Parameter::HashType, {"-m", "--hash-type"}},
-        {Parameter::HexCharset, {"", "--hex-charset"}},
-        {Parameter::HexSalt, {"", "--hex-salt"}},
-        {Parameter::OptimizedKernel, {"-O", "--optimized-kernel-enable"}},
-        {Parameter::Outfile, {"-o", "--outfile"}},
-        {Parameter::OutfileFormat, {"", "--outfile-format"}},
-        {Parameter::Remove, {"", "--remove"}},
-        {Parameter::RulesFile, {"-r", "--rules-file"}},
-        {Parameter::SegmentSize, {"-c", "--segment-size"}},
-        {Parameter::SpeedOnly, {"", "--speed-only"}},
-        {Parameter::Username, {"", "--username"}},
-        {Parameter::WorkloadProfile, {"-w", "--workload-profile"}},
+        {Parameter::AttackMode, {QStringLiteral("-a"), QStringLiteral("--attack-mode")}},
+        {Parameter::BackendDevices, {QStringLiteral("-d"), QStringLiteral("--backend-devices")}},
+        {Parameter::CpuAffinity, {QString(), QStringLiteral("--cpu-affinity")}},
+        {Parameter::CustomCharset1, {QStringLiteral("-1"), QStringLiteral("--custom-charset1")}},
+        {Parameter::CustomCharset2, {QStringLiteral("-2"), QStringLiteral("--custom-charset2")}},
+        {Parameter::CustomCharset3, {QStringLiteral("-3"), QStringLiteral("--custom-charset3")}},
+        {Parameter::CustomCharset4, {QStringLiteral("-4"), QStringLiteral("--custom-charset4")}},
+        {Parameter::GenerateRules, {QStringLiteral("-g"), QStringLiteral("--generate-rules")}},
+        {Parameter::HashType, {QStringLiteral("-m"), QStringLiteral("--hash-type")}},
+        {Parameter::HexCharset, {QString(), QStringLiteral("--hex-charset")}},
+        {Parameter::HexSalt, {QString(), QStringLiteral("--hex-salt")}},
+        {Parameter::OptimizedKernel,
+         {QStringLiteral("-O"), QStringLiteral("--optimized-kernel-enable")}},
+        {Parameter::Outfile, {QStringLiteral("-o"), QStringLiteral("--outfile")}},
+        {Parameter::OutfileFormat, {QString(), QStringLiteral("--outfile-format")}},
+        {Parameter::Remove, {QString(), QStringLiteral("--remove")}},
+        {Parameter::RulesFile, {QStringLiteral("-r"), QStringLiteral("--rules-file")}},
+        {Parameter::SegmentSize, {QStringLiteral("-c"), QStringLiteral("--segment-size")}},
+        {Parameter::SpeedOnly, {QString(), QStringLiteral("--speed-only")}},
+        {Parameter::Username, {QString(), QStringLiteral("--username")}},
+        {Parameter::WorkloadProfile, {QStringLiteral("-w"), QStringLiteral("--workload-profile")}},
     };
 
     auto it = parameterMap.constFind(key);
@@ -115,8 +116,12 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
 
         result.exitStatus = proc.exitStatus();
         result.exitCode = proc.exitCode();
-        result.standardOutput = proc.readAllStandardOutput();
-        result.standardError = proc.readAllStandardError();
+        // QProcess hands back raw bytes. hashcat speaks UTF-8, so decoding it
+        // as such is what turns the bytes into a QString; the implicit
+        // QByteArray-to-QString conversion would do the same, but through the
+        // deprecated constructor this project compiles without.
+        result.standardOutput = QString::fromUtf8(proc.readAllStandardOutput());
+        result.standardError = QString::fromUtf8(proc.readAllStandardError());
 
         return result;
     });
@@ -179,17 +184,22 @@ HelperUtils::LaunchError HelperUtils::validateLaunch(const QString &hashFile,
 const QMap<QString, QStringList> &HelperUtils::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
-        {"cmd.exe", {"/k"}},
-        {"xterm", {"-hold", "-e"}},
-        {"gnome-terminal", {"--wait", "--"}},
-        {"ptyxis", {"--"}},
-        {"konsole", {"--hold", "-e"}},
-        {"xfce4-terminal", {"--hold", "-x"}},
-        {"alacritty", {"-e"}},        // -e consumes the rest of the arguments
-        {"kitty", {}},                // the program is the first positional argument
-        {"foot", {}},                 // trailing arguments are run as the command
-        {"wezterm", {"start", "--"}}, // wezterm start -- <program>
-        {"wt.exe", {"-d", "."}},      // Windows Terminal
+        {QStringLiteral("cmd.exe"), {QStringLiteral("/k")}},
+        {QStringLiteral("xterm"), {QStringLiteral("-hold"), QStringLiteral("-e")}},
+        {QStringLiteral("gnome-terminal"), {QStringLiteral("--wait"), QStringLiteral("--")}},
+        {QStringLiteral("ptyxis"), {QStringLiteral("--")}},
+        {QStringLiteral("konsole"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
+        {QStringLiteral("xfce4-terminal"), {QStringLiteral("--hold"), QStringLiteral("-x")}},
+        // -e consumes the rest of the arguments
+        {QStringLiteral("alacritty"), {QStringLiteral("-e")}},
+        // the program is the first positional argument
+        {QStringLiteral("kitty"), {}},
+        // trailing arguments are run as the command
+        {QStringLiteral("foot"), {}},
+        // wezterm start -- <program>
+        {QStringLiteral("wezterm"), {QStringLiteral("start"), QStringLiteral("--")}},
+        // Windows Terminal
+        {QStringLiteral("wt.exe"), {QStringLiteral("-d"), QStringLiteral(".")}},
     };
     return table;
 }

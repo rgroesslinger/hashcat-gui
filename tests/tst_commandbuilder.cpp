@@ -28,6 +28,7 @@ private slots:
     void shortFallsBackToLong();
     void outfileIsOptInAndExpanded();
     void expandOutfileTemplateSubstitutesUnixTimeAndHash();
+    void nonAsciiArgumentsSurviveVerbatim();
     void predicates();
 };
 
@@ -212,6 +213,46 @@ void TestCommandBuilder::expandOutfileTemplateSubstitutesUnixTimeAndHash()
     QCOMPARE(CommandBuilder::expandOutfileTemplate(QStringLiteral("cracked_<HASH>.txt"),
                                                    QStringLiteral("/tmp/My.Hash.TXT")),
              QStringLiteral("cracked_My.Hash.TXT.txt"));
+}
+
+// A mask describes a password, and a password may hold anything - including
+// characters outside ASCII. The mask, the custom charset and the file paths
+// all have to reach the argument vector unchanged, and survive as the UTF-8
+// bytes the operating system hands to hashcat. The literals are written as
+// \u escapes on purpose, so the test does not depend on the encoding of its
+// own source file.
+void TestCommandBuilder::nonAsciiArgumentsSurviveVerbatim()
+{
+    const QString mask = QStringLiteral("Passw\u00f6rd?d");       // Passwörd?d
+    const QString charset = QStringLiteral("\u00e4\u00f6\u00fc"); // äöü
+    const QString dictionary = QStringLiteral("/tmp/W\u00f6rterbuch.txt");
+    const QString hashFile = QStringLiteral("/tmp/H\u00e4sch.txt");
+    const QString outfile = QStringLiteral("Ergebnis_<hash>_\u00e4.txt");
+
+    HashcatOptions options;
+    // Hybrid wordlist + mask reads a wordlist, a mask and a custom charset,
+    // so one invocation exercises all three non-ASCII inputs.
+    options.attackMode = AttackMode::HybridWordMask;
+    options.hashFile = hashFile;
+    options.mask = mask;
+    options.wordlists << dictionary;
+    options.customCharsets[0].enabled = true;
+    options.customCharsets[0].value = charset;
+    options.outfileEnabled = true;
+    options.outfile = outfile;
+
+    const QStringList arguments = CommandBuilder::build(options);
+    QVERIFY(arguments.contains(charset));
+    QVERIFY(arguments.contains(mask));
+    QVERIFY(arguments.contains(dictionary));
+    QVERIFY(arguments.contains(hashFile));
+    // <hash> is the hash file's name, non-ASCII included
+    QVERIFY(arguments.contains(QStringLiteral("Ergebnis_H\u00e4sch.txt_\u00e4.txt")));
+
+    // The bytes the operating system will see are real UTF-8: "ö" is C3 B6,
+    // not the single Latin-1 byte F6 a local-8-bit conversion would produce.
+    const QByteArray commandLine = arguments.join(QLatin1Char(' ')).toUtf8();
+    QVERIFY(commandLine.contains(QByteArray::fromHex("c3b6")));
 }
 
 void TestCommandBuilder::predicates()

@@ -22,6 +22,7 @@ private slots:
     void unusableReplyIsRejected();
     void invalidReplyIsRejected();
     void failedParseKeepsThePreviousList();
+    void utf8NamesArePreserved();
 };
 
 // What hashcat prints: multi-line and indented, with fields the parser never
@@ -133,6 +134,23 @@ void TestHashcatInfoParser::failedParseKeepsThePreviousList()
                                                    &errorMessage));
     QCOMPARE(hashModes.size(), 1);
     QCOMPARE(hashModes.value(0), QStringLiteral("0 | MD5"));
+}
+
+// A hash type's display name is UTF-8 text and may hold characters outside
+// ASCII. It travels from the JSON bytes to the combo box and has to arrive
+// there unchanged; the literals are \u escapes so the test does not depend on
+// the encoding of its own source file.
+void TestHashcatInfoParser::utf8NamesArePreserved()
+{
+    const QString raw = QStringLiteral(
+        "{\"0\":{\"name\":\"MD5 \u2013 \u00e4\u00f6\u00fc\u00df \u65e5\u672c\u8a9e\"}}");
+
+    QMap<quint32, QString> hashModes;
+    QVERIFY(HashcatInfoParser::parseExampleHashes(raw, hashModes));
+    QCOMPARE(hashModes.value(0),
+             QStringLiteral("0 | MD5 \u2013 \u00e4\u00f6\u00fc\u00df \u65e5\u672c\u8a9e"));
+    // every character is still whole: no replacement character crept in
+    QVERIFY(!hashModes.value(0).contains(QChar(0xFFFD)));
 }
 
 int main(int argc, char *argv[])

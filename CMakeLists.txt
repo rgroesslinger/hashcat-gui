@@ -9,21 +9,26 @@ project(hashcat-gui
 # The standard install destinations the install() rules below write to.
 include(GNUInstallDirs)
 
-# Build in Release mode by default
-if(NOT CMAKE_BUILD_TYPE)
+# Build in Release mode by default.
+#
+# Only for single-configuration generators: with a multi-config generator
+# CMAKE_BUILD_TYPE is deliberately empty and CMAKE_CONFIGURATION_TYPES drives
+# the build.
+# CACHE ... FORCE so the value lands in CMakeCache.txt and stays user-overridable
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "No build type specified - defaulting to Release")
-    set(CMAKE_BUILD_TYPE Release)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-message(STATUS "Building with CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-
-# The compilation database the generators support (Ninja, Makefiles) feeds
-# clang-tidy and editor integrations such as clangd. Generators without
-# support ignore the variable, so it is safe to set unconditionally.
+# The compilation database the generators support feeds clang-tidy
+# and editor integrations. Generators without support ignore the variable
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Flags for everything this file builds - the application and the tests
 add_compile_options(-Wall -Wextra -Wpedantic)
+
+# Compile in strict standard mode: no extensions
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Qt specific preprocessing
 set(CMAKE_AUTORCC ON)
@@ -60,16 +65,19 @@ set(HASHCAT_GUI_SOURCES
     src/settingsdialog.ui
 )
 
-# The sources are built once, into an object library the application and
-# every test link against, instead of being compiled again for each target.
-# Object files rather than a static library: that puts the qrc objects and
-# the static initializers directly on the link line, where nothing can drop
-# them as unreferenced.
+# The shared sources are compiled once into an object library the application
+# and every test link against. Object files rather than a static library, so
+# the qrc objects and static initializers cannot be dropped as unreferenced.
 add_library(hashcat-gui-core OBJECT ${HASHCAT_GUI_SOURCES})
 target_include_directories(hashcat-gui-core PUBLIC src)
 target_link_libraries(hashcat-gui-core PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
 target_compile_features(hashcat-gui-core PUBLIC cxx_std_20)
-set_target_properties(hashcat-gui-core PROPERTIES CXX_EXTENSIONS OFF)
+
+# Reject Qt's implicit byte/ASCII <-> QString conversions so every literal has
+# to state its encoding (QLatin1StringView, QStringLiteral or fromUtf8).
+# PRIVATE, and on each production target, so the tests stay exempt.
+set(HASHCAT_GUI_UTF8_DEFINITIONS QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII)
+target_compile_definitions(hashcat-gui-core PRIVATE ${HASHCAT_GUI_UTF8_DEFINITIONS})
 
 qt_add_executable(hashcat-gui WIN32
     src/main.cpp
@@ -78,17 +86,15 @@ qt_add_executable(hashcat-gui WIN32
 
 target_link_libraries(hashcat-gui PRIVATE hashcat-gui-core)
 
-# Make the project version visible to the sources as a string.
-target_compile_definitions(hashcat-gui PRIVATE HASHCAT_GUI_VERSION="${PROJECT_VERSION}")
+# main.cpp is compiled here, not into hashcat-gui-core, so it needs the same
+# UTF-8 guard the object library above carries.
+target_compile_definitions(hashcat-gui PRIVATE
+    ${HASHCAT_GUI_UTF8_DEFINITIONS}
+    HASHCAT_GUI_VERSION="${PROJECT_VERSION}")
 
-# Translations.
-#
-# LinguistTools is optional on purpose: a machine without qt6-tools still
-# builds, it just gets the untranslated source strings and no .qm files.
-#
-# SOURCE_TARGETS keeps lupdate on the application's own sources alone:
-# without it Qt collects every target in the project, the test executables
-# included, and a tr() added to a test would land in the catalogs.
+# LinguistTools is optional: without it the build still works, just with no
+# .qm files. SOURCE_TARGETS keeps lupdate off the tests, so a tr() added to a
+# test cannot land in the catalogs.
 find_package(Qt6 COMPONENTS LinguistTools QUIET)
 if(Qt6LinguistTools_FOUND)
     qt_add_translations(hashcat-gui
@@ -102,19 +108,13 @@ else()
     message(STATUS "Qt6 LinguistTools not found - building without translations")
 endif()
 
-# Tests.
-#
-# Qt6::Test ships with qtbase, but not every installation has the development
-# files for it. Without them the build still works and simply runs no tests -
-# which a CI job notices, because its ctest runs with --no-tests=error.
-#
-# BUILD_TESTING is the standard CMake switch: -DBUILD_TESTING=OFF skips the
-# test binaries entirely.
+# Qt6::Test is optional: without it the build still works and runs no tests,
+# which CI notices through ctest --no-tests=error. -DBUILD_TESTING=OFF skips
+# the test binaries on purpose.
 include(CTest)
 find_package(Qt6 COMPONENTS Test QUIET)
 
-# One executable per test source under tests/. This list is the single place a
-# test is added or removed: it drives both the executables built below and the
+# The single list of tests: it drives both the executables built below and the
 # run properties they are registered with.
 set(HASHCAT_GUI_TESTS
     tst_aboutdialog
@@ -136,11 +136,9 @@ elseif(Qt6Test_FOUND)
         add_test(NAME ${test} COMMAND ${test})
     endforeach()
 
-    # tst_translations can only prove that :/i18n answers at runtime if its
-    # binary carries the catalogs the way the application carries them. The
-    # files are the ones qt_add_translations() derives from the .ts list
-    # above; a build without LinguistTools produces neither the files nor
-    # the definition, and the test skips instead of failing.
+    # tst_translations only proves :/i18n answers at runtime if its binary embeds
+    # the catalogs the way the application does; without LinguistTools there are
+    # none, and the test skips instead of failing.
     if(Qt6LinguistTools_FOUND)
         target_compile_definitions(tst_translations PRIVATE HASHCAT_GUI_QM_EMBEDDED)
         qt_add_resources(tst_translations "tst_translations_translations"
@@ -151,14 +149,10 @@ elseif(Qt6Test_FOUND)
                 ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui_sr.qm)
     endif()
 
-    # The CI runners have no display and none is needed: nothing the tests
-    # show, not even the main window they construct. The offscreen plugin
-    # ships with qt6-base on every platform we build for.
-    #
-    # TIMEOUT caps each test at 60 s: a test that stumbles into a modal
-    # dialog nobody closes (or a hashcat query that never returns) must fail
-    # instead of hanging the whole CI job. The longest legitimate wait is
-    # AppConstants::Hashcat::QueryTimeoutMs (20 s).
+    # Headless CI: nothing the tests show, not even the main window, is drawn, and
+    # the offscreen plugin ships with qt6-base everywhere. TIMEOUT 60 s fails a
+    # test stuck on a modal dialog or a hashcat query that never returns, instead
+    # of hanging the job (longest legitimate wait: 20 s).
     set_tests_properties(${HASHCAT_GUI_TESTS}
         PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
 else()
@@ -176,9 +170,8 @@ file(GLOB ANALYSIS_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
 
-# `cmake --build build --target clang-format` reformats the sources in place
-# with the repository's .clang-format. A machine without clang-format simply
-# has no such target.
+# `--target clang-format` reformats the sources in place with the repo's
+# .clang-format; no clang-format, no target.
 find_program(CLANG_FORMAT NAMES clang-format)
 if(CLANG_FORMAT)
     add_custom_target(clang-format
@@ -186,11 +179,9 @@ if(CLANG_FORMAT)
         COMMENT "Formatting sources with clang-format")
 endif()
 
-# `cmake --build build --target clazy` runs clazy over the sources using the
-# compilation database, in the same spirit as the format target. clazy has no
-# config file of its own; the check selection lives in the CLAZY_CHECKS cache
-# variable, and CLAZY_IGNORE_DIRS keeps the report on this project's files
-# instead of Qt's headers. A machine without clazy simply has no such target.
+# `--target clazy` runs clazy over the sources from the compilation database.
+# The checks live in the CLAZY_CHECKS cache variable, and CLAZY_IGNORE_DIRS
+# keeps the report off Qt's headers; no clazy, no target.
 find_program(CLAZY_STANDALONE NAMES clazy-standalone)
 if(CLAZY_STANDALONE)
     set(CLAZY_CHECKS "level0,level1" CACHE STRING
@@ -203,10 +194,8 @@ if(CLAZY_STANDALONE)
         COMMENT "Running clazy over the sources")
 endif()
 
-# `cmake --build build --target clang-tidy` runs clang-tidy over the sources
-# using the compilation database. The .clang-tidy file selects the checks and
-# the header filter, so this target needs no cache variable of its own. A
-# machine without clang-tidy simply has no such target.
+# `--target clang-tidy` runs clang-tidy over the sources from the compilation
+# database; .clang-tidy supplies the checks, so no cache variable is needed.
 find_program(CLANG_TIDY NAMES clang-tidy)
 if(CLANG_TIDY)
     add_custom_target(clang-tidy
@@ -214,16 +203,13 @@ if(CLANG_TIDY)
         COMMENT "Running clang-tidy over the sources")
 endif()
 
-# Install to the standard directories.
-#
-# The icon is kept in the source tree as a mirrored hicolor theme
+# The icon tree is mirrored in the source as a hicolor theme
 # (src/icons/hicolor/<size>/apps/), so one install(DIRECTORY) copies every size
-# the artwork exists for, already in the layout the icon theme spec expects.
+# in the layout the icon theme spec expects.
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/icons/hicolor
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons)
 
-# The desktop entry itself: Icon=hashcat-gui is resolved by name through the
-# hicolor tree above when it is installed next to it.
+# Icon=hashcat-gui resolves by name through the hicolor tree above.
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/hashcat-gui.desktop
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 

@@ -35,6 +35,7 @@ private slots:
     void executeHashcatCapturesOutput();
     void executeHashcatGivesUpOnTimeout();
     void executeHashcatAppendsQuietAndUsesBinaryDirectory();
+    void executeHashcatDecodesUtf8Output();
 
 private:
     // The stubs only make sense where a #! line does
@@ -302,8 +303,39 @@ void TestHelperUtils::executeHashcatAppendsQuietAndUsesBinaryDirectory()
 
     // the caller's arguments, then --quiet - in that order
     const QStringList expectedArguments{QStringLiteral("--version"),
-                                        QString::fromLatin1(AppConstants::Hashcat::Quiet)};
+                                        QString(AppConstants::Hashcat::Quiet)};
     QCOMPARE(output.mid(1), expectedArguments);
+}
+
+// The bytes QProcess hands back are decoded as UTF-8, so a non-ASCII reply arrives intact instead
+// of as replacement characters. The literals are \u escapes so the test does not depend on the
+// encoding of its own source file.
+void TestHelperUtils::executeHashcatDecodesUtf8Output()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs on this platform");
+#else
+    QVERIFY2(stubsAvailable(), "the shell stub could not be written");
+#endif
+
+    const QString text =
+        QStringLiteral("Gr\u00fc\u00dfe \u2013 \u00e4\u00f6\u00fc\u00df \u65e5\u672c\u8a9e");
+
+    // The stub prints the UTF-8 bytes of the text, exactly as hashcat would.
+    const QByteArray script =
+        QStringLiteral("#!/bin/sh\nprintf '%s\\n' \"%1\"\n").arg(text).toUtf8();
+    const QString stub =
+        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-utf8"), script);
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    const HashcatResult result =
+        HelperUtils::executeHashcat({QStringLiteral("--version")}).result();
+
+    QCOMPARE(int(result.exitStatus), int(QProcess::NormalExit));
+    QCOMPARE(result.exitCode, 0);
+    QCOMPARE(result.standardOutput.trimmed(), text);
 }
 
 int main(int argc, char *argv[])
