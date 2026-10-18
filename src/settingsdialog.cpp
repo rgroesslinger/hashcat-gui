@@ -48,8 +48,7 @@ void SettingsDialog::readSettings()
 
     // Languages: the combo shows each language's own name and carries the
     // locale code as item data - that code is what gets stored. "System
-    // default" (an empty code) means "whatever the environment says", it is
-    // the behavior the application had before language became a setting.
+    // default" (an empty code) means "whatever the environment says".
     ui->comboBox_language->addItem(tr("System default"), QString());
     for (const auto &language : AppConstants::Languages::Available) {
         ui->comboBox_language->addItem(QString::fromUtf8(language.name),
@@ -68,10 +67,8 @@ void SettingsDialog::readSettings()
     ui->comboBox_language->setCurrentIndex(index);
 
     // What the combo shows is what Save will store, so that is what counts as
-    // "unchanged". Taking the raw stored value instead would make a stale code
-    // that fell back to "System default" read as a pending language change:
-    // Save would then announce a restart and rewrite the key behind the user's
-    // back, for a language the user never picked.
+    // "unchanged": a stale code that fell back to "System default" must not
+    // read as a pending change and trigger a restart.
     loadedLanguage = ui->comboBox_language->currentData().toString();
 }
 

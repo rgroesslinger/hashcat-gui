@@ -136,8 +136,7 @@ void MainWindow::showEvent(QShowEvent *event)
 
 // Give the window exactly the size its current tab needs: no scrollbar when
 // the tab content is taller than the geometry from mainwindow.ui, and no empty
-// strip when it is shorter. Either happened before whenever the hard-coded
-// size did not match the style, font, DPI scaling or translation at hand.
+// strip when it is shorter.
 void MainWindow::fitToContent()
 {
     QScrollArea *area = ui->tabWidget_main->currentWidget()->findChild<QScrollArea *>();
@@ -389,10 +388,8 @@ void MainWindow::initHashAndAttackModes()
                     }
 
                     // A profile loaded while the combo was still empty could
-                    // not select its hash type then; now that the items
-                    // exist, apply the stored index once and consume it -
-                    // a failed fill never reaches this point, so a pending
-                    // index survives until a later query succeeds.
+                    // not select its hash type; apply the stored index once now
+                    // that the items exist, and consume it.
                     if (m_pendingHashTypeIndex >= 0
                         && m_pendingHashTypeIndex < ui->comboBox_hash->count()) {
                         ui->comboBox_hash->setCurrentIndex(m_pendingHashTypeIndex);
@@ -607,11 +604,9 @@ void MainWindow::hashFileTextChanged(const QString &text)
         return;
     }
 
-    // Suggest "<hash file>.out", but never overwrite a value that is no
-    // longer ours: the user may have picked a different outfile, or a profile
-    // may just have been loaded. The suggestion only follows the hash file
-    // name while the field still contains the suggestion generated for the
-    // previous one.
+    // Suggest "<hash file>.out", but never overwrite a value that is no longer
+    // ours: the suggestion only follows the hash file name while the field
+    // still holds the suggestion generated for the previous one.
     const QString suggestion = text + AppConstants::Defaults::OutfileSuffix;
     QLineEdit *outfile = ui->lineEdit_outfile;
     if (outfile->text().isEmpty() || outfile->text() == suggestedOutfile) {
@@ -640,8 +635,6 @@ void MainWindow::executeClicked()
     const QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
 
     // Nothing is started unless the configuration is known to be complete.
-    // Previously a terminal that was no longer installed simply left the
-    // program empty and startDetached() failed without a word.
     QString detail;
     const HelperUtils::LaunchError error =
         HelperUtils::validateLaunch(ui->lineEdit_hashfile->text(), hashcatPath, configuredTerminal,
@@ -745,10 +738,8 @@ void MainWindow::commandChanged()
 
     ui->lineEdit_command->clear();
 
-    // Prepend the hashcat binary name if it has already been configured in
-    // settings. Without one the preview is the bare argument list, which must
-    // not start with a blank - that blank used to end up in the clipboard as
-    // well.
+    // Prepend the hashcat binary name when one is configured; without it the
+    // preview is the bare argument list, which must not start with a blank.
     const QString binary = hashcatPath.isEmpty() ? QString() : QFileInfo(hashcatPath).fileName();
     ui->lineEdit_command->setText(binary);
 
@@ -801,9 +792,8 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
 
     // checkBox_hex_hash is named after nothing in particular: it reads
-    // "Assume charset is given in hex" and maps to --hex-charset. Renaming it
-    // would change its object name, which is also the key under which a
-    // saved profile stores it.
+    // "Assume charset is given in hex", maps to --hex-charset, and its object
+    // name is also the key a saved profile stores it under.
     QCheckBox *charsetBoxes[4] = {
         ui->checkBox_custom_charset1,
         ui->checkBox_custom_charset2,

@@ -25,15 +25,11 @@ enum class AttackMode : std::uint8_t {
 // One UI independent description of a hashcat invocation.
 //
 // MainWindow fills it from the widgets, CommandBuilder turns it into an
-// argument vector. Splitting the two makes the argument rules testable
-// without constructing a window, and it makes the gating rules - which attack
-// mode contributes a wordlist, a mask or a custom charset - the builder's
-// business rather than a side effect of whether a group box happens to be
-// enabled at the time.
+// argument vector, which makes the argument rules testable without a window
+// and keeps the gating rules - which attack mode contributes a wordlist, a
+// mask or a custom charset - in the builder instead of in the group boxes.
 //
-// The member defaults are what the widgets in mainwindow.ui start with, so a
-// default constructed HashcatOptions produces exactly the command line the
-// freshly opened main window previews.
+// The member defaults are what the widgets in mainwindow.ui start with.
 struct HashcatOptions {
     bool useShortParameters = false;
 

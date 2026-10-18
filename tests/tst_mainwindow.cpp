@@ -35,14 +35,10 @@ class TestMainWindow : public QObject
 public:
     TestMainWindow()
     {
-        // Safety net for ctest, for the tests that spin the event loop: a
-        // reply the stub cannot produce opens a modal warning, and a modal
-        // dialog must never be able to hang the run. Repeating with a short
-        // interval, because a warning can only appear while an event loop
-        // is turning - which is when this timer ticks - and the failure-path
-        // tests below want it gone the moment it is there. Living as a
-        // member lets cleanup() stop it, so it cannot fire into a later
-        // test and close a modal that test legitimately opened.
+        // Safety net for the tests that spin the event loop: a reply the stub
+        // cannot produce opens a modal warning, and a modal must never be able
+        // to hang the run. A member, so cleanup() stops it before it can fire
+        // into a later test.
         m_watchdog.setSingleShot(false);
         m_watchdog.setInterval(100);
         connect(&m_watchdog, &QTimer::timeout, this, [] {
@@ -150,10 +146,9 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
 {
     MainWindow window;
 
-    // What each mode owes the widgets, written down independently of the very
-    // predicates updateViewAttackMode() switches on: the same ground truth
-    // tst_commandbuilder::predicates pins for the builder, asserted here
-    // against the widgets. A wrong predicate now disagrees with this table.
+    // What each mode owes the widgets, independent of the predicates
+    // updateViewAttackMode() switches on: the same table
+    // tst_commandbuilder::predicates pins for the builder.
     struct Expectation {
         AttackMode mode;
         bool wordlists;
@@ -450,11 +445,10 @@ void TestMainWindow::commandPreviewCarriesTheBinaryName()
     QCOMPARE(window.ui->lineEdit_command->text(), QStringLiteral("hashcat --attack-mode 0"));
 }
 
-// The profile machinery as the application uses it: saveDefaultProfile()
-// (the aboutToQuit handler) and the loadDefaultProfile() every constructor
-// runs. Two things are pinned here that no other test reaches: the command
-// preview stays out of the file, and a new window starts from the stored
-// state instead of the widget defaults.
+// The profile machinery as the application uses it: saveDefaultProfile() and
+// the loadDefaultProfile() every constructor runs. Pinned here, and nowhere
+// else: the command preview stays out of the file, and a new window starts
+// from the stored state.
 void TestMainWindow::defaultProfileRoundTrips()
 {
     // A failed save or load opens a modal warning; the watchdog must be
@@ -539,11 +533,9 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
     QCOMPARE(window.m_pendingHashTypeIndex, -1); // applied and consumed
 }
 
-// The window used to open at the single size hard-coded in mainwindow.ui. No
-// one number can be right for every font, DPI scaling, style and translation:
-// whichever way it is off, the tab either shows a scrollbar or a strip of
-// empty space below its content. The window now measures the content on its
-// first show instead.
+// No single size fits every font, DPI scaling, style and translation: a fixed
+// geometry either clips the content or leaves an empty strip. The window
+// measures the content on its first show instead.
 void TestMainWindow::windowFitsItsContent()
 {
     // A configured path keeps the constructor from queueing the settings
@@ -563,11 +555,9 @@ void TestMainWindow::windowFitsItsContent()
     QVERIFY(content);
     QVERIFY(window.screen());
 
-    // The size the window has to take. The sizeHint carries menu bar, margins,
-    // tab bar and frame, but the QScrollArea inside it is capped by Qt, so its
-    // capped hint is swapped for the content's real minimum. A screen too small
-    // for the content clamps the result; the same 40/80 headroom for the window
-    // decorations that fitToContent() leaves, and the scroll areas take over.
+    // The size fitToContent() should have produced: the capped scroll area hint
+    // swapped for the content minimum, clamped to the screen with the same
+    // 40/80 headroom for decorations.
     const QSize natural = window.sizeHint() + content->minimumSizeHint() - area->sizeHint();
     const QSize cap = window.screen()->availableGeometry().size() - QSize(40, 80);
     QCOMPARE(window.size(), natural.boundedTo(cap));

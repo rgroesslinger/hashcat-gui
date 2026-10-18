@@ -128,11 +128,9 @@ void TestWidgetStateSerializer::roundTrip()
     QCOMPARE(restored.listWidget->item(1)->checkState(), Qt::Unchecked);
 }
 
-// A field may hold non-ASCII text - a mask, a wordlist path, anything the
-// user typed. The profile is written as UTF-8 and read back as UTF-8, so the
-// exact characters have to survive the round trip, and the file itself has to
-// carry them encoded rather than escaped away. The literals are \u escapes so
-// the test does not depend on the encoding of its own source file.
+// A field may hold non-ASCII text. The profile is written and read as UTF-8,
+// so the exact characters have to survive the round trip and the file must
+// carry them encoded rather than escaped. The literals are \u escapes.
 void TestWidgetStateSerializer::nonAsciiValuesSurviveTheFile()
 {
     const QString text = QStringLiteral("W\u00f6rterbuch \u2013 \u00e4\u00f6\u00fc\u00df");

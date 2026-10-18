@@ -14,15 +14,12 @@
 
 // Scratch base directories for a test process.
 //
-// QSettings and QStandardPaths resolve XDG_CONFIG_HOME / XDG_DATA_HOME when
-// they are first used. Redirecting them here means no test can read, and
-// above all no test can overwrite, the settings, default profile or window
-// geometry of whoever runs ctest.
+// QSettings and QStandardPaths resolve XDG_CONFIG_HOME / XDG_DATA_HOME on
+// first use; redirecting them here means no test can read or overwrite the
+// settings, default profile or window geometry of whoever runs ctest.
 //
-// The three accessors hold function local statics that are first touched from
-// main(), before SettingsManager's singleton exists. Both are therefore
-// destroyed in reverse order of that: the singleton first, the directories
-// last, so nothing ever writes into a directory that is already gone.
+// The three statics are first touched from main(), so they outlive
+// SettingsManager's singleton and are destroyed last, after it.
 namespace TestEnvironment
 {
 
@@ -60,10 +57,9 @@ inline void redirectBaseDirectories()
     qputenv("XDG_CACHE_HOME", cacheHome().path().toUtf8());
 }
 
-// A hashcat stand-in the tests can actually execute. Returns an empty path on
-// a platform that cannot run it - no shell to interpret the #! line, or
-// Windows, which starts no such file at all. Callers QSKIP on Windows and
-// treat an empty path as a hard failure everywhere else.
+// A hashcat stand-in the tests can execute. Returns an empty path where a #!
+// script cannot run (Windows) or be written; callers QSKIP on Windows and
+// treat an empty path as a hard failure elsewhere.
 inline QString writeShellStub([[maybe_unused]] const QString &name,
                               [[maybe_unused]] const QByteArray &content)
 {

@@ -19,10 +19,9 @@
 
 // Result of a single hashcat invocation.
 //
-// The status members are initialised to values that mean "no process ran":
-// every consumer checks `exitStatus != NormalExit || exitCode != 0` before
-// looking at the output, so an early return (missing configuration, process
-// never started, timeout) must not be able to look like a successful run.
+// The status members default to "no process ran", so an early return (missing
+// configuration, process never started, timeout) cannot look like a successful
+// run to the consumers that check exitStatus/exitCode first.
 struct HashcatResult {
     QProcess::ExitStatus exitStatus = QProcess::CrashExit;
     int exitCode = -1;
@@ -73,9 +72,8 @@ public:
 
     // Checks everything that has to hold before hashcat can be started.
     //
-    // detail receives the offending value - the missing path, or the
-    // terminals that would work - when it is not nullptr. Keeping this out of
-    // MainWindow means the conditions can be tested without showing dialogs.
+    // detail receives the offending value - the missing path, or the terminals
+    // that would work - when it is not nullptr.
     static LaunchError validateLaunch(const QString &hashFile, const QString &hashcatPath,
                                       const QString &configuredTerminal,
                                       const QStringList &availableTerminals,

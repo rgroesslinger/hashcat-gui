@@ -44,7 +44,7 @@ private slots:
     void aboutQtTriggered();
     void aboutTriggered();
 
-    // main‑tab buttons
+    // main-tab buttons
     void executeClicked();
     void openHashFileClicked();
     void outputClicked();
@@ -69,7 +69,7 @@ private slots:
     // line edits
     void hashFileTextChanged(const QString &text);
 
-    // rule‑file buttons
+    // rule-file buttons
     void openRulesFile1Clicked();
     void openRulesFile2Clicked();
     void openRulesFile3Clicked();

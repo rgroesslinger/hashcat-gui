@@ -59,20 +59,11 @@ QString HelperUtils::getParameter(Parameter key, bool useShort)
     return pair.second;
 }
 
-/**
- * This method runs hashcat asynchronously using QtConcurrent and returns a future
- * that will contain the execution results.
- *
- * Usage Example:
- *
- * QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>();
- * connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
- *     const HashcatResult &result = watcher->result();
- *     // process contents of "result"
- *     watcher->deleteLater();
- * });
- * watcher->setFuture(HelperUtils::executeHashcat(QStringList() << "--help"));
- */
+// Runs hashcat asynchronously; the caller attaches a QFutureWatcher and reads
+// the result in its finished handler:
+//   auto *w = new QFutureWatcher<HashcatResult>(this);
+//   connect(w, &QFutureWatcher<HashcatResult>::finished, this, ...);
+//   w->setFuture(HelperUtils::executeHashcat({"--help"}));
 QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int timeoutMs)
 {
     // QSettings is only reentrant. The lambda below runs on the thread pool,
@@ -116,10 +107,8 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
 
         result.exitStatus = proc.exitStatus();
         result.exitCode = proc.exitCode();
-        // QProcess hands back raw bytes. hashcat speaks UTF-8, so decoding it
-        // as such is what turns the bytes into a QString; the implicit
-        // QByteArray-to-QString conversion would do the same, but through the
-        // deprecated constructor this project compiles without.
+        // QProcess hands back raw bytes; hashcat speaks UTF-8, so decode them
+        // as such rather than through the conversion this project compiles without.
         result.standardOutput = QString::fromUtf8(proc.readAllStandardOutput());
         result.standardError = QString::fromUtf8(proc.readAllStandardError());
 
@@ -177,10 +166,8 @@ HelperUtils::LaunchError HelperUtils::validateLaunch(const QString &hashFile,
 
 // The arguments that belong between the terminal program and the hashcat
 // command line, for every supported terminal. The entries are pure data -
-// nothing here looks at the filesystem - so the tests can pin what each one
-// promises. Terminals whose option takes a single shell-quoted string
-// instead of an argument vector (terminator -e) cannot be expressed here
-// and are deliberately not listed.
+// nothing here looks at the filesystem. Terminals whose option takes a single
+// shell-quoted string (terminator -e) are deliberately not listed.
 const QMap<QString, QStringList> &HelperUtils::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {

@@ -216,11 +216,10 @@ void TestCommandBuilder::expandOutfileTemplateSubstitutesUnixTimeAndHash()
 }
 
 // A mask describes a password, and a password may hold anything - including
-// characters outside ASCII. The mask, the custom charset and the file paths
-// all have to reach the argument vector unchanged, and survive as the UTF-8
-// bytes the operating system hands to hashcat. The literals are written as
-// \u escapes on purpose, so the test does not depend on the encoding of its
-// own source file.
+// characters outside ASCII. The mask, charset and paths have to reach the
+// argument vector unchanged, as the UTF-8 bytes the operating system hands to
+// hashcat. The literals are \u escapes, so the test does not depend on its own
+// source encoding.
 void TestCommandBuilder::nonAsciiArgumentsSurviveVerbatim()
 {
     const QString mask = QStringLiteral("Passw\u00f6rd?d");       // Passwörd?d

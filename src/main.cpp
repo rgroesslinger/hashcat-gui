@@ -36,19 +36,11 @@ int main(int argc, char *argv[])
     // to resolve the installed hicolor icon by name
     a.setDesktopFileName(QStringLiteral("hashcat-gui"));
 
-    // Window and taskbar icon.
-    //
-    // Windows has no icon theme, so the full-bleed .ico is used directly: it
-    // carries every size Windows asks for and matches the icon Explorer and
-    // shortcuts show for the executable.
-    //
-    // Elsewhere the icon theme is preferred, because it resolves the installed
-    // hicolor icon at the size the desktop asks for and covers the sizes no
-    // bitmap exists for with the scalable SVG. QIcon::fromTheme() gives no hint
-    // when that entry cannot actually be rendered - the scalable SVG needs the
-    // qsvg image format plugin at runtime, and without it the icon is not null
-    // and advertises a size, but yields no pixmap - so the result is probed and
-    // the PNGs embedded below are used whenever it comes up empty.
+    // Window and taskbar icon. Windows gets the full-bleed .ico; elsewhere the
+    // icon theme is preferred. QIcon::fromTheme() cannot tell when the themed
+    // SVG is unrenderable (no qsvg plugin): it looks valid but yields no
+    // pixmap, so the result is probed and the embedded PNGs are used when it
+    // comes up empty.
 #if defined(Q_OS_WIN)
     a.setWindowIcon(QIcon(QStringLiteral(":/icons/hashcat-gui.ico")));
 #else

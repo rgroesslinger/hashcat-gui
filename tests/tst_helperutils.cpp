@@ -307,9 +307,8 @@ void TestHelperUtils::executeHashcatAppendsQuietAndUsesBinaryDirectory()
     QCOMPARE(output.mid(1), expectedArguments);
 }
 
-// The bytes QProcess hands back are decoded as UTF-8, so a non-ASCII reply arrives intact instead
-// of as replacement characters. The literals are \u escapes so the test does not depend on the
-// encoding of its own source file.
+// The bytes QProcess hands back are decoded as UTF-8, so a non-ASCII reply
+// arrives intact. The literals are \u escapes.
 void TestHelperUtils::executeHashcatDecodesUtf8Output()
 {
 #ifdef Q_OS_WIN

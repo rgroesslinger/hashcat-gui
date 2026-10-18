@@ -11,19 +11,11 @@
 
 // Application wide constants.
 //
-// Settings keys, file names, default values and the literals handed to
-// hashcat used to be spelled out at every use site, where a typo in a settings
-// key would silently create a second key and a typo in a command line token
-// would silently change the command. Keeping them together also documents
-// which defaults are duplicated in the .ui files.
-//
 // Everything that is a protocol token - a settings key, a file name, a
-// hashcat option, a placeholder - is declared as QLatin1StringView. Each one
-// of those is ASCII, so the type states that explicitly, needs no allocation
-// and still converts to QString where a QString is wanted. Text a user reads
-// that may legitimately carry non-ASCII characters (the language names below)
-// stays a const char * holding UTF-8, converted with QString::fromUtf8() at
-// the use site.
+// hashcat option, a placeholder - is a QLatin1StringView: ASCII, allocation
+// free, and still convertible to QString. User-visible text that may be
+// non-ASCII (the language names below) stays a UTF-8 const char * converted
+// with QString::fromUtf8() at the use site.
 namespace AppConstants
 {
 
@@ -41,12 +33,8 @@ inline constexpr QLatin1StringView Language{"language"};
 // The languages the settings dialog offers.
 //
 // What gets stored is always the locale code, never the display text, so
-// relabeling an entry cannot orphan a saved setting. The names are each
-// language's own name on purpose: whoever reads "Deutsch" knows it is their
-// language, "German" only helps English speakers. Both members hold UTF-8 and
-// are converted with QString::fromUtf8() where they are shown, because an
-// autonym such as a future "Čeština" is not ASCII and must not travel through
-// a Latin-1 view.
+// relabeling an entry cannot orphan a saved setting. Both members hold UTF-8
+// and are converted with QString::fromUtf8() where they are shown.
 namespace Languages
 {
 struct Language {

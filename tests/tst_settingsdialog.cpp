@@ -55,21 +55,19 @@ public:
                     focused->clearFocus();
                 }
                 if (!fileDialog->selectedFiles().contains(pickFile)) {
-                    // A native file dialog applies the pick asynchronously and
-                    // may still be offering what an earlier dialog in this
-                    // process selected; keep asking until it holds our file,
-                    // but never accept on a file we did not choose.
+                    // A native dialog applies the pick asynchronously and may
+                    // still offer an earlier selection; keep asking until it
+                    // holds our file, but never accept one we did not choose.
                     fileDialog->selectFile(pickFile);
                     if (++waitingForPick > 50) {
                         // ~2.5s without our file: close so the test fails on
-                        // its own assertions instead of hanging until the
-                        // ctest timeout kills it.
+                        // its assertions instead of hanging until ctest kills it.
                         fileDialog->close();
                     }
                     return;
                 }
-                // accept() is protected on QFileDialog; going through QDialog
-                // calls the very same virtual implementation
+                // accept() is protected on QFileDialog; QDialog calls the same
+                // virtual implementation.
                 static_cast<QDialog *>(fileDialog)->accept();
             }
         });
