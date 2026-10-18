@@ -4,6 +4,7 @@
  */
 
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QIcon>
 #include <QLocale>
 #include <QTranslator>
@@ -22,6 +23,15 @@ int main(int argc, char *argv[])
     // (and with it the location of the default profile)
     a.setApplicationName(QStringLiteral("hashcat-gui"));
     a.setApplicationVersion(QString::fromUtf8(AppVersion::String));
+
+    // Standard --help / --version handling. parser.process() exits the
+    // process on either option, so the main window is never created and no
+    // dialog opens - handy for smoke-testing the binary.
+    QCommandLineParser parser;
+    parser.setApplicationDescription(a.applicationName());
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.process(a);
 
     // Let the desktop match the window to the XDG desktop entry
     // to resolve the installed hicolor icon by name
