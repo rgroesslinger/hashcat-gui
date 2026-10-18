@@ -11,6 +11,9 @@
 #include <QJsonObject>
 #include <QListWidgetItem>
 #include <QStandardPaths>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QScreen>
 #include <QTimer>
 #include <QWidget>
 
@@ -66,6 +69,7 @@ private slots:
     void commandPreviewCarriesTheBinaryName();
     void defaultProfileRoundTrips();
     void profileHashTypeSurvivesTheAsynchronousQuery();
+    void windowFitsItsContent();
 
 private:
     QString m_savedHashcatPath;
@@ -533,6 +537,51 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
     QCOMPARE(window.ui->comboBox_hash->currentIndex(), 1);
     QCOMPARE(window.ui->comboBox_hash->currentData().toUInt(), 1000u);
     QCOMPARE(window.m_pendingHashTypeIndex, -1); // applied and consumed
+}
+
+// The window used to open at the single size hard-coded in mainwindow.ui. No
+// one number can be right for every font, DPI scaling, style and translation:
+// whichever way it is off, the tab either shows a scrollbar or a strip of
+// empty space below its content. The window now measures the content on its
+// first show instead.
+void TestMainWindow::windowFitsItsContent()
+{
+    // A configured path keeps the constructor from queueing the settings
+    // dialog, whose modal loop would want the event loop this test spins. The
+    // path need not exist: the query it starts only ever fills the hash type
+    // combo, which stays empty and keeps the measured size stable.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+    m_watchdog.start();
+
+    MainWindow window;
+    window.show();
+    QCoreApplication::processEvents();
+
+    QScrollArea *area = window.ui->scrollArea_2;
+    QWidget *content = area->widget();
+    QVERIFY(content);
+    QVERIFY(window.screen());
+
+    // The size the window has to take. The sizeHint carries menu bar, margins,
+    // tab bar and frame, but the QScrollArea inside it is capped by Qt, so its
+    // capped hint is swapped for the content's real minimum. A screen too small
+    // for the content clamps the result; the same 40/80 headroom for the window
+    // decorations that fitToContent() leaves, and the scroll areas take over.
+    const QSize natural = window.sizeHint() + content->minimumSizeHint() - area->sizeHint();
+    const QSize cap = window.screen()->availableGeometry().size() - QSize(40, 80);
+    QCOMPARE(window.size(), natural.boundedTo(cap));
+
+    if (natural.height() <= cap.height()) {
+        // The content fits the screen: no scrollbar, and no empty strip below
+        // it - the content is exactly as tall as it needs to be.
+        QVERIFY(!area->verticalScrollBar()->isVisible());
+        QVERIFY(content->height() - content->minimumSizeHint().height() < 30);
+    } else {
+        // The content is taller than the screen: the window stays on-screen
+        // and the scroll area has to show its scrollbar.
+        QVERIFY(area->verticalScrollBar()->isVisible());
+    }
 }
 
 int main(int argc, char *argv[])

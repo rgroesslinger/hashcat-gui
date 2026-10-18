@@ -22,6 +22,8 @@
 #include <QClipboard>
 #include <QStandardPaths>
 #include <QFutureWatcher>
+#include <QScreen>
+#include <QScrollArea>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
@@ -118,6 +120,47 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::showEvent(QShowEvent *event)
+{
+    QMainWindow::showEvent(event);
+
+    // Fit once, on the first show. Guarded because hiding and restoring the
+    // window must not override a size the user has chosen in the meantime.
+    if (!m_sizedToContent) {
+        m_sizedToContent = true;
+        fitToContent();
+    }
+}
+
+// Give the window exactly the size its current tab needs: no scrollbar when
+// the tab content is taller than the geometry from mainwindow.ui, and no empty
+// strip when it is shorter. Either happened before whenever the hard-coded
+// size did not match the style, font, DPI scaling or translation at hand.
+void MainWindow::fitToContent()
+{
+    QScrollArea *area = ui->tabWidget_main->currentWidget()->findChild<QScrollArea *>();
+    if (!area || !area->widget()) {
+        return;
+    }
+
+    // The window's own sizeHint is not usable here: Qt caps the sizeHint of a
+    // resizable QScrollArea at 24 font heights, which can be far below what
+    // the tab content needs. Replace that capped hint with the content's
+    // minimum - the size at which every widget just fits - and carry it over
+    // through the difference, which holds the menu bar, margins, tab bar and
+    // frame.
+    QSize target = sizeHint() + area->widget()->minimumSizeHint() - area->sizeHint();
+
+    // A screen too small for the content keeps the window on-screen; the
+    // scroll areas stay in place and show their scrollbars as the fallback.
+    // The margin leaves room for the window decorations.
+    if (const QScreen *scr = screen()) {
+        target = target.boundedTo(scr->availableGeometry().size() - QSize(40, 80));
+    }
+
+    resize(target);
 }
 
 /*************** Menu Bar ***************/

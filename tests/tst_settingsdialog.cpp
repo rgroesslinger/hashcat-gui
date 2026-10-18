@@ -97,6 +97,7 @@ private slots:
     void staleLanguageCodeDoesNotDemandARestart();
     void selectPathClickedAcceptsAnExecutable();
     void selectPathClickedRejectsAPlainFile();
+    void fitsItsContent();
 
 private:
     QString m_savedHashcatPath;
@@ -258,6 +259,21 @@ void TestSettingsDialog::selectPathClickedRejectsAPlainFile()
     QCOMPARE(recorder.title, QStringLiteral("Invalid file"));
     QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QStringLiteral("/preset"));
 #endif
+}
+
+// The dialog must not be pinned to the 450x385 in the .ui: that one size
+// clips its content under a large font or a long translation and leaves an
+// empty margin under a small one. SetFixedSize makes it exactly content-sized.
+void TestSettingsDialog::fitsItsContent()
+{
+    SettingsDialog dialog;
+    dialog.show();
+    QCoreApplication::processEvents();
+
+    QCOMPARE(dialog.size(), dialog.sizeHint());
+    // content-sized, and still not resizable
+    QCOMPARE(dialog.minimumSize(), dialog.maximumSize());
+    QCOMPARE(dialog.size(), dialog.maximumSize());
 }
 
 int main(int argc, char *argv[])

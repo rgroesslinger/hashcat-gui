@@ -10,24 +10,6 @@
     <height>160</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>500</width>
-    <height>160</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>500</width>
-    <height>160</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>About</string>
   </property>
@@ -35,6 +17,9 @@
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="sizeConstraint">
+    <enum>QLayout::SizeConstraint::SetFixedSize</enum>
+   </property>
    <item>
     <widget class="QGroupBox" name="groupBox_versions">
      <property name="title">
@@ -82,27 +67,23 @@
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
              <widget class="QLabel" name="label_hc_version">
+              <property name="maximumSize">
+               <size>
+                <width>360</width>
+                <height>16777215</height>
+               </size>
+              </property>
               <property name="text">
                <string>[unknown]</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
            </layout>
           </item>
          </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>258</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>
@@ -152,19 +133,6 @@
            </layout>
           </item>
          </layout>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>258</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </item>

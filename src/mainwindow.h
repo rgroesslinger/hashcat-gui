@@ -10,6 +10,7 @@
 #include <QListWidgetItem>
 #include <QComboBox>
 #include <QProcess>
+#include <QShowEvent>
 
 #include "hashcatoptions.h"
 #include "helperutils.h"
@@ -26,6 +27,12 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
+
+protected:
+    // The window cannot know its natural size before it is shown: the scroll
+    // areas inside the tabs only report the content's final minimum once they
+    // are polished. The one-shot fit to the content therefore happens here.
+    void showEvent(QShowEvent *event) override;
 
 private slots:
     // menu actions
@@ -103,6 +110,14 @@ private:
     QString defaultProfileFile() const;
     void loadDefaultProfile();
     void saveDefaultProfile();
+
+    // Gives the window the size its current tab actually needs once, on the
+    // first show. See showEvent().
+    void fitToContent();
+
+    // The fit in showEvent() runs a single time; a later show (hide/restore)
+    // must not move or resize a window the user has placed themselves.
+    bool m_sizedToContent = false;
 
     // A profile can name a hash type while comboBox_hash still has no items
     // - the list arrives with the asynchronous hashcat query, after the

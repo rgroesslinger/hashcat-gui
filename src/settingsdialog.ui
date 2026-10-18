@@ -10,24 +10,6 @@
     <height>385</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>450</width>
-    <height>385</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>450</width>
-    <height>385</height>
-   </size>
-  </property>
   <property name="windowTitle">
    <string>Settings</string>
   </property>
@@ -35,6 +17,9 @@
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="sizeConstraint">
+    <enum>QLayout::SizeConstraint::SetFixedSize</enum>
+   </property>
    <item>
     <widget class="QGroupBox" name="groupBox_hc_path">
      <property name="sizePolicy">
@@ -73,6 +58,12 @@
         </property>
         <item>
          <widget class="QLineEdit" name="lineEdit_hc_path">
+          <property name="minimumSize">
+           <size>
+            <width>320</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>

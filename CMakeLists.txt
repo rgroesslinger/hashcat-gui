@@ -124,6 +124,7 @@ find_package(Qt6 COMPONENTS Test QUIET)
 # test is added or removed: it drives both the executables built below and the
 # run properties they are registered with.
 set(HASHCAT_GUI_TESTS
+    tst_aboutdialog
     tst_commandbuilder
     tst_hashcatinfoparser
     tst_helperutils
