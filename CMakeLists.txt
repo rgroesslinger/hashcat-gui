@@ -9,13 +9,6 @@ project(hashcat-gui
 # The standard install destinations the install() rules below write to.
 include(GNUInstallDirs)
 
-# Set version
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in
-    ${CMAKE_CURRENT_BINARY_DIR}/version.h
-    @ONLY
-)
-
 # Build in Release mode by default
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "No build type specified - defaulting to Release")
@@ -83,10 +76,10 @@ qt_add_executable(hashcat-gui WIN32
     src/hashcat-gui.rc
 )
 
-# version.h is generated, it lives in the build tree
-target_include_directories(hashcat-gui PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-
 target_link_libraries(hashcat-gui PRIVATE hashcat-gui-core)
+
+# Make the project version visible to the sources as a string.
+target_compile_definitions(hashcat-gui PRIVATE HASHCAT_GUI_VERSION="${PROJECT_VERSION}")
 
 # Translations.
 #

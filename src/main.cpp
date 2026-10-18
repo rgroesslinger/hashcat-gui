@@ -11,7 +11,6 @@
 #include "mainwindow.h"
 #include "settingsmanager.h"
 #include "appconstants.h"
-#include "version.h"
 
 int main(int argc, char *argv[])
 {
@@ -22,7 +21,7 @@ int main(int argc, char *argv[])
     // organization in addition would change QStandardPaths::AppDataLocation
     // (and with it the location of the default profile)
     a.setApplicationName(QStringLiteral("hashcat-gui"));
-    a.setApplicationVersion(QString::fromUtf8(AppVersion::String));
+    a.setApplicationVersion(QStringLiteral(HASHCAT_GUI_VERSION));
 
     // Standard --help / --version handling. parser.process() exits the
     // process on either option, so the main window is never created and no
