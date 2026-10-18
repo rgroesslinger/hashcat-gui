@@ -1,14 +1,18 @@
 cmake_minimum_required(VERSION 3.24)
-project(hashcat-gui CXX)
+project(hashcat-gui
+    VERSION 0.7.1
+    DESCRIPTION "Qt-based GUI for hashcat"
+    HOMEPAGE_URL "https://github.com/rgroesslinger/hashcat-gui/"
+    LANGUAGES CXX
+)
 
 # The standard install destinations the install() rules below write to.
 include(GNUInstallDirs)
 
 # Set version
-set(GUI_VERSION 0.7.1)
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
-    ${CMAKE_CURRENT_BINARY_DIR}/config.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/version.h
     @ONLY
 )
 
@@ -19,11 +23,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 message(STATUS "Building with CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-
-# Need at least C++20
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 # The compilation database the generators support (Ninja, Makefiles) feeds
 # clang-tidy and editor integrations such as clangd. Generators without
@@ -76,13 +75,15 @@ set(HASHCAT_GUI_SOURCES
 add_library(hashcat-gui-core OBJECT ${HASHCAT_GUI_SOURCES})
 target_include_directories(hashcat-gui-core PUBLIC src)
 target_link_libraries(hashcat-gui-core PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
+target_compile_features(hashcat-gui-core PUBLIC cxx_std_20)
+set_target_properties(hashcat-gui-core PROPERTIES CXX_EXTENSIONS OFF)
 
-add_executable(hashcat-gui WIN32
+qt_add_executable(hashcat-gui WIN32
     src/main.cpp
     src/hashcat-gui.rc
 )
 
-# config.h is generated, it lives in the build tree
+# version.h is generated, it lives in the build tree
 target_include_directories(hashcat-gui PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(hashcat-gui PRIVATE hashcat-gui-core)
@@ -233,3 +234,10 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/hashcat-gui.desktop
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications)
 
 install(TARGETS hashcat-gui RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+# Packaging. CPack derives the archive name/version from these variables.
+set(CPACK_PACKAGE_NAME "hashcat-gui")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_DESCRIPTION}")
+set(CPACK_PACKAGE_HOMEPAGE_URL "${PROJECT_HOMEPAGE_URL}")
+include(CPack)

@@ -10,7 +10,7 @@
 #include "mainwindow.h"
 #include "settingsmanager.h"
 #include "appconstants.h"
-#include "config.h"
+#include "version.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     // organization in addition would change QStandardPaths::AppDataLocation
     // (and with it the location of the default profile)
     a.setApplicationName(QStringLiteral("hashcat-gui"));
-    a.setApplicationVersion(GUI_VERSION);
+    a.setApplicationVersion(QString::fromUtf8(AppVersion::String));
 
     // Let the desktop match the window to the XDG desktop entry
     // to resolve the installed hicolor icon by name
