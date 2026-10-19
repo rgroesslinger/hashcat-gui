@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: windows-latest
 
+    # Uploading the asset is the only thing here that writes to the repository.
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
