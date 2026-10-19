@@ -85,6 +85,32 @@ inline constexpr QLatin1StringView UnixTime{"<unixtime>"};
 inline constexpr QLatin1StringView Hash{"<hash>"};
 } // namespace Placeholders
 
+// Fixed reference tables for the help tooltips. Hashcat syntax, so they are
+// non-translatable constants here.
+namespace HelpText
+{
+inline constexpr QLatin1StringView BuiltinCharsets{"  ?l = abcdefghijklmnopqrstuvwxyz [a-z]\n"
+                                                   "  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]\n"
+                                                   "  ?d = 0123456789 [0-9]\n"
+                                                   "  ?h = 0123456789abcdef [0-9a-f]\n"
+                                                   "  ?H = 0123456789ABCDEF [0-9A-F]\n"
+                                                   "  ?s =  !\"#$%&'()*+,-./:;<>=?@[]^_`{|}~\n"
+                                                   "  ?a = ?l?u?d?s\n"
+                                                   "  ?b = 0x00 - 0xff"};
+inline constexpr QLatin1StringView OutfileFormats{"  1 = hash[:salt]\n"
+                                                  "  2 = plain\n"
+                                                  "  3 = hex_plain\n"
+                                                  "  4 = crack_pos\n"
+                                                  "  5 = timestamp absolute\n"
+                                                  "  6 = timestamp relative"};
+} // namespace HelpText
+
+// Fixed external links. Only the label around a link is translatable.
+namespace Urls
+{
+inline constexpr QLatin1StringView Hashcat{"https://hashcat.net"};
+} // namespace Urls
+
 // Command line tokens that belong to hashcat itself.
 namespace Hashcat
 {

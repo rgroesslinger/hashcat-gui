@@ -77,7 +77,7 @@
         <location filename="../src/mainwindow.ui" line="348"/>
         <location filename="../src/mainwindow.ui" line="391"/>
         <location filename="../src/mainwindow.ui" line="434"/>
-        <location filename="../src/mainwindow.ui" line="857"/>
+        <location filename="../src/mainwindow.ui" line="812"/>
         <source>Open...</source>
         <translation>Apri...</translation>
     </message>
@@ -169,104 +169,82 @@
         <translation>Maschera</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="538"/>
-        <location filename="../src/mainwindow.ui" line="590"/>
-        <location filename="../src/mainwindow.ui" line="632"/>
-        <location filename="../src/mainwindow.ui" line="674"/>
-        <location filename="../src/mainwindow.ui" line="713"/>
-        <source>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</source>
-        <translation>Set di caratteri integrati:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</translation>
+        <location filename="../src/mainwindow.cpp" line="39"/>
+        <source>Built-in charsets:</source>
+        <translation>Set di caratteri integrati:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="563"/>
+        <location filename="../src/mainwindow.ui" line="554"/>
         <source>Custom charsets</source>
         <translation>Set di caratteri personalizzati</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="571"/>
+        <location filename="../src/mainwindow.ui" line="562"/>
         <source>Charset 1:</source>
         <translation>Set di caratteri 1:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="613"/>
+        <location filename="../src/mainwindow.ui" line="595"/>
         <source>Charset 2:</source>
         <translation>Set di caratteri 2:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="655"/>
+        <location filename="../src/mainwindow.ui" line="628"/>
         <source>Charset 3:</source>
         <translation>Set di caratteri 3:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="697"/>
+        <location filename="../src/mainwindow.ui" line="661"/>
         <source>Charset 4:</source>
         <translation>Set di caratteri 4:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="740"/>
+        <location filename="../src/mainwindow.ui" line="695"/>
         <source>Resources</source>
         <translation>Risorse</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="750"/>
+        <location filename="../src/mainwindow.ui" line="705"/>
         <source>CPU affinity:</source>
         <translation>Affinità CPU:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="757"/>
+        <location filename="../src/mainwindow.ui" line="712"/>
         <source>Backend devices:</source>
         <translation>Dispositivi backend:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="764"/>
+        <location filename="../src/mainwindow.ui" line="719"/>
         <source>Segment size:</source>
         <translation>Dimensione del segmento:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="775"/>
+        <location filename="../src/mainwindow.ui" line="730"/>
         <source>locks to CPU devices, separate with comma</source>
         <translation>vincola ai dispositivi CPU, separare con virgole</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="782"/>
+        <location filename="../src/mainwindow.ui" line="737"/>
         <source>devices to use, separate with comma</source>
         <translation>dispositivi da usare, separare con virgole</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="798"/>
+        <location filename="../src/mainwindow.ui" line="753"/>
         <source> MB</source>
         <translation> MB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="821"/>
+        <location filename="../src/mainwindow.ui" line="776"/>
         <source>Output</source>
         <translation>Output</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="829"/>
+        <location filename="../src/mainwindow.ui" line="784"/>
         <source>Write recovered hashes to file:</source>
         <translation>Scrivi gli hash recuperati nel file:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="841"/>
+        <location filename="../src/mainwindow.ui" line="796"/>
         <source>Built-in variables:
 
   &lt;hash&gt; = current hash filename or hash
@@ -277,68 +255,47 @@
   &lt;unixtime&gt; = timestamp Unix corrente</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="871"/>
+        <location filename="../src/mainwindow.ui" line="826"/>
         <source>Format:</source>
         <translation>Formato:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="881"/>
-        <source>Outfile format to use, separated with commas.
-default: 1,2
-
-  1 = hash[:salt]
-  2 = plain
-  3 = hex_plain
-  4 = crack_pos
-  5 = timestamp absolute
-  6 = timestamp relative</source>
-        <translation>Formato del file di output da usare, separato da virgole.
-predefinito: 1,2
-
-  1 = hash[:salt]
-  2 = plain
-  3 = hex_plain
-  4 = crack_pos
-  5 = timestamp absolute
-  6 = timestamp relative</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.ui" line="923"/>
+        <location filename="../src/mainwindow.ui" line="870"/>
         <source>Start</source>
         <translation>Avvia</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="930"/>
+        <location filename="../src/mainwindow.ui" line="877"/>
         <source>Copy command to clipboard</source>
         <translation>Copia il comando negli appunti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="973"/>
+        <location filename="../src/mainwindow.ui" line="920"/>
         <source>Advanced</source>
         <translation>Avanzate</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="997"/>
+        <location filename="../src/mainwindow.ui" line="944"/>
         <source>General</source>
         <translation>Generale</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1009"/>
+        <location filename="../src/mainwindow.ui" line="956"/>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>Abilita i kernel ottimizzati (limita la lunghezza della password)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1016"/>
+        <location filename="../src/mainwindow.ui" line="963"/>
         <source>Return expected speed of the attack, then quit</source>
         <translation>Mostra la velocità prevista dell’attacco, poi esci</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1025"/>
+        <location filename="../src/mainwindow.ui" line="972"/>
         <source>Override workload profile</source>
         <translation>Sovrascrivi il profilo di carico di lavoro</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1035"/>
+        <location filename="../src/mainwindow.ui" line="982"/>
         <source> # | Performance | Runtime | Power Consumption | Desktop Impact
  ===+=============+=========+===================+=========
   1 | Low               |   2 ms    | Low               | Minimal
@@ -357,194 +314,201 @@ predefinito: 1,2
 </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1121"/>
+        <location filename="../src/mainwindow.ui" line="1068"/>
         <source>Help</source>
         <translation>Aiuto</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1128"/>
+        <location filename="../src/mainwindow.ui" line="1075"/>
         <source>Tools</source>
         <translation>Strumenti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1134"/>
+        <location filename="../src/mainwindow.ui" line="1081"/>
         <source>File</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1148"/>
+        <location filename="../src/mainwindow.ui" line="1095"/>
         <source>About</source>
         <translation>Informazioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1153"/>
+        <location filename="../src/mainwindow.ui" line="1100"/>
         <source>Reset fields</source>
         <translation>Reimposta i campi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1158"/>
+        <location filename="../src/mainwindow.ui" line="1105"/>
         <source>Quit</source>
         <translation>Esci</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1163"/>
+        <location filename="../src/mainwindow.ui" line="1110"/>
         <source>About Qt</source>
         <translation>Informazioni su Qt</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1168"/>
+        <location filename="../src/mainwindow.ui" line="1115"/>
         <source>Settings</source>
         <translation>Impostazioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1173"/>
+        <location filename="../src/mainwindow.ui" line="1120"/>
         <source>Export Profile</source>
         <translation>Esporta profilo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1178"/>
+        <location filename="../src/mainwindow.ui" line="1125"/>
         <source>Import Profile</source>
         <translation>Importa profilo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="172"/>
+        <location filename="../src/mainwindow.cpp" line="47"/>
+        <source>Outfile format to use, separated with commas.
+default: 1,2</source>
+        <translation>Formato del file di output da usare, separato da virgole.
+predefinito: 1,2</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="186"/>
         <source>Save Profile</source>
         <translation>Salva profilo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="173"/>
-        <location filename="../src/mainwindow.cpp" line="191"/>
+        <location filename="../src/mainwindow.cpp" line="187"/>
+        <location filename="../src/mainwindow.cpp" line="205"/>
         <source>JSON Files (*.json)</source>
         <translation>File JSON (*.json)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="180"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
         <source>Saved</source>
         <translation>Salvato</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="180"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
         <source>Profile saved to %1.</source>
         <translation>Profilo salvato in %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="182"/>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="196"/>
+        <location filename="../src/mainwindow.cpp" line="346"/>
         <source>Save failed</source>
         <translation>Salvataggio non riuscito</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="190"/>
+        <location filename="../src/mainwindow.cpp" line="204"/>
         <source>Load Profile</source>
         <translation>Carica profilo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="205"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
         <source>Loaded</source>
         <translation>Caricato</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="205"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
         <source>Profile loaded from %1.</source>
         <translation>Profilo caricato da %1.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="207"/>
-        <location filename="../src/mainwindow.cpp" line="318"/>
+        <location filename="../src/mainwindow.cpp" line="221"/>
+        <location filename="../src/mainwindow.cpp" line="332"/>
         <source>Load failed</source>
         <translation>Caricamento non riuscito</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="344"/>
+        <location filename="../src/mainwindow.cpp" line="358"/>
         <source>Straight</source>
         <translation>Dizionario</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="345"/>
+        <location filename="../src/mainwindow.cpp" line="359"/>
         <source>Combination</source>
         <translation>Combinazione</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="360"/>
         <source>Brute-force</source>
         <translation>Forza bruta</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="347"/>
+        <location filename="../src/mainwindow.cpp" line="361"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>Ibrido: wordlist + maschera</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="362"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>Ibrido: maschera + wordlist</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="349"/>
+        <location filename="../src/mainwindow.cpp" line="363"/>
         <source>Association</source>
         <translation>Associazione</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="375"/>
         <source>Updating...</source>
         <translation>Aggiornamento in corso...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="376"/>
+        <location filename="../src/mainwindow.cpp" line="390"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Impossibile ottenere i tipi di hash supportati.
 Errore: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="408"/>
+        <location filename="../src/mainwindow.cpp" line="422"/>
         <source>hashcat error</source>
         <translation>Errore di hashcat</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="442"/>
+        <location filename="../src/mainwindow.cpp" line="456"/>
         <source>Open Hash File</source>
         <translation>Apri file di hash</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="450"/>
+        <location filename="../src/mainwindow.cpp" line="464"/>
         <source>Save Output File</source>
         <translation>Salva file di output</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="467"/>
+        <location filename="../src/mainwindow.cpp" line="481"/>
         <source>Add Wordlists</source>
         <translation>Aggiungi wordlist</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="553"/>
-        <location filename="../src/mainwindow.cpp" line="561"/>
-        <location filename="../src/mainwindow.cpp" line="569"/>
+        <location filename="../src/mainwindow.cpp" line="567"/>
+        <location filename="../src/mainwindow.cpp" line="575"/>
+        <location filename="../src/mainwindow.cpp" line="583"/>
         <source>Open Rules File</source>
         <translation>Apri file di regole</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="666"/>
+        <location filename="../src/mainwindow.cpp" line="680"/>
         <source>Launch failed</source>
         <translation>Avvio non riuscito</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="667"/>
+        <location filename="../src/mainwindow.cpp" line="681"/>
         <source>Could not start %1: %2</source>
         <translation>Impossibile avviare %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="684"/>
+        <location filename="../src/mainwindow.cpp" line="698"/>
         <source>Please choose a hash file.</source>
         <translation>Scegliere un file di hash.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="691"/>
+        <location filename="../src/mainwindow.cpp" line="705"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>Vai su &lt;b&gt;%1 → %2&lt;/b&gt; per configurare il percorso dell’eseguibile di hashcat.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="701"/>
+        <location filename="../src/mainwindow.cpp" line="715"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -553,17 +517,17 @@ Navigate to %2 → %3 to change it.</source>
 Vai su %2 → %3 per modificarlo.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="709"/>
+        <location filename="../src/mainwindow.cpp" line="723"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>Vai su &lt;b&gt;%1 → %2&lt;/b&gt; per selezionare il terminale usato per l’avvio.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="714"/>
+        <location filename="../src/mainwindow.cpp" line="728"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Nessun terminale supportato trovato su questo sistema. hashcat-gui ne richiede uno per mostrare l’output di hashcat.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="720"/>
+        <location filename="../src/mainwindow.cpp" line="734"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>Il terminale configurato &quot;%1&quot; non è disponibile. Terminali disponibili: %2
@@ -581,11 +545,6 @@ Vai su %3 → %4 per modificarlo.</translation>
         <location filename="../src/settingsdialog.ui" line="38"/>
         <source>Hashcat executable</source>
         <translation>Eseguibile di hashcat</translation>
-    </message>
-    <message>
-        <location filename="../src/settingsdialog.ui" line="50"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Download from &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scarica da &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="75"/>
@@ -623,37 +582,42 @@ Vai su %3 → %4 per modificarlo.</translation>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="52"/>
+        <location filename="../src/settingsdialog.cpp" line="20"/>
+        <source>Download from %1</source>
+        <translation>Scarica da %1</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.cpp" line="59"/>
         <source>System default</source>
         <translation>Predefinito di sistema</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="78"/>
+        <location filename="../src/settingsdialog.cpp" line="85"/>
         <source>Select the hashcat executable</source>
         <translation>Seleziona l’eseguibile di hashcat</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="80"/>
+        <location filename="../src/settingsdialog.cpp" line="87"/>
         <source>Executable Files (*.exe *.bin);;All Files (*)</source>
         <translation>File eseguibili (*.exe *.bin);;Tutti i file (*)</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="86"/>
+        <location filename="../src/settingsdialog.cpp" line="93"/>
         <source>Invalid file</source>
         <translation>File non valido</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="87"/>
+        <location filename="../src/settingsdialog.cpp" line="94"/>
         <source>The selected file is not an executable.</source>
         <translation>Il file selezionato non è un eseguibile.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="110"/>
+        <location filename="../src/settingsdialog.cpp" line="117"/>
         <source>Restart required</source>
         <translation>Riavvio necessario</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="111"/>
+        <location filename="../src/settingsdialog.cpp" line="118"/>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>Riavvia hashcat-gui per applicare la nuova lingua.</translation>
     </message>

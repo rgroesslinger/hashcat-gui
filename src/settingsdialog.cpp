@@ -13,6 +13,13 @@
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+
+    // The URL is fixed, so only the label around it is translatable.
+    const QString downloadLink =
+        QStringLiteral("<a href=\"%1\">%1</a>").arg(QString(AppConstants::Urls::Hashcat));
+    ui->label_download->setText(tr("Download from %1").arg(downloadLink));
+    ui->label_download->setOpenExternalLinks(true);
+
     readSettings();
 
     connect(ui->pushButton_settings_select_path, &QPushButton::clicked, this,

@@ -535,16 +535,7 @@
                    <item row="0" column="0">
                     <widget class="QLineEdit" name="lineEdit_mask">
                      <property name="toolTip">
-                      <string>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</string>
+                      <string/>
                      </property>
                      <property name="text">
                       <string/>
@@ -587,16 +578,7 @@
                         </size>
                        </property>
                        <property name="toolTip">
-                        <string>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</string>
+                        <string/>
                        </property>
                        <property name="text">
                         <string/>
@@ -629,16 +611,7 @@
                         </size>
                        </property>
                        <property name="toolTip">
-                        <string>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</string>
+                        <string/>
                        </property>
                        <property name="text">
                         <string/>
@@ -671,16 +644,7 @@
                         </size>
                        </property>
                        <property name="toolTip">
-                        <string>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</string>
+                        <string/>
                        </property>
                        <property name="text">
                         <string/>
@@ -710,16 +674,7 @@
                         </size>
                        </property>
                        <property name="toolTip">
-                        <string>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</string>
+                        <string/>
                        </property>
                       </widget>
                      </item>
@@ -878,15 +833,7 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_outfile_format">
                        <property name="toolTip">
-                        <string>Outfile format to use, separated with commas.
-default: 1,2
-
-  1 = hash[:salt]
-  2 = plain
-  3 = hex_plain
-  4 = crack_pos
-  5 = timestamp absolute
-  6 = timestamp relative</string>
+                        <string/>
                        </property>
                        <property name="text">
                         <string notr="true">1,2</string>

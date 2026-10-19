@@ -77,7 +77,7 @@
         <location filename="../src/mainwindow.ui" line="348"/>
         <location filename="../src/mainwindow.ui" line="391"/>
         <location filename="../src/mainwindow.ui" line="434"/>
-        <location filename="../src/mainwindow.ui" line="857"/>
+        <location filename="../src/mainwindow.ui" line="812"/>
         <source>Open...</source>
         <translation>開く...</translation>
     </message>
@@ -169,104 +169,82 @@
         <translation>マスク</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="538"/>
-        <location filename="../src/mainwindow.ui" line="590"/>
-        <location filename="../src/mainwindow.ui" line="632"/>
-        <location filename="../src/mainwindow.ui" line="674"/>
-        <location filename="../src/mainwindow.ui" line="713"/>
-        <source>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</source>
-        <translation>組み込み文字セット:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</translation>
+        <location filename="../src/mainwindow.cpp" line="39"/>
+        <source>Built-in charsets:</source>
+        <translation>組み込み文字セット:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="563"/>
+        <location filename="../src/mainwindow.ui" line="554"/>
         <source>Custom charsets</source>
         <translation>カスタム文字セット</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="571"/>
+        <location filename="../src/mainwindow.ui" line="562"/>
         <source>Charset 1:</source>
         <translation>文字セット 1:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="613"/>
+        <location filename="../src/mainwindow.ui" line="595"/>
         <source>Charset 2:</source>
         <translation>文字セット 2:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="655"/>
+        <location filename="../src/mainwindow.ui" line="628"/>
         <source>Charset 3:</source>
         <translation>文字セット 3:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="697"/>
+        <location filename="../src/mainwindow.ui" line="661"/>
         <source>Charset 4:</source>
         <translation>文字セット 4:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="740"/>
+        <location filename="../src/mainwindow.ui" line="695"/>
         <source>Resources</source>
         <translation>リソース</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="750"/>
+        <location filename="../src/mainwindow.ui" line="705"/>
         <source>CPU affinity:</source>
         <translation>CPU アフィニティ:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="757"/>
+        <location filename="../src/mainwindow.ui" line="712"/>
         <source>Backend devices:</source>
         <translation>バックエンドデバイス:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="764"/>
+        <location filename="../src/mainwindow.ui" line="719"/>
         <source>Segment size:</source>
         <translation>セグメントサイズ:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="775"/>
+        <location filename="../src/mainwindow.ui" line="730"/>
         <source>locks to CPU devices, separate with comma</source>
         <translation>CPU デバイスに固定します。カンマで区切ります</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="782"/>
+        <location filename="../src/mainwindow.ui" line="737"/>
         <source>devices to use, separate with comma</source>
         <translation>使用するデバイス。カンマで区切ります</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="798"/>
+        <location filename="../src/mainwindow.ui" line="753"/>
         <source> MB</source>
         <translation> MB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="821"/>
+        <location filename="../src/mainwindow.ui" line="776"/>
         <source>Output</source>
         <translation>出力</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="829"/>
+        <location filename="../src/mainwindow.ui" line="784"/>
         <source>Write recovered hashes to file:</source>
         <translation>復元したハッシュをファイルに書き込む:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="841"/>
+        <location filename="../src/mainwindow.ui" line="796"/>
         <source>Built-in variables:
 
   &lt;hash&gt; = current hash filename or hash
@@ -277,68 +255,47 @@
   &lt;unixtime&gt; = 現在の UNIX タイムスタンプ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="871"/>
+        <location filename="../src/mainwindow.ui" line="826"/>
         <source>Format:</source>
         <translation>形式:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="881"/>
-        <source>Outfile format to use, separated with commas.
-default: 1,2
-
-  1 = hash[:salt]
-  2 = plain
-  3 = hex_plain
-  4 = crack_pos
-  5 = timestamp absolute
-  6 = timestamp relative</source>
-        <translation>使用する出力ファイルの形式。カンマで区切ります。
-既定値: 1,2
-
-  1 = hash[:salt]
-  2 = plain
-  3 = hex_plain
-  4 = crack_pos
-  5 = timestamp absolute
-  6 = timestamp relative</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.ui" line="923"/>
+        <location filename="../src/mainwindow.ui" line="870"/>
         <source>Start</source>
         <translation>開始</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="930"/>
+        <location filename="../src/mainwindow.ui" line="877"/>
         <source>Copy command to clipboard</source>
         <translation>コマンドをクリップボードにコピー</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="973"/>
+        <location filename="../src/mainwindow.ui" line="920"/>
         <source>Advanced</source>
         <translation>詳細</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="997"/>
+        <location filename="../src/mainwindow.ui" line="944"/>
         <source>General</source>
         <translation>全般</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1009"/>
+        <location filename="../src/mainwindow.ui" line="956"/>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>最適化カーネルを有効にする (パスワード長が制限されます)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1016"/>
+        <location filename="../src/mainwindow.ui" line="963"/>
         <source>Return expected speed of the attack, then quit</source>
         <translation>攻撃の予想速度を表示して終了する</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1025"/>
+        <location filename="../src/mainwindow.ui" line="972"/>
         <source>Override workload profile</source>
         <translation>ワークロードプロファイルを上書きする</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1035"/>
+        <location filename="../src/mainwindow.ui" line="982"/>
         <source> # | Performance | Runtime | Power Consumption | Desktop Impact
  ===+=============+=========+===================+=========
   1 | Low               |   2 ms    | Low               | Minimal
@@ -357,194 +314,201 @@ default: 1,2
 </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1121"/>
+        <location filename="../src/mainwindow.ui" line="1068"/>
         <source>Help</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1128"/>
+        <location filename="../src/mainwindow.ui" line="1075"/>
         <source>Tools</source>
         <translation>ツール</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1134"/>
+        <location filename="../src/mainwindow.ui" line="1081"/>
         <source>File</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1148"/>
+        <location filename="../src/mainwindow.ui" line="1095"/>
         <source>About</source>
         <translation>情報</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1153"/>
+        <location filename="../src/mainwindow.ui" line="1100"/>
         <source>Reset fields</source>
         <translation>フィールドをリセット</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1158"/>
+        <location filename="../src/mainwindow.ui" line="1105"/>
         <source>Quit</source>
         <translation>終了</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1163"/>
+        <location filename="../src/mainwindow.ui" line="1110"/>
         <source>About Qt</source>
         <translation>Qt について</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1168"/>
+        <location filename="../src/mainwindow.ui" line="1115"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1173"/>
+        <location filename="../src/mainwindow.ui" line="1120"/>
         <source>Export Profile</source>
         <translation>プロファイルをエクスポート</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1178"/>
+        <location filename="../src/mainwindow.ui" line="1125"/>
         <source>Import Profile</source>
         <translation>プロファイルをインポート</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="172"/>
+        <location filename="../src/mainwindow.cpp" line="47"/>
+        <source>Outfile format to use, separated with commas.
+default: 1,2</source>
+        <translation>使用する出力ファイルの形式。カンマで区切ります。
+既定値: 1,2</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="186"/>
         <source>Save Profile</source>
         <translation>プロファイルを保存</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="173"/>
-        <location filename="../src/mainwindow.cpp" line="191"/>
+        <location filename="../src/mainwindow.cpp" line="187"/>
+        <location filename="../src/mainwindow.cpp" line="205"/>
         <source>JSON Files (*.json)</source>
         <translation>JSON ファイル (*.json)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="180"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
         <source>Saved</source>
         <translation>保存しました</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="180"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
         <source>Profile saved to %1.</source>
         <translation>プロファイルを %1 に保存しました。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="182"/>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="196"/>
+        <location filename="../src/mainwindow.cpp" line="346"/>
         <source>Save failed</source>
         <translation>保存に失敗しました</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="190"/>
+        <location filename="../src/mainwindow.cpp" line="204"/>
         <source>Load Profile</source>
         <translation>プロファイルを読み込む</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="205"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
         <source>Loaded</source>
         <translation>読み込みました</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="205"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
         <source>Profile loaded from %1.</source>
         <translation>プロファイルを %1 から読み込みました。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="207"/>
-        <location filename="../src/mainwindow.cpp" line="318"/>
+        <location filename="../src/mainwindow.cpp" line="221"/>
+        <location filename="../src/mainwindow.cpp" line="332"/>
         <source>Load failed</source>
         <translation>読み込みに失敗しました</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="344"/>
+        <location filename="../src/mainwindow.cpp" line="358"/>
         <source>Straight</source>
         <translation>辞書</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="345"/>
+        <location filename="../src/mainwindow.cpp" line="359"/>
         <source>Combination</source>
         <translation>組み合わせ</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="360"/>
         <source>Brute-force</source>
         <translation>ブルートフォース</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="347"/>
+        <location filename="../src/mainwindow.cpp" line="361"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>ハイブリッド: ワードリスト + マスク</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="362"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>ハイブリッド: マスク + ワードリスト</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="349"/>
+        <location filename="../src/mainwindow.cpp" line="363"/>
         <source>Association</source>
         <translation>関連付け</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="375"/>
         <source>Updating...</source>
         <translation>更新中...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="376"/>
+        <location filename="../src/mainwindow.cpp" line="390"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>サポートされているハッシュタイプを取得できませんでした。
 エラー: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="408"/>
+        <location filename="../src/mainwindow.cpp" line="422"/>
         <source>hashcat error</source>
         <translation>hashcat エラー</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="442"/>
+        <location filename="../src/mainwindow.cpp" line="456"/>
         <source>Open Hash File</source>
         <translation>ハッシュファイルを開く</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="450"/>
+        <location filename="../src/mainwindow.cpp" line="464"/>
         <source>Save Output File</source>
         <translation>出力ファイルを保存</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="467"/>
+        <location filename="../src/mainwindow.cpp" line="481"/>
         <source>Add Wordlists</source>
         <translation>ワードリストを追加</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="553"/>
-        <location filename="../src/mainwindow.cpp" line="561"/>
-        <location filename="../src/mainwindow.cpp" line="569"/>
+        <location filename="../src/mainwindow.cpp" line="567"/>
+        <location filename="../src/mainwindow.cpp" line="575"/>
+        <location filename="../src/mainwindow.cpp" line="583"/>
         <source>Open Rules File</source>
         <translation>ルールファイルを開く</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="666"/>
+        <location filename="../src/mainwindow.cpp" line="680"/>
         <source>Launch failed</source>
         <translation>起動に失敗しました</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="667"/>
+        <location filename="../src/mainwindow.cpp" line="681"/>
         <source>Could not start %1: %2</source>
         <translation>%1 を起動できませんでした: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="684"/>
+        <location filename="../src/mainwindow.cpp" line="698"/>
         <source>Please choose a hash file.</source>
         <translation>ハッシュファイルを選択してください。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="691"/>
+        <location filename="../src/mainwindow.cpp" line="705"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt; を開いて、hashcat 実行ファイルのパスを設定してください。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="701"/>
+        <location filename="../src/mainwindow.cpp" line="715"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -553,17 +517,17 @@ Navigate to %2 → %3 to change it.</source>
 変更するには %2 → %3 を開いてください。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="709"/>
+        <location filename="../src/mainwindow.cpp" line="723"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt; を開いて、起動に使用するターミナルを選択してください。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="714"/>
+        <location filename="../src/mainwindow.cpp" line="728"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>このシステムでサポートされているターミナルが見つかりません。hashcat の出力を表示するために、hashcat-gui にはターミナルが必要です。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="720"/>
+        <location filename="../src/mainwindow.cpp" line="734"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>設定されたターミナル &quot;%1&quot; は利用できません。利用可能なターミナル: %2
@@ -581,11 +545,6 @@ Navigate to %3 → %4 to change it.</source>
         <location filename="../src/settingsdialog.ui" line="38"/>
         <source>Hashcat executable</source>
         <translation>hashcat 実行ファイル</translation>
-    </message>
-    <message>
-        <location filename="../src/settingsdialog.ui" line="50"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Download from &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ダウンロード元: &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="75"/>
@@ -623,37 +582,42 @@ Navigate to %3 → %4 to change it.</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="52"/>
+        <location filename="../src/settingsdialog.cpp" line="20"/>
+        <source>Download from %1</source>
+        <translation>ダウンロード元: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.cpp" line="59"/>
         <source>System default</source>
         <translation>システムの既定</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="78"/>
+        <location filename="../src/settingsdialog.cpp" line="85"/>
         <source>Select the hashcat executable</source>
         <translation>hashcat 実行ファイルを選択</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="80"/>
+        <location filename="../src/settingsdialog.cpp" line="87"/>
         <source>Executable Files (*.exe *.bin);;All Files (*)</source>
         <translation>実行ファイル (*.exe *.bin);;すべてのファイル (*)</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="86"/>
+        <location filename="../src/settingsdialog.cpp" line="93"/>
         <source>Invalid file</source>
         <translation>無効なファイル</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="87"/>
+        <location filename="../src/settingsdialog.cpp" line="94"/>
         <source>The selected file is not an executable.</source>
         <translation>選択したファイルは実行ファイルではありません。</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="110"/>
+        <location filename="../src/settingsdialog.cpp" line="117"/>
         <source>Restart required</source>
         <translation>再起動が必要です</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="111"/>
+        <location filename="../src/settingsdialog.cpp" line="118"/>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>新しい言語を適用するには hashcat-gui を再起動してください。</translation>
     </message>

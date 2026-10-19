@@ -34,6 +34,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
+    /* ---------- help tooltips: translatable label + fixed reference tables -- */
+    const QString charsetTip =
+        tr("Built-in charsets:") + QLatin1String("\n\n") + AppConstants::HelpText::BuiltinCharsets;
+    ui->lineEdit_mask->setToolTip(charsetTip);
+    ui->lineEdit_custom_charset1->setToolTip(charsetTip);
+    ui->lineEdit_custom_charset2->setToolTip(charsetTip);
+    ui->lineEdit_custom_charset3->setToolTip(charsetTip);
+    ui->lineEdit_custom_charset4->setToolTip(charsetTip);
+
+    const QString outfileFormatTip =
+        tr("Outfile format to use, separated with commas.\ndefault: 1,2") + QLatin1String("\n\n")
+        + AppConstants::HelpText::OutfileFormats;
+    ui->lineEdit_outfile_format->setToolTip(outfileFormatTip);
+
     auto &settings = SettingsManager::instance();
 
     initHashAndAttackModes();

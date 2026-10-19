@@ -77,7 +77,7 @@
         <location filename="../src/mainwindow.ui" line="348"/>
         <location filename="../src/mainwindow.ui" line="391"/>
         <location filename="../src/mainwindow.ui" line="434"/>
-        <location filename="../src/mainwindow.ui" line="857"/>
+        <location filename="../src/mainwindow.ui" line="812"/>
         <source>Open...</source>
         <translation>열기...</translation>
     </message>
@@ -169,104 +169,82 @@
         <translation>마스크</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="538"/>
-        <location filename="../src/mainwindow.ui" line="590"/>
-        <location filename="../src/mainwindow.ui" line="632"/>
-        <location filename="../src/mainwindow.ui" line="674"/>
-        <location filename="../src/mainwindow.ui" line="713"/>
-        <source>Built-in charsets:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</source>
-        <translation>내장 문자 집합:
-
-  ?l = abcdefghijklmnopqrstuvwxyz [a-z]
-  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]
-  ?d = 0123456789 [0-9]
-  ?h = 0123456789abcdef [0-9a-f]
-  ?H = 0123456789ABCDEF [0-9A-F]
-  ?s =  !&quot;#$%&amp;&apos;()*+,-./:;&lt;=&gt;?@[]^_`{|}~
-  ?a = ?l?u?d?s
-  ?b = 0x00 - 0xff</translation>
+        <location filename="../src/mainwindow.cpp" line="39"/>
+        <source>Built-in charsets:</source>
+        <translation>내장 문자 집합:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="563"/>
+        <location filename="../src/mainwindow.ui" line="554"/>
         <source>Custom charsets</source>
         <translation>사용자 지정 문자 집합</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="571"/>
+        <location filename="../src/mainwindow.ui" line="562"/>
         <source>Charset 1:</source>
         <translation>문자 집합 1:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="613"/>
+        <location filename="../src/mainwindow.ui" line="595"/>
         <source>Charset 2:</source>
         <translation>문자 집합 2:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="655"/>
+        <location filename="../src/mainwindow.ui" line="628"/>
         <source>Charset 3:</source>
         <translation>문자 집합 3:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="697"/>
+        <location filename="../src/mainwindow.ui" line="661"/>
         <source>Charset 4:</source>
         <translation>문자 집합 4:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="740"/>
+        <location filename="../src/mainwindow.ui" line="695"/>
         <source>Resources</source>
         <translation>리소스</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="750"/>
+        <location filename="../src/mainwindow.ui" line="705"/>
         <source>CPU affinity:</source>
         <translation>CPU 선호도:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="757"/>
+        <location filename="../src/mainwindow.ui" line="712"/>
         <source>Backend devices:</source>
         <translation>백엔드 장치:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="764"/>
+        <location filename="../src/mainwindow.ui" line="719"/>
         <source>Segment size:</source>
         <translation>세그먼트 크기:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="775"/>
+        <location filename="../src/mainwindow.ui" line="730"/>
         <source>locks to CPU devices, separate with comma</source>
         <translation>CPU 장치에 고정합니다. 쉼표로 구분</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="782"/>
+        <location filename="../src/mainwindow.ui" line="737"/>
         <source>devices to use, separate with comma</source>
         <translation>사용할 장치. 쉼표로 구분</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="798"/>
+        <location filename="../src/mainwindow.ui" line="753"/>
         <source> MB</source>
         <translation> MB</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="821"/>
+        <location filename="../src/mainwindow.ui" line="776"/>
         <source>Output</source>
         <translation>출력</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="829"/>
+        <location filename="../src/mainwindow.ui" line="784"/>
         <source>Write recovered hashes to file:</source>
         <translation>복구한 해시를 파일에 쓰기:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="841"/>
+        <location filename="../src/mainwindow.ui" line="796"/>
         <source>Built-in variables:
 
   &lt;hash&gt; = current hash filename or hash
@@ -277,68 +255,47 @@
   &lt;unixtime&gt; = 현재 유닉스 타임스탬프</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="871"/>
+        <location filename="../src/mainwindow.ui" line="826"/>
         <source>Format:</source>
         <translation>형식:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="881"/>
-        <source>Outfile format to use, separated with commas.
-default: 1,2
-
-  1 = hash[:salt]
-  2 = plain
-  3 = hex_plain
-  4 = crack_pos
-  5 = timestamp absolute
-  6 = timestamp relative</source>
-        <translation>사용할 출력 파일 형식. 쉼표로 구분합니다.
-기본값: 1,2
-
-  1 = hash[:salt]
-  2 = plain
-  3 = hex_plain
-  4 = crack_pos
-  5 = timestamp absolute
-  6 = timestamp relative</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.ui" line="923"/>
+        <location filename="../src/mainwindow.ui" line="870"/>
         <source>Start</source>
         <translation>시작</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="930"/>
+        <location filename="../src/mainwindow.ui" line="877"/>
         <source>Copy command to clipboard</source>
         <translation>명령을 클립보드에 복사</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="973"/>
+        <location filename="../src/mainwindow.ui" line="920"/>
         <source>Advanced</source>
         <translation>고급</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="997"/>
+        <location filename="../src/mainwindow.ui" line="944"/>
         <source>General</source>
         <translation>일반</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1009"/>
+        <location filename="../src/mainwindow.ui" line="956"/>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>최적화된 커널 사용 (비밀번호 길이 제한)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1016"/>
+        <location filename="../src/mainwindow.ui" line="963"/>
         <source>Return expected speed of the attack, then quit</source>
         <translation>공격의 예상 속도를 출력한 뒤 종료</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1025"/>
+        <location filename="../src/mainwindow.ui" line="972"/>
         <source>Override workload profile</source>
         <translation>워크로드 프로필 재정의</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1035"/>
+        <location filename="../src/mainwindow.ui" line="982"/>
         <source> # | Performance | Runtime | Power Consumption | Desktop Impact
  ===+=============+=========+===================+=========
   1 | Low               |   2 ms    | Low               | Minimal
@@ -357,194 +314,201 @@ default: 1,2
 </translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1121"/>
+        <location filename="../src/mainwindow.ui" line="1068"/>
         <source>Help</source>
         <translation>도움말</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1128"/>
+        <location filename="../src/mainwindow.ui" line="1075"/>
         <source>Tools</source>
         <translation>도구</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1134"/>
+        <location filename="../src/mainwindow.ui" line="1081"/>
         <source>File</source>
         <translation>파일</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1148"/>
+        <location filename="../src/mainwindow.ui" line="1095"/>
         <source>About</source>
         <translation>정보</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1153"/>
+        <location filename="../src/mainwindow.ui" line="1100"/>
         <source>Reset fields</source>
         <translation>필드 초기화</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1158"/>
+        <location filename="../src/mainwindow.ui" line="1105"/>
         <source>Quit</source>
         <translation>종료</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1163"/>
+        <location filename="../src/mainwindow.ui" line="1110"/>
         <source>About Qt</source>
         <translation>Qt 정보</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1168"/>
+        <location filename="../src/mainwindow.ui" line="1115"/>
         <source>Settings</source>
         <translation>설정</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1173"/>
+        <location filename="../src/mainwindow.ui" line="1120"/>
         <source>Export Profile</source>
         <translation>프로필 내보내기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="1178"/>
+        <location filename="../src/mainwindow.ui" line="1125"/>
         <source>Import Profile</source>
         <translation>프로필 가져오기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="172"/>
+        <location filename="../src/mainwindow.cpp" line="47"/>
+        <source>Outfile format to use, separated with commas.
+default: 1,2</source>
+        <translation>사용할 출력 파일 형식. 쉼표로 구분합니다.
+기본값: 1,2</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="186"/>
         <source>Save Profile</source>
         <translation>프로필 저장</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="173"/>
-        <location filename="../src/mainwindow.cpp" line="191"/>
+        <location filename="../src/mainwindow.cpp" line="187"/>
+        <location filename="../src/mainwindow.cpp" line="205"/>
         <source>JSON Files (*.json)</source>
         <translation>JSON 파일 (*.json)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="180"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
         <source>Saved</source>
         <translation>저장됨</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="180"/>
+        <location filename="../src/mainwindow.cpp" line="194"/>
         <source>Profile saved to %1.</source>
         <translation>프로필을 %1에 저장했습니다.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="182"/>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="196"/>
+        <location filename="../src/mainwindow.cpp" line="346"/>
         <source>Save failed</source>
         <translation>저장 실패</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="190"/>
+        <location filename="../src/mainwindow.cpp" line="204"/>
         <source>Load Profile</source>
         <translation>프로필 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="205"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
         <source>Loaded</source>
         <translation>불러옴</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="205"/>
+        <location filename="../src/mainwindow.cpp" line="219"/>
         <source>Profile loaded from %1.</source>
         <translation>%1에서 프로필을 불러왔습니다.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="207"/>
-        <location filename="../src/mainwindow.cpp" line="318"/>
+        <location filename="../src/mainwindow.cpp" line="221"/>
+        <location filename="../src/mainwindow.cpp" line="332"/>
         <source>Load failed</source>
         <translation>불러오기 실패</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="344"/>
+        <location filename="../src/mainwindow.cpp" line="358"/>
         <source>Straight</source>
         <translation>사전</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="345"/>
+        <location filename="../src/mainwindow.cpp" line="359"/>
         <source>Combination</source>
         <translation>조합</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="360"/>
         <source>Brute-force</source>
         <translation>무차별 대입</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="347"/>
+        <location filename="../src/mainwindow.cpp" line="361"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>하이브리드: 단어 목록 + 마스크</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="348"/>
+        <location filename="../src/mainwindow.cpp" line="362"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>하이브리드: 마스크 + 단어 목록</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="349"/>
+        <location filename="../src/mainwindow.cpp" line="363"/>
         <source>Association</source>
         <translation>연관</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="375"/>
         <source>Updating...</source>
         <translation>업데이트 중...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="376"/>
+        <location filename="../src/mainwindow.cpp" line="390"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>지원되는 해시 유형을 가져오지 못했습니다.
 오류: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="408"/>
+        <location filename="../src/mainwindow.cpp" line="422"/>
         <source>hashcat error</source>
         <translation>hashcat 오류</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="442"/>
+        <location filename="../src/mainwindow.cpp" line="456"/>
         <source>Open Hash File</source>
         <translation>해시 파일 열기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="450"/>
+        <location filename="../src/mainwindow.cpp" line="464"/>
         <source>Save Output File</source>
         <translation>출력 파일 저장</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="467"/>
+        <location filename="../src/mainwindow.cpp" line="481"/>
         <source>Add Wordlists</source>
         <translation>단어 목록 추가</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="553"/>
-        <location filename="../src/mainwindow.cpp" line="561"/>
-        <location filename="../src/mainwindow.cpp" line="569"/>
+        <location filename="../src/mainwindow.cpp" line="567"/>
+        <location filename="../src/mainwindow.cpp" line="575"/>
+        <location filename="../src/mainwindow.cpp" line="583"/>
         <source>Open Rules File</source>
         <translation>규칙 파일 열기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="666"/>
+        <location filename="../src/mainwindow.cpp" line="680"/>
         <source>Launch failed</source>
         <translation>실행 실패</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="667"/>
+        <location filename="../src/mainwindow.cpp" line="681"/>
         <source>Could not start %1: %2</source>
         <translation>%1을(를) 시작할 수 없습니다: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="684"/>
+        <location filename="../src/mainwindow.cpp" line="698"/>
         <source>Please choose a hash file.</source>
         <translation>해시 파일을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="691"/>
+        <location filename="../src/mainwindow.cpp" line="705"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 hashcat 실행 파일 경로를 설정하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="701"/>
+        <location filename="../src/mainwindow.cpp" line="715"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -553,17 +517,17 @@ Navigate to %2 → %3 to change it.</source>
 변경하려면 %2 → %3으로 이동하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="709"/>
+        <location filename="../src/mainwindow.cpp" line="723"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 실행에 사용할 터미널을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="714"/>
+        <location filename="../src/mainwindow.cpp" line="728"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>이 시스템에서 지원되는 터미널을 찾을 수 없습니다. hashcat-gui는 hashcat 출력을 표시하기 위해 터미널이 필요합니다.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="720"/>
+        <location filename="../src/mainwindow.cpp" line="734"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>설정된 터미널 &quot;%1&quot;을(를) 사용할 수 없습니다. 사용 가능한 터미널: %2
@@ -581,11 +545,6 @@ Navigate to %3 → %4 to change it.</source>
         <location filename="../src/settingsdialog.ui" line="38"/>
         <source>Hashcat executable</source>
         <translation>hashcat 실행 파일</translation>
-    </message>
-    <message>
-        <location filename="../src/settingsdialog.ui" line="50"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Download from &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;다운로드: &lt;a href=&quot;https://hashcat.net&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#27bf73;&quot;&gt;https://hashcat.net&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="75"/>
@@ -623,37 +582,42 @@ Navigate to %3 → %4 to change it.</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="52"/>
+        <location filename="../src/settingsdialog.cpp" line="20"/>
+        <source>Download from %1</source>
+        <translation>다운로드: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.cpp" line="59"/>
         <source>System default</source>
         <translation>시스템 기본값</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="78"/>
+        <location filename="../src/settingsdialog.cpp" line="85"/>
         <source>Select the hashcat executable</source>
         <translation>hashcat 실행 파일 선택</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="80"/>
+        <location filename="../src/settingsdialog.cpp" line="87"/>
         <source>Executable Files (*.exe *.bin);;All Files (*)</source>
         <translation>실행 파일 (*.exe *.bin);;모든 파일 (*)</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="86"/>
+        <location filename="../src/settingsdialog.cpp" line="93"/>
         <source>Invalid file</source>
         <translation>잘못된 파일</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="87"/>
+        <location filename="../src/settingsdialog.cpp" line="94"/>
         <source>The selected file is not an executable.</source>
         <translation>선택한 파일은 실행 파일이 아닙니다.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="110"/>
+        <location filename="../src/settingsdialog.cpp" line="117"/>
         <source>Restart required</source>
         <translation>다시 시작 필요</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.cpp" line="111"/>
+        <location filename="../src/settingsdialog.cpp" line="118"/>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>새 언어를 적용하려면 hashcat-gui를 다시 시작하세요.</translation>
     </message>
