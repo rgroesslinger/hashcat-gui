@@ -20,12 +20,15 @@ BuildRequires: cmake(Qt6Core)
 BuildRequires: cmake(Qt6Gui)
 BuildRequires: cmake(Qt6Widgets)
 BuildRequires: cmake(Qt6Concurrent)
+BuildRequires: cmake(Qt6LinguistTools)
 %endif
 
 %if 0%{?debian_version} || 0%{?ubuntu_version}
 BuildRequires: g++
 BuildRequires: cmake
 BuildRequires: qt6-base-dev
+BuildRequires: qt6-tools-dev
+BuildRequires: qt6-l10n-tools
 BuildRequires: debbuild-macros
 %endif
 
@@ -36,7 +39,10 @@ A Qt-based GUI for hashcat, a powerful password recovery utility
 %setup -q
 
 %build
-%cmake
+# BUILD_TESTING keeps the test binaries out of the package build - they
+# are run by CI, not by the packager. The translations are not optional
+# here: a package without them is a broken package.
+%cmake -DBUILD_TESTING=OFF -DHASHCAT_GUI_REQUIRE_TRANSLATIONS=ON
 %cmake_build
 
 %install

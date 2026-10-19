@@ -99,7 +99,19 @@ target_compile_definitions(hashcat-gui PRIVATE
 # single list the build (below) and the test embedding derive their catalogs from.
 set(HASHCAT_GUI_TRANSLATIONS de es fr it sr ja zh_CN ko)
 
+# A developer is fine with a build without translations; a packager is not:
+# the .qm files are compiled into the binary, so a package built without the
+# linguist tools ships an untranslated program. The requirement can therefore
+# be switched on, and a packager should switch it on.
+option(HASHCAT_GUI_REQUIRE_TRANSLATIONS
+    "Fail the configure step when the Qt6 LinguistTools are missing" OFF)
+
 find_package(Qt6 COMPONENTS LinguistTools QUIET)
+if(HASHCAT_GUI_REQUIRE_TRANSLATIONS AND NOT Qt6LinguistTools_FOUND)
+    message(FATAL_ERROR
+        "HASHCAT_GUI_REQUIRE_TRANSLATIONS is on, but the Qt6 LinguistTools were not found.")
+endif()
+
 if(Qt6LinguistTools_FOUND)
     # Derive the .ts sources from the single catalog list.
     set(HASHCAT_GUI_TS_FILES)
