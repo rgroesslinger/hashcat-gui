@@ -1,30 +1,36 @@
 # Changelog
 
 ## 0.8.0 (Unreleased)
-- Support for translations (#12)
-  - The catalogs in `translations/` are now compiled into the executable and loaded when the program starts
-  - The language can be selected in the settings: System default follows the environment and lands on English whenever no catalog matches it
-- Support for more terminals (#7)
-  - alacritty, kitty, foot, wezterm and Windows Terminal
-- Decoupled business logic from UI, enhancing codebase maintainability and enabling the creation of a robust and extensive test suite
-- Test suite: `tst_*` binaries wired into `ctest`, covering the command line rules, the hash type parser, the hashcat launch and helper process, the profile serializer, the settings dialog, the main window and the embedded translation catalogs
+
+### New Features
+- **Translations**: Multi-language support with compiled translation catalogs; language can be selected in settings (system default falls back to English) (#12)
+- **Terminal support**: Added alacritty, kitty, foot, wezterm, and Windows Terminal (#7)
+- **CLI help**: Added `--version` and `--help` command-line parser support
+- **Test suite**: Integrated `tst_*` binaries into `ctest`, covering command line rules, hash type parser, hashcat launch, profile serializer, settings dialog, main window, and translation catalogs
+- **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
+
+### Improvements
+- Decoupled business logic from UI for better maintainability and testability
 - Refactored default values and magic numbers in `src/appconstants.h` (#10)
-- Hardened UTF-8 handling and handling of all strings by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`
-- `HashcatOptions` and `CommandBuilder`: the command line is built from a UI-independent description, and the gating rules (`attackUsesMask()`, `attackUsesWordlists()`, `attackUsesRules()`) live in one place that the main window's group boxes use too, so the visible options and the generated command cannot disagree
-- CI builds the translations, runs the tests and fails when the catalogs are out of step with the sources
-- Added `clang-format`, `clang-tidy` and `clazy` tooling
-- The GUI now refuses to start hashcat when the configuration is incomplete instead of failing silently
-- A terminal that cannot be started (wrong path, permissions) now reports an error instead of failing silently
-- Profile errors are reported through an error message returned to the caller rather than the serializer opening its own dialog, so a failed profile load at start-up is reported as well
-- The hash type saved in a profile is applied once the background query has filled the selector; at start-up the selection used to be dropped
-- File → Export only announces success when the profile was actually written; a failed write used to be reported as saved
-- The hash type selector is re-enabled when the background query fails or returns malformed JSON; it used to stay on "Updating..." for the rest of the session
-- `--hash-type` is left out while no hash type is selected; an empty selector used to send `-m 0`
-- Attack mode and hash type ids travel as combo box item data, so a missing entry can no longer silently become mode or type `0`
-- Sorting the word list with nothing selected no longer hands a null item to `insertItem()`
-- The suggested outfile no longer overwrites a file name the user or a loaded profile chose
+- Hardened UTF-8 and string handling by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`
+- `HashcatOptions` and `CommandBuilder`: command line built from UI-independent description; gating rules centralized so visible options and generated command stay in sync
+- CI now builds translations, runs tests, and fails when catalogs are out of step with sources
+- **Qt 6.8 & C++20 baseline**: Bumped minimum Qt version to 6.8 and moved build baseline from C++17 to C++20
+- **New artwork**: Added new application artwork and improved the XDG `.desktop` file entry
+
+### Bug Fixes
+- GUI now refuses to start hashcat when configuration is incomplete instead of failing silently
+- Terminal startup failures (wrong path, permissions) now report errors instead of failing silently
+- Profile errors reported via error message instead of opening a dialog, ensuring failed profile loads at start-up are reported
+- Hash type saved in a profile is now correctly applied after background query completes (was dropped at start-up)
+- File → Export only announces success when the profile was actually written
+- Hash type selector re-enabled when background query fails or returns malformed JSON
+- `--hash-type` omitted when no hash type is selected (empty selector no longer sends `-m 0`)
+- Attack mode and hash type IDs use combo box item data, preventing silent fallback to mode/type `0`
+- Sorting word list with nothing selected no longer passes a null item to `insertItem()`
+- Suggested outfile no longer overwrites user-selected or profile-chosen file names
 - Copy to clipboard no longer crashes on platforms without clipboard support
-- Windows now size themselves to their content instead of a hard-coded geometry, so they no longer open with scrollbars, clipped content or unused space under different screen sizes, fonts, DPI scalings or translations
+- Windows now size to content instead of hard-coded geometry, fixing scrollbars, clipped content, and unused space across different screen sizes, fonts, DPI, and translations
 
 ## 0.7.1 (2026-02-15)
 - Added support for more command options
