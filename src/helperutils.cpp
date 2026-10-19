@@ -177,15 +177,10 @@ const QMap<QString, QStringList> &HelperUtils::terminalArguments()
         {QStringLiteral("ptyxis"), {QStringLiteral("--")}},
         {QStringLiteral("konsole"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
         {QStringLiteral("xfce4-terminal"), {QStringLiteral("--hold"), QStringLiteral("-x")}},
-        // -e consumes the rest of the arguments
         {QStringLiteral("alacritty"), {QStringLiteral("-e")}},
-        // the program is the first positional argument
-        {QStringLiteral("kitty"), {}},
-        // trailing arguments are run as the command
-        {QStringLiteral("foot"), {}},
-        // wezterm start -- <program>
+        {QStringLiteral("kitty"), {QStringLiteral("--hold")}},
+        {QStringLiteral("foot"), {QStringLiteral("--hold")}},
         {QStringLiteral("wezterm"), {QStringLiteral("start"), QStringLiteral("--")}},
-        // Windows Terminal
         {QStringLiteral("wt.exe"), {QStringLiteral("-d"), QStringLiteral(".")}},
     };
     return table;

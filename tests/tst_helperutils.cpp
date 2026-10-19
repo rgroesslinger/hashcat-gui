@@ -206,8 +206,8 @@ void TestHelperUtils::terminalArgumentsArePinned()
         {"konsole", {"--hold", "-e"}},
         {"xfce4-terminal", {"--hold", "-x"}},
         {"alacritty", {"-e"}},
-        {"kitty", {}},
-        {"foot", {}},
+        {"kitty", {"--hold"}},
+        {"foot", {"--hold"}},
         {"wezterm", {"start", "--"}},
         {"wt.exe", {"-d", "."}},
     };
