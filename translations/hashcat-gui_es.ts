@@ -260,42 +260,42 @@
         <translation>Formato:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="870"/>
+        <location filename="../src/mainwindow.ui" line="1029"/>
         <source>Start</source>
         <translation>Iniciar</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="877"/>
+        <location filename="../src/mainwindow.ui" line="1036"/>
         <source>Copy command to clipboard</source>
         <translation>Copiar comando al portapapeles</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="920"/>
+        <location filename="../src/mainwindow.ui" line="889"/>
         <source>Advanced</source>
         <translation>Avanzado</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="944"/>
+        <location filename="../src/mainwindow.ui" line="913"/>
         <source>General</source>
         <translation>General</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="956"/>
+        <location filename="../src/mainwindow.ui" line="925"/>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>Activar los kernels optimizados (limita la longitud de la contraseña)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="963"/>
+        <location filename="../src/mainwindow.ui" line="932"/>
         <source>Return expected speed of the attack, then quit</source>
         <translation>Mostrar la velocidad esperada del ataque y salir</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="972"/>
+        <location filename="../src/mainwindow.ui" line="941"/>
         <source>Override workload profile</source>
         <translation>Sobrescribir el perfil de carga de trabajo</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="982"/>
+        <location filename="../src/mainwindow.ui" line="951"/>
         <source> # | Performance | Runtime | Power Consumption | Desktop Impact
  ===+=============+=========+===================+=========
   1 | Low               |   2 ms    | Low               | Minimal
@@ -393,7 +393,7 @@ predeterminado: 1,2</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="196"/>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="402"/>
         <source>Save failed</source>
         <translation>Error al guardar</translation>
     </message>
@@ -403,7 +403,7 @@ predeterminado: 1,2</translation>
         <translation>Cargar perfil</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="219"/>
+        <location filename="../src/mainwindow.cpp" line="218"/>
         <source>Loaded</source>
         <translation>Cargado</translation>
     </message>
@@ -414,101 +414,113 @@ predeterminado: 1,2</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="221"/>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="333"/>
+        <location filename="../src/mainwindow.cpp" line="477"/>
+        <source>Profile warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="224"/>
+        <location filename="../src/mainwindow.cpp" line="336"/>
         <source>Load failed</source>
         <translation>Error al cargar</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="358"/>
+        <location filename="../src/mainwindow.cpp" line="382"/>
+        <source>The profile names the hash type %1, which this hashcat version does not support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="414"/>
         <source>Straight</source>
         <translation>Diccionario</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="359"/>
+        <location filename="../src/mainwindow.cpp" line="415"/>
         <source>Combination</source>
         <translation>Combinación</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="360"/>
+        <location filename="../src/mainwindow.cpp" line="416"/>
         <source>Brute-force</source>
         <translation>Fuerza bruta</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="417"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>Híbrido: lista de palabras + máscara</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="418"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>Híbrido: máscara + lista de palabras</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="363"/>
+        <location filename="../src/mainwindow.cpp" line="419"/>
         <source>Association</source>
         <translation>Asociación</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="375"/>
+        <location filename="../src/mainwindow.cpp" line="431"/>
         <source>Updating...</source>
         <translation>Actualizando...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="390"/>
+        <location filename="../src/mainwindow.cpp" line="447"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>No se pudieron obtener los tipos de hash compatibles.
 Error: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="422"/>
+        <location filename="../src/mainwindow.cpp" line="475"/>
         <source>hashcat error</source>
         <translation>Error de hashcat</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="456"/>
+        <location filename="../src/mainwindow.cpp" line="511"/>
         <source>Open Hash File</source>
         <translation>Abrir archivo de hashes</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="464"/>
+        <location filename="../src/mainwindow.cpp" line="519"/>
         <source>Save Output File</source>
         <translation>Guardar archivo de salida</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="481"/>
+        <location filename="../src/mainwindow.cpp" line="536"/>
         <source>Add Wordlists</source>
         <translation>Añadir listas de palabras</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="567"/>
-        <location filename="../src/mainwindow.cpp" line="575"/>
-        <location filename="../src/mainwindow.cpp" line="583"/>
+        <location filename="../src/mainwindow.cpp" line="622"/>
+        <location filename="../src/mainwindow.cpp" line="630"/>
+        <location filename="../src/mainwindow.cpp" line="638"/>
         <source>Open Rules File</source>
         <translation>Abrir archivo de reglas</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="680"/>
+        <location filename="../src/mainwindow.cpp" line="735"/>
         <source>Launch failed</source>
         <translation>Error al iniciar</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="681"/>
+        <location filename="../src/mainwindow.cpp" line="736"/>
         <source>Could not start %1: %2</source>
         <translation>No se pudo iniciar %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="698"/>
+        <location filename="../src/mainwindow.cpp" line="753"/>
         <source>Please choose a hash file.</source>
         <translation>Elija un archivo de hashes.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="705"/>
+        <location filename="../src/mainwindow.cpp" line="760"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>Vaya a &lt;b&gt;%1 → %2&lt;/b&gt; para configurar la ruta del ejecutable de hashcat.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="715"/>
+        <location filename="../src/mainwindow.cpp" line="770"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -517,17 +529,17 @@ Navigate to %2 → %3 to change it.</source>
 Vaya a %2 → %3 para cambiarlo.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="723"/>
+        <location filename="../src/mainwindow.cpp" line="778"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>Vaya a &lt;b&gt;%1 → %2&lt;/b&gt; para seleccionar el terminal usado para el inicio.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="728"/>
+        <location filename="../src/mainwindow.cpp" line="783"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>No se encontró ningún terminal compatible en este sistema. hashcat-gui necesita uno para mostrar la salida de hashcat.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="734"/>
+        <location filename="../src/mainwindow.cpp" line="789"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>El terminal configurado &quot;%1&quot; no está disponible. Terminales disponibles: %2
@@ -625,27 +637,27 @@ Vaya a %3 → %4 para cambiarlo.</translation>
 <context>
     <name>WidgetStateSerializer</name>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="174"/>
+        <location filename="../src/widgetstateserializer.cpp" line="202"/>
         <source>Could not open %1 for writing: %2</source>
         <translation>No se pudo abrir %1 para escritura: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="180"/>
+        <location filename="../src/widgetstateserializer.cpp" line="208"/>
         <source>Could not write to %1: %2</source>
         <translation>No se pudo escribir en %1: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="199"/>
+        <location filename="../src/widgetstateserializer.cpp" line="227"/>
         <source>Could not open %1 for reading: %2</source>
         <translation>No se pudo abrir %1 para lectura: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="207"/>
+        <location filename="../src/widgetstateserializer.cpp" line="235"/>
         <source>The file is not a valid JSON file: %1</source>
         <translation>El archivo no es un archivo JSON válido: %1</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="213"/>
+        <location filename="../src/widgetstateserializer.cpp" line="241"/>
         <source>The file does not contain a profile for &quot;%1&quot;.</source>
         <translation>El archivo no contiene un perfil para &quot;%1&quot;.</translation>
     </message>

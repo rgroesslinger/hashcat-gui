@@ -65,6 +65,7 @@ private slots:
     void commandPreviewCarriesTheBinaryName();
     void defaultProfileRoundTrips();
     void profileHashTypeSurvivesTheAsynchronousQuery();
+    void profileWithAnUnknownHashTypeSelectsNothing();
     void windowFitsItsContent();
     void commandBarStaysVisibleOnEveryTab();
 
@@ -479,7 +480,9 @@ void TestMainWindow::defaultProfileRoundTrips()
         root.value(QString::fromUtf8(writer.metaObject()->className())).toObject();
     QVERIFY(!state.isEmpty());
     QVERIFY(!state.contains(QLatin1String(AppConstants::Files::PreviewWidget)));
-    QCOMPARE(state.value(QStringLiteral("comboBox_attack")).toInt(), 2);
+    // The attack mode is stored by its id, not by its position: the ids are
+    // 0, 1, 3, 6, 7 and 9, and brute-force - the third entry - is id 3.
+    QCOMPARE(state.value(QStringLiteral("comboBox_attack")).toInt(), 3);
 
     // A new window runs loadDefaultProfile() in its constructor...
     MainWindow reloaded;
@@ -494,7 +497,7 @@ void TestMainWindow::defaultProfileRoundTrips()
 
 // The constructor loads the profile while the hashcat query that fills
 // comboBox_hash is still in flight: the combo has no items, so
-// setCurrentIndex() is a silent no-op and the stored index can only be
+// setCurrentIndex() is a silent no-op and the stored id can only be
 // applied when the reply delivers the items.
 void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
 {
@@ -511,13 +514,13 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
-    // A profile that picked the second entry: the ids sort 0, 1000, so the
+    // A profile that names the hash type 1000: the ids sort 0, 1000, so the
     // selection must land on NTLM and not on the first item the fill leaves.
     const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"MainWindow": {"comboBox_hash": 1}})");
+    profile.write(R"({"MainWindow": {"comboBox_hash": 1000}})");
     profile.close();
 
     m_watchdog.start();
@@ -531,7 +534,44 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
 
     QCOMPARE(window.ui->comboBox_hash->currentIndex(), 1);
     QCOMPARE(window.ui->comboBox_hash->currentData().toUInt(), 1000u);
-    QCOMPARE(window.m_pendingHashTypeIndex, -1); // applied and consumed
+    QCOMPARE(window.m_pendingHashTypeId, -1); // applied and consumed
+}
+
+// A profile that names a hash type this hashcat does not know. Selecting
+// another one would crack with the wrong algorithm, so nothing is selected
+// instead - and the command line asks for no hash type at all.
+void TestMainWindow::profileWithAnUnknownHashTypeSelectsNothing()
+{
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-unknown"),
+        "#!/bin/sh\n"
+        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+        "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QVERIFY(QDir().mkpath(dir));
+    QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
+    QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    profile.write(R"({"MainWindow": {"comboBox_hash": 9999}})");
+    profile.close();
+
+    m_watchdog.start();
+
+    MainWindow window;
+
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->count() > 0,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+
+    QCOMPARE(window.ui->comboBox_hash->currentIndex(), -1);
+    QVERIFY(!window.generateArguments().contains(QStringLiteral("-m")));
+    QVERIFY(!window.generateArguments().contains(QStringLiteral("--hash-type")));
 }
 
 // No single size fits every font, DPI scaling, style and translation: a fixed

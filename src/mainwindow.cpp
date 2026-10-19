@@ -211,12 +211,15 @@ void MainWindow::importTriggered()
         if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
                                 &error, &state)) {
             // Same deferred hash type as loadDefaultProfile(): while the
-            // query is in flight the combo cannot take the stored index.
-            if (ui->comboBox_hash->count() == 0) {
-                m_pendingHashTypeIndex = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
-            }
+            // query is in flight the combo cannot take the stored id.
+            const QString problem = restoreHashType(state);
             commandChanged();
-            QMessageBox::information(this, tr("Loaded"), tr("Profile loaded from %1.").arg(file));
+            if (problem.isEmpty()) {
+                QMessageBox::information(this, tr("Loaded"),
+                                         tr("Profile loaded from %1.").arg(file));
+            } else {
+                QMessageBox::warning(this, tr("Profile warning"), problem);
+            }
         } else {
             QMessageBox::warning(this, tr("Load failed"), error);
         }
@@ -235,7 +238,7 @@ void MainWindow::resetFieldsTriggered()
     ui->comboBox_hash->setCurrentIndex(0);
     // A fresh form must not re-apply a hash type a profile is still waiting
     // to deliver.
-    m_pendingHashTypeIndex = -1;
+    m_pendingHashTypeId = -1;
     ui->radioButton_use_rules_file->setChecked(true);
     ui->checkBox_rulesfile_1->setChecked(false);
     ui->checkBox_rulesfile_2->setChecked(false);
@@ -322,16 +325,69 @@ void MainWindow::loadDefaultProfile()
         if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
                                 &error, &state)) {
             // The hash combo has no items yet - the query that fills it runs
-            // asynchronously. Remember the stored index; the reply applies
-            // it once the items exist.
-            if (ui->comboBox_hash->count() == 0) {
-                m_pendingHashTypeIndex = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
-            }
+            // asynchronously. Remember the stored hash type; the reply
+            // applies it once the items exist.
+            const QString problem = restoreHashType(state);
             commandChanged();
+            if (!problem.isEmpty()) {
+                QMessageBox::warning(this, tr("Profile warning"), problem);
+            }
         } else {
             QMessageBox::warning(this, tr("Load failed"), error);
         }
     }
+}
+
+// The hash type a profile names, applied to the combo box.
+//
+// The list of hash types arrives with the asynchronous hashcat query, so a
+// profile loaded before it cannot select anything yet: the id waits in
+// m_pendingHashTypeId until the items exist.
+//
+// The id is what the list is keyed by, and it is what a profile stores. A
+// profile that names no id - one written before the ids were stored - does
+// not select a hash type.
+//
+// Returns a message when the profile names a hash type this hashcat does
+// not know.
+QString MainWindow::restoreHashType(const QJsonObject &state)
+{
+    m_pendingHashTypeId = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
+
+    if (ui->comboBox_hash->count() == 0) {
+        // The list is still on its way; the value waits for it.
+        return {};
+    }
+
+    return applyPendingHashType();
+}
+
+// Applies the hash type a profile asked for, now that the list of hash
+// types exists. Returns a message when the profile names a hash type this
+// hashcat does not know.
+QString MainWindow::applyPendingHashType()
+{
+    QString problem;
+
+    if (m_pendingHashTypeId >= 0) {
+        const int index = ui->comboBox_hash->findData(m_pendingHashTypeId);
+        if (index >= 0) {
+            ui->comboBox_hash->setCurrentIndex(index);
+        } else {
+            // The hash type is gone. An empty selection is the honest
+            // answer: the position would point at a different hash type, and
+            // cracking with the wrong one is worse than not cracking at
+            // all.
+            ui->comboBox_hash->setCurrentIndex(-1);
+            problem = tr("The profile names the hash type %1, which this hashcat version does "
+                         "not support.")
+                          .arg(m_pendingHashTypeId);
+        }
+    }
+
+    m_pendingHashTypeId = -1;
+
+    return problem;
 }
 
 // Save the default profile – called by aboutToQuit signal
@@ -384,6 +440,7 @@ void MainWindow::initHashAndAttackModes()
             watcher->deleteLater();
 
             QString error;
+            QString hashTypeProblem;
 
             // Check if the command failed
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
@@ -402,13 +459,9 @@ void MainWindow::initHashAndAttackModes()
                     }
 
                     // A profile loaded while the combo was still empty could
-                    // not select its hash type; apply the stored index once now
-                    // that the items exist, and consume it.
-                    if (m_pendingHashTypeIndex >= 0
-                        && m_pendingHashTypeIndex < ui->comboBox_hash->count()) {
-                        ui->comboBox_hash->setCurrentIndex(m_pendingHashTypeIndex);
-                    }
-                    m_pendingHashTypeIndex = -1;
+                    // not select its hash type; apply the stored id now that
+                    // the items exist, and consume it.
+                    hashTypeProblem = applyPendingHashType();
                 }
             }
 
@@ -420,6 +473,8 @@ void MainWindow::initHashAndAttackModes()
 
             if (!error.isEmpty()) {
                 QMessageBox::warning(this, tr("hashcat error"), error);
+            } else if (!hashTypeProblem.isEmpty()) {
+                QMessageBox::warning(this, tr("Profile warning"), hashTypeProblem);
             }
         });
 

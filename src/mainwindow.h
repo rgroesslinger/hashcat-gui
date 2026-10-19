@@ -15,6 +15,8 @@
 #include "hashcatoptions.h"
 #include "helperutils.h"
 
+#include <QJsonObject>
+
 namespace Ui
 {
 class MainWindow;
@@ -111,6 +113,15 @@ private:
     void loadDefaultProfile();
     void saveDefaultProfile();
 
+    // Restores the hash type a profile names. Returns a message when the
+    // profile names a hash type this hashcat does not know.
+    QString restoreHashType(const QJsonObject &state);
+
+    // Applies the hash type a profile asked for, now that the list of hash
+    // types exists. Returns a message when the profile names a hash type
+    // this hashcat does not know.
+    QString applyPendingHashType();
+
     // Gives the window the size its current tab actually needs once, on the
     // first show. See showEvent().
     void fitToContent();
@@ -121,9 +132,9 @@ private:
 
     // A profile can name a hash type while comboBox_hash still has no items
     // - the list arrives with the asynchronous hashcat query, after the
-    // constructor has already loaded the profile. The stored index waits
+    // constructor has already loaded the profile. The stored id waits
     // here and is applied once the items exist, see initHashAndAttackModes().
-    int m_pendingHashTypeIndex = -1;
+    int m_pendingHashTypeId = -1;
 };
 
 #endif // MAINWINDOW_H

@@ -52,11 +52,17 @@ This local checklist is the only enforcement.
 - Keep UI-independent logic in `CommandBuilder`, `HashcatInfoParser`, `HelperUtils`, and
   `WidgetStateSerializer` so it stays testable.
 - Hash types are loaded asynchronously from `hashcat --example-hashes --machine-readable`.
-  The hash combo is empty until the query returns; profiles use `m_pendingHashTypeIndex`
+  The hash combo is empty until the query returns; profiles use `m_pendingHashTypeId`
   for this. Never block the GUI thread with a hashcat query. `QSettings` is only reentrant,
   so read it on the calling thread before handing work to `QtConcurrent`.
 - `WidgetStateSerializer` persists `QLineEdit`, `QCheckBox`, `QComboBox`, `QRadioButton`,
   `QSpinBox`, `QDoubleSpinBox`, and `QListWidget` children by `objectName`.
+  A `QComboBox` is stored by the identifier of its selected entry: the data the
+  application gave the entry - the attack mode id, the hash type id - or, for an entry
+  without data, its text. The position is not an identifier: a list that grows in the
+  middle shifts every position behind it, and a profile that stored the position would
+  select a different entry. An identifier the list does not know leaves the combo box
+  alone.
   Renaming widget object names breaks saved profiles and tests. Transient widgets such as
   the command preview are excluded via `AppConstants::Files::PreviewWidget`.
 - Settings use `QSettings::NativeFormat` under the application name; keys belong in

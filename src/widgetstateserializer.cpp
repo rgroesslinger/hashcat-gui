@@ -49,7 +49,19 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
 
     auto const comboBoxes = w->findChildren<const QComboBox *>();
     for (const QComboBox *comboBox : comboBoxes) {
-        obj[comboBox->objectName()] = comboBox->currentIndex();
+        const QString name = comboBox->objectName();
+
+        // A combo box is stored by the identifier of its selected entry, not
+        // by its position. The position is not an identifier: a list that
+        // grows in the middle shifts every position behind it, and a profile
+        // that stored the position would select a different entry.
+        //
+        // The identifier is the data the application gave the entry: the
+        // attack mode id, the hash type id. An entry without data is
+        // identified by its text, which is stable for a fixed list.
+        const QVariant data = comboBox->currentData();
+        obj[name] =
+            data.isValid() ? QJsonValue::fromVariant(data) : QJsonValue(comboBox->currentText());
     }
 
     auto const radioButtons = w->findChildren<const QRadioButton *>();
@@ -116,9 +128,24 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
 
     auto const comboBoxes = w->findChildren<QComboBox *>();
     for (QComboBox *comboBox : comboBoxes) {
-        if (mutableObj.contains(comboBox->objectName())) {
-            comboBox->setCurrentIndex(mutableObj[comboBox->objectName()].toInt());
+        const QString name = comboBox->objectName();
+        if (!mutableObj.contains(name)) {
+            continue;
         }
+
+        // The identifier is the data of the entry; an entry without data was
+        // stored by its text.
+        const QJsonValue identifier = mutableObj.value(name);
+        int index = comboBox->findData(identifier.toVariant());
+        if (index < 0) {
+            index = comboBox->findText(identifier.toString());
+        }
+        if (index >= 0) {
+            comboBox->setCurrentIndex(index);
+        }
+        // An identifier the list does not know is left alone on purpose: the
+        // position would point at a different entry, and silently selecting
+        // that is exactly what the identifier exists to prevent.
     }
 
     auto const radioButtons = w->findChildren<QRadioButton *>();

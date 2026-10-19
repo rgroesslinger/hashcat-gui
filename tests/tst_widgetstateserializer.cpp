@@ -8,6 +8,9 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QRadioButton>
@@ -24,6 +27,9 @@ class TestWidgetStateSerializer : public QObject
 
 private slots:
     void roundTrip();
+    void comboBoxIdentifiersSurviveAShiftedList();
+    void comboBoxWithoutDataIsStoredByItsText();
+    void anUnknownIdentifierChangesNothing();
     void nonAsciiValuesSurviveTheFile();
     void ignoredWidgetsAreNotSaved();
     void ignoredWidgetsAreNotRestored();
@@ -53,6 +59,13 @@ struct Form {
         comboBox->addItems(
             {QStringLiteral("English"), QStringLiteral("Deutsch"), QStringLiteral("Srpski")});
 
+        // A combo box whose entries carry an id, the way the attack modes
+        // and the hash types do.
+        comboBoxWithData = new QComboBox(&widget);
+        comboBoxWithData->setObjectName(QStringLiteral("comboBox_hash"));
+        comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
+        comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000u);
+
         radioButton = new QRadioButton(&widget);
         radioButton->setObjectName(QStringLiteral("radioButton_plain"));
 
@@ -70,6 +83,7 @@ struct Form {
     QLineEdit *lineEdit;
     QCheckBox *checkBox;
     QComboBox *comboBox;
+    QComboBox *comboBoxWithData;
     QRadioButton *radioButton;
     QSpinBox *spinBox;
     QDoubleSpinBox *doubleSpinBox;
@@ -83,6 +97,7 @@ void fill(Form &form)
     form.lineEdit->setText(QStringLiteral("-m 0 --quiet"));
     form.checkBox->setChecked(true);
     form.comboBox->setCurrentIndex(2);
+    form.comboBoxWithData->setCurrentIndex(1);
     form.radioButton->setChecked(true);
     form.spinBox->setValue(42);
     form.doubleSpinBox->setValue(2.5);
@@ -118,6 +133,8 @@ void TestWidgetStateSerializer::roundTrip()
     QCOMPARE(restored.lineEdit->text(), QStringLiteral("-m 0 --quiet"));
     QCOMPARE(restored.checkBox->isChecked(), true);
     QCOMPARE(restored.comboBox->currentIndex(), 2);
+    QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
     QCOMPARE(restored.radioButton->isChecked(), true);
     QCOMPARE(restored.spinBox->value(), 42);
     QCOMPARE(restored.doubleSpinBox->value(), 2.5);
@@ -126,6 +143,101 @@ void TestWidgetStateSerializer::roundTrip()
     QCOMPARE(restored.listWidget->item(0)->checkState(), Qt::Checked);
     QCOMPARE(restored.listWidget->item(1)->text(), QStringLiteral("best64.rule"));
     QCOMPARE(restored.listWidget->item(1)->checkState(), Qt::Unchecked);
+}
+
+// A combo box is stored by the identifier of its selected entry. A list
+// that grew in the middle must not change what a profile selects.
+void TestWidgetStateSerializer::comboBoxIdentifiersSurviveAShiftedList()
+{
+    Form source;
+    source.comboBoxWithData->setCurrentIndex(1); // NTLM, id 1000
+
+    WidgetStateSerializer serializer;
+    QString errorMessage;
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("ids.json"));
+
+    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
+                                        &errorMessage),
+             qPrintable(errorMessage));
+
+    // The file holds the id, not the position...
+    QFile saved(file);
+    QVERIFY(saved.open(QIODevice::ReadOnly));
+    const QJsonObject root = QJsonDocument::fromJson(saved.readAll()).object();
+    saved.close();
+    const QJsonObject state = root.value(QStringLiteral("default")).toObject();
+    QCOMPARE(state.value(QStringLiteral("comboBox_hash")).toInt(), 1000);
+
+    // ... and a list that has grown in front of it still selects the same
+    // entry.
+    Form restored;
+    restored.comboBoxWithData->clear();
+    restored.comboBoxWithData->addItem(QStringLiteral("SHA-1"), 100u);
+    restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
+    restored.comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000u);
+
+    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
+                                          &errorMessage),
+             qPrintable(errorMessage));
+
+    QCOMPARE(restored.comboBoxWithData->currentIndex(), 2);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
+}
+
+// An entry without data has no id of its own, so it is identified by its
+// text - which is stable for a fixed list like the workload profiles.
+void TestWidgetStateSerializer::comboBoxWithoutDataIsStoredByItsText()
+{
+    Form source;
+    source.comboBox->setCurrentIndex(1); // "Deutsch"
+
+    WidgetStateSerializer serializer;
+    QString errorMessage;
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("text.json"));
+
+    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
+                                        &errorMessage),
+             qPrintable(errorMessage));
+
+    QFile saved(file);
+    QVERIFY(saved.open(QIODevice::ReadOnly));
+    const QJsonObject root = QJsonDocument::fromJson(saved.readAll()).object();
+    saved.close();
+    const QJsonObject state = root.value(QStringLiteral("default")).toObject();
+    QCOMPARE(state.value(QStringLiteral("comboBox_language")).toString(),
+             QStringLiteral("Deutsch"));
+
+    Form restored;
+    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
+                                          &errorMessage),
+             qPrintable(errorMessage));
+
+    QCOMPARE(restored.comboBox->currentIndex(), 1);
+    QCOMPARE(restored.comboBox->currentText(), QStringLiteral("Deutsch"));
+}
+
+// An identifier the list does not know leaves the combo box alone. The
+// position would point at a different entry, and silently selecting that is
+// exactly what the identifier exists to prevent.
+void TestWidgetStateSerializer::anUnknownIdentifierChangesNothing()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("unknown.json"));
+    QFile out(file);
+    QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    out.write(R"({"default": {"comboBox_hash": 9999}})");
+    out.close();
+
+    Form restored;
+    restored.comboBoxWithData->setCurrentIndex(1); // NTLM
+
+    WidgetStateSerializer serializer;
+    QString errorMessage;
+    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
+                                          &errorMessage),
+             qPrintable(errorMessage));
+
+    QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
 }
 
 // A field may hold non-ASCII text. The profile is written and read as UTF-8,

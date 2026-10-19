@@ -260,42 +260,42 @@
         <translation>格式：</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="870"/>
+        <location filename="../src/mainwindow.ui" line="1029"/>
         <source>Start</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="877"/>
+        <location filename="../src/mainwindow.ui" line="1036"/>
         <source>Copy command to clipboard</source>
         <translation>将命令复制到剪贴板</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="920"/>
+        <location filename="../src/mainwindow.ui" line="889"/>
         <source>Advanced</source>
         <translation>高级</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="944"/>
+        <location filename="../src/mainwindow.ui" line="913"/>
         <source>General</source>
         <translation>常规</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="956"/>
+        <location filename="../src/mainwindow.ui" line="925"/>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>启用优化内核（会限制密码长度）</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="963"/>
+        <location filename="../src/mainwindow.ui" line="932"/>
         <source>Return expected speed of the attack, then quit</source>
         <translation>输出攻击的预期速度，然后退出</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="972"/>
+        <location filename="../src/mainwindow.ui" line="941"/>
         <source>Override workload profile</source>
         <translation>覆盖工作负载配置</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="982"/>
+        <location filename="../src/mainwindow.ui" line="951"/>
         <source> # | Performance | Runtime | Power Consumption | Desktop Impact
  ===+=============+=========+===================+=========
   1 | Low               |   2 ms    | Low               | Minimal
@@ -393,7 +393,7 @@ default: 1,2</source>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="196"/>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="402"/>
         <source>Save failed</source>
         <translation>保存失败</translation>
     </message>
@@ -403,7 +403,7 @@ default: 1,2</source>
         <translation>加载配置文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="219"/>
+        <location filename="../src/mainwindow.cpp" line="218"/>
         <source>Loaded</source>
         <translation>已加载</translation>
     </message>
@@ -414,101 +414,113 @@ default: 1,2</source>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="221"/>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="333"/>
+        <location filename="../src/mainwindow.cpp" line="477"/>
+        <source>Profile warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="224"/>
+        <location filename="../src/mainwindow.cpp" line="336"/>
         <source>Load failed</source>
         <translation>加载失败</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="358"/>
+        <location filename="../src/mainwindow.cpp" line="382"/>
+        <source>The profile names the hash type %1, which this hashcat version does not support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="414"/>
         <source>Straight</source>
         <translation>字典</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="359"/>
+        <location filename="../src/mainwindow.cpp" line="415"/>
         <source>Combination</source>
         <translation>组合</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="360"/>
+        <location filename="../src/mainwindow.cpp" line="416"/>
         <source>Brute-force</source>
         <translation>暴力破解</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="417"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>混合：字典 + 掩码</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="418"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>混合：掩码 + 字典</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="363"/>
+        <location filename="../src/mainwindow.cpp" line="419"/>
         <source>Association</source>
         <translation>关联</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="375"/>
+        <location filename="../src/mainwindow.cpp" line="431"/>
         <source>Updating...</source>
         <translation>正在更新...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="390"/>
+        <location filename="../src/mainwindow.cpp" line="447"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>无法获取支持的哈希类型。
 错误：%1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="422"/>
+        <location filename="../src/mainwindow.cpp" line="475"/>
         <source>hashcat error</source>
         <translation>hashcat 错误</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="456"/>
+        <location filename="../src/mainwindow.cpp" line="511"/>
         <source>Open Hash File</source>
         <translation>打开哈希文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="464"/>
+        <location filename="../src/mainwindow.cpp" line="519"/>
         <source>Save Output File</source>
         <translation>保存输出文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="481"/>
+        <location filename="../src/mainwindow.cpp" line="536"/>
         <source>Add Wordlists</source>
         <translation>添加字典</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="567"/>
-        <location filename="../src/mainwindow.cpp" line="575"/>
-        <location filename="../src/mainwindow.cpp" line="583"/>
+        <location filename="../src/mainwindow.cpp" line="622"/>
+        <location filename="../src/mainwindow.cpp" line="630"/>
+        <location filename="../src/mainwindow.cpp" line="638"/>
         <source>Open Rules File</source>
         <translation>打开规则文件</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="680"/>
+        <location filename="../src/mainwindow.cpp" line="735"/>
         <source>Launch failed</source>
         <translation>启动失败</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="681"/>
+        <location filename="../src/mainwindow.cpp" line="736"/>
         <source>Could not start %1: %2</source>
         <translation>无法启动 %1：%2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="698"/>
+        <location filename="../src/mainwindow.cpp" line="753"/>
         <source>Please choose a hash file.</source>
         <translation>请选择一个哈希文件。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="705"/>
+        <location filename="../src/mainwindow.cpp" line="760"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>请前往 &lt;b&gt;%1 → %2&lt;/b&gt; 配置 hashcat 可执行文件的路径。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="715"/>
+        <location filename="../src/mainwindow.cpp" line="770"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -517,17 +529,17 @@ Navigate to %2 → %3 to change it.</source>
 请前往 %2 → %3 进行修改。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="723"/>
+        <location filename="../src/mainwindow.cpp" line="778"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>请前往 &lt;b&gt;%1 → %2&lt;/b&gt; 选择用于启动的终端。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="728"/>
+        <location filename="../src/mainwindow.cpp" line="783"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>在此系统上未找到受支持的终端。hashcat-gui 需要终端来显示 hashcat 的输出。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="734"/>
+        <location filename="../src/mainwindow.cpp" line="789"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>配置的终端“%1”不可用。可用的终端：%2
@@ -625,27 +637,27 @@ Navigate to %3 → %4 to change it.</source>
 <context>
     <name>WidgetStateSerializer</name>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="174"/>
+        <location filename="../src/widgetstateserializer.cpp" line="202"/>
         <source>Could not open %1 for writing: %2</source>
         <translation>无法以写入方式打开 %1：%2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="180"/>
+        <location filename="../src/widgetstateserializer.cpp" line="208"/>
         <source>Could not write to %1: %2</source>
         <translation>无法写入 %1：%2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="199"/>
+        <location filename="../src/widgetstateserializer.cpp" line="227"/>
         <source>Could not open %1 for reading: %2</source>
         <translation>无法以读取方式打开 %1：%2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="207"/>
+        <location filename="../src/widgetstateserializer.cpp" line="235"/>
         <source>The file is not a valid JSON file: %1</source>
         <translation>该文件不是有效的 JSON 文件：%1</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="213"/>
+        <location filename="../src/widgetstateserializer.cpp" line="241"/>
         <source>The file does not contain a profile for &quot;%1&quot;.</source>
         <translation>该文件不包含“%1”的配置文件。</translation>
     </message>

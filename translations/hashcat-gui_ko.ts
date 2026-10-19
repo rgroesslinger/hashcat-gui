@@ -260,42 +260,42 @@
         <translation>형식:</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="870"/>
+        <location filename="../src/mainwindow.ui" line="1029"/>
         <source>Start</source>
         <translation>시작</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="877"/>
+        <location filename="../src/mainwindow.ui" line="1036"/>
         <source>Copy command to clipboard</source>
         <translation>명령을 클립보드에 복사</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="920"/>
+        <location filename="../src/mainwindow.ui" line="889"/>
         <source>Advanced</source>
         <translation>고급</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="944"/>
+        <location filename="../src/mainwindow.ui" line="913"/>
         <source>General</source>
         <translation>일반</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="956"/>
+        <location filename="../src/mainwindow.ui" line="925"/>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>최적화된 커널 사용 (비밀번호 길이 제한)</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="963"/>
+        <location filename="../src/mainwindow.ui" line="932"/>
         <source>Return expected speed of the attack, then quit</source>
         <translation>공격의 예상 속도를 출력한 뒤 종료</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="972"/>
+        <location filename="../src/mainwindow.ui" line="941"/>
         <source>Override workload profile</source>
         <translation>워크로드 프로필 재정의</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.ui" line="982"/>
+        <location filename="../src/mainwindow.ui" line="951"/>
         <source> # | Performance | Runtime | Power Consumption | Desktop Impact
  ===+=============+=========+===================+=========
   1 | Low               |   2 ms    | Low               | Minimal
@@ -393,7 +393,7 @@ default: 1,2</source>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="196"/>
-        <location filename="../src/mainwindow.cpp" line="346"/>
+        <location filename="../src/mainwindow.cpp" line="402"/>
         <source>Save failed</source>
         <translation>저장 실패</translation>
     </message>
@@ -403,7 +403,7 @@ default: 1,2</source>
         <translation>프로필 불러오기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="219"/>
+        <location filename="../src/mainwindow.cpp" line="218"/>
         <source>Loaded</source>
         <translation>불러옴</translation>
     </message>
@@ -414,101 +414,113 @@ default: 1,2</source>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="221"/>
-        <location filename="../src/mainwindow.cpp" line="332"/>
+        <location filename="../src/mainwindow.cpp" line="333"/>
+        <location filename="../src/mainwindow.cpp" line="477"/>
+        <source>Profile warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="224"/>
+        <location filename="../src/mainwindow.cpp" line="336"/>
         <source>Load failed</source>
         <translation>불러오기 실패</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="358"/>
+        <location filename="../src/mainwindow.cpp" line="382"/>
+        <source>The profile names the hash type %1, which this hashcat version does not support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="414"/>
         <source>Straight</source>
         <translation>사전</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="359"/>
+        <location filename="../src/mainwindow.cpp" line="415"/>
         <source>Combination</source>
         <translation>조합</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="360"/>
+        <location filename="../src/mainwindow.cpp" line="416"/>
         <source>Brute-force</source>
         <translation>무차별 대입</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="361"/>
+        <location filename="../src/mainwindow.cpp" line="417"/>
         <source>Hybrid Wordlist + Mask</source>
         <translation>하이브리드: 단어 목록 + 마스크</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="362"/>
+        <location filename="../src/mainwindow.cpp" line="418"/>
         <source>Hybrid Mask + Wordlist</source>
         <translation>하이브리드: 마스크 + 단어 목록</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="363"/>
+        <location filename="../src/mainwindow.cpp" line="419"/>
         <source>Association</source>
         <translation>연관</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="375"/>
+        <location filename="../src/mainwindow.cpp" line="431"/>
         <source>Updating...</source>
         <translation>업데이트 중...</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="390"/>
+        <location filename="../src/mainwindow.cpp" line="447"/>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>지원되는 해시 유형을 가져오지 못했습니다.
 오류: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="422"/>
+        <location filename="../src/mainwindow.cpp" line="475"/>
         <source>hashcat error</source>
         <translation>hashcat 오류</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="456"/>
+        <location filename="../src/mainwindow.cpp" line="511"/>
         <source>Open Hash File</source>
         <translation>해시 파일 열기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="464"/>
+        <location filename="../src/mainwindow.cpp" line="519"/>
         <source>Save Output File</source>
         <translation>출력 파일 저장</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="481"/>
+        <location filename="../src/mainwindow.cpp" line="536"/>
         <source>Add Wordlists</source>
         <translation>단어 목록 추가</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="567"/>
-        <location filename="../src/mainwindow.cpp" line="575"/>
-        <location filename="../src/mainwindow.cpp" line="583"/>
+        <location filename="../src/mainwindow.cpp" line="622"/>
+        <location filename="../src/mainwindow.cpp" line="630"/>
+        <location filename="../src/mainwindow.cpp" line="638"/>
         <source>Open Rules File</source>
         <translation>규칙 파일 열기</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="680"/>
+        <location filename="../src/mainwindow.cpp" line="735"/>
         <source>Launch failed</source>
         <translation>실행 실패</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="681"/>
+        <location filename="../src/mainwindow.cpp" line="736"/>
         <source>Could not start %1: %2</source>
         <translation>%1을(를) 시작할 수 없습니다: %2</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="698"/>
+        <location filename="../src/mainwindow.cpp" line="753"/>
         <source>Please choose a hash file.</source>
         <translation>해시 파일을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="705"/>
+        <location filename="../src/mainwindow.cpp" line="760"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 hashcat 실행 파일 경로를 설정하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="715"/>
+        <location filename="../src/mainwindow.cpp" line="770"/>
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
@@ -517,17 +529,17 @@ Navigate to %2 → %3 to change it.</source>
 변경하려면 %2 → %3으로 이동하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="723"/>
+        <location filename="../src/mainwindow.cpp" line="778"/>
         <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 실행에 사용할 터미널을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="728"/>
+        <location filename="../src/mainwindow.cpp" line="783"/>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>이 시스템에서 지원되는 터미널을 찾을 수 없습니다. hashcat-gui는 hashcat 출력을 표시하기 위해 터미널이 필요합니다.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cpp" line="734"/>
+        <location filename="../src/mainwindow.cpp" line="789"/>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
         <translation>설정된 터미널 &quot;%1&quot;을(를) 사용할 수 없습니다. 사용 가능한 터미널: %2
@@ -625,27 +637,27 @@ Navigate to %3 → %4 to change it.</source>
 <context>
     <name>WidgetStateSerializer</name>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="174"/>
+        <location filename="../src/widgetstateserializer.cpp" line="202"/>
         <source>Could not open %1 for writing: %2</source>
         <translation>%1을(를) 쓰기용으로 열 수 없습니다: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="180"/>
+        <location filename="../src/widgetstateserializer.cpp" line="208"/>
         <source>Could not write to %1: %2</source>
         <translation>%1에 쓸 수 없습니다: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="199"/>
+        <location filename="../src/widgetstateserializer.cpp" line="227"/>
         <source>Could not open %1 for reading: %2</source>
         <translation>%1을(를) 읽기용으로 열 수 없습니다: %2</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="207"/>
+        <location filename="../src/widgetstateserializer.cpp" line="235"/>
         <source>The file is not a valid JSON file: %1</source>
         <translation>유효한 JSON 파일이 아닙니다: %1</translation>
     </message>
     <message>
-        <location filename="../src/widgetstateserializer.cpp" line="213"/>
+        <location filename="../src/widgetstateserializer.cpp" line="241"/>
         <source>The file does not contain a profile for &quot;%1&quot;.</source>
         <translation>파일에 &quot;%1&quot;의 프로필이 없습니다.</translation>
     </message>

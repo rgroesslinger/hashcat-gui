@@ -18,12 +18,14 @@
 - **Qt 6.8 & C++20 baseline**: Bumped minimum Qt version to 6.8 and moved build baseline from C++17 to C++20
 - **New artwork**: Added new application artwork and improved the XDG `.desktop` file entry
 - **Persistent command bar**: Moved Start, Copy, and the command preview below the tabs so they stay visible on every tab
+- Combo boxes in a profile are stored by the id of their selected entry instead of its position, so a list that grows - a new hash type, a new attack mode - no longer changes what a saved profile selects
 
 ### Bug Fixes
 - GUI now refuses to start hashcat when configuration is incomplete instead of failing silently
 - Terminal startup failures (wrong path, permissions) now report errors instead of failing silently
 - Profile errors reported via error message instead of opening a dialog, ensuring failed profile loads at start-up are reported
 - Hash type saved in a profile is now correctly applied after background query completes (was dropped at start-up)
+- A profile that names a hash type the installed hashcat does not know now leaves the hash type unselected and says so, instead of silently selecting another one
 - File → Export only announces success when the profile was actually written
 - Hash type selector re-enabled when background query fails or returns malformed JSON
 - `--hash-type` omitted when no hash type is selected (empty selector no longer sends `-m 0`)
