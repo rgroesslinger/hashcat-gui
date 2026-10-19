@@ -772,14 +772,14 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_cpu_affinity">
                        <property name="toolTip">
-                        <string>locks to CPU devices, seperate with comma</string>
+                        <string>locks to CPU devices, separate with comma</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_devices">
                        <property name="toolTip">
-                        <string>devices to use, seperate with comma</string>
+                        <string>devices to use, separate with comma</string>
                        </property>
                        <property name="text">
                         <string notr="true">0</string>
