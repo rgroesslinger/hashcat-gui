@@ -30,7 +30,8 @@ inline constexpr QLatin1StringView UseShortParameters{"useShortParameters"};
 inline constexpr QLatin1StringView Language{"language"};
 } // namespace SettingsKeys
 
-// The languages the settings dialog offers.
+// The languages the settings dialog offers, sorted by each name in its own
+// language so the combo reads naturally for every user.
 //
 // What gets stored is always the locale code, never the display text, so
 // relabeling an entry cannot orphan a saved setting. Both members hold UTF-8
@@ -41,10 +42,12 @@ struct Language {
     const char *code;
     const char *name;
 };
+// Ordered by each name's native spelling in codepoint order: Latin names
+// interleave alphabetically, non-Latin names cluster after them by codepoint.
 inline constexpr Language Available[] = {
-    {"en", "English"},
-    {"de", "Deutsch"},
-    {"sr", "Srpski"},
+    {"de", "Deutsch"},  {"en", "English"},     {"es", "Español"},
+    {"fr", "Français"}, {"it", "Italiano"},    {"sr", "Srpski"},
+    {"ja", "日本語"},   {"zh_CN", "简体中文"}, {"ko", "한국어"},
 };
 // What a fresh install gets before anything was ever saved, and what the
 // dialog falls back to when the key holds a code that is no longer offered:

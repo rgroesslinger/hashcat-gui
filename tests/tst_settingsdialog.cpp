@@ -153,8 +153,11 @@ void TestSettingsDialog::languageComboStoresLocaleCodes()
 
     // Move to "Deutsch" and save: the stored value is the code, not the
     // name and not the display text. The restart dialog for this real
-    // change is what the recorder catches instead of blocking on.
-    dialog.ui->comboBox_language->setCurrentIndex(2);
+    // change is what the recorder catches instead of blocking on. Selecting
+    // by code keeps this independent of the order the languages are listed in.
+    const int deIndex = dialog.ui->comboBox_language->findData(QStringLiteral("de"));
+    QVERIFY(deIndex >= 0);
+    dialog.ui->comboBox_language->setCurrentIndex(deIndex);
     QCOMPARE(dialog.ui->comboBox_language->currentData().toString(), QStringLiteral("de"));
 
     ModalRecorder recorder;
@@ -173,23 +176,23 @@ void TestSettingsDialog::languageComboStoresLocaleCodes()
 // dialog alone must not rewrite the stored value behind the user's back.
 void TestSettingsDialog::unknownLanguageCodeFallsBackToSystemDefault()
 {
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language, QStringLiteral("fr"));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language, QStringLiteral("xx"));
 
     SettingsDialog dialog;
     QCOMPARE(dialog.ui->comboBox_language->currentIndex(), 0);
     QCOMPARE(dialog.ui->comboBox_language->currentData().toString(), QString());
 
     QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Language),
-             QStringLiteral("fr"));
+             QStringLiteral("xx"));
 }
 
-// The regression the stale-code fallback used to set off: with "fr" stored
-// and the combo showing "System default", saving after changing only the
-// hashcat path is no language change at all - no restart dialog, no rewrite
-// of the key to something the user never picked.
+// The regression the stale-code fallback used to set off: with a code no
+// longer offered stored and the combo showing "System default", saving after
+// changing only the hashcat path is no language change at all - no restart
+// dialog, no rewrite of the key to something the user never picked.
 void TestSettingsDialog::staleLanguageCodeDoesNotDemandARestart()
 {
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language, QStringLiteral("fr"));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Language, QStringLiteral("xx"));
 
     SettingsDialog dialog;
     dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/opt/somewhere/hashcat"));

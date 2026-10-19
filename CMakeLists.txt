@@ -95,14 +95,22 @@ target_compile_definitions(hashcat-gui PRIVATE
 # LinguistTools is optional: without it the build still works, just with no
 # .qm files. SOURCE_TARGETS keeps lupdate off the tests, so a tr() added to a
 # test cannot land in the catalogs.
+# The translation catalogs, one per line. Named "hashcat-gui_<code>", and the
+# single list the build (below) and the test embedding derive their catalogs from.
+set(HASHCAT_GUI_TRANSLATIONS de es fr it sr ja zh_CN ko)
+
 find_package(Qt6 COMPONENTS LinguistTools QUIET)
 if(Qt6LinguistTools_FOUND)
+    # Derive the .ts sources from the single catalog list.
+    set(HASHCAT_GUI_TS_FILES)
+    foreach(code IN LISTS HASHCAT_GUI_TRANSLATIONS)
+        list(APPEND HASHCAT_GUI_TS_FILES translations/hashcat-gui_${code}.ts)
+    endforeach()
+
     qt_add_translations(hashcat-gui
         SOURCE_TARGETS hashcat-gui hashcat-gui-core
         LUPDATE_OPTIONS -no-obsolete
-        TS_FILES
-            translations/hashcat-gui_de.ts
-            translations/hashcat-gui_sr.ts
+        TS_FILES ${HASHCAT_GUI_TS_FILES}
     )
 else()
     message(STATUS "Qt6 LinguistTools not found - building without translations")
@@ -138,15 +146,24 @@ elseif(Qt6Test_FOUND)
 
     # tst_translations only proves :/i18n answers at runtime if its binary embeds
     # the catalogs the way the application does; without LinguistTools there are
-    # none, and the test skips instead of failing.
+    # none, and the test skips instead of failing. The embedded .qm files are
+    # derived from the same catalog list as the build above.
     if(Qt6LinguistTools_FOUND)
         target_compile_definitions(tst_translations PRIVATE HASHCAT_GUI_QM_EMBEDDED)
+
+        # The .qm files do not exist yet at configure time - qt_add_translations
+        # produces them at build time - but qt_add_resources only needs their
+        # paths, listed here from the single catalog list.
+        set(HASHCAT_GUI_QM_FILES)
+        foreach(code IN LISTS HASHCAT_GUI_TRANSLATIONS)
+            list(APPEND HASHCAT_GUI_QM_FILES
+                ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui_${code}.qm)
+        endforeach()
+
         qt_add_resources(tst_translations "tst_translations_translations"
             PREFIX "/i18n"
             BASE ${CMAKE_CURRENT_BINARY_DIR}
-            FILES
-                ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui_de.qm
-                ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui_sr.qm)
+            FILES ${HASHCAT_GUI_QM_FILES})
     endif()
 
     # Headless CI: nothing the tests show, not even the main window, is drawn, and
