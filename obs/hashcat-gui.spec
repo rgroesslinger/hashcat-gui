@@ -46,6 +46,10 @@ A Qt-based GUI for hashcat, a powerful password recovery utility
 %license LICENSE
 %doc README.md FAQ.md CHANGELOG.md
 %{_bindir}/hashcat-gui
+# The desktop entry and the icon tree that install() puts on the system.
+%{_datadir}/applications/hashcat-gui.desktop
+%{_datadir}/icons/hicolor/*/apps/hashcat-gui.png
+%{_datadir}/icons/hicolor/scalable/apps/hashcat-gui.svg
 
 %check
 
