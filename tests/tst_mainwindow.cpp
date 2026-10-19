@@ -66,6 +66,7 @@ private slots:
     void defaultProfileRoundTrips();
     void profileHashTypeSurvivesTheAsynchronousQuery();
     void windowFitsItsContent();
+    void commandBarStaysVisibleOnEveryTab();
 
 private:
     QString m_savedHashcatPath;
@@ -572,6 +573,42 @@ void TestMainWindow::windowFitsItsContent()
         // and the scroll area has to show its scrollbar.
         QVERIFY(area->verticalScrollBar()->isVisible());
     }
+}
+
+// The command bar belongs to the window, not to one tab: switching tabs must
+// not take Start, Copy or the preview away.
+void TestMainWindow::commandBarStaysVisibleOnEveryTab()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+    m_watchdog.start();
+
+    MainWindow window;
+    window.show();
+    QCoreApplication::processEvents();
+
+    QPushButton *execute = window.ui->pushButton_execute;
+    QPushButton *copy = window.ui->pushButton_copy_clipboard;
+    QLineEdit *preview = window.ui->lineEdit_command;
+
+    // The row lives below the tabs, not in the first tab's scroll content.
+    QVERIFY(window.centralWidget()->isAncestorOf(execute));
+    QVERIFY(!window.ui->tabWidget_main->isAncestorOf(execute));
+    QVERIFY(!window.ui->scrollArea_2->isAncestorOf(execute));
+    QVERIFY(!window.ui->tabWidget_main->isAncestorOf(copy));
+    QVERIFY(!window.ui->tabWidget_main->isAncestorOf(preview));
+
+    QVERIFY(execute->isVisible());
+    QVERIFY(copy->isVisible());
+    QVERIFY(preview->isVisible());
+
+    // ... and the row stays on screen on the second tab as well.
+    window.ui->tabWidget_main->setCurrentWidget(window.ui->tab_advanced);
+    QCoreApplication::processEvents();
+
+    QVERIFY(execute->isVisible());
+    QVERIFY(copy->isVisible());
+    QVERIFY(preview->isVisible());
 }
 
 int main(int argc, char *argv[])
