@@ -18,6 +18,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QDir>
+#include <QSaveFile>
 
 // Report a failure through errorMessage when the caller asked for it
 static void setError(QString *errorMessage, const QString &text)
@@ -195,20 +196,23 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key, const QWidget *w
     QJsonObject root;
     root[key] = widgetToJson(widget, ignoredWidgets);
 
-    QFile f(filename);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    // QSaveFile writes to a temporary file next to the target and renames it
+    // over the target only when the write succeeded. A crash in the middle
+    // therefore leaves the old profile alone instead of a truncated one,
+    // which the next start would report as a broken profile.
+    QSaveFile f(filename);
+    if (!f.open(QIODevice::WriteOnly)) {
         setError(errorMessage,
                  tr("Could not open %1 for writing: %2").arg(filename, f.errorString()));
         return false;
     }
 
     const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Indented);
-    if (f.write(data) != data.size() || !f.flush()) {
+    if (f.write(data) != data.size() || !f.commit()) {
         setError(errorMessage, tr("Could not write to %1: %2").arg(filename, f.errorString()));
         return false;
     }
 
-    f.close();
     setError(errorMessage, QString());
     return true;
 }
