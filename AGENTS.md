@@ -15,7 +15,9 @@ all steps pass:
 `clang-format` edits files, so it must run before the final build and tests.
 If a target is missing, the corresponding tool is not installed
 (`clang-format`, `clang-tidy`, `clazy-standalone`); install it rather than
-skipping the check.
+skipping the check. Two Qt modules belong to the same list: Qt6 LinguistTools
+— without them the `update_translations` target disappears and CI then fails on
+stale catalogs — and Qt6 Test, without which the suite silently runs nothing.
 
 `clang-tidy` and `clazy` are configured as warning-only (`WarningsAsErrors` is
 empty), so a zero exit status does not mean they found nothing. Read their
@@ -81,8 +83,10 @@ This local checklist is the only enforcement.
 - Tests must use `TestEnvironment::run`, not `QTEST_MAIN`; it redirects XDG
   config/data/cache directories so tests never touch real settings. Shell-script hashcat
   stubs do not run on Windows, so those cases `QSKIP`.
-- `FAQ.md` is generated from `FAQ.yaml` — edit `FAQ.yaml` only, never `FAQ.md`; nothing in
-  the repo regenerates it, so a direct edit is silently lost.
+- `FAQ.md` is generated from `FAQ.yaml` by
+  [mdfaqgen](https://github.com/rgroesslinger/mdfaqgen) — edit `FAQ.yaml` only,
+  never `FAQ.md`. Regenerate with `mdfaqgen FAQ.yaml FAQ.md`; the tool asks before it
+  overwrites an existing file.
 - `build/` is gitignored. Do not commit generated `ui_*.h`, `.qm`, or binaries.
 
 ## CI checks
