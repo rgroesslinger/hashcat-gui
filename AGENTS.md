@@ -57,12 +57,13 @@ This local checklist is the only enforcement.
   so read it on the calling thread before handing work to `QtConcurrent`.
 - `WidgetStateSerializer` persists `QLineEdit`, `QCheckBox`, `QComboBox`, `QRadioButton`,
   `QSpinBox`, `QDoubleSpinBox`, and `QListWidget` children by `objectName`.
-  A `QComboBox` is stored by the identifier of its selected entry: the data the
-  application gave the entry - the attack mode id, the hash type id - or, for an entry
-  without data, its text. The position is not an identifier: a list that grows in the
-  middle shifts every position behind it, and a profile that stored the position would
-  select a different entry. An identifier the list does not know leaves the combo box
-  alone.
+  A `QComboBox` is stored by the identifier of its selected entry: the item data the
+  application gave the entry - the attack mode id, the hash type id, the workload level.
+  A display text is never used: it is translatable and not an identifier. A combo box whose
+  entries carry no item data at all falls back to the position, the only thing such a list
+  has. The position is not an identifier: a list that grows in the middle shifts every
+  position behind it, and a profile that stored the position would select a different entry.
+  An identifier the list does not know leaves the combo box alone.
   Renaming widget object names breaks saved profiles and tests. Transient widgets such as
   the command preview are excluded via `AppConstants::Files::PreviewWidget`.
 - Settings use `QSettings::NativeFormat` under the application name; keys belong in
@@ -78,8 +79,11 @@ This local checklist is the only enforcement.
   Use `QStringLiteral`, `QLatin1StringView`, or `QString::fromUtf8`; tests are exempt.
 - Put protocol tokens, settings keys, defaults, and file names in `src/appconstants.h`.
   Fixed hashcat syntax/help tables are deliberately non-translatable.
-- Wrap user-visible text in `tr()`. After changing a `tr()` string, run
-  `cmake --build build --target update_translations` and commit the refreshed `translations/*.ts`.
+- Wrap user-visible text in `tr()`. The catalogs are built with
+  `lupdate -locations none`, so they carry no source file/line references and moving code
+  does not touch them. Run `cmake --build build --target update_translations` only when a
+  `tr()` string is added, changed, or removed, and commit the refreshed `translations/*.ts`
+  (a new string arrives untranslated); CI runs the same target and fails on any other drift.
   Adding a language requires updating both `HASHCAT_GUI_TRANSLATIONS` and
   `AppConstants::Languages::Available`; English has no catalog, and `tst_translations`
   enforces that the two lists stay in sync.

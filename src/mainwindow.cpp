@@ -50,6 +50,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     auto &settings = SettingsManager::instance();
 
+    // The workload levels carry only display text in the .ui file; give each
+    // one an id so a profile stores the level and not its position.
+    for (int i = 0; i < ui->comboBox_workload_profile->count(); ++i) {
+        ui->comboBox_workload_profile->setItemData(i, i + 1);
+    }
+
     initHashAndAttackModes();
     updateViewAttackMode();
 

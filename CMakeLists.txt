@@ -119,9 +119,10 @@ if(Qt6LinguistTools_FOUND)
         list(APPEND HASHCAT_GUI_TS_FILES translations/hashcat-gui_${code}.ts)
     endforeach()
 
+    # Do not carry obsolete entries and line numbers in translations
     qt_add_translations(hashcat-gui
         SOURCE_TARGETS hashcat-gui hashcat-gui-core
-        LUPDATE_OPTIONS -no-obsolete
+        LUPDATE_OPTIONS -no-obsolete -locations none
         TS_FILES ${HASHCAT_GUI_TS_FILES}
     )
 else()

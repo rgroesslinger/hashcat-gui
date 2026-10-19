@@ -28,7 +28,8 @@ class TestWidgetStateSerializer : public QObject
 private slots:
     void roundTrip();
     void comboBoxIdentifiersSurviveAShiftedList();
-    void comboBoxWithoutDataIsStoredByItsText();
+    void comboBoxWithoutDataIsStoredByItsIndex();
+    void comboBoxIdentifierIsNotMatchedByText();
     void anUnknownIdentifierChangesNothing();
     void nonAsciiValuesSurviveTheFile();
     void ignoredWidgetsAreNotSaved();
@@ -184,16 +185,15 @@ void TestWidgetStateSerializer::comboBoxIdentifiersSurviveAShiftedList()
     QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
 }
 
-// An entry without data has no id of its own, so it is identified by its
-// text - which is stable for a fixed list like the workload profiles.
-void TestWidgetStateSerializer::comboBoxWithoutDataIsStoredByItsText()
+// A combo box whose entries carry no identifier falls back to its position.
+void TestWidgetStateSerializer::comboBoxWithoutDataIsStoredByItsIndex()
 {
     Form source;
     source.comboBox->setCurrentIndex(1); // "Deutsch"
 
     WidgetStateSerializer serializer;
     QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("text.json"));
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("index.json"));
 
     QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
                                         &errorMessage),
@@ -204,8 +204,7 @@ void TestWidgetStateSerializer::comboBoxWithoutDataIsStoredByItsText()
     const QJsonObject root = QJsonDocument::fromJson(saved.readAll()).object();
     saved.close();
     const QJsonObject state = root.value(QStringLiteral("default")).toObject();
-    QCOMPARE(state.value(QStringLiteral("comboBox_language")).toString(),
-             QStringLiteral("Deutsch"));
+    QCOMPARE(state.value(QStringLiteral("comboBox_language")).toInt(), 1);
 
     Form restored;
     QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
@@ -214,6 +213,35 @@ void TestWidgetStateSerializer::comboBoxWithoutDataIsStoredByItsText()
 
     QCOMPARE(restored.comboBox->currentIndex(), 1);
     QCOMPARE(restored.comboBox->currentText(), QStringLiteral("Deutsch"));
+}
+
+// A stored identifier is looked up in the item data only; a display text that
+// happens to match it must not select an entry the profile never named.
+void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("clash.json"));
+    QFile out(file);
+    QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    out.write(R"({"default": {"comboBox_hash": 1}})");
+    out.close();
+
+    Form restored;
+    restored.comboBoxWithData->clear();
+    // The text "1" is not the identifier 1; only the data counts.
+    restored.comboBoxWithData->addItem(QStringLiteral("1"), 5u);
+    restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
+    restored.comboBoxWithData->setCurrentIndex(1); // MD5, id 0
+
+    WidgetStateSerializer serializer;
+    QString errorMessage;
+    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
+                                          &errorMessage),
+             qPrintable(errorMessage));
+
+    // The identifier 1 is unknown, so nothing changes - even though an entry
+    // displays "1".
+    QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 0u);
 }
 
 // An identifier the list does not know leaves the combo box alone. The

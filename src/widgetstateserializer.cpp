@@ -28,6 +28,19 @@ static void setError(QString *errorMessage, const QString &text)
     }
 }
 
+// Whether the entries of a combo box carry identifiers (item data) at all.
+// It decides whether a selection is stored by identifier or by position: the
+// two never mix within one combo box, so the stored value is unambiguous.
+static bool comboBoxHasItemData(const QComboBox *comboBox)
+{
+    for (int i = 0; i < comboBox->count(); ++i) {
+        if (comboBox->itemData(i).isValid()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent)
 {
 }
@@ -50,19 +63,12 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
 
     auto const comboBoxes = w->findChildren<const QComboBox *>();
     for (const QComboBox *comboBox : comboBoxes) {
-        const QString name = comboBox->objectName();
-
-        // A combo box is stored by the identifier of its selected entry, not
-        // by its position. The position is not an identifier: a list that
-        // grows in the middle shifts every position behind it, and a profile
-        // that stored the position would select a different entry.
-        //
-        // The identifier is the data the application gave the entry: the
-        // attack mode id, the hash type id. An entry without data is
-        // identified by its text, which is stable for a fixed list.
-        const QVariant data = comboBox->currentData();
-        obj[name] =
-            data.isValid() ? QJsonValue::fromVariant(data) : QJsonValue(comboBox->currentText());
+        // Stored by the identifier of the selected entry - the attack mode or
+        // hash type id - not by its position, which a list that grows in the
+        // middle shifts. A combo box without identifiers falls back to that.
+        obj[comboBox->objectName()] = comboBoxHasItemData(comboBox)
+                                          ? QJsonValue::fromVariant(comboBox->currentData())
+                                          : QJsonValue(comboBox->currentIndex());
     }
 
     auto const radioButtons = w->findChildren<const QRadioButton *>();
@@ -134,19 +140,25 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
             continue;
         }
 
-        // The identifier is the data of the entry; an entry without data was
-        // stored by its text.
-        const QJsonValue identifier = mutableObj.value(name);
-        int index = comboBox->findData(identifier.toVariant());
-        if (index < 0) {
-            index = comboBox->findText(identifier.toString());
+        const QJsonValue stored = mutableObj.value(name);
+        if (stored.isUndefined() || stored.isNull()) {
+            continue;
         }
-        if (index >= 0) {
-            comboBox->setCurrentIndex(index);
+
+        if (comboBoxHasItemData(comboBox)) {
+            // The identifier is the item data and nothing else; an unknown one
+            // leaves the combo box alone instead of selecting another entry.
+            const int index = comboBox->findData(stored.toVariant());
+            if (index >= 0) {
+                comboBox->setCurrentIndex(index);
+            }
+        } else {
+            // No entry has an identifier, so the position is all that is left.
+            const int index = stored.toInt(-1);
+            if (index >= 0 && index < comboBox->count()) {
+                comboBox->setCurrentIndex(index);
+            }
         }
-        // An identifier the list does not know is left alone on purpose: the
-        // position would point at a different entry, and silently selecting
-        // that is exactly what the identifier exists to prevent.
     }
 
     auto const radioButtons = w->findChildren<QRadioButton *>();
