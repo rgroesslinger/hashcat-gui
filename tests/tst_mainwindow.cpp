@@ -558,20 +558,22 @@ void TestMainWindow::windowFitsItsContent()
 
     // The size fitToContent() should have produced: the capped scroll area hint
     // swapped for the content minimum, clamped to the screen with the same
-    // 40/80 headroom for decorations.
+    // 40/80 headroom for decorations. QTRY because a resize inside showEvent()
+    // needs the event loop to settle the child layouts before the final
+    // scrollbar state is visible.
     const QSize natural = window.sizeHint() + content->minimumSizeHint() - area->sizeHint();
     const QSize cap = window.screen()->availableGeometry().size() - QSize(40, 80);
-    QCOMPARE(window.size(), natural.boundedTo(cap));
+    QTRY_COMPARE(window.size(), natural.boundedTo(cap));
 
     if (natural.height() <= cap.height()) {
         // The content fits the screen: no scrollbar, and no empty strip below
         // it - the content is exactly as tall as it needs to be.
-        QVERIFY(!area->verticalScrollBar()->isVisible());
+        QTRY_VERIFY(!area->verticalScrollBar()->isVisible());
         QVERIFY(content->height() - content->minimumSizeHint().height() < 30);
     } else {
         // The content is taller than the screen: the window stays on-screen
         // and the scroll area has to show its scrollbar.
-        QVERIFY(area->verticalScrollBar()->isVisible());
+        QTRY_VERIFY(area->verticalScrollBar()->isVisible());
     }
 }
 
