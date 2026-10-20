@@ -31,6 +31,7 @@ public:
     static bool attackUsesMask(AttackMode mode);
     static bool attackUsesWordlists(AttackMode mode);
     static bool attackUsesRules(AttackMode mode);
+    static bool attackUsesCombinationRules(AttackMode mode);
 };
 
 #endif // COMMANDBUILDER_H

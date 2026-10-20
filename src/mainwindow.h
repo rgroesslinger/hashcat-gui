@@ -99,6 +99,7 @@ private:
 
     void initHashAndAttackModes();
     void updateViewAttackMode();
+    void updateOptionDependencies();
 
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about

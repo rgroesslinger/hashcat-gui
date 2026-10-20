@@ -78,6 +78,11 @@ inline constexpr QLatin1StringView OutfileFormat{"1,2"};
 inline constexpr QLatin1StringView BackendDevices{};
 inline constexpr int SegmentSize = 32; // MB
 inline constexpr QLatin1StringView OutfileSuffix{".out"};
+inline constexpr int Runtime = 0;         // seconds, 0 = unlimited
+inline constexpr int StatusTimer = 1;     // seconds
+inline constexpr int HwmonTempAbort = 90; // degrees Celsius
+inline constexpr int IncrementMin = 0;    // 0 = hashcat default
+inline constexpr int IncrementMax = 0;    // 0 = hashcat default
 } // namespace Defaults
 
 // Placeholders the user can type into the outfile field.
@@ -105,6 +110,11 @@ inline constexpr QLatin1StringView OutfileFormats{"  1 = hash[:salt]\n"
                                                   "  4 = crack_pos\n"
                                                   "  5 = timestamp absolute\n"
                                                   "  6 = timestamp relative"};
+inline constexpr QLatin1StringView OpenClDeviceTypes{"  1 = CPU\n"
+                                                     "  2 = GPU\n"
+                                                     "  Separate multiple values with commas."};
+inline constexpr QLatin1StringView CommonEncodings{"  utf-8, utf-16le, utf-16be,\n"
+                                                   "  iso-8859-1, iso-8859-15, windows-1252"};
 } // namespace HelpText
 
 // Fixed external links. Only the label around a link is translatable.

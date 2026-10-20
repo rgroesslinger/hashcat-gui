@@ -27,6 +27,12 @@ private slots:
     void argumentLayout();
     void uiDefaultsAreNotRepeated();
     void hexCharsetFollowsTheMaskModes();
+    void advancedOptionsAreEmitted();
+    void incrementFollowsMaskModesAndTheFlag();
+    void combinationRulesFollowCombinationMode();
+    void wordlistOptionsFollowWordlistModes();
+    void statusTimerNeedsStatus();
+    void advancedShortForms();
     void shortFallsBackToLong();
     void outfileIsOptInAndExpanded();
     void expandOutfileTemplateSubstitutesUnixTimeAndHash();
@@ -173,6 +179,241 @@ void TestCommandBuilder::hexCharsetFollowsTheMaskModes()
         const QStringList arguments = CommandBuilder::build(options);
         QCOMPARE(arguments.contains(QStringLiteral("--hex-charset")), maskModes.contains(mode));
     }
+}
+
+// One invocation that uses every Tier 1 option at once, so the test pins
+// both the emission and the relative order of the new arguments.
+void TestCommandBuilder::advancedOptionsAreEmitted()
+{
+    HashcatOptions options;
+    options.attackMode = AttackMode::HybridWordMask;
+    options.force = true;
+    options.session = QStringLiteral("job");
+    options.runtime = 60;
+    options.status = true;
+    options.statusTimer = 5;
+    options.potfileDisable = true;
+    options.skip = QStringLiteral("100");
+    options.limit = QStringLiteral("200");
+    options.increment = true;
+    options.incrementMin = 2;
+    options.incrementMax = 8;
+    options.hexCharset = true;
+    options.hexSalt = true;
+    options.hexWordlist = true;
+    options.encodingFrom = QStringLiteral("iso-8859-15");
+    options.encodingTo = QStringLiteral("utf-8");
+    options.deviceTypes = QStringLiteral("1,2");
+    options.hwmonTempAbort = true;
+    options.hwmonTempAbortCelsius = 85;
+    options.hashFile = QStringLiteral("hash.txt");
+    options.wordlists << QStringLiteral("dict.txt");
+    options.mask = QStringLiteral("?d?d");
+
+    const QStringList expected{
+        "--attack-mode",
+        "6",
+        "--force",
+        "--session",
+        "job",
+        "--runtime",
+        "60",
+        "--status",
+        "--status-timer",
+        "5",
+        "--potfile-disable",
+        "--skip",
+        "100",
+        "--limit",
+        "200",
+        "--increment",
+        "--increment-min",
+        "2",
+        "--increment-max",
+        "8",
+        "--hex-charset",
+        "--hex-salt",
+        "--hex-wordlist",
+        "--encoding-from",
+        "iso-8859-15",
+        "--encoding-to",
+        "utf-8",
+        "--opencl-device-types",
+        "1,2",
+        "--hwmon-temp-abort",
+        "85",
+        "hash.txt",
+        "dict.txt",
+        "?d?d",
+    };
+    QCOMPARE(CommandBuilder::build(options), expected);
+}
+
+void TestCommandBuilder::incrementFollowsMaskModesAndTheFlag()
+{
+    const QList<AttackMode> modes{
+        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
+        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+    };
+    const QSet<AttackMode> maskModes{
+        AttackMode::BruteForce,
+        AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord,
+    };
+
+    for (const AttackMode mode : modes) {
+        HashcatOptions options;
+        options.attackMode = mode;
+        options.increment = true;
+        options.incrementMin = 2;
+        options.incrementMax = 4;
+
+        const QStringList arguments = CommandBuilder::build(options);
+        const bool emitted = arguments.contains(QStringLiteral("--increment"))
+                             && arguments.contains(QStringLiteral("--increment-min"))
+                             && arguments.contains(QStringLiteral("--increment-max"));
+        QCOMPARE(emitted, maskModes.contains(mode));
+    }
+
+    // The bounds are part of the increment option; without the flag they
+    // would only be noise in the preview.
+    HashcatOptions options;
+    options.attackMode = AttackMode::HybridWordMask;
+    options.incrementMin = 2;
+    options.incrementMax = 4;
+    const QStringList arguments = CommandBuilder::build(options);
+    QVERIFY(!arguments.contains(QStringLiteral("--increment-min")));
+    QVERIFY(!arguments.contains(QStringLiteral("--increment-max")));
+}
+
+void TestCommandBuilder::combinationRulesFollowCombinationMode()
+{
+    const QList<AttackMode> modes{
+        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
+        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+    };
+
+    for (const AttackMode mode : modes) {
+        HashcatOptions options;
+        options.attackMode = mode;
+        options.ruleLeft = QStringLiteral("c");
+        options.ruleRight = QStringLiteral("^x");
+
+        const QStringList arguments = CommandBuilder::build(options);
+        const bool emitted = arguments.contains(QStringLiteral("--rule-left"))
+                             && arguments.contains(QStringLiteral("--rule-right"));
+        QCOMPARE(emitted, mode == AttackMode::Combination);
+    }
+}
+
+void TestCommandBuilder::wordlistOptionsFollowWordlistModes()
+{
+    const QList<AttackMode> modes{
+        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
+        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+    };
+    const QSet<AttackMode> wordlistModes{
+        AttackMode::Straight,       AttackMode::Combination, AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Association,
+    };
+
+    for (const AttackMode mode : modes) {
+        HashcatOptions options;
+        options.attackMode = mode;
+        options.hexWordlist = true;
+        options.encodingFrom = QStringLiteral("iso-8859-15");
+        options.encodingTo = QStringLiteral("utf-8");
+
+        const QStringList arguments = CommandBuilder::build(options);
+        const bool emitted = arguments.contains(QStringLiteral("--hex-wordlist"))
+                             && arguments.contains(QStringLiteral("--encoding-from"))
+                             && arguments.contains(QStringLiteral("--encoding-to"));
+        QCOMPARE(emitted, wordlistModes.contains(mode));
+    }
+}
+
+void TestCommandBuilder::statusTimerNeedsStatus()
+{
+    HashcatOptions options;
+    options.statusTimer = 10;
+
+    QStringList arguments = CommandBuilder::build(options);
+    QVERIFY(!arguments.contains(QStringLiteral("--status")));
+    QVERIFY(!arguments.contains(QStringLiteral("--status-timer")));
+
+    options.status = true;
+    options.statusTimer = AppConstants::Defaults::StatusTimer;
+    arguments = CommandBuilder::build(options);
+    QVERIFY(arguments.contains(QStringLiteral("--status")));
+    QVERIFY(!arguments.contains(QStringLiteral("--status-timer")));
+
+    options.statusTimer = 10;
+    arguments = CommandBuilder::build(options);
+    QVERIFY(arguments.contains(QStringLiteral("--status")));
+    QVERIFY(arguments.contains(QStringLiteral("--status-timer")));
+    QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--status-timer")) + 1),
+             QStringLiteral("10"));
+}
+
+void TestCommandBuilder::advancedShortForms()
+{
+    HashcatOptions options;
+    options.useShortParameters = true;
+    options.attackMode = AttackMode::Combination;
+    options.force = true;
+    options.session = QStringLiteral("job");
+    options.runtime = 60;
+    options.status = true;
+    options.statusTimer = 5;
+    options.potfileDisable = true;
+    options.ruleLeft = QStringLiteral("c");
+    options.ruleRight = QStringLiteral("^x");
+    options.skip = QStringLiteral("100");
+    options.limit = QStringLiteral("200");
+    options.hexWordlist = true;
+    options.encodingFrom = QStringLiteral("iso-8859-15");
+    options.encodingTo = QStringLiteral("utf-8");
+    options.deviceTypes = QStringLiteral("1,2");
+    options.hwmonTempAbort = true;
+    options.hwmonTempAbortCelsius = 85;
+
+    QStringList expected{
+        "-a",
+        "1",
+        "--force",
+        "--session",
+        "job",
+        "--runtime",
+        "60",
+        "--status",
+        "--status-timer",
+        "5",
+        "--potfile-disable",
+        "-j",
+        "c",
+        "-k",
+        "^x",
+        "-s",
+        "100",
+        "-l",
+        "200",
+        "--hex-wordlist",
+        "--encoding-from",
+        "iso-8859-15",
+        "--encoding-to",
+        "utf-8",
+        "-D",
+        "1,2",
+        "--hwmon-temp-abort",
+        "85",
+    };
+    QCOMPARE(CommandBuilder::build(options), expected);
+
+    // --increment is the one new option with a short form that the combination
+    // row above cannot exercise.
+    options.attackMode = AttackMode::BruteForce;
+    options.increment = true;
+    QVERIFY(CommandBuilder::build(options).contains(QStringLiteral("-i")));
 }
 
 void TestCommandBuilder::shortFallsBackToLong()

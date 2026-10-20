@@ -168,16 +168,31 @@ void TestHelperUtils::parameterSpelling()
     QCOMPARE(HelperUtils::getParameter(Parameter::HexCharset, true),
              QStringLiteral("--hex-charset"));
 
+    // The short forms that differ from the parameter name are easy to get
+    // wrong, so pin them here as well.
+    QCOMPARE(HelperUtils::getParameter(Parameter::Increment, true), QStringLiteral("-i"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::Skip, true), QStringLiteral("-s"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::Limit, true), QStringLiteral("-l"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::OpenclDeviceTypes, true), QStringLiteral("-D"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::RuleLeft, true), QStringLiteral("-j"));
+    QCOMPARE(HelperUtils::getParameter(Parameter::RuleRight, true), QStringLiteral("-k"));
+
     // every enumerator has to be spelled out, otherwise the option silently
     // vanishes from the command line
     const Parameter all[] = {
-        Parameter::AttackMode,     Parameter::BackendDevices,  Parameter::CpuAffinity,
-        Parameter::CustomCharset1, Parameter::CustomCharset2,  Parameter::CustomCharset3,
-        Parameter::CustomCharset4, Parameter::GenerateRules,   Parameter::HashType,
-        Parameter::HexCharset,     Parameter::HexSalt,         Parameter::OptimizedKernel,
-        Parameter::Outfile,        Parameter::OutfileFormat,   Parameter::Remove,
-        Parameter::RulesFile,      Parameter::SegmentSize,     Parameter::SpeedOnly,
-        Parameter::Username,       Parameter::WorkloadProfile,
+        Parameter::AttackMode,      Parameter::BackendDevices,  Parameter::CpuAffinity,
+        Parameter::CustomCharset1,  Parameter::CustomCharset2,  Parameter::CustomCharset3,
+        Parameter::CustomCharset4,  Parameter::EncodingFrom,    Parameter::EncodingTo,
+        Parameter::Force,           Parameter::GenerateRules,   Parameter::HashType,
+        Parameter::HexCharset,      Parameter::HexSalt,         Parameter::HexWordlist,
+        Parameter::HwmonTempAbort,  Parameter::Increment,       Parameter::IncrementMax,
+        Parameter::IncrementMin,    Parameter::Limit,           Parameter::OpenclDeviceTypes,
+        Parameter::OptimizedKernel, Parameter::Outfile,         Parameter::OutfileFormat,
+        Parameter::PotfileDisable,  Parameter::Remove,          Parameter::RuleLeft,
+        Parameter::RuleRight,       Parameter::RulesFile,       Parameter::Runtime,
+        Parameter::SegmentSize,     Parameter::Session,         Parameter::Skip,
+        Parameter::SpeedOnly,       Parameter::Status,          Parameter::StatusTimer,
+        Parameter::Username,        Parameter::WorkloadProfile,
     };
     for (const Parameter key : all) {
         QVERIFY2(!HelperUtils::getParameter(key).isEmpty(), "an enum has no long spelling");

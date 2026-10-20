@@ -55,6 +55,35 @@ struct HashcatOptions {
     QString workloadProfile;
     bool optimizedKernel = false;
 
+    // Execution scheduling and output state, independent of the attack mode.
+    QString session;
+    int runtime = AppConstants::Defaults::Runtime; // seconds, 0 = no limit
+    QString skip;
+    QString limit;
+    bool status = false;
+    int statusTimer = AppConstants::Defaults::StatusTimer; // seconds
+    bool force = false;
+    bool potfileDisable = false;
+
+    // Mask incrementing, only meaningful in the mask based attack modes.
+    bool increment = false;
+    int incrementMin = AppConstants::Defaults::IncrementMin; // 0 = hashcat default
+    int incrementMax = AppConstants::Defaults::IncrementMax; // 0 = hashcat default
+
+    // Wordlist interpretation, only meaningful in the wordlist modes.
+    bool hexWordlist = false;
+    QString encodingFrom;
+    QString encodingTo;
+
+    // Hardware selection and safety.
+    QString deviceTypes;
+    bool hwmonTempAbort = false;
+    int hwmonTempAbortCelsius = AppConstants::Defaults::HwmonTempAbort;
+
+    // Single rules for combination mode, where -r / -g are not allowed.
+    QString ruleLeft;
+    QString ruleRight;
+
     struct Charset {
         bool enabled = false;
         QString value;

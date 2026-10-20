@@ -41,6 +41,13 @@ bool CommandBuilder::attackUsesRules(AttackMode mode)
     return mode == AttackMode::Straight || mode == AttackMode::Association;
 }
 
+// True when the attack mode accepts the single rules -j / -k. Combination mode
+// forbids -r / -g, so these are the only rules it understands.
+bool CommandBuilder::attackUsesCombinationRules(AttackMode mode)
+{
+    return mode == AttackMode::Combination;
+}
+
 QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QString &hashFile)
 {
     QString outfile = tmplate;
@@ -67,12 +74,37 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     arguments << parameter(HelperUtils::Parameter::AttackMode, useShort)
               << QString::number(static_cast<int>(mode));
 
+    if (options.force) {
+        arguments << parameter(HelperUtils::Parameter::Force, useShort);
+    }
+
     if (options.remove) {
         arguments << parameter(HelperUtils::Parameter::Remove, useShort);
     }
 
     if (options.ignoreUsername) {
         arguments << parameter(HelperUtils::Parameter::Username, useShort);
+    }
+
+    if (!options.session.isEmpty()) {
+        arguments << parameter(HelperUtils::Parameter::Session, useShort) << options.session;
+    }
+
+    if (options.runtime > 0) {
+        arguments << parameter(HelperUtils::Parameter::Runtime, useShort)
+                  << QString::number(options.runtime);
+    }
+
+    if (options.status) {
+        arguments << parameter(HelperUtils::Parameter::Status, useShort);
+        if (options.statusTimer != AppConstants::Defaults::StatusTimer) {
+            arguments << parameter(HelperUtils::Parameter::StatusTimer, useShort)
+                      << QString::number(options.statusTimer);
+        }
+    }
+
+    if (options.potfileDisable) {
+        arguments << parameter(HelperUtils::Parameter::PotfileDisable, useShort);
     }
 
     // rules - either existing rule files or a number of generated rules
@@ -83,6 +115,16 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         if (options.rulesFiles.isEmpty() && options.generateRules > 0) {
             arguments << parameter(HelperUtils::Parameter::GenerateRules, useShort)
                       << QString::number(options.generateRules);
+        }
+    }
+
+    if (attackUsesCombinationRules(mode)) {
+        if (!options.ruleLeft.isEmpty()) {
+            arguments << parameter(HelperUtils::Parameter::RuleLeft, useShort) << options.ruleLeft;
+        }
+        if (!options.ruleRight.isEmpty()) {
+            arguments << parameter(HelperUtils::Parameter::RuleRight, useShort)
+                      << options.ruleRight;
         }
     }
 
@@ -116,6 +158,28 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameter(HelperUtils::Parameter::OptimizedKernel, useShort);
     }
 
+    if (!options.skip.isEmpty()) {
+        arguments << parameter(HelperUtils::Parameter::Skip, useShort) << options.skip;
+    }
+
+    if (!options.limit.isEmpty()) {
+        arguments << parameter(HelperUtils::Parameter::Limit, useShort) << options.limit;
+    }
+
+    // Incrementing only makes sense while a mask is in use. The two bounds
+    // are part of the same option: without the flag they would be ignored.
+    if (attackUsesMask(mode) && options.increment) {
+        arguments << parameter(HelperUtils::Parameter::Increment, useShort);
+        if (options.incrementMin > 0) {
+            arguments << parameter(HelperUtils::Parameter::IncrementMin, useShort)
+                      << QString::number(options.incrementMin);
+        }
+        if (options.incrementMax > 0) {
+            arguments << parameter(HelperUtils::Parameter::IncrementMax, useShort)
+                      << QString::number(options.incrementMax);
+        }
+    }
+
     // Custom charsets are only meaningful together with a mask. The UI
     // disables the group box for the other attack modes; here that gating is
     // expressed directly so a stale checkbox cannot leak -1 ... -4 into a
@@ -145,6 +209,21 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameter(HelperUtils::Parameter::HexSalt, useShort);
     }
 
+    // Wordlist interpretation only applies while a wordlist is read.
+    if (attackUsesWordlists(mode)) {
+        if (options.hexWordlist) {
+            arguments << parameter(HelperUtils::Parameter::HexWordlist, useShort);
+        }
+        if (!options.encodingFrom.isEmpty()) {
+            arguments << parameter(HelperUtils::Parameter::EncodingFrom, useShort)
+                      << options.encodingFrom;
+        }
+        if (!options.encodingTo.isEmpty()) {
+            arguments << parameter(HelperUtils::Parameter::EncodingTo, useShort)
+                      << options.encodingTo;
+        }
+    }
+
     if (options.outfileEnabled && !options.outfile.isEmpty()) {
         arguments << parameter(HelperUtils::Parameter::Outfile, useShort)
                   << expandOutfileTemplate(options.outfile, options.hashFile);
@@ -163,6 +242,16 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     if (!options.backendDevices.isEmpty()) {
         arguments << parameter(HelperUtils::Parameter::BackendDevices, useShort)
                   << options.backendDevices;
+    }
+
+    if (!options.deviceTypes.isEmpty()) {
+        arguments << parameter(HelperUtils::Parameter::OpenclDeviceTypes, useShort)
+                  << options.deviceTypes;
+    }
+
+    if (options.hwmonTempAbort) {
+        arguments << parameter(HelperUtils::Parameter::HwmonTempAbort, useShort)
+                  << QString::number(options.hwmonTempAbortCelsius);
     }
 
     if (options.segmentSize != AppConstants::Defaults::SegmentSize) {

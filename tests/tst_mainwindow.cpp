@@ -54,6 +54,7 @@ private slots:
     void freshWindowMatchesTheDefaultOptions();
     void attackModeIdsTravelAsItemData();
     void groupBoxesFollowTheBuilderPredicates();
+    void optionDependenciesFollowTheirCheckboxes();
     void widgetsFlowIntoTheOptions();
     void checkedWordlistsEndUpInTheCommand();
     void hashTypeComesFromTheItemData();
@@ -155,15 +156,16 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
         AttackMode mode;
         bool wordlists;
         bool rules;
+        bool combinationRules;
         bool mask;
     };
     const QList<Expectation> expectations{
-        {AttackMode::Straight, true, true, false},
-        {AttackMode::Combination, true, false, false},
-        {AttackMode::BruteForce, false, false, true},
-        {AttackMode::HybridWordMask, true, false, true},
-        {AttackMode::HybridMaskWord, true, false, true},
-        {AttackMode::Association, true, true, false},
+        {AttackMode::Straight, true, true, false, false},
+        {AttackMode::Combination, true, false, true, false},
+        {AttackMode::BruteForce, false, false, false, true},
+        {AttackMode::HybridWordMask, true, false, false, true},
+        {AttackMode::HybridMaskWord, true, false, false, true},
+        {AttackMode::Association, true, true, false, false},
     };
 
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
@@ -185,11 +187,45 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
 
         QCOMPARE(window.ui->groupBox_wordlists->isEnabled(), expected->wordlists);
         QCOMPARE(window.ui->groupBox_rules->isEnabled(), expected->rules);
+        QCOMPARE(window.ui->groupBox_combination_rules->isEnabled(), expected->combinationRules);
         QCOMPARE(window.ui->groupBox_mask->isEnabled(), expected->mask);
         QCOMPARE(window.ui->groupBox_custom_charset->isEnabled(), expected->mask);
         // --hex-charset belongs to the mask modes for the same reason.
         QCOMPARE(window.ui->checkBox_hex_hash->isEnabled(), expected->mask);
     }
+}
+
+void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
+{
+    MainWindow window;
+    // A mask mode keeps the increment widgets out of the disabled mask group,
+    // so the test observes their own dependency and not the group's.
+    window.ui->comboBox_attack->setCurrentIndex(2); // brute-force
+
+    // A fresh window: every dependent value starts switched off.
+    QVERIFY(!window.ui->spinBox_increment_min->isEnabled());
+    QVERIFY(!window.ui->spinBox_increment_max->isEnabled());
+    QVERIFY(!window.ui->spinBox_status_timer->isEnabled());
+    QVERIFY(!window.ui->spinBox_hwmon_temp_abort->isEnabled());
+
+    window.ui->checkBox_increment->setChecked(true);
+    QVERIFY(window.ui->spinBox_increment_min->isEnabled());
+    QVERIFY(window.ui->spinBox_increment_max->isEnabled());
+    QVERIFY(window.ui->label_increment_min->isEnabled());
+    QVERIFY(window.ui->label_increment_max->isEnabled());
+    window.ui->checkBox_increment->setChecked(false);
+    QVERIFY(!window.ui->spinBox_increment_min->isEnabled());
+    QVERIFY(!window.ui->spinBox_increment_max->isEnabled());
+
+    window.ui->checkBox_status->setChecked(true);
+    QVERIFY(window.ui->spinBox_status_timer->isEnabled());
+    window.ui->checkBox_status->setChecked(false);
+    QVERIFY(!window.ui->spinBox_status_timer->isEnabled());
+
+    window.ui->checkBox_hwmon_temp_abort->setChecked(true);
+    QVERIFY(window.ui->spinBox_hwmon_temp_abort->isEnabled());
+    window.ui->checkBox_hwmon_temp_abort->setChecked(false);
+    QVERIFY(!window.ui->spinBox_hwmon_temp_abort->isEnabled());
 }
 
 void TestMainWindow::widgetsFlowIntoTheOptions()
@@ -203,6 +239,25 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     window.ui->checkBox_speed_only->setChecked(true);
     window.ui->checkBox_override_workload_profile->setChecked(true);
     window.ui->comboBox_workload_profile->setCurrentText(QStringLiteral("2"));
+    window.ui->checkBox_hex_wordlist->setChecked(true);
+    window.ui->lineEdit_encoding_from->setText(QStringLiteral("iso-8859-15"));
+    window.ui->lineEdit_encoding_to->setText(QStringLiteral("utf-8"));
+    window.ui->lineEdit_rule_left->setText(QStringLiteral("c"));
+    window.ui->lineEdit_rule_right->setText(QStringLiteral("^x"));
+    window.ui->checkBox_increment->setChecked(true);
+    window.ui->spinBox_increment_min->setValue(2);
+    window.ui->spinBox_increment_max->setValue(8);
+    window.ui->lineEdit_session->setText(QStringLiteral("job"));
+    window.ui->spinBox_runtime->setValue(60);
+    window.ui->lineEdit_skip->setText(QStringLiteral("100"));
+    window.ui->lineEdit_limit->setText(QStringLiteral("200"));
+    window.ui->checkBox_status->setChecked(true);
+    window.ui->spinBox_status_timer->setValue(5);
+    window.ui->checkBox_force->setChecked(true);
+    window.ui->checkBox_potfile_disable->setChecked(true);
+    window.ui->lineEdit_device_types->setText(QStringLiteral("1,2"));
+    window.ui->checkBox_hwmon_temp_abort->setChecked(true);
+    window.ui->spinBox_hwmon_temp_abort->setValue(85);
 
     const HashcatOptions options = window.collectHashcatOptions();
     QCOMPARE(options.hashFile, QStringLiteral("/tmp/example.hash"));
@@ -211,6 +266,25 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(options.ignoreUsername);
     QVERIFY(options.speedOnly);
     QCOMPARE(options.workloadProfile, QStringLiteral("2"));
+    QVERIFY(options.hexWordlist);
+    QCOMPARE(options.encodingFrom, QStringLiteral("iso-8859-15"));
+    QCOMPARE(options.encodingTo, QStringLiteral("utf-8"));
+    QCOMPARE(options.ruleLeft, QStringLiteral("c"));
+    QCOMPARE(options.ruleRight, QStringLiteral("^x"));
+    QVERIFY(options.increment);
+    QCOMPARE(options.incrementMin, 2);
+    QCOMPARE(options.incrementMax, 8);
+    QCOMPARE(options.session, QStringLiteral("job"));
+    QCOMPARE(options.runtime, 60);
+    QCOMPARE(options.skip, QStringLiteral("100"));
+    QCOMPARE(options.limit, QStringLiteral("200"));
+    QVERIFY(options.status);
+    QCOMPARE(options.statusTimer, 5);
+    QVERIFY(options.force);
+    QVERIFY(options.potfileDisable);
+    QCOMPARE(options.deviceTypes, QStringLiteral("1,2"));
+    QVERIFY(options.hwmonTempAbort);
+    QCOMPARE(options.hwmonTempAbortCelsius, 85);
 
     // Untouched fields keep the values the .ui file starts with
     QCOMPARE(options.outfileFormat, AppConstants::Defaults::OutfileFormat);
@@ -225,6 +299,23 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(arguments.contains(QStringLiteral("--username")));
     QVERIFY(arguments.contains(QStringLiteral("--speed-only")));
     QVERIFY(arguments.contains(QStringLiteral("--workload-profile")));
+    QVERIFY(arguments.contains(QStringLiteral("--force")));
+    QVERIFY(arguments.contains(QStringLiteral("--session")));
+    QVERIFY(arguments.contains(QStringLiteral("--runtime")));
+    QVERIFY(arguments.contains(QStringLiteral("--skip")));
+    QVERIFY(arguments.contains(QStringLiteral("--limit")));
+    QVERIFY(arguments.contains(QStringLiteral("--status")));
+    QVERIFY(arguments.contains(QStringLiteral("--status-timer")));
+    QVERIFY(arguments.contains(QStringLiteral("--potfile-disable")));
+    QVERIFY(arguments.contains(QStringLiteral("--hex-wordlist")));
+    QVERIFY(arguments.contains(QStringLiteral("--encoding-from")));
+    QVERIFY(arguments.contains(QStringLiteral("--encoding-to")));
+    QVERIFY(arguments.contains(QStringLiteral("--opencl-device-types")));
+    QVERIFY(arguments.contains(QStringLiteral("--hwmon-temp-abort")));
+    // Straight mode has no mask and no combination rules.
+    QVERIFY(!arguments.contains(QStringLiteral("--increment")));
+    QVERIFY(!arguments.contains(QStringLiteral("--rule-left")));
+    QVERIFY(!arguments.contains(QStringLiteral("--rule-right")));
     QVERIFY(!arguments.contains(QStringLiteral("--segment-size")));
     QVERIFY(!arguments.contains(QStringLiteral("--outfile")));
 

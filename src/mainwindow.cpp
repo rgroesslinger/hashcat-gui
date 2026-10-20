@@ -48,6 +48,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         + AppConstants::HelpText::OutfileFormats;
     ui->lineEdit_outfile_format->setToolTip(outfileFormatTip);
 
+    const QString encodingTip =
+        tr("Common encodings:") + QLatin1String("\n\n") + AppConstants::HelpText::CommonEncodings;
+    ui->lineEdit_encoding_from->setToolTip(tr("Force the internal wordlist encoding from this "
+                                              "code. Leave empty to let hashcat decide.")
+                                           + QLatin1String("\n\n") + encodingTip);
+    ui->lineEdit_encoding_to->setToolTip(
+        tr("Force the internal wordlist encoding to this code. Leave empty to let hashcat decide.")
+        + QLatin1String("\n\n") + encodingTip);
+
+    const QString deviceTypeTip = tr("OpenCL device types to use, separated with commas")
+                                  + QLatin1String("\n\n")
+                                  + AppConstants::HelpText::OpenClDeviceTypes;
+    ui->lineEdit_device_types->setToolTip(deviceTypeTip);
+
     auto &settings = SettingsManager::instance();
 
     // The workload levels carry only display text in the .ui file; give each
@@ -128,6 +142,43 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this,
             &MainWindow::attackIndexChanged);
     connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
+
+    /* ---------- advanced options ---------- */
+    const auto notifyOnText = [this](QLineEdit *edit) {
+        connect(edit, &QLineEdit::textChanged, this, &MainWindow::commandChanged);
+    };
+    const auto notifyOnToggle = [this](QCheckBox *box) {
+        connect(box, &QCheckBox::toggled, this, &MainWindow::commandChanged);
+    };
+    const auto notifyOnValue = [this](QSpinBox *spinBox) {
+        connect(spinBox, &QSpinBox::valueChanged, this, &MainWindow::commandChanged);
+    };
+
+    notifyOnToggle(ui->checkBox_hex_wordlist);
+    notifyOnText(ui->lineEdit_encoding_from);
+    notifyOnText(ui->lineEdit_encoding_to);
+    notifyOnText(ui->lineEdit_rule_left);
+    notifyOnText(ui->lineEdit_rule_right);
+    notifyOnToggle(ui->checkBox_increment);
+    notifyOnValue(ui->spinBox_increment_min);
+    notifyOnValue(ui->spinBox_increment_max);
+    notifyOnText(ui->lineEdit_session);
+    notifyOnValue(ui->spinBox_runtime);
+    notifyOnText(ui->lineEdit_skip);
+    notifyOnText(ui->lineEdit_limit);
+    notifyOnToggle(ui->checkBox_status);
+    notifyOnValue(ui->spinBox_status_timer);
+    notifyOnToggle(ui->checkBox_force);
+    notifyOnToggle(ui->checkBox_potfile_disable);
+    notifyOnText(ui->lineEdit_device_types);
+    notifyOnToggle(ui->checkBox_hwmon_temp_abort);
+    notifyOnValue(ui->spinBox_hwmon_temp_abort);
+
+    connect(ui->checkBox_increment, &QCheckBox::toggled, this,
+            &MainWindow::updateOptionDependencies);
+    connect(ui->checkBox_status, &QCheckBox::toggled, this, &MainWindow::updateOptionDependencies);
+    connect(ui->checkBox_hwmon_temp_abort, &QCheckBox::toggled, this,
+            &MainWindow::updateOptionDependencies);
 
     loadDefaultProfile();
 
@@ -240,6 +291,9 @@ void MainWindow::resetFieldsTriggered()
     ui->checkBox_ignoreusername->setChecked(false);
     ui->checkBox_remove->setChecked(false);
     ui->listWidget_wordlist->clear();
+    ui->checkBox_hex_wordlist->setChecked(false);
+    ui->lineEdit_encoding_from->clear();
+    ui->lineEdit_encoding_to->clear();
     ui->comboBox_attack->setCurrentIndex(0);
     ui->comboBox_hash->setCurrentIndex(0);
     // A fresh form must not re-apply a hash type a profile is still waiting
@@ -252,8 +306,13 @@ void MainWindow::resetFieldsTriggered()
     ui->lineEdit_open_rulesfile_1->clear();
     ui->lineEdit_open_rulesfile_2->clear();
     ui->lineEdit_open_rulesfile_3->clear();
+    ui->lineEdit_rule_left->clear();
+    ui->lineEdit_rule_right->clear();
     ui->spinBox_generate_rules->setValue(1);
     ui->lineEdit_mask->clear();
+    ui->checkBox_increment->setChecked(false);
+    ui->spinBox_increment_min->setValue(AppConstants::Defaults::IncrementMin);
+    ui->spinBox_increment_max->setValue(AppConstants::Defaults::IncrementMax);
     ui->checkBox_custom_charset1->setChecked(false);
     ui->lineEdit_custom_charset1->clear();
     ui->checkBox_custom_charset2->setChecked(false);
@@ -271,12 +330,24 @@ void MainWindow::resetFieldsTriggered()
     ui->lineEdit_devices->setText(AppConstants::Defaults::BackendDevices);
     ui->spinBox_segment->setValue(AppConstants::Defaults::SegmentSize);
 
-    // Advanced tab
+    // General tab
+    ui->lineEdit_session->clear();
+    ui->spinBox_runtime->setValue(AppConstants::Defaults::Runtime);
+    ui->lineEdit_skip->clear();
+    ui->lineEdit_limit->clear();
+    ui->checkBox_status->setChecked(false);
+    ui->spinBox_status_timer->setValue(AppConstants::Defaults::StatusTimer);
+    ui->checkBox_force->setChecked(false);
+    ui->checkBox_potfile_disable->setChecked(false);
     ui->checkBox_optimized_kernel->setChecked(false);
     ui->checkBox_speed_only->setChecked(false);
     ui->checkBox_override_workload_profile->setChecked(false);
     ui->comboBox_workload_profile->setCurrentIndex(0);
+    ui->lineEdit_device_types->clear();
+    ui->checkBox_hwmon_temp_abort->setChecked(false);
+    ui->spinBox_hwmon_temp_abort->setValue(AppConstants::Defaults::HwmonTempAbort);
 
+    updateOptionDependencies();
     commandChanged();
 }
 
@@ -506,13 +577,30 @@ void MainWindow::updateViewAttackMode()
     const bool usesMask = CommandBuilder::attackUsesMask(mode);
     ui->groupBox_wordlists->setEnabled(CommandBuilder::attackUsesWordlists(mode));
     ui->groupBox_rules->setEnabled(CommandBuilder::attackUsesRules(mode));
+    ui->groupBox_combination_rules->setEnabled(CommandBuilder::attackUsesCombinationRules(mode));
     ui->groupBox_custom_charset->setEnabled(usesMask);
     ui->groupBox_mask->setEnabled(usesMask);
     // --hex-charset only describes masks and custom charsets; keep it out of
     // reach in the modes that use neither.
     ui->checkBox_hex_hash->setEnabled(usesMask);
 
+    updateOptionDependencies();
     commandChanged();
+}
+
+// Options that only carry a value while their parent checkbox is on. The
+// group box gating already covers the attack-mode side; this covers the
+// intra-group dependencies that do not follow from the mode.
+void MainWindow::updateOptionDependencies()
+{
+    const bool increment = ui->checkBox_increment->isChecked();
+    ui->label_increment_min->setEnabled(increment);
+    ui->spinBox_increment_min->setEnabled(increment);
+    ui->label_increment_max->setEnabled(increment);
+    ui->spinBox_increment_max->setEnabled(increment);
+
+    ui->spinBox_status_timer->setEnabled(ui->checkBox_status->isChecked());
+    ui->spinBox_hwmon_temp_abort->setEnabled(ui->checkBox_hwmon_temp_abort->isChecked());
 }
 
 void MainWindow::openHashFileClicked()
@@ -848,6 +936,15 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.remove = ui->checkBox_remove->isChecked();
     options.ignoreUsername = ui->checkBox_ignoreusername->isChecked();
 
+    options.force = ui->checkBox_force->isChecked();
+    options.session = ui->lineEdit_session->text();
+    options.runtime = ui->spinBox_runtime->value();
+    options.skip = ui->lineEdit_skip->text();
+    options.limit = ui->lineEdit_limit->text();
+    options.status = ui->checkBox_status->isChecked();
+    options.statusTimer = ui->spinBox_status_timer->value();
+    options.potfileDisable = ui->checkBox_potfile_disable->isChecked();
+
     if (ui->radioButton_use_rules_file->isChecked()) {
         QCheckBox *boxes[3] = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2,
                                ui->checkBox_rulesfile_3};
@@ -862,7 +959,13 @@ HashcatOptions MainWindow::collectHashcatOptions()
         options.generateRules = ui->spinBox_generate_rules->value();
     }
 
+    options.ruleLeft = ui->lineEdit_rule_left->text();
+    options.ruleRight = ui->lineEdit_rule_right->text();
+
     options.mask = ui->lineEdit_mask->text();
+    options.increment = ui->checkBox_increment->isChecked();
+    options.incrementMin = ui->spinBox_increment_min->value();
+    options.incrementMax = ui->spinBox_increment_max->value();
     options.speedOnly = ui->checkBox_speed_only->isChecked();
     // The combo carries the workload level as item data; read that instead of
     // the display text, which is only a label.
@@ -893,12 +996,18 @@ HashcatOptions MainWindow::collectHashcatOptions()
 
     options.hexCharset = ui->checkBox_hex_hash->isChecked();
     options.hexSalt = ui->checkBox_hex_salt->isChecked();
+    options.hexWordlist = ui->checkBox_hex_wordlist->isChecked();
+    options.encodingFrom = ui->lineEdit_encoding_from->text();
+    options.encodingTo = ui->lineEdit_encoding_to->text();
 
     options.outfileEnabled = ui->checkBox_outfile->isChecked();
     options.outfile = ui->lineEdit_outfile->text();
     options.outfileFormat = ui->lineEdit_outfile_format->text();
     options.cpuAffinity = ui->lineEdit_cpu_affinity->text();
     options.backendDevices = ui->lineEdit_devices->text();
+    options.deviceTypes = ui->lineEdit_device_types->text();
+    options.hwmonTempAbort = ui->checkBox_hwmon_temp_abort->isChecked();
+    options.hwmonTempAbortCelsius = ui->spinBox_hwmon_temp_abort->value();
     options.segmentSize = ui->spinBox_segment->value();
     options.hashFile = ui->lineEdit_hashfile->text();
 
