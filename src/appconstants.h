@@ -79,11 +79,20 @@ inline constexpr QLatin1StringView BackendDevices{};
 inline constexpr int SegmentSize = 32; // MB
 inline constexpr QLatin1StringView OutfileSuffix{".out"};
 inline constexpr int Runtime = 0;         // seconds, 0 = unlimited
-inline constexpr int StatusTimer = 1;     // seconds
+inline constexpr int StatusTimer = 10;    // seconds, hashcat's own default
 inline constexpr int HwmonTempAbort = 90; // degrees Celsius
 inline constexpr int IncrementMin = 0;    // 0 = hashcat default
 inline constexpr int IncrementMax = 0;    // 0 = hashcat default
 } // namespace Defaults
+
+// The pattern the keyspace bounds -s and -l have to match. Hashcat takes them
+// as plain unsigned numbers, and they reach far beyond what a spin box can
+// hold, so the two fields filter on this pattern instead of on a numeric
+// validator.
+namespace Validation
+{
+inline constexpr QLatin1StringView Digits{"^[0-9]*$"};
+} // namespace Validation
 
 // Placeholders the user can type into the outfile field.
 namespace Placeholders

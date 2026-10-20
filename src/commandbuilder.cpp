@@ -107,10 +107,11 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
 
     if (options.status) {
         arguments << parameter(HelperUtils::Parameter::Status, useShort);
-        if (options.statusTimer != AppConstants::Defaults::StatusTimer) {
-            arguments << parameter(HelperUtils::Parameter::StatusTimer, useShort)
-                      << QString::number(options.statusTimer);
-        }
+        // hashcat's own default interval is 10 s, so the GUI always passes its
+        // own: omitting it would silently update every 10 s instead of the
+        // interval the spin box shows.
+        arguments << parameter(HelperUtils::Parameter::StatusTimer, useShort)
+                  << QString::number(options.statusTimer);
     }
 
     if (options.potfileDisable) {

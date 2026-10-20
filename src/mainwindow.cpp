@@ -27,6 +27,8 @@
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
@@ -56,6 +58,12 @@ void activateLayouts(QWidget *widget)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // -s and -l take a plain number; a digit-only validator keeps a value
+    // hashcat would refuse to start from ever reaching the command line.
+    const QRegularExpression digits{QString(AppConstants::Validation::Digits)};
+    ui->lineEdit_skip->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_skip));
+    ui->lineEdit_limit->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_limit));
 
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
     const QString charsetTip =

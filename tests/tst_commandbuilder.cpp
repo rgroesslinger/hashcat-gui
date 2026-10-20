@@ -358,22 +358,27 @@ void TestCommandBuilder::statusTimerNeedsStatus()
     HashcatOptions options;
     options.statusTimer = 10;
 
+    // The interval is never emitted without the flag it belongs to.
     QStringList arguments = CommandBuilder::build(options);
     QVERIFY(!arguments.contains(QStringLiteral("--status")));
     QVERIFY(!arguments.contains(QStringLiteral("--status-timer")));
 
     options.status = true;
+    // hashcat's own default interval is 10 s, so the GUI always passes its
+    // own - even at the default value the spin box starts with.
     options.statusTimer = AppConstants::Defaults::StatusTimer;
-    arguments = CommandBuilder::build(options);
-    QVERIFY(arguments.contains(QStringLiteral("--status")));
-    QVERIFY(!arguments.contains(QStringLiteral("--status-timer")));
-
-    options.statusTimer = 10;
     arguments = CommandBuilder::build(options);
     QVERIFY(arguments.contains(QStringLiteral("--status")));
     QVERIFY(arguments.contains(QStringLiteral("--status-timer")));
     QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--status-timer")) + 1),
-             QStringLiteral("10"));
+             QString::number(AppConstants::Defaults::StatusTimer));
+
+    options.statusTimer = 1;
+    arguments = CommandBuilder::build(options);
+    QVERIFY(arguments.contains(QStringLiteral("--status")));
+    QVERIFY(arguments.contains(QStringLiteral("--status-timer")));
+    QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--status-timer")) + 1),
+             QStringLiteral("1"));
 }
 
 void TestCommandBuilder::advancedShortForms()

@@ -57,6 +57,8 @@ private slots:
     void groupBoxesFollowTheBuilderPredicates();
     void optionDependenciesFollowTheirCheckboxes();
     void widgetsFlowIntoTheOptions();
+    void statusTimerReachesTheCommandLine();
+    void skipAndLimitAcceptOnlyNumbers();
     void checkedWordlistsEndUpInTheCommand();
     void hashTypeComesFromTheItemData();
     void hashTypesAreFilledFromHashcat();
@@ -387,6 +389,52 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     window.ui->spinBox_segment->setValue(64);
     QCOMPARE(window.collectHashcatOptions().segmentSize, 64);
     QVERIFY(window.generateArguments().contains(QStringLiteral("--segment-size")));
+}
+
+void TestMainWindow::statusTimerReachesTheCommandLine()
+{
+    MainWindow window;
+
+    // The spin box starts at hashcat's own interval, and the value it shows is
+    // the value the command line carries.
+    QCOMPARE(window.ui->spinBox_status_timer->value(), AppConstants::Defaults::StatusTimer);
+
+    window.ui->checkBox_status->setChecked(true);
+
+    QStringList arguments = window.generateArguments();
+    QVERIFY(arguments.contains(QStringLiteral("--status")));
+    QVERIFY(arguments.contains(QStringLiteral("--status-timer")));
+    QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--status-timer")) + 1),
+             QString::number(AppConstants::Defaults::StatusTimer));
+
+    // ... and the command line follows the spin box.
+    window.ui->spinBox_status_timer->setValue(1);
+    arguments = window.generateArguments();
+    QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--status-timer")) + 1),
+             QStringLiteral("1"));
+}
+
+void TestMainWindow::skipAndLimitAcceptOnlyNumbers()
+{
+    MainWindow window;
+
+    QLineEdit *skip = window.ui->lineEdit_skip;
+    QLineEdit *limit = window.ui->lineEdit_limit;
+    QVERIFY(skip->validator() != nullptr);
+    QVERIFY(limit->validator() != nullptr);
+
+    // Typing is what the validator guards: an invalid character is dropped.
+    QTest::keyClicks(skip, QStringLiteral("12a"));
+    QCOMPARE(skip->text(), QStringLiteral("12"));
+
+    QTest::keyClicks(limit, QStringLiteral("1b2"));
+    QCOMPARE(limit->text(), QStringLiteral("12"));
+
+    // Empty stays allowed - it means "not set".
+    skip->clear();
+    limit->clear();
+    QVERIFY(skip->text().isEmpty());
+    QVERIFY(limit->text().isEmpty());
 }
 
 void TestMainWindow::checkedWordlistsEndUpInTheCommand()

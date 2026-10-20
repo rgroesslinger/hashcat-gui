@@ -989,7 +989,7 @@
                       <number>3600</number>
                      </property>
                      <property name="value">
-                      <number>1</number>
+                      <number>10</number>
                      </property>
                     </widget>
                    </item>
