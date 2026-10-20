@@ -22,13 +22,35 @@
 #include <QClipboard>
 #include <QStandardPaths>
 #include <QFutureWatcher>
+#include <QLayout>
 #include <QScreen>
 #include <QScrollArea>
+#include <QScrollBar>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
 #include <windows.h>
 #endif
+
+namespace
+{
+// A hidden tab page keeps stale layout minima until its layouts have run at
+// least once. Walk the page bottom-up so every nested group box and layout
+// resolves its minimum before the page layout sums them up.
+void activateLayouts(QWidget *widget)
+{
+    widget->ensurePolished();
+    const QList<QWidget *> children =
+        widget->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly);
+    for (QWidget *child : children) {
+        activateLayouts(child);
+    }
+    if (QLayout *layout = widget->layout()) {
+        layout->invalidate();
+        layout->activate();
+    }
+}
+} // namespace
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -205,29 +227,76 @@ void MainWindow::showEvent(QShowEvent *event)
     }
 }
 
-// Give the window exactly the size its current tab needs: no scrollbar when
-// the tab content is taller than the geometry from mainwindow.ui, and no empty
+// Give the window the size the tabs need: the tallest tab decides the height,
+// the widest one the width. No scrollbar when the content fits, and no empty
 // strip when it is shorter.
 void MainWindow::fitToContent()
 {
-    QScrollArea *area = ui->tabWidget_main->currentWidget()->findChild<QScrollArea *>();
-    if (!area || !area->widget()) {
+    QWidget *currentTab = ui->tabWidget_main->currentWidget();
+    if (!currentTab) {
+        return;
+    }
+    QScrollArea *currentArea = currentTab->findChild<QScrollArea *>();
+    if (!currentArea || !currentArea->widget()) {
         return;
     }
 
-    // The window's own sizeHint is not usable here: Qt caps the sizeHint of a
-    // resizable QScrollArea at 24 font heights, which can be far below what
-    // the tab content needs. Replace that capped hint with the content's
-    // minimum - the size at which every widget just fits - and carry it over
-    // through the difference, which holds the menu bar, margins, tab bar and
-    // frame.
-    QSize target = sizeHint() + area->widget()->minimumSizeHint() - area->sizeHint();
+    // Hidden pages report the minima they had before their layouts first ran.
+    // Resolve every page first, then take the largest minimum in each
+    // direction independently: one tab can be the height reference while
+    // another is the width reference.
+    QList<QScrollArea *> areas;
+    QSize contentMinimum(0, 0);
+    for (int i = 0; i < ui->tabWidget_main->count(); ++i) {
+        QWidget *tab = ui->tabWidget_main->widget(i);
+        if (!tab) {
+            continue;
+        }
+        QScrollArea *area = tab->findChild<QScrollArea *>();
+        if (!area || !area->widget()) {
+            continue;
+        }
+        activateLayouts(area->widget());
+        areas.append(area);
+        contentMinimum = contentMinimum.expandedTo(area->widget()->minimumSizeHint());
+    }
+    if (areas.isEmpty()) {
+        return;
+    }
+
+    // The scroll area's own sizeHint is capped and does not describe the tab
+    // content. Derive the window chrome from the geometry it has on first
+    // show: the difference between the window and the scroll area that fills
+    // it holds the menu bar, margins, tab bar and frame, and is the same for
+    // every tab.
+    const QSize chrome = size() - currentArea->size();
+    QSize target = chrome + contentMinimum;
 
     // A screen too small for the content keeps the window on-screen; the
     // scroll areas stay in place and show their scrollbars as the fallback.
     // The margin leaves room for the window decorations.
-    if (const QScreen *scr = screen()) {
-        target = target.boundedTo(scr->availableGeometry().size() - QSize(40, 80));
+    const QScreen *scr = screen();
+    QSize cap;
+    if (scr) {
+        cap = scr->availableGeometry().size() - QSize(40, 80);
+        target = target.boundedTo(cap);
+    }
+
+    // A tab taller than the final viewport shows a vertical scrollbar. Reserve
+    // its width so that content does not need a horizontal scrollbar as well.
+    const int viewportHeight = target.height() - chrome.height();
+    int requiredWidth = 0;
+    for (const QScrollArea *area : areas) {
+        const QSize minimum = area->widget()->minimumSizeHint();
+        int width = minimum.width();
+        if (minimum.height() > viewportHeight) {
+            width += area->verticalScrollBar()->sizeHint().width();
+        }
+        requiredWidth = qMax(requiredWidth, width);
+    }
+    target.setWidth(chrome.width() + requiredWidth);
+    if (scr) {
+        target.setWidth(qMin(target.width(), cap.width()));
     }
 
     resize(target);

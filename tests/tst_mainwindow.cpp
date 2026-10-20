@@ -684,29 +684,80 @@ void TestMainWindow::windowFitsItsContent()
     window.show();
     QCoreApplication::processEvents();
 
-    QScrollArea *area = window.ui->scrollArea_2;
-    QWidget *content = area->widget();
-    QVERIFY(content);
+    QScrollArea *attackArea = window.ui->scrollArea_2;
+    QWidget *attackContent = attackArea->widget();
+    QScrollArea *generalArea = window.ui->scrollArea;
+    QVERIFY(attackContent);
+    QVERIFY(generalArea->widget());
     QVERIFY(window.screen());
 
-    // The size fitToContent() should have produced: the capped scroll area hint
-    // swapped for the content minimum, clamped to the screen with the same
-    // 40/80 headroom for decorations. QTRY because a resize inside showEvent()
-    // needs the event loop to settle the child layouts before the final
-    // scrollbar state is visible.
-    const QSize natural = window.sizeHint() + content->minimumSizeHint() - area->sizeHint();
+    // Regression: the General tab needs more width than the Attack tab, so the
+    // window must take its width from the tab that is not in front at startup.
+    QVERIFY(generalArea->widget()->minimumSizeHint().width()
+            > attackContent->minimumSizeHint().width());
+
+    // The size fitToContent() should have produced: the common window chrome
+    // plus the largest content minimum in each direction. A tab whose content
+    // is taller than the final viewport also needs room for its vertical
+    // scrollbar, otherwise it would show a horizontal one as well.
+    const QSize chrome = window.size() - attackArea->size();
     const QSize cap = window.screen()->availableGeometry().size() - QSize(40, 80);
-    QTRY_COMPARE(window.size(), natural.boundedTo(cap));
+    QSize contentMinimum(0, 0);
+    for (int i = 0; i < window.ui->tabWidget_main->count(); ++i) {
+        QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
+        QVERIFY(tabArea);
+        QVERIFY(tabArea->widget());
+        contentMinimum = contentMinimum.expandedTo(tabArea->widget()->minimumSizeHint());
+    }
+    QSize natural = chrome + contentMinimum;
+    const int viewportHeight = natural.boundedTo(cap).height() - chrome.height();
+    int requiredWidth = 0;
+    for (int i = 0; i < window.ui->tabWidget_main->count(); ++i) {
+        QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
+        const QSize minimum = tabArea->widget()->minimumSizeHint();
+        int width = minimum.width();
+        if (minimum.height() > viewportHeight) {
+            width += tabArea->verticalScrollBar()->sizeHint().width();
+        }
+        requiredWidth = qMax(requiredWidth, width);
+    }
+    natural.setWidth(chrome.width() + requiredWidth);
+    const QSize target = natural.boundedTo(cap);
+
+    // QTRY because a resize inside showEvent() needs the event loop to settle
+    // the child layouts before the final scrollbar state is visible.
+    QTRY_COMPARE(window.size(), target);
+
+    // Both tabs fit horizontally. Only the height may fall back to a scrollbar
+    // when the screen is too small for the tallest tab.
+    if (target.width() == natural.width()) {
+        for (int i = 0; i < window.ui->tabWidget_main->count(); ++i) {
+            window.ui->tabWidget_main->setCurrentIndex(i);
+            QCoreApplication::processEvents();
+            QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
+            QTRY_VERIFY(!tabArea->horizontalScrollBar()->isVisible());
+        }
+    }
+
+    // The fit uses the same chrome for every tab and must not depend on which
+    // one is in front.
+    window.ui->tabWidget_main->setCurrentIndex(1);
+    QCoreApplication::processEvents();
+    window.fitToContent();
+    QCoreApplication::processEvents();
+    QCOMPARE(window.size(), target);
+    window.ui->tabWidget_main->setCurrentIndex(0);
+    QCoreApplication::processEvents();
 
     if (natural.height() <= cap.height()) {
         // The content fits the screen: no scrollbar, and no empty strip below
         // it - the content is exactly as tall as it needs to be.
-        QTRY_VERIFY(!area->verticalScrollBar()->isVisible());
-        QVERIFY(content->height() - content->minimumSizeHint().height() < 30);
+        QTRY_VERIFY(!attackArea->verticalScrollBar()->isVisible());
+        QVERIFY(attackContent->height() - attackContent->minimumSizeHint().height() < 30);
     } else {
         // The content is taller than the screen: the window stays on-screen
         // and the scroll area has to show its scrollbar.
-        QTRY_VERIFY(area->verticalScrollBar()->isVisible());
+        QTRY_VERIFY(attackArea->verticalScrollBar()->isVisible());
     }
 }
 

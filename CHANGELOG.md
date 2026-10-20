@@ -35,7 +35,7 @@
 - Sorting word list with nothing selected no longer passes a null item to `insertItem()`
 - Suggested outfile no longer overwrites user-selected or profile-chosen file names
 - Copy to clipboard no longer crashes on platforms without clipboard support
-- Windows now size to content instead of hard-coded geometry, fixing scrollbars, clipped content, and unused space across different screen sizes, fonts, DPI, and translations
+- Windows now size to content instead of hard-coded geometry, using the tallest tab for the height and the widest tab for the width; this fixes scrollbars, clipped content, and unused space across different screen sizes, fonts, DPI, and translations
 
 ## 0.7.1 (2026-02-15)
 - Added support for more command options
