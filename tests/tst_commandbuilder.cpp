@@ -6,6 +6,7 @@
 #include "testenvironment.h"
 
 #include <QDateTime>
+#include <QSet>
 
 #include "appconstants.h"
 #include "commandbuilder.h"
@@ -25,6 +26,7 @@ private slots:
     void argumentLayout_data();
     void argumentLayout();
     void uiDefaultsAreNotRepeated();
+    void hexCharsetFollowsTheMaskModes();
     void shortFallsBackToLong();
     void outfileIsOptInAndExpanded();
     void expandOutfileTemplateSubstitutesUnixTimeAndHash();
@@ -140,12 +142,37 @@ void TestCommandBuilder::uiDefaultsAreNotRepeated()
 
     // ... and are passed as soon as they differ
     options.outfileFormat = QStringLiteral("1");
-    options.backendDevices = QStringLiteral("0,1");
+    options.backendDevices = QStringLiteral("1,2");
     options.segmentSize = 64;
 
     const QStringList full{"--attack-mode",     "0",   "--outfile-format", "1",
-                           "--backend-devices", "0,1", "--segment-size",   "64"};
+                           "--backend-devices", "1,2", "--segment-size",   "64"};
     QCOMPARE(CommandBuilder::build(options), full);
+}
+
+// --hex-charset describes masks and custom charsets. Hashcat accepts it in
+// every attack mode but ignores it outside the mask modes, so the builder
+// must not let a stale checkbox reach modes 0, 1 and 9.
+void TestCommandBuilder::hexCharsetFollowsTheMaskModes()
+{
+    const QList<AttackMode> modes{
+        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
+        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+    };
+    const QSet<AttackMode> maskModes{
+        AttackMode::BruteForce,
+        AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord,
+    };
+
+    for (const AttackMode mode : modes) {
+        HashcatOptions options;
+        options.attackMode = mode;
+        options.hexCharset = true;
+
+        const QStringList arguments = CommandBuilder::build(options);
+        QCOMPARE(arguments.contains(QStringLiteral("--hex-charset")), maskModes.contains(mode));
+    }
 }
 
 void TestCommandBuilder::shortFallsBackToLong()

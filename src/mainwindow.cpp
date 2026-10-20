@@ -508,6 +508,9 @@ void MainWindow::updateViewAttackMode()
     ui->groupBox_rules->setEnabled(CommandBuilder::attackUsesRules(mode));
     ui->groupBox_custom_charset->setEnabled(usesMask);
     ui->groupBox_mask->setEnabled(usesMask);
+    // --hex-charset only describes masks and custom charsets; keep it out of
+    // reach in the modes that use neither.
+    ui->checkBox_hex_hash->setEnabled(usesMask);
 
     commandChanged();
 }
@@ -861,8 +864,10 @@ HashcatOptions MainWindow::collectHashcatOptions()
 
     options.mask = ui->lineEdit_mask->text();
     options.speedOnly = ui->checkBox_speed_only->isChecked();
+    // The combo carries the workload level as item data; read that instead of
+    // the display text, which is only a label.
     if (ui->checkBox_override_workload_profile->isChecked()) {
-        options.workloadProfile = ui->comboBox_workload_profile->currentText();
+        options.workloadProfile = ui->comboBox_workload_profile->currentData().toString();
     }
     options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
 

@@ -734,10 +734,10 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_devices">
                        <property name="toolTip">
-                        <string>devices to use, separate with comma</string>
+                        <string>Devices to use, separated with commas. Leave empty for all devices.</string>
                        </property>
                        <property name="text">
-                        <string notr="true">0</string>
+                        <string/>
                        </property>
                       </widget>
                      </item>

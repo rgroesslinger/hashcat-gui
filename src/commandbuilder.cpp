@@ -135,7 +135,9 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         }
     }
 
-    if (options.hexCharset) {
+    // --hex-charset describes the masks and custom charsets only; in the
+    // other attack modes hashcat would accept and ignore it.
+    if (attackUsesMask(mode) && options.hexCharset) {
         arguments << parameter(HelperUtils::Parameter::HexCharset, useShort);
     }
 
@@ -158,8 +160,7 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
                   << options.cpuAffinity;
     }
 
-    if (!options.backendDevices.isEmpty()
-        && options.backendDevices != AppConstants::Defaults::BackendDevices) {
+    if (!options.backendDevices.isEmpty()) {
         arguments << parameter(HelperUtils::Parameter::BackendDevices, useShort)
                   << options.backendDevices;
     }

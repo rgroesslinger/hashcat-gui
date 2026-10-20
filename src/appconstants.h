@@ -67,13 +67,15 @@ inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 } // namespace Files
 
 // Values the widgets start with. The identical defaults are baked into the
-// .ui files (lineEdit_outfile_format = "1,2", lineEdit_devices = "0",
+// .ui files (lineEdit_outfile_format = "1,2", lineEdit_devices is empty,
 // spinBox_segment = 32, comboBox_workload_profile items "1".."4"), so these
 // constants only describe what code constructing the widgets itself gets.
 namespace Defaults
 {
 inline constexpr QLatin1StringView OutfileFormat{"1,2"};
-inline constexpr QLatin1StringView BackendDevices{"0"};
+// Empty means "let hashcat use every backend device". Hashcat device ids
+// start at 1, so there is no valid zero value to store here.
+inline constexpr QLatin1StringView BackendDevices{};
 inline constexpr int SegmentSize = 32; // MB
 inline constexpr QLatin1StringView OutfileSuffix{".out"};
 } // namespace Defaults
@@ -94,7 +96,7 @@ inline constexpr QLatin1StringView BuiltinCharsets{"  ?l = abcdefghijklmnopqrstu
                                                    "  ?d = 0123456789 [0-9]\n"
                                                    "  ?h = 0123456789abcdef [0-9a-f]\n"
                                                    "  ?H = 0123456789ABCDEF [0-9A-F]\n"
-                                                   "  ?s =  !\"#$%&'()*+,-./:;<>=?@[]^_`{|}~\n"
+                                                   "  ?s =  !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n"
                                                    "  ?a = ?l?u?d?s\n"
                                                    "  ?b = 0x00 - 0xff"};
 inline constexpr QLatin1StringView OutfileFormats{"  1 = hash[:salt]\n"

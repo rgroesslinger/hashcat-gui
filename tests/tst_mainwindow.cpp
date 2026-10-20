@@ -187,6 +187,8 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
         QCOMPARE(window.ui->groupBox_rules->isEnabled(), expected->rules);
         QCOMPARE(window.ui->groupBox_mask->isEnabled(), expected->mask);
         QCOMPARE(window.ui->groupBox_custom_charset->isEnabled(), expected->mask);
+        // --hex-charset belongs to the mask modes for the same reason.
+        QCOMPARE(window.ui->checkBox_hex_hash->isEnabled(), expected->mask);
     }
 }
 
