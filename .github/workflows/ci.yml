@@ -31,10 +31,10 @@ jobs:
         uses: actions/checkout@v6
 
       # ----- Linux -----
-      # qt6-tools-dev + qt6-l10n-tools are what Qt6LinguistTools needs: the
-      # CMake package and the lupdate/lrelease binaries. Without them the
-      # build still succeeds, it just produces no .qm - which would silently
-      # defeat the translation check below.
+      # qt6-tools-dev + qt6-l10n-tools provide Qt6LinguistTools: the CMake
+      # package and the lupdate/lrelease binaries. Without them the build
+      # still works, just with no .qm, and tst_translations skips - it only
+      # checks that offered languages have an embedded catalog.
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -51,22 +51,6 @@ jobs:
       - name: Test (Linux)
         if: runner.os == 'Linux'
         run: ctest --test-dir build --output-on-failure --no-tests=error
-
-      # A source string added without refreshing the catalogs would only be
-      # noticed the next time somebody ran lupdate. Refresh them here and
-      # insist the result is empty - on one matrix row rather than once per
-      # row, since the answer is identical everywhere.
-      #
-      # The catalogs carry no source locations (lupdate -locations none), so
-      # only a real source or translation change shows up here. A catalog
-      # declared in CMakeLists.txt but missing from the repository is caught
-      # separately, since git diff cannot see a file nobody ever added.
-      - name: Check the translations are in step with the sources (Linux)
-        if: matrix.compiler == 'linux-gcc'
-        run: |
-          cmake --build build --target update_translations
-          git diff --exit-code -- translations/
-          test -z "$(git status --porcelain translations/ | grep '^??')"
 
       # Validate desktop file
       - name: Validate the desktop entry (Linux)

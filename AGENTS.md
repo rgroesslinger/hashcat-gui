@@ -11,8 +11,12 @@ Run from the repo root, in order. The change is not complete until all pass:
 5. `cmake --build build --target clang-tidy` — analyzes `src/` and `tests/`.
 6. `cmake --build build --target clazy` — analyzes `src/` and `tests/`.
 
+The checklist covers the code. The translation catalogs are not part of it — see
+**Translations** below.
+
 **Prerequisites:** Qt 6.8+, C++20, `clang-format`, `clang-tidy`, `clazy-standalone`, and two Qt modules:
-- Qt6 LinguistTools — without it `update_translations` disappears and CI fails on stale catalogs.
+- Qt6 LinguistTools — needed for the `update_translations` target and for the `.qm`
+  files in the binary. Without it the build still works, it just ships no catalogs.
 - Qt6 Test — without it the suite silently runs nothing (hence `--no-tests=error`).
 
 A missing target means a missing tool: install it (or tell the user), never skip the check.
@@ -23,8 +27,8 @@ not mean clean. Read the output; fix or explicitly justify every finding. CI doe
 these three targets — this checklist is the only enforcement.
 
 **Conditional checks:**
-- `tr()` string added/changed/removed → `cmake --build build --target update_translations`,
-  commit the refreshed `translations/*.ts` (new strings arrive untranslated).
+- Release preparation — the translation catalogs are refreshed and committed → see
+  **Translations** below.
 - Desktop entry or icon metadata changed → `desktop-file-validate hashcat-gui.desktop`.
 - Structural/architectural change (source lists, build system, translations, packaging) →
   check that `build-release.yml`, the CI workflow, and `obs/` are still valid.
@@ -94,7 +98,15 @@ these three targets — this checklist is the only enforcement.
 **Translations**
 - Wrap user-visible text in `tr()`. Catalogs are refreshed with
   `lupdate -no-obsolete -locations none`: no file/line refs (moving code doesn't touch
-  them) and no entries left behind whose source string is gone. CI fails on any drift.
+  them) and no entries left behind whose source string is gone.
+- **During development the catalogs are not maintained.** Do not run
+  `cmake --build build --target update_translations`: it rewrites every
+  `translations/*.ts` file, so a two-line change turns into a diff of hundreds of
+  lines nobody asked for. The catalogs may lag behind the sources, and nothing —
+  neither CI nor the tests — complains about outdated or unfinished translations.
+- **Before a release** the catalogs are refreshed once, by hand:
+  `cmake --build build --target update_translations`. Commit the refreshed
+  `translations/*.ts` files with the release; new strings arrive untranslated.
 - Adding a language: update both `HASHCAT_GUI_TRANSLATIONS` and
   `AppConstants::Languages::Available` (English has no catalog); `tst_translations`
   enforces they match.
@@ -121,7 +133,8 @@ these three targets — this checklist is the only enforcement.
 
 ## CI and packaging
 
-- CI: GCC and Clang on Linux and Windows; `ctest --no-tests=error`; on Linux also checks
-  translation catalogs are current and runs `desktop-file-validate hashcat-gui.desktop`.
+- CI: GCC and Clang on Linux and Windows; `ctest --no-tests=error`; on Linux also runs
+  `desktop-file-validate hashcat-gui.desktop`. CI does not look at the translation
+  catalogs at all — they are refreshed and committed by hand before a release.
 - Windows binary: `build-release.yml` on GitHub release publish. Linux packages: built
   externally on openSUSE Build Service from `obs/`.

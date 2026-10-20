@@ -14,7 +14,6 @@
 - Refactored default values and magic numbers in `src/appconstants.h` (#10)
 - Hardened UTF-8 and string handling by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`
 - `HashcatOptions` and `CommandBuilder`: command line built from UI-independent description; gating rules centralized so visible options and generated command stay in sync
-- CI now builds translations, runs tests, and fails when catalogs are out of step with sources
 - **Qt 6.8 & C++20 baseline**: Bumped minimum Qt version to 6.8 and moved build baseline from C++17 to C++20
 - **New artwork**: Added new application artwork and improved the XDG `.desktop` file entry
 - **Persistent command bar**: Moved Start, Copy, and the command preview below the tabs so they stay visible on every tab

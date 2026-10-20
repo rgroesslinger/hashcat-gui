@@ -71,7 +71,7 @@ The custom targets below are invoked with `cmake --build build --target <name>`.
 
 | Target | Effect | Requires |
 | - | - | - |
-| `update_translations` | Refresh the `translations/*.ts` catalogs after a `tr()` change | Qt6 LinguistTools |
+| `update_translations` | Refresh the `translations/*.ts` catalogs | Qt6 LinguistTools |
 | `clang-format` | Reformat all sources in place | clang-format |
 | `clang-tidy` | Run the clang-tidy checks over the sources | clang-tidy |
 | `clazy` | Run the clazy Qt checks over the sources | clazy-standalone |
@@ -94,13 +94,13 @@ The catalogs live in `translations/` and are compiled into the executable, so th
 
 The UI follows the environment's language by default; **Settings → Language** offers an explicit choice instead.
 
-After adding or changing a `tr()` string, refresh them:
+The catalogs are refreshed with:
 
 ```
 cmake --build build --target update_translations
 ```
 
-A normal build already recompiles them to `.qm`. CI runs the refresh and fails if it changes anything committed, which is what keeps the catalogs in step with the sources.
+A normal build compiles the committed catalogs to `.qm`.
 
 ### Code style
 
