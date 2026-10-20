@@ -928,6 +928,13 @@ void TestMainWindow::windowFitsItsContent()
     natural.setWidth(chrome.width() + requiredWidth);
     const QSize target = natural.boundedTo(cap);
 
+    // The window has to be big enough for the content: a scrollbar for
+    // content that fits is the bug this guards. Checked before the exact
+    // size, so that a failure says what went wrong.
+    if (natural.height() <= cap.height()) {
+        QTRY_VERIFY(!attackArea->verticalScrollBar()->isVisible());
+    }
+
     // QTRY because a resize inside showEvent() needs the event loop to settle
     // the child layouts before the final scrollbar state is visible.
     QTRY_COMPARE(window.size(), target);
@@ -963,6 +970,12 @@ void TestMainWindow::windowFitsItsContent()
         // and the scroll area has to show its scrollbar.
         QTRY_VERIFY(attackArea->verticalScrollBar()->isVisible());
     }
+
+    // Regression: the hint under the mode selector must not wrap. A wrapped
+    // label asks its layout for more height than its size hint announced, so
+    // the window was sized for less than the content needed and the scroll
+    // area showed a scrollbar for content that fitted.
+    QVERIFY(!window.ui->label_mode_hint->wordWrap());
 }
 
 // The command bar belongs to the window, not to one tab: switching tabs must
