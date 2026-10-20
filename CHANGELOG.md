@@ -18,7 +18,7 @@
 - **Qt 6.8 & C++20 baseline**: Bumped minimum Qt version to 6.8 and moved build baseline from C++17 to C++20
 - **New artwork**: Added new application artwork and improved the XDG `.desktop` file entry
 - **Persistent command bar**: Moved Start, Copy, and the command preview below the tabs so they stay visible on every tab
-- **More hashcat options**: Added `--increment` with bounds, `--skip`, `--limit`, `--runtime`, `--force`, `--session`, `--status`/`--status-timer`, `-D`, `--hwmon-temp-abort`, `-j`/`-k` for combination mode, `--encoding-from`/`--encoding-to`, `--hex-wordlist`, and `--potfile-disable`
+- **More hashcat options**: Added `--increment` with bounds, `--skip`, `--limit`, `--runtime`, `--force`, `--session`, `--status`/`--status-timer`, `-D`, `--hwmon-temp-abort`, `-j`/`-k` single rules for the left/right wordlist, `--encoding-from`/`--encoding-to`, `--hex-wordlist`, and `--potfile-disable`
 - **Clearer tabs**: The Attack tab now holds the mode-specific hash input, wordlist, rules, mask and charset options; the General tab holds session, output, resource, performance and hardware options
 - Combo boxes in a profile are stored by the id of their selected entry instead of its position, so a list that grows - a new hash type, a new attack mode - no longer changes what a saved profile selects
 

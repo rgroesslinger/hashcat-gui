@@ -559,7 +559,7 @@
                    <bool>false</bool>
                   </property>
                   <property name="title">
-                   <string>Combination rules</string>
+                   <string>Wordlist rules</string>
                   </property>
                   <layout class="QGridLayout" name="gridLayout_combination_rules">
                    <item row="0" column="0">

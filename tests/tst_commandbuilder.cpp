@@ -29,7 +29,7 @@ private slots:
     void hexCharsetFollowsTheMaskModes();
     void advancedOptionsAreEmitted();
     void incrementFollowsMaskModesAndTheFlag();
-    void combinationRulesFollowCombinationMode();
+    void wordlistRulesFollowTheirSide();
     void wordlistOptionsFollowWordlistModes();
     void statusTimerNeedsStatus();
     void advancedShortForms();
@@ -286,11 +286,21 @@ void TestCommandBuilder::incrementFollowsMaskModesAndTheFlag()
     QVERIFY(!arguments.contains(QStringLiteral("--increment-max")));
 }
 
-void TestCommandBuilder::combinationRulesFollowCombinationMode()
+void TestCommandBuilder::wordlistRulesFollowTheirSide()
 {
     const QList<AttackMode> modes{
         AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
         AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+    };
+    const QSet<AttackMode> leftModes{
+        AttackMode::Straight,
+        AttackMode::Combination,
+        AttackMode::HybridWordMask,
+        AttackMode::Association,
+    };
+    const QSet<AttackMode> rightModes{
+        AttackMode::Combination,
+        AttackMode::HybridMaskWord,
     };
 
     for (const AttackMode mode : modes) {
@@ -300,9 +310,20 @@ void TestCommandBuilder::combinationRulesFollowCombinationMode()
         options.ruleRight = QStringLiteral("^x");
 
         const QStringList arguments = CommandBuilder::build(options);
-        const bool emitted = arguments.contains(QStringLiteral("--rule-left"))
-                             && arguments.contains(QStringLiteral("--rule-right"));
-        QCOMPARE(emitted, mode == AttackMode::Combination);
+        const bool usesLeft = leftModes.contains(mode);
+        const bool usesRight = rightModes.contains(mode);
+
+        QCOMPARE(arguments.contains(QStringLiteral("--rule-left")), usesLeft);
+        QCOMPARE(arguments.contains(QStringLiteral("--rule-right")), usesRight);
+
+        if (usesLeft) {
+            QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--rule-left")) + 1),
+                     QStringLiteral("c"));
+        }
+        if (usesRight) {
+            QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--rule-right")) + 1),
+                     QStringLiteral("^x"));
+        }
     }
 }
 
@@ -546,6 +567,20 @@ void TestCommandBuilder::predicates()
     QVERIFY(!CommandBuilder::attackUsesRules(Mode::BruteForce));
     QVERIFY(!CommandBuilder::attackUsesRules(Mode::HybridWordMask));
     QVERIFY(!CommandBuilder::attackUsesRules(Mode::HybridMaskWord));
+
+    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::Straight));
+    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::Combination));
+    QVERIFY(!CommandBuilder::attackUsesRuleLeft(Mode::BruteForce));
+    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::HybridWordMask));
+    QVERIFY(!CommandBuilder::attackUsesRuleLeft(Mode::HybridMaskWord));
+    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::Association));
+
+    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::Straight));
+    QVERIFY(CommandBuilder::attackUsesRuleRight(Mode::Combination));
+    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::BruteForce));
+    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::HybridWordMask));
+    QVERIFY(CommandBuilder::attackUsesRuleRight(Mode::HybridMaskWord));
+    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::Association));
 }
 
 int main(int argc, char *argv[])

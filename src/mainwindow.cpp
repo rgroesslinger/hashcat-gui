@@ -694,13 +694,19 @@ void MainWindow::updateViewAttackMode()
 {
     const AttackMode mode = static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
 
-    // Use the very predicates CommandBuilder applies, so the group boxes show
+    // Use the very predicates CommandBuilder applies, so the widgets show
     // exactly the options that end up in the command line and the two can
     // never drift apart.
     const bool usesMask = CommandBuilder::attackUsesMask(mode);
+    const bool usesRuleLeft = CommandBuilder::attackUsesRuleLeft(mode);
+    const bool usesRuleRight = CommandBuilder::attackUsesRuleRight(mode);
     ui->groupBox_wordlists->setEnabled(CommandBuilder::attackUsesWordlists(mode));
     ui->groupBox_rules->setEnabled(CommandBuilder::attackUsesRules(mode));
-    ui->groupBox_combination_rules->setEnabled(CommandBuilder::attackUsesCombinationRules(mode));
+    ui->groupBox_combination_rules->setEnabled(usesRuleLeft || usesRuleRight);
+    ui->label_rule_left->setEnabled(usesRuleLeft);
+    ui->lineEdit_rule_left->setEnabled(usesRuleLeft);
+    ui->label_rule_right->setEnabled(usesRuleRight);
+    ui->lineEdit_rule_right->setEnabled(usesRuleRight);
     ui->groupBox_custom_charset->setEnabled(usesMask);
     ui->groupBox_mask->setEnabled(usesMask);
     // --hex-charset only describes masks and custom charsets; keep it out of

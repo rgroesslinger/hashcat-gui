@@ -213,16 +213,17 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
         AttackMode mode;
         bool wordlists;
         bool rules;
-        bool combinationRules;
+        bool ruleLeft;
+        bool ruleRight;
         bool mask;
     };
     const QList<Expectation> expectations{
-        {AttackMode::Straight, true, true, false, false},
-        {AttackMode::Combination, true, false, true, false},
-        {AttackMode::BruteForce, false, false, false, true},
-        {AttackMode::HybridWordMask, true, false, false, true},
-        {AttackMode::HybridMaskWord, true, false, false, true},
-        {AttackMode::Association, true, true, false, false},
+        {AttackMode::Straight, true, true, true, false, false},
+        {AttackMode::Combination, true, false, true, true, false},
+        {AttackMode::BruteForce, false, false, false, false, true},
+        {AttackMode::HybridWordMask, true, false, true, false, true},
+        {AttackMode::HybridMaskWord, true, false, false, true, true},
+        {AttackMode::Association, true, true, true, false, false},
     };
 
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
@@ -244,7 +245,12 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
 
         QCOMPARE(window.ui->groupBox_wordlists->isEnabled(), expected->wordlists);
         QCOMPARE(window.ui->groupBox_rules->isEnabled(), expected->rules);
-        QCOMPARE(window.ui->groupBox_combination_rules->isEnabled(), expected->combinationRules);
+        QCOMPARE(window.ui->groupBox_combination_rules->isEnabled(),
+                 expected->ruleLeft || expected->ruleRight);
+        QCOMPARE(window.ui->label_rule_left->isEnabled(), expected->ruleLeft);
+        QCOMPARE(window.ui->lineEdit_rule_left->isEnabled(), expected->ruleLeft);
+        QCOMPARE(window.ui->label_rule_right->isEnabled(), expected->ruleRight);
+        QCOMPARE(window.ui->lineEdit_rule_right->isEnabled(), expected->ruleRight);
         QCOMPARE(window.ui->groupBox_mask->isEnabled(), expected->mask);
         QCOMPARE(window.ui->groupBox_custom_charset->isEnabled(), expected->mask);
         // --hex-charset belongs to the mask modes for the same reason.
@@ -369,9 +375,10 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(arguments.contains(QStringLiteral("--encoding-to")));
     QVERIFY(arguments.contains(QStringLiteral("--opencl-device-types")));
     QVERIFY(arguments.contains(QStringLiteral("--hwmon-temp-abort")));
-    // Straight mode has no mask and no combination rules.
+    // Straight mode has no mask; it applies the left rule but has no right
+    // wordlist, so the right rule is left out.
     QVERIFY(!arguments.contains(QStringLiteral("--increment")));
-    QVERIFY(!arguments.contains(QStringLiteral("--rule-left")));
+    QVERIFY(arguments.contains(QStringLiteral("--rule-left")));
     QVERIFY(!arguments.contains(QStringLiteral("--rule-right")));
     QVERIFY(!arguments.contains(QStringLiteral("--segment-size")));
     QVERIFY(!arguments.contains(QStringLiteral("--outfile")));

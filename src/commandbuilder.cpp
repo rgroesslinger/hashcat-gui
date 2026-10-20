@@ -41,11 +41,21 @@ bool CommandBuilder::attackUsesRules(AttackMode mode)
     return mode == AttackMode::Straight || mode == AttackMode::Association;
 }
 
-// True when the attack mode accepts the single rules -j / -k. Combination mode
-// forbids -r / -g, so these are the only rules it understands.
-bool CommandBuilder::attackUsesCombinationRules(AttackMode mode)
+// -j applies to the wordlist on the left. That is the only wordlist in modes
+// 0, 6 and 9, and the first one in combination mode. Hashcat accepts -j in
+// every attack mode and silently ignores it where there is no left wordlist,
+// so each side is gated on its own instead of being tied to mode 1.
+bool CommandBuilder::attackUsesRuleLeft(AttackMode mode)
 {
-    return mode == AttackMode::Combination;
+    return mode == AttackMode::Straight || mode == AttackMode::Combination
+           || mode == AttackMode::HybridWordMask || mode == AttackMode::Association;
+}
+
+// -k applies to the wordlist on the right, which only combination mode (two
+// wordlists) and mask + wordlist mode provide.
+bool CommandBuilder::attackUsesRuleRight(AttackMode mode)
+{
+    return mode == AttackMode::Combination || mode == AttackMode::HybridMaskWord;
 }
 
 QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QString &hashFile)
@@ -118,14 +128,11 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         }
     }
 
-    if (attackUsesCombinationRules(mode)) {
-        if (!options.ruleLeft.isEmpty()) {
-            arguments << parameter(HelperUtils::Parameter::RuleLeft, useShort) << options.ruleLeft;
-        }
-        if (!options.ruleRight.isEmpty()) {
-            arguments << parameter(HelperUtils::Parameter::RuleRight, useShort)
-                      << options.ruleRight;
-        }
+    if (attackUsesRuleLeft(mode) && !options.ruleLeft.isEmpty()) {
+        arguments << parameter(HelperUtils::Parameter::RuleLeft, useShort) << options.ruleLeft;
+    }
+    if (attackUsesRuleRight(mode) && !options.ruleRight.isEmpty()) {
+        arguments << parameter(HelperUtils::Parameter::RuleRight, useShort) << options.ruleRight;
     }
 
     // mask - its position relative to the dictionaries depends on the mode
