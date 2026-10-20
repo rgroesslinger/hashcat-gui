@@ -28,6 +28,10 @@ private slots:
     void cleanup();
     void validateLaunch_data();
     void validateLaunch();
+    void modeRequirements_data();
+    void modeRequirements();
+    void validateOptions_data();
+    void validateOptions();
     void parameterSpelling();
     void unknownParameterIsEmpty();
     void terminalArgumentsArePinned();
@@ -150,6 +154,150 @@ void TestHelperUtils::validateLaunch()
     QCOMPARE(int(HelperUtils::validateLaunch(hashFile, hashcatPath, configuredTerminal,
                                              availableTerminals, nullptr)),
              expected);
+}
+
+// What each attack mode needs from the user. These numbers are what the
+// launch validation and the hint under the mode selector work with.
+void TestHelperUtils::modeRequirements_data()
+{
+    QTest::addColumn<int>("mode");
+    QTest::addColumn<int>("minWordlists");
+    QTest::addColumn<int>("maxWordlists");
+    QTest::addColumn<bool>("needsMask");
+
+    QTest::newRow("straight") << int(AttackMode::Straight) << 1 << -1 << false;
+    QTest::newRow("combination") << int(AttackMode::Combination) << 2 << 2 << false;
+    QTest::newRow("brute force") << int(AttackMode::BruteForce) << 0 << -1 << true;
+    QTest::newRow("hybrid word + mask") << int(AttackMode::HybridWordMask) << 1 << -1 << true;
+    QTest::newRow("hybrid mask + word") << int(AttackMode::HybridMaskWord) << 1 << -1 << true;
+    QTest::newRow("association") << int(AttackMode::Association) << 1 << -1 << false;
+}
+
+void TestHelperUtils::modeRequirements()
+{
+    QFETCH(int, mode);
+    QFETCH(int, minWordlists);
+    QFETCH(int, maxWordlists);
+    QFETCH(bool, needsMask);
+
+    const HelperUtils::ModeRequirements requirements =
+        HelperUtils::modeRequirements(static_cast<AttackMode>(mode));
+
+    QCOMPARE(requirements.minWordlists, minWordlists);
+    QCOMPARE(requirements.maxWordlists, maxWordlists);
+    QCOMPARE(requirements.needsMask, needsMask);
+}
+
+// The checks that keep an attack that hashcat would refuse from starting.
+void TestHelperUtils::validateOptions_data()
+{
+    QTest::addColumn<int>("mode");
+    QTest::addColumn<QStringList>("wordlists");
+    QTest::addColumn<QString>("mask");
+    QTest::addColumn<bool>("increment");
+    QTest::addColumn<int>("incrementMin");
+    QTest::addColumn<int>("incrementMax");
+    QTest::addColumn<int>("expected");
+    QTest::addColumn<QString>("expectedDetail");
+
+    const QStringList one{QStringLiteral("/tmp/a.txt")};
+    const QStringList two{QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")};
+    const QStringList three{QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt"),
+                            QStringLiteral("/tmp/c.txt")};
+
+    QTest::newRow("straight with one word list")
+        << int(AttackMode::Straight) << one << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::None) << QString();
+
+    QTest::newRow("straight without a word list")
+        << int(AttackMode::Straight) << QStringList() << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::NoWordlist) << QString();
+
+    QTest::newRow("straight with several word lists")
+        << int(AttackMode::Straight) << three << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::None) << QString();
+
+    QTest::newRow("combination with two word lists")
+        << int(AttackMode::Combination) << two << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::None) << QString();
+
+    QTest::newRow("combination with one word list")
+        << int(AttackMode::Combination) << one << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::WrongWordlistCount) << QStringLiteral("1");
+
+    QTest::newRow("combination with three word lists")
+        << int(AttackMode::Combination) << three << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::WrongWordlistCount) << QStringLiteral("3");
+
+    QTest::newRow("brute force with a mask")
+        << int(AttackMode::BruteForce) << QStringList() << QStringLiteral("?a?a?a?a") << false << 0
+        << 0 << int(HelperUtils::LaunchError::None) << QString();
+
+    QTest::newRow("brute force without a mask")
+        << int(AttackMode::BruteForce) << QStringList() << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::NoMask) << QString();
+
+    // Word lists do not matter in brute force mode: they are not part of the
+    // command line there.
+    QTest::newRow("brute force ignores the word lists")
+        << int(AttackMode::BruteForce) << three << QStringLiteral("?a?a?a?a") << false << 0 << 0
+        << int(HelperUtils::LaunchError::None) << QString();
+
+    QTest::newRow("hybrid word + mask needs both")
+        << int(AttackMode::HybridWordMask) << one << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::NoMask) << QString();
+
+    QTest::newRow("hybrid mask + word needs a word list")
+        << int(AttackMode::HybridMaskWord) << QStringList() << QStringLiteral("?a?a?a?a") << false
+        << 0 << 0 << int(HelperUtils::LaunchError::NoWordlist) << QString();
+
+    QTest::newRow("association without a word list")
+        << int(AttackMode::Association) << QStringList() << QString() << false << 0 << 0
+        << int(HelperUtils::LaunchError::NoWordlist) << QString();
+
+    QTest::newRow("increment bounds that fit")
+        << int(AttackMode::BruteForce) << QStringList() << QStringLiteral("?a?a?a?a") << true << 4
+        << 8 << int(HelperUtils::LaunchError::None) << QString();
+
+    QTest::newRow("increment minimum above the maximum")
+        << int(AttackMode::BruteForce) << QStringList() << QStringLiteral("?a?a?a?a") << true << 8
+        << 4 << int(HelperUtils::LaunchError::InvalidIncrement) << QString();
+
+    // Without the flag the bounds are not used at all, so they cannot
+    // contradict each other either.
+    QTest::newRow("increment bounds without the flag")
+        << int(AttackMode::BruteForce) << QStringList() << QStringLiteral("?a?a?a?a") << false << 8
+        << 4 << int(HelperUtils::LaunchError::None) << QString();
+}
+
+void TestHelperUtils::validateOptions()
+{
+    QFETCH(int, mode);
+    QFETCH(QStringList, wordlists);
+    QFETCH(QString, mask);
+    QFETCH(bool, increment);
+    QFETCH(int, incrementMin);
+    QFETCH(int, incrementMax);
+    QFETCH(int, expected);
+    QFETCH(QString, expectedDetail);
+
+    HashcatOptions options;
+    options.attackMode = static_cast<AttackMode>(mode);
+    options.wordlists = wordlists;
+    options.mask = mask;
+    options.increment = increment;
+    options.incrementMin = incrementMin;
+    options.incrementMax = incrementMax;
+
+    // A stale value must not survive a call that has nothing to report
+    QString detail(QStringLiteral("stale"));
+    const HelperUtils::LaunchError error = HelperUtils::validateOptions(options, &detail);
+
+    QCOMPARE(int(error), expected);
+    QCOMPARE(detail, expectedDetail);
+
+    // The same has to hold when the caller does not care about the detail
+    QCOMPARE(int(HelperUtils::validateOptions(options, nullptr)), expected);
 }
 
 void TestHelperUtils::parameterSpelling()

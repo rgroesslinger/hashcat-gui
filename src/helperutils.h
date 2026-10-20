@@ -16,6 +16,7 @@
 #include <cstdint>
 
 #include "appconstants.h"
+#include "hashcatoptions.h"
 
 // Result of a single hashcat invocation.
 //
@@ -86,6 +87,24 @@ public:
         NoTerminal,         // no terminal selected
         NoTerminals,        // this system has no supported terminal at all
         UnknownTerminal,    // the configured terminal is not installed
+        NoWordlist,         // the mode reads word lists, none is selected
+        WrongWordlistCount, // the mode wants an exact number of word lists
+        NoMask,             // the mode brute-forces a mask, none is given
+        InvalidIncrement,   // the increment bounds contradict each other
+    };
+
+    // What an attack mode needs from the user before hashcat can run.
+    //
+    // The numbers come from hashcat's own argument validation: combination
+    // mode multiplies two word lists and refuses every other number, the mask
+    // based modes brute-force a mask and read at least one word list.
+    struct ModeRequirements {
+        // How many word lists the mode reads at least.
+        int minWordlists = 0;
+        // How many at most; -1 means "as many as the user selects".
+        int maxWordlists = -1;
+        // True when the mode needs a mask.
+        bool needsMask = false;
     };
 
     // Checks everything that has to hold before hashcat can be started.
@@ -96,6 +115,14 @@ public:
                                       const QString &configuredTerminal,
                                       const QStringList &availableTerminals,
                                       QString *detail = nullptr);
+
+    // What the attack mode needs from the user, see ModeRequirements.
+    static ModeRequirements modeRequirements(AttackMode mode);
+
+    // Checks what the selected attack mode needs: the word lists it reads,
+    // the mask it brute-forces and the bounds of the increment. detail
+    // receives the number of selected word lists when it is not nullptr.
+    static LaunchError validateOptions(const HashcatOptions &options, QString *detail = nullptr);
 
     static QFuture<HashcatResult>
     executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);

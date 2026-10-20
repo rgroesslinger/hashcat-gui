@@ -183,6 +183,74 @@ HelperUtils::LaunchError HelperUtils::validateLaunch(const QString &hashFile,
     return LaunchError::None;
 }
 
+// What the user has to provide for the attack mode: hashcat's own argument
+// validation decides which numbers of word lists a mode accepts.
+HelperUtils::ModeRequirements HelperUtils::modeRequirements(AttackMode mode)
+{
+    switch (mode) {
+    case AttackMode::Combination:
+        // Combination multiplies two word lists. Hashcat answers every other
+        // number with a usage error.
+        return {2, 2, false};
+    case AttackMode::BruteForce:
+        // The mask is the whole attack; word lists are not read at all.
+        return {0, -1, true};
+    case AttackMode::HybridWordMask:
+    case AttackMode::HybridMaskWord:
+        // One word list and one mask.
+        return {1, -1, true};
+    case AttackMode::Straight:
+    case AttackMode::Association:
+        // Any number of word lists, but at least one.
+        return {1, -1, false};
+    }
+
+    return {1, -1, false};
+}
+
+// Returns what keeps the selected attack mode from running, if anything
+HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &options,
+                                                      QString *detail)
+{
+    if (detail) {
+        detail->clear();
+    }
+
+    const ModeRequirements requirements = modeRequirements(options.attackMode);
+    const int wordlistCount = static_cast<int>(options.wordlists.size());
+
+    if (wordlistCount < requirements.minWordlists) {
+        if (requirements.maxWordlists == requirements.minWordlists) {
+            // The mode wants an exact number of word lists.
+            if (detail) {
+                *detail = QString::number(wordlistCount);
+            }
+            return LaunchError::WrongWordlistCount;
+        }
+        return LaunchError::NoWordlist;
+    }
+
+    if (requirements.maxWordlists >= 0 && wordlistCount > requirements.maxWordlists) {
+        if (detail) {
+            *detail = QString::number(wordlistCount);
+        }
+        return LaunchError::WrongWordlistCount;
+    }
+
+    // A mask mode without a mask would run an unintended default mask.
+    if (requirements.needsMask && options.mask.trimmed().isEmpty()) {
+        return LaunchError::NoMask;
+    }
+
+    // Hashcat refuses a minimum length that is larger than the maximum.
+    if (options.increment && options.incrementMin > 0 && options.incrementMax > 0
+        && options.incrementMin > options.incrementMax) {
+        return LaunchError::InvalidIncrement;
+    }
+
+    return LaunchError::None;
+}
+
 // The arguments that belong between the terminal program and the hashcat
 // command line, for every supported terminal. The entries are pure data -
 // nothing here looks at the filesystem. Terminals whose option takes a single
