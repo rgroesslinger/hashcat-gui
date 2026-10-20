@@ -18,6 +18,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QProcess>
+#include <QAbstractButton>
 #include <QAbstractItemModel>
 #include <QClipboard>
 #include <QStandardPaths>
@@ -98,6 +99,83 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /* ---------- save default profile on quit ---------- */
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::saveDefaultProfile);
 
+    /* ---------- command preview ---------- */
+    // Every widget whose value reaches the command line is connected here
+    // exactly once. Controls that also need to enable fields, open dialogs or
+    // change the attack-mode gating are connected to their own slot below;
+    // that second connection is the side effect, not a second preview update.
+    const auto notifyOnText = [this](QLineEdit *edit) {
+        connect(edit, &QLineEdit::textChanged, this, &MainWindow::commandChanged);
+    };
+    const auto notifyOnToggle = [this](QAbstractButton *button) {
+        connect(button, &QAbstractButton::toggled, this, &MainWindow::commandChanged);
+    };
+    const auto notifyOnValue = [this](QSpinBox *spinBox) {
+        connect(spinBox, &QSpinBox::valueChanged, this, &MainWindow::commandChanged);
+    };
+    const auto notifyOnIndex = [this](QComboBox *comboBox) {
+        connect(comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::commandChanged);
+    };
+
+    // Attack tab
+    notifyOnIndex(ui->comboBox_hash);
+    notifyOnText(ui->lineEdit_hashfile);
+    notifyOnToggle(ui->checkBox_hex_hash);
+    notifyOnToggle(ui->checkBox_hex_salt);
+    // Word lists
+    notifyOnText(ui->lineEdit_encoding_from);
+    notifyOnText(ui->lineEdit_encoding_to);
+    notifyOnToggle(ui->checkBox_hex_wordlist);
+    // Rules
+    notifyOnToggle(ui->checkBox_rulesfile_1);
+    notifyOnToggle(ui->checkBox_rulesfile_2);
+    notifyOnToggle(ui->checkBox_rulesfile_3);
+    notifyOnText(ui->lineEdit_open_rulesfile_1);
+    notifyOnText(ui->lineEdit_open_rulesfile_2);
+    notifyOnText(ui->lineEdit_open_rulesfile_3);
+    notifyOnToggle(ui->radioButton_use_rules_file);
+    notifyOnToggle(ui->radioButton_generate_rules);
+    notifyOnValue(ui->spinBox_generate_rules);
+    notifyOnText(ui->lineEdit_rule_left);
+    notifyOnText(ui->lineEdit_rule_right);
+    // Mask and charsets
+    notifyOnText(ui->lineEdit_mask);
+    notifyOnToggle(ui->checkBox_increment);
+    notifyOnValue(ui->spinBox_increment_min);
+    notifyOnValue(ui->spinBox_increment_max);
+    notifyOnToggle(ui->checkBox_custom_charset1);
+    notifyOnToggle(ui->checkBox_custom_charset2);
+    notifyOnToggle(ui->checkBox_custom_charset3);
+    notifyOnToggle(ui->checkBox_custom_charset4);
+    notifyOnText(ui->lineEdit_custom_charset1);
+    notifyOnText(ui->lineEdit_custom_charset2);
+    notifyOnText(ui->lineEdit_custom_charset3);
+    notifyOnText(ui->lineEdit_custom_charset4);
+    // General tab
+    notifyOnToggle(ui->checkBox_remove);
+    notifyOnToggle(ui->checkBox_ignoreusername);
+    notifyOnToggle(ui->checkBox_outfile);
+    notifyOnText(ui->lineEdit_outfile);
+    notifyOnText(ui->lineEdit_outfile_format);
+    notifyOnText(ui->lineEdit_cpu_affinity);
+    notifyOnText(ui->lineEdit_devices);
+    notifyOnValue(ui->spinBox_segment);
+    notifyOnText(ui->lineEdit_session);
+    notifyOnValue(ui->spinBox_runtime);
+    notifyOnText(ui->lineEdit_skip);
+    notifyOnText(ui->lineEdit_limit);
+    notifyOnToggle(ui->checkBox_status);
+    notifyOnValue(ui->spinBox_status_timer);
+    notifyOnToggle(ui->checkBox_force);
+    notifyOnToggle(ui->checkBox_potfile_disable);
+    notifyOnToggle(ui->checkBox_optimized_kernel);
+    notifyOnToggle(ui->checkBox_speed_only);
+    notifyOnToggle(ui->checkBox_override_workload_profile);
+    notifyOnIndex(ui->comboBox_workload_profile);
+    notifyOnText(ui->lineEdit_device_types);
+    notifyOnToggle(ui->checkBox_hwmon_temp_abort);
+    notifyOnValue(ui->spinBox_hwmon_temp_abort);
+
     /* ---------- menu actions ---------- */
     connect(ui->actionHelp_About, &QAction::triggered, this, &MainWindow::aboutTriggered);
     connect(ui->actionReset_fields, &QAction::triggered, this, &MainWindow::resetFieldsTriggered);
@@ -161,41 +239,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::copyCommandToClipboard);
     connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled,
             ui->comboBox_workload_profile, &QComboBox::setEnabled);
+    // attackIndexChanged() refreshes the preview through
+    // updateViewAttackMode(); connecting it to commandChanged() as well would
+    // rebuild the preview twice for every mode change.
     connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this,
             &MainWindow::attackIndexChanged);
     connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
 
-    /* ---------- advanced options ---------- */
-    const auto notifyOnText = [this](QLineEdit *edit) {
-        connect(edit, &QLineEdit::textChanged, this, &MainWindow::commandChanged);
-    };
-    const auto notifyOnToggle = [this](QCheckBox *box) {
-        connect(box, &QCheckBox::toggled, this, &MainWindow::commandChanged);
-    };
-    const auto notifyOnValue = [this](QSpinBox *spinBox) {
-        connect(spinBox, &QSpinBox::valueChanged, this, &MainWindow::commandChanged);
-    };
-
-    notifyOnToggle(ui->checkBox_hex_wordlist);
-    notifyOnText(ui->lineEdit_encoding_from);
-    notifyOnText(ui->lineEdit_encoding_to);
-    notifyOnText(ui->lineEdit_rule_left);
-    notifyOnText(ui->lineEdit_rule_right);
-    notifyOnToggle(ui->checkBox_increment);
-    notifyOnValue(ui->spinBox_increment_min);
-    notifyOnValue(ui->spinBox_increment_max);
-    notifyOnText(ui->lineEdit_session);
-    notifyOnValue(ui->spinBox_runtime);
-    notifyOnText(ui->lineEdit_skip);
-    notifyOnText(ui->lineEdit_limit);
-    notifyOnToggle(ui->checkBox_status);
-    notifyOnValue(ui->spinBox_status_timer);
-    notifyOnToggle(ui->checkBox_force);
-    notifyOnToggle(ui->checkBox_potfile_disable);
-    notifyOnText(ui->lineEdit_device_types);
-    notifyOnToggle(ui->checkBox_hwmon_temp_abort);
-    notifyOnValue(ui->spinBox_hwmon_temp_abort);
-
+    /* ---------- dependent widgets ---------- */
     connect(ui->checkBox_increment, &QCheckBox::toggled, this,
             &MainWindow::updateOptionDependencies);
     connect(ui->checkBox_status, &QCheckBox::toggled, this, &MainWindow::updateOptionDependencies);
@@ -430,6 +481,9 @@ void MainWindow::settingsTriggered()
         if (ui->comboBox_hash->count() == 0) {
             initHashAndAttackModes();
         }
+        // The settings can change the binary name and the short/long parameter
+        // choice, both of which are part of the preview.
+        commandChanged();
     }
 }
 

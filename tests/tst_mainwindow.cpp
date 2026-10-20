@@ -52,6 +52,7 @@ private slots:
     void init();
     void cleanup();
     void freshWindowMatchesTheDefaultOptions();
+    void commandPreviewFollowsWidgetChanges();
     void attackModeIdsTravelAsItemData();
     void groupBoxesFollowTheBuilderPredicates();
     void optionDependenciesFollowTheirCheckboxes();
@@ -123,6 +124,62 @@ void TestMainWindow::freshWindowMatchesTheDefaultOptions()
 
     // ... and that is what the preview shows, character for character
     QCOMPARE(window.ui->lineEdit_command->text(), expected.join(QLatin1Char(' ')));
+}
+
+void TestMainWindow::commandPreviewFollowsWidgetChanges()
+{
+    MainWindow window;
+    QLineEdit *preview = window.ui->lineEdit_command;
+
+    QCOMPARE(preview->text(), QStringLiteral("--attack-mode 0"));
+
+    // One representative for each connection helper, including the controls
+    // that used to be wired through the .ui connections table.
+    window.ui->checkBox_remove->setChecked(true);
+    QVERIFY(preview->text().contains(QStringLiteral("--remove")));
+
+    window.ui->checkBox_ignoreusername->setChecked(true);
+    QVERIFY(preview->text().contains(QStringLiteral("--username")));
+
+    window.ui->lineEdit_devices->setText(QStringLiteral("1,2"));
+    QVERIFY(preview->text().contains(QStringLiteral("--backend-devices 1,2")));
+
+    window.ui->spinBox_segment->setValue(64);
+    QVERIFY(preview->text().contains(QStringLiteral("--segment-size 64")));
+
+    window.ui->lineEdit_session->setText(QStringLiteral("job"));
+    QVERIFY(preview->text().contains(QStringLiteral("--session job")));
+
+    window.ui->checkBox_force->setChecked(true);
+    QVERIFY(preview->text().contains(QStringLiteral("--force")));
+
+    window.ui->spinBox_runtime->setValue(60);
+    QVERIFY(preview->text().contains(QStringLiteral("--runtime 60")));
+
+    window.ui->checkBox_override_workload_profile->setChecked(true);
+    window.ui->comboBox_workload_profile->setCurrentText(QStringLiteral("2"));
+    QVERIFY(preview->text().contains(QStringLiteral("--workload-profile 2")));
+
+    // Radio buttons share the toggle helper and keep their side-effect slot.
+    window.ui->radioButton_generate_rules->setChecked(true);
+    QVERIFY(preview->text().contains(QStringLiteral("--generate-rules 1")));
+
+    // The hash combo is filled asynchronously in the application; fill it by
+    // hand here to test the index connection without a hashcat query.
+    window.ui->comboBox_hash->clear();
+    window.ui->comboBox_hash->addItem(QStringLiteral("1000 | NTLM"), 1000);
+    QVERIFY(preview->text().contains(QStringLiteral("--hash-type 1000")));
+
+    // The attack mode refreshes the preview through updateViewAttackMode(),
+    // not through a second commandChanged connection.
+    window.ui->comboBox_attack->setCurrentIndex(2); // brute-force
+    QVERIFY(preview->text().contains(QStringLiteral("--attack-mode 3")));
+
+    window.ui->lineEdit_mask->setText(QStringLiteral("?d?d"));
+    QVERIFY(preview->text().contains(QStringLiteral("?d?d")));
+
+    window.ui->checkBox_increment->setChecked(true);
+    QVERIFY(preview->text().contains(QStringLiteral("--increment")));
 }
 
 void TestMainWindow::attackModeIdsTravelAsItemData()
