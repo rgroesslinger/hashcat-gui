@@ -126,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     };
 
     // Attack tab
-    notifyOnIndex(ui->comboBox_hash);
+    notifyOnIndex(ui->comboBox_hash_type);
     notifyOnText(ui->lineEdit_hashfile);
     notifyOnToggle(ui->checkBox_hex_hash);
     notifyOnToggle(ui->checkBox_hex_salt);
@@ -138,9 +138,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnToggle(ui->checkBox_rulesfile_1);
     notifyOnToggle(ui->checkBox_rulesfile_2);
     notifyOnToggle(ui->checkBox_rulesfile_3);
-    notifyOnText(ui->lineEdit_open_rulesfile_1);
-    notifyOnText(ui->lineEdit_open_rulesfile_2);
-    notifyOnText(ui->lineEdit_open_rulesfile_3);
+    notifyOnText(ui->lineEdit_rulesfile_1);
+    notifyOnText(ui->lineEdit_rulesfile_2);
+    notifyOnText(ui->lineEdit_rulesfile_3);
     notifyOnToggle(ui->radioButton_use_rules_file);
     notifyOnToggle(ui->radioButton_generate_rules);
     notifyOnValue(ui->spinBox_generate_rules);
@@ -241,7 +241,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
     connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
             &MainWindow::openHashFileClicked);
-    connect(ui->pushButton_output, &QPushButton::clicked, this, &MainWindow::outputClicked);
+    connect(ui->pushButton_open_outfile, &QPushButton::clicked, this,
+            &MainWindow::openOutfileClicked);
     connect(ui->pushButton_execute, &QPushButton::clicked, this, &MainWindow::executeClicked);
     connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this,
             &MainWindow::copyCommandToClipboard);
@@ -423,7 +424,7 @@ void MainWindow::resetFieldsTriggered()
     ui->lineEdit_encoding_from->clear();
     ui->lineEdit_encoding_to->clear();
     ui->comboBox_attack->setCurrentIndex(0);
-    ui->comboBox_hash->setCurrentIndex(0);
+    ui->comboBox_hash_type->setCurrentIndex(0);
     // A fresh form must not re-apply a hash type a profile is still waiting
     // to deliver.
     m_pendingHashTypeId = -1;
@@ -431,9 +432,9 @@ void MainWindow::resetFieldsTriggered()
     ui->checkBox_rulesfile_1->setChecked(false);
     ui->checkBox_rulesfile_2->setChecked(false);
     ui->checkBox_rulesfile_3->setChecked(false);
-    ui->lineEdit_open_rulesfile_1->clear();
-    ui->lineEdit_open_rulesfile_2->clear();
-    ui->lineEdit_open_rulesfile_3->clear();
+    ui->lineEdit_rulesfile_1->clear();
+    ui->lineEdit_rulesfile_2->clear();
+    ui->lineEdit_rulesfile_3->clear();
     ui->lineEdit_rule_left->clear();
     ui->lineEdit_rule_right->clear();
     ui->spinBox_generate_rules->setValue(1);
@@ -486,7 +487,7 @@ void MainWindow::settingsTriggered()
     if (settingsDialog.exec() == QDialog::Accepted) {
         // If SettingsDialog was saved and there are no hash types yet maybe we can populate them
         // now
-        if (ui->comboBox_hash->count() == 0) {
+        if (ui->comboBox_hash_type->count() == 0) {
             initHashAndAttackModes();
         }
         // The settings can change the binary name and the short/long parameter
@@ -560,9 +561,9 @@ void MainWindow::loadDefaultProfile()
 // not know.
 QString MainWindow::restoreHashType(const QJsonObject &state)
 {
-    m_pendingHashTypeId = state.value(QStringLiteral("comboBox_hash")).toInt(-1);
+    m_pendingHashTypeId = state.value(QStringLiteral("comboBox_hash_type")).toInt(-1);
 
-    if (ui->comboBox_hash->count() == 0) {
+    if (ui->comboBox_hash_type->count() == 0) {
         // The list is still on its way; the value waits for it.
         return {};
     }
@@ -578,15 +579,15 @@ QString MainWindow::applyPendingHashType()
     QString problem;
 
     if (m_pendingHashTypeId >= 0) {
-        const int index = ui->comboBox_hash->findData(m_pendingHashTypeId);
+        const int index = ui->comboBox_hash_type->findData(m_pendingHashTypeId);
         if (index >= 0) {
-            ui->comboBox_hash->setCurrentIndex(index);
+            ui->comboBox_hash_type->setCurrentIndex(index);
         } else {
             // The hash type is gone. An empty selection is the honest
             // answer: the position would point at a different hash type, and
             // cracking with the wrong one is worse than not cracking at
             // all.
-            ui->comboBox_hash->setCurrentIndex(-1);
+            ui->comboBox_hash_type->setCurrentIndex(-1);
             problem = tr("The profile names the hash type %1, which this hashcat version does "
                          "not support.")
                           .arg(m_pendingHashTypeId);
@@ -614,7 +615,7 @@ void MainWindow::saveDefaultProfile()
 void MainWindow::initHashAndAttackModes()
 {
     ui->comboBox_attack->clear();
-    ui->comboBox_hash->clear();
+    ui->comboBox_hash_type->clear();
     attackModes.clear();
     hashModes.clear();
 
@@ -636,8 +637,8 @@ void MainWindow::initHashAndAttackModes()
     auto &settings = SettingsManager::instance();
 
     if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
-        ui->comboBox_hash->setToolTip(tr("Updating..."));
-        ui->comboBox_hash->setEnabled(false);
+        ui->comboBox_hash_type->setToolTip(tr("Updating..."));
+        ui->comboBox_hash_type->setEnabled(false);
 
         // Create a watcher that will be destroyed once finished
         QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
@@ -659,11 +660,11 @@ void MainWindow::initHashAndAttackModes()
                 if (HashcatInfoParser::parseExampleHashes(result.standardOutput, parsed, &error)) {
                     hashModes = std::move(parsed);
 
-                    ui->comboBox_hash->clear();
+                    ui->comboBox_hash_type->clear();
 
                     // fill the combobox, hash type id as item data
                     for (auto it = hashModes.constBegin(); it != hashModes.constEnd(); ++it) {
-                        ui->comboBox_hash->addItem(it.value(), it.key());
+                        ui->comboBox_hash_type->addItem(it.value(), it.key());
                     }
 
                     // A profile loaded while the combo was still empty could
@@ -676,8 +677,8 @@ void MainWindow::initHashAndAttackModes()
             // The combo was disabled while the query ran. Restore it on every
             // path so a failed or malformed reply does not leave it stuck on
             // the "Updating..." tooltip forever.
-            ui->comboBox_hash->setEnabled(true);
-            ui->comboBox_hash->setToolTip(QString());
+            ui->comboBox_hash_type->setEnabled(true);
+            ui->comboBox_hash_type->setToolTip(QString());
 
             if (!error.isEmpty()) {
                 QMessageBox::warning(this, tr("hashcat error"), error);
@@ -784,7 +785,7 @@ void MainWindow::openHashFileClicked()
     }
 }
 
-void MainWindow::outputClicked()
+void MainWindow::openOutfileClicked()
 {
     QString outfile = QFileDialog::getSaveFileName(this, tr("Save Output File"));
     if (!outfile.isEmpty()) {
@@ -848,19 +849,19 @@ void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
 
 void MainWindow::rulesfile1Toggled(bool checked)
 {
-    ui->lineEdit_open_rulesfile_1->setEnabled(checked);
+    ui->lineEdit_rulesfile_1->setEnabled(checked);
     ui->pushButton_open_rulesfile_1->setEnabled(checked);
 }
 
 void MainWindow::rulesfile2Toggled(bool checked)
 {
-    ui->lineEdit_open_rulesfile_2->setEnabled(checked);
+    ui->lineEdit_rulesfile_2->setEnabled(checked);
     ui->pushButton_open_rulesfile_2->setEnabled(checked);
 }
 
 void MainWindow::rulesfile3Toggled(bool checked)
 {
-    ui->lineEdit_open_rulesfile_3->setEnabled(checked);
+    ui->lineEdit_rulesfile_3->setEnabled(checked);
     ui->pushButton_open_rulesfile_3->setEnabled(checked);
 }
 
@@ -891,7 +892,7 @@ void MainWindow::openRulesFile1Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
     if (!rulesfile.isEmpty()) {
-        ui->lineEdit_open_rulesfile_1->setText(QDir::toNativeSeparators(rulesfile));
+        ui->lineEdit_rulesfile_1->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
 
@@ -899,7 +900,7 @@ void MainWindow::openRulesFile2Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
     if (!rulesfile.isEmpty()) {
-        ui->lineEdit_open_rulesfile_2->setText(QDir::toNativeSeparators(rulesfile));
+        ui->lineEdit_rulesfile_2->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
 
@@ -907,7 +908,7 @@ void MainWindow::openRulesFile3Clicked()
 {
     QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
     if (!rulesfile.isEmpty()) {
-        ui->lineEdit_open_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
+        ui->lineEdit_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
     }
 }
 
@@ -934,7 +935,7 @@ void MainWindow::customCharset4Toggled(bool checked)
 void MainWindow::outfileToggled(bool checked)
 {
     ui->lineEdit_outfile->setEnabled(checked);
-    ui->pushButton_output->setEnabled(checked);
+    ui->pushButton_open_outfile->setEnabled(checked);
 }
 
 void MainWindow::hashFileTextChanged(const QString &text)
@@ -1139,7 +1140,7 @@ HashcatOptions MainWindow::collectHashcatOptions()
     // currentData() is invalid while the hash type list has not been filled -
     // no hashcat configured, or the query failed. CommandBuilder then leaves
     // -m out entirely instead of asking for hash type 0.
-    const QVariant hashType = ui->comboBox_hash->currentData();
+    const QVariant hashType = ui->comboBox_hash_type->currentData();
     options.hashType = hashType.isValid() ? hashType.toInt() : -1;
 
     options.attackMode = static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
@@ -1159,8 +1160,8 @@ HashcatOptions MainWindow::collectHashcatOptions()
     if (ui->radioButton_use_rules_file->isChecked()) {
         QCheckBox *boxes[3] = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2,
                                ui->checkBox_rulesfile_3};
-        QLineEdit *edits[3] = {ui->lineEdit_open_rulesfile_1, ui->lineEdit_open_rulesfile_2,
-                               ui->lineEdit_open_rulesfile_3};
+        QLineEdit *edits[3] = {ui->lineEdit_rulesfile_1, ui->lineEdit_rulesfile_2,
+                               ui->lineEdit_rulesfile_3};
         for (int i = 0; i < 3; ++i) {
             if (boxes[i]->isChecked() && !edits[i]->text().isEmpty()) {
                 options.rulesFiles << edits[i]->text();

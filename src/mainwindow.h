@@ -49,7 +49,7 @@ private slots:
     // main-tab buttons
     void executeClicked();
     void openHashFileClicked();
-    void outputClicked();
+    void openOutfileClicked();
     void removeWordlistClicked();
     void addWordlistClicked();
     void wordlistSortAscClicked();
@@ -137,8 +137,8 @@ private:
     // must not move or resize a window the user has placed themselves.
     bool m_sizedToContent = false;
 
-    // A profile can name a hash type while comboBox_hash still has no items
-    // - the list arrives with the asynchronous hashcat query, after the
+    // A profile can name a hash type while comboBox_hash_type still has no
+    // items - the list arrives with the asynchronous hashcat query, after the
     // constructor has already loaded the profile. The stored id waits
     // here and is applied once the items exist, see initHashAndAttackModes().
     int m_pendingHashTypeId = -1;

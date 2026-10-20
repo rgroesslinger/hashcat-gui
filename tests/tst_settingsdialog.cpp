@@ -6,6 +6,7 @@
 #include "testenvironment.h"
 
 #include <QDir>
+#include <QGroupBox>
 #include <QMessageBox>
 #include <QTimer>
 
@@ -96,6 +97,7 @@ private slots:
     void selectPathClickedAcceptsAnExecutable();
     void selectPathClickedRejectsAPlainFile();
     void fitsItsContent();
+    void groupBoxesShareOneTitleAlignment();
 
 private:
     QString m_savedHashcatPath;
@@ -275,6 +277,20 @@ void TestSettingsDialog::fitsItsContent()
     // content-sized, and still not resizable
     QCOMPARE(dialog.minimumSize(), dialog.maximumSize());
     QCOMPARE(dialog.size(), dialog.maximumSize());
+}
+
+// The titles of the group boxes have to look alike. The alignment is the only
+// thing that decides it, and a group box without it would draw its title
+// above the frame while its neighbours break the border with it.
+void TestSettingsDialog::groupBoxesShareOneTitleAlignment()
+{
+    SettingsDialog dialog;
+
+    QVERIFY(!dialog.findChildren<QGroupBox *>().isEmpty());
+    const QStringList offenders = TestEnvironment::groupBoxesWithUnexpectedTitleAlignment(&dialog);
+    QVERIFY2(offenders.isEmpty(),
+             qPrintable(QStringLiteral("group boxes with another title alignment: %1")
+                            .arg(offenders.join(QStringLiteral(", ")))));
 }
 
 int main(int argc, char *argv[])

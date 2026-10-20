@@ -9,6 +9,8 @@
 #include <QApplication>
 #include <QCoreApplication>
 #include <QFile>
+#include <QGroupBox>
+#include <QStringList>
 #include <QTemporaryDir>
 #include <QtTest/QTest>
 
@@ -84,6 +86,31 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
     QFile::setPermissions(path, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
     return path;
 #endif
+}
+
+// The title alignment every group box has to use.
+//
+// Qt 6 dropped QGroupBox::titlePosition, so the vertical bit of the title
+// alignment is the only lever left: with it the title breaks the top border
+// of the frame, without it the Fusion style pushes the frame below the title
+// and the title ends up above the box. A group box that forgets the property
+// therefore looks different from its neighbours.
+inline Qt::Alignment groupBoxTitleAlignment()
+{
+    return Qt::AlignLeft | Qt::AlignVCenter;
+}
+
+// The group boxes below root that do not use that alignment, by name.
+inline QStringList groupBoxesWithUnexpectedTitleAlignment(QObject *root)
+{
+    QStringList offenders;
+    const QList<QGroupBox *> boxes = root->findChildren<QGroupBox *>();
+    for (QGroupBox *box : boxes) {
+        if (box->alignment() != groupBoxTitleAlignment()) {
+            offenders << box->objectName();
+        }
+    }
+    return offenders;
 }
 
 // Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behaviour, plus the redirect

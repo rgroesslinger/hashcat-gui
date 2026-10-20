@@ -7,6 +7,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QGroupBox>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QListWidgetItem>
@@ -55,6 +56,7 @@ private slots:
     void commandPreviewFollowsWidgetChanges();
     void attackModeIdsTravelAsItemData();
     void groupBoxesFollowTheBuilderPredicates();
+    void groupBoxesShareOneTitleAlignment();
     void optionDependenciesFollowTheirCheckboxes();
     void modeHintFollowsTheAttackMode();
     void launchValidationFollowsTheWidgets();
@@ -170,8 +172,8 @@ void TestMainWindow::commandPreviewFollowsWidgetChanges()
 
     // The hash combo is filled asynchronously in the application; fill it by
     // hand here to test the index connection without a hashcat query.
-    window.ui->comboBox_hash->clear();
-    window.ui->comboBox_hash->addItem(QStringLiteral("1000 | NTLM"), 1000);
+    window.ui->comboBox_hash_type->clear();
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"), 1000);
     QVERIFY(preview->text().contains(QStringLiteral("--hash-type 1000")));
 
     // The attack mode refreshes the preview through updateViewAttackMode(),
@@ -260,6 +262,20 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
         // --hex-charset belongs to the mask modes for the same reason.
         QCOMPARE(window.ui->checkBox_hex_hash->isEnabled(), expected->mask);
     }
+}
+
+// The titles of the group boxes have to look alike. The alignment is the only
+// thing that decides it, and a group box without it would draw its title
+// above the frame while its neighbours break the border with it.
+void TestMainWindow::groupBoxesShareOneTitleAlignment()
+{
+    MainWindow window;
+
+    QVERIFY(!window.findChildren<QGroupBox *>().isEmpty());
+    const QStringList offenders = TestEnvironment::groupBoxesWithUnexpectedTitleAlignment(&window);
+    QVERIFY2(offenders.isEmpty(),
+             qPrintable(QStringLiteral("group boxes with another title alignment: %1")
+                            .arg(offenders.join(QStringLiteral(", ")))));
 }
 
 void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
@@ -557,10 +573,10 @@ void TestMainWindow::hashTypeComesFromTheItemData()
 
     // The real list comes from hashcat at runtime; inserting it by hand keeps
     // this test independent of the stub below.
-    window.ui->comboBox_hash->clear();
-    window.ui->comboBox_hash->addItem(QStringLiteral("1000 | NTLM"), 1000);
-    window.ui->comboBox_hash->addItem(QStringLiteral("0 | MD5"), 0);
-    window.ui->comboBox_hash->setCurrentIndex(0);
+    window.ui->comboBox_hash_type->clear();
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"), 1000);
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
+    window.ui->comboBox_hash_type->setCurrentIndex(0);
 
     QCOMPARE(window.collectHashcatOptions().hashType, 1000);
     const QStringList withHashType{"--hash-type", "1000", "--attack-mode", "0"};
@@ -568,7 +584,7 @@ void TestMainWindow::hashTypeComesFromTheItemData()
 
     // Nothing selected - the state before the query finished - must leave -m
     // out instead of silently asking for hash type 0
-    window.ui->comboBox_hash->clear();
+    window.ui->comboBox_hash_type->clear();
     QCOMPARE(window.collectHashcatOptions().hashType, -1);
     const QStringList withoutHashType{"--attack-mode", "0"};
     QCOMPARE(window.generateArguments(), withoutHashType);
@@ -599,21 +615,21 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
 
     // The query runs off-thread; until the event loop delivers its result the
     // combo stays parked in the state initHashAndAttackModes() put it in.
-    QVERIFY(!window.ui->comboBox_hash->isEnabled());
-    QCOMPARE(window.ui->comboBox_hash->toolTip(), QStringLiteral("Updating..."));
+    QVERIFY(!window.ui->comboBox_hash_type->isEnabled());
+    QCOMPARE(window.ui->comboBox_hash_type->toolTip(), QStringLiteral("Updating..."));
 
     // Wait at least as long as the query's own deadline: giving up earlier
     // would fail the test while hashcat could still have answered
-    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->count() > 0,
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
-    QCOMPARE(window.ui->comboBox_hash->count(), 2);
-    QVERIFY(window.ui->comboBox_hash->isEnabled());
-    QVERIFY(window.ui->comboBox_hash->toolTip().isEmpty());
+    QCOMPARE(window.ui->comboBox_hash_type->count(), 2);
+    QVERIFY(window.ui->comboBox_hash_type->isEnabled());
+    QVERIFY(window.ui->comboBox_hash_type->toolTip().isEmpty());
 
     // 0 sorts before 1000, and the ids travel as item data
-    QCOMPARE(window.ui->comboBox_hash->itemData(0).toUInt(), 0u);
-    QCOMPARE(window.ui->comboBox_hash->itemData(1).toUInt(), 1000u);
+    QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 0u);
+    QCOMPARE(window.ui->comboBox_hash_type->itemData(1).toUInt(), 1000u);
 
     const QStringList arguments = window.generateArguments();
     const qsizetype hashType = arguments.indexOf(QStringLiteral("--hash-type"));
@@ -658,14 +674,14 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
 
     // The query starts out exactly like the successful one: parked on the
     // reply, with the tooltip that says so.
-    QVERIFY(!window.ui->comboBox_hash->isEnabled());
-    QCOMPARE(window.ui->comboBox_hash->toolTip(), QStringLiteral("Updating..."));
+    QVERIFY(!window.ui->comboBox_hash_type->isEnabled());
+    QCOMPARE(window.ui->comboBox_hash_type->toolTip(), QStringLiteral("Updating..."));
 
     // ... and when the reply turns out to be unusable, the combo comes back
-    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->isEnabled(),
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->isEnabled(),
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QVERIFY(window.ui->comboBox_hash->toolTip().isEmpty());
-    QCOMPARE(window.ui->comboBox_hash->count(), 0);
+    QVERIFY(window.ui->comboBox_hash_type->toolTip().isEmpty());
+    QCOMPARE(window.ui->comboBox_hash_type->count(), 0);
 }
 
 // The suggestion may follow the hash file name only as long as nobody else
@@ -793,7 +809,7 @@ void TestMainWindow::defaultProfileRoundTrips()
 }
 
 // The constructor loads the profile while the hashcat query that fills
-// comboBox_hash is still in flight: the combo has no items, so
+// comboBox_hash_type is still in flight: the combo has no items, so
 // setCurrentIndex() is a silent no-op and the stored id can only be
 // applied when the reply delivers the items.
 void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
@@ -817,7 +833,7 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"MainWindow": {"comboBox_hash": 1000}})");
+    profile.write(R"({"MainWindow": {"comboBox_hash_type": 1000}})");
     profile.close();
 
     m_watchdog.start();
@@ -826,11 +842,11 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
 
     // The query runs off-thread; wait at least as long as its own deadline
     // so the test never gives up while hashcat could still have answered.
-    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->count() > 0,
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
-    QCOMPARE(window.ui->comboBox_hash->currentIndex(), 1);
-    QCOMPARE(window.ui->comboBox_hash->currentData().toUInt(), 1000u);
+    QCOMPARE(window.ui->comboBox_hash_type->currentIndex(), 1);
+    QCOMPARE(window.ui->comboBox_hash_type->currentData().toUInt(), 1000u);
     QCOMPARE(window.m_pendingHashTypeId, -1); // applied and consumed
 }
 
@@ -856,17 +872,17 @@ void TestMainWindow::profileWithAnUnknownHashTypeSelectsNothing()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"MainWindow": {"comboBox_hash": 9999}})");
+    profile.write(R"({"MainWindow": {"comboBox_hash_type": 9999}})");
     profile.close();
 
     m_watchdog.start();
 
     MainWindow window;
 
-    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash->count() > 0,
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
-    QCOMPARE(window.ui->comboBox_hash->currentIndex(), -1);
+    QCOMPARE(window.ui->comboBox_hash_type->currentIndex(), -1);
     QVERIFY(!window.generateArguments().contains(QStringLiteral("-m")));
     QVERIFY(!window.generateArguments().contains(QStringLiteral("--hash-type")));
 }

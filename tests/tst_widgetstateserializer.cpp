@@ -63,7 +63,7 @@ struct Form {
         // A combo box whose entries carry an id, the way the attack modes
         // and the hash types do.
         comboBoxWithData = new QComboBox(&widget);
-        comboBoxWithData->setObjectName(QStringLiteral("comboBox_hash"));
+        comboBoxWithData->setObjectName(QStringLiteral("comboBox_hash_type"));
         comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
         comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000u);
 
@@ -167,7 +167,7 @@ void TestWidgetStateSerializer::comboBoxIdentifiersSurviveAShiftedList()
     const QJsonObject root = QJsonDocument::fromJson(saved.readAll()).object();
     saved.close();
     const QJsonObject state = root.value(QStringLiteral("default")).toObject();
-    QCOMPARE(state.value(QStringLiteral("comboBox_hash")).toInt(), 1000);
+    QCOMPARE(state.value(QStringLiteral("comboBox_hash_type")).toInt(), 1000);
 
     // ... and a list that has grown in front of it still selects the same
     // entry.
@@ -222,7 +222,7 @@ void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("clash.json"));
     QFile out(file);
     QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    out.write(R"({"default": {"comboBox_hash": 1}})");
+    out.write(R"({"default": {"comboBox_hash_type": 1}})");
     out.close();
 
     Form restored;
@@ -252,7 +252,7 @@ void TestWidgetStateSerializer::anUnknownIdentifierChangesNothing()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("unknown.json"));
     QFile out(file);
     QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    out.write(R"({"default": {"comboBox_hash": 9999}})");
+    out.write(R"({"default": {"comboBox_hash_type": 9999}})");
     out.close();
 
     Form restored;

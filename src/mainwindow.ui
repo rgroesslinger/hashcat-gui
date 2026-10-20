@@ -156,7 +156,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="label_hash">
+               <widget class="QLabel" name="label_hash_type">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -169,7 +169,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox_hash">
+               <widget class="QComboBox" name="comboBox_hash_type">
                 <property name="minimumSize">
                  <size>
                   <width>300</width>
@@ -200,6 +200,9 @@
              <widget class="QGroupBox" name="groupBox_wordlists">
               <property name="title">
                <string>Word lists</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_wordlists">
                <item>
@@ -355,6 +358,9 @@
                   <property name="title">
                    <string>Rules</string>
                   </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                  </property>
                   <layout class="QVBoxLayout" name="verticalLayout_18">
                    <item>
                     <widget class="QRadioButton" name="radioButton_use_rules_file">
@@ -379,7 +385,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_open_rulesfile_1">
+                      <widget class="QLineEdit" name="lineEdit_rulesfile_1">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -422,7 +428,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_open_rulesfile_2">
+                      <widget class="QLineEdit" name="lineEdit_rulesfile_2">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -465,7 +471,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_open_rulesfile_3">
+                      <widget class="QLineEdit" name="lineEdit_rulesfile_3">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -574,6 +580,9 @@
                   <property name="title">
                    <string>Wordlist rules</string>
                   </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                  </property>
                   <layout class="QGridLayout" name="gridLayout_combination_rules">
                    <item row="0" column="0">
                     <widget class="QLabel" name="label_rule_left">
@@ -623,7 +632,7 @@
                    <string>Mask</string>
                   </property>
                   <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                   <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QGridLayout" name="gridLayout_7">
                    <item row="0" column="0">
@@ -719,6 +728,9 @@
                  <widget class="QGroupBox" name="groupBox_custom_charset">
                   <property name="title">
                    <string>Custom charsets</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_9">
                    <item>
@@ -902,9 +914,12 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_advanced_top">
               <item>
-               <widget class="QGroupBox" name="groupBox_session">
+               <widget class="QGroupBox" name="groupBox_session_and_limits">
                 <property name="title">
                  <string>Session and limits</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_session">
                  <item row="0" column="0">
@@ -1035,12 +1050,12 @@
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_general">
+               <widget class="QGroupBox" name="groupBox_performance">
                 <property name="title">
                  <string>Performance</string>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                 <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <property name="checkable">
                  <bool>false</bool>
@@ -1135,6 +1150,9 @@
                <widget class="QGroupBox" name="groupBox_resources">
                 <property name="title">
                  <string>Resources</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_12">
                  <item row="0" column="0">
@@ -1277,6 +1295,9 @@
                 <property name="title">
                  <string>Output</string>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_25">
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -1306,7 +1327,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QPushButton" name="pushButton_output">
+                      <widget class="QPushButton" name="pushButton_open_outfile">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>

@@ -5,6 +5,7 @@
 
 #include "testenvironment.h"
 
+#include <QGroupBox>
 #include <QLabel>
 
 #include "aboutdialog.h"
@@ -21,6 +22,7 @@ class TestAboutDialog : public QObject
 private slots:
     void fitsItsContent();
     void longVersionTextWrapsInsteadOfWidening();
+    void groupBoxesShareOneTitleAlignment();
 };
 
 void TestAboutDialog::fitsItsContent()
@@ -55,6 +57,20 @@ void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
     // the whole one-line string, so it stays on-screen.
     QVERIFY(label->height() > label->fontMetrics().height());
     QVERIFY(dialog.width() < singleLineWidth);
+}
+
+// The titles of the group boxes have to look alike. The alignment is the only
+// thing that decides it, and a group box without it would draw its title
+// above the frame while its neighbours break the border with it.
+void TestAboutDialog::groupBoxesShareOneTitleAlignment()
+{
+    AboutDialog dialog;
+
+    QVERIFY(!dialog.findChildren<QGroupBox *>().isEmpty());
+    const QStringList offenders = TestEnvironment::groupBoxesWithUnexpectedTitleAlignment(&dialog);
+    QVERIFY2(offenders.isEmpty(),
+             qPrintable(QStringLiteral("group boxes with another title alignment: %1")
+                            .arg(offenders.join(QStringLiteral(", ")))));
 }
 
 int main(int argc, char *argv[])
