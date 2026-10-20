@@ -56,6 +56,8 @@ private slots:
     void attackModeIdsTravelAsItemData();
     void groupBoxesFollowTheBuilderPredicates();
     void optionDependenciesFollowTheirCheckboxes();
+    void modeHintFollowsTheAttackMode();
+    void launchValidationFollowsTheWidgets();
     void widgetsFlowIntoTheOptions();
     void statusTimerReachesTheCommandLine();
     void skipAndLimitAcceptOnlyNumbers();
@@ -291,6 +293,96 @@ void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
     QVERIFY(window.ui->spinBox_hwmon_temp_abort->isEnabled());
     window.ui->checkBox_hwmon_temp_abort->setChecked(false);
     QVERIFY(!window.ui->spinBox_hwmon_temp_abort->isEnabled());
+}
+
+// The hint under the mode selector has to tell the user what the mode needs,
+// otherwise the launch validation is the first thing that explains it.
+void TestMainWindow::modeHintFollowsTheAttackMode()
+{
+    MainWindow window;
+
+    struct Expectation {
+        AttackMode mode;
+        QString hint;
+    };
+    const QList<Expectation> expectations{
+        {AttackMode::Straight, QStringLiteral("This mode needs at least one word list.")},
+        {AttackMode::Combination,
+         QStringLiteral("This mode needs exactly 2 word lists (left, right).")},
+        {AttackMode::BruteForce, QStringLiteral("This mode needs a mask.")},
+        {AttackMode::HybridWordMask, QStringLiteral("This mode needs a word list and a mask.")},
+        {AttackMode::HybridMaskWord, QStringLiteral("This mode needs a word list and a mask.")},
+        {AttackMode::Association, QStringLiteral("This mode needs at least one word list.")},
+    };
+
+    for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
+        // -1 first, so that every iteration really changes the index and runs
+        // attackIndexChanged()
+        window.ui->comboBox_attack->setCurrentIndex(-1);
+        window.ui->comboBox_attack->setCurrentIndex(i);
+
+        const AttackMode mode =
+            static_cast<AttackMode>(window.ui->comboBox_attack->currentData().toInt());
+
+        const Expectation *expected = nullptr;
+        for (const Expectation &candidate : expectations) {
+            if (candidate.mode == mode) {
+                expected = &candidate;
+            }
+        }
+        QVERIFY2(expected, "no expectation written down for this attack mode");
+
+        QCOMPARE(window.ui->label_mode_hint->text(), expected->hint);
+    }
+}
+
+// The launch validation works on what the window collects, so the two have to
+// agree: what the widgets show is what the validation complains about.
+void TestMainWindow::launchValidationFollowsTheWidgets()
+{
+    MainWindow window;
+
+    const auto addWordlist = [&window](const QString &path) {
+        auto *item = new QListWidgetItem(path, window.ui->listWidget_wordlist);
+        item->setCheckState(Qt::Checked);
+    };
+
+    // Straight mode without a word list is what the hint warns about.
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::NoWordlist));
+
+    addWordlist(QStringLiteral("/tmp/a.txt"));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+
+    // Combination mode wants exactly two word lists.
+    window.ui->comboBox_attack->setCurrentIndex(1); // combination
+    QCOMPARE(int(window.ui->comboBox_attack->currentData().toInt()), int(AttackMode::Combination));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::WrongWordlistCount));
+
+    addWordlist(QStringLiteral("/tmp/b.txt"));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+
+    addWordlist(QStringLiteral("/tmp/c.txt"));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::WrongWordlistCount));
+
+    // A mask mode needs a mask, and the bounds of the increment have to fit.
+    window.ui->comboBox_attack->setCurrentIndex(2); // brute-force
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::NoMask));
+
+    window.ui->lineEdit_mask->setText(QStringLiteral("?d?d?d?d"));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+
+    window.ui->checkBox_increment->setChecked(true);
+    window.ui->spinBox_increment_min->setValue(8);
+    window.ui->spinBox_increment_max->setValue(4);
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::InvalidIncrement));
 }
 
 void TestMainWindow::widgetsFlowIntoTheOptions()
