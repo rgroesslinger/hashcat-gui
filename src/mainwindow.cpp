@@ -721,8 +721,44 @@ void MainWindow::updateViewAttackMode()
     // reach in the modes that use neither.
     ui->checkBox_hex_hash->setEnabled(usesMask);
 
+    // Tell the user what the mode expects, so the launch validation does not
+    // have to be the first thing that explains it.
+    ui->label_mode_hint->setText(modeHint(mode));
+
     updateOptionDependencies();
     commandChanged();
+}
+
+// The attack mode the user selected.
+AttackMode MainWindow::currentAttackMode() const
+{
+    return static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
+}
+
+// What the user has to provide for the selected attack mode.
+//
+// The wording follows the requirements in HelperUtils::modeRequirements(), so
+// the hint and the launch validation cannot tell the user different things.
+QString MainWindow::modeHint(AttackMode mode) const
+{
+    const HelperUtils::ModeRequirements requirements = HelperUtils::modeRequirements(mode);
+
+    // Combination mode is the only one that wants an exact number of word
+    // lists, and its two lists are the left and the right side.
+    if (requirements.minWordlists > 0 && requirements.maxWordlists == requirements.minWordlists) {
+        return tr("This mode needs exactly %1 word lists (left, right).")
+            .arg(requirements.minWordlists);
+    }
+    if (requirements.needsMask && requirements.minWordlists > 0) {
+        return tr("This mode needs a word list and a mask.");
+    }
+    if (requirements.needsMask) {
+        return tr("This mode needs a mask.");
+    }
+    if (requirements.minWordlists > 0) {
+        return tr("This mode needs at least one word list.");
+    }
+    return QString();
 }
 
 // Options that only carry a value while their parent checkbox is on. The
@@ -930,6 +966,17 @@ void MainWindow::copyCommandToClipboard()
 
 void MainWindow::executeClicked()
 {
+    // What the selected attack mode needs comes first: it is what the user
+    // has just configured, and hashcat would only answer it with a usage
+    // error after the run has started.
+    QString detail;
+    const HelperUtils::LaunchError optionError =
+        HelperUtils::validateOptions(collectHashcatOptions(), &detail);
+    if (optionError != HelperUtils::LaunchError::None) {
+        showLaunchError(optionError, detail);
+        return;
+    }
+
     auto &settings = SettingsManager::instance();
 
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
@@ -938,7 +985,6 @@ void MainWindow::executeClicked()
     const QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
 
     // Nothing is started unless the configuration is known to be complete.
-    QString detail;
     const HelperUtils::LaunchError error =
         HelperUtils::validateLaunch(ui->lineEdit_hashfile->text(), hashcatPath, configuredTerminal,
                                     availableTerminals.keys(), &detail);
@@ -1023,6 +1069,34 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         box.setText(tr("The configured terminal \"%1\" is not available. Available terminals: %2\n"
                        "Navigate to %3 → %4 to change it.")
                         .arg(configuredTerminal, detail, menu, settingsEntry));
+        break;
+
+    // The mode specific requirements. They are not misconfigurations of the
+    // installation but of the attack itself, so the message says what the
+    // mode needs instead of pointing at the settings.
+    case HelperUtils::LaunchError::NoWordlist:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("This attack mode needs at least one word list."));
+        break;
+
+    case HelperUtils::LaunchError::WrongWordlistCount: {
+        const HelperUtils::ModeRequirements requirements =
+            HelperUtils::modeRequirements(currentAttackMode());
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("This attack mode needs exactly %1 word lists.\nCurrently selected: %2.")
+                        .arg(requirements.minWordlists)
+                        .arg(detail));
+        break;
+    }
+
+    case HelperUtils::LaunchError::NoMask:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("This attack mode needs a mask."));
+        break;
+
+    case HelperUtils::LaunchError::InvalidIncrement:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The minimum increment length is larger than the maximum."));
         break;
 
     case HelperUtils::LaunchError::None:

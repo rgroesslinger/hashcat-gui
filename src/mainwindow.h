@@ -101,6 +101,12 @@ private:
     void updateViewAttackMode();
     void updateOptionDependencies();
 
+    // The attack mode the user selected.
+    AttackMode currentAttackMode() const;
+
+    // What the selected attack mode needs from the user.
+    QString modeHint(AttackMode mode) const;
+
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about
     // widgets.
