@@ -22,6 +22,11 @@ public:
     ~AboutDialog() override;
     void updateVersionLabel();
 
+    // Shows the version of hashcat, or the error it answered with. The text
+    // is wrapped, so a long message grows the dialog instead of being cut
+    // off.
+    void setVersionText(const QString &text);
+
 private slots:
     void okClicked();
 
@@ -31,6 +36,9 @@ private:
 
     // Fills the row of links to the project and to hashcat.
     void updateLinks();
+
+    // Fills the row with the licenses of the application and of hashcat.
+    void updateLicense();
 
     Ui::AboutDialog *ui;
 };

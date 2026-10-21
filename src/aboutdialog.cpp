@@ -16,6 +16,8 @@
 #include <QPixmap>
 #include <QSysInfo>
 #include <QStringList>
+#include <QTextLayout>
+#include <QTextOption>
 
 namespace
 {
@@ -52,6 +54,36 @@ void setLink(QLabel *label, QLatin1StringView url, const QString &text)
 {
     setLinkText(label, url, link(url, text));
 }
+
+// Wraps the text into lines of at most width pixels.
+//
+// A label wraps its text at word boundaries only and does not tell its
+// layout how tall the result becomes. The version text is therefore wrapped
+// here - a word longer than the line is broken as well - and handed to the
+// label with the line breaks in it. The label can then report its size, and
+// the dialog grows with the text instead of cutting it off.
+QString wrapText(const QString &text, const QFont &font, int width)
+{
+    QTextOption option;
+    option.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+
+    QTextLayout layout(text, font);
+    layout.setTextOption(option);
+    layout.beginLayout();
+
+    QStringList lines;
+    while (true) {
+        QTextLine line = layout.createLine();
+        if (!line.isValid()) {
+            break;
+        }
+        line.setLineWidth(width);
+        lines << text.mid(line.textStart(), line.textLength());
+    }
+    layout.endLayout();
+
+    return lines.join(QLatin1Char('\n'));
+}
 } // namespace
 
 AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDialog)
@@ -60,6 +92,7 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDia
     updateVersionLabel();
     updateSystemLabels();
     updateLinks();
+    updateLicense();
 
     // The logo is scaled to the size the .ui gives the label, so the artwork
     // stays sharp on a high-dpi display without the .ui having to know about
@@ -111,6 +144,16 @@ void AboutDialog::updateLinks()
     setLink(ui->label_link_hashcat_faq, AppConstants::Urls::HashcatFaq, tr("hashcat FAQ"));
 }
 
+void AboutDialog::updateLicense()
+{
+    setLinkText(ui->label_license_gui, AppConstants::Urls::License,
+                tr("hashcat-gui is licensed under the %1.")
+                    .arg(link(AppConstants::Urls::License, tr("GPL"))));
+    setLinkText(ui->label_license_hashcat, AppConstants::Urls::HashcatLicense,
+                tr("hashcat is licensed under the %1.")
+                    .arg(link(AppConstants::Urls::HashcatLicense, tr("MIT"))));
+}
+
 void AboutDialog::updateVersionLabel()
 {
     auto &settings = SettingsManager::instance();
@@ -124,10 +167,9 @@ void AboutDialog::updateVersionLabel()
             const HashcatResult &result = watcher->result();
 
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                ui->label_hc_version->setText(
-                    tr("Error: %1").arg(result.standardError.simplified()));
+                setVersionText(tr("Error: %1").arg(result.standardError.simplified()));
             } else {
-                ui->label_hc_version->setText(result.standardOutput.simplified());
+                setVersionText(result.standardOutput.simplified());
             }
 
             watcher->deleteLater();
@@ -138,4 +180,17 @@ void AboutDialog::updateVersionLabel()
     }
 
     ui->label_hc_gui_version->setText(QApplication::applicationVersion());
+}
+
+// Shows the version of hashcat, or the error it answered with.
+//
+// The text is wrapped before it goes into the label, because the label
+// neither breaks words that are longer than its line nor tells its layout
+// how tall the wrapped text is.
+void AboutDialog::setVersionText(const QString &text)
+{
+    // The label has a fixed width, so the text is wrapped at the width it
+    // will be shown in.
+    const int width = ui->label_hc_version->minimumWidth();
+    ui->label_hc_version->setText(wrapText(text, ui->label_hc_version->font(), width));
 }

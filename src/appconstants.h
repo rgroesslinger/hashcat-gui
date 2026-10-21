@@ -147,6 +147,11 @@ inline constexpr QLatin1StringView HashcatFaq{
     "https://hashcat.net/wiki/doku.php?id=frequently_asked_questions"};
 inline constexpr QLatin1StringView Project{"https://github.com/rgroesslinger/hashcat-gui"};
 inline constexpr QLatin1StringView Issues{"https://github.com/rgroesslinger/hashcat-gui/issues"};
+// The license of the application and the one of the tool it drives.
+inline constexpr QLatin1StringView License{
+    "https://github.com/rgroesslinger/hashcat-gui/blob/master/LICENSE"};
+inline constexpr QLatin1StringView HashcatLicense{
+    "https://github.com/hashcat/hashcat/blob/master/docs/license.txt"};
 } // namespace Urls
 
 // Command line tokens that belong to hashcat itself.

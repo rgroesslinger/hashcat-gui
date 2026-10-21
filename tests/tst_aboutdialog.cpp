@@ -29,6 +29,7 @@ private slots:
     void showsTheLogoAndTheApplicationName();
     void showsTheToolkitAndTheOperatingSystem();
     void linksToTheProjectAndToHashcat();
+    void namesTheLicensesOfBothPrograms();
 };
 
 void TestAboutDialog::fitsItsContent()
@@ -55,7 +56,8 @@ void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
     const QString longText = QStringLiteral("Error: ") + QString(300, QLatin1Char('x'));
     const int singleLineWidth = label->fontMetrics().horizontalAdvance(longText);
     const int heightBefore = dialog.height();
-    label->setText(longText);
+
+    dialog.setVersionText(longText);
 
     // SetFixedSize re-applies the layout's size once the event loop turns.
     QTRY_VERIFY(dialog.height() > heightBefore);
@@ -63,6 +65,11 @@ void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
     // the whole one-line string, so it stays on-screen.
     QVERIFY(label->height() > label->fontMetrics().height());
     QVERIFY(dialog.width() < singleLineWidth);
+    // Every line fits into the label, so nothing is cut off.
+    const QStringList lines = label->text().split(QLatin1Char('\n'));
+    for (const QString &line : lines) {
+        QVERIFY(label->fontMetrics().horizontalAdvance(line) <= label->width());
+    }
 }
 
 // The titles of the group boxes have to look alike. The alignment is the only
@@ -140,6 +147,33 @@ void TestAboutDialog::linksToTheProjectAndToHashcat()
         // The tooltip says where the link leads.
         QCOMPARE(label->toolTip(), urls.at(i));
     }
+}
+
+// Both programs are free software, and both say so in their own license.
+// The dialog has to name them, and it has to link the texts.
+void TestAboutDialog::namesTheLicensesOfBothPrograms()
+{
+    AboutDialog dialog;
+
+    QLabel *gui = dialog.findChild<QLabel *>(QStringLiteral("label_license_gui"));
+    QVERIFY(gui);
+    QVERIFY(gui->openExternalLinks());
+    QVERIFY(gui->text().contains(QStringLiteral("GPL")));
+    QVERIFY(gui->text().contains(QString(AppConstants::Urls::License)));
+    QCOMPARE(gui->toolTip(), QString(AppConstants::Urls::License));
+
+    QLabel *hashcat = dialog.findChild<QLabel *>(QStringLiteral("label_license_hashcat"));
+    QVERIFY(hashcat);
+    QVERIFY(hashcat->openExternalLinks());
+    QVERIFY(hashcat->text().contains(QStringLiteral("MIT")));
+    QCOMPARE(hashcat->toolTip(), QString(AppConstants::Urls::HashcatLicense));
+
+    // Both sentences have the same shape, and neither of them names the
+    // license a second time.
+    QVERIFY(gui->text().contains(QStringLiteral(">GPL</a>")));
+    QVERIFY(hashcat->text().contains(QStringLiteral(">MIT</a>")));
+    QVERIFY(gui->text().contains(QStringLiteral("licensed under the")));
+    QVERIFY(hashcat->text().contains(QStringLiteral("licensed under the")));
 }
 
 int main(int argc, char *argv[])
