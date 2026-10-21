@@ -14,21 +14,10 @@
 #include <QDoubleSpinBox>
 #include <QListWidget>
 #include <QListWidgetItem>
-#include <QFile>
-#include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QSaveFile>
 #include <QDir>
 #include <QStandardPaths>
-
-// Report a failure through errorMessage when the caller asked for it
-static void setError(QString *errorMessage, const QString &text)
-{
-    if (errorMessage) {
-        *errorMessage = text;
-    }
-}
 
 // Whether the entries of a combo box carry identifiers (item data) at all.
 // It decides whether a selection is stored by identifier or by position: the
@@ -53,7 +42,7 @@ QString WidgetStateSerializer::defaultProfilePath()
     return QDir(dirPath).filePath(AppConstants::Files::DefaultProfile);
 }
 
-static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidgets = {})
+QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &ignoredWidgets)
 {
     QJsonObject obj;
 
@@ -112,25 +101,34 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
     return obj;
 }
 
-static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &ignoredWidgets = {})
+QStringList WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
+                                                  const QStringList &ignoredWidgets)
 {
+    // The names are removed from a copy, so that the caller can still read the
+    // values afterwards - the hash type, for one.
     QJsonObject mutableObj = obj;
 
     for (const QString &name : ignoredWidgets) {
         mutableObj.remove(name);
     }
 
+    // Every name that is applied is taken off the copy, so that what is left
+    // over names the values no widget claimed.
     auto const lineEdits = w->findChildren<QLineEdit *>();
     for (QLineEdit *lineEdit : lineEdits) {
-        if (mutableObj.contains(lineEdit->objectName())) {
-            lineEdit->setText(mutableObj[lineEdit->objectName()].toString());
+        const QString name = lineEdit->objectName();
+        if (mutableObj.contains(name)) {
+            lineEdit->setText(mutableObj[name].toString());
+            mutableObj.remove(name);
         }
     }
 
     auto const checkBoxes = w->findChildren<QCheckBox *>();
     for (QCheckBox *checkBox : checkBoxes) {
-        if (mutableObj.contains(checkBox->objectName())) {
-            checkBox->setChecked(mutableObj[checkBox->objectName()].toBool());
+        const QString name = checkBox->objectName();
+        if (mutableObj.contains(name)) {
+            checkBox->setChecked(mutableObj[name].toBool());
+            mutableObj.remove(name);
         }
     }
 
@@ -142,6 +140,9 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
         }
 
         const QJsonValue stored = mutableObj.value(name);
+        // The widget claimed the name, even when the value is empty.
+        mutableObj.remove(name);
+
         if (stored.isUndefined() || stored.isNull()) {
             continue;
         }
@@ -164,30 +165,38 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
 
     auto const radioButtons = w->findChildren<QRadioButton *>();
     for (QRadioButton *radioButton : radioButtons) {
-        if (mutableObj.contains(radioButton->objectName())) {
-            radioButton->setChecked(mutableObj[radioButton->objectName()].toBool());
+        const QString name = radioButton->objectName();
+        if (mutableObj.contains(name)) {
+            radioButton->setChecked(mutableObj[name].toBool());
+            mutableObj.remove(name);
         }
     }
 
     auto const spinBoxes = w->findChildren<QSpinBox *>();
     for (QSpinBox *spinBox : spinBoxes) {
-        if (mutableObj.contains(spinBox->objectName())) {
-            spinBox->setValue(mutableObj[spinBox->objectName()].toInt());
+        const QString name = spinBox->objectName();
+        if (mutableObj.contains(name)) {
+            spinBox->setValue(mutableObj[name].toInt());
+            mutableObj.remove(name);
         }
     }
 
     auto const doubleSpinBoxes = w->findChildren<QDoubleSpinBox *>();
     for (QDoubleSpinBox *doubleSpinBox : doubleSpinBoxes) {
-        if (mutableObj.contains(doubleSpinBox->objectName())) {
-            doubleSpinBox->setValue(mutableObj[doubleSpinBox->objectName()].toDouble());
+        const QString name = doubleSpinBox->objectName();
+        if (mutableObj.contains(name)) {
+            doubleSpinBox->setValue(mutableObj[name].toDouble());
+            mutableObj.remove(name);
         }
     }
 
     auto const listWidgets = w->findChildren<QListWidget *>();
     for (QListWidget *listWidget : listWidgets) {
-        if (mutableObj.contains(listWidget->objectName())) {
+        const QString name = listWidget->objectName();
+        if (mutableObj.contains(name)) {
             listWidget->clear();
-            const QJsonArray list = mutableObj[listWidget->objectName()].toArray();
+            const QJsonArray list = mutableObj[name].toArray();
+            mutableObj.remove(name);
             for (const auto &v : list) {
                 QJsonObject li = v.toObject();
                 QListWidgetItem *item =
@@ -197,83 +206,6 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
             }
         }
     }
-}
 
-bool WidgetStateSerializer::saveStateToFile(const QString &key, const QWidget *widget,
-                                            const QString &filename,
-                                            const QStringList &ignoredWidgets,
-                                            QString *errorMessage) const
-{
-    QJsonObject root;
-    root[QStringLiteral("version")] = AppConstants::Profiles::Version;
-    root[key] = widgetToJson(widget, ignoredWidgets);
-
-    // QSaveFile writes to a temporary file next to the target and renames it
-    // over the target only when the write succeeded. A crash in the middle
-    // therefore leaves the old profile alone instead of a truncated one,
-    // which the next start would report as a broken profile.
-    QSaveFile f(filename);
-    if (!f.open(QIODevice::WriteOnly)) {
-        setError(errorMessage,
-                 tr("Could not open %1 for writing: %2").arg(filename, f.errorString()));
-        return false;
-    }
-
-    const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Indented);
-    if (f.write(data) != data.size() || !f.commit()) {
-        setError(errorMessage, tr("Could not write to %1: %2").arg(filename, f.errorString()));
-        return false;
-    }
-
-    setError(errorMessage, QString());
-    return true;
-}
-
-bool WidgetStateSerializer::loadStateFromFile(const QString &key, QWidget *widget,
-                                              const QString &filename,
-                                              const QStringList &ignoredWidgets,
-                                              QString *errorMessage, QJsonObject *profileState,
-                                              QString *warning) const
-{
-    QFile f(filename);
-    if (!f.open(QIODevice::ReadOnly)) {
-        setError(errorMessage,
-                 tr("Could not open %1 for reading: %2").arg(filename, f.errorString()));
-        return false;
-    }
-
-    QByteArray data = f.readAll();
-    QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &err);
-    if (err.error != QJsonParseError::NoError || !doc.isObject()) {
-        setError(errorMessage, tr("The file is not a valid JSON file: %1").arg(err.errorString()));
-        return false;
-    }
-
-    QJsonObject root = doc.object();
-
-    if (!root.contains(key)) {
-        setError(errorMessage, tr("The file does not contain a profile for \"%1\".").arg(key));
-        return false;
-    }
-
-    // A profile names the widgets by their object name, so the names are part
-    // of the format. A profile from another version still names the widgets
-    // that did not change, so it is read - the values of the widgets it names
-    // no longer exist are left at their defaults, and the user is told that
-    // the profile is not complete.
-    const int version = root.value(QStringLiteral("version")).toInt(-1);
-    if (version != AppConstants::Profiles::Version && warning) {
-        *warning = tr("This profile was made by another version of hashcat-gui. It was loaded, but "
-                      "the values it does not know about were left at their defaults.");
-    }
-
-    const QJsonObject state = root[key].toObject();
-    if (profileState) {
-        *profileState = state;
-    }
-
-    jsonToWidget(state, widget, ignoredWidgets);
-    setError(errorMessage, QString());
-    return true;
+    return mutableObj.keys();
 }

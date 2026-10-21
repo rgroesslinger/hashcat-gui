@@ -12,6 +12,7 @@
 #include "commandbuilder.h"
 #include "hashcatinfoparser.h"
 #include "helperutils.h"
+#include "statefile.h"
 #include "widgetstateserializer.h"
 #include <QDir>
 #include <QFileDialog>
@@ -407,48 +408,90 @@ void MainWindow::fitToContent()
 // File → Export
 void MainWindow::exportTriggered()
 {
-    QStringList ignoreWidgets = {AppConstants::Files::PreviewWidget};
+    const QString file = QFileDialog::getSaveFileName(this, tr("Export Profile"),
+                                                      QStringLiteral("hashcat-gui-session.json"),
+                                                      tr("JSON Files (*.json)"));
 
-    QString file = QFileDialog::getSaveFileName(this, tr("Export Profile"), QString(),
-                                                tr("JSON Files (*.json)"));
+    if (file.isEmpty()) {
+        return;
+    }
 
-    if (!file.isEmpty()) {
-        WidgetStateSerializer s;
-        const QString key = QString::fromUtf8(metaObject()->className());
-        QString error;
-        if (s.saveStateToFile(key, this, file, ignoreWidgets, &error)) {
-            QMessageBox::information(this, tr("Exported"), tr("Profile exported to %1.").arg(file));
-        } else {
-            QMessageBox::warning(this, tr("Export failed"), error);
-        }
+    QString error;
+    const QJsonObject values =
+        WidgetStateSerializer::toJson(this, {AppConstants::Files::PreviewWidget});
+    if (StateFile::write(file, AppConstants::FileSections::Session, AppConstants::Profiles::Version,
+                         values, &error)) {
+        QMessageBox::information(this, tr("Exported"), tr("Profile exported to %1.").arg(file));
+    } else {
+        QMessageBox::warning(this, tr("Export failed"), error);
     }
 }
 
 // File → Import
 void MainWindow::importTriggered()
 {
-    QString file = QFileDialog::getOpenFileName(this, tr("Import Profile"), QString(),
-                                                tr("JSON Files (*.json)"));
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import Profile"), QString(),
+                                                      tr("JSON Files (*.json)"));
 
-    if (!file.isEmpty()) {
-        WidgetStateSerializer s;
-        QString error;
-        QString warning;
-        QJsonObject state;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
-                                &error, &state, &warning)) {
-            // Same deferred hash type as loadDefaultProfile(): while the
-            // query is in flight the combo cannot take the stored id.
-            const QString problem = restoreHashType(state);
-            commandChanged();
-            if (!showProfileNotes(warning, problem)) {
-                QMessageBox::information(this, tr("Imported"),
-                                         tr("Profile imported from %1.").arg(file));
-            }
-        } else {
-            QMessageBox::warning(this, tr("Import failed"), error);
-        }
+    if (file.isEmpty()) {
+        return;
     }
+
+    QString error;
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
+                         &otherSections, &error)) {
+        QMessageBox::warning(this, tr("Import failed"), error);
+        return;
+    }
+
+    // The mapping applies the values; the hash type is the one it cannot
+    // take yet, see restoreHashType().
+    const QStringList unknown = WidgetStateSerializer::applyToWidgets(values, this);
+    const QString problem = restoreHashType(values);
+    commandChanged();
+
+    QStringList notes =
+        importNotes(version, AppConstants::Profiles::Version, otherSections, unknown);
+    if (!problem.isEmpty()) {
+        notes << problem;
+    }
+
+    if (notes.isEmpty()) {
+        QMessageBox::information(this, tr("Imported"), tr("Profile imported from %1.").arg(file));
+    } else {
+        QMessageBox::warning(
+            this, tr("Imported"),
+            tr("Profile imported from %1.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
+    }
+}
+
+// The notes an import has for the user: the version the file was made by, the
+// sections it holds besides the one that was imported, and the values this
+// version does not know.
+QStringList MainWindow::importNotes(int fileVersion, int currentVersion,
+                                    const QStringList &otherSections,
+                                    const QStringList &unknownValues) const
+{
+    QStringList notes;
+
+    if (fileVersion != currentVersion) {
+        notes << tr("This file was made by another version of hashcat-gui.");
+    }
+
+    if (!otherSections.isEmpty()) {
+        notes << tr("The file holds sections this import does not use: %1.")
+                     .arg(StateFile::nameList(otherSections));
+    }
+
+    const QString unknown = StateFile::unknownValuesNote(unknownValues);
+    if (!unknown.isEmpty()) {
+        notes << unknown;
+    }
+
+    return notes;
 }
 
 // Tools → Reset field
@@ -578,46 +621,42 @@ void MainWindow::loadDefaultProfile()
         return;
     }
 
-    QString file = defaultProfileFile();
-    if (QFile::exists(file)) {
-        WidgetStateSerializer s;
-        QString error;
-        QString warning;
-        QJsonObject state;
-        if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
-                                &error, &state, &warning)) {
-            // The hash combo has no items yet - the query that fills it runs
-            // asynchronously. Remember the stored hash type; the reply
-            // applies it once the items exist.
-            const QString problem = restoreHashType(state);
-            commandChanged();
-            showProfileNotes(warning, problem);
-        } else {
-            QMessageBox::warning(this, tr("Load failed"), error);
-        }
+    const QString file = defaultProfileFile();
+    if (!QFile::exists(file)) {
+        return;
     }
-}
 
-// The notes a loaded profile has for the user: a profile from another
-// version and a hash type this hashcat does not know are both worth a word.
-// They share one box, so a profile that has both does not open two.
-//
-// Returns whether a note was shown.
-bool MainWindow::showProfileNotes(const QString &warning, const QString &problem)
-{
-    QStringList notes;
-    if (!warning.isEmpty()) {
-        notes << warning;
+    QString error;
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
+                         &otherSections, &error)) {
+        // The default profile is the cache of the last session, not something
+        // the user made: a file that cannot be read is deleted and the start
+        // goes on. The files the user exported are never deleted.
+        QFile::remove(file);
+        return;
     }
+
+    // The hash combo has no items yet - the query that fills it runs
+    // asynchronously. Remember the stored hash type; the reply applies it
+    // once the items exist.
+    const QStringList unknown = WidgetStateSerializer::applyToWidgets(values, this);
+    const QString problem = restoreHashType(values);
+    commandChanged();
+
+    // The auto-load is not an import: there is no headline, and nothing is
+    // shown when the load went well.
+    QStringList notes =
+        importNotes(version, AppConstants::Profiles::Version, otherSections, unknown);
     if (!problem.isEmpty()) {
         notes << problem;
     }
-    if (notes.isEmpty()) {
-        return false;
-    }
 
-    QMessageBox::warning(this, tr("Profile warning"), notes.join(QLatin1Char('\n')));
-    return true;
+    if (!notes.isEmpty()) {
+        QMessageBox::warning(this, tr("Profile warning"), notes.join(QLatin1Char('\n')));
+    }
 }
 
 // The hash type a profile names, applied to the combo box.
@@ -632,16 +671,34 @@ bool MainWindow::showProfileNotes(const QString &warning, const QString &problem
 //
 // Returns a message when the profile names a hash type this hashcat does
 // not know.
-QString MainWindow::restoreHashType(const QJsonObject &state)
+// The hash type of a profile.
+//
+// The mapping applies it when the list of hash types is there; this only
+// checks whether this hashcat knows the one the file names, and it waits for
+// the list while the query that fills it is still on its way.
+QString MainWindow::restoreHashType(const QJsonObject &values)
 {
-    m_pendingHashTypeId = state.value(QStringLiteral("comboBox_hash_type")).toInt(-1);
+    const int id = values.value(QStringLiteral("comboBox_hash_type")).toInt(-1);
 
     if (ui->comboBox_hash_type->count() == 0) {
         // The list is still on its way; the value waits for it.
+        m_pendingHashTypeId = id;
         return {};
     }
 
-    return applyPendingHashType();
+    if (id >= 0 && ui->comboBox_hash_type->findData(id) < 0) {
+        // The hash type is gone. An empty selection is the honest answer: the
+        // position would point at a different hash type, and cracking with the
+        // wrong one is worse than not cracking at all.
+        ui->comboBox_hash_type->setCurrentIndex(-1);
+        m_pendingHashTypeId = -1;
+        return tr("The profile names the hash type %1, which this hashcat version does not "
+                  "support.")
+            .arg(id);
+    }
+
+    m_pendingHashTypeId = -1;
+    return {};
 }
 
 // Applies the hash type a profile asked for, now that the list of hash
@@ -681,13 +738,14 @@ void MainWindow::saveDefaultProfile()
         return;
     }
 
-    QStringList ignoreWidgets = {AppConstants::Files::PreviewWidget};
-    QString file = defaultProfileFile();
+    const QString file = defaultProfileFile();
     QDir().mkpath(QFileInfo(file).absolutePath());
-    WidgetStateSerializer s;
+
     QString error;
-    if (!s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets,
-                           &error)) {
+    const QJsonObject values =
+        WidgetStateSerializer::toJson(this, {AppConstants::Files::PreviewWidget});
+    if (!StateFile::write(file, AppConstants::FileSections::Session,
+                          AppConstants::Profiles::Version, values, &error)) {
         QMessageBox::warning(this, tr("Save failed"), error);
     }
 }

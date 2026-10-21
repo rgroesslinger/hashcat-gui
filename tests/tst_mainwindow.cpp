@@ -32,6 +32,7 @@
 #include "mainwindow.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
+#include "statefile.h"
 #include "widgetstateserializer.h"
 
 namespace
@@ -108,8 +109,13 @@ QJsonObject readJsonObject(const QString &filename)
 // name. A widget the reset forgot is named here, not just counted.
 QStringList differingWidgets(const QString &filename, const QJsonObject &reference)
 {
-    const QJsonObject state =
-        readJsonObject(filename).value(QStringLiteral("MainWindow")).toObject();
+    const QJsonObject state = readJsonObject(filename)
+                                  .value(QStringLiteral("sections"))
+                                  .toObject()
+                                  .value(QString(AppConstants::FileSections::Session))
+                                  .toObject()
+                                  .value(QStringLiteral("values"))
+                                  .toObject();
 
     QStringList names;
     for (auto it = state.begin(); it != state.end(); ++it) {
@@ -417,20 +423,26 @@ void TestMainWindow::resetFieldsRestoresEveryWidget()
 
     QVERIFY(QMetaObject::invokeMethod(&window, "resetFieldsTriggered"));
 
-    WidgetStateSerializer serializer;
     QString error;
     const QString freshFile = TestEnvironment::configHome().filePath(QStringLiteral("fresh.json"));
     const QString resetFile = TestEnvironment::configHome().filePath(QStringLiteral("reset.json"));
     const QStringList ignored{AppConstants::Files::PreviewWidget};
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("MainWindow"), &fresh, freshFile, ignored,
-                                        &error),
+    QVERIFY2(StateFile::write(freshFile, AppConstants::FileSections::Session,
+                              AppConstants::Profiles::Version,
+                              WidgetStateSerializer::toJson(&fresh, ignored), &error),
              qPrintable(error));
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("MainWindow"), &window, resetFile, ignored,
-                                        &error),
+    QVERIFY2(StateFile::write(resetFile, AppConstants::FileSections::Session,
+                              AppConstants::Profiles::Version,
+                              WidgetStateSerializer::toJson(&window, ignored), &error),
              qPrintable(error));
 
-    const QJsonObject defaults =
-        readJsonObject(freshFile).value(QStringLiteral("MainWindow")).toObject();
+    const QJsonObject defaults = readJsonObject(freshFile)
+                                     .value(QStringLiteral("sections"))
+                                     .toObject()
+                                     .value(QString(AppConstants::FileSections::Session))
+                                     .toObject()
+                                     .value(QStringLiteral("values"))
+                                     .toObject();
     const QStringList differing = differingWidgets(resetFile, defaults);
     QVERIFY2(differing.isEmpty(), qPrintable(QStringLiteral("these widgets were not reset: %1")
                                                  .arg(differing.join(QStringLiteral(", ")))));
@@ -1018,15 +1030,19 @@ void TestMainWindow::defaultProfileRoundTrips()
     const QString profile = writer.defaultProfileFile();
     QVERIFY(QFile::exists(profile));
 
-    // What gets stored: the window under its class name, and without the
-    // command preview - that one is regenerated from the state on load.
+    // What gets stored: the values of the session, and without the command
+    // preview - that one is regenerated from the state on load.
     QFile file(profile);
     QVERIFY(file.open(QIODevice::ReadOnly));
     const QJsonObject root = QJsonDocument::fromJson(file.readAll()).object();
     file.close();
 
-    const QJsonObject state =
-        root.value(QString::fromUtf8(writer.metaObject()->className())).toObject();
+    const QJsonObject state = root.value(QStringLiteral("sections"))
+                                  .toObject()
+                                  .value(QString(AppConstants::FileSections::Session))
+                                  .toObject()
+                                  .value(QStringLiteral("values"))
+                                  .toObject();
     QVERIFY(!state.isEmpty());
     QVERIFY(!state.contains(QLatin1String(AppConstants::Files::PreviewWidget)));
     // The attack mode is stored by its id, not by its position: the ids are
@@ -1069,7 +1085,8 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"version": 1, "MainWindow": {"comboBox_hash_type": 1000}})");
+    profile.write(R"({"createdWith": "hashcat-gui 0.8.0", "sections": {"session": )"
+                  R"({"version": 1, "values": {"comboBox_hash_type": 1000}}}})");
     profile.close();
 
     m_watchdog.start();
@@ -1108,7 +1125,8 @@ void TestMainWindow::profileWithAnUnknownHashTypeSelectsNothing()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"version": 1, "MainWindow": {"comboBox_hash_type": 9999}})");
+    profile.write(R"({"createdWith": "hashcat-gui 0.8.0", "sections": {"session": )"
+                  R"({"version": 1, "values": {"comboBox_hash_type": 9999}}}})");
     profile.close();
 
     m_watchdog.start();

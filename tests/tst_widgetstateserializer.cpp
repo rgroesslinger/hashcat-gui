@@ -8,8 +8,6 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
-#include <QFile>
-#include <QJsonDocument>
 #include <QJsonObject>
 #include <QLineEdit>
 #include <QListWidget>
@@ -18,9 +16,9 @@
 
 #include "widgetstateserializer.h"
 
-// What a profile write does to a form, and what a profile read gives back:
-// every widget type the serializer knows, the fields the caller asked to
-// keep out of the file, and a clear answer when the file is unusable.
+// What the mapping between a form and its values does: every widget type the
+// serializer knows, the fields the caller asked to keep out, and the names of
+// the values that no widget claimed.
 class TestWidgetStateSerializer : public QObject
 {
     Q_OBJECT
@@ -31,22 +29,18 @@ private slots:
     void comboBoxWithoutDataIsStoredByItsIndex();
     void comboBoxIdentifierIsNotMatchedByText();
     void anUnknownIdentifierChangesNothing();
-    void nonAsciiValuesSurviveTheFile();
+    void nonAsciiValuesSurviveTheValues();
     void ignoredWidgetsAreNotSaved();
     void ignoredWidgetsAreNotRestored();
-    void corruptJsonIsRejected();
-    void missingProfileIsRejected();
-    void aProfileFromAnotherVersionIsLoadedWithAWarning();
-    void writeFailureIsReported();
-    void readFailureIsReported();
-    void errorIsClearedOnSuccess();
+    void aValueNoWidgetClaimedIsReported();
+    void theInputIsNotModified();
 };
 
 namespace
 {
 
 // One of every widget type the serializer understands, under object names a
-// real profile would carry.
+// real session would carry.
 struct Form {
     Form()
     {
@@ -119,18 +113,10 @@ void TestWidgetStateSerializer::roundTrip()
     Form source;
     fill(source);
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("roundtrip.json"));
-
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
-                                        &errorMessage),
-             qPrintable(errorMessage));
+    const QJsonObject values = WidgetStateSerializer::toJson(&source.widget);
 
     Form restored;
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage),
-             qPrintable(errorMessage));
+    WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
     QCOMPARE(restored.lineEdit->text(), QStringLiteral("-m 0 --quiet"));
     QCOMPARE(restored.checkBox->isChecked(), true);
@@ -148,27 +134,15 @@ void TestWidgetStateSerializer::roundTrip()
 }
 
 // A combo box is stored by the identifier of its selected entry. A list
-// that grew in the middle must not change what a profile selects.
+// that grew in the middle must not change what a session selects.
 void TestWidgetStateSerializer::comboBoxIdentifiersSurviveAShiftedList()
 {
     Form source;
     source.comboBoxWithData->setCurrentIndex(1); // NTLM, id 1000
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("ids.json"));
-
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
-                                        &errorMessage),
-             qPrintable(errorMessage));
-
-    // The file holds the id, not the position...
-    QFile saved(file);
-    QVERIFY(saved.open(QIODevice::ReadOnly));
-    const QJsonObject root = QJsonDocument::fromJson(saved.readAll()).object();
-    saved.close();
-    const QJsonObject state = root.value(QStringLiteral("default")).toObject();
-    QCOMPARE(state.value(QStringLiteral("comboBox_hash_type")).toInt(), 1000);
+    // The values hold the id, not the position...
+    const QJsonObject values = WidgetStateSerializer::toJson(&source.widget);
+    QCOMPARE(values.value(QStringLiteral("comboBox_hash_type")).toInt(), 1000);
 
     // ... and a list that has grown in front of it still selects the same
     // entry.
@@ -178,9 +152,7 @@ void TestWidgetStateSerializer::comboBoxIdentifiersSurviveAShiftedList()
     restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
     restored.comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000u);
 
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage),
-             qPrintable(errorMessage));
+    WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
     QCOMPARE(restored.comboBoxWithData->currentIndex(), 2);
     QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
@@ -192,39 +164,22 @@ void TestWidgetStateSerializer::comboBoxWithoutDataIsStoredByItsIndex()
     Form source;
     source.comboBox->setCurrentIndex(1); // "Deutsch"
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("index.json"));
-
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
-                                        &errorMessage),
-             qPrintable(errorMessage));
-
-    QFile saved(file);
-    QVERIFY(saved.open(QIODevice::ReadOnly));
-    const QJsonObject root = QJsonDocument::fromJson(saved.readAll()).object();
-    saved.close();
-    const QJsonObject state = root.value(QStringLiteral("default")).toObject();
-    QCOMPARE(state.value(QStringLiteral("comboBox_language")).toInt(), 1);
+    const QJsonObject values = WidgetStateSerializer::toJson(&source.widget);
+    QCOMPARE(values.value(QStringLiteral("comboBox_language")).toInt(), 1);
 
     Form restored;
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage),
-             qPrintable(errorMessage));
+    WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
     QCOMPARE(restored.comboBox->currentIndex(), 1);
     QCOMPARE(restored.comboBox->currentText(), QStringLiteral("Deutsch"));
 }
 
 // A stored identifier is looked up in the item data only; a display text that
-// happens to match it must not select an entry the profile never named.
+// happens to match it must not select an entry the session never named.
 void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("clash.json"));
-    QFile out(file);
-    QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    out.write(R"({"version": 1, "default": {"comboBox_hash_type": 1}})");
-    out.close();
+    QJsonObject values;
+    values.insert(QStringLiteral("comboBox_hash_type"), 1);
 
     Form restored;
     restored.comboBoxWithData->clear();
@@ -233,11 +188,7 @@ void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
     restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
     restored.comboBoxWithData->setCurrentIndex(1); // MD5, id 0
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage),
-             qPrintable(errorMessage));
+    WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
     // The identifier 1 is unknown, so nothing changes - even though an entry
     // displays "1".
@@ -250,29 +201,22 @@ void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
 // exactly what the identifier exists to prevent.
 void TestWidgetStateSerializer::anUnknownIdentifierChangesNothing()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("unknown.json"));
-    QFile out(file);
-    QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    out.write(R"({"version": 1, "default": {"comboBox_hash_type": 9999}})");
-    out.close();
+    QJsonObject values;
+    values.insert(QStringLiteral("comboBox_hash_type"), 9999);
 
     Form restored;
     restored.comboBoxWithData->setCurrentIndex(1); // NTLM
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage),
-             qPrintable(errorMessage));
+    WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
     QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
     QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
 }
 
-// A field may hold non-ASCII text. The profile is written and read as UTF-8,
-// so the exact characters have to survive the round trip and the file must
-// carry them encoded rather than escaped. The literals are \u escapes.
-void TestWidgetStateSerializer::nonAsciiValuesSurviveTheFile()
+// A field may hold non-ASCII text, and it has to survive the round trip
+// unchanged. The literals are \u escapes so that the test does not depend on
+// the encoding of its own source file.
+void TestWidgetStateSerializer::nonAsciiValuesSurviveTheValues()
 {
     const QString text = QStringLiteral("W\u00f6rterbuch \u2013 \u00e4\u00f6\u00fc\u00df");
     const QString entry = QStringLiteral("\u65e5\u672c\u8a9e.txt"); // 日本語.txt
@@ -282,25 +226,11 @@ void TestWidgetStateSerializer::nonAsciiValuesSurviveTheFile()
     auto *item = new QListWidgetItem(entry, source.listWidget);
     item->setCheckState(Qt::Checked);
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("utf8.json"));
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
-                                        &errorMessage),
-             qPrintable(errorMessage));
-
-    // UTF-8 on disk: the bytes are the encoded characters, so a reader that is
-    // not this serializer sees the same text this process holds.
-    QFile saved(file);
-    QVERIFY(saved.open(QIODevice::ReadOnly));
-    const QByteArray bytes = saved.readAll();
-    QVERIFY(bytes.contains(text.toUtf8()));
-    QVERIFY(bytes.contains(entry.toUtf8()));
+    const QJsonObject values = WidgetStateSerializer::toJson(&source.widget);
 
     Form restored;
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage),
-             qPrintable(errorMessage));
+    WidgetStateSerializer::applyToWidgets(values, &restored.widget);
+
     QCOMPARE(restored.lineEdit->text(), text);
     QCOMPARE(restored.listWidget->count(), 1);
     QCOMPARE(restored.listWidget->item(0)->text(), entry);
@@ -308,49 +238,33 @@ void TestWidgetStateSerializer::nonAsciiValuesSurviveTheFile()
 }
 
 // The caller named lineEdit_command; its key and its value must not reach
-// the file, while the rest of the form does.
+// the values, while the rest of the form does.
 void TestWidgetStateSerializer::ignoredWidgetsAreNotSaved()
 {
     Form source;
     fill(source);
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("ignored-save.json"));
+    const QJsonObject values =
+        WidgetStateSerializer::toJson(&source.widget, {QStringLiteral("lineEdit_command")});
 
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file,
-                                        {QStringLiteral("lineEdit_command")}, &errorMessage),
-             qPrintable(errorMessage));
-
-    QFile saved(file);
-    QVERIFY(saved.open(QIODevice::ReadOnly));
-    const QByteArray data = saved.readAll();
-    QVERIFY(!data.contains("lineEdit_command"));
-    QVERIFY(!data.contains("-m 0 --quiet"));
-    QVERIFY(data.contains("spinBox_segment_size"));
+    QVERIFY(!values.contains(QStringLiteral("lineEdit_command")));
+    QVERIFY(!values.contains(QStringLiteral("-m 0 --quiet")));
+    QVERIFY(values.contains(QStringLiteral("spinBox_segment_size")));
 }
 
-// The file does hold the value; the loader was told to leave lineEdit_command
+// The values do hold the value; the loader was told to leave lineEdit_command
 // alone, so the target keeps its own text while everything else restores.
 void TestWidgetStateSerializer::ignoredWidgetsAreNotRestored()
 {
     Form source;
     fill(source);
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("ignored-load.json"));
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
-                                        &errorMessage),
-             qPrintable(errorMessage));
+    const QJsonObject values = WidgetStateSerializer::toJson(&source.widget);
 
     Form target;
     target.lineEdit->setText(QStringLiteral("keep me"));
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &target.widget, file,
-                                          {QStringLiteral("lineEdit_command")}, &errorMessage),
-             qPrintable(errorMessage));
+    WidgetStateSerializer::applyToWidgets(values, &target.widget,
+                                          {QStringLiteral("lineEdit_command")});
 
     QCOMPARE(target.lineEdit->text(), QStringLiteral("keep me"));
     // ... and the widgets not on the list still restored
@@ -358,149 +272,37 @@ void TestWidgetStateSerializer::ignoredWidgetsAreNotRestored()
     QCOMPARE(target.spinBox->value(), 42);
 }
 
-// A file that is not JSON, and one that is JSON but not an object, are both
-// refused - with a reason, and without touching a single widget.
-void TestWidgetStateSerializer::corruptJsonIsRejected()
+// A value that names no widget is the one of a file that was made by another
+// version, or that was edited by hand. The caller has to be able to name it.
+void TestWidgetStateSerializer::aValueNoWidgetClaimedIsReported()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("corrupt.json"));
+    QJsonObject values;
+    values.insert(QStringLiteral("lineEdit_command"), QStringLiteral("-m 0 --quiet"));
+    values.insert(QStringLiteral("lineEdit_fromTheFuture"), QStringLiteral("something"));
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
+    Form restored;
+    const QStringList unknown = WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
-    {
-        QFile out(file);
-        QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-        out.write("{this is not json");
-        out.close();
-    }
-
-    Form form;
-    form.lineEdit->setText(QStringLiteral("must survive"));
-    QVERIFY(!serializer.loadStateFromFile(QStringLiteral("default"), &form.widget, file, {},
-                                          &errorMessage));
-    QVERIFY(!errorMessage.isEmpty());
-    QCOMPARE(form.lineEdit->text(), QStringLiteral("must survive"));
-
-    {
-        QFile out(file);
-        QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-        out.write("[1, 2, 3]");
-        out.close();
-    }
-
-    QVERIFY(!serializer.loadStateFromFile(QStringLiteral("default"), &form.widget, file, {},
-                                          &errorMessage));
-    QVERIFY(!errorMessage.isEmpty());
-    QCOMPARE(form.lineEdit->text(), QStringLiteral("must survive"));
+    QCOMPARE(unknown, QStringList{QStringLiteral("lineEdit_fromTheFuture")});
+    // The value that did name a widget was applied.
+    QCOMPARE(restored.lineEdit->text(), QStringLiteral("-m 0 --quiet"));
 }
 
-// A perfectly good file that simply holds a different profile: the reply
-// names the profile that was looked for, so the caller can say what went
-// wrong without parsing anything.
-void TestWidgetStateSerializer::missingProfileIsRejected()
+// The caller reads the values after they were applied - the hash type, for
+// one - so the mapping must not touch what it was given.
+void TestWidgetStateSerializer::theInputIsNotModified()
 {
     Form source;
     fill(source);
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("other-profile.json"));
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("other"), &source.widget, file, {},
-                                        &errorMessage),
-             qPrintable(errorMessage));
-
-    Form target;
-    QVERIFY(!serializer.loadStateFromFile(QStringLiteral("default"), &target.widget, file, {},
-                                          &errorMessage));
-    QVERIFY(!errorMessage.isEmpty());
-    QVERIFY(errorMessage.contains(QStringLiteral("default")));
-}
-
-// A profile stores the widgets by their object name, so the names are part
-// of the format. A profile from another version names widgets that may not
-// exist anymore. It is still read: the widgets it names that do exist keep
-// their values, the others are left at their defaults, and the user is told
-// that the profile is not complete.
-void TestWidgetStateSerializer::aProfileFromAnotherVersionIsLoadedWithAWarning()
-{
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("old-version.json"));
-    QFile out(file);
-    QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    // A profile from before the format carried a version at all.
-    out.write(R"({"default": {"comboBox_hash_type": 1000}})");
-    out.close();
+    const QJsonObject values = WidgetStateSerializer::toJson(&source.widget);
 
     Form restored;
-    restored.comboBoxWithData->setCurrentIndex(0); // MD5
+    WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    QString warning;
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage, nullptr, &warning),
-             qPrintable(errorMessage));
-
-    // The value the profile names is applied - the one field that changed
-    // does not cost the whole profile.
-    QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
-    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
-    // ... and the user is told that the profile comes from another version.
-    QVERIFY(!warning.isEmpty());
-}
-
-// A profile path whose directory does not exist: the save has to fail with
-// the path in the message, not write somewhere else and claim success.
-void TestWidgetStateSerializer::writeFailureIsReported()
-{
-    Form form;
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("no-such-dir/profile.json"));
-
-    QVERIFY(!serializer.saveStateToFile(QStringLiteral("default"), &form.widget, file, {},
-                                        &errorMessage));
-    QVERIFY(!errorMessage.isEmpty());
-    QVERIFY(errorMessage.contains(file));
-}
-
-// The reading side of the same coin - the path again travels with the error.
-void TestWidgetStateSerializer::readFailureIsReported()
-{
-    Form form;
-    WidgetStateSerializer serializer;
-    QString errorMessage;
-    const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("never-written.json"));
-
-    QVERIFY(!serializer.loadStateFromFile(QStringLiteral("default"), &form.widget, file, {},
-                                          &errorMessage));
-    QVERIFY(!errorMessage.isEmpty());
-    QVERIFY(errorMessage.contains(file));
-}
-
-// The same QString rides through several saves and loads; a reason left
-// behind by a failed one must not appear as the error of the next success.
-void TestWidgetStateSerializer::errorIsClearedOnSuccess()
-{
-    Form source;
-    fill(source);
-
-    WidgetStateSerializer serializer;
-    QString errorMessage = QStringLiteral("left over from an earlier failure");
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("cleared.json"));
-
-    QVERIFY2(serializer.saveStateToFile(QStringLiteral("default"), &source.widget, file, {},
-                                        &errorMessage),
-             qPrintable(errorMessage));
-    QVERIFY(errorMessage.isEmpty());
-
-    Form restored;
-    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
-                                          &errorMessage),
-             qPrintable(errorMessage));
-    QVERIFY(errorMessage.isEmpty());
+    QCOMPARE(values.value(QStringLiteral("comboBox_hash_type")).toInt(), 1000);
+    QCOMPARE(values.value(QStringLiteral("lineEdit_command")).toString(),
+             QStringLiteral("-m 0 --quiet"));
 }
 
 int main(int argc, char *argv[])

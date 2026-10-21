@@ -106,9 +106,11 @@ private:
     // What the selected attack mode needs from the user.
     QString modeHint(AttackMode mode) const;
 
-    // Shows what a loaded profile has to say for itself. Returns whether a
-    // note was shown.
-    bool showProfileNotes(const QString &warning, const QString &problem);
+    // The notes an import has for the user: the version the file was made by,
+    // the sections it holds besides the one that was imported, and the values
+    // this version does not know.
+    QStringList importNotes(int fileVersion, int currentVersion, const QStringList &otherSections,
+                            const QStringList &unknownValues) const;
 
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about

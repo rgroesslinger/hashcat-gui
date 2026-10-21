@@ -26,31 +26,21 @@ public:
     // left unset, see main.cpp.
     static QString defaultProfilePath();
 
-    // Serialize the state of widget into a profile file.
+    // The widget state as a JSON object; the object names are the keys.
     //
-    // Errors are reported through the return value and, when errorMessage is
-    // not nullptr, the reason is written there. The serializer deliberately
-    // does not open a dialog: callers decide how to present a failure, and
-    // the class stays usable from unit tests.
-    bool saveStateToFile(const QString &key, const QWidget *widget, const QString &filename,
-                         const QStringList &ignoredWidgets = {},
-                         QString *errorMessage = nullptr) const;
+    // The ignored widgets are left out: they hold something transient, like
+    // the command preview, which is rebuilt from the other values.
+    static QJsonObject toJson(const QWidget *widget, const QStringList &ignoredWidgets = {});
 
-    // Restore the state of widget from a profile file.
+    // Applies a JSON object to the widgets. Returns the names in the values
+    // that no widget claimed - the values of a file that was made by another
+    // version, or that was edited by hand.
     //
-    // When profileState is not nullptr the profile object that was applied
-    // is copied there, so callers can read values the widgets could not take
-    // yet - a combobox that has no items until an asynchronous query fills
-    // it, see MainWindow::loadDefaultProfile().
-    //
-    // A profile from another version of the format is read as well: the
-    // widgets it names that still exist keep their values, the ones that do
-    // not exist any more are left at their defaults. warning receives a note
-    // about it, so the caller can tell the user that the profile is not
-    // complete.
-    bool loadStateFromFile(const QString &key, QWidget *widget, const QString &filename,
-                           const QStringList &ignoredWidgets = {}, QString *errorMessage = nullptr,
-                           QJsonObject *profileState = nullptr, QString *warning = nullptr) const;
+    // The input object is not modified: the names are removed from a copy to
+    // compute the remainder, so that the caller can still read the values
+    // afterwards - the hash type, for one.
+    static QStringList applyToWidgets(const QJsonObject &values, QWidget *widget,
+                                      const QStringList &ignoredWidgets = {});
 };
 
 #endif // WIDGETSTATESERIALIZER_H

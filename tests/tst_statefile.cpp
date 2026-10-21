@@ -22,6 +22,7 @@ class TestStateFile : public QObject
 private slots:
     void aSectionSurvivesTheRoundTrip();
     void theWrittenFileHasTheExpectedShape();
+    void theValuesAreWrittenAsUtf8();
     void anotherSectionIsRefused();
     void aFileWithTwoSectionsReportsTheOther();
     void aFileWithoutSectionsIsRefused();
@@ -108,6 +109,26 @@ void TestStateFile::theWrittenFileHasTheExpectedShape()
         sections.value(QString(AppConstants::FileSections::Session)).toObject();
     QCOMPARE(section.value(QStringLiteral("version")).toInt(), 1);
     QCOMPARE(section.value(QStringLiteral("values")).toObject(), values);
+}
+
+// The values are written as UTF-8, so the bytes on disk are the encoded
+// characters and a reader that is not this program sees the same text. The
+// literals are \u escapes, so the test does not depend on the encoding of its
+// own source file.
+void TestStateFile::theValuesAreWrittenAsUtf8()
+{
+    const QString path = scratchFile(QStringLiteral("utf8.json"));
+    const QString text = QStringLiteral("W\u00f6rterbuch \u2013 \u00e4\u00f6\u00fc\u00df");
+
+    QJsonObject values;
+    values.insert(QStringLiteral("lineEdit_hashfile"), text);
+    QVERIFY(StateFile::write(path, AppConstants::FileSections::Session, 1, values, nullptr));
+
+    QFile file(path);
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    const QByteArray bytes = file.readAll();
+    file.close();
+    QVERIFY(bytes.contains(text.toUtf8()));
 }
 
 // A file that holds something else is not a file of this kind. The message
