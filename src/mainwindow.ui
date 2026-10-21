@@ -922,6 +922,9 @@
                  <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_session">
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignTop</set>
+                 </property>
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_session">
                    <property name="text">
@@ -1061,6 +1064,9 @@
                  <bool>false</bool>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout">
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignTop</set>
+                 </property>
                  <item>
                   <widget class="QCheckBox" name="checkBox_optimized_kernel">
                    <property name="text">
@@ -1155,6 +1161,9 @@
                  <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_12">
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignTop</set>
+                 </property>
                  <item row="0" column="0">
                   <layout class="QHBoxLayout" name="horizontalLayout_31">
                    <item>
@@ -1299,6 +1308,9 @@
                  <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_25">
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignTop</set>
+                 </property>
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
                    <item>

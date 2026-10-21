@@ -157,6 +157,7 @@ private slots:
     void attackModeIdsTravelAsItemData();
     void groupBoxesFollowTheBuilderPredicates();
     void groupBoxesShareOneTitleAlignment();
+    void generalTabGroupBoxesAlignTheirContentToTheTop();
     void resetFieldsRestoresEveryWidget();
     void optionDependenciesFollowTheirCheckboxes();
     void modeHintFollowsTheAttackMode();
@@ -373,6 +374,28 @@ void TestMainWindow::groupBoxesShareOneTitleAlignment()
     MainWindow window;
 
     TestEnvironment::checkGroupBoxTitleAlignment(&window);
+}
+
+// A group box in a row is as tall as its tallest neighbour. Without the top
+// alignment Qt spreads the children of the shorter boxes over that height or
+// centres them, so two boxes next to each other would start their content at
+// different heights.
+void TestMainWindow::generalTabGroupBoxesAlignTheirContentToTheTop()
+{
+    MainWindow window;
+
+    const QList<QGroupBox *> boxes = window.ui->tab_general->findChildren<QGroupBox *>();
+    QVERIFY(!boxes.isEmpty());
+
+    QStringList offenders;
+    for (QGroupBox *box : boxes) {
+        if (!(box->layout()->alignment() & Qt::AlignTop)) {
+            offenders << box->objectName();
+        }
+    }
+    QVERIFY2(offenders.isEmpty(),
+             qPrintable(QStringLiteral("group boxes whose content is not top aligned: %1")
+                            .arg(offenders.join(QStringLiteral(", ")))));
 }
 
 // The reset has to bring every widget that holds a value back to its
