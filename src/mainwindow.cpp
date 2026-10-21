@@ -21,6 +21,7 @@
 #include <QAbstractButton>
 #include <QAbstractItemModel>
 #include <QClipboard>
+#include <QCursor>
 #include <QStandardPaths>
 #include <QFutureWatcher>
 #include <QLayout>
@@ -29,6 +30,7 @@
 #include <QScrollBar>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QToolTip>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
@@ -52,6 +54,41 @@ void activateLayouts(QWidget *widget)
         layout->invalidate();
         layout->activate();
     }
+}
+
+// The tooltip of the command preview: the whole command, because the line
+// edit shows only its beginning.
+//
+// Plain text, not rich text: a rich text tooltip is squeezed into whatever
+// width its text control happens to have and grows tall instead, while a
+// plain text one keeps the line breaks it is given.
+//
+// A path that contains something like "<b>" is read as a tag and mangles the
+// display - rare enough to accept.
+QString commandTooltip(const QString &command)
+{
+    if (command.isEmpty()) {
+        return {};
+    }
+
+    // The breaks go between the arguments, so a flag stays with the value
+    // that follows it.
+    const QStringList parts = command.split(QLatin1Char(' '));
+    QStringList lines;
+    QString line;
+    for (const QString &part : std::as_const(parts)) {
+        const bool endsWithFlag = line.section(QLatin1Char(' '), -1).startsWith(QLatin1Char('-'));
+        if (!line.isEmpty() && line.size() + part.size() > 120 && !endsWithFlag) {
+            lines << line;
+            line = part;
+        } else {
+            line += (line.isEmpty() ? QString() : QStringLiteral(" ")) + part;
+        }
+    }
+    if (!line.isEmpty()) {
+        lines << line;
+    }
+    return lines.join(QLatin1Char('\n'));
 }
 } // namespace
 
@@ -982,6 +1019,9 @@ void MainWindow::copyCommandToClipboard()
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard) {
         clipboard->setText(text);
+        // A one-shot tooltip confirms the copy. The button's own tooltip
+        // would not re-render while the pointer stays on the button.
+        QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"), nullptr, {}, 2000);
     }
 }
 
@@ -1147,19 +1187,19 @@ void MainWindow::commandChanged()
     auto &settings = SettingsManager::instance();
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 
-    ui->lineEdit_command->clear();
-
-    // Prepend the hashcat binary name when one is configured; without it the
+    // The binary name comes first when one is configured; without it the
     // preview is the bare argument list, which must not start with a blank.
     const QString binary = hashcatPath.isEmpty() ? QString() : QFileInfo(hashcatPath).fileName();
-    ui->lineEdit_command->setText(binary);
+    const QStringList arguments = generateArguments();
 
-    const QString arguments = generateArguments().join(QLatin1Char(' '));
-    if (!arguments.isEmpty()) {
-        ui->lineEdit_command->insert((binary.isEmpty() ? QString() : QStringLiteral(" "))
-                                     + arguments);
-    }
+    const QString command = (binary.isEmpty() ? QString() : binary + QLatin1Char(' '))
+                            + arguments.join(QLatin1Char(' '));
+    ui->lineEdit_command->setText(command);
     ui->lineEdit_command->setCursorPosition(0);
+
+    // The line edit shows the beginning of the command only - it is as wide as
+    // the window and the command is not. The tooltip carries all of it.
+    ui->lineEdit_command->setToolTip(commandTooltip(command));
 }
 
 HashcatOptions MainWindow::collectHashcatOptions()

@@ -7,6 +7,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QClipboard>
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
@@ -22,6 +23,7 @@
 #include <QScrollBar>
 #include <QScreen>
 #include <QTimer>
+#include <QToolTip>
 #include <QWidget>
 
 #include "appconstants.h"
@@ -173,6 +175,8 @@ private slots:
     void outfileSuggestionFollowsUntilTheUserTakesOver();
     void wordlistSortSurvivesAMissingSelection();
     void commandPreviewCarriesTheBinaryName();
+    void thePreviewTooltipHoldsTheWholeCommand();
+    void copyingTheCommandPutsItOnTheClipboard();
     void defaultProfileRoundTrips();
     void profileHashTypeSurvivesTheAsynchronousQuery();
     void profileWithAnUnknownHashTypeSelectsNothing();
@@ -939,6 +943,57 @@ void TestMainWindow::commandPreviewCarriesTheBinaryName()
 
     MainWindow window;
     QCOMPARE(window.ui->lineEdit_command->text(), QStringLiteral("hashcat --attack-mode 0"));
+}
+
+// The line edit shows the beginning of the command only; the tooltip has to
+// carry all of it.
+void TestMainWindow::thePreviewTooltipHoldsTheWholeCommand()
+{
+    MainWindow window;
+
+    // More word lists than the window can show, and a path that looks like a
+    // tag.
+    for (int i = 0; i < 12; ++i) {
+        auto *item = new QListWidgetItem(QStringLiteral("/tmp/wordlist-number-%1.txt").arg(i),
+                                         window.ui->listWidget_wordlist);
+        item->setCheckState(Qt::Checked);
+    }
+    window.ui->checkBox_outfile->setChecked(true);
+    window.ui->lineEdit_outfile->setText(QStringLiteral("/tmp/<b>out</b>.txt"));
+
+    const QString command = window.ui->lineEdit_command->text();
+    const QString tooltip = window.ui->lineEdit_command->toolTip();
+
+    // Every part of the command is in the tooltip.
+    const QStringList parts = command.split(QLatin1Char(' '));
+    for (const QString &part : std::as_const(parts)) {
+        QVERIFY2(tooltip.contains(part),
+                 qPrintable(QStringLiteral("the tooltip does not hold \"%1\"").arg(part)));
+    }
+
+    // The tooltip is plain text: the command is in it as it is.
+    QVERIFY(tooltip.contains(QStringLiteral("/tmp/<b>out</b>.txt")));
+
+    // A command this long is broken into several lines.
+    QVERIFY(tooltip.contains(QLatin1Char('\n')));
+}
+
+// Copying puts the command on the clipboard and says that it did.
+void TestMainWindow::copyingTheCommandPutsItOnTheClipboard()
+{
+    MainWindow window;
+    window.ui->checkBox_remove->setChecked(true);
+
+    const QString command = window.ui->lineEdit_command->text();
+    QVERIFY(!command.isEmpty());
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "copyCommandToClipboard"));
+
+    QCOMPARE(QApplication::clipboard()->text(), command);
+
+    // The confirmation is a one-shot tooltip at the pointer.
+    QVERIFY(QToolTip::text().contains(QStringLiteral("Copied")));
+    QToolTip::hideText();
 }
 
 // The profile machinery as the application uses it: saveDefaultProfile() and
