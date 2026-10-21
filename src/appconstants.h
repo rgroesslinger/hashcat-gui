@@ -32,7 +32,34 @@ inline constexpr QLatin1StringView RestoreSession{"restoreSession"};
 inline constexpr QLatin1StringView ColorScheme{"colorScheme"};
 // Locale code of the UI language, see the Languages namespace below.
 inline constexpr QLatin1StringView Language{"language"};
+
+// Every key the settings are made of, in the order they are written. The
+// import needs the list to tell the keys it does not know from the ones it
+// applies.
+inline constexpr QLatin1StringView All[] = {
+    HashcatPath, Terminal, UseShortParameters, RestoreSession, ColorScheme, Language,
+};
 } // namespace SettingsKeys
+
+// The version of the settings a file holds.
+//
+// The widget names of the session and the keys of the settings change
+// independently of each other, so each of them has its own version.
+namespace Settings
+{
+inline constexpr int Version = 1;
+} // namespace Settings
+
+// The names of the sections a file can hold.
+//
+// They are constants and not the name of a class: the session file is named
+// after its class today, so renaming that class would orphan every profile
+// that was ever written.
+namespace FileSections
+{
+inline constexpr QLatin1StringView Session{"session"};
+inline constexpr QLatin1StringView Settings{"settings"};
+} // namespace FileSections
 
 // The languages the settings dialog offers, sorted by each name in its own
 // language so the combo reads naturally for every user.

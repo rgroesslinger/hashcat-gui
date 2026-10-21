@@ -57,6 +57,8 @@ set(HASHCAT_GUI_SOURCES
     src/settingsdialog.cpp
     src/settingsmanager.h
     src/settingsmanager.cpp
+    src/statefile.h
+    src/statefile.cpp
     src/widgetstateserializer.h
     src/widgetstateserializer.cpp
     src/resources.qrc
@@ -145,6 +147,7 @@ set(HASHCAT_GUI_TESTS
     tst_helperutils
     tst_mainwindow
     tst_settingsdialog
+    tst_statefile
     tst_translations
     tst_widgetstateserializer
 )
