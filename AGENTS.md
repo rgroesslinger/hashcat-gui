@@ -53,11 +53,14 @@ these three targets — this checklist is the only enforcement.
   and to the terminal; `WidgetStateSerializer` persists profiles. Keep the argument order
   stable: the preview, the clipboard and the tests all depend on it.
 - Attack-mode gating predicates live in `CommandBuilder` and are reused for group-box
-  enablement in `MainWindow`. Do not duplicate them.
+  enablement in `MainWindow`. Do not duplicate them. `CommandBuilder::modeRequirements()`
+  derives what a mode needs from those predicates, so the group boxes, the mode hint and
+  the launch validation cannot disagree.
 - Keep UI-independent logic in `CommandBuilder`, `HashcatInfoParser`, `HelperUtils`, and
   `WidgetStateSerializer` so it stays testable.
-- Launch validation: `HelperUtils::validateLaunch`. hashcat starts detached in an external
-  terminal (`CREATE_NEW_CONSOLE` on Windows).
+- Launch validation: `HelperUtils::validateOptions()` (what the selected mode needs) and
+  then `HelperUtils::validateLaunch()` (the path, the binary and the terminal). hashcat
+  starts detached in an external terminal (`CREATE_NEW_CONSOLE` on Windows).
 
 ### Threading and async
 - Hash types load asynchronously from `hashcat --example-hashes --machine-readable`; the

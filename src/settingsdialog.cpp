@@ -22,7 +22,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 
     readSettings();
 
-    connect(ui->pushButton_settings_select_path, &QPushButton::clicked, this,
+    connect(ui->pushButton_select_path, &QPushButton::clicked, this,
             &SettingsDialog::selectPathClicked);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &SettingsDialog::saveClicked);
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &SettingsDialog::cancelClicked);
@@ -42,7 +42,7 @@ void SettingsDialog::readSettings()
         settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
 
     // available terminals
-    QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
+    QMap<QString, QStringList> availableTerminals = HelperUtils::availableTerminals();
     ui->comboBox_terminal->addItems(availableTerminals.keys());
 
     // terminal from saved settings

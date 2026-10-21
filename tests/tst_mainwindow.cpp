@@ -147,10 +147,10 @@ void TestMainWindow::commandPreviewFollowsWidgetChanges()
     window.ui->checkBox_ignoreusername->setChecked(true);
     QVERIFY(preview->text().contains(QStringLiteral("--username")));
 
-    window.ui->lineEdit_devices->setText(QStringLiteral("1,2"));
+    window.ui->lineEdit_backend_devices->setText(QStringLiteral("1,2"));
     QVERIFY(preview->text().contains(QStringLiteral("--backend-devices 1,2")));
 
-    window.ui->spinBox_segment->setValue(64);
+    window.ui->spinBox_segment_size->setValue(64);
     QVERIFY(preview->text().contains(QStringLiteral("--segment-size 64")));
 
     window.ui->lineEdit_session->setText(QStringLiteral("job"));
@@ -251,7 +251,7 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
 
         QCOMPARE(window.ui->groupBox_wordlists->isEnabled(), expected->wordlists);
         QCOMPARE(window.ui->groupBox_rules->isEnabled(), expected->rules);
-        QCOMPARE(window.ui->groupBox_combination_rules->isEnabled(),
+        QCOMPARE(window.ui->groupBox_wordlist_rules->isEnabled(),
                  expected->ruleLeft || expected->ruleRight);
         QCOMPARE(window.ui->label_rule_left->isEnabled(), expected->ruleLeft);
         QCOMPARE(window.ui->lineEdit_rule_left->isEnabled(), expected->ruleLeft);
@@ -260,7 +260,7 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
         QCOMPARE(window.ui->groupBox_mask->isEnabled(), expected->mask);
         QCOMPARE(window.ui->groupBox_custom_charset->isEnabled(), expected->mask);
         // --hex-charset belongs to the mask modes for the same reason.
-        QCOMPARE(window.ui->checkBox_hex_hash->isEnabled(), expected->mask);
+        QCOMPARE(window.ui->checkBox_hex_charset->isEnabled(), expected->mask);
     }
 }
 
@@ -271,11 +271,7 @@ void TestMainWindow::groupBoxesShareOneTitleAlignment()
 {
     MainWindow window;
 
-    QVERIFY(!window.findChildren<QGroupBox *>().isEmpty());
-    const QStringList offenders = TestEnvironment::groupBoxesWithUnexpectedTitleAlignment(&window);
-    QVERIFY2(offenders.isEmpty(),
-             qPrintable(QStringLiteral("group boxes with another title alignment: %1")
-                            .arg(offenders.join(QStringLiteral(", ")))));
+    TestEnvironment::checkGroupBoxTitleAlignment(&window);
 }
 
 void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
@@ -428,7 +424,7 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     window.ui->spinBox_status_timer->setValue(5);
     window.ui->checkBox_force->setChecked(true);
     window.ui->checkBox_potfile_disable->setChecked(true);
-    window.ui->lineEdit_device_types->setText(QStringLiteral("1,2"));
+    window.ui->lineEdit_opencl_device_types->setText(QStringLiteral("1,2"));
     window.ui->checkBox_hwmon_temp_abort->setChecked(true);
     window.ui->spinBox_hwmon_temp_abort->setValue(85);
 
@@ -455,7 +451,7 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QCOMPARE(options.statusTimer, 5);
     QVERIFY(options.force);
     QVERIFY(options.potfileDisable);
-    QCOMPARE(options.deviceTypes, QStringLiteral("1,2"));
+    QCOMPARE(options.openclDeviceTypes, QStringLiteral("1,2"));
     QVERIFY(options.hwmonTempAbort);
     QCOMPARE(options.hwmonTempAbortCelsius, 85);
 
@@ -494,7 +490,7 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(!arguments.contains(QStringLiteral("--outfile")));
 
     // ... and a segment size that is no longer the default does show up
-    window.ui->spinBox_segment->setValue(64);
+    window.ui->spinBox_segment_size->setValue(64);
     QCOMPARE(window.collectHashcatOptions().segmentSize, 64);
     QVERIFY(window.generateArguments().contains(QStringLiteral("--segment-size")));
 }
@@ -776,7 +772,7 @@ void TestMainWindow::defaultProfileRoundTrips()
 
     MainWindow writer;
     writer.ui->comboBox_attack->setCurrentIndex(2); // brute-force, not the default straight
-    writer.ui->spinBox_segment->setValue(64);       // not the default 32
+    writer.ui->spinBox_segment_size->setValue(64);  // not the default 32
     writer.saveDefaultProfile();
 
     const QString profile = writer.defaultProfileFile();
@@ -800,7 +796,7 @@ void TestMainWindow::defaultProfileRoundTrips()
     // A new window runs loadDefaultProfile() in its constructor...
     MainWindow reloaded;
     QCOMPARE(reloaded.ui->comboBox_attack->currentIndex(), 2);
-    QCOMPARE(reloaded.ui->spinBox_segment->value(), 64);
+    QCOMPARE(reloaded.ui->spinBox_segment_size->value(), 64);
 
     // ...and the preview reflects the restored state, not the defaults the
     // widgets held before the profile arrived.
@@ -904,9 +900,9 @@ void TestMainWindow::windowFitsItsContent()
     window.show();
     QCoreApplication::processEvents();
 
-    QScrollArea *attackArea = window.ui->scrollArea_2;
+    QScrollArea *attackArea = window.ui->scrollArea_attack;
     QWidget *attackContent = attackArea->widget();
-    QScrollArea *generalArea = window.ui->scrollArea;
+    QScrollArea *generalArea = window.ui->scrollArea_general;
     QVERIFY(attackContent);
     QVERIFY(generalArea->widget());
     QVERIFY(window.screen());
@@ -1006,14 +1002,14 @@ void TestMainWindow::commandBarStaysVisibleOnEveryTab()
     window.show();
     QCoreApplication::processEvents();
 
-    QPushButton *execute = window.ui->pushButton_execute;
+    QPushButton *execute = window.ui->pushButton_start;
     QPushButton *copy = window.ui->pushButton_copy_clipboard;
     QLineEdit *preview = window.ui->lineEdit_command;
 
     // The row lives below the tabs, not in the first tab's scroll content.
     QVERIFY(window.centralWidget()->isAncestorOf(execute));
     QVERIFY(!window.ui->tabWidget_main->isAncestorOf(execute));
-    QVERIFY(!window.ui->scrollArea_2->isAncestorOf(execute));
+    QVERIFY(!window.ui->scrollArea_attack->isAncestorOf(execute));
     QVERIFY(!window.ui->tabWidget_main->isAncestorOf(copy));
     QVERIFY(!window.ui->tabWidget_main->isAncestorOf(preview));
 
@@ -1022,7 +1018,7 @@ void TestMainWindow::commandBarStaysVisibleOnEveryTab()
     QVERIFY(preview->isVisible());
 
     // ... and the row stays on screen on the second tab as well.
-    window.ui->tabWidget_main->setCurrentWidget(window.ui->tab_advanced);
+    window.ui->tabWidget_main->setCurrentWidget(window.ui->tab_general);
     QCoreApplication::processEvents();
 
     QVERIFY(execute->isVisible());

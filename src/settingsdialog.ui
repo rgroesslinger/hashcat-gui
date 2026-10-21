@@ -73,9 +73,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_settings_select_path">
+         <widget class="QPushButton" name="pushButton_select_path">
           <property name="text">
-           <string>Select</string>
+           <string>Select...</string>
           </property>
          </widget>
         </item>

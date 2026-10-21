@@ -76,7 +76,7 @@ struct HashcatOptions {
     QString encodingTo;
 
     // Hardware selection and safety.
-    QString deviceTypes;
+    QString openclDeviceTypes;
     bool hwmonTempAbort = false;
     int hwmonTempAbortCelsius = AppConstants::Defaults::HwmonTempAbort;
 

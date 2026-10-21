@@ -66,11 +66,7 @@ void TestAboutDialog::groupBoxesShareOneTitleAlignment()
 {
     AboutDialog dialog;
 
-    QVERIFY(!dialog.findChildren<QGroupBox *>().isEmpty());
-    const QStringList offenders = TestEnvironment::groupBoxesWithUnexpectedTitleAlignment(&dialog);
-    QVERIFY2(offenders.isEmpty(),
-             qPrintable(QStringLiteral("group boxes with another title alignment: %1")
-                            .arg(offenders.join(QStringLiteral(", ")))));
+    TestEnvironment::checkGroupBoxTitleAlignment(&dialog);
 }
 
 int main(int argc, char *argv[])

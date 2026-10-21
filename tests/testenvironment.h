@@ -100,17 +100,23 @@ inline Qt::Alignment groupBoxTitleAlignment()
     return Qt::AlignLeft | Qt::AlignVCenter;
 }
 
-// The group boxes below root that do not use that alignment, by name.
-inline QStringList groupBoxesWithUnexpectedTitleAlignment(QObject *root)
+// Checks that every group box below root places its title that way. The
+// names of the offenders are part of the message, so a group box that lost
+// the property can be found by name.
+inline void checkGroupBoxTitleAlignment(QObject *root)
 {
-    QStringList offenders;
     const QList<QGroupBox *> boxes = root->findChildren<QGroupBox *>();
+    QVERIFY2(!boxes.isEmpty(), "the window has no group box at all");
+
+    QStringList offenders;
     for (QGroupBox *box : boxes) {
         if (box->alignment() != groupBoxTitleAlignment()) {
             offenders << box->objectName();
         }
     }
-    return offenders;
+    QVERIFY2(offenders.isEmpty(),
+             qPrintable(QStringLiteral("group boxes with another title alignment: %1")
+                            .arg(offenders.join(QStringLiteral(", ")))));
 }
 
 // Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behaviour, plus the redirect

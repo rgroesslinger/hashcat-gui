@@ -47,7 +47,7 @@ private slots:
     void aboutTriggered();
 
     // main-tab buttons
-    void executeClicked();
+    void startClicked();
     void openHashFileClicked();
     void openOutfileClicked();
     void removeWordlistClicked();
@@ -58,9 +58,9 @@ private slots:
 
     // checkboxes / radio buttons
     void outfileToggled(bool checked);
-    void rulesfile1Toggled(bool checked);
-    void rulesfile2Toggled(bool checked);
-    void rulesfile3Toggled(bool checked);
+    void rulesFile1Toggled(bool checked);
+    void rulesFile2Toggled(bool checked);
+    void rulesFile3Toggled(bool checked);
     void generateRulesToggled(bool checked);
     void useRulesFileToggled(bool checked);
     void customCharset1Toggled(bool checked);
@@ -90,12 +90,11 @@ private:
 
     Ui::MainWindow *ui;
 
-    // Last outfile name generated from the hash file name, see
-    // hashFileTextChanged(). Empty when the field holds a user-chosen value.
-    QString suggestedOutfile;
-
-    QMap<quint32, QString> hashModes;
-    QMap<AttackMode, QString> attackModes;
+    // The last outfile name generated from the hash file name, see
+    // hashFileTextChanged(). It is not cleared when the user types a name of
+    // their own: the field is only overwritten again while it still holds
+    // this suggestion.
+    QString m_suggestedOutfile;
 
     void initHashAndAttackModes();
     void updateViewAttackMode();

@@ -4,7 +4,7 @@
  */
 
 #include "settingsmanager.h"
-#include <QApplication>
+#include <QCoreApplication>
 
 SettingsManager::SettingsManager()
     : settings(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::applicationName(),

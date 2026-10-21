@@ -71,13 +71,13 @@ struct Form {
         radioButton->setObjectName(QStringLiteral("radioButton_plain"));
 
         spinBox = new QSpinBox(&widget);
-        spinBox->setObjectName(QStringLiteral("spinBox_segment"));
+        spinBox->setObjectName(QStringLiteral("spinBox_segment_size"));
 
         doubleSpinBox = new QDoubleSpinBox(&widget);
         doubleSpinBox->setObjectName(QStringLiteral("doubleSpinBox_ratio"));
 
         listWidget = new QListWidget(&widget);
-        listWidget->setObjectName(QStringLiteral("listWidget_wordlists"));
+        listWidget->setObjectName(QStringLiteral("listWidget_wordlist"));
     }
 
     QWidget widget;
@@ -327,7 +327,7 @@ void TestWidgetStateSerializer::ignoredWidgetsAreNotSaved()
     const QByteArray data = saved.readAll();
     QVERIFY(!data.contains("lineEdit_command"));
     QVERIFY(!data.contains("-m 0 --quiet"));
-    QVERIFY(data.contains("spinBox_segment"));
+    QVERIFY(data.contains("spinBox_segment_size"));
 }
 
 // The file does hold the value; the loader was told to leave lineEdit_command
@@ -415,6 +415,7 @@ void TestWidgetStateSerializer::missingProfileIsRejected()
     QVERIFY(!errorMessage.isEmpty());
     QVERIFY(errorMessage.contains(QStringLiteral("default")));
 }
+
 
 // A profile path whose directory does not exist: the save has to fail with
 // the path in the message, not write somewhere else and claim success.

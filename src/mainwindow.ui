@@ -41,20 +41,20 @@
       <property name="movable">
        <bool>false</bool>
       </property>
-      <widget class="QWidget" name="tab_hc">
+      <widget class="QWidget" name="tab_attack">
        <attribute name="title">
         <string>Attack</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
         <item>
-         <widget class="QScrollArea" name="scrollArea_2">
+         <widget class="QScrollArea" name="scrollArea_attack">
           <property name="frameShape">
            <enum>QFrame::Shape::NoFrame</enum>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents_2">
+          <widget class="QWidget" name="scrollAreaWidgetContents_attack">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -123,7 +123,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_29">
               <item>
-               <widget class="QLabel" name="label_mode">
+               <widget class="QLabel" name="label_attack_mode">
                 <property name="text">
                  <string>Mode:</string>
                 </property>
@@ -318,7 +318,7 @@
                   <string>Assume words in the wordlist are given in hexadecimal</string>
                  </property>
                  <property name="text">
-                  <string>Wordlist entries are hex</string>
+                  <string>Wordlist is hex</string>
                  </property>
                 </widget>
                </item>
@@ -573,7 +573,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QGroupBox" name="groupBox_combination_rules">
+                 <widget class="QGroupBox" name="groupBox_wordlist_rules">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -620,9 +620,9 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_7">
                 <item>
-                 <widget class="QCheckBox" name="checkBox_hex_hash">
+                 <widget class="QCheckBox" name="checkBox_hex_charset">
                   <property name="text">
-                   <string>Assume charset is given in hex</string>
+                   <string>Charset is hex</string>
                   </property>
                  </widget>
                 </item>
@@ -885,7 +885,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_advanced">
+      <widget class="QWidget" name="tab_general">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -894,14 +894,14 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_23">
         <item>
-         <widget class="QScrollArea" name="scrollArea">
+         <widget class="QScrollArea" name="scrollArea_general">
           <property name="frameShape">
            <enum>QFrame::Shape::NoFrame</enum>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
+          <widget class="QWidget" name="scrollAreaWidgetContents_general">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -1167,21 +1167,21 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_devices">
+                      <widget class="QLabel" name="label_backend_devices">
                        <property name="text">
                         <string>Backend devices:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_device_types">
+                      <widget class="QLabel" name="label_opencl_device_types">
                        <property name="text">
                         <string>Device types:</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLabel" name="label_segment">
+                      <widget class="QLabel" name="label_segment_size">
                        <property name="text">
                         <string>Segment size:</string>
                        </property>
@@ -1199,7 +1199,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_devices">
+                      <widget class="QLineEdit" name="lineEdit_backend_devices">
                        <property name="toolTip">
                         <string>Devices to use, separated with commas. Leave empty for all devices.</string>
                        </property>
@@ -1209,14 +1209,14 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="lineEdit_device_types">
+                      <widget class="QLineEdit" name="lineEdit_opencl_device_types">
                        <property name="toolTip">
                         <string>OpenCL device types to use, separated with commas</string>
                        </property>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QSpinBox" name="spinBox_segment">
+                      <widget class="QSpinBox" name="spinBox_segment_size">
                        <property name="sizePolicy">
                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                          <horstretch>0</horstretch>
@@ -1291,9 +1291,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QGroupBox" name="groupBox_output">
+               <widget class="QGroupBox" name="groupBox_outfile">
                 <property name="title">
-                 <string>Output</string>
+                 <string>Outfile</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1332,7 +1332,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="text">
-                        <string>Open...</string>
+                        <string>Save...</string>
                        </property>
                       </widget>
                      </item>
@@ -1419,7 +1419,7 @@
     <item row="1" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_42">
       <item>
-       <widget class="QPushButton" name="pushButton_execute">
+       <widget class="QPushButton" name="pushButton_start">
         <property name="text">
          <string>Start</string>
         </property>
@@ -1462,14 +1462,14 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionAbout_Qt"/>
-    <addaction name="actionHelp_About"/>
+    <addaction name="actionAboutQt"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionReset_fields"/>
+    <addaction name="actionResetFields"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -1485,12 +1485,12 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="actionHelp_About">
+  <action name="actionAbout">
    <property name="text">
     <string>About</string>
    </property>
   </action>
-  <action name="actionReset_fields">
+  <action name="actionResetFields">
    <property name="text">
     <string>Reset fields</string>
    </property>
@@ -1500,7 +1500,7 @@
     <string>Quit</string>
    </property>
   </action>
-  <action name="actionAbout_Qt">
+  <action name="actionAboutQt">
    <property name="text">
     <string>About Qt</string>
    </property>

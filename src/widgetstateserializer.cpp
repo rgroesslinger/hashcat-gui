@@ -17,7 +17,6 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QDir>
 #include <QSaveFile>
 
 // Report a failure through errorMessage when the caller asked for it
@@ -45,7 +44,7 @@ WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent)
 {
 }
 
-// Serialize QWidget values to QJSonObject
+// Serialize QWidget values to QJsonObject
 static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidgets = {})
 {
     QJsonObject obj;
@@ -252,6 +251,7 @@ bool WidgetStateSerializer::loadStateFromFile(const QString &key, QWidget *widge
     }
 
     QJsonObject root = doc.object();
+
     if (!root.contains(key)) {
         setError(errorMessage, tr("The file does not contain a profile for \"%1\".").arg(key));
         return false;

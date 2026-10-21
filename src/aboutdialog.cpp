@@ -8,7 +8,6 @@
 #include "helperutils.h"
 #include "settingsmanager.h"
 #include "appconstants.h"
-#include <QMessageBox>
 #include <QFileInfo>
 #include <QFutureWatcher>
 

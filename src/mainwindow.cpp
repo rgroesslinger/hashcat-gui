@@ -91,7 +91,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     const QString deviceTypeTip = tr("OpenCL device types to use, separated with commas")
                                   + QLatin1String("\n\n")
                                   + AppConstants::HelpText::OpenClDeviceTypes;
-    ui->lineEdit_device_types->setToolTip(deviceTypeTip);
+    ui->lineEdit_opencl_device_types->setToolTip(deviceTypeTip);
 
     auto &settings = SettingsManager::instance();
 
@@ -112,6 +112,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // exactly once. Controls that also need to enable fields, open dialogs or
     // change the attack-mode gating are connected to their own slot below;
     // that second connection is the side effect, not a second preview update.
+    // The attack mode combo is the one exception: it refreshes the preview
+    // through attackIndexChanged(), see below.
     const auto notifyOnText = [this](QLineEdit *edit) {
         connect(edit, &QLineEdit::textChanged, this, &MainWindow::commandChanged);
     };
@@ -128,7 +130,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Attack tab
     notifyOnIndex(ui->comboBox_hash_type);
     notifyOnText(ui->lineEdit_hashfile);
-    notifyOnToggle(ui->checkBox_hex_hash);
+    notifyOnToggle(ui->checkBox_hex_charset);
     notifyOnToggle(ui->checkBox_hex_salt);
     // Word lists
     notifyOnText(ui->lineEdit_encoding_from);
@@ -159,15 +161,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnText(ui->lineEdit_custom_charset2);
     notifyOnText(ui->lineEdit_custom_charset3);
     notifyOnText(ui->lineEdit_custom_charset4);
-    // General tab
+    // The two hash file options stay on the Attack tab; everything from the
+    // outfile on belongs to the General tab.
     notifyOnToggle(ui->checkBox_remove);
     notifyOnToggle(ui->checkBox_ignoreusername);
+    // General tab
     notifyOnToggle(ui->checkBox_outfile);
     notifyOnText(ui->lineEdit_outfile);
     notifyOnText(ui->lineEdit_outfile_format);
     notifyOnText(ui->lineEdit_cpu_affinity);
-    notifyOnText(ui->lineEdit_devices);
-    notifyOnValue(ui->spinBox_segment);
+    notifyOnText(ui->lineEdit_backend_devices);
+    notifyOnValue(ui->spinBox_segment_size);
     notifyOnText(ui->lineEdit_session);
     notifyOnValue(ui->spinBox_runtime);
     notifyOnText(ui->lineEdit_skip);
@@ -180,18 +184,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnToggle(ui->checkBox_speed_only);
     notifyOnToggle(ui->checkBox_override_workload_profile);
     notifyOnIndex(ui->comboBox_workload_profile);
-    notifyOnText(ui->lineEdit_device_types);
+    notifyOnText(ui->lineEdit_opencl_device_types);
     notifyOnToggle(ui->checkBox_hwmon_temp_abort);
     notifyOnValue(ui->spinBox_hwmon_temp_abort);
 
     /* ---------- menu actions ---------- */
-    connect(ui->actionHelp_About, &QAction::triggered, this, &MainWindow::aboutTriggered);
-    connect(ui->actionReset_fields, &QAction::triggered, this, &MainWindow::resetFieldsTriggered);
+    connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::aboutTriggered);
+    connect(ui->actionResetFields, &QAction::triggered, this, &MainWindow::resetFieldsTriggered);
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::quitTriggered);
     connect(ui->actionExport, &QAction::triggered, this, &MainWindow::exportTriggered);
     connect(ui->actionImport, &QAction::triggered, this, &MainWindow::importTriggered);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::settingsTriggered);
-    connect(ui->actionAbout_Qt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
+    connect(ui->actionAboutQt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
 
     /* ---------- wordlist ---------- */
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this,
@@ -213,9 +217,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::wordlistSortDescClicked);
 
     /* ---------- rules ---------- */
-    connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesfile1Toggled);
-    connect(ui->checkBox_rulesfile_2, &QCheckBox::toggled, this, &MainWindow::rulesfile2Toggled);
-    connect(ui->checkBox_rulesfile_3, &QCheckBox::toggled, this, &MainWindow::rulesfile3Toggled);
+    connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesFile1Toggled);
+    connect(ui->checkBox_rulesfile_2, &QCheckBox::toggled, this, &MainWindow::rulesFile2Toggled);
+    connect(ui->checkBox_rulesfile_3, &QCheckBox::toggled, this, &MainWindow::rulesFile3Toggled);
     connect(ui->pushButton_open_rulesfile_1, &QPushButton::clicked, this,
             &MainWindow::openRulesFile1Clicked);
     connect(ui->pushButton_open_rulesfile_2, &QPushButton::clicked, this,
@@ -243,7 +247,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::openHashFileClicked);
     connect(ui->pushButton_open_outfile, &QPushButton::clicked, this,
             &MainWindow::openOutfileClicked);
-    connect(ui->pushButton_execute, &QPushButton::clicked, this, &MainWindow::executeClicked);
+    connect(ui->pushButton_start, &QPushButton::clicked, this, &MainWindow::startClicked);
     connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this,
             &MainWindow::copyCommandToClipboard);
     connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled,
@@ -369,7 +373,7 @@ void MainWindow::exportTriggered()
 {
     QStringList ignoreWidgets = {AppConstants::Files::PreviewWidget};
 
-    QString file = QFileDialog::getSaveFileName(this, tr("Save Profile"), QString(),
+    QString file = QFileDialog::getSaveFileName(this, tr("Export Profile"), QString(),
                                                 tr("JSON Files (*.json)"));
 
     if (!file.isEmpty()) {
@@ -377,9 +381,9 @@ void MainWindow::exportTriggered()
         const QString key = QString::fromUtf8(metaObject()->className());
         QString error;
         if (s.saveStateToFile(key, this, file, ignoreWidgets, &error)) {
-            QMessageBox::information(this, tr("Saved"), tr("Profile saved to %1.").arg(file));
+            QMessageBox::information(this, tr("Exported"), tr("Profile exported to %1.").arg(file));
         } else {
-            QMessageBox::warning(this, tr("Save failed"), error);
+            QMessageBox::warning(this, tr("Export failed"), error);
         }
     }
 }
@@ -387,7 +391,7 @@ void MainWindow::exportTriggered()
 // File → Import
 void MainWindow::importTriggered()
 {
-    QString file = QFileDialog::getOpenFileName(this, tr("Load Profile"), QString(),
+    QString file = QFileDialog::getOpenFileName(this, tr("Import Profile"), QString(),
                                                 tr("JSON Files (*.json)"));
 
     if (!file.isEmpty()) {
@@ -401,13 +405,13 @@ void MainWindow::importTriggered()
             const QString problem = restoreHashType(state);
             commandChanged();
             if (problem.isEmpty()) {
-                QMessageBox::information(this, tr("Loaded"),
-                                         tr("Profile loaded from %1.").arg(file));
+                QMessageBox::information(this, tr("Imported"),
+                                         tr("Profile imported from %1.").arg(file));
             } else {
                 QMessageBox::warning(this, tr("Profile warning"), problem);
             }
         } else {
-            QMessageBox::warning(this, tr("Load failed"), error);
+            QMessageBox::warning(this, tr("Import failed"), error);
         }
     }
 }
@@ -415,7 +419,7 @@ void MainWindow::importTriggered()
 // Tools → Reset field
 void MainWindow::resetFieldsTriggered()
 {
-    // Main tab
+    // Attack tab
     ui->lineEdit_hashfile->clear();
     ui->checkBox_ignoreusername->setChecked(false);
     ui->checkBox_remove->setChecked(false);
@@ -450,16 +454,17 @@ void MainWindow::resetFieldsTriggered()
     ui->lineEdit_custom_charset3->clear();
     ui->checkBox_custom_charset4->setChecked(false);
     ui->lineEdit_custom_charset4->clear();
-    ui->checkBox_hex_hash->setChecked(false);
+    ui->checkBox_hex_charset->setChecked(false);
     ui->checkBox_hex_salt->setChecked(false);
+
+    // General tab
     ui->checkBox_outfile->setChecked(false);
     ui->lineEdit_outfile->clear();
     ui->lineEdit_outfile_format->setText(AppConstants::Defaults::OutfileFormat);
     ui->lineEdit_cpu_affinity->clear();
-    ui->lineEdit_devices->setText(AppConstants::Defaults::BackendDevices);
-    ui->spinBox_segment->setValue(AppConstants::Defaults::SegmentSize);
+    ui->lineEdit_backend_devices->setText(AppConstants::Defaults::BackendDevices);
+    ui->spinBox_segment_size->setValue(AppConstants::Defaults::SegmentSize);
 
-    // General tab
     ui->lineEdit_session->clear();
     ui->spinBox_runtime->setValue(AppConstants::Defaults::Runtime);
     ui->lineEdit_skip->clear();
@@ -472,7 +477,7 @@ void MainWindow::resetFieldsTriggered()
     ui->checkBox_speed_only->setChecked(false);
     ui->checkBox_override_workload_profile->setChecked(false);
     ui->comboBox_workload_profile->setCurrentIndex(0);
-    ui->lineEdit_device_types->clear();
+    ui->lineEdit_opencl_device_types->clear();
     ui->checkBox_hwmon_temp_abort->setChecked(false);
     ui->spinBox_hwmon_temp_abort->setValue(AppConstants::Defaults::HwmonTempAbort);
 
@@ -616,10 +621,9 @@ void MainWindow::initHashAndAttackModes()
 {
     ui->comboBox_attack->clear();
     ui->comboBox_hash_type->clear();
-    attackModes.clear();
-    hashModes.clear();
 
     // Attack modes
+    QMap<AttackMode, QString> attackModes;
     attackModes.insert(AttackMode::Straight, tr("Straight"));
     attackModes.insert(AttackMode::Combination, tr("Combination"));
     attackModes.insert(AttackMode::BruteForce, tr("Brute-force"));
@@ -658,12 +662,10 @@ void MainWindow::initHashAndAttackModes()
             } else {
                 QMap<quint32, QString> parsed;
                 if (HashcatInfoParser::parseExampleHashes(result.standardOutput, parsed, &error)) {
-                    hashModes = std::move(parsed);
-
                     ui->comboBox_hash_type->clear();
 
                     // fill the combobox, hash type id as item data
-                    for (auto it = hashModes.constBegin(); it != hashModes.constEnd(); ++it) {
+                    for (auto it = parsed.constBegin(); it != parsed.constEnd(); ++it) {
                         ui->comboBox_hash_type->addItem(it.value(), it.key());
                     }
 
@@ -711,7 +713,7 @@ void MainWindow::updateViewAttackMode()
     const bool usesRuleRight = CommandBuilder::attackUsesRuleRight(mode);
     ui->groupBox_wordlists->setEnabled(CommandBuilder::attackUsesWordlists(mode));
     ui->groupBox_rules->setEnabled(CommandBuilder::attackUsesRules(mode));
-    ui->groupBox_combination_rules->setEnabled(usesRuleLeft || usesRuleRight);
+    ui->groupBox_wordlist_rules->setEnabled(usesRuleLeft || usesRuleRight);
     ui->label_rule_left->setEnabled(usesRuleLeft);
     ui->lineEdit_rule_left->setEnabled(usesRuleLeft);
     ui->label_rule_right->setEnabled(usesRuleRight);
@@ -720,7 +722,7 @@ void MainWindow::updateViewAttackMode()
     ui->groupBox_mask->setEnabled(usesMask);
     // --hex-charset only describes masks and custom charsets; keep it out of
     // reach in the modes that use neither.
-    ui->checkBox_hex_hash->setEnabled(usesMask);
+    ui->checkBox_hex_charset->setEnabled(usesMask);
 
     // Tell the user what the mode expects, so the launch validation does not
     // have to be the first thing that explains it.
@@ -738,11 +740,11 @@ AttackMode MainWindow::currentAttackMode() const
 
 // What the user has to provide for the selected attack mode.
 //
-// The wording follows the requirements in HelperUtils::modeRequirements(), so
+// The wording follows the requirements in CommandBuilder::modeRequirements(), so
 // the hint and the launch validation cannot tell the user different things.
 QString MainWindow::modeHint(AttackMode mode) const
 {
-    const HelperUtils::ModeRequirements requirements = HelperUtils::modeRequirements(mode);
+    const CommandBuilder::ModeRequirements requirements = CommandBuilder::modeRequirements(mode);
 
     // Combination mode is the only one that wants an exact number of word
     // lists, and its two lists are the left and the right side.
@@ -847,19 +849,19 @@ void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
     ui->toolButton_wordlist_sort_desc->setEnabled(true);
 }
 
-void MainWindow::rulesfile1Toggled(bool checked)
+void MainWindow::rulesFile1Toggled(bool checked)
 {
     ui->lineEdit_rulesfile_1->setEnabled(checked);
     ui->pushButton_open_rulesfile_1->setEnabled(checked);
 }
 
-void MainWindow::rulesfile2Toggled(bool checked)
+void MainWindow::rulesFile2Toggled(bool checked)
 {
     ui->lineEdit_rulesfile_2->setEnabled(checked);
     ui->pushButton_open_rulesfile_2->setEnabled(checked);
 }
 
-void MainWindow::rulesfile3Toggled(bool checked)
+void MainWindow::rulesFile3Toggled(bool checked)
 {
     ui->lineEdit_rulesfile_3->setEnabled(checked);
     ui->pushButton_open_rulesfile_3->setEnabled(checked);
@@ -871,9 +873,9 @@ void MainWindow::useRulesFileToggled(bool checked)
     ui->checkBox_rulesfile_2->setEnabled(checked);
     ui->checkBox_rulesfile_3->setEnabled(checked);
     if (checked) {
-        rulesfile1Toggled(ui->checkBox_rulesfile_1->isChecked());
-        rulesfile2Toggled(ui->checkBox_rulesfile_2->isChecked());
-        rulesfile3Toggled(ui->checkBox_rulesfile_3->isChecked());
+        rulesFile1Toggled(ui->checkBox_rulesfile_1->isChecked());
+        rulesFile2Toggled(ui->checkBox_rulesfile_2->isChecked());
+        rulesFile3Toggled(ui->checkBox_rulesfile_3->isChecked());
     }
 }
 
@@ -882,9 +884,9 @@ void MainWindow::generateRulesToggled(bool checked)
     ui->spinBox_generate_rules->setEnabled(checked);
     if (checked) {
         useRulesFileToggled(false);
-        rulesfile1Toggled(false);
-        rulesfile2Toggled(false);
-        rulesfile3Toggled(false);
+        rulesFile1Toggled(false);
+        rulesFile2Toggled(false);
+        rulesFile3Toggled(false);
     }
 }
 
@@ -949,8 +951,8 @@ void MainWindow::hashFileTextChanged(const QString &text)
     // still holds the suggestion generated for the previous one.
     const QString suggestion = text + AppConstants::Defaults::OutfileSuffix;
     QLineEdit *outfile = ui->lineEdit_outfile;
-    if (outfile->text().isEmpty() || outfile->text() == suggestedOutfile) {
-        suggestedOutfile = suggestion;
+    if (outfile->text().isEmpty() || outfile->text() == m_suggestedOutfile) {
+        m_suggestedOutfile = suggestion;
         outfile->setText(suggestion);
     }
 }
@@ -965,7 +967,7 @@ void MainWindow::copyCommandToClipboard()
     }
 }
 
-void MainWindow::executeClicked()
+void MainWindow::startClicked()
 {
     // What the selected attack mode needs comes first: it is what the user
     // has just configured, and hashcat would only answer it with a usage
@@ -983,7 +985,7 @@ void MainWindow::executeClicked()
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     const QString configuredTerminal =
         settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
-    const QMap<QString, QStringList> availableTerminals = HelperUtils::getAvailableTerminals();
+    const QMap<QString, QStringList> availableTerminals = HelperUtils::availableTerminals();
 
     // Nothing is started unless the configuration is known to be complete.
     const HelperUtils::LaunchError error =
@@ -1081,8 +1083,8 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         break;
 
     case HelperUtils::LaunchError::WrongWordlistCount: {
-        const HelperUtils::ModeRequirements requirements =
-            HelperUtils::modeRequirements(currentAttackMode());
+        const CommandBuilder::ModeRequirements requirements =
+            CommandBuilder::modeRequirements(currentAttackMode());
         box.setIcon(QMessageBox::Information);
         box.setText(tr("This attack mode needs exactly %1 word lists.\nCurrently selected: %2.")
                         .arg(requirements.minWordlists)
@@ -1186,7 +1188,7 @@ HashcatOptions MainWindow::collectHashcatOptions()
     }
     options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
 
-    // checkBox_hex_hash is named after nothing in particular: it reads
+    // checkBox_hex_charset is named after nothing in particular: it reads
     // "Assume charset is given in hex", maps to --hex-charset, and its object
     // name is also the key a saved profile stores it under.
     QCheckBox *charsetBoxes[4] = {
@@ -1206,7 +1208,7 @@ HashcatOptions MainWindow::collectHashcatOptions()
         options.customCharsets[i].value = charsetEdits[i]->text();
     }
 
-    options.hexCharset = ui->checkBox_hex_hash->isChecked();
+    options.hexCharset = ui->checkBox_hex_charset->isChecked();
     options.hexSalt = ui->checkBox_hex_salt->isChecked();
     options.hexWordlist = ui->checkBox_hex_wordlist->isChecked();
     options.encodingFrom = ui->lineEdit_encoding_from->text();
@@ -1216,11 +1218,11 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.outfile = ui->lineEdit_outfile->text();
     options.outfileFormat = ui->lineEdit_outfile_format->text();
     options.cpuAffinity = ui->lineEdit_cpu_affinity->text();
-    options.backendDevices = ui->lineEdit_devices->text();
-    options.deviceTypes = ui->lineEdit_device_types->text();
+    options.backendDevices = ui->lineEdit_backend_devices->text();
+    options.openclDeviceTypes = ui->lineEdit_opencl_device_types->text();
     options.hwmonTempAbort = ui->checkBox_hwmon_temp_abort->isChecked();
     options.hwmonTempAbortCelsius = ui->spinBox_hwmon_temp_abort->value();
-    options.segmentSize = ui->spinBox_segment->value();
+    options.segmentSize = ui->spinBox_segment_size->value();
     options.hashFile = ui->lineEdit_hashfile->text();
 
     const auto wordlists =

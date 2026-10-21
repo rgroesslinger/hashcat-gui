@@ -6,7 +6,7 @@
 - **Translations**: Multi-language support with compiled translation catalogs; language can be selected in settings (system default falls back to English) (#12)
 - **Terminal support**: Added alacritty, kitty, foot, wezterm, and Windows Terminal (#7)
 - **CLI help**: Added `--version` and `--help` command-line parser support
-- **Test suite**: Integrated `tst_*` binaries into `ctest`, covering command line rules, hash type parser, hashcat launch, profile serializer, settings dialog, main window, and translation catalogs
+- **Test suite**: Integrated `tst_*` binaries into `ctest`, covering command line rules, hash type parser, hashcat launch, profile serializer, settings dialog, about dialog, main window, and translation catalogs
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
 
 ### Improvements

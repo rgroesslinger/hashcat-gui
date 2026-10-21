@@ -28,12 +28,8 @@ private slots:
     void cleanup();
     void validateLaunch_data();
     void validateLaunch();
-    void modeRequirements_data();
-    void modeRequirements();
     void validateOptions_data();
     void validateOptions();
-    void parameterSpelling();
-    void unknownParameterIsEmpty();
     void terminalArgumentsArePinned();
     void executeHashcatWithoutAPath();
     void executeHashcatCapturesOutput();
@@ -156,38 +152,6 @@ void TestHelperUtils::validateLaunch()
              expected);
 }
 
-// What each attack mode needs from the user. These numbers are what the
-// launch validation and the hint under the mode selector work with.
-void TestHelperUtils::modeRequirements_data()
-{
-    QTest::addColumn<int>("mode");
-    QTest::addColumn<int>("minWordlists");
-    QTest::addColumn<int>("maxWordlists");
-    QTest::addColumn<bool>("needsMask");
-
-    QTest::newRow("straight") << int(AttackMode::Straight) << 1 << -1 << false;
-    QTest::newRow("combination") << int(AttackMode::Combination) << 2 << 2 << false;
-    QTest::newRow("brute force") << int(AttackMode::BruteForce) << 0 << -1 << true;
-    QTest::newRow("hybrid word + mask") << int(AttackMode::HybridWordMask) << 1 << -1 << true;
-    QTest::newRow("hybrid mask + word") << int(AttackMode::HybridMaskWord) << 1 << -1 << true;
-    QTest::newRow("association") << int(AttackMode::Association) << 1 << -1 << false;
-}
-
-void TestHelperUtils::modeRequirements()
-{
-    QFETCH(int, mode);
-    QFETCH(int, minWordlists);
-    QFETCH(int, maxWordlists);
-    QFETCH(bool, needsMask);
-
-    const HelperUtils::ModeRequirements requirements =
-        HelperUtils::modeRequirements(static_cast<AttackMode>(mode));
-
-    QCOMPARE(requirements.minWordlists, minWordlists);
-    QCOMPARE(requirements.maxWordlists, maxWordlists);
-    QCOMPARE(requirements.needsMask, needsMask);
-}
-
 // The checks that keep an attack that hashcat would refuse from starting.
 void TestHelperUtils::validateOptions_data()
 {
@@ -300,60 +264,7 @@ void TestHelperUtils::validateOptions()
     QCOMPARE(int(HelperUtils::validateOptions(options, nullptr)), expected);
 }
 
-void TestHelperUtils::parameterSpelling()
-{
-    using Parameter = HelperUtils::Parameter;
-
-    QCOMPARE(HelperUtils::getParameter(Parameter::AttackMode), QStringLiteral("--attack-mode"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::AttackMode, true), QStringLiteral("-a"));
-
-    // --cpu-affinity has no short form; asking for one must fall back to the
-    // long one rather than produce an empty argument
-    QCOMPARE(HelperUtils::getParameter(Parameter::CpuAffinity, true),
-             QStringLiteral("--cpu-affinity"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::CpuAffinity, false),
-             QStringLiteral("--cpu-affinity"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::HexCharset, true),
-             QStringLiteral("--hex-charset"));
-
-    // The short forms that differ from the parameter name are easy to get
-    // wrong, so pin them here as well.
-    QCOMPARE(HelperUtils::getParameter(Parameter::Increment, true), QStringLiteral("-i"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::Skip, true), QStringLiteral("-s"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::Limit, true), QStringLiteral("-l"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::OpenclDeviceTypes, true), QStringLiteral("-D"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::RuleLeft, true), QStringLiteral("-j"));
-    QCOMPARE(HelperUtils::getParameter(Parameter::RuleRight, true), QStringLiteral("-k"));
-
-    // every enumerator has to be spelled out, otherwise the option silently
-    // vanishes from the command line
-    const Parameter all[] = {
-        Parameter::AttackMode,      Parameter::BackendDevices,  Parameter::CpuAffinity,
-        Parameter::CustomCharset1,  Parameter::CustomCharset2,  Parameter::CustomCharset3,
-        Parameter::CustomCharset4,  Parameter::EncodingFrom,    Parameter::EncodingTo,
-        Parameter::Force,           Parameter::GenerateRules,   Parameter::HashType,
-        Parameter::HexCharset,      Parameter::HexSalt,         Parameter::HexWordlist,
-        Parameter::HwmonTempAbort,  Parameter::Increment,       Parameter::IncrementMax,
-        Parameter::IncrementMin,    Parameter::Limit,           Parameter::OpenclDeviceTypes,
-        Parameter::OptimizedKernel, Parameter::Outfile,         Parameter::OutfileFormat,
-        Parameter::PotfileDisable,  Parameter::Remove,          Parameter::RuleLeft,
-        Parameter::RuleRight,       Parameter::RulesFile,       Parameter::Runtime,
-        Parameter::SegmentSize,     Parameter::Session,         Parameter::Skip,
-        Parameter::SpeedOnly,       Parameter::Status,          Parameter::StatusTimer,
-        Parameter::Username,        Parameter::WorkloadProfile,
-    };
-    for (const Parameter key : all) {
-        QVERIFY2(!HelperUtils::getParameter(key).isEmpty(), "an enum has no long spelling");
-        QVERIFY2(!HelperUtils::getParameter(key, true).isEmpty(), "an enum has no spelling at all");
-    }
-}
-
-void TestHelperUtils::unknownParameterIsEmpty()
-{
-    QVERIFY(HelperUtils::getParameter(static_cast<HelperUtils::Parameter>(4711)).isEmpty());
-}
-
-// The mapping executeClicked() builds its command line from: pin every
+// The mapping startClicked() builds its command line from: pin every
 // entry, because a wrong one is a terminal that starts and then never runs hashcat.
 void TestHelperUtils::terminalArgumentsArePinned()
 {

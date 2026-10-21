@@ -38,7 +38,7 @@ Alternatively, download the latest [source release](https://github.com/rgroessli
 | Distribution | Package installation command |
 | - | ----- |
 | Debian/Ubuntu | `apt install build-essential cmake qt6-base-dev qt6-tools-dev qt6-l10n-tools` |
-| Fedora | `dnf install gcc-c++ cmake qt6-qtbase-devel qt6-qttools-devel` |
+| Fedora | `dnf install gcc-c++ cmake qt6-qtbase-devel qt6-qttools-devel qt6-linguist` |
 | openSUSE | `zypper install gcc-c++ cmake qt6-base-devel qt6-linguist-devel` |
 | Arch | `pacman -S --needed gcc cmake qt6-base qt6-tools` |
 
@@ -110,7 +110,7 @@ A normal build compiles the committed catalogs to `.qm`.
 cmake --build build --target clang-format
 ```
 
-`.clang-tidy` runs over the whole tree from a target:
+`.clang-tidy` runs over the sources in `src/` and the tests in `tests/` from a target:
 
 ```
 cmake --build build --target clang-tidy

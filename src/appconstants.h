@@ -67,8 +67,8 @@ inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 } // namespace Files
 
 // Values the widgets start with. The identical defaults are baked into the
-// .ui files (lineEdit_outfile_format = "1,2", lineEdit_devices is empty,
-// spinBox_segment = 32, comboBox_workload_profile items "1".."4"), so these
+// .ui files (lineEdit_outfile_format = "1,2", lineEdit_backend_devices is empty,
+// spinBox_segment_size = 32, comboBox_workload_profile items "1".."4"), so these
 // constants only describe what code constructing the widgets itself gets.
 namespace Defaults
 {

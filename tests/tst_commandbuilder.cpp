@@ -37,6 +37,10 @@ private slots:
     void outfileIsOptInAndExpanded();
     void expandOutfileTemplateSubstitutesUnixTimeAndHash();
     void nonAsciiArgumentsSurviveVerbatim();
+    void modeRequirements_data();
+    void modeRequirements();
+    void parameterSpelling();
+    void unknownParameterIsEmpty();
     void predicates();
 };
 
@@ -203,7 +207,7 @@ void TestCommandBuilder::advancedOptionsAreEmitted()
     options.hexWordlist = true;
     options.encodingFrom = QStringLiteral("iso-8859-15");
     options.encodingTo = QStringLiteral("utf-8");
-    options.deviceTypes = QStringLiteral("1,2");
+    options.openclDeviceTypes = QStringLiteral("1,2");
     options.hwmonTempAbort = true;
     options.hwmonTempAbortCelsius = 85;
     options.hashFile = QStringLiteral("hash.txt");
@@ -399,7 +403,7 @@ void TestCommandBuilder::advancedShortForms()
     options.hexWordlist = true;
     options.encodingFrom = QStringLiteral("iso-8859-15");
     options.encodingTo = QStringLiteral("utf-8");
-    options.deviceTypes = QStringLiteral("1,2");
+    options.openclDeviceTypes = QStringLiteral("1,2");
     options.hwmonTempAbort = true;
     options.hwmonTempAbortCelsius = 85;
 
@@ -546,6 +550,93 @@ void TestCommandBuilder::nonAsciiArgumentsSurviveVerbatim()
     // not the single Latin-1 byte F6 a local-8-bit conversion would produce.
     const QByteArray commandLine = arguments.join(QLatin1Char(' ')).toUtf8();
     QVERIFY(commandLine.contains(QByteArray::fromHex("c3b6")));
+}
+
+// What each attack mode needs from the user. These numbers are what the
+// launch validation and the hint under the mode selector work with.
+void TestCommandBuilder::modeRequirements_data()
+{
+    QTest::addColumn<int>("mode");
+    QTest::addColumn<int>("minWordlists");
+    QTest::addColumn<int>("maxWordlists");
+    QTest::addColumn<bool>("needsMask");
+
+    QTest::newRow("straight") << int(AttackMode::Straight) << 1 << -1 << false;
+    QTest::newRow("combination") << int(AttackMode::Combination) << 2 << 2 << false;
+    QTest::newRow("brute force") << int(AttackMode::BruteForce) << 0 << -1 << true;
+    QTest::newRow("hybrid word + mask") << int(AttackMode::HybridWordMask) << 1 << -1 << true;
+    QTest::newRow("hybrid mask + word") << int(AttackMode::HybridMaskWord) << 1 << -1 << true;
+    QTest::newRow("association") << int(AttackMode::Association) << 1 << -1 << false;
+}
+
+void TestCommandBuilder::modeRequirements()
+{
+    QFETCH(int, mode);
+    QFETCH(int, minWordlists);
+    QFETCH(int, maxWordlists);
+    QFETCH(bool, needsMask);
+
+    const CommandBuilder::ModeRequirements requirements =
+        CommandBuilder::modeRequirements(static_cast<AttackMode>(mode));
+
+    QCOMPARE(requirements.minWordlists, minWordlists);
+    QCOMPARE(requirements.maxWordlists, maxWordlists);
+    QCOMPARE(requirements.needsMask, needsMask);
+}
+
+void TestCommandBuilder::parameterSpelling()
+{
+    using Parameter = CommandBuilder::Parameter;
+
+    QCOMPARE(CommandBuilder::parameterName(Parameter::AttackMode), QStringLiteral("--attack-mode"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::AttackMode, true), QStringLiteral("-a"));
+
+    // --cpu-affinity has no short form; asking for one must fall back to the
+    // long one rather than produce an empty argument
+    QCOMPARE(CommandBuilder::parameterName(Parameter::CpuAffinity, true),
+             QStringLiteral("--cpu-affinity"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::CpuAffinity, false),
+             QStringLiteral("--cpu-affinity"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::HexCharset, true),
+             QStringLiteral("--hex-charset"));
+
+    // The short forms that differ from the parameter name are easy to get
+    // wrong, so pin them here as well.
+    QCOMPARE(CommandBuilder::parameterName(Parameter::Increment, true), QStringLiteral("-i"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::Skip, true), QStringLiteral("-s"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::Limit, true), QStringLiteral("-l"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::OpenclDeviceTypes, true),
+             QStringLiteral("-D"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::RuleLeft, true), QStringLiteral("-j"));
+    QCOMPARE(CommandBuilder::parameterName(Parameter::RuleRight, true), QStringLiteral("-k"));
+
+    // every enumerator has to be spelled out, otherwise the option silently
+    // vanishes from the command line
+    const Parameter all[] = {
+        Parameter::AttackMode,      Parameter::BackendDevices,  Parameter::CpuAffinity,
+        Parameter::CustomCharset1,  Parameter::CustomCharset2,  Parameter::CustomCharset3,
+        Parameter::CustomCharset4,  Parameter::EncodingFrom,    Parameter::EncodingTo,
+        Parameter::Force,           Parameter::GenerateRules,   Parameter::HashType,
+        Parameter::HexCharset,      Parameter::HexSalt,         Parameter::HexWordlist,
+        Parameter::HwmonTempAbort,  Parameter::Increment,       Parameter::IncrementMax,
+        Parameter::IncrementMin,    Parameter::Limit,           Parameter::OpenclDeviceTypes,
+        Parameter::OptimizedKernel, Parameter::Outfile,         Parameter::OutfileFormat,
+        Parameter::PotfileDisable,  Parameter::Remove,          Parameter::RuleLeft,
+        Parameter::RuleRight,       Parameter::RulesFile,       Parameter::Runtime,
+        Parameter::SegmentSize,     Parameter::Session,         Parameter::Skip,
+        Parameter::SpeedOnly,       Parameter::Status,          Parameter::StatusTimer,
+        Parameter::Username,        Parameter::WorkloadProfile,
+    };
+    for (const Parameter key : all) {
+        QVERIFY2(!CommandBuilder::parameterName(key).isEmpty(), "an enum has no long spelling");
+        QVERIFY2(!CommandBuilder::parameterName(key, true).isEmpty(),
+                 "an enum has no spelling at all");
+    }
+}
+
+void TestCommandBuilder::unknownParameterIsEmpty()
+{
+    QVERIFY(CommandBuilder::parameterName(static_cast<CommandBuilder::Parameter>(4711)).isEmpty());
 }
 
 void TestCommandBuilder::predicates()

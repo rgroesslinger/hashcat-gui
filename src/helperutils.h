@@ -36,48 +36,6 @@ class HelperUtils
     Q_DECLARE_TR_FUNCTIONS(HelperUtils)
 
 public:
-    // Valid command line parameters
-    enum class Parameter : std::uint8_t {
-        AttackMode,
-        BackendDevices,
-        CpuAffinity,
-        CustomCharset1,
-        CustomCharset2,
-        CustomCharset3,
-        CustomCharset4,
-        EncodingFrom,
-        EncodingTo,
-        Force,
-        GenerateRules,
-        HashType,
-        HexCharset,
-        HexSalt,
-        HexWordlist,
-        HwmonTempAbort,
-        Increment,
-        IncrementMax,
-        IncrementMin,
-        Limit,
-        OpenclDeviceTypes,
-        OptimizedKernel,
-        Outfile,
-        OutfileFormat,
-        PotfileDisable,
-        Remove,
-        RuleLeft,
-        RuleRight,
-        RulesFile,
-        Runtime,
-        SegmentSize,
-        Session,
-        Skip,
-        SpeedOnly,
-        Status,
-        StatusTimer,
-        Username,
-        WorkloadProfile,
-    };
-
     // What can keep the Execute button from starting anything
     enum class LaunchError : std::uint8_t {
         None,
@@ -93,20 +51,6 @@ public:
         InvalidIncrement,   // the increment bounds contradict each other
     };
 
-    // What an attack mode needs from the user before hashcat can run.
-    //
-    // The numbers come from hashcat's own argument validation: combination
-    // mode multiplies two word lists and refuses every other number, the mask
-    // based modes brute-force a mask and read at least one word list.
-    struct ModeRequirements {
-        // How many word lists the mode reads at least.
-        int minWordlists = 0;
-        // How many at most; -1 means "as many as the user selects".
-        int maxWordlists = -1;
-        // True when the mode needs a mask.
-        bool needsMask = false;
-    };
-
     // Checks everything that has to hold before hashcat can be started.
     //
     // detail receives the offending value - the missing path, or the terminals
@@ -116,12 +60,12 @@ public:
                                       const QStringList &availableTerminals,
                                       QString *detail = nullptr);
 
-    // What the attack mode needs from the user, see ModeRequirements.
-    static ModeRequirements modeRequirements(AttackMode mode);
-
     // Checks what the selected attack mode needs: the word lists it reads,
     // the mask it brute-forces and the bounds of the increment. detail
     // receives the number of selected word lists when it is not nullptr.
+    //
+    // What the mode needs comes from CommandBuilder::modeRequirements(), so
+    // the group boxes, the mode hint and this check cannot disagree.
     static LaunchError validateOptions(const HashcatOptions &options, QString *detail = nullptr);
 
     static QFuture<HashcatResult>
@@ -132,8 +76,7 @@ public:
     // here looks at the filesystem - so the tests can pin every entry.
     static const QMap<QString, QStringList> &terminalArguments();
 
-    static QMap<QString, QStringList> getAvailableTerminals();
-    static QString getParameter(Parameter key, bool useShort = false);
+    static QMap<QString, QStringList> availableTerminals();
 };
 
 #endif // HELPERUTILS_H
