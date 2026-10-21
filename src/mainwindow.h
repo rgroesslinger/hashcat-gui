@@ -108,11 +108,10 @@ private:
     // What the selected attack mode needs from the user.
     QString modeHint(AttackMode mode) const;
 
-    // The notes an import has for the user: the version the file was made by,
-    // the sections it holds besides the one that was imported, and the values
-    // this version does not know.
-    QStringList importNotes(int fileVersion, int currentVersion, const QStringList &otherSections,
-                            const QStringList &unknownValues) const;
+    // The notes an import has about the file itself: the version it was made
+    // by and the sections it holds besides the one that was imported.
+    QStringList fileNotes(int fileVersion, int currentVersion,
+                          const QStringList &otherSections) const;
 
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about

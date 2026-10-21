@@ -47,6 +47,7 @@ private slots:
     void importSettingsFillsTheDialog();
     void importSettingsAppliesEmptyValues();
     void importSettingsNamesTheUnknownKeys();
+    void importSettingsDoesNotApplyAValueOfTheWrongType();
     void colorSchemeFollowsTheSetting();
     void fitsItsContent();
     void groupBoxesShareOneTitleAlignment();
@@ -424,6 +425,32 @@ void TestSettingsDialog::importSettingsNamesTheUnknownKeys()
     QCOMPARE(notes.size(), 1);
     QVERIFY(notes.first().contains(QStringLiteral("aKeyFromTheFuture")));
     QVERIFY(notes.first().contains(QStringLiteral("anotherOne")));
+}
+
+// A value of the wrong type cannot be applied: converting it would change a
+// setting the user did not ask for. The setting keeps what it has, and the
+// value is reported.
+void TestSettingsDialog::importSettingsDoesNotApplyAValueOfTheWrongType()
+{
+    QJsonObject stored;
+    // A check box wants a boolean, a text field a string.
+    stored.insert(QStringLiteral("useShortParameters"), QStringLiteral("invalidString"));
+    stored.insert(QStringLiteral("hashcatPath"), 42);
+
+    SettingsDialog dialog;
+    dialog.ui->checkBox_use_short_parameters->setChecked(true);
+    dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/before/hashcat"));
+
+    const QStringList notes = dialog.applyImportedSettings(stored);
+
+    // The settings keep the values they had.
+    QCOMPARE(dialog.ui->checkBox_use_short_parameters->isChecked(), true);
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QStringLiteral("/before/hashcat"));
+
+    // ... and the values that were not applied are named.
+    QCOMPARE(notes.size(), 1);
+    QVERIFY(notes.first().contains(QStringLiteral("useShortParameters")));
+    QVERIFY(notes.first().contains(QStringLiteral("hashcatPath")));
 }
 
 int main(int argc, char *argv[])

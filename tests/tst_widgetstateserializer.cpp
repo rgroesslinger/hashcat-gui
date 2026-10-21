@@ -33,6 +33,7 @@ private slots:
     void ignoredWidgetsAreNotSaved();
     void ignoredWidgetsAreNotRestored();
     void aValueNoWidgetClaimedIsReported();
+    void aValueOfTheWrongTypeIsNotApplied();
     void theInputIsNotModified();
 };
 
@@ -281,11 +282,44 @@ void TestWidgetStateSerializer::aValueNoWidgetClaimedIsReported()
     values.insert(QStringLiteral("lineEdit_fromTheFuture"), QStringLiteral("something"));
 
     Form restored;
-    const QStringList unknown = WidgetStateSerializer::applyToWidgets(values, &restored.widget);
+    const WidgetStateSerializer::ApplyResult result =
+        WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
-    QCOMPARE(unknown, QStringList{QStringLiteral("lineEdit_fromTheFuture")});
+    QCOMPARE(result.unknownKeys, QStringList{QStringLiteral("lineEdit_fromTheFuture")});
+    QVERIFY(result.wrongTypes.isEmpty());
     // The value that did name a widget was applied.
     QCOMPARE(restored.lineEdit->text(), QStringLiteral("-m 0 --quiet"));
+}
+
+// A value of the wrong type cannot be applied: converting it would change
+// something the user did not ask for. The widget keeps what it has, and the
+// value is reported.
+void TestWidgetStateSerializer::aValueOfTheWrongTypeIsNotApplied()
+{
+    QJsonObject values;
+    // A check box wants a boolean, a spin box a number, a line edit a text.
+    values.insert(QStringLiteral("checkBox_rules"), QStringLiteral("invalidString"));
+    values.insert(QStringLiteral("spinBox_segment_size"), QStringLiteral("64"));
+    values.insert(QStringLiteral("lineEdit_command"), 42);
+
+    Form restored;
+    restored.checkBox->setChecked(true);
+    restored.spinBox->setValue(32);
+    restored.lineEdit->setText(QStringLiteral("keep me"));
+
+    const WidgetStateSerializer::ApplyResult result =
+        WidgetStateSerializer::applyToWidgets(values, &restored.widget);
+
+    // The widgets are walked by type, so the names come in that order.
+    QCOMPARE(result.wrongTypes,
+             QStringList({QStringLiteral("lineEdit_command"), QStringLiteral("checkBox_rules"),
+                          QStringLiteral("spinBox_segment_size")}));
+    QVERIFY(result.unknownKeys.isEmpty());
+
+    // The widgets keep the values they had.
+    QCOMPARE(restored.checkBox->isChecked(), true);
+    QCOMPARE(restored.spinBox->value(), 32);
+    QCOMPARE(restored.lineEdit->text(), QStringLiteral("keep me"));
 }
 
 // The caller reads the values after they were applied - the hash type, for

@@ -32,14 +32,25 @@ public:
     // the command preview, which is rebuilt from the other values.
     static QJsonObject toJson(const QWidget *widget, const QStringList &ignoredWidgets = {});
 
-    // Applies a JSON object to the widgets. Returns the names in the values
-    // that no widget claimed - the values of a file that was made by another
-    // version, or that was edited by hand.
+    // The values of a file that could not be applied to the widgets.
+    struct ApplyResult {
+        // The names no widget claimed: the file was made by another version,
+        // or it was edited by hand.
+        QStringList unknownKeys;
+
+        // The names whose value is of a type the widget does not take. The
+        // widget keeps the value it had: applying what the file holds would
+        // change something the user did not ask for.
+        QStringList wrongTypes;
+    };
+
+    // Applies a JSON object to the widgets and reports the values that could
+    // not be applied.
     //
     // The input object is not modified: the names are removed from a copy to
     // compute the remainder, so that the caller can still read the values
     // afterwards - the hash type, for one.
-    static QStringList applyToWidgets(const QJsonObject &values, QWidget *widget,
+    static ApplyResult applyToWidgets(const QJsonObject &values, QWidget *widget,
                                       const QStringList &ignoredWidgets = {});
 };
 

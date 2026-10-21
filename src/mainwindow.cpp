@@ -453,12 +453,14 @@ void MainWindow::importTriggered()
 
     // The mapping applies the values; the hash type is the one it cannot
     // take yet, see restoreHashType().
-    const QStringList unknown = WidgetStateSerializer::applyToWidgets(values, this);
+    const WidgetStateSerializer::ApplyResult notApplied =
+        WidgetStateSerializer::applyToWidgets(values, this);
     const QString problem = restoreHashType(values);
     commandChanged();
 
-    QStringList notes =
-        importNotes(version, AppConstants::Profiles::Version, otherSections, unknown);
+    QStringList notes = fileNotes(version, AppConstants::Profiles::Version, otherSections);
+    notes << StateFile::unknownValuesNote(notApplied.unknownKeys);
+    notes << StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
     if (!problem.isEmpty()) {
         notes << problem;
     }
@@ -472,12 +474,10 @@ void MainWindow::importTriggered()
     }
 }
 
-// The notes an import has for the user: the version the file was made by, the
-// sections it holds besides the one that was imported, and the values this
-// version does not know.
-QStringList MainWindow::importNotes(int fileVersion, int currentVersion,
-                                    const QStringList &otherSections,
-                                    const QStringList &unknownValues) const
+// The notes an import has about the file itself: the version it was made by
+// and the sections it holds besides the one that was imported.
+QStringList MainWindow::fileNotes(int fileVersion, int currentVersion,
+                                  const QStringList &otherSections) const
 {
     QStringList notes;
 
@@ -488,11 +488,6 @@ QStringList MainWindow::importNotes(int fileVersion, int currentVersion,
     if (!otherSections.isEmpty()) {
         notes << tr("The file holds sections this import does not use: %1.")
                      .arg(StateFile::nameList(otherSections));
-    }
-
-    const QString unknown = StateFile::unknownValuesNote(unknownValues);
-    if (!unknown.isEmpty()) {
-        notes << unknown;
     }
 
     return notes;
@@ -546,7 +541,7 @@ void MainWindow::importSettingsTriggered()
     // them before Save applies them.
     SettingsDialog settingsDialog(this);
     QStringList notes = settingsDialog.applyImportedSettings(values);
-    notes << importNotes(version, AppConstants::Settings::Version, otherSections, {});
+    notes << fileNotes(version, AppConstants::Settings::Version, otherSections);
 
     QStringList message;
     message << tr("Settings imported from %1.").arg(file);
@@ -710,14 +705,16 @@ void MainWindow::loadDefaultProfile()
     // The hash combo has no items yet - the query that fills it runs
     // asynchronously. Remember the stored hash type; the reply applies it
     // once the items exist.
-    const QStringList unknown = WidgetStateSerializer::applyToWidgets(values, this);
+    const WidgetStateSerializer::ApplyResult notApplied =
+        WidgetStateSerializer::applyToWidgets(values, this);
     const QString problem = restoreHashType(values);
     commandChanged();
 
     // The auto-load is not an import: there is no headline, and nothing is
     // shown when the load went well.
-    QStringList notes =
-        importNotes(version, AppConstants::Profiles::Version, otherSections, unknown);
+    QStringList notes = fileNotes(version, AppConstants::Profiles::Version, otherSections);
+    notes << StateFile::unknownValuesNote(notApplied.unknownKeys);
+    notes << StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
     if (!problem.isEmpty()) {
         notes << problem;
     }

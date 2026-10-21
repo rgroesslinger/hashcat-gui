@@ -171,3 +171,13 @@ QString StateFile::unknownValuesNote(const QStringList &names)
     return tr("The file names values this version does not know, so they were not applied: %1.")
         .arg(nameList(names));
 }
+
+QString StateFile::wrongTypeValuesNote(const QStringList &names)
+{
+    if (names.isEmpty()) {
+        return {};
+    }
+
+    return tr("The file holds values of the wrong type, so they were not applied: %1.")
+        .arg(nameList(names));
+}

@@ -101,8 +101,9 @@ QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &i
     return obj;
 }
 
-QStringList WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
-                                                  const QStringList &ignoredWidgets)
+WidgetStateSerializer::ApplyResult
+WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
+                                      const QStringList &ignoredWidgets)
 {
     // The names are removed from a copy, so that the caller can still read the
     // values afterwards - the hash type, for one.
@@ -112,24 +113,42 @@ QStringList WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidge
         mutableObj.remove(name);
     }
 
+    ApplyResult result;
+
     // Every name that is applied is taken off the copy, so that what is left
     // over names the values no widget claimed.
     auto const lineEdits = w->findChildren<QLineEdit *>();
     for (QLineEdit *lineEdit : lineEdits) {
         const QString name = lineEdit->objectName();
-        if (mutableObj.contains(name)) {
-            lineEdit->setText(mutableObj[name].toString());
-            mutableObj.remove(name);
+        if (!mutableObj.contains(name)) {
+            continue;
         }
+
+        const QJsonValue value = mutableObj.value(name);
+        mutableObj.remove(name);
+
+        if (!value.isString()) {
+            result.wrongTypes << name;
+            continue;
+        }
+        lineEdit->setText(value.toString());
     }
 
     auto const checkBoxes = w->findChildren<QCheckBox *>();
     for (QCheckBox *checkBox : checkBoxes) {
         const QString name = checkBox->objectName();
-        if (mutableObj.contains(name)) {
-            checkBox->setChecked(mutableObj[name].toBool());
-            mutableObj.remove(name);
+        if (!mutableObj.contains(name)) {
+            continue;
         }
+
+        const QJsonValue value = mutableObj.value(name);
+        mutableObj.remove(name);
+
+        if (!value.isBool()) {
+            result.wrongTypes << name;
+            continue;
+        }
+        checkBox->setChecked(value.toBool());
     }
 
     auto const comboBoxes = w->findChildren<QComboBox *>();
@@ -144,6 +163,13 @@ QStringList WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidge
         mutableObj.remove(name);
 
         if (stored.isUndefined() || stored.isNull()) {
+            continue;
+        }
+
+        // A combo box holds the identifier of its entry or its position; both
+        // are numbers, but an entry may carry a text as its identifier.
+        if (!stored.isDouble() && !stored.isString()) {
+            result.wrongTypes << name;
             continue;
         }
 
@@ -166,46 +192,80 @@ QStringList WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidge
     auto const radioButtons = w->findChildren<QRadioButton *>();
     for (QRadioButton *radioButton : radioButtons) {
         const QString name = radioButton->objectName();
-        if (mutableObj.contains(name)) {
-            radioButton->setChecked(mutableObj[name].toBool());
-            mutableObj.remove(name);
+        if (!mutableObj.contains(name)) {
+            continue;
         }
+
+        const QJsonValue value = mutableObj.value(name);
+        mutableObj.remove(name);
+
+        if (!value.isBool()) {
+            result.wrongTypes << name;
+            continue;
+        }
+        radioButton->setChecked(value.toBool());
     }
 
     auto const spinBoxes = w->findChildren<QSpinBox *>();
     for (QSpinBox *spinBox : spinBoxes) {
         const QString name = spinBox->objectName();
-        if (mutableObj.contains(name)) {
-            spinBox->setValue(mutableObj[name].toInt());
-            mutableObj.remove(name);
+        if (!mutableObj.contains(name)) {
+            continue;
         }
+
+        const QJsonValue value = mutableObj.value(name);
+        mutableObj.remove(name);
+
+        if (!value.isDouble()) {
+            result.wrongTypes << name;
+            continue;
+        }
+        spinBox->setValue(value.toInt());
     }
 
     auto const doubleSpinBoxes = w->findChildren<QDoubleSpinBox *>();
     for (QDoubleSpinBox *doubleSpinBox : doubleSpinBoxes) {
         const QString name = doubleSpinBox->objectName();
-        if (mutableObj.contains(name)) {
-            doubleSpinBox->setValue(mutableObj[name].toDouble());
-            mutableObj.remove(name);
+        if (!mutableObj.contains(name)) {
+            continue;
         }
+
+        const QJsonValue value = mutableObj.value(name);
+        mutableObj.remove(name);
+
+        if (!value.isDouble()) {
+            result.wrongTypes << name;
+            continue;
+        }
+        doubleSpinBox->setValue(value.toDouble());
     }
 
     auto const listWidgets = w->findChildren<QListWidget *>();
     for (QListWidget *listWidget : listWidgets) {
         const QString name = listWidget->objectName();
-        if (mutableObj.contains(name)) {
-            listWidget->clear();
-            const QJsonArray list = mutableObj[name].toArray();
-            mutableObj.remove(name);
-            for (const auto &v : list) {
-                QJsonObject li = v.toObject();
-                QListWidgetItem *item =
-                    new QListWidgetItem(li[QStringLiteral("text")].toString(), listWidget);
-                item->setCheckState(li[QStringLiteral("checked")].toBool() ? Qt::Checked
-                                                                           : Qt::Unchecked);
-            }
+        if (!mutableObj.contains(name)) {
+            continue;
+        }
+
+        const QJsonValue value = mutableObj.value(name);
+        mutableObj.remove(name);
+
+        if (!value.isArray()) {
+            result.wrongTypes << name;
+            continue;
+        }
+
+        listWidget->clear();
+        const QJsonArray list = value.toArray();
+        for (const auto &v : list) {
+            QJsonObject li = v.toObject();
+            QListWidgetItem *item =
+                new QListWidgetItem(li[QStringLiteral("text")].toString(), listWidget);
+            item->setCheckState(li[QStringLiteral("checked")].toBool() ? Qt::Checked
+                                                                       : Qt::Unchecked);
         }
     }
 
-    return mutableObj.keys();
+    result.unknownKeys = mutableObj.keys();
+    return result;
 }

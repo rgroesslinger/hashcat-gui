@@ -11,16 +11,31 @@
 #include "widgetstateserializer.h"
 #include "appconstants.h"
 #include <QDesktopServices>
-#include <QFileInfo>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QMessageBox>
 #include <QUrl>
 
 #include <algorithm>
 #include <iterator>
+
+namespace
+{
+// The type a setting takes. A value of another type cannot be used: the
+// setting would keep what it has, and the file is reported.
+bool hasExpectedType(QLatin1StringView key, const QJsonValue &value)
+{
+    if (key == AppConstants::SettingsKeys::UseShortParameters
+        || key == AppConstants::SettingsKeys::RestoreSession) {
+        return value.isBool();
+    }
+
+    return value.isString();
+}
+} // namespace
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog)
 {
@@ -185,12 +200,21 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
 {
     QStringList notes;
 
+    // The values that could not be applied: the keys this version does not
+    // know, and the values that are of a type the setting does not take.
+    QStringList unknownKeys;
+    QStringList wrongTypes;
+
     // A key the file mentions is a value the user chose, even when it is
     // empty: an empty language or color scheme is the system default, and an
     // empty path says that hashcat is not configured.
     if (settings.contains(AppConstants::SettingsKeys::HashcatPath)) {
-        ui->lineEdit_hc_path->setText(
-            settings.value(AppConstants::SettingsKeys::HashcatPath).toString());
+        const QJsonValue value = settings.value(AppConstants::SettingsKeys::HashcatPath);
+        if (hasExpectedType(AppConstants::SettingsKeys::HashcatPath, value)) {
+            ui->lineEdit_hc_path->setText(value.toString());
+        } else {
+            wrongTypes << QString(AppConstants::SettingsKeys::HashcatPath);
+        }
     }
 
     // The terminal is the one exception: its combo has no empty entry, so
@@ -206,53 +230,75 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
     }
 
     if (settings.contains(AppConstants::SettingsKeys::UseShortParameters)) {
-        ui->checkBox_use_short_parameters->setChecked(
-            settings.value(AppConstants::SettingsKeys::UseShortParameters).toBool());
+        const QJsonValue value = settings.value(AppConstants::SettingsKeys::UseShortParameters);
+        if (hasExpectedType(AppConstants::SettingsKeys::UseShortParameters, value)) {
+            ui->checkBox_use_short_parameters->setChecked(value.toBool());
+        } else {
+            wrongTypes << QString(AppConstants::SettingsKeys::UseShortParameters);
+        }
     }
 
     if (settings.contains(AppConstants::SettingsKeys::RestoreSession)) {
-        ui->checkBox_restore_session->setChecked(
-            settings.value(AppConstants::SettingsKeys::RestoreSession).toBool());
+        const QJsonValue value = settings.value(AppConstants::SettingsKeys::RestoreSession);
+        if (hasExpectedType(AppConstants::SettingsKeys::RestoreSession, value)) {
+            ui->checkBox_restore_session->setChecked(value.toBool());
+        } else {
+            wrongTypes << QString(AppConstants::SettingsKeys::RestoreSession);
+        }
     }
 
     if (settings.contains(AppConstants::SettingsKeys::Language)) {
-        const QString language = settings.value(AppConstants::SettingsKeys::Language).toString();
-        const int index = ui->comboBox_language->findData(language);
-        if (index >= 0) {
-            ui->comboBox_language->setCurrentIndex(index);
+        const QJsonValue value = settings.value(AppConstants::SettingsKeys::Language);
+        if (!hasExpectedType(AppConstants::SettingsKeys::Language, value)) {
+            wrongTypes << QString(AppConstants::SettingsKeys::Language);
         } else {
-            notes << tr("The language %1 is not offered and was not applied.").arg(language);
+            const QString language = value.toString();
+            const int index = ui->comboBox_language->findData(language);
+            if (index >= 0) {
+                ui->comboBox_language->setCurrentIndex(index);
+            } else {
+                notes << tr("The language %1 is not offered and was not applied.").arg(language);
+            }
         }
     }
 
     if (settings.contains(AppConstants::SettingsKeys::ColorScheme)) {
-        const QString colorScheme =
-            settings.value(AppConstants::SettingsKeys::ColorScheme).toString();
-        const int index = ui->comboBox_color_scheme->findData(colorScheme);
-        if (index >= 0) {
-            ui->comboBox_color_scheme->setCurrentIndex(index);
+        const QJsonValue value = settings.value(AppConstants::SettingsKeys::ColorScheme);
+        if (!hasExpectedType(AppConstants::SettingsKeys::ColorScheme, value)) {
+            wrongTypes << QString(AppConstants::SettingsKeys::ColorScheme);
         } else {
-            notes << tr("The color scheme %1 is not offered and was not applied.").arg(colorScheme);
+            const QString colorScheme = value.toString();
+            const int index = ui->comboBox_color_scheme->findData(colorScheme);
+            if (index >= 0) {
+                ui->comboBox_color_scheme->setCurrentIndex(index);
+            } else {
+                notes << tr("The color scheme %1 is not offered and was not applied.")
+                             .arg(colorScheme);
+            }
         }
     }
 
     // The keys this version does not know: the file was made by another
     // version, or it was edited by hand. They are named in one sentence, so
     // that a file with many of them stays readable.
-    QStringList unknown;
     const QStringList keys = settings.keys();
     for (const QString &key : keys) {
         const bool known = std::any_of(
             std::begin(AppConstants::SettingsKeys::All), std::end(AppConstants::SettingsKeys::All),
             [&key](QLatin1StringView candidate) { return QString(candidate) == key; });
         if (!known) {
-            unknown << key;
+            unknownKeys << key;
         }
     }
 
-    const QString note = StateFile::unknownValuesNote(unknown);
-    if (!note.isEmpty()) {
-        notes << note;
+    const QString unknownNote = StateFile::unknownValuesNote(unknownKeys);
+    if (!unknownNote.isEmpty()) {
+        notes << unknownNote;
+    }
+
+    const QString wrongTypeNote = StateFile::wrongTypeValuesNote(wrongTypes);
+    if (!wrongTypeNote.isEmpty()) {
+        notes << wrongTypeNote;
     }
 
     return notes;

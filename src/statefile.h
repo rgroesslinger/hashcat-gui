@@ -63,6 +63,12 @@ public:
     // The note for the values a file names that this version does not know.
     // An empty list gives an empty string.
     static QString unknownValuesNote(const QStringList &names);
+
+    // The note for the values a file holds that are of the wrong type: the
+    // setting they belong to takes another one, and applying them would
+    // change something the user did not ask for. An empty list gives an empty
+    // string.
+    static QString wrongTypeValuesNote(const QStringList &names);
 };
 
 #endif // STATEFILE_H
