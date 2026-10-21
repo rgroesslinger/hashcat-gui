@@ -13,6 +13,9 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
 #include <QMessageBox>
 #include <QUrl>
 
@@ -34,6 +37,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
             &SettingsDialog::clearProfileClicked);
     connect(ui->pushButton_open_folder, &QPushButton::clicked, this,
             &SettingsDialog::openFolderClicked);
+    connect(ui->pushButton_export_settings, &QPushButton::clicked, this,
+            &SettingsDialog::exportSettingsClicked);
+    connect(ui->pushButton_import_settings, &QPushButton::clicked, this,
+            &SettingsDialog::importSettingsClicked);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &SettingsDialog::saveClicked);
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &SettingsDialog::cancelClicked);
 }
@@ -127,6 +134,154 @@ void SettingsDialog::openFolderClicked()
     }
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
+}
+
+// Writes the settings to a file, so that they can be moved to another
+// machine or kept as a backup.
+void SettingsDialog::exportSettingsClicked()
+{
+    const QString file = QFileDialog::getSaveFileName(this, tr("Export Settings"), QString(),
+                                                      tr("JSON Files (*.json)"));
+    if (file.isEmpty()) {
+        return;
+    }
+
+    QJsonObject root;
+    root.insert(QStringLiteral("application"), QCoreApplication::applicationName());
+    root.insert(QStringLiteral("version"), QCoreApplication::applicationVersion());
+    root.insert(QStringLiteral("settings"), savedSettings());
+
+    QFile file_handle(file);
+    if (!file_handle.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        QMessageBox::warning(this, tr("Export failed"),
+                             tr("The settings could not be written to %1.").arg(file));
+        return;
+    }
+    file_handle.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
+    file_handle.close();
+
+    QMessageBox::information(this, tr("Exported"), tr("Settings exported to %1.").arg(file));
+}
+
+// Reads the settings from a file and fills the dialog with them.
+//
+// The values are not applied right away: the user reviews them and saves
+// them, like every other change in this dialog.
+void SettingsDialog::importSettingsClicked()
+{
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import Settings"), QString(),
+                                                      tr("JSON Files (*.json)"));
+    if (file.isEmpty()) {
+        return;
+    }
+
+    QFile handle(file);
+    if (!handle.open(QIODevice::ReadOnly)) {
+        QMessageBox::warning(this, tr("Import failed"),
+                             tr("The settings could not be read from %1.").arg(file));
+        return;
+    }
+
+    QJsonParseError parseError;
+    const QJsonDocument document = QJsonDocument::fromJson(handle.readAll(), &parseError);
+    handle.close();
+
+    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
+        QMessageBox::warning(this, tr("Import failed"),
+                             tr("The file %1 does not contain settings.").arg(file));
+        return;
+    }
+
+    const QJsonObject root = document.object();
+    const QJsonObject settings = root.value(QStringLiteral("settings")).toObject();
+    if (settings.isEmpty()) {
+        QMessageBox::warning(this, tr("Import failed"),
+                             tr("The file %1 does not contain settings.").arg(file));
+        return;
+    }
+
+    const QStringList notes = applyImportedSettings(settings);
+
+    QStringList message;
+    message << tr("Settings imported from %1.").arg(file);
+    message << tr("Review them and save them to apply them.");
+    message << notes;
+
+    QMessageBox::information(this, tr("Imported"), message.join(QLatin1Char('\n')));
+}
+
+// The settings as they are stored right now.
+//
+// The export is a backup of the configuration the application runs with, so
+// it holds what is saved and not what the dialog shows but has not saved.
+QJsonObject SettingsDialog::savedSettings() const
+{
+    auto &settings = SettingsManager::instance();
+
+    QJsonObject stored;
+    stored.insert(AppConstants::SettingsKeys::HashcatPath,
+                  settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
+    stored.insert(AppConstants::SettingsKeys::Terminal,
+                  settings.getKey<QString>(AppConstants::SettingsKeys::Terminal));
+    stored.insert(AppConstants::SettingsKeys::UseShortParameters,
+                  settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters));
+    stored.insert(AppConstants::SettingsKeys::RestoreSession,
+                  settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true));
+    stored.insert(AppConstants::SettingsKeys::Language,
+                  settings.getKey<QString>(AppConstants::SettingsKeys::Language));
+
+    return stored;
+}
+
+// Fills the dialog with the settings of an imported file.
+//
+// Returns the notes for the user: a value the dialog cannot take - a
+// terminal that is not installed - is worth a word.
+QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
+{
+    QStringList notes;
+
+    // A key the file mentions is a value the user chose, even when it is
+    // empty: an empty language is the system default, and an empty path says
+    // that hashcat is not configured.
+    if (settings.contains(AppConstants::SettingsKeys::HashcatPath)) {
+        ui->lineEdit_hc_path->setText(
+            settings.value(AppConstants::SettingsKeys::HashcatPath).toString());
+    }
+
+    // The terminal is the one exception: its combo has no empty entry, so
+    // there is nothing an empty value could select.
+    const QString terminal = settings.value(AppConstants::SettingsKeys::Terminal).toString();
+    if (!terminal.isEmpty()) {
+        const int index = ui->comboBox_terminal->findText(terminal);
+        if (index >= 0) {
+            ui->comboBox_terminal->setCurrentIndex(index);
+        } else {
+            notes << tr("The terminal %1 is not installed and was not applied.").arg(terminal);
+        }
+    }
+
+    if (settings.contains(AppConstants::SettingsKeys::UseShortParameters)) {
+        ui->checkBox_use_short_parameters->setChecked(
+            settings.value(AppConstants::SettingsKeys::UseShortParameters).toBool());
+    }
+
+    if (settings.contains(AppConstants::SettingsKeys::RestoreSession)) {
+        ui->checkBox_restore_session->setChecked(
+            settings.value(AppConstants::SettingsKeys::RestoreSession).toBool());
+    }
+
+    if (settings.contains(AppConstants::SettingsKeys::Language)) {
+        const QString language = settings.value(AppConstants::SettingsKeys::Language).toString();
+        const int index = ui->comboBox_language->findData(language);
+        if (index >= 0) {
+            ui->comboBox_language->setCurrentIndex(index);
+        } else {
+            notes << tr("The language %1 is not offered and was not applied.").arg(language);
+        }
+    }
+
+    return notes;
 }
 
 void SettingsDialog::selectPathClicked()

@@ -8,6 +8,8 @@
 
 #include <QDialog>
 #include <QFileDialog>
+#include <QJsonObject>
+#include <QStringList>
 
 namespace Ui
 {
@@ -27,6 +29,8 @@ private slots:
     void selectPathClicked();
     void clearProfileClicked();
     void openFolderClicked();
+    void exportSettingsClicked();
+    void importSettingsClicked();
     void saveClicked();
     void cancelClicked();
 
@@ -41,6 +45,13 @@ private:
 
     // The home directory as a tilde.
     static QString shortenPath(const QString &path);
+
+    // The settings as they are stored right now.
+    QJsonObject savedSettings() const;
+
+    // Fills the dialog with the settings of an imported file. Returns the
+    // notes for the user.
+    QStringList applyImportedSettings(const QJsonObject &settings);
 
     Ui::SettingsDialog *ui;
 

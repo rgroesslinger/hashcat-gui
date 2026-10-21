@@ -9,6 +9,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QGroupBox>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMessageBox>
 #include <QTimer>
 
@@ -102,6 +104,9 @@ private slots:
     void restoreSessionFollowsTheSetting();
     void clearProfileDeletesTheStoredProfile();
     void showsWhereTheFilesAreStored();
+    void exportSettingsWritesTheKnownSettings();
+    void importSettingsFillsTheDialog();
+    void importSettingsAppliesEmptyValues();
     void fitsItsContent();
     void groupBoxesShareOneTitleAlignment();
 
@@ -334,6 +339,112 @@ void TestSettingsDialog::showsWhereTheFilesAreStored()
     // registry on Windows has none.
     const bool inFile = QFileInfo(settingsFile).isAbsolute();
     QCOMPARE(dialog.ui->pushButton_open_folder->isEnabled(), inFile);
+}
+
+// The export writes the settings the application runs with into a file, so
+// that they can be moved to another machine.
+void TestSettingsDialog::exportSettingsWritesTheKnownSettings()
+{
+    auto &settings = SettingsManager::instance();
+    settings.setKey(AppConstants::SettingsKeys::HashcatPath,
+                    QStringLiteral("/opt/somewhere/hashcat"));
+    settings.setKey(AppConstants::SettingsKeys::Terminal, QStringLiteral("kitty"));
+
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("settings.json"));
+
+    SettingsDialog dialog;
+
+    ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "exportSettingsClicked"));
+
+    QVERIFY(QFile::exists(file));
+
+    QFile handle(file);
+    QVERIFY(handle.open(QIODevice::ReadOnly));
+    const QJsonDocument document = QJsonDocument::fromJson(handle.readAll());
+    handle.close();
+
+    QVERIFY(document.isObject());
+    const QJsonObject stored = document.object().value(QStringLiteral("settings")).toObject();
+    QCOMPARE(stored.value(QStringLiteral("hashcatPath")).toString(),
+             QStringLiteral("/opt/somewhere/hashcat"));
+    QCOMPARE(stored.value(QStringLiteral("terminal")).toString(), QStringLiteral("kitty"));
+    QVERIFY(stored.contains(QStringLiteral("useShortParameters")));
+    QVERIFY(stored.contains(QStringLiteral("restoreSession")));
+    QVERIFY(stored.contains(QStringLiteral("language")));
+}
+
+// The import fills the dialog with the settings of a file. They are not
+// applied before the user saves them.
+void TestSettingsDialog::importSettingsFillsTheDialog()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("import.json"));
+
+    QJsonObject stored;
+    stored.insert(QStringLiteral("hashcatPath"), QStringLiteral("/imported/hashcat"));
+    stored.insert(QStringLiteral("useShortParameters"), true);
+    stored.insert(QStringLiteral("restoreSession"), false);
+    stored.insert(QStringLiteral("language"), QStringLiteral("de"));
+
+    QJsonObject root;
+    root.insert(QStringLiteral("settings"), stored);
+
+    QFile handle(file);
+    QVERIFY(handle.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    handle.write(QJsonDocument(root).toJson());
+    handle.close();
+
+    SettingsDialog dialog;
+
+    ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "importSettingsClicked"));
+
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QStringLiteral("/imported/hashcat"));
+    QCOMPARE(dialog.ui->checkBox_use_short_parameters->isChecked(), true);
+    QCOMPARE(dialog.ui->checkBox_restore_session->isChecked(), false);
+    QCOMPARE(dialog.ui->comboBox_language->currentData().toString(), QStringLiteral("de"));
+    // The imported values are not applied before the user saves them.
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath),
+             QString());
+}
+
+// An empty value is a value too: it is the system default, and a file that
+// says so has to be taken at its word.
+void TestSettingsDialog::importSettingsAppliesEmptyValues()
+{
+    const QString file =
+        TestEnvironment::configHome().filePath(QStringLiteral("import_empty.json"));
+
+    QJsonObject stored;
+    stored.insert(QStringLiteral("hashcatPath"), QString());
+    stored.insert(QStringLiteral("language"), QString());
+
+    QJsonObject root;
+    root.insert(QStringLiteral("settings"), stored);
+
+    QFile handle(file);
+    QVERIFY(handle.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    handle.write(QJsonDocument(root).toJson());
+    handle.close();
+
+    SettingsDialog dialog;
+    // The dialog shows something else, so that the import has to change it.
+    dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/before/hashcat"));
+    dialog.ui->comboBox_language->setCurrentIndex(
+        dialog.ui->comboBox_language->findData(QStringLiteral("de")));
+
+    ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "importSettingsClicked"));
+
+    // The empty values took the place of the ones that were there.
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QString());
+    QCOMPARE(dialog.ui->comboBox_language->currentData().toString(), QString());
 }
 
 // The dialog must not be pinned to the 450x385 in the .ui: that one size
