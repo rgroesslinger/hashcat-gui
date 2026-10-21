@@ -150,8 +150,9 @@ public:
         // into a later test.
         m_watchdog.setSingleShot(false);
         m_watchdog.setInterval(100);
-        connect(&m_watchdog, &QTimer::timeout, this, [] {
+        connect(&m_watchdog, &QTimer::timeout, this, [this] {
             if (QWidget *modal = QApplication::activeModalWidget()) {
+                ++m_closedModals;
                 modal->close();
             }
         });
@@ -191,11 +192,14 @@ private slots:
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
     void theImportNamesTheValuesTheSessionDoesNotKnow();
+    void theStartupShowsNoBox();
 
 private:
     QString m_savedHashcatPath;
     QString m_savedTerminal;
     bool m_savedShortParameters = false;
+    // The modals the watchdog had to close: a test that expects none.
+    int m_closedModals = 0;
     QTimer m_watchdog;
 };
 
@@ -214,6 +218,8 @@ void TestMainWindow::init()
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, QString());
     settings.setKey(AppConstants::SettingsKeys::Terminal, QString());
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
+
+    m_closedModals = 0;
 }
 
 void TestMainWindow::cleanup()
@@ -1371,6 +1377,32 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
     // ... and the one that named nothing is named in the notes.
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
+}
+
+// The startup must be quiet. A profile the application wrote itself holds
+// nothing it does not know, so no box may open - an empty one would be the
+// worst kind of noise.
+void TestMainWindow::theStartupShowsNoBox()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-startup"),
+                                                         "#!/bin/sh\n"
+                                                         "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
+                                                         "exit 0\n");
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    // A profile the application wrote itself.
+    MainWindow writer;
+    writer.ui->spinBox_segment_size->setValue(64);
+    writer.saveDefaultProfile();
+
+    m_watchdog.start();
+    MainWindow reloaded;
+
+    // The window opened without a box...
+    QCOMPARE(m_closedModals, 0);
+    // ... and the profile was restored.
+    QCOMPARE(reloaded.ui->spinBox_segment_size->value(), 64);
 }
 
 int main(int argc, char *argv[])

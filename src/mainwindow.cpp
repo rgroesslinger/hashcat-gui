@@ -459,8 +459,16 @@ void MainWindow::importTriggered()
     commandChanged();
 
     QStringList notes = fileNotes(version, AppConstants::Profiles::Version, otherSections);
-    notes << StateFile::unknownValuesNote(notApplied.unknownKeys);
-    notes << StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
+    // The notes are only there when there is something to say.
+    const QString unknownNote = StateFile::unknownValuesNote(notApplied.unknownKeys);
+    if (!unknownNote.isEmpty()) {
+        notes << unknownNote;
+    }
+
+    const QString wrongTypeNote = StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
+    if (!wrongTypeNote.isEmpty()) {
+        notes << wrongTypeNote;
+    }
     if (!problem.isEmpty()) {
         notes << problem;
     }
@@ -713,8 +721,16 @@ void MainWindow::loadDefaultProfile()
     // The auto-load is not an import: there is no headline, and nothing is
     // shown when the load went well.
     QStringList notes = fileNotes(version, AppConstants::Profiles::Version, otherSections);
-    notes << StateFile::unknownValuesNote(notApplied.unknownKeys);
-    notes << StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
+    // The notes are only there when there is something to say.
+    const QString unknownNote = StateFile::unknownValuesNote(notApplied.unknownKeys);
+    if (!unknownNote.isEmpty()) {
+        notes << unknownNote;
+    }
+
+    const QString wrongTypeNote = StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
+    if (!wrongTypeNote.isEmpty()) {
+        notes << wrongTypeNote;
+    }
     if (!problem.isEmpty()) {
         notes << problem;
     }
