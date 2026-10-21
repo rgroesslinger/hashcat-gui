@@ -7,10 +7,16 @@
 
 #include <QDir>
 #include <QFile>
+#include <QComboBox>
+#include <QDoubleSpinBox>
 #include <QGroupBox>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLineEdit>
+#include <QListWidget>
 #include <QListWidgetItem>
+#include <QRadioButton>
+#include <QSpinBox>
 #include <QStandardPaths>
 #include <QScrollArea>
 #include <QScrollBar>
@@ -24,6 +30,100 @@
 #include "mainwindow.h"
 #include "settingsmanager.h"
 #include "ui_mainwindow.h"
+#include "widgetstateserializer.h"
+
+namespace
+{
+
+// Puts every widget below root into a state the defaults do not have, so a
+// reset that forgets one of them shows up in the comparison with a fresh
+// window. The command preview is left alone: it is generated, not entered.
+void changeEveryValue(QWidget *root)
+{
+    const auto lineEdits = root->findChildren<QLineEdit *>();
+    for (QLineEdit *lineEdit : lineEdits) {
+        if (lineEdit->objectName() == AppConstants::Files::PreviewWidget) {
+            continue;
+        }
+        lineEdit->setText(lineEdit->text().isEmpty() ? QStringLiteral("changed") : QString());
+    }
+
+    const auto checkBoxes = root->findChildren<QCheckBox *>();
+    for (QCheckBox *checkBox : checkBoxes) {
+        checkBox->setChecked(!checkBox->isChecked());
+    }
+
+    // The radio buttons of a group exclude each other, so the reset has to
+    // name the one that is checked.
+    const auto radioButtons = root->findChildren<QRadioButton *>();
+    for (QRadioButton *radioButton : radioButtons) {
+        radioButton->setChecked(!radioButton->isChecked());
+    }
+
+    const auto comboBoxes = root->findChildren<QComboBox *>();
+    for (QComboBox *comboBox : comboBoxes) {
+        if (comboBox->count() > 1) {
+            comboBox->setCurrentIndex(comboBox->currentIndex() == 0 ? 1 : 0);
+        }
+    }
+
+    const auto spinBoxes = root->findChildren<QSpinBox *>();
+    for (QSpinBox *spinBox : spinBoxes) {
+        if (spinBox->minimum() != spinBox->maximum()) {
+            spinBox->setValue(spinBox->value() == spinBox->maximum() ? spinBox->value() - 1
+                                                                     : spinBox->value() + 1);
+        }
+    }
+
+    const auto doubleSpinBoxes = root->findChildren<QDoubleSpinBox *>();
+    for (QDoubleSpinBox *doubleSpinBox : doubleSpinBoxes) {
+        if (doubleSpinBox->minimum() != doubleSpinBox->maximum()) {
+            doubleSpinBox->setValue(doubleSpinBox->value() == doubleSpinBox->maximum()
+                                        ? doubleSpinBox->value() - 1
+                                        : doubleSpinBox->value() + 1);
+        }
+    }
+
+    const auto listWidgets = root->findChildren<QListWidget *>();
+    for (QListWidget *listWidget : listWidgets) {
+        listWidget->addItem(QStringLiteral("changed"));
+    }
+}
+
+// The profile file a serializer wrote, as the object it holds.
+QJsonObject readJsonObject(const QString &filename)
+{
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return {};
+    }
+    const QByteArray data = file.readAll();
+    file.close();
+    return QJsonDocument::fromJson(data).object();
+}
+
+// The widgets whose values in filename differ from the ones in reference, by
+// name. A widget the reset forgot is named here, not just counted.
+QStringList differingWidgets(const QString &filename, const QJsonObject &reference)
+{
+    const QJsonObject state =
+        readJsonObject(filename).value(QStringLiteral("MainWindow")).toObject();
+
+    QStringList names;
+    for (auto it = state.begin(); it != state.end(); ++it) {
+        if (reference.value(it.key()) != it.value()) {
+            names << it.key();
+        }
+    }
+    for (auto it = reference.begin(); it != reference.end(); ++it) {
+        if (!state.contains(it.key())) {
+            names << it.key();
+        }
+    }
+    return names;
+}
+
+} // namespace
 
 // The half of the command line rules that lives in widgets: does a freshly
 // opened window really start at the values HashcatOptions documents, does the
@@ -57,6 +157,7 @@ private slots:
     void attackModeIdsTravelAsItemData();
     void groupBoxesFollowTheBuilderPredicates();
     void groupBoxesShareOneTitleAlignment();
+    void resetFieldsRestoresEveryWidget();
     void optionDependenciesFollowTheirCheckboxes();
     void modeHintFollowsTheAttackMode();
     void launchValidationFollowsTheWidgets();
@@ -272,6 +373,41 @@ void TestMainWindow::groupBoxesShareOneTitleAlignment()
     MainWindow window;
 
     TestEnvironment::checkGroupBoxTitleAlignment(&window);
+}
+
+// The reset has to bring every widget that holds a value back to its
+// default.
+//
+// The test does not know the widgets: it changes every one of them, resets
+// the form and compares the whole state with a fresh window. A widget the
+// reset forgets - now or after it is added - shows up as a difference, and
+// the list of widgets does not have to be kept in two places.
+void TestMainWindow::resetFieldsRestoresEveryWidget()
+{
+    MainWindow fresh;
+    MainWindow window;
+
+    changeEveryValue(&window);
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "resetFieldsTriggered"));
+
+    WidgetStateSerializer serializer;
+    QString error;
+    const QString freshFile = TestEnvironment::configHome().filePath(QStringLiteral("fresh.json"));
+    const QString resetFile = TestEnvironment::configHome().filePath(QStringLiteral("reset.json"));
+    const QStringList ignored{AppConstants::Files::PreviewWidget};
+    QVERIFY2(serializer.saveStateToFile(QStringLiteral("MainWindow"), &fresh, freshFile, ignored,
+                                        &error),
+             qPrintable(error));
+    QVERIFY2(serializer.saveStateToFile(QStringLiteral("MainWindow"), &window, resetFile, ignored,
+                                        &error),
+             qPrintable(error));
+
+    const QJsonObject defaults =
+        readJsonObject(freshFile).value(QStringLiteral("MainWindow")).toObject();
+    const QStringList differing = differingWidgets(resetFile, defaults);
+    QVERIFY2(differing.isEmpty(), qPrintable(QStringLiteral("these widgets were not reset: %1")
+                                                 .arg(differing.join(QStringLiteral(", ")))));
 }
 
 void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
