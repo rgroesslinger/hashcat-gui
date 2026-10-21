@@ -5,6 +5,7 @@
 
 #include "testenvironment.h"
 
+#include <QClipboard>
 #include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
@@ -30,6 +31,7 @@ private slots:
     void showsTheToolkitAndTheOperatingSystem();
     void linksToTheProjectAndToHashcat();
     void namesTheLicensesOfBothPrograms();
+    void copyDetailsPutsThemOnTheClipboard();
 };
 
 void TestAboutDialog::fitsItsContent()
@@ -174,6 +176,28 @@ void TestAboutDialog::namesTheLicensesOfBothPrograms()
     QVERIFY(hashcat->text().contains(QStringLiteral(">MIT</a>")));
     QVERIFY(gui->text().contains(QStringLiteral("licensed under the")));
     QVERIFY(hashcat->text().contains(QStringLiteral("licensed under the")));
+}
+
+// The details a bug report needs are one click away: the version of the
+// application, of the toolkit and of the system, and the hashcat in use.
+void TestAboutDialog::copyDetailsPutsThemOnTheClipboard()
+{
+    AboutDialog dialog;
+
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_copy_details"));
+    QVERIFY(button);
+    button->click();
+
+    QClipboard *clipboard = QApplication::clipboard();
+    QVERIFY(clipboard);
+
+    const QString text = clipboard->text();
+    QVERIFY(text.contains(QApplication::applicationVersion()));
+    QVERIFY(text.contains(QString::fromLatin1(qVersion())));
+    QVERIFY(text.contains(QSysInfo::prettyProductName()));
+    // One line per fact, so that a report can quote them one by one.
+    QCOMPARE(text.count(QLatin1Char('\n')), 3);
 }
 
 int main(int argc, char *argv[])

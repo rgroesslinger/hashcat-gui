@@ -9,6 +9,8 @@
 #include "settingsmanager.h"
 #include "appconstants.h"
 #include <QApplication>
+#include <QClipboard>
+#include <QCursor>
 #include <QFileInfo>
 #include <QFont>
 #include <QFutureWatcher>
@@ -18,6 +20,7 @@
 #include <QStringList>
 #include <QTextLayout>
 #include <QTextOption>
+#include <QToolTip>
 
 namespace
 {
@@ -111,6 +114,8 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDia
     ui->label_app_name->setFont(nameFont);
 
     connect(ui->pushButton_ok, &QPushButton::clicked, this, &AboutDialog::okClicked);
+    connect(ui->pushButton_copy_details, &QPushButton::clicked, this,
+            &AboutDialog::copyDetailsClicked);
 }
 
 AboutDialog::~AboutDialog()
@@ -121,6 +126,43 @@ AboutDialog::~AboutDialog()
 void AboutDialog::okClicked()
 {
     close();
+}
+
+void AboutDialog::copyDetailsClicked()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    if (!clipboard) {
+        // No clipboard on this platform.
+        return;
+    }
+
+    clipboard->setText(detailsText());
+    // A one-shot tooltip confirms the copy. The button's own tooltip would
+    // not re-render while the pointer stays on the button.
+    QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"), nullptr, {}, 2000);
+}
+
+// What a bug report needs: the version of the application, of the toolkit
+// and of the system, and the hashcat it drives.
+//
+// The text goes into bug reports, so it is not translated - a report that
+// mixes languages is harder to read.
+QString AboutDialog::detailsText() const
+{
+    QStringList details;
+    details << QStringLiteral("hashcat-gui %1").arg(QApplication::applicationVersion());
+    details << QStringLiteral("Qt %1").arg(QString::fromLatin1(qVersion()));
+    details << QStringLiteral("OS: %1").arg(QSysInfo::prettyProductName());
+
+    const QString hashcatPath =
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    if (hashcatPath.isEmpty()) {
+        details << QStringLiteral("hashcat: not configured");
+    } else {
+        details << QStringLiteral("hashcat %1 (%2)").arg(m_hashcatVersion, hashcatPath);
+    }
+
+    return details.join(QLatin1Char('\n'));
 }
 
 // What the application runs on: the toolkit it is built with and the system
@@ -189,6 +231,8 @@ void AboutDialog::updateVersionLabel()
 // how tall the wrapped text is.
 void AboutDialog::setVersionText(const QString &text)
 {
+    m_hashcatVersion = text;
+
     // The label has a fixed width, so the text is wrapped at the width it
     // will be shown in.
     const int width = ui->label_hc_version->minimumWidth();

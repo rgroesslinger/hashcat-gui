@@ -29,6 +29,7 @@ public:
 
 private slots:
     void okClicked();
+    void copyDetailsClicked();
 
 private:
     // Fills the rows that describe the system the application runs on.
@@ -39,6 +40,13 @@ private:
 
     // Fills the row with the licenses of the application and of hashcat.
     void updateLicense();
+
+    // What a bug report needs: the versions and the hashcat in use.
+    QString detailsText() const;
+
+    // The version of hashcat, or the error it answered with. The label
+    // shows it wrapped, this keeps the text as it is.
+    QString m_hashcatVersion;
 
     Ui::AboutDialog *ui;
 };
