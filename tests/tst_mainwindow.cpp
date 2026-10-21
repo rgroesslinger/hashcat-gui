@@ -371,7 +371,7 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
 
 // The titles of the group boxes have to look alike. The alignment is the only
 // thing that decides it, and a group box without it would draw its title
-// above the frame while its neighbours break the border with it.
+// above the frame while its neighbors break the border with it.
 void TestMainWindow::groupBoxesShareOneTitleAlignment()
 {
     MainWindow window;
@@ -379,9 +379,9 @@ void TestMainWindow::groupBoxesShareOneTitleAlignment()
     TestEnvironment::checkGroupBoxTitleAlignment(&window);
 }
 
-// A group box in a row is as tall as its tallest neighbour. Without the top
+// A group box in a row is as tall as its tallest neighbor. Without the top
 // alignment Qt spreads the children of the shorter boxes over that height or
-// centres them, so two boxes next to each other would start their content at
+// centers them, so two boxes next to each other would start their content at
 // different heights.
 void TestMainWindow::generalTabGroupBoxesAlignTheirContentToTheTop()
 {

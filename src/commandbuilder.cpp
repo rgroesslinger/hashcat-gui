@@ -132,7 +132,7 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
     auto it = parameterMap.constFind(key);
     if (it == parameterMap.constEnd()) {
         // Every enumerator has an entry above, but dereferencing end() would
-        // be undefined behaviour, so fail soft instead.
+        // be undefined behavior, so fail soft instead.
         return {};
     }
     const auto &pair = it.value();

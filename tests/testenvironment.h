@@ -94,7 +94,7 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
 // alignment is the only lever left: with it the title breaks the top border
 // of the frame, without it the Fusion style pushes the frame below the title
 // and the title ends up above the box. A group box that forgets the property
-// therefore looks different from its neighbours.
+// therefore looks different from its neighbors.
 inline Qt::Alignment groupBoxTitleAlignment()
 {
     return Qt::AlignLeft | Qt::AlignVCenter;
@@ -119,7 +119,7 @@ inline void checkGroupBoxTitleAlignment(QObject *root)
                             .arg(offenders.join(QStringLiteral(", ")))));
 }
 
-// Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behaviour, plus the redirect
+// Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behavior, plus the redirect
 // above. needsGui decides between QApplication and QCoreApplication - the
 // command builder and helper utils tests never need a display.
 inline int run(QObject *test, int argc, char *argv[], bool needsGui)

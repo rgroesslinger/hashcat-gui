@@ -76,7 +76,7 @@ void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
 
 // The titles of the group boxes have to look alike. The alignment is the only
 // thing that decides it, and a group box without it would draw its title
-// above the frame while its neighbours break the border with it.
+// above the frame while its neighbors break the border with it.
 void TestAboutDialog::groupBoxesShareOneTitleAlignment()
 {
     AboutDialog dialog;
