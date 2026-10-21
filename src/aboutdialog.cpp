@@ -12,8 +12,10 @@
 #include <QFileInfo>
 #include <QFont>
 #include <QFutureWatcher>
+#include <QLabel>
 #include <QPixmap>
 #include <QSysInfo>
+#include <QStringList>
 
 namespace
 {
@@ -24,6 +26,32 @@ const QString &logoPath()
     static const QString path = QStringLiteral(":/icons/hicolor/128x128/apps/hashcat-gui.png");
     return path;
 }
+
+// An anchor around a label. The address is a constant, the label around it
+// is what gets translated.
+QString link(QLatin1StringView url, const QString &text)
+{
+    return QStringLiteral("<a href=\"%1\">%2</a>").arg(QString(url), text);
+}
+
+// A sentence with a link in it: the anchor sits where the text says it does.
+//
+// The tooltip says where the link leads, so a user does not have to click it
+// to find out.
+void setLinkText(QLabel *label, QLatin1StringView url, const QString &richText)
+{
+    label->setText(richText);
+    label->setOpenExternalLinks(true);
+    label->setTextInteractionFlags(Qt::TextInteractionFlag::LinksAccessibleByMouse
+                                   | Qt::TextInteractionFlag::LinksAccessibleByKeyboard);
+    label->setToolTip(QString(url));
+}
+
+// A link that is nothing but the anchor around its text.
+void setLink(QLabel *label, QLatin1StringView url, const QString &text)
+{
+    setLinkText(label, url, link(url, text));
+}
 } // namespace
 
 AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDialog)
@@ -31,6 +59,7 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDia
     ui->setupUi(this);
     updateVersionLabel();
     updateSystemLabels();
+    updateLinks();
 
     // The logo is scaled to the size the .ui gives the label, so the artwork
     // stays sharp on a high-dpi display without the .ui having to know about
@@ -68,6 +97,18 @@ void AboutDialog::updateSystemLabels()
 {
     ui->label_qt_version->setText(QString::fromLatin1(qVersion()));
     ui->label_os->setText(QSysInfo::prettyProductName());
+}
+
+// The places the user is most likely to want next: the source of the
+// application, the place to report a problem and the pages of hashcat
+// itself. The URLs are constants, only the labels around them are
+// translated.
+void AboutDialog::updateLinks()
+{
+    setLink(ui->label_link_project, AppConstants::Urls::Project, tr("Project page"));
+    setLink(ui->label_link_issue, AppConstants::Urls::Issues, tr("Report an issue"));
+    setLink(ui->label_link_hashcat, AppConstants::Urls::Hashcat, tr("hashcat"));
+    setLink(ui->label_link_hashcat_faq, AppConstants::Urls::HashcatFaq, tr("hashcat FAQ"));
 }
 
 void AboutDialog::updateVersionLabel()

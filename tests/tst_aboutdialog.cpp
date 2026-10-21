@@ -11,6 +11,7 @@
 #include <QSysInfo>
 
 #include "aboutdialog.h"
+#include "appconstants.h"
 
 // The About dialog must not be pinned to the 500x160 in the .ui: under a
 // large font or a longer version string that clips its content, under a small
@@ -27,6 +28,7 @@ private slots:
     void groupBoxesShareOneTitleAlignment();
     void showsTheLogoAndTheApplicationName();
     void showsTheToolkitAndTheOperatingSystem();
+    void linksToTheProjectAndToHashcat();
 };
 
 void TestAboutDialog::fitsItsContent()
@@ -108,6 +110,36 @@ void TestAboutDialog::showsTheToolkitAndTheOperatingSystem()
     QLabel *os = dialog.findChild<QLabel *>(QStringLiteral("label_os"));
     QVERIFY(os);
     QCOMPARE(os->text(), QSysInfo::prettyProductName());
+}
+
+// The links are the way out of the dialog: to the source of the application,
+// to the place where a problem can be reported and to hashcat itself. All of
+// them have to be there, and the tooltip of a link says where it leads.
+void TestAboutDialog::linksToTheProjectAndToHashcat()
+{
+    AboutDialog dialog;
+
+    const QStringList names{
+        QStringLiteral("label_link_project"),
+        QStringLiteral("label_link_issue"),
+        QStringLiteral("label_link_hashcat"),
+        QStringLiteral("label_link_hashcat_faq"),
+    };
+    const QStringList urls{
+        QString(AppConstants::Urls::Project),
+        QString(AppConstants::Urls::Issues),
+        QString(AppConstants::Urls::Hashcat),
+        QString(AppConstants::Urls::HashcatFaq),
+    };
+
+    for (int i = 0; i < names.size(); ++i) {
+        QLabel *label = dialog.findChild<QLabel *>(names.at(i));
+        QVERIFY(label);
+        QVERIFY(label->openExternalLinks());
+        QVERIFY(label->text().contains(urls.at(i)));
+        // The tooltip says where the link leads.
+        QCOMPARE(label->toolTip(), urls.at(i));
+    }
 }
 
 int main(int argc, char *argv[])

@@ -143,6 +143,10 @@ inline constexpr QLatin1StringView CommonEncodings{"  utf-8, utf-16le, utf-16be,
 namespace Urls
 {
 inline constexpr QLatin1StringView Hashcat{"https://hashcat.net"};
+inline constexpr QLatin1StringView HashcatFaq{
+    "https://hashcat.net/wiki/doku.php?id=frequently_asked_questions"};
+inline constexpr QLatin1StringView Project{"https://github.com/rgroesslinger/hashcat-gui"};
+inline constexpr QLatin1StringView Issues{"https://github.com/rgroesslinger/hashcat-gui/issues"};
 } // namespace Urls
 
 // Command line tokens that belong to hashcat itself.

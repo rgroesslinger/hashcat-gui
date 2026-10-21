@@ -29,6 +29,9 @@ private:
     // Fills the rows that describe the system the application runs on.
     void updateSystemLabels();
 
+    // Fills the row of links to the project and to hashcat.
+    void updateLinks();
+
     Ui::AboutDialog *ui;
 };
 
