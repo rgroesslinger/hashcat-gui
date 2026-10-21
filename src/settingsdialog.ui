@@ -301,20 +301,6 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_open_folder">
         <item>
-         <widget class="QPushButton" name="pushButton_export_settings">
-          <property name="text">
-           <string>Export...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_import_settings">
-          <property name="text">
-           <string>Import...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_open_folder">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>

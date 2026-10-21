@@ -231,6 +231,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::quitTriggered);
     connect(ui->actionExport, &QAction::triggered, this, &MainWindow::exportTriggered);
     connect(ui->actionImport, &QAction::triggered, this, &MainWindow::importTriggered);
+    connect(ui->actionImportSettings, &QAction::triggered, this,
+            &MainWindow::importSettingsTriggered);
+    connect(ui->actionExportSettings, &QAction::triggered, this,
+            &MainWindow::exportSettingsTriggered);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::settingsTriggered);
     connect(ui->actionAboutQt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
 
@@ -492,6 +496,70 @@ QStringList MainWindow::importNotes(int fileVersion, int currentVersion,
     }
 
     return notes;
+}
+
+// File → Export Settings
+void MainWindow::exportSettingsTriggered()
+{
+    const QString file = QFileDialog::getSaveFileName(this, tr("Export Settings"),
+                                                      QStringLiteral("hashcat-gui-settings.json"),
+                                                      tr("JSON Files (*.json)"));
+
+    if (file.isEmpty()) {
+        return;
+    }
+
+    // The settings that are in effect - the dialog is closed while the File
+    // menu is used, so there is no second state that could be exported.
+    SettingsDialog settingsDialog(this);
+
+    QString error;
+    if (StateFile::write(file, AppConstants::FileSections::Settings,
+                         AppConstants::Settings::Version, settingsDialog.savedSettings(), &error)) {
+        QMessageBox::information(this, tr("Exported"), tr("Settings exported to %1.").arg(file));
+    } else {
+        QMessageBox::warning(this, tr("Export failed"), error);
+    }
+}
+
+// File → Import Settings
+void MainWindow::importSettingsTriggered()
+{
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import Settings"), QString(),
+                                                      tr("JSON Files (*.json)"));
+
+    if (file.isEmpty()) {
+        return;
+    }
+
+    QString error;
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    if (!StateFile::read(file, AppConstants::FileSections::Settings, &values, &version,
+                         &otherSections, &error)) {
+        QMessageBox::warning(this, tr("Import failed"), error);
+        return;
+    }
+
+    // The dialog opens with the values of the file in it, so the user reviews
+    // them before Save applies them.
+    SettingsDialog settingsDialog(this);
+    QStringList notes = settingsDialog.applyImportedSettings(values);
+    notes << importNotes(version, AppConstants::Settings::Version, otherSections, {});
+
+    QStringList message;
+    message << tr("Settings imported from %1.").arg(file);
+    message << tr("Review them and save them to apply them.");
+    message << notes;
+
+    if (notes.isEmpty()) {
+        QMessageBox::information(this, tr("Imported"), message.join(QLatin1Char('\n')));
+    } else {
+        QMessageBox::warning(this, tr("Imported"), message.join(QLatin1Char('\n')));
+    }
+
+    settingsDialog.exec();
 }
 
 // Tools → Reset field

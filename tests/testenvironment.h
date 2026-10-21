@@ -8,10 +8,14 @@
 
 #include <QApplication>
 #include <QCoreApplication>
+#include <QDialog>
 #include <QFile>
+#include <QFileDialog>
 #include <QGroupBox>
+#include <QMessageBox>
 #include <QStringList>
 #include <QTemporaryDir>
+#include <QTimer>
 #include <QtTest/QTest>
 
 // Scratch base directories for a test process.
@@ -87,6 +91,73 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
     return path;
 #endif
 }
+
+// Drives the dialogs a file dialog opens, and records - while closing - any
+// message box. A box that should not have appeared must neither hang the
+// test nor pass unnoticed: the flag is the evidence.
+class ModalRecorder
+{
+public:
+    // Non-empty: the path a file dialog is asked to pick.
+    QString pickFile;
+
+    bool messageBoxSeen = false;
+    QString title;
+    QString text;
+
+    void start()
+    {
+        waitingForPick = 0;
+        timer.setInterval(50);
+        QObject::connect(&timer, &QTimer::timeout, &timer, [this] {
+            QWidget *modal = QApplication::activeModalWidget();
+            if (!modal) {
+                return;
+            }
+            if (auto *box = qobject_cast<QMessageBox *>(modal)) {
+                messageBoxSeen = true;
+                title = box->windowTitle();
+                text = box->text();
+                box->close();
+            } else if (auto *fileDialog = qobject_cast<QFileDialog *>(modal)) {
+                if (pickFile.isEmpty()) {
+                    fileDialog->close();
+                    return;
+                }
+                // selectFile() leaves the file name alone while its edit has
+                // focus - and the dialog opens with exactly that focus - so
+                // let go of it first or the pick never takes.
+                if (QWidget *focused = fileDialog->focusWidget()) {
+                    focused->clearFocus();
+                }
+                if (!fileDialog->selectedFiles().contains(pickFile)) {
+                    // A native dialog applies the pick asynchronously and may
+                    // still offer an earlier selection; keep asking until it
+                    // holds our file, but never accept one we did not choose.
+                    fileDialog->selectFile(pickFile);
+                    if (++waitingForPick > 50) {
+                        // ~2.5s without our file: close so the test fails on
+                        // its assertions instead of hanging until ctest kills it.
+                        fileDialog->close();
+                    }
+                    return;
+                }
+                // accept() is protected on QFileDialog; QDialog calls the same
+                // virtual implementation.
+                static_cast<QDialog *>(fileDialog)->accept();
+            } else {
+                // Any other dialog - the settings dialog an import opens - is
+                // closed, so that it cannot block the test.
+                modal->close();
+            }
+        });
+        timer.start();
+    }
+
+private:
+    QTimer timer;
+    int waitingForPick = 0;
+};
 
 // The title alignment every group box has to use.
 //

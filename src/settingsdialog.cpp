@@ -13,9 +13,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonParseError>
 #include <QMessageBox>
 #include <QUrl>
 
@@ -37,10 +35,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
             &SettingsDialog::clearProfileClicked);
     connect(ui->pushButton_open_folder, &QPushButton::clicked, this,
             &SettingsDialog::openFolderClicked);
-    connect(ui->pushButton_export_settings, &QPushButton::clicked, this,
-            &SettingsDialog::exportSettingsClicked);
-    connect(ui->pushButton_import_settings, &QPushButton::clicked, this,
-            &SettingsDialog::importSettingsClicked);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &SettingsDialog::saveClicked);
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &SettingsDialog::cancelClicked);
 }
@@ -151,80 +145,6 @@ void SettingsDialog::openFolderClicked()
     }
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
-}
-
-// Writes the settings to a file, so that they can be moved to another
-// machine or kept as a backup.
-void SettingsDialog::exportSettingsClicked()
-{
-    const QString file = QFileDialog::getSaveFileName(this, tr("Export Settings"), QString(),
-                                                      tr("JSON Files (*.json)"));
-    if (file.isEmpty()) {
-        return;
-    }
-
-    QJsonObject root;
-    root.insert(QStringLiteral("application"), QCoreApplication::applicationName());
-    root.insert(QStringLiteral("version"), QCoreApplication::applicationVersion());
-    root.insert(QStringLiteral("settings"), savedSettings());
-
-    QFile file_handle(file);
-    if (!file_handle.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        QMessageBox::warning(this, tr("Export failed"),
-                             tr("The settings could not be written to %1.").arg(file));
-        return;
-    }
-    file_handle.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
-    file_handle.close();
-
-    QMessageBox::information(this, tr("Exported"), tr("Settings exported to %1.").arg(file));
-}
-
-// Reads the settings from a file and fills the dialog with them.
-//
-// The values are not applied right away: the user reviews them and saves
-// them, like every other change in this dialog.
-void SettingsDialog::importSettingsClicked()
-{
-    const QString file = QFileDialog::getOpenFileName(this, tr("Import Settings"), QString(),
-                                                      tr("JSON Files (*.json)"));
-    if (file.isEmpty()) {
-        return;
-    }
-
-    QFile handle(file);
-    if (!handle.open(QIODevice::ReadOnly)) {
-        QMessageBox::warning(this, tr("Import failed"),
-                             tr("The settings could not be read from %1.").arg(file));
-        return;
-    }
-
-    QJsonParseError parseError;
-    const QJsonDocument document = QJsonDocument::fromJson(handle.readAll(), &parseError);
-    handle.close();
-
-    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
-        QMessageBox::warning(this, tr("Import failed"),
-                             tr("The file %1 does not contain settings.").arg(file));
-        return;
-    }
-
-    const QJsonObject root = document.object();
-    const QJsonObject settings = root.value(QStringLiteral("settings")).toObject();
-    if (settings.isEmpty()) {
-        QMessageBox::warning(this, tr("Import failed"),
-                             tr("The file %1 does not contain settings.").arg(file));
-        return;
-    }
-
-    const QStringList notes = applyImportedSettings(settings);
-
-    QStringList message;
-    message << tr("Settings imported from %1.").arg(file);
-    message << tr("Review them and save them to apply them.");
-    message << notes;
-
-    QMessageBox::information(this, tr("Imported"), message.join(QLatin1Char('\n')));
 }
 
 // The settings as they are stored right now.

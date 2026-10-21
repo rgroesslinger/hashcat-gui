@@ -24,69 +24,6 @@
 
 #include <iterator>
 
-// Drives the dialogs the settings dialog opens by itself, and records -
-// while closing - any message box. A box that should not have appeared must
-// neither hang the test nor pass unnoticed: the flag is the evidence.
-class ModalRecorder
-{
-public:
-    // Non-empty: the path a file dialog is asked to pick.
-    QString pickFile;
-
-    bool messageBoxSeen = false;
-    QString title;
-    QString text;
-
-    void start()
-    {
-        waitingForPick = 0;
-        timer.setInterval(50);
-        QObject::connect(&timer, &QTimer::timeout, &timer, [this] {
-            QWidget *modal = QApplication::activeModalWidget();
-            if (!modal) {
-                return;
-            }
-            if (auto *box = qobject_cast<QMessageBox *>(modal)) {
-                messageBoxSeen = true;
-                title = box->windowTitle();
-                text = box->text();
-                box->close();
-            } else if (auto *fileDialog = qobject_cast<QFileDialog *>(modal)) {
-                if (pickFile.isEmpty()) {
-                    fileDialog->close();
-                    return;
-                }
-                // selectFile() leaves the file name alone while its edit has
-                // focus - and the dialog opens with exactly that focus - so
-                // let go of it first or the pick never takes.
-                if (QWidget *focused = fileDialog->focusWidget()) {
-                    focused->clearFocus();
-                }
-                if (!fileDialog->selectedFiles().contains(pickFile)) {
-                    // A native dialog applies the pick asynchronously and may
-                    // still offer an earlier selection; keep asking until it
-                    // holds our file, but never accept one we did not choose.
-                    fileDialog->selectFile(pickFile);
-                    if (++waitingForPick > 50) {
-                        // ~2.5s without our file: close so the test fails on
-                        // its assertions instead of hanging until ctest kills it.
-                        fileDialog->close();
-                    }
-                    return;
-                }
-                // accept() is protected on QFileDialog; QDialog calls the same
-                // virtual implementation.
-                static_cast<QDialog *>(fileDialog)->accept();
-            }
-        });
-        timer.start();
-    }
-
-private:
-    QTimer timer;
-    int waitingForPick = 0;
-};
-
 // The language setting and the executable check: does the combo carry locale
 // codes all the way into the settings, does a stale code stay quiet until
 // the user actually picks a language, and does selectPathClicked() turn away
@@ -106,7 +43,7 @@ private slots:
     void restoreSessionFollowsTheSetting();
     void clearProfileDeletesTheStoredProfile();
     void showsWhereTheFilesAreStored();
-    void exportSettingsWritesTheKnownSettings();
+    void savedSettingsHoldTheKnownSettings();
     void importSettingsFillsTheDialog();
     void importSettingsAppliesEmptyValues();
     void colorSchemeFollowsTheSetting();
@@ -183,7 +120,7 @@ void TestSettingsDialog::languageComboStoresLocaleCodes()
     dialog.ui->comboBox_language->setCurrentIndex(deIndex);
     QCOMPARE(dialog.ui->comboBox_language->currentData().toString(), QStringLiteral("de"));
 
-    ModalRecorder recorder;
+    TestEnvironment::ModalRecorder recorder;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
 
@@ -220,7 +157,7 @@ void TestSettingsDialog::staleLanguageCodeDoesNotDemandARestart()
     SettingsDialog dialog;
     dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/opt/somewhere/hashcat"));
 
-    ModalRecorder recorder;
+    TestEnvironment::ModalRecorder recorder;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
 
@@ -248,7 +185,7 @@ void TestSettingsDialog::selectPathClickedAcceptsAnExecutable()
     SettingsDialog dialog;
     dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/preset"));
 
-    ModalRecorder recorder;
+    TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = stub;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "selectPathClicked"));
@@ -274,7 +211,7 @@ void TestSettingsDialog::selectPathClickedRejectsAPlainFile()
     SettingsDialog dialog;
     dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/preset"));
 
-    ModalRecorder recorder;
+    TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = plain;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "selectPathClicked"));
@@ -296,7 +233,7 @@ void TestSettingsDialog::restoreSessionFollowsTheSetting()
 
     dialog.ui->checkBox_restore_session->setChecked(true);
 
-    ModalRecorder recorder;
+    TestEnvironment::ModalRecorder recorder;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
 
@@ -319,7 +256,7 @@ void TestSettingsDialog::clearProfileDeletesTheStoredProfile()
 
     SettingsDialog dialog;
 
-    ModalRecorder recorder;
+    TestEnvironment::ModalRecorder recorder;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "clearProfileClicked"));
 
@@ -347,33 +284,18 @@ void TestSettingsDialog::showsWhereTheFilesAreStored()
     QCOMPARE(dialog.ui->pushButton_open_folder->isEnabled(), inFile);
 }
 
-// The export writes the settings the application runs with into a file, so
-// that they can be moved to another machine.
-void TestSettingsDialog::exportSettingsWritesTheKnownSettings()
+// The export holds the settings the application runs with, so that they can
+// be moved to another machine.
+void TestSettingsDialog::savedSettingsHoldTheKnownSettings()
 {
     auto &settings = SettingsManager::instance();
     settings.setKey(AppConstants::SettingsKeys::HashcatPath,
                     QStringLiteral("/opt/somewhere/hashcat"));
     settings.setKey(AppConstants::SettingsKeys::Terminal, QStringLiteral("kitty"));
 
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("settings.json"));
-
     SettingsDialog dialog;
+    const QJsonObject stored = dialog.savedSettings();
 
-    ModalRecorder recorder;
-    recorder.pickFile = file;
-    recorder.start();
-    QVERIFY(QMetaObject::invokeMethod(&dialog, "exportSettingsClicked"));
-
-    QVERIFY(QFile::exists(file));
-
-    QFile handle(file);
-    QVERIFY(handle.open(QIODevice::ReadOnly));
-    const QJsonDocument document = QJsonDocument::fromJson(handle.readAll());
-    handle.close();
-
-    QVERIFY(document.isObject());
-    const QJsonObject stored = document.object().value(QStringLiteral("settings")).toObject();
     QCOMPARE(stored.value(QStringLiteral("hashcatPath")).toString(),
              QStringLiteral("/opt/somewhere/hashcat"));
     QCOMPARE(stored.value(QStringLiteral("terminal")).toString(), QStringLiteral("kitty"));
@@ -387,28 +309,14 @@ void TestSettingsDialog::exportSettingsWritesTheKnownSettings()
 // applied before the user saves them.
 void TestSettingsDialog::importSettingsFillsTheDialog()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("import.json"));
-
     QJsonObject stored;
     stored.insert(QStringLiteral("hashcatPath"), QStringLiteral("/imported/hashcat"));
     stored.insert(QStringLiteral("useShortParameters"), true);
     stored.insert(QStringLiteral("restoreSession"), false);
     stored.insert(QStringLiteral("language"), QStringLiteral("de"));
 
-    QJsonObject root;
-    root.insert(QStringLiteral("settings"), stored);
-
-    QFile handle(file);
-    QVERIFY(handle.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    handle.write(QJsonDocument(root).toJson());
-    handle.close();
-
     SettingsDialog dialog;
-
-    ModalRecorder recorder;
-    recorder.pickFile = file;
-    recorder.start();
-    QVERIFY(QMetaObject::invokeMethod(&dialog, "importSettingsClicked"));
+    dialog.applyImportedSettings(stored);
 
     QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QStringLiteral("/imported/hashcat"));
     QCOMPARE(dialog.ui->checkBox_use_short_parameters->isChecked(), true);
@@ -423,21 +331,10 @@ void TestSettingsDialog::importSettingsFillsTheDialog()
 // says so has to be taken at its word.
 void TestSettingsDialog::importSettingsAppliesEmptyValues()
 {
-    const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("import_empty.json"));
-
     QJsonObject stored;
     stored.insert(QStringLiteral("hashcatPath"), QString());
     stored.insert(QStringLiteral("language"), QString());
     stored.insert(QStringLiteral("colorScheme"), QString());
-
-    QJsonObject root;
-    root.insert(QStringLiteral("settings"), stored);
-
-    QFile handle(file);
-    QVERIFY(handle.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    handle.write(QJsonDocument(root).toJson());
-    handle.close();
 
     SettingsDialog dialog;
     // The dialog shows something else, so that the import has to change it.
@@ -447,10 +344,7 @@ void TestSettingsDialog::importSettingsAppliesEmptyValues()
     dialog.ui->comboBox_color_scheme->setCurrentIndex(
         dialog.ui->comboBox_color_scheme->findData(QStringLiteral("dark")));
 
-    ModalRecorder recorder;
-    recorder.pickFile = file;
-    recorder.start();
-    QVERIFY(QMetaObject::invokeMethod(&dialog, "importSettingsClicked"));
+    dialog.applyImportedSettings(stored);
 
     // The empty values took the place of the ones that were there.
     QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QString());
@@ -472,7 +366,7 @@ void TestSettingsDialog::colorSchemeFollowsTheSetting()
     QVERIFY(lightIndex >= 0);
     dialog.ui->comboBox_color_scheme->setCurrentIndex(lightIndex);
 
-    ModalRecorder recorder;
+    TestEnvironment::ModalRecorder recorder;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
 

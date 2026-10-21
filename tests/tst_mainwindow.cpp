@@ -188,6 +188,8 @@ private slots:
     void profileWithAnUnknownHashTypeSelectsNothing();
     void windowFitsItsContent();
     void commandBarStaysVisibleOnEveryTab();
+    void theSettingsAreExportedThroughTheFileMenu();
+    void theSettingsAreImportedThroughTheFileMenu();
 
 private:
     QString m_savedHashcatPath;
@@ -1282,6 +1284,62 @@ void TestMainWindow::commandBarStaysVisibleOnEveryTab()
     QVERIFY(execute->isVisible());
     QVERIFY(copy->isVisible());
     QVERIFY(preview->isVisible());
+}
+
+// The settings leave the application through the File menu, like the profile:
+// the file holds the settings that are in effect, in the shared format.
+void TestMainWindow::theSettingsAreExportedThroughTheFileMenu()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/somewhere/hashcat"));
+
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("settings.json"));
+
+    MainWindow window;
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "exportSettingsTriggered"));
+
+    QVERIFY(QFile::exists(file));
+
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    QVERIFY2(StateFile::read(file, AppConstants::FileSections::Settings, &values, &version,
+                             &otherSections, nullptr),
+             "the exported settings cannot be read again");
+    QCOMPARE(values.value(QStringLiteral("hashcatPath")).toString(),
+             QStringLiteral("/opt/somewhere/hashcat"));
+}
+
+// The import opens the settings dialog with the values of the file in it, so
+// the user reviews them before they are applied.
+void TestMainWindow::theSettingsAreImportedThroughTheFileMenu()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("import.json"));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("hashcatPath"), QStringLiteral("/imported/hashcat"));
+    QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,
+                             AppConstants::Settings::Version, values, nullptr));
+
+    // A configured hashcat, so that the window does not queue the settings
+    // dialog of its own.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/somewhere/hashcat"));
+
+    MainWindow window;
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+
+    // The dialog the import opens is closed by the recorder; the test is
+    // about the file that was read and the notes that came with it.
+    QVERIFY(QMetaObject::invokeMethod(&window, "importSettingsTriggered"));
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Imported"));
 }
 
 int main(int argc, char *argv[])

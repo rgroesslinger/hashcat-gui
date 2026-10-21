@@ -1489,6 +1489,8 @@
     </property>
     <addaction name="actionImport"/>
     <addaction name="actionExport"/>
+    <addaction name="actionImportSettings"/>
+    <addaction name="actionExportSettings"/>
     <addaction name="actionSettings"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -1520,6 +1522,16 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionImportSettings">
+   <property name="text">
+    <string>Import Settings</string>
+   </property>
+  </action>
+  <action name="actionExportSettings">
+   <property name="text">
+    <string>Export Settings</string>
    </property>
   </action>
   <action name="actionExport">

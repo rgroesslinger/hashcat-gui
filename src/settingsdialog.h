@@ -24,13 +24,22 @@ public:
     explicit SettingsDialog(QWidget *parent = nullptr);
     ~SettingsDialog() override;
 
+    // The settings as they are stored right now.
+    //
+    // The export is a backup of the configuration the application runs with,
+    // so it holds what is saved and not what the dialog shows but has not
+    // saved.
+    QJsonObject savedSettings() const;
+
+    // Fills the dialog with the settings of an imported file. Returns the
+    // notes for the user.
+    QStringList applyImportedSettings(const QJsonObject &settings);
+
 private slots:
     void readSettings();
     void selectPathClicked();
     void clearProfileClicked();
     void openFolderClicked();
-    void exportSettingsClicked();
-    void importSettingsClicked();
     void saveClicked();
     void cancelClicked();
 
@@ -45,13 +54,6 @@ private:
 
     // The home directory as a tilde.
     static QString shortenPath(const QString &path);
-
-    // The settings as they are stored right now.
-    QJsonObject savedSettings() const;
-
-    // Fills the dialog with the settings of an imported file. Returns the
-    // notes for the user.
-    QStringList applyImportedSettings(const QJsonObject &settings);
 
     Ui::SettingsDialog *ui;
 
