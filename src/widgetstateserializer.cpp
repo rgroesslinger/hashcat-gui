@@ -4,6 +4,7 @@
  */
 
 #include "widgetstateserializer.h"
+#include "appconstants.h"
 
 #include <QLineEdit>
 #include <QCheckBox>
@@ -205,6 +206,7 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key, const QWidget *w
                                             QString *errorMessage) const
 {
     QJsonObject root;
+    root[QStringLiteral("version")] = AppConstants::Profiles::Version;
     root[key] = widgetToJson(widget, ignoredWidgets);
 
     // QSaveFile writes to a temporary file next to the target and renames it
@@ -232,8 +234,8 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key, const QWidget *w
 bool WidgetStateSerializer::loadStateFromFile(const QString &key, QWidget *widget,
                                               const QString &filename,
                                               const QStringList &ignoredWidgets,
-                                              QString *errorMessage,
-                                              QJsonObject *profileState) const
+                                              QString *errorMessage, QJsonObject *profileState,
+                                              QString *warning) const
 {
     QFile f(filename);
     if (!f.open(QIODevice::ReadOnly)) {
@@ -255,6 +257,17 @@ bool WidgetStateSerializer::loadStateFromFile(const QString &key, QWidget *widge
     if (!root.contains(key)) {
         setError(errorMessage, tr("The file does not contain a profile for \"%1\".").arg(key));
         return false;
+    }
+
+    // A profile names the widgets by their object name, so the names are part
+    // of the format. A profile from another version still names the widgets
+    // that did not change, so it is read - the values of the widgets it names
+    // no longer exist are left at their defaults, and the user is told that
+    // the profile is not complete.
+    const int version = root.value(QStringLiteral("version")).toInt(-1);
+    if (version != AppConstants::Profiles::Version && warning) {
+        *warning = tr("This profile was made by another version of hashcat-gui. It was loaded, but "
+                      "the values it does not know about were left at their defaults.");
     }
 
     const QJsonObject state = root[key].toObject();

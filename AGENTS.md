@@ -73,6 +73,11 @@ these three targets — this checklist is the only enforcement.
 - Persists `QLineEdit`, `QCheckBox`, `QComboBox`, `QRadioButton`, `QSpinBox`,
   `QDoubleSpinBox`, `QListWidget` children by `objectName`. Renaming object names breaks
   saved profiles and tests.
+- A profile carries `AppConstants::Profiles::Version`. The object names are part of the
+  format, so a profile from another version names widgets that may not exist any more: it
+  is still read - the widgets it names that do exist keep their values - and the user is
+  told that the rest was left at its defaults. Bump the version whenever a persisted
+  widget is renamed.
 - A `QComboBox` is stored by the item data the app gave the entry (attack mode id, hash type
   id, workload level) — never by display text (translatable). Only a combo with no item data
   at all falls back to position, which is not an identifier: inserting mid-list shifts every

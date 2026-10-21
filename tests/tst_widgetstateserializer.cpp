@@ -36,6 +36,7 @@ private slots:
     void ignoredWidgetsAreNotRestored();
     void corruptJsonIsRejected();
     void missingProfileIsRejected();
+    void aProfileFromAnotherVersionIsLoadedWithAWarning();
     void writeFailureIsReported();
     void readFailureIsReported();
     void errorIsClearedOnSuccess();
@@ -222,7 +223,7 @@ void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("clash.json"));
     QFile out(file);
     QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    out.write(R"({"default": {"comboBox_hash_type": 1}})");
+    out.write(R"({"version": 1, "default": {"comboBox_hash_type": 1}})");
     out.close();
 
     Form restored;
@@ -252,7 +253,7 @@ void TestWidgetStateSerializer::anUnknownIdentifierChangesNothing()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("unknown.json"));
     QFile out(file);
     QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    out.write(R"({"default": {"comboBox_hash_type": 9999}})");
+    out.write(R"({"version": 1, "default": {"comboBox_hash_type": 9999}})");
     out.close();
 
     Form restored;
@@ -416,6 +417,37 @@ void TestWidgetStateSerializer::missingProfileIsRejected()
     QVERIFY(errorMessage.contains(QStringLiteral("default")));
 }
 
+// A profile stores the widgets by their object name, so the names are part
+// of the format. A profile from another version names widgets that may not
+// exist anymore. It is still read: the widgets it names that do exist keep
+// their values, the others are left at their defaults, and the user is told
+// that the profile is not complete.
+void TestWidgetStateSerializer::aProfileFromAnotherVersionIsLoadedWithAWarning()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("old-version.json"));
+    QFile out(file);
+    QVERIFY(out.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    // A profile from before the format carried a version at all.
+    out.write(R"({"default": {"comboBox_hash_type": 1000}})");
+    out.close();
+
+    Form restored;
+    restored.comboBoxWithData->setCurrentIndex(0); // MD5
+
+    WidgetStateSerializer serializer;
+    QString errorMessage;
+    QString warning;
+    QVERIFY2(serializer.loadStateFromFile(QStringLiteral("default"), &restored.widget, file, {},
+                                          &errorMessage, nullptr, &warning),
+             qPrintable(errorMessage));
+
+    // The value the profile names is applied - the one field that changed
+    // does not cost the whole profile.
+    QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
+    // ... and the user is told that the profile comes from another version.
+    QVERIFY(!warning.isEmpty());
+}
 
 // A profile path whose directory does not exist: the save has to fail with
 // the path in the message, not write somewhere else and claim success.

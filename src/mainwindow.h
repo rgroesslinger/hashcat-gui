@@ -106,6 +106,10 @@ private:
     // What the selected attack mode needs from the user.
     QString modeHint(AttackMode mode) const;
 
+    // Shows what a loaded profile has to say for itself. Returns whether a
+    // note was shown.
+    bool showProfileNotes(const QString &warning, const QString &problem);
+
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about
     // widgets.

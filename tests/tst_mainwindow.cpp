@@ -829,7 +829,7 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"MainWindow": {"comboBox_hash_type": 1000}})");
+    profile.write(R"({"version": 1, "MainWindow": {"comboBox_hash_type": 1000}})");
     profile.close();
 
     m_watchdog.start();
@@ -868,7 +868,7 @@ void TestMainWindow::profileWithAnUnknownHashTypeSelectsNothing()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"MainWindow": {"comboBox_hash_type": 9999}})");
+    profile.write(R"({"version": 1, "MainWindow": {"comboBox_hash_type": 9999}})");
     profile.close();
 
     m_watchdog.start();

@@ -35,9 +35,15 @@ public:
     // is copied there, so callers can read values the widgets could not take
     // yet - a combobox that has no items until an asynchronous query fills
     // it, see MainWindow::loadDefaultProfile().
+    //
+    // A profile from another version of the format is read as well: the
+    // widgets it names that still exist keep their values, the ones that do
+    // not exist any more are left at their defaults. warning receives a note
+    // about it, so the caller can tell the user that the profile is not
+    // complete.
     bool loadStateFromFile(const QString &key, QWidget *widget, const QString &filename,
                            const QStringList &ignoredWidgets = {}, QString *errorMessage = nullptr,
-                           QJsonObject *profileState = nullptr) const;
+                           QJsonObject *profileState = nullptr, QString *warning = nullptr) const;
 };
 
 #endif // WIDGETSTATESERIALIZER_H

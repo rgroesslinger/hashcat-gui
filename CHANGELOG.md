@@ -21,6 +21,7 @@
 - **Clearer tabs**: The Attack tab now holds the mode-specific hash input, wordlist, rules, mask and charset options; the General tab holds session, output, resource, performance and hardware options
 - **Mode hint**: The attack mode selector now states what the selected mode needs - the number of word lists, a mask, or both
 - Combo boxes in a profile are stored by the id of their selected entry instead of its position, so a list that grows - a new hash type, a new attack mode - no longer changes what a saved profile selects
+- **A profile says which version wrote it**: A profile from another version of hashcat-gui is still loaded - the values it knows are kept - and the user is told that the rest was left at its defaults
 
 ### Bug Fixes
 - GUI now refuses to start hashcat when configuration is incomplete instead of failing silently

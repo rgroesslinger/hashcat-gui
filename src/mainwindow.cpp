@@ -397,18 +397,17 @@ void MainWindow::importTriggered()
     if (!file.isEmpty()) {
         WidgetStateSerializer s;
         QString error;
+        QString warning;
         QJsonObject state;
         if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
-                                &error, &state)) {
+                                &error, &state, &warning)) {
             // Same deferred hash type as loadDefaultProfile(): while the
             // query is in flight the combo cannot take the stored id.
             const QString problem = restoreHashType(state);
             commandChanged();
-            if (problem.isEmpty()) {
+            if (!showProfileNotes(warning, problem)) {
                 QMessageBox::information(this, tr("Imported"),
                                          tr("Profile imported from %1.").arg(file));
-            } else {
-                QMessageBox::warning(this, tr("Profile warning"), problem);
             }
         } else {
             QMessageBox::warning(this, tr("Import failed"), error);
@@ -535,21 +534,42 @@ void MainWindow::loadDefaultProfile()
     if (QFile::exists(file)) {
         WidgetStateSerializer s;
         QString error;
+        QString warning;
         QJsonObject state;
         if (s.loadStateFromFile(QString::fromUtf8(metaObject()->className()), this, file, {},
-                                &error, &state)) {
+                                &error, &state, &warning)) {
             // The hash combo has no items yet - the query that fills it runs
             // asynchronously. Remember the stored hash type; the reply
             // applies it once the items exist.
             const QString problem = restoreHashType(state);
             commandChanged();
-            if (!problem.isEmpty()) {
-                QMessageBox::warning(this, tr("Profile warning"), problem);
-            }
+            showProfileNotes(warning, problem);
         } else {
             QMessageBox::warning(this, tr("Load failed"), error);
         }
     }
+}
+
+// The notes a loaded profile has for the user: a profile from another
+// version and a hash type this hashcat does not know are both worth a word.
+// They share one box, so a profile that has both does not open two.
+//
+// Returns whether a note was shown.
+bool MainWindow::showProfileNotes(const QString &warning, const QString &problem)
+{
+    QStringList notes;
+    if (!warning.isEmpty()) {
+        notes << warning;
+    }
+    if (!problem.isEmpty()) {
+        notes << problem;
+    }
+    if (notes.isEmpty()) {
+        return false;
+    }
+
+    QMessageBox::warning(this, tr("Profile warning"), notes.join(QLatin1Char('\n')));
+    return true;
 }
 
 // The hash type a profile names, applied to the combo box.
