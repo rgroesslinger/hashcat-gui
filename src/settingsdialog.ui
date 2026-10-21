@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>385</height>
+    <width>455</width>
+    <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,6 @@
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
-   <property name="sizeConstraint">
-    <enum>QLayout::SizeConstraint::SetFixedSize</enum>
-   </property>
    <item>
     <widget class="QGroupBox" name="groupBox_hc_path">
      <property name="sizePolicy">
@@ -176,7 +173,7 @@
       <item>
        <widget class="QLabel" name="label_color_scheme_note">
         <property name="text">
-         <string>Not every platform supports light and dark; what you see depends on the desktop.</string>
+         <string>Not all color schemes are available on all platforms.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

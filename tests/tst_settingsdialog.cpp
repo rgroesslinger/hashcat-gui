@@ -381,9 +381,9 @@ void TestSettingsDialog::colorSchemeFollowsTheSetting()
     QVERIFY(!note->text().isEmpty());
 }
 
-// The dialog must not be pinned to the 450x385 in the .ui: that one size
-// clips its content under a large font or a long translation and leaves an
-// empty margin under a small one. SetFixedSize makes it exactly content-sized.
+// The dialog opens as large as its content: the size in the .ui would clip
+// the content under a large font or a long translation and leave an empty
+// margin under a small one.
 void TestSettingsDialog::fitsItsContent()
 {
     SettingsDialog dialog;
@@ -391,9 +391,9 @@ void TestSettingsDialog::fitsItsContent()
     QCoreApplication::processEvents();
 
     QCOMPARE(dialog.size(), dialog.sizeHint());
-    // content-sized, and still not resizable
-    QCOMPARE(dialog.minimumSize(), dialog.maximumSize());
-    QCOMPARE(dialog.size(), dialog.maximumSize());
+
+    // The user may make the dialog whatever size they like afterwards.
+    QVERIFY(dialog.minimumSize() != dialog.maximumSize());
 }
 
 // The titles of the group boxes have to look alike. The alignment is the only

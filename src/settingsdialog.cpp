@@ -17,6 +17,7 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QMessageBox>
+#include <QShowEvent>
 #include <QUrl>
 
 #include <algorithm>
@@ -62,6 +63,20 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 SettingsDialog::~SettingsDialog()
 {
     delete ui;
+}
+
+void SettingsDialog::showEvent(QShowEvent *event)
+{
+    QDialog::showEvent(event);
+
+    if (m_sizedToContent) {
+        return;
+    }
+    m_sizedToContent = true;
+
+    // The content decides how large the dialog is; the user may then make it
+    // whatever size they like.
+    resize(sizeHint());
 }
 
 void SettingsDialog::readSettings()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>160</height>
+    <width>480</width>
+    <height>455</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,6 @@
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
-   <property name="sizeConstraint">
-    <enum>QLayout::SizeConstraint::SetFixedSize</enum>
-   </property>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_header">
      <item>
@@ -161,6 +158,12 @@
       </item>
       <item row="0" column="1">
        <widget class="QLabel" name="label_qt_version">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -181,6 +184,12 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="label_os">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string/>
         </property>
@@ -353,22 +362,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLabel" name="label_license_hashcat">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="textInteractionFlags">
-         <set>Qt::TextInteractionFlag::LinksAccessibleByMouse|Qt::TextInteractionFlag::LinksAccessibleByKeyboard</set>
-        </property>
-        <property name="openExternalLinks">
-         <bool>true</bool>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -376,6 +369,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <widget class="QPushButton" name="pushButton_copy_details">
+       <property name="toolTip">
+        <string>Copy the application, toolkit, system and hashcat versions to the clipboard</string>
+       </property>
        <property name="text">
         <string>Copy details</string>
        </property>

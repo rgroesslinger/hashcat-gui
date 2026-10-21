@@ -14,11 +14,10 @@
 #include "aboutdialog.h"
 #include "appconstants.h"
 
-// The About dialog must not be pinned to the 500x160 in the .ui: under a
-// large font or a longer version string that clips its content, under a small
-// one it leaves an empty margin. SetFixedSize makes it exactly content-sized,
-// and the version label wraps so a long hashcat error cannot push the dialog
-// off the screen.
+// The About dialog opens as large as its content: the size in the .ui would
+// clip the content under a large font or a longer version string and leave an
+// empty margin under a small one. The version label wraps, so a long hashcat
+// error grows the dialog instead of pushing it off the screen.
 class TestAboutDialog : public QObject
 {
     Q_OBJECT
@@ -30,7 +29,7 @@ private slots:
     void showsTheLogoAndTheApplicationName();
     void showsTheToolkitAndTheOperatingSystem();
     void linksToTheProjectAndToHashcat();
-    void namesTheLicensesOfBothPrograms();
+    void namesTheLicenseOfTheApplication();
     void copyDetailsPutsThemOnTheClipboard();
 };
 
@@ -41,9 +40,9 @@ void TestAboutDialog::fitsItsContent()
     QCoreApplication::processEvents();
 
     QCOMPARE(dialog.size(), dialog.sizeHint());
-    // content-sized, and still not resizable
-    QCOMPARE(dialog.minimumSize(), dialog.maximumSize());
-    QCOMPARE(dialog.size(), dialog.maximumSize());
+
+    // The user may make the dialog whatever size they like afterwards.
+    QVERIFY(dialog.minimumSize() != dialog.maximumSize());
 }
 
 void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
@@ -151,31 +150,27 @@ void TestAboutDialog::linksToTheProjectAndToHashcat()
     }
 }
 
-// Both programs are free software, and both say so in their own license.
-// The dialog has to name them, and it has to link the texts.
-void TestAboutDialog::namesTheLicensesOfBothPrograms()
+// The dialog names the license of the application and links its text.
+//
+// The license of hashcat is not part of it: the application does not
+// distribute hashcat, so it does not state its terms either.
+void TestAboutDialog::namesTheLicenseOfTheApplication()
 {
     AboutDialog dialog;
 
     QLabel *gui = dialog.findChild<QLabel *>(QStringLiteral("label_license_gui"));
     QVERIFY(gui);
     QVERIFY(gui->openExternalLinks());
-    QVERIFY(gui->text().contains(QStringLiteral("GPL")));
+    QVERIFY(gui->text().contains(QStringLiteral("GNU GPL")));
+    QVERIFY(gui->text().contains(QStringLiteral("v3.0 or later")));
     QVERIFY(gui->text().contains(QString(AppConstants::Urls::License)));
     QCOMPARE(gui->toolTip(), QString(AppConstants::Urls::License));
 
-    QLabel *hashcat = dialog.findChild<QLabel *>(QStringLiteral("label_license_hashcat"));
-    QVERIFY(hashcat);
-    QVERIFY(hashcat->openExternalLinks());
-    QVERIFY(hashcat->text().contains(QStringLiteral("MIT")));
-    QCOMPARE(hashcat->toolTip(), QString(AppConstants::Urls::HashcatLicense));
+    // The name of the license is the link, and nothing else is named.
+    QVERIFY(gui->text().contains(QStringLiteral(">GNU GPL v3.0 or later</a>")));
 
-    // Both sentences have the same shape, and neither of them names the
-    // license a second time.
-    QVERIFY(gui->text().contains(QStringLiteral(">GPL</a>")));
-    QVERIFY(hashcat->text().contains(QStringLiteral(">MIT</a>")));
-    QVERIFY(gui->text().contains(QStringLiteral("licensed under the")));
-    QVERIFY(hashcat->text().contains(QStringLiteral("licensed under the")));
+    // The license of hashcat is nowhere in the dialog.
+    QVERIFY(dialog.findChild<QLabel *>(QStringLiteral("label_license_hashcat")) == nullptr);
 }
 
 // The details a bug report needs are one click away: the version of the

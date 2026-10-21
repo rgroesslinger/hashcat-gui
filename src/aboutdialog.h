@@ -27,6 +27,13 @@ public:
     // off.
     void setVersionText(const QString &text);
 
+protected:
+    // The dialog opens as large as its content. The height of the
+    // word-wrapped labels is only known once they have been polished, so the
+    // fit happens when the dialog is shown - and only then, so that a window
+    // the user has resized is left alone.
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void okClicked();
     void copyDetailsClicked();
@@ -47,6 +54,9 @@ private:
     // The version of hashcat, or the error it answered with. The label
     // shows it wrapped, this keeps the text as it is.
     QString m_hashcatVersion;
+
+    // The dialog is fitted to its content once, on the first show.
+    bool m_sizedToContent = false;
 
     Ui::AboutDialog *ui;
 };

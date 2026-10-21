@@ -35,6 +35,13 @@ public:
     // notes for the user.
     QStringList applyImportedSettings(const QJsonObject &settings);
 
+protected:
+    // The dialog opens as large as its content. The height of the
+    // word-wrapped labels is only known once they have been polished, so the
+    // fit happens when the dialog is shown - and only then, so that a window
+    // the user has resized is left alone.
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void readSettings();
     void selectPathClicked();
@@ -64,6 +71,9 @@ private:
     // The folder the settings are stored in, empty where there is none - the
     // registry on Windows has no folder to open.
     QString m_settingsFolder;
+
+    // The dialog is fitted to its content once, on the first show.
+    bool m_sizedToContent = false;
 };
 
 #endif // SETTINGSDIALOG_H

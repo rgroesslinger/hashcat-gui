@@ -14,6 +14,7 @@
 #include <QFileInfo>
 #include <QFont>
 #include <QFutureWatcher>
+#include <QShowEvent>
 #include <QLabel>
 #include <QPixmap>
 #include <QSysInfo>
@@ -123,6 +124,20 @@ AboutDialog::~AboutDialog()
     delete ui;
 }
 
+void AboutDialog::showEvent(QShowEvent *event)
+{
+    QDialog::showEvent(event);
+
+    if (m_sizedToContent) {
+        return;
+    }
+    m_sizedToContent = true;
+
+    // The content decides how large the dialog is; the user may then make it
+    // whatever size they like.
+    resize(sizeHint());
+}
+
 void AboutDialog::okClicked()
 {
     close();
@@ -186,14 +201,15 @@ void AboutDialog::updateLinks()
     setLink(ui->label_link_hashcat_faq, AppConstants::Urls::HashcatFaq, tr("hashcat FAQ"));
 }
 
+// The license of the application.
+//
+// hashcat is a program of its own, with a license of its own; the dialog does
+// not distribute it, so it does not state its terms either.
 void AboutDialog::updateLicense()
 {
     setLinkText(ui->label_license_gui, AppConstants::Urls::License,
                 tr("hashcat-gui is licensed under the %1.")
-                    .arg(link(AppConstants::Urls::License, tr("GPL"))));
-    setLinkText(ui->label_license_hashcat, AppConstants::Urls::HashcatLicense,
-                tr("hashcat is licensed under the %1.")
-                    .arg(link(AppConstants::Urls::HashcatLicense, tr("MIT"))));
+                    .arg(link(AppConstants::Urls::License, tr("GNU GPL v3.0 or later"))));
 }
 
 void AboutDialog::updateVersionLabel()
