@@ -531,6 +531,33 @@ void TestMainWindow::launchValidationFollowsTheWidgets()
     window.ui->spinBox_increment_max->setValue(4);
     QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
              int(HelperUtils::LaunchError::InvalidIncrement));
+
+    // A valid pair of bounds, but incrementing and speed-only are mutually
+    // exclusive in hashcat. Both controls are reachable in a mask mode.
+    window.ui->spinBox_increment_min->setValue(4);
+    window.ui->spinBox_increment_max->setValue(8);
+    window.ui->checkBox_speed_only->setChecked(true);
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::IncrementWithSpeedOnly));
+    window.ui->checkBox_speed_only->setChecked(false);
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+
+    // Association keeps the checked increment from the brute-force step (its
+    // group box is disabled), but the command line carries no -i, so the
+    // launch validation has to ignore it. --remove is refused, and its box
+    // stays enabled so the user can clear it.
+    window.ui->comboBox_attack->setCurrentIndex(5); // association
+    QCOMPARE(int(window.ui->comboBox_attack->currentData().toInt()), int(AttackMode::Association));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+
+    window.ui->checkBox_remove->setChecked(true);
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::RemoveInAssociation));
+    window.ui->checkBox_remove->setChecked(false);
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
 }
 
 void TestMainWindow::widgetsFlowIntoTheOptions()

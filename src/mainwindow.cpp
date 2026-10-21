@@ -1103,6 +1103,9 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         break;
 
     case HelperUtils::LaunchError::WrongWordlistCount: {
+        // The wording below uses minWordlists as the exact count. That is only
+        // correct while Combination is the sole mode with maxWordlists >= 0,
+        // and there min == max; a mode with a range needs different wording.
         const CommandBuilder::ModeRequirements requirements =
             CommandBuilder::modeRequirements(currentAttackMode());
         box.setIcon(QMessageBox::Information);
@@ -1120,6 +1123,16 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
     case HelperUtils::LaunchError::InvalidIncrement:
         box.setIcon(QMessageBox::Information);
         box.setText(tr("The minimum increment length is larger than the maximum."));
+        break;
+
+    case HelperUtils::LaunchError::IncrementWithSpeedOnly:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The increment cannot be combined with the speed-only option."));
+        break;
+
+    case HelperUtils::LaunchError::RemoveInAssociation:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("Removing cracked hashes is not possible in the association attack mode."));
         break;
 
     case HelperUtils::LaunchError::None:

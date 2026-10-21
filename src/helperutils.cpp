@@ -154,10 +154,25 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
         return LaunchError::NoMask;
     }
 
-    // Hashcat refuses a minimum length that is larger than the maximum.
-    if (options.increment && options.incrementMin > 0 && options.incrementMax > 0
+    // Hashcat refuses a minimum length that is larger than the maximum. The
+    // builder emits the flag and its bounds only in the mask modes, so a
+    // stale pair in a disabled group box must not block the other modes.
+    if (options.increment && CommandBuilder::attackUsesMask(options.attackMode)
+        && options.incrementMin > 0 && options.incrementMax > 0
         && options.incrementMin > options.incrementMax) {
         return LaunchError::InvalidIncrement;
+    }
+
+    // Two combinations hashcat answers with a usage error. The increment one
+    // is gated like the bounds above, for the same reason: only a mask mode
+    // puts -i on the command line.
+    if (options.increment && CommandBuilder::attackUsesMask(options.attackMode)
+        && options.speedOnly) {
+        return LaunchError::IncrementWithSpeedOnly;
+    }
+
+    if (options.remove && options.attackMode == AttackMode::Association) {
+        return LaunchError::RemoveInAssociation;
     }
 
     return LaunchError::None;
