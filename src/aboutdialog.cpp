@@ -8,10 +8,12 @@
 #include "helperutils.h"
 #include "settingsmanager.h"
 #include "appconstants.h"
+#include <QApplication>
 #include <QFileInfo>
 #include <QFont>
 #include <QFutureWatcher>
 #include <QPixmap>
+#include <QSysInfo>
 
 namespace
 {
@@ -28,6 +30,7 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDia
 {
     ui->setupUi(this);
     updateVersionLabel();
+    updateSystemLabels();
 
     // The logo is scaled to the size the .ui gives the label, so the artwork
     // stays sharp on a high-dpi display without the .ui having to know about
@@ -56,6 +59,15 @@ AboutDialog::~AboutDialog()
 void AboutDialog::okClicked()
 {
     close();
+}
+
+// What the application runs on: the toolkit it is built with and the system
+// underneath it. Both are asked for when the dialog opens, because neither
+// of them can change while it is on screen.
+void AboutDialog::updateSystemLabels()
+{
+    ui->label_qt_version->setText(QString::fromLatin1(qVersion()));
+    ui->label_os->setText(QSysInfo::prettyProductName());
 }
 
 void AboutDialog::updateVersionLabel()

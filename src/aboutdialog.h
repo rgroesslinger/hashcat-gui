@@ -26,6 +26,9 @@ private slots:
     void okClicked();
 
 private:
+    // Fills the rows that describe the system the application runs on.
+    void updateSystemLabels();
+
     Ui::AboutDialog *ui;
 };
 

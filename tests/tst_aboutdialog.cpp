@@ -7,6 +7,8 @@
 
 #include <QGroupBox>
 #include <QLabel>
+#include <QPushButton>
+#include <QSysInfo>
 
 #include "aboutdialog.h"
 
@@ -24,6 +26,7 @@ private slots:
     void longVersionTextWrapsInsteadOfWidening();
     void groupBoxesShareOneTitleAlignment();
     void showsTheLogoAndTheApplicationName();
+    void showsTheToolkitAndTheOperatingSystem();
 };
 
 void TestAboutDialog::fitsItsContent()
@@ -90,6 +93,21 @@ void TestAboutDialog::showsTheLogoAndTheApplicationName()
     QLabel *description = dialog.findChild<QLabel *>(QStringLiteral("label_app_description"));
     QVERIFY(description);
     QVERIFY(!description->text().isEmpty());
+}
+
+// The toolkit and the system underneath it are part of what a bug report
+// needs, so the dialog states both.
+void TestAboutDialog::showsTheToolkitAndTheOperatingSystem()
+{
+    AboutDialog dialog;
+
+    QLabel *qtVersion = dialog.findChild<QLabel *>(QStringLiteral("label_qt_version"));
+    QVERIFY(qtVersion);
+    QCOMPARE(qtVersion->text(), QString::fromLatin1(qVersion()));
+
+    QLabel *os = dialog.findChild<QLabel *>(QStringLiteral("label_os"));
+    QVERIFY(os);
+    QCOMPARE(os->text(), QSysInfo::prettyProductName());
 }
 
 int main(int argc, char *argv[])
