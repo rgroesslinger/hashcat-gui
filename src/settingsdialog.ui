@@ -56,9 +56,6 @@
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
-        <property name="sizeConstraint">
-         <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
-        </property>
         <item>
          <widget class="QLineEdit" name="lineEdit_hc_path">
           <property name="minimumSize">
