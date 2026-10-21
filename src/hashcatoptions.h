@@ -80,7 +80,9 @@ struct HashcatOptions {
     bool hwmonTempAbort = false;
     int hwmonTempAbortCelsius = AppConstants::Defaults::HwmonTempAbort;
 
-    // Single rules for combination mode, where -r / -g are not allowed.
+    // The single rules of the two wordlist sides (-j / -k). Which side exists
+    // depends on the attack mode, see CommandBuilder::attackUsesRuleLeft() and
+    // attackUsesRuleRight(); -r / -g are not allowed in combination mode.
     QString ruleLeft;
     QString ruleRight;
 

@@ -92,9 +92,6 @@ target_compile_definitions(hashcat-gui PRIVATE
     ${HASHCAT_GUI_UTF8_DEFINITIONS}
     HASHCAT_GUI_VERSION="${PROJECT_VERSION}")
 
-# LinguistTools is optional: without it the build still works, just with no
-# .qm files. SOURCE_TARGETS keeps lupdate off the tests, so a tr() added to a
-# test cannot land in the catalogs.
 # The translation catalogs, one per line. Named "hashcat-gui_<code>", and the
 # single list the build (below) and the test embedding derive their catalogs from.
 set(HASHCAT_GUI_TRANSLATIONS de es fr it sr ja zh_CN ko)
@@ -106,6 +103,8 @@ set(HASHCAT_GUI_TRANSLATIONS de es fr it sr ja zh_CN ko)
 option(HASHCAT_GUI_REQUIRE_TRANSLATIONS
     "Fail the configure step when the Qt6 LinguistTools are missing" OFF)
 
+# LinguistTools is optional: without it the build still works, just with no
+# .qm files.
 find_package(Qt6 COMPONENTS LinguistTools QUIET)
 if(HASHCAT_GUI_REQUIRE_TRANSLATIONS AND NOT Qt6LinguistTools_FOUND)
     message(FATAL_ERROR
@@ -119,6 +118,8 @@ if(Qt6LinguistTools_FOUND)
         list(APPEND HASHCAT_GUI_TS_FILES translations/hashcat-gui_${code}.ts)
     endforeach()
 
+    # SOURCE_TARGETS keeps lupdate off the tests, so a tr() added to a test
+    # cannot land in the catalogs.
     # Do not carry obsolete entries and line numbers in translations
     qt_add_translations(hashcat-gui
         SOURCE_TARGETS hashcat-gui hashcat-gui-core
@@ -189,13 +190,15 @@ else()
     message(STATUS "Qt6 Test module not found - building without tests")
 endif()
 
-# The source files the tooling targets. The analyzers work on the .cpp globs
-# only - headers are analyzed as part of their translation units.
+# The sources clang-format rewrites in place
 file(GLOB PROJECT_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h)
+
+# The sources the analyzers run over: the .cpp files only - a header is
+# analyzed as part of its translation unit.
 file(GLOB ANALYSIS_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)

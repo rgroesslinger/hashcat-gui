@@ -10,21 +10,19 @@
 #include <QFileInfo>
 #include <QMap>
 
-// True when the attack mode reads a mask
 bool CommandBuilder::attackUsesMask(AttackMode mode)
 {
     return mode == AttackMode::BruteForce || mode == AttackMode::HybridWordMask
            || mode == AttackMode::HybridMaskWord;
 }
 
-// True when the attack mode takes dictionaries (attack mode 3 takes only the
-// mask, everything else takes at least one wordlist)
+// Attack mode 3 takes only the mask, every other mode takes at least one
+// word list
 bool CommandBuilder::attackUsesWordlists(AttackMode mode)
 {
     return mode != AttackMode::BruteForce;
 }
 
-// True when the attack mode accepts -r / -g
 bool CommandBuilder::attackUsesRules(AttackMode mode)
 {
     return mode == AttackMode::Straight || mode == AttackMode::Association;
@@ -140,11 +138,9 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
     const auto &pair = it.value();
 
     if (useShort && !pair.first.isEmpty()) {
-        // short form
         return pair.first;
     }
 
-    // long form (default)
     return pair.second;
 }
 

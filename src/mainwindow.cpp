@@ -667,7 +667,7 @@ void MainWindow::initHashAndAttackModes()
         // Create a watcher that will be destroyed once finished
         QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
 
-        // When the future is finished parse the JSON and fill hashModes
+        // When the future is finished, fill the combo with the parsed types.
         connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
             const HashcatResult &result = watcher->result();
             watcher->deleteLater();
@@ -740,8 +740,6 @@ void MainWindow::updateViewAttackMode()
     ui->lineEdit_rule_right->setEnabled(usesRuleRight);
     ui->groupBox_custom_charset->setEnabled(usesMask);
     ui->groupBox_mask->setEnabled(usesMask);
-    // --hex-charset only describes masks and custom charsets; keep it out of
-    // reach in the modes that use neither.
     ui->checkBox_hex_charset->setEnabled(usesMask);
 
     // Tell the user what the mode expects, so the launch validation does not
@@ -1221,9 +1219,6 @@ HashcatOptions MainWindow::collectHashcatOptions()
     }
     options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
 
-    // checkBox_hex_charset is named after nothing in particular: it reads
-    // "Assume charset is given in hex", maps to --hex-charset, and its object
-    // name is also the key a saved profile stores it under.
     QCheckBox *charsetBoxes[4] = {
         ui->checkBox_custom_charset1,
         ui->checkBox_custom_charset2,

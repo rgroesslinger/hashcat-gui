@@ -37,19 +37,15 @@ void SettingsDialog::readSettings()
 {
     auto &settings = SettingsManager::instance();
 
-    // hashcat path from saved settings
     ui->lineEdit_hc_path->setText(
         settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
 
-    // available terminals
     QMap<QString, QStringList> availableTerminals = HelperUtils::availableTerminals();
     ui->comboBox_terminal->addItems(availableTerminals.keys());
 
-    // terminal from saved settings
     ui->comboBox_terminal->setCurrentIndex(ui->comboBox_terminal->findText(
         settings.getKey<QString>(AppConstants::SettingsKeys::Terminal)));
 
-    // use short parameters
     ui->checkBox_use_short_parameters->setChecked(
         settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters));
 
@@ -79,7 +75,6 @@ void SettingsDialog::readSettings()
     loadedLanguage = ui->comboBox_language->currentData().toString();
 }
 
-// Configure path to hashcat binary
 void SettingsDialog::selectPathClicked()
 {
     QFileDialog fileDialog(this, tr("Select the hashcat executable"));
@@ -100,7 +95,6 @@ void SettingsDialog::selectPathClicked()
 
 void SettingsDialog::saveClicked()
 {
-    // Save values in persistent settings
     auto &settings = SettingsManager::instance();
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, ui->lineEdit_hc_path->text());
     settings.setKey(AppConstants::SettingsKeys::Terminal, ui->comboBox_terminal->currentText());

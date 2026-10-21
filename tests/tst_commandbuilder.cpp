@@ -59,10 +59,14 @@ void TestCommandBuilder::noHashTypeWhileNoneIsSelected()
     HashcatOptions options;
     options.hashType = -1;
 
-    const QStringList arguments = CommandBuilder::build(options);
-    QVERIFY(!arguments.contains(QStringLiteral("--hash-type")));
-    // the short form of --hash-type is -m, so check that exact token too
-    QVERIFY(!arguments.contains(QStringLiteral("-m")));
+    const QStringList longForm = CommandBuilder::build(options);
+    QVERIFY(!longForm.contains(QStringLiteral("--hash-type")));
+
+    // The short form of --hash-type is -m, so that one has to be left out as
+    // well.
+    options.useShortParameters = true;
+    const QStringList shortForm = CommandBuilder::build(options);
+    QVERIFY(!shortForm.contains(QStringLiteral("-m")));
 }
 
 void TestCommandBuilder::hashTypeComesBeforeTheAttackMode()
@@ -185,8 +189,8 @@ void TestCommandBuilder::hexCharsetFollowsTheMaskModes()
     }
 }
 
-// One invocation that uses every Tier 1 option at once, so the test pins
-// both the emission and the relative order of the new arguments.
+// One invocation that uses every advanced option at once, so the test pins
+// both the emission and the relative order of the arguments.
 void TestCommandBuilder::advancedOptionsAreEmitted()
 {
     HashcatOptions options;
@@ -439,8 +443,8 @@ void TestCommandBuilder::advancedShortForms()
     };
     QCOMPARE(CommandBuilder::build(options), expected);
 
-    // --increment is the one new option with a short form that the combination
-    // row above cannot exercise.
+    // --increment is the one option with a short form that the combination
+    // mode above cannot exercise.
     options.attackMode = AttackMode::BruteForce;
     options.increment = true;
     QVERIFY(CommandBuilder::build(options).contains(QStringLiteral("-i")));

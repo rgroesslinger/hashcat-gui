@@ -72,7 +72,8 @@ inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 // the format: a profile written by another version of hashcat-gui can name
 // widgets that no longer exist, and then it would fill in only half of the
 // form without saying so. The version number makes that visible - a profile
-// with a different number is reported instead of half-loaded.
+// with a different number is still read, but the user is told that it is not
+// complete.
 namespace Profiles
 {
 inline constexpr int Version = 1;

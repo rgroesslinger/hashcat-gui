@@ -45,12 +45,10 @@ WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent)
 {
 }
 
-// Serialize QWidget values to QJsonObject
 static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidgets = {})
 {
     QJsonObject obj;
 
-    // simple widgets
     auto const lineEdits = w->findChildren<const QLineEdit *>();
     for (const QLineEdit *lineEdit : lineEdits) {
         obj[lineEdit->objectName()] = lineEdit->text();
@@ -86,7 +84,6 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
         obj[doubleSpinBox->objectName()] = doubleSpinBox->value();
     }
 
-    // list widgets
     auto const listWidgets = w->findChildren<const QListWidget *>();
     for (const QListWidget *listWidget : listWidgets) {
         QJsonArray list;
@@ -100,7 +97,6 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
         obj[listWidget->objectName()] = list;
     }
 
-    // Delete any widget that the caller flagged to ignore
     for (const QString &name : ignoredWidgets) {
         obj.remove(name);
     }
@@ -108,17 +104,14 @@ static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidg
     return obj;
 }
 
-// Serialize QJsonObject values to QWidget
 static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &ignoredWidgets = {})
 {
     QJsonObject mutableObj = obj;
 
-    // Delete any widget that the caller flagged to ignore
     for (const QString &name : ignoredWidgets) {
         mutableObj.remove(name);
     }
 
-    // simple widgets
     auto const lineEdits = w->findChildren<QLineEdit *>();
     for (QLineEdit *lineEdit : lineEdits) {
         if (mutableObj.contains(lineEdit->objectName())) {
@@ -182,7 +175,6 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
         }
     }
 
-    // list widgets
     auto const listWidgets = w->findChildren<QListWidget *>();
     for (QListWidget *listWidget : listWidgets) {
         if (mutableObj.contains(listWidget->objectName())) {
@@ -199,7 +191,6 @@ static void jsonToWidget(const QJsonObject &obj, QWidget *w, const QStringList &
     }
 }
 
-// Write QWidget state to a file
 bool WidgetStateSerializer::saveStateToFile(const QString &key, const QWidget *widget,
                                             const QString &filename,
                                             const QStringList &ignoredWidgets,
@@ -230,7 +221,6 @@ bool WidgetStateSerializer::saveStateToFile(const QString &key, const QWidget *w
     return true;
 }
 
-// Read a file and restore a QWidget state
 bool WidgetStateSerializer::loadStateFromFile(const QString &key, QWidget *widget,
                                               const QString &filename,
                                               const QStringList &ignoredWidgets,

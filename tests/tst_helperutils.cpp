@@ -16,8 +16,8 @@
 #include "helperutils.h"
 #include "settingsmanager.h"
 
-// The conditions that keep Execute from starting anything, the spelling of
-// the parameters, the terminal table, and the hashcat helper process itself.
+// The conditions that keep Execute from starting anything, the terminal
+// table, and the hashcat helper process itself.
 class TestHelperUtils : public QObject
 {
     Q_OBJECT

@@ -25,8 +25,8 @@ private slots:
     void everyEmbeddedCatalogIsOffered();
 };
 
-// One check per catalog: a single one would pass while the other language
-// silently fell out of the build.
+// Two catalogs get a check of their own; the rest are covered by
+// everyOfferedLanguageIsEmbedded() below.
 void TestTranslations::germanCatalogIsEmbedded()
 {
 #ifndef HASHCAT_GUI_QM_EMBEDDED

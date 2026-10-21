@@ -241,8 +241,7 @@ void TestMainWindow::commandPreviewFollowsWidgetChanges()
 
     QCOMPARE(preview->text(), QStringLiteral("--attack-mode 0"));
 
-    // One representative for each connection helper, including the controls
-    // that used to be wired through the .ui connections table.
+    // One representative for each connection helper.
     window.ui->checkBox_remove->setChecked(true);
     QVERIFY(preview->text().contains(QStringLiteral("--remove")));
 

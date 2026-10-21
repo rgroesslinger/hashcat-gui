@@ -71,7 +71,6 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
     });
 }
 
-// Returns what keeps a launch from happening, if anything
 HelperUtils::LaunchError HelperUtils::validateLaunch(const QString &hashFile,
                                                      const QString &hashcatPath,
                                                      const QString &configuredTerminal,
@@ -119,7 +118,6 @@ HelperUtils::LaunchError HelperUtils::validateLaunch(const QString &hashFile,
     return LaunchError::None;
 }
 
-// Returns what keeps the selected attack mode from running, if anything
 HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &options,
                                                       QString *detail)
 {
@@ -200,12 +198,10 @@ const QMap<QString, QStringList> &HelperUtils::terminalArguments()
     return table;
 }
 
-// Returns all supported terminals
 QMap<QString, QStringList> HelperUtils::availableTerminals()
 {
     QMap<QString, QStringList> terminals;
 
-    // Check which ones are actually available
     const QMap<QString, QStringList> &table = terminalArguments();
     for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
         QString fullPath = QStandardPaths::findExecutable(it.key());

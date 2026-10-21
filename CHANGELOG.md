@@ -4,39 +4,39 @@
 
 ### New Features
 - **Translations**: Multi-language support with compiled translation catalogs; language can be selected in settings (system default falls back to English) (#12)
-- **Terminal support**: Added alacritty, kitty, foot, wezterm, and Windows Terminal (#7)
+- **Terminal support**: Added Alacritty, kitty, foot, WezTerm, and Windows Terminal (#7)
 - **CLI help**: Added `--version` and `--help` command-line parser support
-- **Test suite**: Integrated `tst_*` binaries into `ctest`, covering command line rules, hash type parser, hashcat launch, profile serializer, settings dialog, about dialog, main window, and translation catalogs
+- **Test suite**: Integrated `tst_*` binaries into `ctest`, covering the command builder, hash type parser, hashcat launch, profile serializer, settings dialog, about dialog, main window, and translation catalogs
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
 
 ### Improvements
 - Decoupled business logic from UI for better maintainability and testability
-- Refactored default values and magic numbers in `src/appconstants.h` (#10)
+- Refactored default values, help tables, and magic numbers in `src/appconstants.h` (#10)
 - Hardened UTF-8 and string handling by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`
-- `HashcatOptions` and `CommandBuilder`: command line built from UI-independent description; gating rules centralized so visible options and generated command stay in sync
+- `HashcatOptions` and `CommandBuilder`: the command line is built from a UI-independent description; gating rules centralized so visible options and generated command stay in sync
 - **Qt 6.8 & C++20 baseline**: Bumped minimum Qt version to 6.8 and moved build baseline from C++17 to C++20
 - **New artwork**: Added new application artwork and improved the XDG `.desktop` file entry
 - **Persistent command bar**: Moved Start, Copy, and the command preview below the tabs so they stay visible on every tab
-- **More hashcat options**: Added `--increment` with bounds, `--skip`, `--limit`, `--runtime`, `--force`, `--session`, `--status`/`--status-timer`, `-D`, `--hwmon-temp-abort`, `-j`/`-k` single rules for the left/right wordlist, `--encoding-from`/`--encoding-to`, `--hex-wordlist`, and `--potfile-disable`
-- **Clearer tabs**: The Attack tab now holds the mode-specific hash input, wordlist, rules, mask and charset options; the General tab holds session, output, resource, performance and hardware options
-- **Mode hint**: The attack mode selector now states what the selected mode needs - the number of word lists, a mask, or both
-- Combo boxes in a profile are stored by the id of their selected entry instead of its position, so a list that grows - a new hash type, a new attack mode - no longer changes what a saved profile selects
+- **More hashcat options**: Added `--increment` with bounds, `--skip`, `--limit`, `--runtime`, `--force`, `--session`, `--status`/`--status-timer`, `--opencl-device-types`, `--hwmon-temp-abort`, `--rule-left`/`--rule-right` single rules for the left/right wordlist, `--encoding-from`/`--encoding-to`, `--hex-wordlist`, and `--potfile-disable`
+- **Clearer tabs**: The Attack tab holds the hash input and the mode-specific word lists, rules, mask, and charset options; the General tab holds the session and limits, performance, resources, and outfile options
+- **Mode hint**: A hint below the attack mode selector now states what the selected mode needs: the number of word lists, a mask, or both
+- Combo boxes in a profile are stored by the identifier of their selected entry instead of its position, so a list that grows - a new hash type, a new attack mode - no longer changes what a saved profile selects
 - **A profile says which version wrote it**: A profile from another version of hashcat-gui is still loaded - the values it knows are kept - and the user is told that the rest was left at its defaults
 
 ### Bug Fixes
 - GUI now refuses to start hashcat when configuration is incomplete instead of failing silently
 - Terminal startup failures (wrong path, permissions) now report errors instead of failing silently
-- Profile errors reported via error message instead of opening a dialog, ensuring failed profile loads at start-up are reported
-- Hash type saved in a profile is now correctly applied after background query completes (was dropped at start-up)
+- Profile save/load errors now reach the main window instead of having the serializer open its own dialog; a failed profile load at start-up is now reported as well
+- Hash type saved in a profile is now correctly applied after the background query completes (was dropped at start-up)
 - A profile that names a hash type the installed hashcat does not know now leaves the hash type unselected and says so, instead of silently selecting another one
-- File → Export only announces success when the profile was actually written
+- File → Export Profile only announces success when the profile was actually written
 - Hash type selector re-enabled when background query fails or returns malformed JSON
 - `--hash-type` omitted when no hash type is selected (empty selector no longer sends `-m 0`)
-- Attack mode and hash type IDs use combo box item data, preventing silent fallback to mode/type `0`
-- Sorting word list with nothing selected no longer passes a null item to `insertItem()`
-- Suggested outfile no longer overwrites user-selected or profile-chosen file names
-- Copy to clipboard no longer crashes on platforms without clipboard support
-- Windows now size to content instead of hard-coded geometry, using the tallest tab for the height and the widest tab for the width; this fixes scrollbars, clipped content, and unused space across different screen sizes, fonts, DPI, and translations
+- Attack mode and hash type identifiers use combo box item data, preventing silent fallback to mode/type `0`
+- Sorting the word list with nothing selected no longer passes a null item to `insertItem()`
+- The suggested outfile no longer overwrites user-selected or profile-chosen file names
+- Copying to the clipboard no longer crashes on platforms without clipboard support
+- The main window now sizes itself to its content on first show, using the tallest tab for the height and the widest tab for the width; this avoids unnecessary scrollbars, clipped content, and unused space across screen sizes, fonts, DPI, and translations
 
 ## 0.7.1 (2026-02-15)
 - Added support for more command options
