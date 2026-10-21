@@ -26,6 +26,7 @@ private slots:
     void readSettings();
     void selectPathClicked();
     void clearProfileClicked();
+    void openFolderClicked();
     void saveClicked();
     void cancelClicked();
 
@@ -35,11 +36,21 @@ private:
     // dialog's public surface for their sake.
     friend class TestSettingsDialog;
 
+    // Fills the rows that show where the settings and the session are stored.
+    void updatePathLabels();
+
+    // The home directory as a tilde.
+    static QString shortenPath(const QString &path);
+
     Ui::SettingsDialog *ui;
 
     // The language setting as it was when the dialog opened, so saveClicked()
     // can tell an actual change from "the user pressed Save".
     QString loadedLanguage;
+
+    // The folder the settings are stored in, empty where there is none - the
+    // registry on Windows has no folder to open.
+    QString m_settingsFolder;
 };
 
 #endif // SETTINGSDIALOG_H

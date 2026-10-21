@@ -22,3 +22,8 @@ void SettingsManager::setKey(const QString &key, const QVariant &value)
 {
     settings.setValue(key, value);
 }
+
+QString SettingsManager::fileName() const
+{
+    return settings.fileName();
+}

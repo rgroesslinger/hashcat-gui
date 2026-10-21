@@ -20,6 +20,12 @@ public:
 
     void setKey(const QString &key, const QVariant &value);
 
+    // Where the settings are stored.
+    //
+    // A file on the systems that keep settings in files, the registry on
+    // Windows - so the answer is a path only where there is one.
+    QString fileName() const;
+
 private:
     SettingsManager();
     ~SettingsManager() = default;

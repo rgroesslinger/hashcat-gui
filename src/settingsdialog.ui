@@ -178,6 +178,30 @@
        </widget>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_profile_path">
+        <item>
+         <widget class="QLabel" name="label_profile_path_text">
+          <property name="text">
+           <string>Session file</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_profile_path">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="toolTip">
+           <string>The file the last session is stored in</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_clear_profile">
         <item>
          <spacer name="horizontalSpacer_clear_profile">
@@ -196,6 +220,69 @@
          <widget class="QPushButton" name="pushButton_clear_profile">
           <property name="text">
            <string>Clear the saved profile</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_configuration">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Configuration</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_configuration">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_settings_path">
+        <item>
+         <widget class="QLabel" name="label_settings_path_text">
+          <property name="text">
+           <string>Settings file</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_settings_path">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_open_folder">
+        <item>
+         <spacer name="horizontalSpacer_open_folder">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_open_folder">
+          <property name="text">
+           <string>Open the folder</string>
           </property>
          </widget>
         </item>

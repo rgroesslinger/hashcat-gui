@@ -101,6 +101,7 @@ private slots:
     void selectPathClickedRejectsAPlainFile();
     void restoreSessionFollowsTheSetting();
     void clearProfileDeletesTheStoredProfile();
+    void showsWhereTheFilesAreStored();
     void fitsItsContent();
     void groupBoxesShareOneTitleAlignment();
 
@@ -314,6 +315,25 @@ void TestSettingsDialog::clearProfileDeletesTheStoredProfile()
     QVERIFY2(!QFile::exists(path), "the saved profile was not deleted");
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Profile cleared"));
+}
+
+// The dialog says where it keeps the settings and the session, so the user
+// does not have to look them up in the documentation.
+void TestSettingsDialog::showsWhereTheFilesAreStored()
+{
+    SettingsDialog dialog;
+
+    const QString settingsFile = SettingsManager::instance().fileName();
+    QVERIFY(!settingsFile.isEmpty());
+    QVERIFY(dialog.ui->lineEdit_settings_path->text().contains(QFileInfo(settingsFile).fileName()));
+
+    const QString profileFile = WidgetStateSerializer::defaultProfilePath();
+    QVERIFY(dialog.ui->lineEdit_profile_path->text().contains(QFileInfo(profileFile).fileName()));
+
+    // Where the settings live in a file, there is a folder to open. The
+    // registry on Windows has none.
+    const bool inFile = QFileInfo(settingsFile).isAbsolute();
+    QCOMPARE(dialog.ui->pushButton_open_folder->isEnabled(), inFile);
 }
 
 // The dialog must not be pinned to the 450x385 in the .ui: that one size

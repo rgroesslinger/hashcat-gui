@@ -9,8 +9,12 @@
 #include "helperutils.h"
 #include "widgetstateserializer.h"
 #include "appconstants.h"
+#include <QDesktopServices>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QMessageBox>
+#include <QUrl>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog)
 {
@@ -28,6 +32,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
             &SettingsDialog::selectPathClicked);
     connect(ui->pushButton_clear_profile, &QPushButton::clicked, this,
             &SettingsDialog::clearProfileClicked);
+    connect(ui->pushButton_open_folder, &QPushButton::clicked, this,
+            &SettingsDialog::openFolderClicked);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &SettingsDialog::saveClicked);
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &SettingsDialog::cancelClicked);
 }
@@ -43,6 +49,8 @@ void SettingsDialog::readSettings()
 
     ui->lineEdit_hc_path->setText(
         settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
+
+    updatePathLabels();
 
     QMap<QString, QStringList> availableTerminals = HelperUtils::availableTerminals();
     ui->comboBox_terminal->addItems(availableTerminals.keys());
@@ -80,6 +88,45 @@ void SettingsDialog::readSettings()
     // "unchanged": a stale code that fell back to "System default" must not
     // read as a pending change and trigger a restart.
     loadedLanguage = ui->comboBox_language->currentData().toString();
+}
+
+// Shows where the application keeps its settings and its session.
+//
+// The home directory is shortened to a tilde, the way the documentation
+// writes it, so that the paths stay readable.
+void SettingsDialog::updatePathLabels()
+{
+    const QString settingsFile = SettingsManager::instance().fileName();
+    const QString profileFile = WidgetStateSerializer::defaultProfilePath();
+
+    // The settings live in a file on most systems and in the registry on
+    // Windows - where there is no folder to open.
+    m_settingsFolder =
+        QFileInfo(settingsFile).isAbsolute() ? QFileInfo(settingsFile).absolutePath() : QString();
+    ui->pushButton_open_folder->setEnabled(!m_settingsFolder.isEmpty());
+
+    ui->lineEdit_settings_path->setText(shortenPath(settingsFile));
+    ui->lineEdit_profile_path->setText(shortenPath(profileFile));
+}
+
+// The home directory as a tilde.
+QString SettingsDialog::shortenPath(const QString &path)
+{
+    const QString home = QDir::homePath();
+    if (!home.isEmpty() && path.startsWith(home)) {
+        return QLatin1Char('~') + path.mid(home.length());
+    }
+    return path;
+}
+
+// Opens the folder the settings are stored in.
+void SettingsDialog::openFolderClicked()
+{
+    if (m_settingsFolder.isEmpty()) {
+        return;
+    }
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
 }
 
 void SettingsDialog::selectPathClicked()
