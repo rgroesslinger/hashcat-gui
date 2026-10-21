@@ -65,9 +65,10 @@ these three targets — this checklist is the only enforcement.
 - The wiring in one line: `main.cpp` starts `MainWindow`, which owns the widgets in
   `mainwindow.ui`; `collectHashcatOptions()` reads them into `HashcatOptions`;
   `CommandBuilder::build()` turns that into hashcat argv; `HelperUtils` talks to hashcat
-  and to the terminal; `WidgetStateSerializer` persists profiles. Keep the argument order
-  stable: the preview, the clipboard and the tests all depend on it. The logic that
-  needs no UI lives in `CommandBuilder`, `HashcatInfoParser`, `HelperUtils` and
+  and to the terminal; `WidgetStateSerializer` maps the widgets to the values of a
+  session and `StateFile` writes them into a file. Keep the argument order stable: the
+  preview, the clipboard and the tests all depend on it. The logic that needs no UI
+  lives in `CommandBuilder`, `HashcatInfoParser`, `HelperUtils`, `StateFile` and
   `WidgetStateSerializer`, so it stays testable.
 - Attack-mode gating predicates live in `CommandBuilder` and are reused for group-box
   enablement in `MainWindow`. Do not duplicate them. `CommandBuilder::modeRequirements()`
@@ -97,17 +98,36 @@ exception, it goes through `attackIndexChanged()`.
   `QtConcurrent`.
 
 ### WidgetStateSerializer
-- Persists `QLineEdit`, `QCheckBox`, `QComboBox`, `QRadioButton`, `QSpinBox`,
-  `QDoubleSpinBox`, `QListWidget` children by `objectName`. The names are part of the
-  profile format: renaming one breaks saved profiles and tests.
-- A profile carries `AppConstants::Profiles::Version`. A profile from another version is
-  still read: the widgets it names keep their values, the rest stays at its defaults,
-  and the user is told. Bump the version whenever a persisted widget is renamed.
+- Turns a widget tree into a JSON object of values and back. The children it knows
+  (`QLineEdit`, `QCheckBox`, `QComboBox`, `QRadioButton`, `QSpinBox`, `QDoubleSpinBox`,
+  `QListWidget`) are addressed by `objectName`. The names are part of the session
+  format: renaming one breaks saved profiles and tests.
+- `applyToWidgets()` returns the names of the values that no widget claimed — the values
+  of a file that was made by another version, or that was edited by hand. The caller
+  names them for the user.
 - A `QComboBox` is stored by the item data the app gave the entry (attack mode id, hash type
   id, workload level) — never by display text (translatable). Only a combo with no item data
   at all falls back to position, which is not an identifier: inserting mid-list shifts every
   later entry. An unknown identifier leaves the combo untouched.
 - Transient widgets (e.g. command preview) are excluded via `AppConstants::Files::PreviewWidget`.
+- The file is not the serializer's business: that is `StateFile`.
+
+### StateFile
+- The file the application writes and reads again: the session it keeps between two runs
+  and the settings the user exports share one envelope (`createdWith`, `sections`, and per
+  section a `version` and its `values`).
+- The names of the sections are constants (`AppConstants::FileSections`), never the name
+  of a class: the session file is named after its class today, so renaming that class
+  would orphan every profile that was ever written.
+- Each section has its own version (`AppConstants::Profiles::Version` for the session,
+  `AppConstants::Settings::Version` for the settings), because the widget names and the
+  setting keys change independently of each other. Bump the version of a section whenever
+  one of its keys is renamed.
+- The class owns the envelope and nothing else: it knows neither the widgets nor the
+  settings of a section, and it does not know the version of one — the caller passes it
+  in and compares what it reads.
+- A file of another section is refused with a message that names it; a file that holds
+  more than one section is read for the one that is wanted, and the others are named.
 
 ### Settings
 - `QSettings::NativeFormat` under the application name; keys go in `AppConstants::SettingsKeys`.

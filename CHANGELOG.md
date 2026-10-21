@@ -10,6 +10,7 @@
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
 
 ### Improvements
+- **One file format**: The session the application keeps between two runs and the settings the user exports share one format now; the files of the older versions are not read any more
 - **Session**: The last session is restored at startup only when asked for, and the saved profile can be cleared from the settings
 - **Settings**: Show where the settings and the session are stored, and add a shortcut to open the folder of the settings
 - **Settings**: The settings can be exported to a file and imported again

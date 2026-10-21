@@ -46,6 +46,7 @@ private slots:
     void savedSettingsHoldTheKnownSettings();
     void importSettingsFillsTheDialog();
     void importSettingsAppliesEmptyValues();
+    void importSettingsNamesTheUnknownKeys();
     void colorSchemeFollowsTheSetting();
     void fitsItsContent();
     void groupBoxesShareOneTitleAlignment();
@@ -402,6 +403,27 @@ void TestSettingsDialog::groupBoxesShareOneTitleAlignment()
     SettingsDialog dialog;
 
     TestEnvironment::checkGroupBoxTitleAlignment(&dialog);
+}
+
+// A key this version does not know - the file was made by another version, or
+// it was edited by hand - is named in the notes, and the keys that are known
+// are applied all the same.
+void TestSettingsDialog::importSettingsNamesTheUnknownKeys()
+{
+    QJsonObject stored;
+    stored.insert(QStringLiteral("hashcatPath"), QStringLiteral("/imported/hashcat"));
+    stored.insert(QStringLiteral("aKeyFromTheFuture"), QStringLiteral("something"));
+    stored.insert(QStringLiteral("anotherOne"), QStringLiteral("something else"));
+
+    SettingsDialog dialog;
+    const QStringList notes = dialog.applyImportedSettings(stored);
+
+    // The known key was applied...
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QStringLiteral("/imported/hashcat"));
+    // ... and the unknown ones are named in one sentence.
+    QCOMPARE(notes.size(), 1);
+    QVERIFY(notes.first().contains(QStringLiteral("aKeyFromTheFuture")));
+    QVERIFY(notes.first().contains(QStringLiteral("anotherOne")));
 }
 
 int main(int argc, char *argv[])

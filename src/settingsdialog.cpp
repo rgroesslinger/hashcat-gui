@@ -7,15 +7,20 @@
 #include "ui_settingsdialog.h"
 #include "settingsmanager.h"
 #include "helperutils.h"
+#include "statefile.h"
 #include "widgetstateserializer.h"
 #include "appconstants.h"
 #include <QDesktopServices>
+#include <QFileInfo>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QUrl>
+
+#include <algorithm>
+#include <iterator>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog)
 {
@@ -229,6 +234,25 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
         } else {
             notes << tr("The color scheme %1 is not offered and was not applied.").arg(colorScheme);
         }
+    }
+
+    // The keys this version does not know: the file was made by another
+    // version, or it was edited by hand. They are named in one sentence, so
+    // that a file with many of them stays readable.
+    QStringList unknown;
+    const QStringList keys = settings.keys();
+    for (const QString &key : keys) {
+        const bool known = std::any_of(
+            std::begin(AppConstants::SettingsKeys::All), std::end(AppConstants::SettingsKeys::All),
+            [&key](QLatin1StringView candidate) { return QString(candidate) == key; });
+        if (!known) {
+            unknown << key;
+        }
+    }
+
+    const QString note = StateFile::unknownValuesNote(unknown);
+    if (!note.isEmpty()) {
+        notes << note;
     }
 
     return notes;

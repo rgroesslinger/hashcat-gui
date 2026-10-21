@@ -190,6 +190,7 @@ private slots:
     void commandBarStaysVisibleOnEveryTab();
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
+    void theImportNamesTheValuesTheSessionDoesNotKnow();
 
 private:
     QString m_savedHashcatPath;
@@ -1340,6 +1341,36 @@ void TestMainWindow::theSettingsAreImportedThroughTheFileMenu()
     QVERIFY(QMetaObject::invokeMethod(&window, "importSettingsTriggered"));
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Imported"));
+}
+
+// A session file that names a widget this version does not know - it was
+// made by another version, or it was edited by hand. The values that are
+// known are applied all the same, and the ones that are not are named.
+void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("session.json"));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    values.insert(QStringLiteral("aWidgetFromTheFuture"), QStringLiteral("something"));
+    QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
+                             AppConstants::Profiles::Version, values, nullptr));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/somewhere/hashcat"));
+
+    MainWindow window;
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
+
+    // The value that named a widget was applied...
+    QCOMPARE(window.ui->spinBox_segment_size->value(), 64);
+    // ... and the one that named nothing is named in the notes.
+    QVERIFY(recorder.messageBoxSeen);
+    QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
 }
 
 int main(int argc, char *argv[])
