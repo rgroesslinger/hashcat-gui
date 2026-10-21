@@ -10,6 +10,7 @@
 #include <QTranslator>
 #include "mainwindow.h"
 #include "settingsmanager.h"
+#include "helperutils.h"
 #include "appconstants.h"
 
 int main(int argc, char *argv[])
@@ -35,6 +36,11 @@ int main(int argc, char *argv[])
     // Let the desktop match the window to the XDG desktop entry
     // to resolve the installed hicolor icon by name
     a.setDesktopFileName(QStringLiteral("hashcat-gui"));
+
+    // The color scheme the user chose. An empty scheme leaves the decision
+    // to the desktop, so the application keeps out of it.
+    HelperUtils::applyColorScheme(SettingsManager::instance().getKey<QString>(
+        AppConstants::SettingsKeys::ColorScheme, QString()));
 
     // Window and taskbar icon. Windows gets the full-bleed .ico; elsewhere the
     // icon theme is preferred. QIcon::fromTheme() cannot tell when the themed

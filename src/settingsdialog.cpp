@@ -71,6 +71,23 @@ void SettingsDialog::readSettings()
     ui->checkBox_restore_session->setChecked(
         settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true));
 
+    // The color scheme: the combo carries the value that gets stored, so
+    // that the display text can be translated freely.
+    ui->comboBox_color_scheme->addItem(tr("System default"), QString());
+    ui->comboBox_color_scheme->addItem(tr("Light"),
+                                       QString(AppConstants::Appearance::ColorSchemeLight));
+    ui->comboBox_color_scheme->addItem(tr("Dark"),
+                                       QString(AppConstants::Appearance::ColorSchemeDark));
+
+    const QString storedScheme =
+        settings.getKey<QString>(AppConstants::SettingsKeys::ColorScheme, QString());
+    int schemeIndex = ui->comboBox_color_scheme->findData(storedScheme);
+    if (schemeIndex < 0) {
+        // A value we no longer offer: follow the system again.
+        schemeIndex = ui->comboBox_color_scheme->findData(QString());
+    }
+    ui->comboBox_color_scheme->setCurrentIndex(schemeIndex);
+
     // Languages: the combo shows each language's own name and carries the
     // locale code as item data - that code is what gets stored. "System
     // default" (an empty code) means "whatever the environment says".
@@ -229,6 +246,8 @@ QJsonObject SettingsDialog::savedSettings() const
                   settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true));
     stored.insert(AppConstants::SettingsKeys::Language,
                   settings.getKey<QString>(AppConstants::SettingsKeys::Language));
+    stored.insert(AppConstants::SettingsKeys::ColorScheme,
+                  settings.getKey<QString>(AppConstants::SettingsKeys::ColorScheme));
 
     return stored;
 }
@@ -242,8 +261,8 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
     QStringList notes;
 
     // A key the file mentions is a value the user chose, even when it is
-    // empty: an empty language is the system default, and an empty path says
-    // that hashcat is not configured.
+    // empty: an empty language or color scheme is the system default, and an
+    // empty path says that hashcat is not configured.
     if (settings.contains(AppConstants::SettingsKeys::HashcatPath)) {
         ui->lineEdit_hc_path->setText(
             settings.value(AppConstants::SettingsKeys::HashcatPath).toString());
@@ -281,6 +300,17 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
         }
     }
 
+    if (settings.contains(AppConstants::SettingsKeys::ColorScheme)) {
+        const QString colorScheme =
+            settings.value(AppConstants::SettingsKeys::ColorScheme).toString();
+        const int index = ui->comboBox_color_scheme->findData(colorScheme);
+        if (index >= 0) {
+            ui->comboBox_color_scheme->setCurrentIndex(index);
+        } else {
+            notes << tr("The color scheme %1 is not offered and was not applied.").arg(colorScheme);
+        }
+    }
+
     return notes;
 }
 
@@ -311,6 +341,13 @@ void SettingsDialog::saveClicked()
                     ui->checkBox_use_short_parameters->isChecked());
     settings.setKey(AppConstants::SettingsKeys::RestoreSession,
                     ui->checkBox_restore_session->isChecked());
+
+    // The color scheme, like the locale code, is stored as the value of the
+    // combo entry and not as its text - see readSettings().
+    const QString colorScheme = ui->comboBox_color_scheme->currentData().toString();
+    settings.setKey(AppConstants::SettingsKeys::ColorScheme, colorScheme);
+    // The color scheme takes effect right away, no restart needed.
+    HelperUtils::applyColorScheme(colorScheme);
     // The locale code, not the display text - see readSettings().
     const QString language = ui->comboBox_language->currentData().toString();
     settings.setKey(AppConstants::SettingsKeys::Language, language);

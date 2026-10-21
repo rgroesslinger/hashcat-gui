@@ -11,10 +11,12 @@
 #include <QGroupBox>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLabel>
 #include <QMessageBox>
 #include <QTimer>
 
 #include "appconstants.h"
+#include "helperutils.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "widgetstateserializer.h"
@@ -107,6 +109,7 @@ private slots:
     void exportSettingsWritesTheKnownSettings();
     void importSettingsFillsTheDialog();
     void importSettingsAppliesEmptyValues();
+    void colorSchemeFollowsTheSetting();
     void fitsItsContent();
     void groupBoxesShareOneTitleAlignment();
 
@@ -147,6 +150,9 @@ void TestSettingsDialog::cleanup()
     settings.setKey(AppConstants::SettingsKeys::Language, m_savedLanguage);
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, m_savedShortParameters);
     settings.setKey(AppConstants::SettingsKeys::RestoreSession, m_savedRestoreSession);
+    // The color scheme is a property of the whole application, so it goes
+    // back to the system default.
+    HelperUtils::applyColorScheme(QString());
 }
 
 // System default plus one row per catalog, each shown in its own language
@@ -374,6 +380,7 @@ void TestSettingsDialog::exportSettingsWritesTheKnownSettings()
     QVERIFY(stored.contains(QStringLiteral("useShortParameters")));
     QVERIFY(stored.contains(QStringLiteral("restoreSession")));
     QVERIFY(stored.contains(QStringLiteral("language")));
+    QVERIFY(stored.contains(QStringLiteral("colorScheme")));
 }
 
 // The import fills the dialog with the settings of a file. They are not
@@ -422,6 +429,7 @@ void TestSettingsDialog::importSettingsAppliesEmptyValues()
     QJsonObject stored;
     stored.insert(QStringLiteral("hashcatPath"), QString());
     stored.insert(QStringLiteral("language"), QString());
+    stored.insert(QStringLiteral("colorScheme"), QString());
 
     QJsonObject root;
     root.insert(QStringLiteral("settings"), stored);
@@ -436,6 +444,8 @@ void TestSettingsDialog::importSettingsAppliesEmptyValues()
     dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/before/hashcat"));
     dialog.ui->comboBox_language->setCurrentIndex(
         dialog.ui->comboBox_language->findData(QStringLiteral("de")));
+    dialog.ui->comboBox_color_scheme->setCurrentIndex(
+        dialog.ui->comboBox_color_scheme->findData(QStringLiteral("dark")));
 
     ModalRecorder recorder;
     recorder.pickFile = file;
@@ -445,6 +455,34 @@ void TestSettingsDialog::importSettingsAppliesEmptyValues()
     // The empty values took the place of the ones that were there.
     QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QString());
     QCOMPARE(dialog.ui->comboBox_language->currentData().toString(), QString());
+    QCOMPARE(dialog.ui->comboBox_color_scheme->currentData().toString(), QString());
+}
+
+// The color scheme is stored as the value of the combo entry, and the
+// dialog follows the setting.
+void TestSettingsDialog::colorSchemeFollowsTheSetting()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::ColorScheme,
+                                       QStringLiteral("dark"));
+
+    SettingsDialog dialog;
+    QCOMPARE(dialog.ui->comboBox_color_scheme->currentData().toString(), QStringLiteral("dark"));
+
+    const int lightIndex = dialog.ui->comboBox_color_scheme->findData(QStringLiteral("light"));
+    QVERIFY(lightIndex >= 0);
+    dialog.ui->comboBox_color_scheme->setCurrentIndex(lightIndex);
+
+    ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::ColorScheme),
+             QStringLiteral("light"));
+
+    // The dialog says that not every platform offers both appearances.
+    QLabel *note = dialog.findChild<QLabel *>(QStringLiteral("label_color_scheme_note"));
+    QVERIFY(note);
+    QVERIFY(!note->text().isEmpty());
 }
 
 // The dialog must not be pinned to the 450x385 in the .ui: that one size

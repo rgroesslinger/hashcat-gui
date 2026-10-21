@@ -80,6 +80,12 @@ public:
     static const QMap<QString, QStringList> &terminalArguments();
 
     static QMap<QString, QStringList> availableTerminals();
+
+    // Applies the color scheme the user chose.
+    //
+    // An empty scheme follows the system again - the desktop decides - while
+    // the other two force a light or a dark appearance.
+    static void applyColorScheme(const QString &scheme);
 };
 
 #endif // HELPERUTILS_H

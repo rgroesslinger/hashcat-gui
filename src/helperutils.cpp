@@ -12,6 +12,8 @@
 #include <QStandardPaths>
 #include <QFileInfo>
 #include <QFuture>
+#include <QGuiApplication>
+#include <QStyleHints>
 #include <QtConcurrent/QtConcurrentRun>
 
 // Runs hashcat asynchronously; the caller attaches a QFutureWatcher and reads
@@ -211,4 +213,21 @@ QMap<QString, QStringList> HelperUtils::availableTerminals()
     }
 
     return terminals;
+}
+
+void HelperUtils::applyColorScheme(const QString &scheme)
+{
+    QStyleHints *hints = QGuiApplication::styleHints();
+    if (!hints) {
+        return;
+    }
+
+    if (scheme == AppConstants::Appearance::ColorSchemeDark) {
+        hints->setColorScheme(Qt::ColorScheme::Dark);
+    } else if (scheme == AppConstants::Appearance::ColorSchemeLight) {
+        hints->setColorScheme(Qt::ColorScheme::Light);
+    } else {
+        // The system default: the desktop decides again.
+        hints->unsetColorScheme();
+    }
 }

@@ -28,6 +28,8 @@ inline constexpr QLatin1StringView Terminal{"terminal"};
 inline constexpr QLatin1StringView UseShortParameters{"useShortParameters"};
 // Whether the application restores the last session at the next start.
 inline constexpr QLatin1StringView RestoreSession{"restoreSession"};
+// The color scheme the user chose, see the Appearance namespace below.
+inline constexpr QLatin1StringView ColorScheme{"colorScheme"};
 // Locale code of the UI language, see the Languages namespace below.
 inline constexpr QLatin1StringView Language{"language"};
 } // namespace SettingsKeys
@@ -57,6 +59,16 @@ inline constexpr Language Available[] = {
 // whenever no catalog answers for it.
 inline constexpr const char *Default = "";
 } // namespace Languages
+
+// The color schemes the settings dialog offers.
+//
+// The empty scheme is the system default: the desktop decides, and the
+// application keeps out of it. The other two are the values that get stored.
+namespace Appearance
+{
+inline constexpr QLatin1StringView ColorSchemeLight{"light"};
+inline constexpr QLatin1StringView ColorSchemeDark{"dark"};
+} // namespace Appearance
 
 namespace Files
 {
