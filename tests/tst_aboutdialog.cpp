@@ -23,6 +23,7 @@ private slots:
     void fitsItsContent();
     void longVersionTextWrapsInsteadOfWidening();
     void groupBoxesShareOneTitleAlignment();
+    void showsTheLogoAndTheApplicationName();
 };
 
 void TestAboutDialog::fitsItsContent()
@@ -67,6 +68,28 @@ void TestAboutDialog::groupBoxesShareOneTitleAlignment()
     AboutDialog dialog;
 
     TestEnvironment::checkGroupBoxTitleAlignment(&dialog);
+}
+
+// The dialog opens with the artwork of the application and its name, so it
+// says what it is about before it lists any version.
+void TestAboutDialog::showsTheLogoAndTheApplicationName()
+{
+    AboutDialog dialog;
+
+    QLabel *logo = dialog.findChild<QLabel *>(QStringLiteral("label_logo"));
+    QVERIFY(logo);
+    QVERIFY2(!logo->pixmap().isNull(), "the logo is missing from the dialog");
+    // The artwork is scaled down into the space the .ui gives it.
+    QVERIFY(logo->pixmap().width() <= logo->width());
+    QVERIFY(logo->pixmap().height() <= logo->height());
+
+    QLabel *name = dialog.findChild<QLabel *>(QStringLiteral("label_app_name"));
+    QVERIFY(name);
+    QCOMPARE(name->text(), QStringLiteral("hashcat-gui"));
+
+    QLabel *description = dialog.findChild<QLabel *>(QStringLiteral("label_app_description"));
+    QVERIFY(description);
+    QVERIFY(!description->text().isEmpty());
 }
 
 int main(int argc, char *argv[])

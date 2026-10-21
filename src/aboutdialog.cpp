@@ -9,12 +9,41 @@
 #include "settingsmanager.h"
 #include "appconstants.h"
 #include <QFileInfo>
+#include <QFont>
 #include <QFutureWatcher>
+#include <QPixmap>
+
+namespace
+{
+// The artwork the window and the taskbar show. It is part of the resources
+// already, so the dialog does not need a second copy.
+const QString &logoPath()
+{
+    static const QString path = QStringLiteral(":/icons/hicolor/128x128/apps/hashcat-gui.png");
+    return path;
+}
+} // namespace
 
 AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
     updateVersionLabel();
+
+    // The logo is scaled to the size the .ui gives the label, so the artwork
+    // stays sharp on a high-dpi display without the .ui having to know about
+    // the device pixel ratio.
+    const QSize logoSize = ui->label_logo->minimumSize();
+    const QPixmap logo(logoPath());
+    if (!logo.isNull()) {
+        ui->label_logo->setPixmap(
+            logo.scaled(logoSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
+    ui->label_logo->setAlignment(Qt::AlignCenter);
+
+    // The application name is the headline of the dialog.
+    QFont nameFont = ui->label_app_name->font();
+    nameFont.setBold(true);
+    ui->label_app_name->setFont(nameFont);
 
     connect(ui->pushButton_ok, &QPushButton::clicked, this, &AboutDialog::okClicked);
 }
