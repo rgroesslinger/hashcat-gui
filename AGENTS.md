@@ -1,5 +1,8 @@
 # AGENTS.md
 
+Qt 6 / C++20 GUI around the hashcat CLI. `main.cpp` -> `MainWindow` -> the widgets
+in `src/mainwindow.ui` -> `HashcatOptions` -> `CommandBuilder::build()` -> hashcat argv.
+
 ## Verification (required for every code change)
 
 Run from the repo root, in order. The change is not complete until all pass:
@@ -10,9 +13,6 @@ Run from the repo root, in order. The change is not complete until all pass:
 4. `ctest --test-dir build --output-on-failure --no-tests=error` — full suite.
 5. `cmake --build build --target clang-tidy` — analyzes `src/` and `tests/`.
 6. `cmake --build build --target clazy` — analyzes `src/` and `tests/`.
-
-The checklist covers the code. The translation catalogs are not part of it — see
-**Translations** below.
 
 **Prerequisites:** Qt 6.8+, C++20, `clang-format`, `clang-tidy`, `clazy-standalone`, and two Qt modules:
 - Qt6 LinguistTools — needed for the `update_translations` target and for the `.qm`
@@ -41,26 +41,53 @@ these three targets — this checklist is the only enforcement.
   (CTest sets `QT_QPA_PLATFORM=offscreen` and a 60 s timeout; direct runs need the variable).
 - Run the app: `./build/hashcat-gui`. `--help` and `--version` exit before creating the window.
 
+### Looking at the UI
+- `QT_QPA_PLATFORM=offscreen` plus `QWidget::grab()` works, but a real `MainWindow`
+  freezes: an empty `hashcatPath` queues the modal Settings dialog, and a hashcat
+  reply that is not valid JSON opens a modal warning — `processEvents()` then blocks
+  inside the modal loop. Prepare the environment first: application name, redirected
+  XDG directories, `hashcatPath` pointing at a stub that prints valid
+  machine-readable JSON (see `TestEnvironment::redirectBaseDirectories()` and the
+  stubs in `tst_helperutils.cpp`).
+- For layout measurements skip `MainWindow` altogether: include the generated
+  `build/hashcat-gui-core_autogen/include/ui_mainwindow.h`, instantiate
+  `Ui::MainWindow`, call `setupUi()` on a plain `QMainWindow`, and grab that. No
+  settings, hashcat or dialogs involved.
+- Keep screenshot harnesses in `/tmp`; they are not part of the repo.
+
 ## Structure
 
 - `hashcat-gui-core` is an OBJECT library with every app source except `main.cpp`; the
-  executable and all tests link it.
+  executable and all tests link it. Keep it an object library: a static one would
+  drop the qrc objects and static initializers as unreferenced.
 - New production `.cpp`/`.h`/`.ui`/`.qrc` files go in `HASHCAT_GUI_SOURCES` (no globbing).
   New tests (one `tests/tst_*.cpp` each, linked against core) go in `HASHCAT_GUI_TESTS`.
 - The wiring in one line: `main.cpp` starts `MainWindow`, which owns the widgets in
   `mainwindow.ui`; `collectHashcatOptions()` reads them into `HashcatOptions`;
   `CommandBuilder::build()` turns that into hashcat argv; `HelperUtils` talks to hashcat
   and to the terminal; `WidgetStateSerializer` persists profiles. Keep the argument order
-  stable: the preview, the clipboard and the tests all depend on it.
+  stable: the preview, the clipboard and the tests all depend on it. The logic that
+  needs no UI lives in `CommandBuilder`, `HashcatInfoParser`, `HelperUtils` and
+  `WidgetStateSerializer`, so it stays testable.
 - Attack-mode gating predicates live in `CommandBuilder` and are reused for group-box
   enablement in `MainWindow`. Do not duplicate them. `CommandBuilder::modeRequirements()`
   derives what a mode needs from those predicates, so the group boxes, the mode hint and
   the launch validation cannot disagree.
-- Keep UI-independent logic in `CommandBuilder`, `HashcatInfoParser`, `HelperUtils`, and
-  `WidgetStateSerializer` so it stays testable.
 - Launch validation: `HelperUtils::validateOptions()` (what the selected mode needs) and
   then `HelperUtils::validateLaunch()` (the path, the binary and the terminal). hashcat
   starts detached in an external terminal (`CREATE_NEW_CONSOLE` on Windows).
+
+### Adding a hashcat option
+The option touches four places, and the command preview and the tests follow it:
+- a field in `HashcatOptions` (`src/hashcatoptions.h`), defaulting to what the widget
+  in `mainwindow.ui` starts with;
+- a `CommandBuilder::Parameter` plus its entry in `parameterName()` and its case in
+  `build()` (`src/commandbuilder.*`) — the builder leaves an option out when it is at
+  its default, so the preview stays free of noise;
+- the widget in `src/mainwindow.ui` and the read in `MainWindow::collectHashcatOptions()`;
+- a case in `tests/tst_commandbuilder.cpp`.
+Connect the new widget to `commandChanged()` once — the attack mode combo is the only
+exception, it goes through `attackIndexChanged()`.
 
 ### Threading and async
 - Hash types load asynchronously from `hashcat --example-hashes --machine-readable`; the
@@ -71,13 +98,11 @@ these three targets — this checklist is the only enforcement.
 
 ### WidgetStateSerializer
 - Persists `QLineEdit`, `QCheckBox`, `QComboBox`, `QRadioButton`, `QSpinBox`,
-  `QDoubleSpinBox`, `QListWidget` children by `objectName`. Renaming object names breaks
-  saved profiles and tests.
-- A profile carries `AppConstants::Profiles::Version`. The object names are part of the
-  format, so a profile from another version names widgets that may not exist any more: it
-  is still read - the widgets it names that do exist keep their values - and the user is
-  told that the rest was left at its defaults. Bump the version whenever a persisted
-  widget is renamed.
+  `QDoubleSpinBox`, `QListWidget` children by `objectName`. The names are part of the
+  profile format: renaming one breaks saved profiles and tests.
+- A profile carries `AppConstants::Profiles::Version`. A profile from another version is
+  still read: the widgets it names keep their values, the rest stays at its defaults,
+  and the user is told. Bump the version whenever a persisted widget is renamed.
 - A `QComboBox` is stored by the item data the app gave the entry (attack mode id, hash type
   id, workload level) — never by display text (translatable). Only a combo with no item data
   at all falls back to position, which is not an identifier: inserting mid-list shifts every
@@ -130,6 +155,7 @@ these three targets — this checklist is the only enforcement.
 **Repo hygiene**
 - `FAQ.md` is generated: edit `FAQ.yaml` only, then `mdfaqgen FAQ.yaml FAQ.md`
   ([mdfaqgen](https://github.com/rgroesslinger/mdfaqgen); it asks before overwriting).
+- A user-visible change gets a `CHANGELOG.md` entry under the "Unreleased" heading.
 - `build/` is gitignored. Never commit generated `ui_*.h`, `.qm`, or binaries.
 
 ## Commit messages
