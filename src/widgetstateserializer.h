@@ -19,6 +19,13 @@ class WidgetStateSerializer : public QObject
 public:
     explicit WidgetStateSerializer(QObject *parent = nullptr);
 
+    // The file the application keeps its state in between two runs.
+    //
+    // The location comes from QStandardPaths::AppDataLocation, which the
+    // application name alone decides - the organization name is deliberately
+    // left unset, see main.cpp.
+    static QString defaultProfilePath();
+
     // Serialize the state of widget into a profile file.
     //
     // Errors are reported through the return value and, when errorMessage is

@@ -10,6 +10,7 @@
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
 
 ### Improvements
+- **Session**: The last session is restored at startup only when asked for, and the saved profile can be cleared from the settings
 - Decoupled business logic from UI for better maintainability and testability
 - Refactored default values, help tables, and magic numbers in `src/appconstants.h` (#10)
 - Hardened UTF-8 and string handling by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`

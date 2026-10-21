@@ -7,7 +7,9 @@
 #include "ui_settingsdialog.h"
 #include "settingsmanager.h"
 #include "helperutils.h"
+#include "widgetstateserializer.h"
 #include "appconstants.h"
+#include <QFile>
 #include <QMessageBox>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog)
@@ -24,6 +26,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 
     connect(ui->pushButton_select_path, &QPushButton::clicked, this,
             &SettingsDialog::selectPathClicked);
+    connect(ui->pushButton_clear_profile, &QPushButton::clicked, this,
+            &SettingsDialog::clearProfileClicked);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &SettingsDialog::saveClicked);
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &SettingsDialog::cancelClicked);
 }
@@ -48,6 +52,9 @@ void SettingsDialog::readSettings()
 
     ui->checkBox_use_short_parameters->setChecked(
         settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters));
+
+    ui->checkBox_restore_session->setChecked(
+        settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true));
 
     // Languages: the combo shows each language's own name and carries the
     // locale code as item data - that code is what gets stored. "System
@@ -100,6 +107,8 @@ void SettingsDialog::saveClicked()
     settings.setKey(AppConstants::SettingsKeys::Terminal, ui->comboBox_terminal->currentText());
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters,
                     ui->checkBox_use_short_parameters->isChecked());
+    settings.setKey(AppConstants::SettingsKeys::RestoreSession,
+                    ui->checkBox_restore_session->isChecked());
     // The locale code, not the display text - see readSettings().
     const QString language = ui->comboBox_language->currentData().toString();
     settings.setKey(AppConstants::SettingsKeys::Language, language);
@@ -120,4 +129,34 @@ void SettingsDialog::saveClicked()
 void SettingsDialog::cancelClicked()
 {
     close();
+}
+
+// Removes the profile the application stored at the last run.
+//
+// The button is not a setting, so it acts right away and not on Save.
+void SettingsDialog::clearProfileClicked()
+{
+    const QString path = WidgetStateSerializer::defaultProfilePath();
+
+    if (!QFile::exists(path)) {
+        QMessageBox::information(this, tr("No saved profile"),
+                                 tr("There is no saved profile to clear."));
+        return;
+    }
+
+    if (!QFile::remove(path)) {
+        QMessageBox::warning(this, tr("Clear failed"),
+                             tr("The saved profile could not be deleted."));
+        return;
+    }
+
+    QStringList notes;
+    notes << tr("The saved profile has been deleted.");
+    if (ui->checkBox_restore_session->isChecked()) {
+        // The setting is not saved yet, so the profile is written again
+        // unless the user turns the setting off before saving.
+        notes << tr("It is written again when hashcat-gui exits.");
+    }
+
+    QMessageBox::information(this, tr("Profile cleared"), notes.join(QLatin1Char('\n')));
 }

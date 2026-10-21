@@ -22,7 +22,6 @@
 #include <QAbstractItemModel>
 #include <QClipboard>
 #include <QCursor>
-#include <QStandardPaths>
 #include <QFutureWatcher>
 #include <QLayout>
 #include <QScreen>
@@ -559,14 +558,26 @@ void MainWindow::aboutTriggered()
 // Path to the default profile JSON
 QString MainWindow::defaultProfileFile() const
 {
-    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QDir().mkpath(dirPath);
-    return QDir(dirPath).filePath(AppConstants::Files::DefaultProfile);
+    return WidgetStateSerializer::defaultProfilePath();
+}
+
+// Whether the application keeps the session between two runs.
+//
+// The user can ask for a fresh form at every start, and then there is
+// nothing to restore and nothing to store.
+bool MainWindow::restoreSessionEnabled() const
+{
+    return SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::RestoreSession,
+                                                    true);
 }
 
 // Load the default profile – called from the constructor
 void MainWindow::loadDefaultProfile()
 {
+    if (!restoreSessionEnabled()) {
+        return;
+    }
+
     QString file = defaultProfileFile();
     if (QFile::exists(file)) {
         WidgetStateSerializer s;
@@ -664,8 +675,15 @@ QString MainWindow::applyPendingHashType()
 // Save the default profile – called by aboutToQuit signal
 void MainWindow::saveDefaultProfile()
 {
+    // Without the setting there is nothing to restore, so nothing is stored
+    // either - a profile that is never read would only be a leftover.
+    if (!restoreSessionEnabled()) {
+        return;
+    }
+
     QStringList ignoreWidgets = {AppConstants::Files::PreviewWidget};
     QString file = defaultProfileFile();
+    QDir().mkpath(QFileInfo(file).absolutePath());
     WidgetStateSerializer s;
     QString error;
     if (!s.saveStateToFile(QString::fromUtf8(metaObject()->className()), this, file, ignoreWidgets,

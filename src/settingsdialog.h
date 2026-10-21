@@ -25,6 +25,7 @@ public:
 private slots:
     void readSettings();
     void selectPathClicked();
+    void clearProfileClicked();
     void saveClicked();
     void cancelClicked();
 

@@ -6,6 +6,8 @@
 #include "testenvironment.h"
 
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
 #include <QGroupBox>
 #include <QMessageBox>
 #include <QTimer>
@@ -13,6 +15,7 @@
 #include "appconstants.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
+#include "widgetstateserializer.h"
 #include "ui_settingsdialog.h"
 
 #include <iterator>
@@ -96,6 +99,8 @@ private slots:
     void staleLanguageCodeDoesNotDemandARestart();
     void selectPathClickedAcceptsAnExecutable();
     void selectPathClickedRejectsAPlainFile();
+    void restoreSessionFollowsTheSetting();
+    void clearProfileDeletesTheStoredProfile();
     void fitsItsContent();
     void groupBoxesShareOneTitleAlignment();
 
@@ -104,6 +109,7 @@ private:
     QString m_savedTerminal;
     QString m_savedLanguage;
     bool m_savedShortParameters = false;
+    bool m_savedRestoreSession = true;
 };
 
 // Every test starts from the same settings, and cleanup() puts back whatever
@@ -115,6 +121,7 @@ void TestSettingsDialog::init()
     m_savedTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
     m_savedLanguage = settings.getKey<QString>(AppConstants::SettingsKeys::Language);
     m_savedShortParameters = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
+    m_savedRestoreSession = settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true);
 
     // A fresh install: nothing configured, system default language. Each
     // test then stores what it needs on top of this.
@@ -123,6 +130,7 @@ void TestSettingsDialog::init()
     settings.setKey(AppConstants::SettingsKeys::Language,
                     QString::fromUtf8(AppConstants::Languages::Default));
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
+    settings.setKey(AppConstants::SettingsKeys::RestoreSession, true);
 }
 
 void TestSettingsDialog::cleanup()
@@ -132,6 +140,7 @@ void TestSettingsDialog::cleanup()
     settings.setKey(AppConstants::SettingsKeys::Terminal, m_savedTerminal);
     settings.setKey(AppConstants::SettingsKeys::Language, m_savedLanguage);
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, m_savedShortParameters);
+    settings.setKey(AppConstants::SettingsKeys::RestoreSession, m_savedRestoreSession);
 }
 
 // System default plus one row per catalog, each shown in its own language
@@ -262,6 +271,49 @@ void TestSettingsDialog::selectPathClickedRejectsAPlainFile()
     QCOMPARE(recorder.title, QStringLiteral("Invalid file"));
     QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QStringLiteral("/preset"));
 #endif
+}
+
+// Whether the last session is restored at the next start is a setting, so
+// the checkbox follows it and Save stores what it shows.
+void TestSettingsDialog::restoreSessionFollowsTheSetting()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, false);
+
+    SettingsDialog dialog;
+    QCOMPARE(dialog.ui->checkBox_restore_session->isChecked(), false);
+
+    dialog.ui->checkBox_restore_session->setChecked(true);
+
+    ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+
+    QCOMPARE(SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::RestoreSession),
+             true);
+}
+
+// The button that clears the saved profile removes the file the application
+// stores its state in, and says that it did.
+void TestSettingsDialog::clearProfileDeletesTheStoredProfile()
+{
+    const QString path = WidgetStateSerializer::defaultProfilePath();
+    QDir().mkpath(QFileInfo(path).absolutePath());
+
+    QFile file(path);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    file.write("{}");
+    file.close();
+    QVERIFY(QFile::exists(path));
+
+    SettingsDialog dialog;
+
+    ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearProfileClicked"));
+
+    QVERIFY2(!QFile::exists(path), "the saved profile was not deleted");
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Profile cleared"));
 }
 
 // The dialog must not be pinned to the 450x385 in the .ui: that one size

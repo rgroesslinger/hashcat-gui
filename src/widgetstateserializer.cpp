@@ -19,6 +19,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QSaveFile>
+#include <QDir>
+#include <QStandardPaths>
 
 // Report a failure through errorMessage when the caller asked for it
 static void setError(QString *errorMessage, const QString &text)
@@ -43,6 +45,12 @@ static bool comboBoxHasItemData(const QComboBox *comboBox)
 
 WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent)
 {
+}
+
+QString WidgetStateSerializer::defaultProfilePath()
+{
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    return QDir(dirPath).filePath(AppConstants::Files::DefaultProfile);
 }
 
 static QJsonObject widgetToJson(const QWidget *w, const QStringList &ignoredWidgets = {})

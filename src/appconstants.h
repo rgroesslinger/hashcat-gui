@@ -26,6 +26,8 @@ namespace SettingsKeys
 inline constexpr QLatin1StringView HashcatPath{"hashcatPath"};
 inline constexpr QLatin1StringView Terminal{"terminal"};
 inline constexpr QLatin1StringView UseShortParameters{"useShortParameters"};
+// Whether the application restores the last session at the next start.
+inline constexpr QLatin1StringView RestoreSession{"restoreSession"};
 // Locale code of the UI language, see the Languages namespace below.
 inline constexpr QLatin1StringView Language{"language"};
 } // namespace SettingsKeys

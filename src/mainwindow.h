@@ -120,6 +120,10 @@ private:
     void showLaunchError(HelperUtils::LaunchError error, const QString &detail);
 
     QString defaultProfileFile() const;
+
+    // Whether the application keeps the session between two runs.
+    bool restoreSessionEnabled() const;
+
     void loadDefaultProfile();
     void saveDefaultProfile();
 
