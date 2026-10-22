@@ -101,16 +101,23 @@ QString commandTooltip(const QString &command)
     return text.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
 }
 
-// Where a file dialog for an export starts: a folder the user knows, with the
-// name the application suggests. A bare file name would open the dialog in the
-// application's working directory, wherever it happened to be started from.
-QString suggestedExportPath(QLatin1StringView fileName)
+// Where a file dialog starts: a folder the user knows. A bare file name
+// would open the dialog in the application's working directory, wherever it
+// happened to be started from.
+QString suggestedFolder()
 {
     QString folder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     if (!QFileInfo(folder).isDir()) {
         folder = QDir::homePath();
     }
-    return QDir(folder).filePath(QString(fileName));
+    return folder;
+}
+
+// Where a file dialog for an export starts: that folder, with the name the
+// application suggests.
+QString suggestedExportPath(QLatin1StringView fileName)
+{
+    return QDir(suggestedFolder()).filePath(QString(fileName));
 }
 } // namespace
 
@@ -456,7 +463,7 @@ void MainWindow::exportTriggered()
 // File → Import
 void MainWindow::importTriggered()
 {
-    const QString file = QFileDialog::getOpenFileName(this, tr("Import Session"), QString(),
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import Session"), suggestedFolder(),
                                                       tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
@@ -584,8 +591,8 @@ void MainWindow::exportSettingsTriggered()
 // File → Import Settings
 void MainWindow::importSettingsTriggered()
 {
-    const QString file = QFileDialog::getOpenFileName(this, tr("Import Settings"), QString(),
-                                                      tr("JSON Files (*.json)"));
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import Settings"),
+                                                      suggestedFolder(), tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
         return;
