@@ -10,6 +10,7 @@
 #include "statefile.h"
 #include "appconstants.h"
 #include <QDesktopServices>
+#include <QProcess>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -170,10 +171,21 @@ void SettingsDialog::updatePathLabels()
     const QString sessionFile = StateFile::sessionFilePath();
 
     // The settings live in a file on most systems and in the registry on
-    // Windows - where there is no folder to open.
-    m_settingsFolder =
-        QFileInfo(settingsFile).isAbsolute() ? QFileInfo(settingsFile).absolutePath() : QString();
+    // Windows. A file has a folder to open; a registry key opens in RegEdit.
+    if (QFileInfo(settingsFile).isAbsolute()) {
+        m_settingsFolder = QFileInfo(settingsFile).absolutePath();
+    } else {
+        m_settingsFolder = settingsFile;
+    }
     ui->pushButton_open_folder->setEnabled(!m_settingsFolder.isEmpty());
+
+#ifdef Q_OS_WIN
+    if (QFileInfo(settingsFile).isAbsolute()) {
+        ui->pushButton_open_folder->setText(tr("Open the folder"));
+    } else {
+        ui->pushButton_open_folder->setText(tr("Open in Registry Editor"));
+    }
+#endif
 
     ui->lineEdit_settings_path->setText(shortenPath(settingsFile));
     ui->lineEdit_session_path->setText(shortenPath(sessionFile));
@@ -185,6 +197,11 @@ void SettingsDialog::updatePathLabels()
 // /home/alice, and shortening it would make it look as if it were.
 QString SettingsDialog::shortenPath(const QString &path)
 {
+#ifdef Q_OS_WIN
+    // A leading "~" is not understood by Explorer, so keep the full path.
+    return path;
+#endif
+
     const QString home = QDir::homePath();
     if (home.isEmpty() || !path.startsWith(home)) {
         return path;
@@ -203,7 +220,29 @@ void SettingsDialog::openFolderClicked()
         return;
     }
 
-    QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
+    // A file-backed location opens in the file manager.
+    if (QFileInfo(m_settingsFolder).isAbsolute()) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
+        return;
+    }
+
+#ifdef Q_OS_WIN
+    // RegEdit has no command line argument for the key to open, so set the
+    // key it remembers as "last opened" and then launch it.
+    QString key = m_settingsFolder;
+    if (!key.startsWith(QStringLiteral("Computer\\"), Qt::CaseInsensitive)
+        && !key.startsWith(QStringLiteral("Computer/"), Qt::CaseInsensitive)) {
+        key = QStringLiteral("Computer\\") + key;
+    }
+
+    QProcess::execute(
+        QStringLiteral("reg"),
+        {QStringLiteral("add"),
+         QStringLiteral("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Applets\\Regedit"),
+         QStringLiteral("/v"), QStringLiteral("LastKey"), QStringLiteral("/t"),
+         QStringLiteral("REG_SZ"), QStringLiteral("/d"), key, QStringLiteral("/f")});
+    QProcess::startDetached(QStringLiteral("regedit"));
+#endif
 }
 
 // The settings as they are stored right now.
@@ -447,26 +486,6 @@ void SettingsDialog::clearSessionClicked()
         return;
     }
 
-    QStringList notes;
-    notes << tr("The saved session has been deleted.");
-
-    // What the exit does with the file depends on the stored setting, not on
-    // the checkbox: the checkbox reaches the settings only when the user
-    // saves. A change that is not saved changes nothing.
-    const bool stored =
-        SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true);
-    const bool wanted = ui->checkBox_restore_session->isChecked();
-
-    if (stored == wanted) {
-        notes << (stored ? tr("It is written again when hashcat-gui exits.")
-                         : tr("It is not written again when hashcat-gui exits."));
-    } else if (stored) {
-        notes << tr("It is written again when hashcat-gui exits - unless you save the settings "
-                    "with the session switched off.");
-    } else {
-        notes << tr("It is not written again when hashcat-gui exits - unless you save the "
-                    "settings with the session switched on.");
-    }
-
-    QMessageBox::information(this, tr("Session cleared"), notes.join(QLatin1Char('\n')));
+    QMessageBox::information(this, tr("Session cleared"),
+                             tr("The saved session has been deleted."));
 }

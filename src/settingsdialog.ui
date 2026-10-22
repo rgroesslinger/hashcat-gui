@@ -276,7 +276,7 @@
         <item>
          <widget class="QLabel" name="label_settings_path_text">
           <property name="text">
-           <string>Settings file</string>
+           <string>Settings location</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
