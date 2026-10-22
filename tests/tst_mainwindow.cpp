@@ -197,6 +197,8 @@ private slots:
     void aNewerSessionIsRefused();
     void anOlderSessionIsAppliedWithANote();
     void aNewerStartupSessionIsLeftAlone();
+    void aSessionFileThatCannotBeReadIsLeftAlone();
+    void aSessionFileOfAnotherShapeIsLeftAlone();
     void theStartupShowsNoBox();
 
 private:
@@ -1505,6 +1507,64 @@ void TestMainWindow::aNewerStartupSessionIsLeftAlone()
 
     QCOMPARE(m_closedModals, 1);
     QVERIFY(window.ui->spinBox_segment_size->value() != 64);
+    QVERIFY(QFile::exists(session));
+}
+
+// A session file this version cannot read is not thrown away: it may belong
+// to a version that can read it, or the user may want to look at it.
+void TestMainWindow::aSessionFileThatCannotBeReadIsLeftAlone()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+
+    // The format of the versions before the sections: this one finds no
+    // section in it.
+    QFile file(session);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    file.write(R"({"version": 1, "MainWindow": {}})");
+    file.close();
+    const QJsonObject before = readJsonObject(session);
+
+    m_watchdog.start();
+    MainWindow window;
+
+    // The startup says why the session did not come back...
+    QCOMPARE(m_closedModals, 1);
+    // ... and the file is still there.
+    QVERIFY(QFile::exists(session));
+
+    // The exit neither writes over it nor deletes it - not with the session
+    // on, and not with it off.
+    window.saveSession();
+    QCOMPARE(readJsonObject(session), before);
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, false);
+    window.saveSession();
+    QCOMPARE(readJsonObject(session), before);
+    QVERIFY(QFile::exists(session));
+}
+
+// A file of a shape this version does not know is left alone as well: it may
+// be a file of a version that comes later.
+void TestMainWindow::aSessionFileOfAnotherShapeIsLeftAlone()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+
+    QFile file(session);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    file.write(R"({"sections": {"somethingElse": {"version": 1, "values": {}}}})");
+    file.close();
+    const QJsonObject before = readJsonObject(session);
+
+    m_watchdog.start();
+    MainWindow window;
+
+    QCOMPARE(m_closedModals, 1);
+    QVERIFY(QFile::exists(session));
+
+    window.saveSession();
+    QCOMPARE(readJsonObject(session), before);
     QVERIFY(QFile::exists(session));
 }
 

@@ -127,6 +127,10 @@ private:
 
     QString sessionFile() const;
 
+    // Whether this version understands the session file: one it cannot read
+    // at all, or one of a newer format, belongs to another version.
+    bool sessionFileIsUnderstood(const QString &file) const;
+
     // Whether the application keeps the session between two runs.
     bool restoreSessionEnabled() const;
 

@@ -759,10 +759,14 @@ void MainWindow::loadSession()
     QStringList otherSections;
     if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
                          &otherSections, &error)) {
-        // The session file is the cache of the last session, not something
-        // the user made: a file that cannot be read is deleted and the start
-        // goes on. The files the user exported are never deleted.
-        QFile::remove(file);
+        // A file this version cannot read is not thrown away: it may belong
+        // to a version that can read it, or the user may want to look at it.
+        // The start goes on without the session.
+        QMessageBox::warning(
+            this, tr("Session warning"),
+            tr("The session file could not be read, so the session was not restored. The file "
+               "was left in place; \"Clear the saved session\" in the settings deletes it.\n\n%1")
+                .arg(error));
         return;
     }
 
@@ -865,15 +869,23 @@ QString MainWindow::applyPendingHashType()
 // Save the session – called by aboutToQuit signal
 void MainWindow::saveSession()
 {
+    const QString file = sessionFile();
+
+    // A file this version does not understand is neither written over nor
+    // deleted: it belongs to another version, and the values in it may mean
+    // something there.
+    if (QFile::exists(file) && !sessionFileIsUnderstood(file)) {
+        return;
+    }
+
     // Without the setting there is nothing to restore, so nothing is stored
     // either. The session of an earlier run goes with it: it would come back
     // as stale state once the setting is switched on again.
     if (!restoreSessionEnabled()) {
-        QFile::remove(sessionFile());
+        QFile::remove(file);
         return;
     }
 
-    const QString file = sessionFile();
     QDir().mkpath(QFileInfo(file).absolutePath());
 
     QString error;
@@ -883,6 +895,26 @@ void MainWindow::saveSession()
                           AppConstants::Sessions::Version, values, &error)) {
         QMessageBox::warning(this, tr("Save failed"), error);
     }
+}
+
+// Whether this version understands the session file.
+//
+// A file it can read and whose format version it knows may be written over:
+// it is the session of an earlier run, or of this one. A file it cannot read
+// at all, or one that holds a format version this build does not know, was
+// written by another version and is left alone.
+bool MainWindow::sessionFileIsUnderstood(const QString &file) const
+{
+    QString error;
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
+                         &otherSections, &error)) {
+        return false;
+    }
+
+    return version <= AppConstants::Sessions::Version;
 }
 
 void MainWindow::initHashAndAttackModes()
