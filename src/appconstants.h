@@ -66,9 +66,9 @@ inline constexpr int Version = 1;
 
 // The names of the sections a file can hold.
 //
-// They are constants and not the name of a class: the session file is named
-// after its class today, so renaming that class would orphan every profile
-// that was ever written.
+// They are constants and not the name of a class: the section of the session
+// used to be keyed by the class name, so renaming that class would orphan
+// every session that was ever written.
 namespace FileSections
 {
 inline constexpr QLatin1StringView Session{"session"};
@@ -113,28 +113,28 @@ inline constexpr QLatin1StringView ColorSchemeDark{"dark"};
 
 namespace Files
 {
-// Saved by MainWindow::saveDefaultProfile(), relative to
+// Saved by MainWindow::saveSession(), relative to
 // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-inline constexpr QLatin1StringView DefaultProfile{"default_profile.json"};
+inline constexpr QLatin1StringView SessionFile{"session.json"};
 // Suggested names for the files the File menu exports.
 inline constexpr QLatin1StringView SessionExport{"hashcat-gui-session.json"};
 inline constexpr QLatin1StringView SettingsExport{"hashcat-gui-settings.json"};
 // The command preview: it is regenerated on every change, so it must never
-// be part of a stored profile.
+// be part of a stored session.
 inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 } // namespace Files
 
-// The profile format.
+// The session format.
 //
-// A profile stores the widgets by their object name, so the names are part of
-// the format: a profile written by another version of hashcat-gui can name
+// A session stores the widgets by their object name, so the names are part of
+// the format: a session written by another version of hashcat-gui can name
 // widgets that no longer exist. An older file is applied and the values it
 // cannot use are named; a file of a newer format is refused, because a name
 // that survived may mean something else there.
-namespace Profiles
+namespace Sessions
 {
 inline constexpr int Version = 1;
-} // namespace Profiles
+} // namespace Sessions
 
 // Values the widgets start with. The identical defaults are baked into the
 // .ui files (lineEdit_outfile_format = "1,2", lineEdit_backend_devices is empty,

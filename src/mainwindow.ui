@@ -1536,12 +1536,12 @@
   </action>
   <action name="actionExport">
    <property name="text">
-    <string>Export Profile</string>
+    <string>Export Session</string>
    </property>
   </action>
   <action name="actionImport">
    <property name="text">
-    <string>Import Profile</string>
+    <string>Import Session</string>
    </property>
   </action>
  </widget>

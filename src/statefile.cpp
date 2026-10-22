@@ -4,11 +4,14 @@
  */
 
 #include "statefile.h"
+#include "appconstants.h"
 
+#include <QDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QSaveFile>
+#include <QStandardPaths>
 
 namespace
 {
@@ -20,6 +23,12 @@ void setError(QString *errorMessage, const QString &text)
     }
 }
 } // namespace
+
+QString StateFile::sessionFilePath()
+{
+    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    return QDir(dirPath).filePath(AppConstants::Files::SessionFile);
+}
 
 bool StateFile::write(const QString &filename, QLatin1StringView section, int version,
                       const QJsonObject &values, QString *errorMessage)

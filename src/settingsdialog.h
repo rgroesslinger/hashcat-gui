@@ -45,7 +45,7 @@ protected:
 private slots:
     void readSettings();
     void selectPathClicked();
-    void clearProfileClicked();
+    void clearSessionClicked();
     void openFolderClicked();
     void saveClicked();
     void cancelClicked();

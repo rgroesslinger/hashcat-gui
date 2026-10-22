@@ -23,7 +23,7 @@
 //
 // QSettings and QStandardPaths resolve XDG_CONFIG_HOME / XDG_DATA_HOME on
 // first use; redirecting them here means no test can read or overwrite the
-// settings, default profile or window geometry of whoever runs ctest.
+// settings, session file or window geometry of whoever runs ctest.
 //
 // The three statics are first touched from main(), so they outlive
 // SettingsManager's singleton and are destroyed last, after it.

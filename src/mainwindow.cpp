@@ -155,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     auto &settings = SettingsManager::instance();
 
     // The workload levels carry only display text in the .ui file; give each
-    // one an id so a profile stores the level and not its position.
+    // one an id so a session stores the level and not its position.
     for (int i = 0; i < ui->comboBox_workload_profile->count(); ++i) {
         ui->comboBox_workload_profile->setItemData(i, i + 1);
     }
@@ -163,8 +163,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     initHashAndAttackModes();
     updateViewAttackMode();
 
-    /* ---------- save default profile on quit ---------- */
-    connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::saveDefaultProfile);
+    /* ---------- save the session on quit ---------- */
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::saveSession);
 
     /* ---------- command preview ---------- */
     // Every widget whose value reaches the command line is connected here
@@ -329,7 +329,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->checkBox_hwmon_temp_abort, &QCheckBox::toggled, this,
             &MainWindow::updateOptionDependencies);
 
-    loadDefaultProfile();
+    loadSession();
 
     /* ---------- show Settings if hashcatPath not set ---------- */
     if (settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
@@ -435,7 +435,7 @@ void MainWindow::fitToContent()
 void MainWindow::exportTriggered()
 {
     const QString file = QFileDialog::getSaveFileName(
-        this, tr("Export Profile"), suggestedExportPath(AppConstants::Files::SessionExport),
+        this, tr("Export Session"), suggestedExportPath(AppConstants::Files::SessionExport),
         tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
@@ -445,9 +445,9 @@ void MainWindow::exportTriggered()
     QString error;
     const QJsonObject values =
         WidgetStateSerializer::toJson(this, {AppConstants::Files::PreviewWidget});
-    if (StateFile::write(file, AppConstants::FileSections::Session, AppConstants::Profiles::Version,
+    if (StateFile::write(file, AppConstants::FileSections::Session, AppConstants::Sessions::Version,
                          values, &error)) {
-        QMessageBox::information(this, tr("Exported"), tr("Profile exported to %1.").arg(file));
+        QMessageBox::information(this, tr("Exported"), tr("Session exported to %1.").arg(file));
     } else {
         QMessageBox::warning(this, tr("Export failed"), error);
     }
@@ -456,7 +456,7 @@ void MainWindow::exportTriggered()
 // File → Import
 void MainWindow::importTriggered()
 {
-    const QString file = QFileDialog::getOpenFileName(this, tr("Import Profile"), QString(),
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import Session"), QString(),
                                                       tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
@@ -473,9 +473,9 @@ void MainWindow::importTriggered()
         return;
     }
 
-    if (version > AppConstants::Profiles::Version) {
+    if (version > AppConstants::Sessions::Version) {
         QMessageBox::warning(this, tr("Import failed"),
-                             newerFileNote(version, AppConstants::Profiles::Version));
+                             newerFileNote(version, AppConstants::Sessions::Version));
         return;
     }
 
@@ -486,7 +486,7 @@ void MainWindow::importTriggered()
     const QString problem = restoreHashType(values);
     commandChanged();
 
-    QStringList notes = fileNotes(version, AppConstants::Profiles::Version, otherSections);
+    QStringList notes = fileNotes(version, AppConstants::Sessions::Version, otherSections);
     // The notes are only there when there is something to say.
     const QString unknownNote = StateFile::unknownValuesNote(notApplied.unknownKeys);
     if (!unknownNote.isEmpty()) {
@@ -502,11 +502,11 @@ void MainWindow::importTriggered()
     }
 
     if (notes.isEmpty()) {
-        QMessageBox::information(this, tr("Imported"), tr("Profile imported from %1.").arg(file));
+        QMessageBox::information(this, tr("Imported"), tr("Session imported from %1.").arg(file));
     } else {
         QMessageBox::warning(
             this, tr("Imported"),
-            tr("Profile imported from %1.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
+            tr("Session imported from %1.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
     }
 }
 
@@ -634,7 +634,7 @@ void MainWindow::resetFieldsTriggered()
     ui->lineEdit_encoding_to->clear();
     ui->comboBox_attack->setCurrentIndex(0);
     ui->comboBox_hash_type->setCurrentIndex(0);
-    // A fresh form must not re-apply a hash type a profile is still waiting
+    // A fresh form must not re-apply a hash type a session is still waiting
     // to deliver.
     m_pendingHashTypeId = -1;
     ui->radioButton_use_rules_file->setChecked(true);
@@ -725,10 +725,10 @@ void MainWindow::aboutTriggered()
     about.exec();
 }
 
-// Path to the default profile JSON
-QString MainWindow::defaultProfileFile() const
+// Path to the session JSON
+QString MainWindow::sessionFile() const
 {
-    return WidgetStateSerializer::defaultProfilePath();
+    return StateFile::sessionFilePath();
 }
 
 // Whether the application keeps the session between two runs.
@@ -741,14 +741,14 @@ bool MainWindow::restoreSessionEnabled() const
                                                     true);
 }
 
-// Load the default profile – called from the constructor
-void MainWindow::loadDefaultProfile()
+// Load the session – called from the constructor
+void MainWindow::loadSession()
 {
     if (!restoreSessionEnabled()) {
         return;
     }
 
-    const QString file = defaultProfileFile();
+    const QString file = sessionFile();
     if (!QFile::exists(file)) {
         return;
     }
@@ -759,18 +759,18 @@ void MainWindow::loadDefaultProfile()
     QStringList otherSections;
     if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
                          &otherSections, &error)) {
-        // The default profile is the cache of the last session, not something
+        // The session file is the cache of the last session, not something
         // the user made: a file that cannot be read is deleted and the start
         // goes on. The files the user exported are never deleted.
         QFile::remove(file);
         return;
     }
 
-    // A profile with a newer format version is left in place: it is what that
+    // A session with a newer format version is left in place: it is what that
     // version saved, and the user may go back to it.
-    if (version > AppConstants::Profiles::Version) {
-        QMessageBox::warning(this, tr("Profile warning"),
-                             newerFileNote(version, AppConstants::Profiles::Version));
+    if (version > AppConstants::Sessions::Version) {
+        QMessageBox::warning(this, tr("Session warning"),
+                             newerFileNote(version, AppConstants::Sessions::Version));
         return;
     }
 
@@ -784,7 +784,7 @@ void MainWindow::loadDefaultProfile()
 
     // The auto-load is not an import: there is no headline, and nothing is
     // shown when the load went well.
-    QStringList notes = fileNotes(version, AppConstants::Profiles::Version, otherSections);
+    QStringList notes = fileNotes(version, AppConstants::Sessions::Version, otherSections);
     // The notes are only there when there is something to say.
     const QString unknownNote = StateFile::unknownValuesNote(notApplied.unknownKeys);
     if (!unknownNote.isEmpty()) {
@@ -800,11 +800,11 @@ void MainWindow::loadDefaultProfile()
     }
 
     if (!notes.isEmpty()) {
-        QMessageBox::warning(this, tr("Profile warning"), notes.join(QLatin1Char('\n')));
+        QMessageBox::warning(this, tr("Session warning"), notes.join(QLatin1Char('\n')));
     }
 }
 
-// The hash type of a profile.
+// The hash type of a session.
 //
 // The mapping applies it when the list of hash types is there; this only
 // checks whether this hashcat knows the one the file names, and it waits for
@@ -825,7 +825,7 @@ QString MainWindow::restoreHashType(const QJsonObject &values)
         // wrong one is worse than not cracking at all.
         ui->comboBox_hash_type->setCurrentIndex(-1);
         m_pendingHashTypeId = -1;
-        return tr("The profile names the hash type %1, which this hashcat version does not "
+        return tr("The session names the hash type %1, which this hashcat version does not "
                   "support.")
             .arg(id);
     }
@@ -834,8 +834,8 @@ QString MainWindow::restoreHashType(const QJsonObject &values)
     return {};
 }
 
-// Applies the hash type a profile asked for, now that the list of hash
-// types exists. Returns a message when the profile names a hash type this
+// Applies the hash type a session asked for, now that the list of hash
+// types exists. Returns a message when the session names a hash type this
 // hashcat does not know.
 QString MainWindow::applyPendingHashType()
 {
@@ -851,7 +851,7 @@ QString MainWindow::applyPendingHashType()
             // cracking with the wrong one is worse than not cracking at
             // all.
             ui->comboBox_hash_type->setCurrentIndex(-1);
-            problem = tr("The profile names the hash type %1, which this hashcat version does "
+            problem = tr("The session names the hash type %1, which this hashcat version does "
                          "not support.")
                           .arg(m_pendingHashTypeId);
         }
@@ -862,25 +862,25 @@ QString MainWindow::applyPendingHashType()
     return problem;
 }
 
-// Save the default profile – called by aboutToQuit signal
-void MainWindow::saveDefaultProfile()
+// Save the session – called by aboutToQuit signal
+void MainWindow::saveSession()
 {
     // Without the setting there is nothing to restore, so nothing is stored
-    // either. The profile of an earlier run goes with it: it would come back
+    // either. The session of an earlier run goes with it: it would come back
     // as stale state once the setting is switched on again.
     if (!restoreSessionEnabled()) {
-        QFile::remove(defaultProfileFile());
+        QFile::remove(sessionFile());
         return;
     }
 
-    const QString file = defaultProfileFile();
+    const QString file = sessionFile();
     QDir().mkpath(QFileInfo(file).absolutePath());
 
     QString error;
     const QJsonObject values =
         WidgetStateSerializer::toJson(this, {AppConstants::Files::PreviewWidget});
     if (!StateFile::write(file, AppConstants::FileSections::Session,
-                          AppConstants::Profiles::Version, values, &error)) {
+                          AppConstants::Sessions::Version, values, &error)) {
         QMessageBox::warning(this, tr("Save failed"), error);
     }
 }
@@ -937,7 +937,7 @@ void MainWindow::initHashAndAttackModes()
                         ui->comboBox_hash_type->addItem(it.value(), it.key());
                     }
 
-                    // A profile loaded while the combo was still empty could
+                    // A session loaded while the combo was still empty could
                     // not select its hash type; apply the stored id now that
                     // the items exist, and consume it.
                     hashTypeProblem = applyPendingHashType();
@@ -953,7 +953,7 @@ void MainWindow::initHashAndAttackModes()
             if (!error.isEmpty()) {
                 QMessageBox::warning(this, tr("hashcat error"), error);
             } else if (!hashTypeProblem.isEmpty()) {
-                QMessageBox::warning(this, tr("Profile warning"), hashTypeProblem);
+                QMessageBox::warning(this, tr("Session warning"), hashTypeProblem);
             }
         });
 

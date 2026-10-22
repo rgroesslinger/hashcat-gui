@@ -206,9 +206,9 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_profile_path">
+       <layout class="QHBoxLayout" name="horizontalLayout_session_path">
         <item>
-         <widget class="QLabel" name="label_profile_path_text">
+         <widget class="QLabel" name="label_session_path_text">
           <property name="text">
            <string>Session file</string>
           </property>
@@ -218,7 +218,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_profile_path">
+         <widget class="QLineEdit" name="lineEdit_session_path">
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -230,9 +230,9 @@
        </layout>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_clear_profile">
+       <layout class="QHBoxLayout" name="horizontalLayout_clear_session">
         <item>
-         <spacer name="horizontalSpacer_clear_profile">
+         <spacer name="horizontalSpacer_clear_session">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
@@ -245,9 +245,9 @@
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_clear_profile">
+         <widget class="QPushButton" name="pushButton_clear_session">
           <property name="text">
-           <string>Clear the saved profile</string>
+           <string>Clear the saved session</string>
           </property>
          </widget>
         </item>

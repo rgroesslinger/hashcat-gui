@@ -19,7 +19,7 @@
 #include "helperutils.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
-#include "widgetstateserializer.h"
+#include "statefile.h"
 #include "ui_settingsdialog.h"
 
 #include <iterator>
@@ -41,8 +41,8 @@ private slots:
     void selectPathClickedAcceptsAnExecutable();
     void selectPathClickedRejectsAPlainFile();
     void restoreSessionFollowsTheSetting();
-    void clearProfileDeletesTheStoredProfile();
-    void clearProfileKeepsTheFileWhenDeclined();
+    void clearSessionDeletesTheStoredSession();
+    void clearSessionKeepsTheFileWhenDeclined();
     void shortenPathOnlyShortensTheHomeDirectory();
     void showsWhereTheFilesAreStored();
     void savedSettingsHoldTheKnownSettings();
@@ -252,11 +252,11 @@ void TestSettingsDialog::restoreSessionFollowsTheSetting()
              true);
 }
 
-// The button that clears the saved profile asks first, then removes the file
+// The button that clears the saved session asks first, then removes the file
 // the application stores its state in, and says that it did.
-void TestSettingsDialog::clearProfileDeletesTheStoredProfile()
+void TestSettingsDialog::clearSessionDeletesTheStoredSession()
 {
-    const QString path = WidgetStateSerializer::defaultProfilePath();
+    const QString path = StateFile::sessionFilePath();
     QDir().mkpath(QFileInfo(path).absolutePath());
 
     QFile file(path);
@@ -270,18 +270,18 @@ void TestSettingsDialog::clearProfileDeletesTheStoredProfile()
     TestEnvironment::ModalRecorder recorder;
     recorder.acceptConfirmation = true;
     recorder.start();
-    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearProfileClicked"));
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearSessionClicked"));
 
-    QVERIFY2(!QFile::exists(path), "the saved profile was not deleted");
+    QVERIFY2(!QFile::exists(path), "the saved session was not deleted");
     QVERIFY(recorder.messageBoxSeen);
-    QCOMPARE(recorder.title, QStringLiteral("Profile cleared"));
+    QCOMPARE(recorder.title, QStringLiteral("Session cleared"));
 }
 
 // The question is what stands between the button and the file: No leaves the
 // session where it is.
-void TestSettingsDialog::clearProfileKeepsTheFileWhenDeclined()
+void TestSettingsDialog::clearSessionKeepsTheFileWhenDeclined()
 {
-    const QString path = WidgetStateSerializer::defaultProfilePath();
+    const QString path = StateFile::sessionFilePath();
     QDir().mkpath(QFileInfo(path).absolutePath());
 
     QFile file(path);
@@ -294,9 +294,9 @@ void TestSettingsDialog::clearProfileKeepsTheFileWhenDeclined()
     // The recorder closes the box, which answers with No.
     TestEnvironment::ModalRecorder recorder;
     recorder.start();
-    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearProfileClicked"));
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearSessionClicked"));
 
-    QCOMPARE(recorder.title, QStringLiteral("Clear profile"));
+    QCOMPARE(recorder.title, QStringLiteral("Clear session"));
     QVERIFY(QFile::exists(path));
     QFile::remove(path);
 }
@@ -324,8 +324,8 @@ void TestSettingsDialog::showsWhereTheFilesAreStored()
     QVERIFY(!settingsFile.isEmpty());
     QVERIFY(dialog.ui->lineEdit_settings_path->text().contains(QFileInfo(settingsFile).fileName()));
 
-    const QString profileFile = WidgetStateSerializer::defaultProfilePath();
-    QVERIFY(dialog.ui->lineEdit_profile_path->text().contains(QFileInfo(profileFile).fileName()));
+    const QString sessionFile = StateFile::sessionFilePath();
+    QVERIFY(dialog.ui->lineEdit_session_path->text().contains(QFileInfo(sessionFile).fileName()));
 
     // Where the settings live in a file, there is a folder to open. The
     // registry on Windows has none.

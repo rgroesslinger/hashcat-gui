@@ -4,7 +4,6 @@
  */
 
 #include "widgetstateserializer.h"
-#include "appconstants.h"
 
 #include <QAbstractSpinBox>
 #include <QLineEdit>
@@ -17,8 +16,6 @@
 #include <QListWidgetItem>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QDir>
-#include <QStandardPaths>
 
 // Whether the entries of a combo box carry identifiers (item data) at all.
 // It decides whether a selection is stored by identifier or by position: the
@@ -58,12 +55,6 @@ static bool isApplicationWidget(const QWidget *widget)
 
 WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent)
 {
-}
-
-QString WidgetStateSerializer::defaultProfilePath()
-{
-    const QString dirPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    return QDir(dirPath).filePath(AppConstants::Files::DefaultProfile);
 }
 
 QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &ignoredWidgets)

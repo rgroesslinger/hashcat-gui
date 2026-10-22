@@ -32,6 +32,13 @@ class StateFile
     Q_DECLARE_TR_FUNCTIONS(StateFile)
 
 public:
+    // The file the application keeps its session in between two runs.
+    //
+    // The location comes from QStandardPaths::AppDataLocation, which the
+    // application name alone decides - the organization name is deliberately
+    // left unset, see main.cpp.
+    static QString sessionFilePath();
+
     // Writes the values into the file as the section of the given name.
     //
     // The file is replaced as a whole, not merged into: a section a previous

@@ -92,7 +92,7 @@ exception, it goes through `attackIndexChanged()`.
 
 ### Threading and async
 - Hash types load asynchronously from `hashcat --example-hashes --machine-readable`; the
-  hash combo is empty until the query returns. Profiles use `m_pendingHashTypeId` for this.
+  hash combo is empty until the query returns. Sessions use `m_pendingHashTypeId` for this.
 - Never block the GUI thread with a hashcat query.
 - `QSettings` is only reentrant: read it on the calling thread before handing work to
   `QtConcurrent`.
@@ -101,7 +101,9 @@ exception, it goes through `attackIndexChanged()`.
 - Turns a widget tree into a JSON object of values and back. The children it knows
   (`QLineEdit`, `QCheckBox`, `QComboBox`, `QRadioButton`, `QSpinBox`, `QDoubleSpinBox`,
   `QListWidget`) are addressed by `objectName`. The names are part of the session
-  format: renaming one breaks saved profiles and tests.
+  format: renaming one breaks saved sessions and tests.
+- The widgets Qt builds for itself are not part of the form: the editor of a spin box or
+  of an editable combo box is skipped, and so is a widget without a name of its own.
 - `applyToWidgets()` returns the names of the values that no widget claimed — the values
   of a file that was made by another version, or that was edited by hand — and the names of
   the values whose type the widget cannot take. The caller names both for the user.
@@ -121,9 +123,9 @@ exception, it goes through `attackIndexChanged()`.
   one. A combined file is an explicit write of all its sections, never a merge into an
   existing file, which would keep stale or foreign sections alive.
 - The names of the sections are constants (`AppConstants::FileSections`), never the name
-  of a class: the session file is named after its class today, so renaming that class
-  would orphan every profile that was ever written.
-- Each section has its own version (`AppConstants::Profiles::Version` for the session,
+  of a class: the section of the session used to be keyed by the class name, so renaming
+  that class would orphan every session that was ever written.
+- Each section has its own version (`AppConstants::Sessions::Version` for the session,
   `AppConstants::Settings::Version` for the settings), because the widget names and the
   setting keys change independently of each other. Bump the version of a section whenever
   one of its keys is renamed, not when one is added: an added key is reported by name.
@@ -145,7 +147,7 @@ exception, it goes through `attackIndexChanged()`.
 - The keys and the type of value each takes are one table (`SettingsKeys::All`); the
   export and the import read it, so a new setting is a new entry there.
 - Do not set `QCoreApplication`'s organization name: it changes
-  `QStandardPaths::AppDataLocation` and the default-profile path.
+  `QStandardPaths::AppDataLocation` and the session file path.
 
 ## Conventions
 

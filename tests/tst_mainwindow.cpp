@@ -94,7 +94,7 @@ void changeEveryValue(QWidget *root)
     }
 }
 
-// The profile file a serializer wrote, as the object it holds.
+// The session file a serializer wrote, as the object it holds.
 QJsonObject readJsonObject(const QString &filename)
 {
     QFile file(filename);
@@ -185,18 +185,18 @@ private slots:
     void commandPreviewCarriesTheBinaryName();
     void thePreviewTooltipHoldsTheWholeCommand();
     void copyingTheCommandPutsItOnTheClipboard();
-    void defaultProfileRoundTrips();
-    void turningTheSessionOffRemovesTheStoredProfile();
-    void profileHashTypeSurvivesTheAsynchronousQuery();
-    void profileWithAnUnknownHashTypeSelectsNothing();
+    void theSessionRoundTrips();
+    void turningTheSessionOffRemovesTheStoredSession();
+    void sessionHashTypeSurvivesTheAsynchronousQuery();
+    void sessionWithAnUnknownHashTypeSelectsNothing();
     void windowFitsItsContent();
     void commandBarStaysVisibleOnEveryTab();
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
     void theImportNamesTheValuesTheSessionDoesNotKnow();
-    void aNewerProfileIsRefused();
-    void anOlderProfileIsAppliedWithANote();
-    void aNewerStartupProfileIsLeftAlone();
+    void aNewerSessionIsRefused();
+    void anOlderSessionIsAppliedWithANote();
+    void aNewerStartupSessionIsLeftAlone();
     void theStartupShowsNoBox();
 
 private:
@@ -221,7 +221,7 @@ void TestMainWindow::init()
 
     // A deterministic starting point: no configured hashcat, no configured
     // terminal, long parameters, the session restored. Everything else comes
-    // from the fresh XDG directories, which hold no profile to load.
+    // from the fresh XDG directories, which hold no session to load.
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, QString());
     settings.setKey(AppConstants::SettingsKeys::Terminal, QString());
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
@@ -234,11 +234,11 @@ void TestMainWindow::cleanup()
 {
     m_watchdog.stop();
 
-    // The round-trip test writes a profile into the redirected data
+    // The round-trip test writes a session into the redirected data
     // directory, and that directory lives for the whole run: every later
     // window would silently load whatever was left there.
     QFile::remove(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                      .filePath(AppConstants::Files::DefaultProfile));
+                      .filePath(AppConstants::Files::SessionFile));
 
     auto &settings = SettingsManager::instance();
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, m_savedHashcatPath);
@@ -446,11 +446,11 @@ void TestMainWindow::resetFieldsRestoresEveryWidget()
     const QString resetFile = TestEnvironment::configHome().filePath(QStringLiteral("reset.json"));
     const QStringList ignored{AppConstants::Files::PreviewWidget};
     QVERIFY2(StateFile::write(freshFile, AppConstants::FileSections::Session,
-                              AppConstants::Profiles::Version,
+                              AppConstants::Sessions::Version,
                               WidgetStateSerializer::toJson(&fresh, ignored), &error),
              qPrintable(error));
     QVERIFY2(StateFile::write(resetFile, AppConstants::FileSections::Session,
-                              AppConstants::Profiles::Version,
+                              AppConstants::Sessions::Version,
                               WidgetStateSerializer::toJson(&window, ignored), &error),
              qPrintable(error));
 
@@ -1034,11 +1034,11 @@ void TestMainWindow::copyingTheCommandPutsItOnTheClipboard()
     QToolTip::hideText();
 }
 
-// The profile machinery as the application uses it: saveDefaultProfile() and
-// the loadDefaultProfile() every constructor runs. Pinned here, and nowhere
+// The session machinery as the application uses it: saveSession() and
+// the loadSession() every constructor runs. Pinned here, and nowhere
 // else: the command preview stays out of the file, and a new window starts
 // from the stored state.
-void TestMainWindow::defaultProfileRoundTrips()
+void TestMainWindow::theSessionRoundTrips()
 {
     // A failed save or load opens a modal warning; the watchdog must be
     // able to close it so the test fails instead of hanging until ctest's
@@ -1051,14 +1051,14 @@ void TestMainWindow::defaultProfileRoundTrips()
     MainWindow writer;
     writer.ui->comboBox_attack->setCurrentIndex(2); // brute-force, not the default straight
     writer.ui->spinBox_segment_size->setValue(64);  // not the default 32
-    writer.saveDefaultProfile();
+    writer.saveSession();
 
-    const QString profile = writer.defaultProfileFile();
-    QVERIFY(QFile::exists(profile));
+    const QString session = writer.sessionFile();
+    QVERIFY(QFile::exists(session));
 
     // What gets stored: the values of the session, and without the command
     // preview - that one is regenerated from the state on load.
-    QFile file(profile);
+    QFile file(session);
     QVERIFY(file.open(QIODevice::ReadOnly));
     const QJsonObject root = QJsonDocument::fromJson(file.readAll()).object();
     file.close();
@@ -1083,44 +1083,44 @@ void TestMainWindow::defaultProfileRoundTrips()
     // 0, 1, 3, 6, 7 and 9, and brute-force - the third entry - is id 3.
     QCOMPARE(state.value(QStringLiteral("comboBox_attack")).toInt(), 3);
 
-    // A new window runs loadDefaultProfile() in its constructor...
+    // A new window runs loadSession() in its constructor...
     MainWindow reloaded;
     QCOMPARE(reloaded.ui->comboBox_attack->currentIndex(), 2);
     QCOMPARE(reloaded.ui->spinBox_segment_size->value(), 64);
 
     // ...and the preview reflects the restored state, not the defaults the
-    // widgets held before the profile arrived.
+    // widgets held before the session arrived.
     QCOMPARE(reloaded.ui->lineEdit_command->text(),
              QStringLiteral("hashcat --attack-mode 3 --segment-size 64"));
 }
 
-// The session is stored only while it is wanted: the profile of an earlier
+// The session is stored only while it is wanted: the session of an earlier
 // run goes when the setting is off, so that it cannot come back as stale
 // state once the setting returns.
-void TestMainWindow::turningTheSessionOffRemovesTheStoredProfile()
+void TestMainWindow::turningTheSessionOffRemovesTheStoredSession()
 {
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, true);
 
     MainWindow writer;
-    writer.saveDefaultProfile();
-    const QString profile = writer.defaultProfileFile();
-    QVERIFY(QFile::exists(profile));
+    writer.saveSession();
+    const QString session = writer.sessionFile();
+    QVERIFY(QFile::exists(session));
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, false);
-    writer.saveDefaultProfile();
+    writer.saveSession();
 
-    QVERIFY(!QFile::exists(profile));
+    QVERIFY(!QFile::exists(session));
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, true);
 }
 
-// The constructor loads the profile while the hashcat query that fills
+// The constructor loads the session while the hashcat query that fills
 // comboBox_hash_type is still in flight: the combo has no items, so
 // setCurrentIndex() is a silent no-op and the stored id can only be
 // applied when the reply delivers the items.
-void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
+void TestMainWindow::sessionHashTypeSurvivesTheAsynchronousQuery()
 {
     const QString stub = TestEnvironment::writeShellStub(
-        QStringLiteral("stub-hashcat-profile"),
+        QStringLiteral("stub-hashcat-session"),
         "#!/bin/sh\n"
         "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
         "exit 0\n");
@@ -1132,15 +1132,15 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
-    // A profile that names the hash type 1000: the ids sort 0, 1000, so the
+    // A session that names the hash type 1000: the ids sort 0, 1000, so the
     // selection must land on NTLM and not on the first item the fill leaves.
     const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QVERIFY(QDir().mkpath(dir));
-    QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
-    QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"sections": {"session": )"
+    QFile session(QDir(dir).filePath(AppConstants::Files::SessionFile));
+    QVERIFY(session.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    session.write(R"({"sections": {"session": )"
                   R"({"version": 1, "values": {"comboBox_hash_type": 1000}}}})");
-    profile.close();
+    session.close();
 
     m_watchdog.start();
 
@@ -1156,10 +1156,10 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
     QCOMPARE(window.m_pendingHashTypeId, -1); // applied and consumed
 }
 
-// A profile that names a hash type this hashcat does not know. Selecting
+// A session that names a hash type this hashcat does not know. Selecting
 // another one would crack with the wrong algorithm, so nothing is selected
 // instead - and the command line asks for no hash type at all.
-void TestMainWindow::profileWithAnUnknownHashTypeSelectsNothing()
+void TestMainWindow::sessionWithAnUnknownHashTypeSelectsNothing()
 {
     const QString stub = TestEnvironment::writeShellStub(
         QStringLiteral("stub-hashcat-unknown"),
@@ -1176,11 +1176,11 @@ void TestMainWindow::profileWithAnUnknownHashTypeSelectsNothing()
 
     const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QVERIFY(QDir().mkpath(dir));
-    QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
-    QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"sections": {"session": )"
+    QFile session(QDir(dir).filePath(AppConstants::Files::SessionFile));
+    QVERIFY(session.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    session.write(R"({"sections": {"session": )"
                   R"({"version": 1, "values": {"comboBox_hash_type": 9999}}}})");
-    profile.close();
+    session.close();
 
     m_watchdog.start();
 
@@ -1337,7 +1337,7 @@ void TestMainWindow::commandBarStaysVisibleOnEveryTab()
     QVERIFY(preview->isVisible());
 }
 
-// The settings leave the application through the File menu, like the profile:
+// The settings leave the application through the File menu, like the session:
 // the file holds the settings that are in effect, in the shared format.
 void TestMainWindow::theSettingsAreExportedThroughTheFileMenu()
 {
@@ -1414,7 +1414,7 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
     values.insert(QStringLiteral("spinBox_segment_size"), 64);
     values.insert(QStringLiteral("aWidgetFromTheFuture"), QStringLiteral("something"));
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
-                             AppConstants::Profiles::Version, values, nullptr));
+                             AppConstants::Sessions::Version, values, nullptr));
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/opt/somewhere/hashcat"));
@@ -1435,14 +1435,14 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
 
 // A file with a newer format version is not applied at all: a value whose
 // name survived may mean something else there. The note names the version.
-void TestMainWindow::aNewerProfileIsRefused()
+void TestMainWindow::aNewerSessionIsRefused()
 {
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("newer.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_segment_size"), 64);
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
-                             AppConstants::Profiles::Version + 1, values, nullptr));
+                             AppConstants::Sessions::Version + 1, values, nullptr));
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/opt/somewhere/hashcat"));
@@ -1457,20 +1457,20 @@ void TestMainWindow::aNewerProfileIsRefused()
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Import failed"));
     QVERIFY(recorder.text.contains(
-        QStringLiteral("format version %1").arg(AppConstants::Profiles::Version + 1)));
+        QStringLiteral("format version %1").arg(AppConstants::Sessions::Version + 1)));
     QVERIFY(window.ui->spinBox_segment_size->value() != 64);
 }
 
 // A file an older version wrote is applied, and the note says why a value it
 // named may be missing.
-void TestMainWindow::anOlderProfileIsAppliedWithANote()
+void TestMainWindow::anOlderSessionIsAppliedWithANote()
 {
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("older.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_segment_size"), 64);
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
-                             AppConstants::Profiles::Version - 1, values, nullptr));
+                             AppConstants::Sessions::Version - 1, values, nullptr));
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/opt/somewhere/hashcat"));
@@ -1488,27 +1488,27 @@ void TestMainWindow::anOlderProfileIsAppliedWithANote()
     QVERIFY(recorder.text.contains(QStringLiteral("older version")));
 }
 
-// The profile the application restores at startup follows the same rule, and
+// The session the application restores at startup follows the same rule, and
 // the file of the newer format version is left in place for that version.
-void TestMainWindow::aNewerStartupProfileIsLeftAlone()
+void TestMainWindow::aNewerStartupSessionIsLeftAlone()
 {
-    const QString profile = WidgetStateSerializer::defaultProfilePath();
-    QVERIFY(QFileInfo(profile).dir().mkpath(QStringLiteral(".")));
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
 
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_segment_size"), 64);
-    QVERIFY(StateFile::write(profile, AppConstants::FileSections::Session,
-                             AppConstants::Profiles::Version + 1, values, nullptr));
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version + 1, values, nullptr));
 
     m_watchdog.start();
     MainWindow window;
 
     QCOMPARE(m_closedModals, 1);
     QVERIFY(window.ui->spinBox_segment_size->value() != 64);
-    QVERIFY(QFile::exists(profile));
+    QVERIFY(QFile::exists(session));
 }
 
-// The startup must be quiet. A profile the application wrote itself holds
+// The startup must be quiet. A session the application wrote itself holds
 // nothing it does not know, so no box may open - an empty one would be the
 // worst kind of noise.
 void TestMainWindow::theStartupShowsNoBox()
@@ -1520,17 +1520,17 @@ void TestMainWindow::theStartupShowsNoBox()
     QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
-    // A profile the application wrote itself.
+    // A session the application wrote itself.
     MainWindow writer;
     writer.ui->spinBox_segment_size->setValue(64);
-    writer.saveDefaultProfile();
+    writer.saveSession();
 
     m_watchdog.start();
     MainWindow reloaded;
 
     // The window opened without a box...
     QCOMPARE(m_closedModals, 0);
-    // ... and the profile was restored.
+    // ... and the session was restored.
     QCOMPARE(reloaded.ui->spinBox_segment_size->value(), 64);
 }
 

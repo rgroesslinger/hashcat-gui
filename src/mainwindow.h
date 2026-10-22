@@ -125,20 +125,20 @@ private:
     // Presents what HelperUtils::validateLaunch() reported
     void showLaunchError(HelperUtils::LaunchError error, const QString &detail);
 
-    QString defaultProfileFile() const;
+    QString sessionFile() const;
 
     // Whether the application keeps the session between two runs.
     bool restoreSessionEnabled() const;
 
-    void loadDefaultProfile();
-    void saveDefaultProfile();
+    void loadSession();
+    void saveSession();
 
-    // Queues the hash type a profile names until the list of hash types
+    // Queues the hash type a session names until the list of hash types
     // exists, and reports one this hashcat does not know.
     QString restoreHashType(const QJsonObject &state);
 
-    // Applies the hash type a profile asked for, now that the list of hash
-    // types exists. Returns a message when the profile names a hash type
+    // Applies the hash type a session asked for, now that the list of hash
+    // types exists. Returns a message when the session names a hash type
     // this hashcat does not know.
     QString applyPendingHashType();
 
@@ -150,9 +150,9 @@ private:
     // must not move or resize a window the user has placed themselves.
     bool m_sizedToContent = false;
 
-    // A profile can name a hash type while comboBox_hash_type still has no
+    // A session can name a hash type while comboBox_hash_type still has no
     // items - the list arrives with the asynchronous hashcat query, after the
-    // constructor has already loaded the profile. The stored id waits
+    // constructor has already loaded the session. The stored id waits
     // here and is applied once the items exist, see initHashAndAttackModes().
     int m_pendingHashTypeId = -1;
 };

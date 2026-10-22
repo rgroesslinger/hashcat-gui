@@ -8,7 +8,6 @@
 #include "settingsmanager.h"
 #include "helperutils.h"
 #include "statefile.h"
-#include "widgetstateserializer.h"
 #include "appconstants.h"
 #include <QDesktopServices>
 #include <QDir>
@@ -60,8 +59,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 
     connect(ui->pushButton_select_path, &QPushButton::clicked, this,
             &SettingsDialog::selectPathClicked);
-    connect(ui->pushButton_clear_profile, &QPushButton::clicked, this,
-            &SettingsDialog::clearProfileClicked);
+    connect(ui->pushButton_clear_session, &QPushButton::clicked, this,
+            &SettingsDialog::clearSessionClicked);
     connect(ui->pushButton_open_folder, &QPushButton::clicked, this,
             &SettingsDialog::openFolderClicked);
     connect(ui->pushButton_save, &QPushButton::clicked, this, &SettingsDialog::saveClicked);
@@ -158,7 +157,7 @@ void SettingsDialog::readSettings()
 void SettingsDialog::updatePathLabels()
 {
     const QString settingsFile = SettingsManager::instance().fileName();
-    const QString profileFile = WidgetStateSerializer::defaultProfilePath();
+    const QString sessionFile = StateFile::sessionFilePath();
 
     // The settings live in a file on most systems and in the registry on
     // Windows - where there is no folder to open.
@@ -167,7 +166,7 @@ void SettingsDialog::updatePathLabels()
     ui->pushButton_open_folder->setEnabled(!m_settingsFolder.isEmpty());
 
     ui->lineEdit_settings_path->setText(shortenPath(settingsFile));
-    ui->lineEdit_profile_path->setText(shortenPath(profileFile));
+    ui->lineEdit_session_path->setText(shortenPath(sessionFile));
 }
 
 // The home directory as a tilde.
@@ -405,22 +404,22 @@ void SettingsDialog::cancelClicked()
     close();
 }
 
-// Removes the profile the application stored at the last run.
+// Removes the session the application stored at the last run.
 //
 // The button is not a setting, so it acts right away and not on Save - but
 // only after asking: the file is the whole session of the last run.
-void SettingsDialog::clearProfileClicked()
+void SettingsDialog::clearSessionClicked()
 {
-    const QString path = WidgetStateSerializer::defaultProfilePath();
+    const QString path = StateFile::sessionFilePath();
 
     if (!QFile::exists(path)) {
-        QMessageBox::information(this, tr("No saved profile"),
-                                 tr("There is no saved profile to clear."));
+        QMessageBox::information(this, tr("No saved session"),
+                                 tr("There is no saved session to clear."));
         return;
     }
 
     const QMessageBox::StandardButton answer =
-        QMessageBox::question(this, tr("Clear profile"), tr("Delete the saved session?"),
+        QMessageBox::question(this, tr("Clear session"), tr("Delete the saved session?"),
                               QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (answer != QMessageBox::Yes) {
         return;
@@ -428,17 +427,17 @@ void SettingsDialog::clearProfileClicked()
 
     if (!QFile::remove(path)) {
         QMessageBox::warning(this, tr("Clear failed"),
-                             tr("The saved profile could not be deleted."));
+                             tr("The saved session could not be deleted."));
         return;
     }
 
     QStringList notes;
-    notes << tr("The saved profile has been deleted.");
+    notes << tr("The saved session has been deleted.");
     if (ui->checkBox_restore_session->isChecked()) {
-        // The setting is not saved yet, so the profile is written again
+        // The setting is not saved yet, so the session is written again
         // unless the user turns the setting off before saving.
         notes << tr("It is written again when hashcat-gui exits.");
     }
 
-    QMessageBox::information(this, tr("Profile cleared"), notes.join(QLatin1Char('\n')));
+    QMessageBox::information(this, tr("Session cleared"), notes.join(QLatin1Char('\n')));
 }

@@ -19,13 +19,6 @@ class WidgetStateSerializer : public QObject
 public:
     explicit WidgetStateSerializer(QObject *parent = nullptr);
 
-    // The file the application keeps its state in between two runs.
-    //
-    // The location comes from QStandardPaths::AppDataLocation, which the
-    // application name alone decides - the organization name is deliberately
-    // left unset, see main.cpp.
-    static QString defaultProfilePath();
-
     // The widget state as a JSON object; the object names are the keys.
     //
     // The ignored widgets are left out: they hold something transient, like

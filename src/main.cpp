@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     // The organization name is deliberately left unset: QSettings passes the
     // application name as its organization, and setting QCoreApplication's
     // organization in addition would change QStandardPaths::AppDataLocation
-    // (and with it the location of the default profile)
+    // (and with it the location of the session file)
     a.setApplicationName(QStringLiteral("hashcat-gui"));
     a.setApplicationVersion(QStringLiteral(HASHCAT_GUI_VERSION));
 
