@@ -365,11 +365,20 @@ void TestSettingsDialog::shortenPathOnlyShortensTheHomeDirectory()
 {
     const QString home = QDir::homePath();
 
+#ifdef Q_OS_WIN
+    // On Windows a leading "~" is not usable, so the path is left as it is.
+    QCOMPARE(SettingsDialog::shortenPath(home), home);
+    QCOMPARE(SettingsDialog::shortenPath(home + QStringLiteral("/.config/hashcat-gui")),
+             home + QStringLiteral("/.config/hashcat-gui"));
+    QCOMPARE(SettingsDialog::shortenPath(home + QStringLiteral("Other/x")),
+             home + QStringLiteral("Other/x"));
+#else
     QCOMPARE(SettingsDialog::shortenPath(home), QStringLiteral("~"));
     QCOMPARE(SettingsDialog::shortenPath(home + QStringLiteral("/.config/hashcat-gui")),
              QStringLiteral("~/.config/hashcat-gui"));
     QCOMPARE(SettingsDialog::shortenPath(home + QStringLiteral("Other/x")),
              home + QStringLiteral("Other/x"));
+#endif
 }
 
 // The dialog says where it keeps the settings and the session, so the user
