@@ -7,6 +7,7 @@
 #define TESTENVIRONMENT_H
 
 #include <QApplication>
+#include <QAbstractButton>
 #include <QCoreApplication>
 #include <QDialog>
 #include <QFile>
@@ -105,6 +106,10 @@ public:
     // test can cover the path that ends in Save.
     bool saveSettingsDialog = false;
 
+    // Clicks Yes on a message box that has one. A box without it - the
+    // information that follows a confirmation, say - is still closed.
+    bool acceptConfirmation = false;
+
     bool messageBoxSeen = false;
     QString title;
     QString text;
@@ -122,6 +127,12 @@ public:
                 messageBoxSeen = true;
                 title = box->windowTitle();
                 text = box->text();
+                if (acceptConfirmation) {
+                    if (QAbstractButton *yes = box->button(QMessageBox::Yes)) {
+                        yes->click();
+                        return;
+                    }
+                }
                 box->close();
             } else if (auto *fileDialog = qobject_cast<QFileDialog *>(modal)) {
                 if (pickFile.isEmpty()) {

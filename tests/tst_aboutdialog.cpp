@@ -27,6 +27,7 @@ private slots:
     void longVersionTextWrapsInsteadOfWidening();
     void groupBoxesShareOneTitleAlignment();
     void showsTheLogoAndTheApplicationName();
+    void versionLabelShowsPlainText();
     void showsTheToolkitAndTheOperatingSystem();
     void linksToTheProjectAndToHashcat();
     void namesTheLicenseOfTheApplication();
@@ -91,10 +92,13 @@ void TestAboutDialog::showsTheLogoAndTheApplicationName()
 
     QLabel *logo = dialog.findChild<QLabel *>(QStringLiteral("label_logo"));
     QVERIFY(logo);
-    QVERIFY2(!logo->pixmap().isNull(), "the logo is missing from the dialog");
-    // The artwork is scaled down into the space the .ui gives it.
-    QVERIFY(logo->pixmap().width() <= logo->width());
-    QVERIFY(logo->pixmap().height() <= logo->height());
+    const QPixmap pixmap = logo->pixmap();
+    QVERIFY2(!pixmap.isNull(), "the logo is missing from the dialog");
+    // The artwork is scaled down into the space the .ui gives it, and the
+    // pixmap carries the ratio so that it stays sharp on a high-dpi display.
+    QVERIFY(pixmap.deviceIndependentSize().width() <= logo->width());
+    QVERIFY(pixmap.deviceIndependentSize().height() <= logo->height());
+    QCOMPARE(pixmap.devicePixelRatio(), dialog.devicePixelRatioF());
 
     QLabel *name = dialog.findChild<QLabel *>(QStringLiteral("label_app_name"));
     QVERIFY(name);
@@ -103,6 +107,17 @@ void TestAboutDialog::showsTheLogoAndTheApplicationName()
     QLabel *description = dialog.findChild<QLabel *>(QStringLiteral("label_app_description"));
     QVERIFY(description);
     QVERIFY(!description->text().isEmpty());
+}
+
+// hashcat's answer is not markup: a message with "<" in it is shown as typed
+// instead of disappearing as if it were a tag.
+void TestAboutDialog::versionLabelShowsPlainText()
+{
+    AboutDialog dialog;
+
+    QLabel *version = dialog.findChild<QLabel *>(QStringLiteral("label_hc_version"));
+    QVERIFY(version);
+    QCOMPARE(version->textFormat(), Qt::PlainText);
 }
 
 // The toolkit and the system underneath it are part of what a bug report

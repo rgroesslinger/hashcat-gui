@@ -31,6 +31,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QStandardPaths>
+#include <QTextDocument>
 #include <QToolTip>
 
 #if defined(Q_OS_WIN)
@@ -64,8 +65,10 @@ void activateLayouts(QWidget *widget)
 // width its text control happens to have and grows tall instead, while a
 // plain text one keeps the line breaks it is given.
 //
-// A path that contains something like "<b>" is read as a tag and mangles the
-// display - rare enough to accept.
+// A path that contains something like "<b>" would be read as a tag and
+// mangle the display, so a command that looks like markup is escaped and its
+// breaks become <br>: the rare case loses the plain-text width, but keeps the
+// text.
 QString commandTooltip(const QString &command)
 {
     if (command.isEmpty()) {
@@ -89,7 +92,13 @@ QString commandTooltip(const QString &command)
     if (!line.isEmpty()) {
         lines << line;
     }
-    return lines.join(QLatin1Char('\n'));
+
+    QString text = lines.join(QLatin1Char('\n'));
+    if (!Qt::mightBeRichText(text)) {
+        return text;
+    }
+
+    return text.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
 }
 
 // Where a file dialog for an export starts: a folder the user knows, with the
@@ -857,8 +866,10 @@ QString MainWindow::applyPendingHashType()
 void MainWindow::saveDefaultProfile()
 {
     // Without the setting there is nothing to restore, so nothing is stored
-    // either - a profile that is never read would only be a leftover.
+    // either. The profile of an earlier run goes with it: it would come back
+    // as stale state once the setting is switched on again.
     if (!restoreSessionEnabled()) {
+        QFile::remove(defaultProfileFile());
         return;
     }
 

@@ -93,19 +93,27 @@ QString wrapText(const QString &text, const QFont &font, int width)
 AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
+
+    // hashcat's answer is not markup: a path or an error with "<" in it would
+    // be read as a tag and disappear from the label.
+    ui->label_hc_version->setTextFormat(Qt::PlainText);
+
     updateVersionLabel();
     updateSystemLabels();
     updateLinks();
     updateLicense();
 
-    // The logo is scaled to the size the .ui gives the label, so the artwork
-    // stays sharp on a high-dpi display without the .ui having to know about
-    // the device pixel ratio.
+    // The logo is scaled to the size the .ui gives the label, in device
+    // pixels, so the artwork stays sharp on a high-dpi display without the
+    // .ui having to know about the device pixel ratio.
     const QSize logoSize = ui->label_logo->minimumSize();
+    const qreal ratio = devicePixelRatioF();
     const QPixmap logo(logoPath());
     if (!logo.isNull()) {
-        ui->label_logo->setPixmap(
-            logo.scaled(logoSize, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        QPixmap scaled =
+            logo.scaled(logoSize * ratio, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        scaled.setDevicePixelRatio(ratio);
+        ui->label_logo->setPixmap(scaled);
     }
     ui->label_logo->setAlignment(Qt::AlignCenter);
 
@@ -173,6 +181,10 @@ QString AboutDialog::detailsText() const
         SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     if (hashcatPath.isEmpty()) {
         details << QStringLiteral("hashcat: not configured");
+    } else if (m_hashcatVersion.isEmpty()) {
+        // The query is still on its way, or it failed: there is no version to
+        // report, and the error is not one.
+        details << QStringLiteral("hashcat: version unknown (%1)").arg(hashcatPath);
     } else {
         details << QStringLiteral("hashcat %1 (%2)").arg(m_hashcatVersion, hashcatPath);
     }
@@ -225,7 +237,7 @@ void AboutDialog::updateVersionLabel()
             const HashcatResult &result = watcher->result();
 
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                setVersionText(tr("Error: %1").arg(result.standardError.simplified()));
+                setVersionError(result.standardError.simplified());
             } else {
                 setVersionText(result.standardOutput.simplified());
             }
@@ -240,15 +252,26 @@ void AboutDialog::updateVersionLabel()
     ui->label_hc_gui_version->setText(QApplication::applicationVersion());
 }
 
-// Shows the version of hashcat, or the error it answered with.
-//
-// The text is wrapped before it goes into the label, because the label
-// neither breaks words that are longer than its line nor tells its layout
-// how tall the wrapped text is.
+// Shows the version of hashcat.
 void AboutDialog::setVersionText(const QString &text)
 {
     m_hashcatVersion = text;
+    setVersionLabel(text);
+}
 
+// The error hashcat answered with: it goes into the label, not into the
+// version the details report.
+void AboutDialog::setVersionError(const QString &error)
+{
+    m_hashcatVersion.clear();
+    setVersionLabel(tr("Error: %1").arg(error));
+}
+
+// The text is wrapped before it goes into the label, because the label
+// neither breaks words that are longer than its line nor tells its layout
+// how tall the wrapped text is.
+void AboutDialog::setVersionLabel(const QString &text)
+{
     // The label has a fixed width, so the text is wrapped at the width it
     // will be shown in.
     const int width = ui->label_hc_version->minimumWidth();

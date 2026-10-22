@@ -171,13 +171,20 @@ void SettingsDialog::updatePathLabels()
 }
 
 // The home directory as a tilde.
+//
+// Only a path inside the home directory is one: /home/alice-other is not
+// /home/alice, and shortening it would make it look as if it were.
 QString SettingsDialog::shortenPath(const QString &path)
 {
     const QString home = QDir::homePath();
-    if (!home.isEmpty() && path.startsWith(home)) {
-        return QLatin1Char('~') + path.mid(home.length());
+    if (home.isEmpty() || !path.startsWith(home)) {
+        return path;
     }
-    return path;
+    if (path.size() > home.size() && path.at(home.size()) != QLatin1Char('/')) {
+        return path;
+    }
+
+    return QLatin1Char('~') + path.mid(home.size());
 }
 
 // Opens the folder the settings are stored in.
@@ -400,7 +407,8 @@ void SettingsDialog::cancelClicked()
 
 // Removes the profile the application stored at the last run.
 //
-// The button is not a setting, so it acts right away and not on Save.
+// The button is not a setting, so it acts right away and not on Save - but
+// only after asking: the file is the whole session of the last run.
 void SettingsDialog::clearProfileClicked()
 {
     const QString path = WidgetStateSerializer::defaultProfilePath();
@@ -408,6 +416,13 @@ void SettingsDialog::clearProfileClicked()
     if (!QFile::exists(path)) {
         QMessageBox::information(this, tr("No saved profile"),
                                  tr("There is no saved profile to clear."));
+        return;
+    }
+
+    const QMessageBox::StandardButton answer =
+        QMessageBox::question(this, tr("Clear profile"), tr("Delete the saved session?"),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (answer != QMessageBox::Yes) {
         return;
     }
 

@@ -14,7 +14,7 @@
 - **Session**: The last session is restored at startup only when asked for, and the saved profile can be cleared from the settings
 - **Settings**: Show where the settings and the session are stored, and add a shortcut to open the folder of the settings
 - **Settings**: The settings can be exported to a file and imported again
-- **Color scheme**: The application can follow the desktop, or use a light or a dark appearance of its own
+- **Color scheme**: The application can follow the desktop, or use a light or a dark appearance of its own where the platform supports it
 - Decoupled business logic from UI for better maintainability and testability
 - Refactored default values, help tables, and magic numbers in `src/appconstants.h` (#10)
 - Hardened UTF-8 and string handling by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`

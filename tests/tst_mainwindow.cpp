@@ -186,6 +186,7 @@ private slots:
     void thePreviewTooltipHoldsTheWholeCommand();
     void copyingTheCommandPutsItOnTheClipboard();
     void defaultProfileRoundTrips();
+    void turningTheSessionOffRemovesTheStoredProfile();
     void profileHashTypeSurvivesTheAsynchronousQuery();
     void profileWithAnUnknownHashTypeSelectsNothing();
     void windowFitsItsContent();
@@ -202,6 +203,7 @@ private:
     QString m_savedHashcatPath;
     QString m_savedTerminal;
     bool m_savedShortParameters = false;
+    bool m_savedRestoreSession = true;
     // The modals the watchdog had to close: a test that expects none.
     int m_closedModals = 0;
     QTimer m_watchdog;
@@ -215,13 +217,15 @@ void TestMainWindow::init()
     m_savedHashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     m_savedTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
     m_savedShortParameters = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
+    m_savedRestoreSession = settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true);
 
     // A deterministic starting point: no configured hashcat, no configured
-    // terminal, long parameters. Everything else comes from the fresh XDG
-    // directories, which hold no profile to load.
+    // terminal, long parameters, the session restored. Everything else comes
+    // from the fresh XDG directories, which hold no profile to load.
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, QString());
     settings.setKey(AppConstants::SettingsKeys::Terminal, QString());
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
+    settings.setKey(AppConstants::SettingsKeys::RestoreSession, true);
 
     m_closedModals = 0;
 }
@@ -240,6 +244,7 @@ void TestMainWindow::cleanup()
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, m_savedHashcatPath);
     settings.setKey(AppConstants::SettingsKeys::Terminal, m_savedTerminal);
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, m_savedShortParameters);
+    settings.setKey(AppConstants::SettingsKeys::RestoreSession, m_savedRestoreSession);
 }
 
 void TestMainWindow::freshWindowMatchesTheDefaultOptions()
@@ -989,18 +994,26 @@ void TestMainWindow::thePreviewTooltipHoldsTheWholeCommand()
     const QString command = window.ui->lineEdit_command->text();
     const QString tooltip = window.ui->lineEdit_command->toolTip();
 
-    // Every part of the command is in the tooltip.
+    // Every part of the command is in the tooltip. The path that looks like a
+    // tag is escaped, so that it is shown as typed.
     const QStringList parts = command.split(QLatin1Char(' '));
     for (const QString &part : std::as_const(parts)) {
-        QVERIFY2(tooltip.contains(part),
+        QVERIFY2(tooltip.contains(part.toHtmlEscaped()),
                  qPrintable(QStringLiteral("the tooltip does not hold \"%1\"").arg(part)));
     }
 
-    // The tooltip is plain text: the command is in it as it is.
-    QVERIFY(tooltip.contains(QStringLiteral("/tmp/<b>out</b>.txt")));
+    QVERIFY(tooltip.contains(QStringLiteral("&lt;b&gt;out&lt;/b&gt;.txt")));
 
-    // A command this long is broken into several lines.
-    QVERIFY(tooltip.contains(QLatin1Char('\n')));
+    // A command that looks like markup becomes rich text, where a line break
+    // has to be explicit.
+    QVERIFY(tooltip.contains(QStringLiteral("<br>")));
+
+    // Without markup the tooltip stays plain text and keeps its line breaks.
+    window.ui->lineEdit_outfile->setText(QStringLiteral("/tmp/out.txt"));
+    const QString plainTooltip = window.ui->lineEdit_command->toolTip();
+    QVERIFY(plainTooltip.contains(QStringLiteral("/tmp/out.txt")));
+    QVERIFY(plainTooltip.contains(QLatin1Char('\n')));
+    QVERIFY(!plainTooltip.contains(QStringLiteral("<br>")));
 }
 
 // Copying puts the command on the clipboard and says that it did.
@@ -1071,6 +1084,25 @@ void TestMainWindow::defaultProfileRoundTrips()
     // widgets held before the profile arrived.
     QCOMPARE(reloaded.ui->lineEdit_command->text(),
              QStringLiteral("hashcat --attack-mode 3 --segment-size 64"));
+}
+
+// The session is stored only while it is wanted: the profile of an earlier
+// run goes when the setting is off, so that it cannot come back as stale
+// state once the setting returns.
+void TestMainWindow::turningTheSessionOffRemovesTheStoredProfile()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, true);
+
+    MainWindow writer;
+    writer.saveDefaultProfile();
+    const QString profile = writer.defaultProfileFile();
+    QVERIFY(QFile::exists(profile));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, false);
+    writer.saveDefaultProfile();
+
+    QVERIFY(!QFile::exists(profile));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, true);
 }
 
 // The constructor loads the profile while the hashcat query that fills

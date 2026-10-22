@@ -42,6 +42,8 @@ private slots:
     void selectPathClickedRejectsAPlainFile();
     void restoreSessionFollowsTheSetting();
     void clearProfileDeletesTheStoredProfile();
+    void clearProfileKeepsTheFileWhenDeclined();
+    void shortenPathOnlyShortensTheHomeDirectory();
     void showsWhereTheFilesAreStored();
     void savedSettingsHoldTheKnownSettings();
     void savedSettingsCoverEveryKnownKey();
@@ -58,6 +60,7 @@ private:
     QString m_savedHashcatPath;
     QString m_savedTerminal;
     QString m_savedLanguage;
+    QString m_savedColorScheme;
     bool m_savedShortParameters = false;
     bool m_savedRestoreSession = true;
 };
@@ -70,15 +73,18 @@ void TestSettingsDialog::init()
     m_savedHashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     m_savedTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
     m_savedLanguage = settings.getKey<QString>(AppConstants::SettingsKeys::Language);
+    m_savedColorScheme = settings.getKey<QString>(AppConstants::SettingsKeys::ColorScheme);
     m_savedShortParameters = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
     m_savedRestoreSession = settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true);
 
-    // A fresh install: nothing configured, system default language. Each
-    // test then stores what it needs on top of this.
+    // A fresh install: nothing configured, system default language, the
+    // system color scheme, the session restored. Each test then stores what
+    // it needs on top of this.
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, QString());
     settings.setKey(AppConstants::SettingsKeys::Terminal, QString());
     settings.setKey(AppConstants::SettingsKeys::Language,
                     QString::fromUtf8(AppConstants::Languages::Default));
+    settings.setKey(AppConstants::SettingsKeys::ColorScheme, QString());
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
     settings.setKey(AppConstants::SettingsKeys::RestoreSession, true);
 }
@@ -91,9 +97,10 @@ void TestSettingsDialog::cleanup()
     settings.setKey(AppConstants::SettingsKeys::Language, m_savedLanguage);
     settings.setKey(AppConstants::SettingsKeys::UseShortParameters, m_savedShortParameters);
     settings.setKey(AppConstants::SettingsKeys::RestoreSession, m_savedRestoreSession);
-    // The color scheme is a property of the whole application, so it goes
-    // back to the system default.
-    HelperUtils::applyColorScheme(QString());
+    settings.setKey(AppConstants::SettingsKeys::ColorScheme, m_savedColorScheme);
+    // The scheme is a property of the whole application, so it returns to
+    // what the user had as well.
+    HelperUtils::applyColorScheme(m_savedColorScheme);
 }
 
 // System default plus one row per catalog, each shown in its own language
@@ -245,8 +252,8 @@ void TestSettingsDialog::restoreSessionFollowsTheSetting()
              true);
 }
 
-// The button that clears the saved profile removes the file the application
-// stores its state in, and says that it did.
+// The button that clears the saved profile asks first, then removes the file
+// the application stores its state in, and says that it did.
 void TestSettingsDialog::clearProfileDeletesTheStoredProfile()
 {
     const QString path = WidgetStateSerializer::defaultProfilePath();
@@ -261,12 +268,50 @@ void TestSettingsDialog::clearProfileDeletesTheStoredProfile()
     SettingsDialog dialog;
 
     TestEnvironment::ModalRecorder recorder;
+    recorder.acceptConfirmation = true;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&dialog, "clearProfileClicked"));
 
     QVERIFY2(!QFile::exists(path), "the saved profile was not deleted");
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Profile cleared"));
+}
+
+// The question is what stands between the button and the file: No leaves the
+// session where it is.
+void TestSettingsDialog::clearProfileKeepsTheFileWhenDeclined()
+{
+    const QString path = WidgetStateSerializer::defaultProfilePath();
+    QDir().mkpath(QFileInfo(path).absolutePath());
+
+    QFile file(path);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    file.write("{}");
+    file.close();
+
+    SettingsDialog dialog;
+
+    // The recorder closes the box, which answers with No.
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearProfileClicked"));
+
+    QCOMPARE(recorder.title, QStringLiteral("Clear profile"));
+    QVERIFY(QFile::exists(path));
+    QFile::remove(path);
+}
+
+// Only a path inside the home directory gets the tilde: a sibling folder
+// whose name begins with the same letters is not in it.
+void TestSettingsDialog::shortenPathOnlyShortensTheHomeDirectory()
+{
+    const QString home = QDir::homePath();
+
+    QCOMPARE(SettingsDialog::shortenPath(home), QStringLiteral("~"));
+    QCOMPARE(SettingsDialog::shortenPath(home + QStringLiteral("/.config/hashcat-gui")),
+             QStringLiteral("~/.config/hashcat-gui"));
+    QCOMPARE(SettingsDialog::shortenPath(home + QStringLiteral("Other/x")),
+             home + QStringLiteral("Other/x"));
 }
 
 // The dialog says where it keeps the settings and the session, so the user

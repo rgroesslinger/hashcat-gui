@@ -22,9 +22,8 @@ public:
     ~AboutDialog() override;
     void updateVersionLabel();
 
-    // Shows the version of hashcat, or the error it answered with. The text
-    // is wrapped, so a long message grows the dialog instead of being cut
-    // off.
+    // Shows the version of hashcat. The text is wrapped, so a long message
+    // grows the dialog instead of being cut off.
     void setVersionText(const QString &text);
 
 protected:
@@ -45,14 +44,21 @@ private:
     // Fills the row of links to the project and to hashcat.
     void updateLinks();
 
-    // Fills the row with the licenses of the application and of hashcat.
+    // Fills the row with the license of the application.
     void updateLicense();
+
+    // Shows the error hashcat answered with in place of the version.
+    void setVersionError(const QString &error);
+
+    // Wraps the text into the label at the width the label shows.
+    void setVersionLabel(const QString &text);
 
     // What a bug report needs: the versions and the hashcat in use.
     QString detailsText() const;
 
-    // The version of hashcat, or the error it answered with. The label
-    // shows it wrapped, this keeps the text as it is.
+    // The version of hashcat - empty while the query is in flight and after
+    // an error. The label shows the version or the error wrapped; this keeps
+    // the version as it is.
     QString m_hashcatVersion;
 
     // The dialog is fitted to its content once, on the first show.
