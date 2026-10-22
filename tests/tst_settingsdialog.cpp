@@ -44,6 +44,8 @@ private slots:
     void clearProfileDeletesTheStoredProfile();
     void showsWhereTheFilesAreStored();
     void savedSettingsHoldTheKnownSettings();
+    void savedSettingsCoverEveryKnownKey();
+    void everyKnownKeyIsTypeChecked();
     void importSettingsFillsTheDialog();
     void importSettingsAppliesEmptyValues();
     void importSettingsNamesTheUnknownKeys();
@@ -304,6 +306,43 @@ void TestSettingsDialog::savedSettingsHoldTheKnownSettings()
     QVERIFY(stored.contains(QStringLiteral("restoreSession")));
     QVERIFY(stored.contains(QStringLiteral("language")));
     QVERIFY(stored.contains(QStringLiteral("colorScheme")));
+}
+
+// Every key of the table reaches the export. Adding a setting means adding an
+// entry there; the export has to follow it, not a second list.
+void TestSettingsDialog::savedSettingsCoverEveryKnownKey()
+{
+    QStringList exportedKeys = SettingsDialog::savedSettings().keys();
+    exportedKeys.sort();
+
+    QStringList knownKeys;
+    for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
+        knownKeys << QString(entry.key);
+    }
+    knownKeys.sort();
+
+    QCOMPARE(exportedKeys, knownKeys);
+}
+
+// Every key of the table is checked against its type before it is applied: a
+// file that gives all of them a value of the wrong type names all of them.
+void TestSettingsDialog::everyKnownKeyIsTypeChecked()
+{
+    QJsonObject stored;
+    for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
+        const QJsonValue wrong = entry.type == AppConstants::SettingsKeys::Type::Boolean
+                                     ? QJsonValue(QStringLiteral("true"))
+                                     : QJsonValue(true);
+        stored.insert(QString(entry.key), wrong);
+    }
+
+    SettingsDialog dialog;
+    const QStringList notes = dialog.applyImportedSettings(stored);
+
+    QCOMPARE(notes.size(), 1);
+    for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
+        QVERIFY2(notes.first().contains(QString(entry.key)), qPrintable(notes.first()));
+    }
 }
 
 // The import fills the dialog with the settings of a file. They are not

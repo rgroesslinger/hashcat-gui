@@ -29,12 +29,20 @@ namespace
 // setting would keep what it has, and the file is reported.
 bool hasExpectedType(QLatin1StringView key, const QJsonValue &value)
 {
-    if (key == AppConstants::SettingsKeys::UseShortParameters
-        || key == AppConstants::SettingsKeys::RestoreSession) {
-        return value.isBool();
+    for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
+        if (entry.key != key) {
+            continue;
+        }
+
+        switch (entry.type) {
+        case AppConstants::SettingsKeys::Type::Boolean:
+            return value.isBool();
+        case AppConstants::SettingsKeys::Type::String:
+            return value.isString();
+        }
     }
 
-    return value.isString();
+    return false;
 }
 } // namespace
 
@@ -191,18 +199,21 @@ QJsonObject SettingsDialog::savedSettings()
     auto &settings = SettingsManager::instance();
 
     QJsonObject stored;
-    stored.insert(AppConstants::SettingsKeys::HashcatPath,
-                  settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
-    stored.insert(AppConstants::SettingsKeys::Terminal,
-                  settings.getKey<QString>(AppConstants::SettingsKeys::Terminal));
-    stored.insert(AppConstants::SettingsKeys::UseShortParameters,
-                  settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters));
-    stored.insert(AppConstants::SettingsKeys::RestoreSession,
-                  settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true));
-    stored.insert(AppConstants::SettingsKeys::Language,
-                  settings.getKey<QString>(AppConstants::SettingsKeys::Language));
-    stored.insert(AppConstants::SettingsKeys::ColorScheme,
-                  settings.getKey<QString>(AppConstants::SettingsKeys::ColorScheme));
+    for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
+        const QString key = QString(entry.key);
+        switch (entry.type) {
+        case AppConstants::SettingsKeys::Type::Boolean: {
+            // Restoring the session is what a fresh install does; every other
+            // flag starts out off.
+            const bool defaultValue = entry.key == AppConstants::SettingsKeys::RestoreSession;
+            stored.insert(key, settings.getKey<bool>(key, defaultValue));
+            break;
+        }
+        case AppConstants::SettingsKeys::Type::String:
+            stored.insert(key, settings.getKey<QString>(key));
+            break;
+        }
+    }
 
     return stored;
 }
@@ -308,9 +319,11 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
     // that a file with many of them stays readable.
     const QStringList keys = settings.keys();
     for (const QString &key : keys) {
-        const bool known = std::any_of(
-            std::begin(AppConstants::SettingsKeys::All), std::end(AppConstants::SettingsKeys::All),
-            [&key](QLatin1StringView candidate) { return QString(candidate) == key; });
+        const bool known = std::any_of(std::begin(AppConstants::SettingsKeys::All),
+                                       std::end(AppConstants::SettingsKeys::All),
+                                       [&key](const AppConstants::SettingsKeys::Entry &entry) {
+                                           return QString(entry.key) == key;
+                                       });
         if (!known) {
             unknownKeys << key;
         }

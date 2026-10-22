@@ -142,6 +142,8 @@ exception, it goes through `attackIndexChanged()`.
 - `QSettings::NativeFormat` under the application name; keys go in `AppConstants::SettingsKeys`.
 - The settings export is a snapshot of the stored values: `SettingsDialog::savedSettings()`
   is static and reads `QSettings`, so it does not depend on a dialog being open.
+- The keys and the type of value each takes are one table (`SettingsKeys::All`); the
+  export and the import read it, so a new setting is a new entry there.
 - Do not set `QCoreApplication`'s organization name: it changes
   `QStandardPaths::AppDataLocation` and the default-profile path.
 

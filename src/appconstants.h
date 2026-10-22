@@ -33,11 +33,25 @@ inline constexpr QLatin1StringView ColorScheme{"colorScheme"};
 // Locale code of the UI language, see the Languages namespace below.
 inline constexpr QLatin1StringView Language{"language"};
 
-// Every key the settings are made of, in the order they are written. The
-// import needs the list to tell the keys it does not know from the ones it
-// applies.
-inline constexpr QLatin1StringView All[] = {
-    HashcatPath, Terminal, UseShortParameters, RestoreSession, ColorScheme, Language,
+// The type of value a stored setting takes. The import checks a value against
+// the type of its key before it applies it.
+enum class Type : quint8 {
+    String,
+    Boolean,
+};
+
+struct Entry {
+    QLatin1StringView key;
+    Type type;
+};
+
+// Every key the settings are made of, with the type of value it takes. The
+// export and the import both read this table, so a new setting is one entry
+// here; the tests then say what else is missing.
+inline constexpr Entry All[] = {
+    {HashcatPath, Type::String},         {Terminal, Type::String},
+    {UseShortParameters, Type::Boolean}, {RestoreSession, Type::Boolean},
+    {ColorScheme, Type::String},         {Language, Type::String},
 };
 } // namespace SettingsKeys
 
