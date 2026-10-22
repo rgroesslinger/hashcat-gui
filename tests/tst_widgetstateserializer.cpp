@@ -32,6 +32,8 @@ private slots:
     void nonAsciiValuesSurviveTheValues();
     void ignoredWidgetsAreNotSaved();
     void ignoredWidgetsAreNotRestored();
+    void theEditorsOfTheSpinBoxesAreNotSaved();
+    void theEditorsOfTheSpinBoxesAreNotRestored();
     void aValueNoWidgetClaimedIsReported();
     void aValueOfTheWrongTypeIsNotApplied();
     void theInputIsNotModified();
@@ -271,6 +273,45 @@ void TestWidgetStateSerializer::ignoredWidgetsAreNotRestored()
     // ... and the widgets not on the list still restored
     QVERIFY(target.checkBox->isChecked());
     QCOMPARE(target.spinBox->value(), 42);
+}
+
+// The editor a spin box builds for itself is a child of that spin box, and
+// the name Qt gives it is the same for every spin box. It belongs to no
+// field of the form, so the session must not carry it.
+void TestWidgetStateSerializer::theEditorsOfTheSpinBoxesAreNotSaved()
+{
+    Form source;
+    fill(source);
+
+    const QJsonObject values = WidgetStateSerializer::toJson(&source.widget);
+
+    for (auto it = values.constBegin(); it != values.constEnd(); ++it) {
+        QVERIFY2(
+            !it.key().startsWith(QStringLiteral("qt_")),
+            qPrintable(QStringLiteral("the session holds the internal name %1").arg(it.key())));
+        QVERIFY2(!it.key().isEmpty(), "the session holds a value without a name");
+    }
+}
+
+// A file that names the editor of a spin box is a file of another version or
+// one that was edited by hand. The name is reported, and no spin box changes:
+// the value must not reach a field through the editor.
+void TestWidgetStateSerializer::theEditorsOfTheSpinBoxesAreNotRestored()
+{
+    QJsonObject values;
+    values.insert(QStringLiteral("qt_spinbox_lineedit"), QStringLiteral("999"));
+
+    Form restored;
+    restored.spinBox->setValue(42);
+    restored.doubleSpinBox->setValue(2.5);
+
+    const WidgetStateSerializer::ApplyResult result =
+        WidgetStateSerializer::applyToWidgets(values, &restored.widget);
+
+    QCOMPARE(result.unknownKeys, QStringList{QStringLiteral("qt_spinbox_lineedit")});
+    QVERIFY(result.wrongTypes.isEmpty());
+    QCOMPARE(restored.spinBox->value(), 42);
+    QCOMPARE(restored.doubleSpinBox->value(), 2.5);
 }
 
 // A value that names no widget is the one of a file that was made by another

@@ -1071,6 +1071,14 @@ void TestMainWindow::defaultProfileRoundTrips()
                                   .toObject();
     QVERIFY(!state.isEmpty());
     QVERIFY(!state.contains(QLatin1String(AppConstants::Files::PreviewWidget)));
+    // The editor a spin box builds for itself is not a field of the form: it
+    // must not become a name of the session format.
+    for (auto it = state.constBegin(); it != state.constEnd(); ++it) {
+        QVERIFY2(
+            !it.key().startsWith(QStringLiteral("qt_")),
+            qPrintable(QStringLiteral("the session holds the internal name %1").arg(it.key())));
+        QVERIFY2(!it.key().isEmpty(), "the session holds a value without a name");
+    }
     // The attack mode is stored by its id, not by its position: the ids are
     // 0, 1, 3, 6, 7 and 9, and brute-force - the third entry - is id 3.
     QCOMPARE(state.value(QStringLiteral("comboBox_attack")).toInt(), 3);
