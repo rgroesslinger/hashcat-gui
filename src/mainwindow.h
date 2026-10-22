@@ -120,6 +120,11 @@ private:
     // either.
     QString newerSessionNote(int fileVersion) const;
 
+    // Applies the values of a session file to the widgets and collects the
+    // notes about what could not be applied.
+    QStringList applySessionFile(const QJsonObject &values, int version,
+                                 const QStringList &otherSections);
+
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about
     // widgets.

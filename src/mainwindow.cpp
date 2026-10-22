@@ -488,12 +488,35 @@ void MainWindow::importTriggered()
 
     // The mapping applies the values; the hash type is the one it cannot
     // take yet, see restoreHashType().
+    const QStringList notes = applySessionFile(values, version, otherSections);
+
+    if (notes.isEmpty()) {
+        QMessageBox::information(this, tr("Imported"), tr("Session imported from %1.").arg(file));
+    } else {
+        QMessageBox::warning(
+            this, tr("Imported"),
+            tr("Session imported from %1.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
+    }
+}
+
+// Applies the values of a session file to the widgets and collects the notes
+// about what could not be applied.
+//
+// The caller decides what to do with the notes: an import has a headline, the
+// auto-load stays quiet when there is nothing to say.
+QStringList MainWindow::applySessionFile(const QJsonObject &values, int version,
+                                         const QStringList &otherSections)
+{
+    // The hash combo has no items yet - the query that fills it runs
+    // asynchronously. Remember the stored hash type; the reply applies it
+    // once the items exist.
     const WidgetStateSerializer::ApplyResult notApplied =
         WidgetStateSerializer::applyToWidgets(values, this, {AppConstants::Files::PreviewWidget});
     const QString problem = restoreHashType(values);
     commandChanged();
 
     QStringList notes = fileNotes(version, AppConstants::Sessions::Version, otherSections);
+
     // The notes are only there when there is something to say.
     const QString unknownNote = StateFile::unknownValuesNote(notApplied.unknownKeys);
     if (!unknownNote.isEmpty()) {
@@ -508,13 +531,7 @@ void MainWindow::importTriggered()
         notes << problem;
     }
 
-    if (notes.isEmpty()) {
-        QMessageBox::information(this, tr("Imported"), tr("Session imported from %1.").arg(file));
-    } else {
-        QMessageBox::warning(
-            this, tr("Imported"),
-            tr("Session imported from %1.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
-    }
+    return notes;
 }
 
 // The notes an import has about the file itself: the version it was made by
@@ -799,30 +816,9 @@ void MainWindow::loadSession()
         return;
     }
 
-    // The hash combo has no items yet - the query that fills it runs
-    // asynchronously. Remember the stored hash type; the reply applies it
-    // once the items exist.
-    const WidgetStateSerializer::ApplyResult notApplied =
-        WidgetStateSerializer::applyToWidgets(values, this, {AppConstants::Files::PreviewWidget});
-    const QString problem = restoreHashType(values);
-    commandChanged();
-
     // The auto-load is not an import: there is no headline, and nothing is
     // shown when the load went well.
-    QStringList notes = fileNotes(version, AppConstants::Sessions::Version, otherSections);
-    // The notes are only there when there is something to say.
-    const QString unknownNote = StateFile::unknownValuesNote(notApplied.unknownKeys);
-    if (!unknownNote.isEmpty()) {
-        notes << unknownNote;
-    }
-
-    const QString wrongTypeNote = StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
-    if (!wrongTypeNote.isEmpty()) {
-        notes << wrongTypeNote;
-    }
-    if (!problem.isEmpty()) {
-        notes << problem;
-    }
+    const QStringList notes = applySessionFile(values, version, otherSections);
 
     if (!notes.isEmpty()) {
         QMessageBox::warning(this, tr("Session warning"), notes.join(QLatin1Char('\n')));
