@@ -23,6 +23,10 @@
 //     }
 //   }
 //
+// The envelope - the shape of the file as a whole - is frozen. A change to it
+// would make every file of an older version unreadable, and the version of a
+// section cannot protect it, because the version lives inside the section.
+//
 // The class owns the envelope and nothing else: it does not know which
 // widgets or which settings a section holds, and it does not know the version
 // of one - the caller passes it in and compares what it reads.
@@ -43,8 +47,9 @@ public:
     //
     // The file is replaced as a whole, not merged into: a section a previous
     // write put there is gone, so the caller decides everything the file
-    // holds. A combined file is an explicit write of all its sections, not a
-    // merge into one that already exists.
+    // holds. A file holds one section today; a combined file would be an
+    // explicit write of all its sections, never a merge into one that already
+    // exists, which would keep stale or foreign sections alive.
     //
     // The write is atomic: a crash in the middle leaves the old file alone
     // instead of a truncated one.
@@ -61,9 +66,11 @@ public:
     //   "The file does not contain a session section; it holds settings."
     //
     // version receives the version of the values the section holds - the
-    // caller compares it with the current one. otherSections receives the
-    // names of the sections the file holds besides the one asked for, also
-    // when the read failed, so that the message can name them.
+    // caller compares it with the current one. A version that is not a number
+    // reads as -1, which the caller applies like the version of a hand-edited,
+    // older file. otherSections receives the names of the sections the file
+    // holds besides the one asked for, also when the read failed, so that the
+    // message can name them.
     static bool read(const QString &filename, QLatin1StringView section, QJsonObject *values,
                      int *version, QStringList *otherSections, QString *errorMessage);
 

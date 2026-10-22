@@ -117,23 +117,35 @@ exception, it goes through `attackIndexChanged()`.
 ### StateFile
 - The file the application writes and reads again: the session it keeps between two runs
   and the settings the user exports share one envelope (`sections`, and per section a
-  `version` and its `values`).
+  `version` and its `values`). The shape of the envelope is frozen: a change to it would
+  make every file of an older version unreadable, and the version of a section cannot
+  protect it, because the version lives inside the section.
 - A write replaces the whole file, it does not merge into it: the caller decides every
   section the file holds, so the session file and an exported settings file each carry
-  one. A combined file is an explicit write of all its sections, never a merge into an
-  existing file, which would keep stale or foreign sections alive.
+  one. A file holds one section today; a combined file would be an explicit write of all
+  its sections, never a merge into an existing file, which would keep stale or foreign
+  sections alive.
 - The names of the sections are constants (`AppConstants::FileSections`), never the name
   of a class: the section of the session used to be keyed by the class name, so renaming
   that class would orphan every session that was ever written.
+- The name of the session file (`session.json`) is a constant as well, and it is named
+  after the section it holds. The version of the section lives inside the file, so it
+  cannot protect the name of the file: a rename would leave every session of every user
+  unread, and there is no version that could say so.
 - Each section has its own version (`AppConstants::Sessions::Version` for the session,
   `AppConstants::Settings::Version` for the settings), because the widget names and the
   setting keys change independently of each other. Bump the version of a section whenever
   one of its keys is renamed, not when one is added: an added key is reported by name.
+- The version of a section is not the version of the application. The widget names and
+  the setting keys change independently of a release, and a file that says "made by an
+  older version" at every upgrade is noise.
 - A section version newer than this build's is refused before anything is applied: the
   bump signals a rename, and a name that survived may mean something else there. A file
   with an older version is applied, and the values it cannot apply are named. A value
   that is unknown or of the wrong type in a file of the same version is skipped and
   named, never a reason to refuse the file.
+- A file the application does not understand is never destroyed. It is left in place, the
+  start reports it, and the exit writes over it only when this version understands it.
 - The class owns the envelope and nothing else: it knows neither the widgets nor the
   settings of a section, and it does not know the version of one — the caller passes it
   in and compares what it reads.
