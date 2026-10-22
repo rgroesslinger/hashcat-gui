@@ -751,8 +751,9 @@ QString MainWindow::sessionFile() const
 // nothing to restore and nothing to store.
 bool MainWindow::restoreSessionEnabled() const
 {
-    return SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::RestoreSession,
-                                                    true);
+    return SettingsManager::instance().getKey<bool>(
+        AppConstants::SettingsKeys::RestoreSession,
+        AppConstants::SettingsKeys::defaultOf<bool>(AppConstants::SettingsKeys::RestoreSession));
 }
 
 // Load the session – called from the constructor

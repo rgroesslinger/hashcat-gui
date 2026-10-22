@@ -104,8 +104,9 @@ void SettingsDialog::readSettings()
     ui->checkBox_use_short_parameters->setChecked(
         settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters));
 
-    ui->checkBox_restore_session->setChecked(
-        settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true));
+    ui->checkBox_restore_session->setChecked(settings.getKey<bool>(
+        AppConstants::SettingsKeys::RestoreSession,
+        AppConstants::SettingsKeys::defaultOf<bool>(AppConstants::SettingsKeys::RestoreSession)));
 
     // The color scheme: the combo carries the value that gets stored, so
     // that the display text can be translated freely.
@@ -115,8 +116,9 @@ void SettingsDialog::readSettings()
     ui->comboBox_color_scheme->addItem(tr("Dark"),
                                        QString(AppConstants::Appearance::ColorSchemeDark));
 
-    const QString storedScheme =
-        settings.getKey<QString>(AppConstants::SettingsKeys::ColorScheme, QString());
+    const QString storedScheme = settings.getKey<QString>(
+        AppConstants::SettingsKeys::ColorScheme,
+        AppConstants::SettingsKeys::defaultOf<QString>(AppConstants::SettingsKeys::ColorScheme));
     int schemeIndex = ui->comboBox_color_scheme->findData(storedScheme);
     if (schemeIndex < 0) {
         // A value we no longer offer: follow the system again.
@@ -134,7 +136,8 @@ void SettingsDialog::readSettings()
     }
 
     const QString stored = settings.getKey<QString>(
-        AppConstants::SettingsKeys::Language, QString::fromUtf8(AppConstants::Languages::Default));
+        AppConstants::SettingsKeys::Language,
+        AppConstants::SettingsKeys::defaultOf<QString>(AppConstants::SettingsKeys::Language));
     int index = ui->comboBox_language->findData(stored);
     if (index < 0) {
         // A code we no longer offer (or a hand-edited file): follow the
@@ -208,15 +211,13 @@ QJsonObject SettingsDialog::savedSettings()
     for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
         const QString key = QString(entry.key);
         switch (entry.type) {
-        case AppConstants::SettingsKeys::Type::Boolean: {
-            // Restoring the session is what a fresh install does; every other
-            // flag starts out off.
-            const bool defaultValue = entry.key == AppConstants::SettingsKeys::RestoreSession;
-            stored.insert(key, settings.getKey<bool>(key, defaultValue));
+        case AppConstants::SettingsKeys::Type::Boolean:
+            stored.insert(key, settings.getKey<bool>(
+                                   key, AppConstants::SettingsKeys::defaultOf<bool>(entry.key)));
             break;
-        }
         case AppConstants::SettingsKeys::Type::String:
-            stored.insert(key, settings.getKey<QString>(key));
+            stored.insert(key, settings.getKey<QString>(
+                                   key, AppConstants::SettingsKeys::defaultOf<QString>(entry.key)));
             break;
         }
     }

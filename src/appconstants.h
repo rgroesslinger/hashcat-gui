@@ -7,7 +7,10 @@
 #define APPCONSTANTS_H
 
 #include <QLatin1StringView>
+#include <QString>
 #include <QtGlobal>
+
+#include <type_traits>
 
 // Application wide constants.
 //
@@ -18,62 +21,6 @@
 // with QString::fromUtf8() at the use site.
 namespace AppConstants
 {
-
-// Keys passed to SettingsManager. SettingsManager takes plain strings, so a
-// mistyped key does not fail - it simply stores the value somewhere else.
-namespace SettingsKeys
-{
-inline constexpr QLatin1StringView HashcatPath{"hashcatPath"};
-inline constexpr QLatin1StringView Terminal{"terminal"};
-inline constexpr QLatin1StringView UseShortParameters{"useShortParameters"};
-// Whether the application restores the last session at the next start.
-inline constexpr QLatin1StringView RestoreSession{"restoreSession"};
-// The color scheme the user chose, see the Appearance namespace below.
-inline constexpr QLatin1StringView ColorScheme{"colorScheme"};
-// Locale code of the UI language, see the Languages namespace below.
-inline constexpr QLatin1StringView Language{"language"};
-
-// The type of value a stored setting takes. The import checks a value against
-// the type of its key before it applies it.
-enum class Type : quint8 {
-    String,
-    Boolean,
-};
-
-struct Entry {
-    QLatin1StringView key;
-    Type type;
-};
-
-// Every key the settings are made of, with the type of value it takes. The
-// export and the import both read this table, so a new setting is one entry
-// here; the tests then say what else is missing.
-inline constexpr Entry All[] = {
-    {HashcatPath, Type::String},         {Terminal, Type::String},
-    {UseShortParameters, Type::Boolean}, {RestoreSession, Type::Boolean},
-    {ColorScheme, Type::String},         {Language, Type::String},
-};
-} // namespace SettingsKeys
-
-// The version of the settings a file holds.
-//
-// The widget names of the session and the keys of the settings change
-// independently of each other, so each of them has its own version.
-namespace Settings
-{
-inline constexpr int Version = 1;
-} // namespace Settings
-
-// The names of the sections a file can hold.
-//
-// They are constants and not the name of a class: the section of the session
-// used to be keyed by the class name, so renaming that class would orphan
-// every session that was ever written.
-namespace FileSections
-{
-inline constexpr QLatin1StringView Session{"session"};
-inline constexpr QLatin1StringView Settings{"settings"};
-} // namespace FileSections
 
 // The languages the settings dialog offers, sorted by each name in its own
 // language so the combo reads naturally for every user.
@@ -100,6 +47,86 @@ inline constexpr Language Available[] = {
 // whenever no catalog answers for it.
 inline constexpr const char *Default = "";
 } // namespace Languages
+
+// Keys passed to SettingsManager. SettingsManager takes plain strings, so a
+// mistyped key does not fail - it simply stores the value somewhere else.
+namespace SettingsKeys
+{
+inline constexpr QLatin1StringView HashcatPath{"hashcatPath"};
+inline constexpr QLatin1StringView Terminal{"terminal"};
+inline constexpr QLatin1StringView UseShortParameters{"useShortParameters"};
+// Whether the application restores the last session at the next start.
+inline constexpr QLatin1StringView RestoreSession{"restoreSession"};
+// The color scheme the user chose, see the Appearance namespace below.
+inline constexpr QLatin1StringView ColorScheme{"colorScheme"};
+// Locale code of the UI language, see the Languages namespace above.
+inline constexpr QLatin1StringView Language{"language"};
+
+// The type of value a stored setting takes. The import checks a value against
+// the type of its key before it applies it.
+enum class Type : quint8 {
+    String,
+    Boolean,
+};
+
+struct Entry {
+    QLatin1StringView key;
+    Type type;
+    // What the setting starts with: the text for a string setting, the
+    // switch for a boolean one. The text is UTF-8, as everywhere else in the
+    // application.
+    const char *textDefault;
+    bool boolDefault;
+};
+
+// Every key the settings are made of, with the type of value it takes and the
+// value it starts with. The export and the import both read this table, so a
+// new setting is one entry here; the tests then say what else is missing.
+inline constexpr Entry All[] = {
+    {HashcatPath, Type::String, "", false},
+    {Terminal, Type::String, "", false},
+    {UseShortParameters, Type::Boolean, "", false},
+    {RestoreSession, Type::Boolean, "", true},
+    {ColorScheme, Type::String, "", false},
+    {Language, Type::String, Languages::Default, false},
+};
+
+// The default of a setting, in the type the setting takes.
+template <typename T> T defaultOf(QLatin1StringView key)
+{
+    for (const Entry &entry : All) {
+        if (entry.key != key) {
+            continue;
+        }
+        if constexpr (std::is_same_v<T, bool>) {
+            return entry.boolDefault;
+        } else {
+            return QString::fromUtf8(entry.textDefault);
+        }
+    }
+    return T();
+}
+} // namespace SettingsKeys
+
+// The version of the settings a file holds.
+//
+// The widget names of the session and the keys of the settings change
+// independently of each other, so each of them has its own version.
+namespace Settings
+{
+inline constexpr int Version = 1;
+} // namespace Settings
+
+// The names of the sections a file can hold.
+//
+// They are constants and not the name of a class: the section of the session
+// used to be keyed by the class name, so renaming that class would orphan
+// every session that was ever written.
+namespace FileSections
+{
+inline constexpr QLatin1StringView Session{"session"};
+inline constexpr QLatin1StringView Settings{"settings"};
+} // namespace FileSections
 
 // The color schemes the settings dialog offers.
 //

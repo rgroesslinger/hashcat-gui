@@ -40,7 +40,8 @@ int main(int argc, char *argv[])
     // The color scheme the user chose. An empty scheme leaves the decision
     // to the desktop, so the application keeps out of it.
     HelperUtils::applyColorScheme(SettingsManager::instance().getKey<QString>(
-        AppConstants::SettingsKeys::ColorScheme, QString()));
+        AppConstants::SettingsKeys::ColorScheme,
+        AppConstants::SettingsKeys::defaultOf<QString>(AppConstants::SettingsKeys::ColorScheme)));
 
     // Window and taskbar icon. Windows gets the full-bleed .ico; elsewhere the
     // icon theme is preferred. QIcon::fromTheme() cannot tell when the themed
@@ -67,7 +68,8 @@ int main(int argc, char *argv[])
     // are tried from most to least specific, so hashcat-gui_de.qm answers for
     // de, de_DE and de_AT alike.
     const QString language = SettingsManager::instance().getKey<QString>(
-        AppConstants::SettingsKeys::Language, QString::fromUtf8(AppConstants::Languages::Default));
+        AppConstants::SettingsKeys::Language,
+        AppConstants::SettingsKeys::defaultOf<QString>(AppConstants::SettingsKeys::Language));
 
     QTranslator translator;
     if (translator.load(language.isEmpty() ? QLocale() : QLocale(language),
