@@ -13,6 +13,7 @@
 
 #include "aboutdialog.h"
 #include "appconstants.h"
+#include "settingsmanager.h"
 
 // The About dialog opens as large as its content: the size in the .ui would
 // clip the content under a large font or a longer version string and leave an
@@ -32,6 +33,7 @@ private slots:
     void linksToTheProjectAndToHashcat();
     void namesTheLicenseOfTheApplication();
     void copyDetailsPutsThemOnTheClipboard();
+    void saysThatNoHashcatIsConfigured();
 };
 
 void TestAboutDialog::fitsItsContent()
@@ -208,6 +210,20 @@ void TestAboutDialog::copyDetailsPutsThemOnTheClipboard()
     QVERIFY(text.contains(QSysInfo::prettyProductName()));
     // One line per fact, so that a report can quote them one by one.
     QCOMPARE(text.count(QLatin1Char('\n')), 3);
+}
+
+// Without a hashcat there is no version to show. The label says so instead of
+// keeping the placeholder of the .ui file, and the details of a bug report
+// say the same.
+void TestAboutDialog::saysThatNoHashcatIsConfigured()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, QString());
+
+    AboutDialog dialog;
+
+    QLabel *label = dialog.findChild<QLabel *>(QStringLiteral("label_hc_version"));
+    QVERIFY(label);
+    QCOMPARE(label->text(), QStringLiteral("not configured"));
 }
 
 int main(int argc, char *argv[])

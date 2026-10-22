@@ -20,11 +20,6 @@ class AboutDialog : public QDialog
 public:
     explicit AboutDialog(QWidget *parent = nullptr);
     ~AboutDialog() override;
-    void updateVersionLabel();
-
-    // Shows the version of hashcat. The text is wrapped, so a long message
-    // grows the dialog instead of being cut off.
-    void setVersionText(const QString &text);
 
 protected:
     // The dialog opens as large as its content. The height of the
@@ -38,6 +33,18 @@ private slots:
     void copyDetailsClicked();
 
 private:
+    // The tests read the dialog through the Ui the same way the main
+    // window's tests do: friendship keeps it private instead of widening the
+    // dialog's public surface for their sake.
+    friend class TestAboutDialog;
+
+    // Fills the row that holds the version of hashcat.
+    void updateVersionLabel();
+
+    // Shows the version of hashcat. The text is wrapped, so a long message
+    // grows the dialog instead of being cut off.
+    void setVersionText(const QString &text);
+
     // Fills the rows that describe the system the application runs on.
     void updateSystemLabels();
 

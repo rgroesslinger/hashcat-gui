@@ -227,10 +227,14 @@ void AboutDialog::updateLicense()
 void AboutDialog::updateVersionLabel()
 {
     auto &settings = SettingsManager::instance();
-    QFileInfo fileInfo(settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
+    const QString path = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 
-    if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
-        ui->label_hc_version_text->setText(fileInfo.fileName());
+    if (path.isEmpty()) {
+        // No hashcat is configured, so there is no version to show. The
+        // details of a bug report say the same.
+        setVersionLabel(tr("not configured"));
+    } else {
+        ui->label_hc_version_text->setText(QFileInfo(path).fileName());
 
         QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
         connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
