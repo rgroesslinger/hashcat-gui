@@ -1487,8 +1487,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionImport"/>
-    <addaction name="actionExport"/>
+    <addaction name="actionImportSession"/>
+    <addaction name="actionExportSession"/>
     <addaction name="separator"/>
     <addaction name="actionImportSettings"/>
     <addaction name="actionExportSettings"/>
@@ -1535,12 +1535,12 @@
     <string>Export Settings</string>
    </property>
   </action>
-  <action name="actionExport">
+  <action name="actionExportSession">
    <property name="text">
     <string>Export Session</string>
    </property>
   </action>
-  <action name="actionImport">
+  <action name="actionImportSession">
    <property name="text">
     <string>Import Session</string>
    </property>

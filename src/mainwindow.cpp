@@ -260,8 +260,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::aboutTriggered);
     connect(ui->actionResetFields, &QAction::triggered, this, &MainWindow::resetFieldsTriggered);
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::quitTriggered);
-    connect(ui->actionExport, &QAction::triggered, this, &MainWindow::exportTriggered);
-    connect(ui->actionImport, &QAction::triggered, this, &MainWindow::importTriggered);
+    connect(ui->actionExportSession, &QAction::triggered, this, &MainWindow::exportTriggered);
+    connect(ui->actionImportSession, &QAction::triggered, this, &MainWindow::importTriggered);
     connect(ui->actionImportSettings, &QAction::triggered, this,
             &MainWindow::importSettingsTriggered);
     connect(ui->actionExportSettings, &QAction::triggered, this,
