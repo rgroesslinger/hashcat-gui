@@ -43,6 +43,8 @@ private slots:
     void restoreSessionFollowsTheSetting();
     void clearSessionDeletesTheStoredSession();
     void clearSessionKeepsTheFileWhenDeclined();
+    void theClearedSessionNoteFollowsTheStoredSetting_data();
+    void theClearedSessionNoteFollowsTheStoredSetting();
     void shortenPathOnlyShortensTheHomeDirectory();
     void showsWhereTheFilesAreStored();
     void savedSettingsHoldTheKnownSettings();
@@ -298,6 +300,61 @@ void TestSettingsDialog::clearSessionKeepsTheFileWhenDeclined()
 
     QCOMPARE(recorder.title, QStringLiteral("Clear session"));
     QVERIFY(QFile::exists(path));
+    QFile::remove(path);
+}
+
+// The note of the cleared session says what the exit does with the file, and
+// the exit follows the stored setting - not the checkbox, which reaches the
+// settings only when the user saves.
+void TestSettingsDialog::theClearedSessionNoteFollowsTheStoredSetting_data()
+{
+    QTest::addColumn<bool>("stored");
+    QTest::addColumn<bool>("checked");
+    QTest::addColumn<QString>("expected");
+
+    QTest::newRow("stored on, box on") << true << true
+                                       << QStringLiteral("It is written again when hashcat-gui "
+                                                         "exits.");
+    QTest::newRow("stored off, box off") << false << false
+                                         << QStringLiteral("It is not written again when "
+                                                           "hashcat-gui exits.");
+    QTest::newRow("stored on, box off")
+        << true << false
+        << QStringLiteral("It is written again when hashcat-gui exits - unless you save the "
+                          "settings with the session switched off.");
+    QTest::newRow("stored off, box on")
+        << false << true
+        << QStringLiteral("It is not written again when hashcat-gui exits - unless you save the "
+                          "settings with the session switched on.");
+}
+
+void TestSettingsDialog::theClearedSessionNoteFollowsTheStoredSetting()
+{
+    QFETCH(bool, stored);
+    QFETCH(bool, checked);
+    QFETCH(QString, expected);
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, stored);
+
+    const QString path = StateFile::sessionFilePath();
+    QDir().mkpath(QFileInfo(path).absolutePath());
+    QFile file(path);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    file.write("{}");
+    file.close();
+
+    SettingsDialog dialog;
+    dialog.ui->checkBox_restore_session->setChecked(checked);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.acceptConfirmation = true;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearSessionClicked"));
+
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Session cleared"));
+    QVERIFY2(recorder.text.contains(expected), qPrintable(recorder.text));
+
     QFile::remove(path);
 }
 

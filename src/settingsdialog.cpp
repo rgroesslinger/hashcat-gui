@@ -433,10 +433,23 @@ void SettingsDialog::clearSessionClicked()
 
     QStringList notes;
     notes << tr("The saved session has been deleted.");
-    if (ui->checkBox_restore_session->isChecked()) {
-        // The setting is not saved yet, so the session is written again
-        // unless the user turns the setting off before saving.
-        notes << tr("It is written again when hashcat-gui exits.");
+
+    // What the exit does with the file depends on the stored setting, not on
+    // the checkbox: the checkbox reaches the settings only when the user
+    // saves. A change that is not saved changes nothing.
+    const bool stored =
+        SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true);
+    const bool wanted = ui->checkBox_restore_session->isChecked();
+
+    if (stored == wanted) {
+        notes << (stored ? tr("It is written again when hashcat-gui exits.")
+                         : tr("It is not written again when hashcat-gui exits."));
+    } else if (stored) {
+        notes << tr("It is written again when hashcat-gui exits - unless you save the settings "
+                    "with the session switched off.");
+    } else {
+        notes << tr("It is not written again when hashcat-gui exits - unless you save the "
+                    "settings with the session switched on.");
     }
 
     QMessageBox::information(this, tr("Session cleared"), notes.join(QLatin1Char('\n')));
