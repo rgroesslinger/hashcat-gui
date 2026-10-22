@@ -1738,7 +1738,11 @@ void TestMainWindow::theStartupShowsNoBox()
                                                          "#!/bin/sh\n"
                                                          "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
                                                          "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
     QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     // A session the application wrote itself.
