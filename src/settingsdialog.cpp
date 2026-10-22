@@ -186,7 +186,7 @@ void SettingsDialog::openFolderClicked()
 //
 // The export is a backup of the configuration the application runs with, so
 // it holds what is saved and not what the dialog shows but has not saved.
-QJsonObject SettingsDialog::savedSettings() const
+QJsonObject SettingsDialog::savedSettings()
 {
     auto &settings = SettingsManager::instance();
 
@@ -232,15 +232,25 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
         }
     }
 
-    // The terminal is the one exception: its combo has no empty entry, so
-    // there is nothing an empty value could select.
-    const QString terminal = settings.value(AppConstants::SettingsKeys::Terminal).toString();
-    if (!terminal.isEmpty()) {
-        const int index = ui->comboBox_terminal->findText(terminal);
-        if (index >= 0) {
-            ui->comboBox_terminal->setCurrentIndex(index);
+    if (settings.contains(AppConstants::SettingsKeys::Terminal)) {
+        const QJsonValue value = settings.value(AppConstants::SettingsKeys::Terminal);
+        if (!hasExpectedType(AppConstants::SettingsKeys::Terminal, value)) {
+            wrongTypes << QString(AppConstants::SettingsKeys::Terminal);
         } else {
-            notes << tr("The terminal %1 is not installed and was not applied.").arg(terminal);
+            const QString terminal = value.toString();
+            if (terminal.isEmpty()) {
+                // The file says that no terminal was configured. The combo has
+                // no empty entry, but it shows that state as no selection.
+                ui->comboBox_terminal->setCurrentIndex(-1);
+            } else {
+                const int index = ui->comboBox_terminal->findText(terminal);
+                if (index >= 0) {
+                    ui->comboBox_terminal->setCurrentIndex(index);
+                } else {
+                    notes << tr("The terminal %1 is not installed and was not applied.")
+                                 .arg(terminal);
+                }
+            }
         }
     }
 

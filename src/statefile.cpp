@@ -76,9 +76,15 @@ bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonOb
 
     QJsonParseError parseError;
     const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
-    if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
-        setError(errorMessage,
-                 tr("The file is not a valid JSON file: %1").arg(parseError.errorString()));
+    if (parseError.error != QJsonParseError::NoError) {
+        setError(errorMessage, tr("The file is not valid JSON: %1").arg(parseError.errorString()));
+        return false;
+    }
+
+    // Valid JSON that is not an object - an array, a number, a string - has no
+    // parse error to report, so it gets its own message.
+    if (!document.isObject()) {
+        setError(errorMessage, tr("The file does not contain a JSON object."));
         return false;
     }
 

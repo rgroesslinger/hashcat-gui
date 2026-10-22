@@ -30,6 +30,7 @@
 #include <QScrollBar>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QStandardPaths>
 #include <QToolTip>
 
 #if defined(Q_OS_WIN)
@@ -89,6 +90,18 @@ QString commandTooltip(const QString &command)
         lines << line;
     }
     return lines.join(QLatin1Char('\n'));
+}
+
+// Where a file dialog for an export starts: a folder the user knows, with the
+// name the application suggests. A bare file name would open the dialog in the
+// application's working directory, wherever it happened to be started from.
+QString suggestedExportPath(QLatin1StringView fileName)
+{
+    QString folder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    if (!QFileInfo(folder).isDir()) {
+        folder = QDir::homePath();
+    }
+    return QDir(folder).filePath(QString(fileName));
 }
 } // namespace
 
@@ -412,9 +425,9 @@ void MainWindow::fitToContent()
 // File → Export
 void MainWindow::exportTriggered()
 {
-    const QString file = QFileDialog::getSaveFileName(this, tr("Export Profile"),
-                                                      QStringLiteral("hashcat-gui-session.json"),
-                                                      tr("JSON Files (*.json)"));
+    const QString file = QFileDialog::getSaveFileName(
+        this, tr("Export Profile"), suggestedExportPath(AppConstants::Files::SessionExport),
+        tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
         return;
@@ -500,7 +513,7 @@ QStringList MainWindow::fileNotes(int fileVersion, int currentVersion,
     // hand-edited; its values are applied like an older file's.
     if (fileVersion >= 0 && fileVersion < currentVersion) {
         notes << tr("The file was made by an older version of hashcat-gui (format version %1; "
-                    "this version reads %2).")
+                    "this version reads format version %2).")
                      .arg(fileVersion)
                      .arg(currentVersion);
     }
@@ -518,8 +531,8 @@ QStringList MainWindow::fileNotes(int fileVersion, int currentVersion,
 // may mean something else there.
 QString MainWindow::newerFileNote(int fileVersion, int currentVersion) const
 {
-    return tr("The file holds format version %1, but this version reads version %2, so it was "
-              "not applied. Update hashcat-gui to read it.")
+    return tr("The file is in format version %1, but this version reads format version %2, so it "
+              "was not applied. Update hashcat-gui to read it.")
         .arg(fileVersion)
         .arg(currentVersion);
 }
@@ -527,21 +540,18 @@ QString MainWindow::newerFileNote(int fileVersion, int currentVersion) const
 // File → Export Settings
 void MainWindow::exportSettingsTriggered()
 {
-    const QString file = QFileDialog::getSaveFileName(this, tr("Export Settings"),
-                                                      QStringLiteral("hashcat-gui-settings.json"),
-                                                      tr("JSON Files (*.json)"));
+    const QString file = QFileDialog::getSaveFileName(
+        this, tr("Export Settings"), suggestedExportPath(AppConstants::Files::SettingsExport),
+        tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
         return;
     }
 
-    // The settings that are in effect - the dialog is closed while the File
-    // menu is used, so there is no second state that could be exported.
-    SettingsDialog settingsDialog(this);
-
     QString error;
     if (StateFile::write(file, AppConstants::FileSections::Settings,
-                         AppConstants::Settings::Version, settingsDialog.savedSettings(), &error)) {
+                         AppConstants::Settings::Version, SettingsDialog::savedSettings(),
+                         &error)) {
         QMessageBox::information(this, tr("Exported"), tr("Settings exported to %1.").arg(file));
     } else {
         QMessageBox::warning(this, tr("Export failed"), error);
@@ -581,8 +591,8 @@ void MainWindow::importSettingsTriggered()
     notes << fileNotes(version, AppConstants::Settings::Version, otherSections);
 
     QStringList message;
-    message << tr("Settings imported from %1.").arg(file);
-    message << tr("Review them and save them to apply them.");
+    message << tr("Settings loaded from %1.").arg(file);
+    message << tr("Review them and save to apply them.");
     message << notes;
 
     if (notes.isEmpty()) {

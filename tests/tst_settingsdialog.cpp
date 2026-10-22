@@ -295,8 +295,7 @@ void TestSettingsDialog::savedSettingsHoldTheKnownSettings()
                     QStringLiteral("/opt/somewhere/hashcat"));
     settings.setKey(AppConstants::SettingsKeys::Terminal, QStringLiteral("kitty"));
 
-    SettingsDialog dialog;
-    const QJsonObject stored = dialog.savedSettings();
+    const QJsonObject stored = SettingsDialog::savedSettings();
 
     QCOMPARE(stored.value(QStringLiteral("hashcatPath")).toString(),
              QStringLiteral("/opt/somewhere/hashcat"));
@@ -329,18 +328,23 @@ void TestSettingsDialog::importSettingsFillsTheDialog()
              QString());
 }
 
-// An empty value is a value too: it is the system default, and a file that
-// says so has to be taken at its word.
+// An empty value is a value too: the system default for the language and the
+// color scheme, and "no terminal" for the terminal. A file that says so has to
+// be taken at its word.
 void TestSettingsDialog::importSettingsAppliesEmptyValues()
 {
     QJsonObject stored;
     stored.insert(QStringLiteral("hashcatPath"), QString());
+    stored.insert(QStringLiteral("terminal"), QString());
     stored.insert(QStringLiteral("language"), QString());
     stored.insert(QStringLiteral("colorScheme"), QString());
 
     SettingsDialog dialog;
     // The dialog shows something else, so that the import has to change it.
     dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/before/hashcat"));
+    if (dialog.ui->comboBox_terminal->count() > 0) {
+        dialog.ui->comboBox_terminal->setCurrentIndex(0);
+    }
     dialog.ui->comboBox_language->setCurrentIndex(
         dialog.ui->comboBox_language->findData(QStringLiteral("de")));
     dialog.ui->comboBox_color_scheme->setCurrentIndex(
@@ -348,8 +352,10 @@ void TestSettingsDialog::importSettingsAppliesEmptyValues()
 
     dialog.applyImportedSettings(stored);
 
-    // The empty values took the place of the ones that were there.
+    // The empty values took the place of the ones that were there. The
+    // terminal combo has no empty entry; no selection is how it shows "none".
     QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QString());
+    QCOMPARE(dialog.ui->comboBox_terminal->currentIndex(), -1);
     QCOMPARE(dialog.ui->comboBox_language->currentData().toString(), QString());
     QCOMPARE(dialog.ui->comboBox_color_scheme->currentData().toString(), QString());
 }
@@ -433,9 +439,10 @@ void TestSettingsDialog::importSettingsNamesTheUnknownKeys()
 void TestSettingsDialog::importSettingsDoesNotApplyAValueOfTheWrongType()
 {
     QJsonObject stored;
-    // A check box wants a boolean, a text field a string.
+    // A check box wants a boolean, a text field and a combo a string.
     stored.insert(QStringLiteral("useShortParameters"), QStringLiteral("invalidString"));
     stored.insert(QStringLiteral("hashcatPath"), 42);
+    stored.insert(QStringLiteral("terminal"), 42);
 
     SettingsDialog dialog;
     dialog.ui->checkBox_use_short_parameters->setChecked(true);
@@ -451,6 +458,7 @@ void TestSettingsDialog::importSettingsDoesNotApplyAValueOfTheWrongType()
     QCOMPARE(notes.size(), 1);
     QVERIFY(notes.first().contains(QStringLiteral("useShortParameters")));
     QVERIFY(notes.first().contains(QStringLiteral("hashcatPath")));
+    QVERIFY(notes.first().contains(QStringLiteral("terminal")));
 }
 
 int main(int argc, char *argv[])

@@ -28,8 +28,8 @@ public:
     //
     // The export is a backup of the configuration the application runs with,
     // so it holds what is saved and not what the dialog shows but has not
-    // saved.
-    QJsonObject savedSettings() const;
+    // saved. It reads the settings, not the dialog, so it needs no instance.
+    static QJsonObject savedSettings();
 
     // Fills the dialog with the settings of an imported file. Returns the
     // notes for the user.

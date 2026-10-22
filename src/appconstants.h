@@ -102,6 +102,9 @@ namespace Files
 // Saved by MainWindow::saveDefaultProfile(), relative to
 // QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
 inline constexpr QLatin1StringView DefaultProfile{"default_profile.json"};
+// Suggested names for the files the File menu exports.
+inline constexpr QLatin1StringView SessionExport{"hashcat-gui-session.json"};
+inline constexpr QLatin1StringView SettingsExport{"hashcat-gui-settings.json"};
 // The command preview: it is regenerated on every change, so it must never
 // be part of a stored profile.
 inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};

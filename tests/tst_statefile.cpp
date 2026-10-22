@@ -29,6 +29,7 @@ private slots:
     void aFileWithoutSectionsIsRefused();
     void aSectionWithoutValuesIsRefused();
     void aCorruptFileIsRefused();
+    void aJsonArrayIsRefused();
     void aMissingFileIsRefused();
     void aWriteThatFailsIsReported();
     void theErrorIsClearedOnSuccess();
@@ -257,6 +258,19 @@ void TestStateFile::aCorruptFileIsRefused()
     QVERIFY(!StateFile::read(path, AppConstants::FileSections::Session, nullptr, nullptr, nullptr,
                              &errorMessage));
     QVERIFY(!errorMessage.isEmpty());
+}
+
+// Valid JSON that is not an object: there is no parse error to report, so the
+// message names what the file lacks instead of saying "no error occurred".
+void TestStateFile::aJsonArrayIsRefused()
+{
+    const QString path = scratchFile(QStringLiteral("array.json"));
+    QVERIFY(writeFile(path, "[1, 2, 3]"));
+
+    QString errorMessage;
+    QVERIFY(!StateFile::read(path, AppConstants::FileSections::Session, nullptr, nullptr, nullptr,
+                             &errorMessage));
+    QVERIFY2(errorMessage.contains(QStringLiteral("JSON object")), qPrintable(errorMessage));
 }
 
 // A file that is not there.
