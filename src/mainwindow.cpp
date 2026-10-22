@@ -562,7 +562,15 @@ void MainWindow::importSettingsTriggered()
         QMessageBox::warning(this, tr("Imported"), message.join(QLatin1Char('\n')));
     }
 
-    settingsDialog.exec();
+    if (settingsDialog.exec() == QDialog::Accepted) {
+        // An import can change the binary name and the short/long parameter
+        // choice too, so the preview and the hash types need the same refresh
+        // as after the settings were saved from the menu.
+        if (ui->comboBox_hash_type->count() == 0) {
+            initHashAndAttackModes();
+        }
+        commandChanged();
+    }
 }
 
 // Tools → Reset field

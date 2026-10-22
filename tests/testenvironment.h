@@ -101,6 +101,10 @@ public:
     // Non-empty: the path a file dialog is asked to pick.
     QString pickFile;
 
+    // Saves the settings dialog an import opens instead of closing it, so a
+    // test can cover the path that ends in Save.
+    bool saveSettingsDialog = false;
+
     bool messageBoxSeen = false;
     QString title;
     QString text;
@@ -147,7 +151,14 @@ public:
                 static_cast<QDialog *>(fileDialog)->accept();
             } else {
                 // Any other dialog - the settings dialog an import opens - is
-                // closed, so that it cannot block the test.
+                // saved when the test asks for it, and closed otherwise so
+                // that it cannot block the test. The slot is private, but the
+                // meta object exposes it either way.
+                if (saveSettingsDialog
+                    && modal->metaObject()->indexOfMethod("saveClicked()") >= 0) {
+                    QMetaObject::invokeMethod(modal, "saveClicked");
+                    return;
+                }
                 modal->close();
             }
         });

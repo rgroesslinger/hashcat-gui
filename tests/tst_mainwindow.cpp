@@ -1328,7 +1328,8 @@ void TestMainWindow::theSettingsAreImportedThroughTheFileMenu()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("import.json"));
 
     QJsonObject values;
-    values.insert(QStringLiteral("hashcatPath"), QStringLiteral("/imported/hashcat"));
+    values.insert(QStringLiteral("hashcatPath"), QStringLiteral("/imported/hashcat-from-the-file"));
+    values.insert(QStringLiteral("useShortParameters"), true);
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,
                              AppConstants::Settings::Version, values, nullptr));
 
@@ -1340,13 +1341,22 @@ void TestMainWindow::theSettingsAreImportedThroughTheFileMenu()
     MainWindow window;
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
+    recorder.saveSettingsDialog = true;
     recorder.start();
 
-    // The dialog the import opens is closed by the recorder; the test is
-    // about the file that was read and the notes that came with it.
+    // The dialog the import opens is saved, so the test also covers what has
+    // to follow a save: the notes that came with the file, and the refresh of
+    // everything that depends on the settings.
     QVERIFY(QMetaObject::invokeMethod(&window, "importSettingsTriggered"));
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Imported"));
+
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath),
+             QStringLiteral("/imported/hashcat-from-the-file"));
+    // The preview follows the new binary and the new parameter style without
+    // the user touching a widget.
+    QVERIFY(window.ui->lineEdit_command->text().startsWith(
+        QStringLiteral("hashcat-from-the-file -a 0")));
 }
 
 // A session file that names a widget this version does not know - it was
