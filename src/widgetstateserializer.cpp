@@ -17,6 +17,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+#include <algorithm>
+
 // Whether the entries of a combo box carry identifiers (item data) at all.
 // It decides whether a selection is stored by identifier or by position: the
 // two never mix within one combo box, so the stored value is unambiguous.
@@ -267,7 +269,10 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         const QJsonValue value = mutableObj.value(name);
         mutableObj.remove(name);
 
-        if (!value.isDouble()) {
+        // A spin box takes whole numbers. QJsonValue::toInt() answers with
+        // its default for a value with a fraction, so the widget would take
+        // a number the file never held.
+        if (!value.isDouble() || value.toDouble() != value.toInt()) {
             result.wrongTypes << name;
             continue;
         }
@@ -312,8 +317,19 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
             continue;
         }
 
-        listWidget->clear();
+        // The entries have to be the objects the exporter wrote. An entry
+        // that is not one would become an empty row - and the list of the
+        // user would be gone before the file is even looked at.
         const QJsonArray list = value.toArray();
+        const bool allEntriesAreObjects =
+            std::all_of(list.constBegin(), list.constEnd(),
+                        [](const QJsonValue &entry) { return entry.isObject(); });
+        if (!allEntriesAreObjects) {
+            result.wrongTypes << name;
+            continue;
+        }
+
+        listWidget->clear();
         for (const auto &v : list) {
             QJsonObject li = v.toObject();
             QListWidgetItem *item =

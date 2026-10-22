@@ -8,6 +8,7 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDoubleSpinBox>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QLineEdit>
 #include <QListWidget>
@@ -36,6 +37,8 @@ private slots:
     void theEditorsOfTheSpinBoxesAreNotRestored();
     void aValueNoWidgetClaimedIsReported();
     void aValueOfTheWrongTypeIsNotApplied();
+    void aFractionalNumberIsNotAppliedToASpinBox();
+    void aListWithAMalformedEntryIsNotApplied();
     void theInputIsNotModified();
 };
 
@@ -361,6 +364,50 @@ void TestWidgetStateSerializer::aValueOfTheWrongTypeIsNotApplied()
     QCOMPARE(restored.checkBox->isChecked(), true);
     QCOMPARE(restored.spinBox->value(), 32);
     QCOMPARE(restored.lineEdit->text(), QStringLiteral("keep me"));
+}
+
+// A spin box takes whole numbers. A value with a fraction is of the wrong
+// type: it is named and not applied, instead of reaching the widget as the
+// zero that QJsonValue::toInt() answers with.
+void TestWidgetStateSerializer::aFractionalNumberIsNotAppliedToASpinBox()
+{
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_segment_size"), 3.5);
+
+    Form restored;
+    restored.spinBox->setValue(32);
+
+    const WidgetStateSerializer::ApplyResult result =
+        WidgetStateSerializer::applyToWidgets(values, &restored.widget);
+
+    QCOMPARE(result.wrongTypes, QStringList{QStringLiteral("spinBox_segment_size")});
+    QVERIFY(result.unknownKeys.isEmpty());
+    QCOMPARE(restored.spinBox->value(), 32);
+}
+
+// The entries of a list have to be the objects the exporter wrote. A list
+// with an entry that is not one is named and not applied: the list of the
+// user stays as it is.
+void TestWidgetStateSerializer::aListWithAMalformedEntryIsNotApplied()
+{
+    QJsonObject values;
+    QJsonArray list;
+    list.append(QJsonObject{{QStringLiteral("text"), QStringLiteral("rockyou.txt")},
+                            {QStringLiteral("checked"), true}});
+    list.append(QStringLiteral("not an object"));
+    values.insert(QStringLiteral("listWidget_wordlist"), list);
+
+    Form restored;
+    auto *kept = new QListWidgetItem(QStringLiteral("best64.rule"), restored.listWidget);
+    kept->setCheckState(Qt::Checked);
+
+    const WidgetStateSerializer::ApplyResult result =
+        WidgetStateSerializer::applyToWidgets(values, &restored.widget);
+
+    QCOMPARE(result.wrongTypes, QStringList{QStringLiteral("listWidget_wordlist")});
+    QVERIFY(result.unknownKeys.isEmpty());
+    QCOMPARE(restored.listWidget->count(), 1);
+    QCOMPARE(restored.listWidget->item(0)->text(), QStringLiteral("best64.rule"));
 }
 
 // The caller reads the values after they were applied - the hash type, for
