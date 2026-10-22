@@ -24,6 +24,62 @@
 
 #include <iterator>
 
+namespace
+{
+
+// The value an imported setting takes in the dialog, and the value the dialog
+// shows for it. A key that neither knows is a key the dialog does not have a
+// widget for - which is what the test is about.
+QJsonValue importableValue(QLatin1StringView key, const Ui::SettingsDialog &ui)
+{
+    if (key == AppConstants::SettingsKeys::HashcatPath) {
+        return QStringLiteral("/imported/hashcat");
+    }
+    if (key == AppConstants::SettingsKeys::Terminal) {
+        // The terminals this machine has: a terminal that is not installed is
+        // not applied, and the import names it.
+        return ui.comboBox_terminal->count() > 0 ? ui.comboBox_terminal->itemText(0) : QString();
+    }
+    if (key == AppConstants::SettingsKeys::UseShortParameters) {
+        return !ui.checkBox_use_short_parameters->isChecked();
+    }
+    if (key == AppConstants::SettingsKeys::RestoreSession) {
+        return !ui.checkBox_restore_session->isChecked();
+    }
+    if (key == AppConstants::SettingsKeys::ColorScheme) {
+        return QStringLiteral("dark");
+    }
+    if (key == AppConstants::SettingsKeys::Language) {
+        return QStringLiteral("de");
+    }
+    return {};
+}
+
+bool dialogShows(const Ui::SettingsDialog &ui, QLatin1StringView key, const QJsonValue &value)
+{
+    if (key == AppConstants::SettingsKeys::HashcatPath) {
+        return ui.lineEdit_hc_path->text() == value.toString();
+    }
+    if (key == AppConstants::SettingsKeys::Terminal) {
+        return ui.comboBox_terminal->currentText() == value.toString();
+    }
+    if (key == AppConstants::SettingsKeys::UseShortParameters) {
+        return ui.checkBox_use_short_parameters->isChecked() == value.toBool();
+    }
+    if (key == AppConstants::SettingsKeys::RestoreSession) {
+        return ui.checkBox_restore_session->isChecked() == value.toBool();
+    }
+    if (key == AppConstants::SettingsKeys::ColorScheme) {
+        return ui.comboBox_color_scheme->currentData().toString() == value.toString();
+    }
+    if (key == AppConstants::SettingsKeys::Language) {
+        return ui.comboBox_language->currentData().toString() == value.toString();
+    }
+    return false;
+}
+
+} // namespace
+
 // The language setting and the executable check: does the combo carry locale
 // codes all the way into the settings, does a stale code stay quiet until
 // the user actually picks a language, and does selectPathClicked() turn away
@@ -50,6 +106,7 @@ private slots:
     void savedSettingsHoldTheKnownSettings();
     void savedSettingsCoverEveryKnownKey();
     void everyKnownKeyIsTypeChecked();
+    void everyKnownKeyIsApplied();
     void importSettingsFillsTheDialog();
     void importSettingsAppliesEmptyValues();
     void importSettingsNamesTheUnknownKeys();
@@ -444,6 +501,32 @@ void TestSettingsDialog::everyKnownKeyIsTypeChecked()
     QCOMPARE(notes.size(), 1);
     for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
         QVERIFY2(notes.first().contains(QString(entry.key)), qPrintable(notes.first()));
+    }
+}
+
+// Every key of the table reaches the dialog. A key that is in the table but
+// has no apply code would be exported, counted as known - so it would never
+// be named - and never applied: it would disappear without a word.
+void TestSettingsDialog::everyKnownKeyIsApplied()
+{
+    for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
+        SettingsDialog dialog;
+
+        const QJsonValue value = importableValue(entry.key, *dialog.ui);
+        QVERIFY2(!value.isUndefined(),
+                 qPrintable(QStringLiteral("no value for the setting %1").arg(QString(entry.key))));
+
+        QJsonObject stored;
+        stored.insert(QString(entry.key), value);
+
+        const QStringList notes = dialog.applyImportedSettings(stored);
+
+        // The value reached the dialog, or the import named the value it could
+        // not use here. A key that is neither was never looked at.
+        const bool applied = dialogShows(*dialog.ui, entry.key, value);
+        QVERIFY2(applied || !notes.isEmpty(),
+                 qPrintable(QStringLiteral("the setting %1 was neither applied nor named")
+                                .arg(QString(entry.key))));
     }
 }
 
