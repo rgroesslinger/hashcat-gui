@@ -116,6 +116,10 @@ exception, it goes through `attackIndexChanged()`.
 - The file the application writes and reads again: the session it keeps between two runs
   and the settings the user exports share one envelope (`sections`, and per section a
   `version` and its `values`).
+- A write replaces the whole file, it does not merge into it: the caller decides every
+  section the file holds, so the session file and an exported settings file each carry
+  one. A combined file is an explicit write of all its sections, never a merge into an
+  existing file, which would keep stale or foreign sections alive.
 - The names of the sections are constants (`AppConstants::FileSections`), never the name
   of a class: the session file is named after its class today, so renaming that class
   would orphan every profile that was ever written.

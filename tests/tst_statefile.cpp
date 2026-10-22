@@ -22,6 +22,7 @@ class TestStateFile : public QObject
 private slots:
     void aSectionSurvivesTheRoundTrip();
     void theWrittenFileHasTheExpectedShape();
+    void writingASectionReplacesTheFile();
     void theValuesAreWrittenAsUtf8();
     void anotherSectionIsRefused();
     void aFileWithTwoSectionsReportsTheOther();
@@ -109,6 +110,37 @@ void TestStateFile::theWrittenFileHasTheExpectedShape()
         sections.value(QString(AppConstants::FileSections::Session)).toObject();
     QCOMPARE(section.value(QStringLiteral("version")).toInt(), 1);
     QCOMPARE(section.value(QStringLiteral("values")).toObject(), values);
+}
+
+// Writing a section replaces the whole file: a section an earlier write put
+// there does not survive next to it. The caller decides what the file holds;
+// a combined file would be written in one call, not merged in.
+void TestStateFile::writingASectionReplacesTheFile()
+{
+    const QString path = scratchFile(QStringLiteral("replace.json"));
+
+    QJsonObject session;
+    session.insert(QStringLiteral("lineEdit_hashfile"), QStringLiteral("/tmp/hashes.txt"));
+    QVERIFY(StateFile::write(path, AppConstants::FileSections::Session, 1, session, nullptr));
+
+    QJsonObject settings;
+    settings.insert(QStringLiteral("hashcatPath"), QStringLiteral("/opt/hashcat"));
+    QVERIFY(StateFile::write(path, AppConstants::FileSections::Settings, 1, settings, nullptr));
+
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    QString errorMessage;
+    QVERIFY2(StateFile::read(path, AppConstants::FileSections::Settings, &values, &version,
+                             &otherSections, &errorMessage),
+             qPrintable(errorMessage));
+    QCOMPARE(values, settings);
+    QVERIFY(otherSections.isEmpty());
+
+    // The session of the first write is gone, not kept beside the settings.
+    QVERIFY(!StateFile::read(path, AppConstants::FileSections::Session, &values, &version,
+                             &otherSections, &errorMessage));
+    QCOMPARE(otherSections, QStringList{QString(AppConstants::FileSections::Settings)});
 }
 
 // The values are written as UTF-8, so the bytes on disk are the encoded

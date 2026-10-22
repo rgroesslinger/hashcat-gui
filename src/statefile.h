@@ -34,6 +34,11 @@ class StateFile
 public:
     // Writes the values into the file as the section of the given name.
     //
+    // The file is replaced as a whole, not merged into: a section a previous
+    // write put there is gone, so the caller decides everything the file
+    // holds. A combined file is an explicit write of all its sections, not a
+    // merge into one that already exists.
+    //
     // The write is atomic: a crash in the middle leaves the old file alone
     // instead of a truncated one.
     static bool write(const QString &filename, QLatin1StringView section, int version,
