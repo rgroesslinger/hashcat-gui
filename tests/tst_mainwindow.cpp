@@ -134,6 +134,18 @@ QStringList differingWidgets(const QString &filename, const QJsonObject &referen
 
 } // namespace
 
+// A hashcat that answers the query for the hash types.
+//
+// A binary that is not there opens a "hashcat error" box while the test
+// runs, and the recorder keeps only the last box it saw - so a test that
+// wants a box of its own needs a hashcat that answers.
+QString hashcatStub(const QString &name)
+{
+    return TestEnvironment::writeShellStub(name, "#!/bin/sh\n"
+                                                 "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
+                                                 "exit 0\n");
+}
+
 // The half of the command line rules that lives in widgets: does a freshly
 // opened window really start at the values HashcatOptions documents, does the
 // item data survive into the options, and do the group boxes agree with the
@@ -196,6 +208,8 @@ private slots:
     void theImportNamesTheValuesTheSessionDoesNotKnow();
     void aNewerSessionIsRefused();
     void anOlderSessionIsAppliedWithANote();
+    void aNewerSettingsFileIsRefused();
+    void anOlderStartupSessionIsAppliedWithANote();
     void aNewerStartupSessionIsLeftAlone();
     void aNewerSessionSurvivesTheExit();
     void theNewerSessionWarningSaysWhatIsLost();
@@ -1382,9 +1396,15 @@ void TestMainWindow::theSettingsAreImportedThroughTheFileMenu()
                              AppConstants::Settings::Version, values, nullptr));
 
     // A configured hashcat, so that the window does not queue the settings
-    // dialog of its own.
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
-                                       QStringLiteral("/opt/somewhere/hashcat"));
+    // dialog of its own - and one that answers, so that no error box opens
+    // while the test runs.
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-settings-import"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
     TestEnvironment::ModalRecorder recorder;
@@ -1403,8 +1423,12 @@ void TestMainWindow::theSettingsAreImportedThroughTheFileMenu()
              QStringLiteral("/imported/hashcat-from-the-file"));
     // The preview follows the new binary and the new parameter style without
     // the user touching a widget.
-    QVERIFY(window.ui->lineEdit_command->text().startsWith(
-        QStringLiteral("hashcat-from-the-file -a 0")));
+    // The preview follows the new binary and the new parameter style without
+    // the user touching a widget. The hash type the stub reports is in it
+    // as well.
+    const QString preview = window.ui->lineEdit_command->text();
+    QVERIFY2(preview.startsWith(QStringLiteral("hashcat-from-the-file")), qPrintable(preview));
+    QVERIFY2(preview.contains(QStringLiteral(" -a 0")), qPrintable(preview));
 }
 
 // A session file that names a widget this version does not know - it was
@@ -1420,8 +1444,13 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version, values, nullptr));
 
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
-                                       QStringLiteral("/opt/somewhere/hashcat"));
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-import"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
     TestEnvironment::ModalRecorder recorder;
@@ -1448,8 +1477,13 @@ void TestMainWindow::aNewerSessionIsRefused()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version + 1, values, nullptr));
 
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
-                                       QStringLiteral("/opt/somewhere/hashcat"));
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-newer"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
     TestEnvironment::ModalRecorder recorder;
@@ -1476,8 +1510,13 @@ void TestMainWindow::anOlderSessionIsAppliedWithANote()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version - 1, values, nullptr));
 
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
-                                       QStringLiteral("/opt/somewhere/hashcat"));
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-older-import"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
     TestEnvironment::ModalRecorder recorder;
@@ -1490,6 +1529,86 @@ void TestMainWindow::anOlderSessionIsAppliedWithANote()
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Imported"));
     QVERIFY(recorder.text.contains(QStringLiteral("older version")));
+}
+
+// A settings file of a newer format version is refused, like a session file:
+// the keys it holds may mean something else there.
+void TestMainWindow::aNewerSettingsFileIsRefused()
+{
+    const QString file =
+        TestEnvironment::configHome().filePath(QStringLiteral("newer-settings.json"));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("useShortParameters"), true);
+    QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,
+                             AppConstants::Settings::Version + 1, values, nullptr));
+
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-settings"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "importSettingsTriggered"));
+
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Import failed"));
+    QVERIFY(recorder.text.contains(
+        QStringLiteral("format version %1").arg(AppConstants::Settings::Version + 1)));
+    // The settings of the file were not applied.
+    QCOMPARE(
+        SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::UseShortParameters),
+        false);
+}
+
+// A session file of an older version is applied at the startup as well: the
+// values it still names are restored, and the file is rewritten with the
+// current version at the exit.
+void TestMainWindow::anOlderStartupSessionIsAppliedWithANote()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version - 1, values, nullptr));
+
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-older"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    MainWindow window;
+
+    // The value that named a widget was applied...
+    QCOMPARE(window.ui->spinBox_segment_size->value(), 64);
+    // ... and the note says that the file was made by an older version.
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Session warning"));
+    QVERIFY(recorder.text.contains(QStringLiteral("older version")));
+
+    // The exit writes the file with the current version.
+    window.saveSession();
+
+    QJsonObject written;
+    int version = 0;
+    QStringList otherSections;
+    QVERIFY(StateFile::read(session, AppConstants::FileSections::Session, &written, &version,
+                            &otherSections, nullptr));
+    QCOMPARE(version, AppConstants::Sessions::Version);
 }
 
 // The session the application restores at startup follows the same rule, and
