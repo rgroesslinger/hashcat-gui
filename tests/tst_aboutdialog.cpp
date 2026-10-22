@@ -60,7 +60,7 @@ void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
 
     dialog.setVersionText(longText);
 
-    // SetFixedSize re-applies the layout's size once the event loop turns.
+    // The layout grows the dialog once the new text has reached the label.
     QTRY_VERIFY(dialog.height() > heightBefore);
     // The text wrapped onto several lines instead of widening the dialog to
     // the whole one-line string, so it stays on-screen.

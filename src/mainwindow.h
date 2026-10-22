@@ -133,8 +133,8 @@ private:
     void loadDefaultProfile();
     void saveDefaultProfile();
 
-    // Restores the hash type a profile names. Returns a message when the
-    // profile names a hash type this hashcat does not know.
+    // Queues the hash type a profile names until the list of hash types
+    // exists, and reports one this hashcat does not know.
     QString restoreHashType(const QJsonObject &state);
 
     // Applies the hash type a profile asked for, now that the list of hash

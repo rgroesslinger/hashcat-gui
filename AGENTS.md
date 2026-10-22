@@ -103,8 +103,8 @@ exception, it goes through `attackIndexChanged()`.
   `QListWidget`) are addressed by `objectName`. The names are part of the session
   format: renaming one breaks saved profiles and tests.
 - `applyToWidgets()` returns the names of the values that no widget claimed — the values
-  of a file that was made by another version, or that was edited by hand. The caller
-  names them for the user.
+  of a file that was made by another version, or that was edited by hand — and the names of
+  the values whose type the widget cannot take. The caller names both for the user.
 - A `QComboBox` is stored by the item data the app gave the entry (attack mode id, hash type
   id, workload level) — never by display text (translatable). Only a combo with no item data
   at all falls back to position, which is not an identifier: inserting mid-list shifts every
@@ -140,6 +140,8 @@ exception, it goes through `attackIndexChanged()`.
 
 ### Settings
 - `QSettings::NativeFormat` under the application name; keys go in `AppConstants::SettingsKeys`.
+- The settings export is a snapshot of the stored values: `SettingsDialog::savedSettings()`
+  is static and reads `QSettings`, so it does not depend on a dialog being open.
 - Do not set `QCoreApplication`'s organization name: it changes
   `QStandardPaths::AppDataLocation` and the default-profile path.
 

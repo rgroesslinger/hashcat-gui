@@ -114,10 +114,9 @@ inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 //
 // A profile stores the widgets by their object name, so the names are part of
 // the format: a profile written by another version of hashcat-gui can name
-// widgets that no longer exist, and then it would fill in only half of the
-// form without saying so. The version number makes that visible - a profile
-// with a different number is still read, but the user is told that it is not
-// complete.
+// widgets that no longer exist. An older file is applied and the values it
+// cannot use are named; a file of a newer format is refused, because a name
+// that survived may mean something else there.
 namespace Profiles
 {
 inline constexpr int Version = 1;
@@ -191,11 +190,9 @@ inline constexpr QLatin1StringView HashcatFaq{
     "https://hashcat.net/wiki/doku.php?id=frequently_asked_questions"};
 inline constexpr QLatin1StringView Project{"https://github.com/rgroesslinger/hashcat-gui"};
 inline constexpr QLatin1StringView Issues{"https://github.com/rgroesslinger/hashcat-gui/issues"};
-// The license of the application and the one of the tool it drives.
+// The license of the application.
 inline constexpr QLatin1StringView License{
     "https://github.com/rgroesslinger/hashcat-gui/blob/master/LICENSE"};
-inline constexpr QLatin1StringView HashcatLicense{
-    "https://github.com/hashcat/hashcat/blob/master/docs/license.txt"};
 } // namespace Urls
 
 // Command line tokens that belong to hashcat itself.

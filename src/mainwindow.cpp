@@ -795,18 +795,6 @@ void MainWindow::loadDefaultProfile()
     }
 }
 
-// The hash type a profile names, applied to the combo box.
-//
-// The list of hash types arrives with the asynchronous hashcat query, so a
-// profile loaded before it cannot select anything yet: the id waits in
-// m_pendingHashTypeId until the items exist.
-//
-// The id is what the list is keyed by, and it is what a profile stores. A
-// profile that names no id - one written before the ids were stored - does
-// not select a hash type.
-//
-// Returns a message when the profile names a hash type this hashcat does
-// not know.
 // The hash type of a profile.
 //
 // The mapping applies it when the list of hash types is there; this only
