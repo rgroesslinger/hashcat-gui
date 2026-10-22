@@ -22,8 +22,8 @@ public:
 
     // Where the settings are stored.
     //
-    // A file on the systems that keep settings in files, the registry on
-    // Windows - so the answer is a path only where there is one.
+    // A file on every platform: QSettings::IniFormat keeps the settings in
+    // an INI file on Windows as well, so there is always a path to open.
     QString fileName() const;
 
 private:

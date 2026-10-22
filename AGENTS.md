@@ -153,7 +153,7 @@ exception, it goes through `attackIndexChanged()`.
   more than one section is read for the one that is wanted, and the others are named.
 
 ### Settings
-- `QSettings::NativeFormat` under the application name; keys go in `AppConstants::SettingsKeys`.
+- `QSettings::IniFormat` under the application name; keys go in `AppConstants::SettingsKeys`.
 - The settings export is a snapshot of the stored values: `SettingsDialog::savedSettings()`
   is static and reads `QSettings`, so it does not depend on a dialog being open.
 - The keys and the type of value each takes are one table (`SettingsKeys::All`); the

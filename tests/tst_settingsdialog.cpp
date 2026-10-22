@@ -394,14 +394,10 @@ void TestSettingsDialog::showsWhereTheFilesAreStored()
     const QString sessionFile = StateFile::sessionFilePath();
     QVERIFY(dialog.ui->lineEdit_session_path->text().contains(QFileInfo(sessionFile).fileName()));
 
-    // Where the settings live in a file, there is a folder to open; on
-    // Windows the registry key opens in RegEdit instead.
-#ifdef Q_OS_WIN
-    QCOMPARE(dialog.ui->pushButton_open_folder->isEnabled(), true);
-#else
+    // The settings live in a file on every platform now, so there is a
+    // folder to open wherever the path is absolute.
     const bool inFile = QFileInfo(settingsFile).isAbsolute();
     QCOMPARE(dialog.ui->pushButton_open_folder->isEnabled(), inFile);
-#endif
 }
 
 // The export holds the settings the application runs with, so that they can

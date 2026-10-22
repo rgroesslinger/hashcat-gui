@@ -7,7 +7,7 @@
 #include <QCoreApplication>
 
 SettingsManager::SettingsManager()
-    : settings(QSettings::NativeFormat, QSettings::UserScope, QCoreApplication::applicationName(),
+    : settings(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationName(),
                QStringLiteral("settings"))
 {
 }

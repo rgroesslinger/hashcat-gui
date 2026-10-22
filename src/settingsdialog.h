@@ -68,8 +68,7 @@ private:
     // can tell an actual change from "the user pressed Save".
     QString loadedLanguage;
 
-    // The folder the settings are stored in, empty where there is none - the
-    // registry on Windows has no folder to open.
+    // The folder the settings are stored in, empty where there is none to open.
     QString m_settingsFolder;
 
     // The dialog is fitted to its content once, on the first show.

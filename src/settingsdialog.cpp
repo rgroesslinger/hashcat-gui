@@ -10,7 +10,6 @@
 #include "statefile.h"
 #include "appconstants.h"
 #include <QDesktopServices>
-#include <QProcess>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -170,25 +169,19 @@ void SettingsDialog::updatePathLabels()
     const QString settingsFile = SettingsManager::instance().fileName();
     const QString sessionFile = StateFile::sessionFilePath();
 
-    // The settings live in a file on most systems and in the registry on
-    // Windows. A file has a folder to open; a registry key opens in RegEdit.
+    // The settings live in a file on every platform now, so there is always
+    // a folder to open next to them.
     if (QFileInfo(settingsFile).isAbsolute()) {
         m_settingsFolder = QFileInfo(settingsFile).absolutePath();
     } else {
-        m_settingsFolder = settingsFile;
+        m_settingsFolder = QString();
     }
     ui->pushButton_open_folder->setEnabled(!m_settingsFolder.isEmpty());
 
-#ifdef Q_OS_WIN
-    if (QFileInfo(settingsFile).isAbsolute()) {
-        ui->pushButton_open_folder->setText(tr("Open the folder"));
-    } else {
-        ui->pushButton_open_folder->setText(tr("Open in Registry Editor"));
-    }
-#endif
-
-    ui->lineEdit_settings_path->setText(shortenPath(settingsFile));
-    ui->lineEdit_session_path->setText(shortenPath(sessionFile));
+    // Qt keeps paths with "/" internally; show the native separator so a
+    // path copied out of the field is valid in another application.
+    ui->lineEdit_settings_path->setText(QDir::toNativeSeparators(shortenPath(settingsFile)));
+    ui->lineEdit_session_path->setText(QDir::toNativeSeparators(shortenPath(sessionFile)));
 }
 
 // The home directory as a tilde.
@@ -221,28 +214,7 @@ void SettingsDialog::openFolderClicked()
     }
 
     // A file-backed location opens in the file manager.
-    if (QFileInfo(m_settingsFolder).isAbsolute()) {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
-        return;
-    }
-
-#ifdef Q_OS_WIN
-    // RegEdit has no command line argument for the key to open, so set the
-    // key it remembers as "last opened" and then launch it.
-    QString key = m_settingsFolder;
-    if (!key.startsWith(QStringLiteral("Computer\\"), Qt::CaseInsensitive)
-        && !key.startsWith(QStringLiteral("Computer/"), Qt::CaseInsensitive)) {
-        key = QStringLiteral("Computer\\") + key;
-    }
-
-    QProcess::execute(
-        QStringLiteral("reg"),
-        {QStringLiteral("add"),
-         QStringLiteral("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Applets\\Regedit"),
-         QStringLiteral("/v"), QStringLiteral("LastKey"), QStringLiteral("/t"),
-         QStringLiteral("REG_SZ"), QStringLiteral("/d"), key, QStringLiteral("/f")});
-    QProcess::startDetached(QStringLiteral("regedit"));
-#endif
+    QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
 }
 
 // The settings as they are stored right now.
