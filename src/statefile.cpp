@@ -5,7 +5,6 @@
 
 #include "statefile.h"
 
-#include <QCoreApplication>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonParseError>
@@ -20,15 +19,6 @@ void setError(QString *errorMessage, const QString &text)
         *errorMessage = text;
     }
 }
-
-// Which release wrote the file. The version is empty in the test process, so
-// the space in front of it goes with it.
-QString createdWith()
-{
-    const QString name = QCoreApplication::applicationName();
-    const QString version = QCoreApplication::applicationVersion();
-    return version.isEmpty() ? name : name + QLatin1Char(' ') + version;
-}
 } // namespace
 
 bool StateFile::write(const QString &filename, QLatin1StringView section, int version,
@@ -42,7 +32,6 @@ bool StateFile::write(const QString &filename, QLatin1StringView section, int ve
     sections.insert(QString(section), sectionObject);
 
     QJsonObject root;
-    root.insert(QStringLiteral("createdWith"), createdWith());
     root.insert(QStringLiteral("sections"), sections);
 
     // QSaveFile writes to a temporary file next to the target and renames it

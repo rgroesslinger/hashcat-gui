@@ -7,6 +7,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QClipboard>
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -192,6 +193,9 @@ private slots:
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
     void theImportNamesTheValuesTheSessionDoesNotKnow();
+    void aNewerProfileIsRefused();
+    void anOlderProfileIsAppliedWithANote();
+    void aNewerStartupProfileIsLeftAlone();
     void theStartupShowsNoBox();
 
 private:
@@ -1094,7 +1098,7 @@ void TestMainWindow::profileHashTypeSurvivesTheAsynchronousQuery()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"createdWith": "hashcat-gui 0.8.0", "sections": {"session": )"
+    profile.write(R"({"sections": {"session": )"
                   R"({"version": 1, "values": {"comboBox_hash_type": 1000}}}})");
     profile.close();
 
@@ -1134,7 +1138,7 @@ void TestMainWindow::profileWithAnUnknownHashTypeSelectsNothing()
     QVERIFY(QDir().mkpath(dir));
     QFile profile(QDir(dir).filePath(AppConstants::Files::DefaultProfile));
     QVERIFY(profile.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    profile.write(R"({"createdWith": "hashcat-gui 0.8.0", "sections": {"session": )"
+    profile.write(R"({"sections": {"session": )"
                   R"({"version": 1, "values": {"comboBox_hash_type": 9999}}}})");
     profile.close();
 
@@ -1387,6 +1391,81 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
     // ... and the one that named nothing is named in the notes.
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
+}
+
+// A file with a newer format version is not applied at all: a value whose
+// name survived may mean something else there. The note names the version.
+void TestMainWindow::aNewerProfileIsRefused()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("newer.json"));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
+                             AppConstants::Profiles::Version + 1, values, nullptr));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/somewhere/hashcat"));
+
+    MainWindow window;
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
+
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Import failed"));
+    QVERIFY(recorder.text.contains(
+        QStringLiteral("format version %1").arg(AppConstants::Profiles::Version + 1)));
+    QVERIFY(window.ui->spinBox_segment_size->value() != 64);
+}
+
+// A file an older version wrote is applied, and the note says why a value it
+// named may be missing.
+void TestMainWindow::anOlderProfileIsAppliedWithANote()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("older.json"));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
+                             AppConstants::Profiles::Version - 1, values, nullptr));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/somewhere/hashcat"));
+
+    MainWindow window;
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
+
+    QCOMPARE(window.ui->spinBox_segment_size->value(), 64);
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Imported"));
+    QVERIFY(recorder.text.contains(QStringLiteral("older version")));
+}
+
+// The profile the application restores at startup follows the same rule, and
+// the file of the newer format version is left in place for that version.
+void TestMainWindow::aNewerStartupProfileIsLeftAlone()
+{
+    const QString profile = WidgetStateSerializer::defaultProfilePath();
+    QVERIFY(QFileInfo(profile).dir().mkpath(QStringLiteral(".")));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    QVERIFY(StateFile::write(profile, AppConstants::FileSections::Session,
+                             AppConstants::Profiles::Version + 1, values, nullptr));
+
+    m_watchdog.start();
+    MainWindow window;
+
+    QCOMPARE(m_closedModals, 1);
+    QVERIFY(window.ui->spinBox_segment_size->value() != 64);
+    QVERIFY(QFile::exists(profile));
 }
 
 // The startup must be quiet. A profile the application wrote itself holds

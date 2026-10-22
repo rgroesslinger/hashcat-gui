@@ -451,6 +451,12 @@ void MainWindow::importTriggered()
         return;
     }
 
+    if (version > AppConstants::Profiles::Version) {
+        QMessageBox::warning(this, tr("Import failed"),
+                             newerFileNote(version, AppConstants::Profiles::Version));
+        return;
+    }
+
     // The mapping applies the values; the hash type is the one it cannot
     // take yet, see restoreHashType().
     const WidgetStateSerializer::ApplyResult notApplied =
@@ -489,8 +495,14 @@ QStringList MainWindow::fileNotes(int fileVersion, int currentVersion,
 {
     QStringList notes;
 
-    if (fileVersion != currentVersion) {
-        notes << tr("This file was made by another version of hashcat-gui.");
+    // A newer format version is refused before it gets here: a name that
+    // survived may mean something else there. A file that names no version is
+    // hand-edited; its values are applied like an older file's.
+    if (fileVersion >= 0 && fileVersion < currentVersion) {
+        notes << tr("The file was made by an older version of hashcat-gui (format version %1; "
+                    "this version reads %2).")
+                     .arg(fileVersion)
+                     .arg(currentVersion);
     }
 
     if (!otherSections.isEmpty()) {
@@ -499,6 +511,17 @@ QStringList MainWindow::fileNotes(int fileVersion, int currentVersion,
     }
 
     return notes;
+}
+
+// Why a file with a newer format version is not applied at all: this version
+// does not know what the values it cannot name mean, and a name that survived
+// may mean something else there.
+QString MainWindow::newerFileNote(int fileVersion, int currentVersion) const
+{
+    return tr("The file holds format version %1, but this version reads version %2, so it was "
+              "not applied. Update hashcat-gui to read it.")
+        .arg(fileVersion)
+        .arg(currentVersion);
 }
 
 // File → Export Settings
@@ -542,6 +565,12 @@ void MainWindow::importSettingsTriggered()
     if (!StateFile::read(file, AppConstants::FileSections::Settings, &values, &version,
                          &otherSections, &error)) {
         QMessageBox::warning(this, tr("Import failed"), error);
+        return;
+    }
+
+    if (version > AppConstants::Settings::Version) {
+        QMessageBox::warning(this, tr("Import failed"),
+                             newerFileNote(version, AppConstants::Settings::Version));
         return;
     }
 
@@ -715,6 +744,14 @@ void MainWindow::loadDefaultProfile()
         // the user made: a file that cannot be read is deleted and the start
         // goes on. The files the user exported are never deleted.
         QFile::remove(file);
+        return;
+    }
+
+    // A profile with a newer format version is left in place: it is what that
+    // version saved, and the user may go back to it.
+    if (version > AppConstants::Profiles::Version) {
+        QMessageBox::warning(this, tr("Profile warning"),
+                             newerFileNote(version, AppConstants::Profiles::Version));
         return;
     }
 

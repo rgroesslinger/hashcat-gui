@@ -18,7 +18,6 @@
 // The file is a JSON object with the sections it holds:
 //
 //   {
-//     "createdWith": "hashcat-gui 0.8.0",
 //     "sections": {
 //       "session": { "version": 1, "values": { ... } }
 //     }

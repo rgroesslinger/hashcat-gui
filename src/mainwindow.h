@@ -113,6 +113,9 @@ private:
     QStringList fileNotes(int fileVersion, int currentVersion,
                           const QStringList &otherSections) const;
 
+    // Why a file a newer version wrote is not applied at all.
+    QString newerFileNote(int fileVersion, int currentVersion) const;
+
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about
     // widgets.

@@ -114,15 +114,20 @@ exception, it goes through `attackIndexChanged()`.
 
 ### StateFile
 - The file the application writes and reads again: the session it keeps between two runs
-  and the settings the user exports share one envelope (`createdWith`, `sections`, and per
-  section a `version` and its `values`).
+  and the settings the user exports share one envelope (`sections`, and per section a
+  `version` and its `values`).
 - The names of the sections are constants (`AppConstants::FileSections`), never the name
   of a class: the session file is named after its class today, so renaming that class
   would orphan every profile that was ever written.
 - Each section has its own version (`AppConstants::Profiles::Version` for the session,
   `AppConstants::Settings::Version` for the settings), because the widget names and the
   setting keys change independently of each other. Bump the version of a section whenever
-  one of its keys is renamed.
+  one of its keys is renamed, not when one is added: an added key is reported by name.
+- A section version newer than this build's is refused before anything is applied: the
+  bump signals a rename, and a name that survived may mean something else there. A file
+  with an older version is applied, and the values it cannot apply are named. A value
+  that is unknown or of the wrong type in a file of the same version is skipped and
+  named, never a reason to refuse the file.
 - The class owns the envelope and nothing else: it knows neither the widgets nor the
   settings of a section, and it does not know the version of one — the caller passes it
   in and compares what it reads.

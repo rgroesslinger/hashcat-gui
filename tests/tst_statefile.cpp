@@ -99,8 +99,8 @@ void TestStateFile::theWrittenFileHasTheExpectedShape()
     const QJsonObject root = QJsonDocument::fromJson(file.readAll()).object();
     file.close();
 
-    // The release that wrote the file is named, but it is only information.
-    QVERIFY(root.value(QStringLiteral("createdWith")).isString());
+    // The envelope holds the sections and nothing else.
+    QCOMPARE(root.keys(), QStringList{QStringLiteral("sections")});
 
     const QJsonObject sections = root.value(QStringLiteral("sections")).toObject();
     QCOMPARE(sections.keys(), QStringList{QString(AppConstants::FileSections::Session)});
