@@ -197,6 +197,8 @@ private slots:
     void aNewerSessionIsRefused();
     void anOlderSessionIsAppliedWithANote();
     void aNewerStartupSessionIsLeftAlone();
+    void aNewerSessionSurvivesTheExit();
+    void theNewerSessionWarningSaysWhatIsLost();
     void aSessionFileThatCannotBeReadIsLeftAlone();
     void aSessionFileOfAnotherShapeIsLeftAlone();
     void theStartupShowsNoBox();
@@ -1508,6 +1510,46 @@ void TestMainWindow::aNewerStartupSessionIsLeftAlone()
     QCOMPARE(m_closedModals, 1);
     QVERIFY(window.ui->spinBox_segment_size->value() != 64);
     QVERIFY(QFile::exists(session));
+}
+
+// The session of a newer version survives the exit: it is not written over,
+// and it is not deleted - not even when the session is switched off, which
+// is the case where the file is never read at the startup.
+void TestMainWindow::aNewerSessionSurvivesTheExit()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version + 1, values, nullptr));
+    const QJsonObject before = readJsonObject(session);
+
+    m_watchdog.start();
+    MainWindow window;
+    QCOMPARE(m_closedModals, 1);
+
+    // The session is on: the file of the newer version is not written over.
+    window.saveSession();
+    QCOMPARE(readJsonObject(session), before);
+
+    // The session is off: the file is not deleted either.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, false);
+    window.saveSession();
+    QCOMPARE(readJsonObject(session), before);
+    QVERIFY(QFile::exists(session));
+}
+
+// The warning of a newer session says what the user loses: the session is not
+// restored, and the session of this run is not stored either.
+void TestMainWindow::theNewerSessionWarningSaysWhatIsLost()
+{
+    MainWindow window;
+
+    const QString note = window.newerSessionNote(AppConstants::Sessions::Version + 1);
+    QVERIFY(note.contains(QStringLiteral("not restored")));
+    QVERIFY(note.contains(QStringLiteral("not stored")));
 }
 
 // A session file this version cannot read is not thrown away: it may belong

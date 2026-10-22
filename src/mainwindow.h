@@ -116,6 +116,10 @@ private:
     // Why a file a newer version wrote is not applied at all.
     QString newerFileNote(int fileVersion, int currentVersion) const;
 
+    // Why the session of a newer version is not restored - and not stored
+    // either.
+    QString newerSessionNote(int fileVersion) const;
+
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about
     // widgets.

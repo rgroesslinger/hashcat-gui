@@ -546,6 +546,20 @@ QString MainWindow::newerFileNote(int fileVersion, int currentVersion) const
         .arg(currentVersion);
 }
 
+// Why the session of a newer version is not restored.
+//
+// The file is left as it is as well, so the session of this run is not
+// stored either: the session of the newer version wins over the one of this
+// run.
+QString MainWindow::newerSessionNote(int fileVersion) const
+{
+    return tr("The session file is in format version %1, but this version reads format version %2, "
+              "so the session was not restored. The file was left as it is, so the session of "
+              "this run is not stored either. Update hashcat-gui to read it.")
+        .arg(fileVersion)
+        .arg(AppConstants::Sessions::Version);
+}
+
 // File → Export Settings
 void MainWindow::exportSettingsTriggered()
 {
@@ -773,8 +787,7 @@ void MainWindow::loadSession()
     // A session with a newer format version is left in place: it is what that
     // version saved, and the user may go back to it.
     if (version > AppConstants::Sessions::Version) {
-        QMessageBox::warning(this, tr("Session warning"),
-                             newerFileNote(version, AppConstants::Sessions::Version));
+        QMessageBox::warning(this, tr("Session warning"), newerSessionNote(version));
         return;
     }
 
