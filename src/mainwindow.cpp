@@ -482,7 +482,7 @@ void MainWindow::importTriggered()
     // The mapping applies the values; the hash type is the one it cannot
     // take yet, see restoreHashType().
     const WidgetStateSerializer::ApplyResult notApplied =
-        WidgetStateSerializer::applyToWidgets(values, this);
+        WidgetStateSerializer::applyToWidgets(values, this, {AppConstants::Files::PreviewWidget});
     const QString problem = restoreHashType(values);
     commandChanged();
 
@@ -796,7 +796,7 @@ void MainWindow::loadSession()
     // asynchronously. Remember the stored hash type; the reply applies it
     // once the items exist.
     const WidgetStateSerializer::ApplyResult notApplied =
-        WidgetStateSerializer::applyToWidgets(values, this);
+        WidgetStateSerializer::applyToWidgets(values, this, {AppConstants::Files::PreviewWidget});
     const QString problem = restoreHashType(values);
     commandChanged();
 
