@@ -107,6 +107,7 @@ private slots:
     void savedSettingsCoverEveryKnownKey();
     void everyKnownKeyIsTypeChecked();
     void everyKnownKeyIsApplied();
+    void theImportedHashcatPathIsNamedWhenItIsMissing();
     void importSettingsFillsTheDialog();
     void importSettingsAppliesEmptyValues();
     void importSettingsNamesTheUnknownKeys();
@@ -530,6 +531,26 @@ void TestSettingsDialog::everyKnownKeyIsApplied()
     }
 }
 
+// A path of another machine is the normal case of an import. It is applied,
+// so that the user can correct it in the dialog, and named, so that the
+// missing file is not a surprise when hashcat is started.
+void TestSettingsDialog::theImportedHashcatPathIsNamedWhenItIsMissing()
+{
+    const QString missing = QStringLiteral("/opt/somewhere/hashcat");
+
+    QJsonObject stored;
+    stored.insert(QStringLiteral("hashcatPath"), missing);
+
+    SettingsDialog dialog;
+    const QStringList notes = dialog.applyImportedSettings(stored);
+
+    // The path is in the dialog, where the user can correct it...
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), missing);
+    // ... and the import says that it is not here.
+    QCOMPARE(notes.size(), 1);
+    QVERIFY2(notes.first().contains(missing), qPrintable(notes.first()));
+}
+
 // The import fills the dialog with the settings of a file. They are not
 // applied before the user saves them.
 void TestSettingsDialog::importSettingsFillsTheDialog()
@@ -651,10 +672,16 @@ void TestSettingsDialog::importSettingsNamesTheUnknownKeys()
 
     // The known key was applied...
     QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QStringLiteral("/imported/hashcat"));
-    // ... and the unknown ones are named in one sentence.
-    QCOMPARE(notes.size(), 1);
-    QVERIFY(notes.first().contains(QStringLiteral("aKeyFromTheFuture")));
-    QVERIFY(notes.first().contains(QStringLiteral("anotherOne")));
+    // ... and the unknown ones are named in one sentence. The path is not on
+    // this computer either, and that has a note of its own.
+    QStringList unknownNotes;
+    for (const QString &note : notes) {
+        if (note.contains(QStringLiteral("aKeyFromTheFuture"))) {
+            unknownNotes << note;
+        }
+    }
+    QCOMPARE(unknownNotes.size(), 1);
+    QVERIFY(unknownNotes.first().contains(QStringLiteral("anotherOne")));
 }
 
 // A value of the wrong type cannot be applied: converting it would change a

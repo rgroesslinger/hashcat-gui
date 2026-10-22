@@ -43,6 +43,13 @@ bool hasExpectedType(QLatin1StringView key, const QJsonValue &value)
 
     return false;
 }
+
+// Whether the path names a file that can be run.
+bool isExecutableFile(const QString &path)
+{
+    const QFileInfo file(path);
+    return file.isFile() && file.isExecutable();
+}
 } // namespace
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsDialog)
@@ -244,7 +251,15 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
     if (settings.contains(AppConstants::SettingsKeys::HashcatPath)) {
         const QJsonValue value = settings.value(AppConstants::SettingsKeys::HashcatPath);
         if (hasExpectedType(AppConstants::SettingsKeys::HashcatPath, value)) {
-            ui->lineEdit_hc_path->setText(value.toString());
+            const QString path = value.toString();
+            ui->lineEdit_hc_path->setText(path);
+
+            // A path of another machine is the normal case of an import. It
+            // is applied - the user reviews the dialog before saving - and
+            // named, so that the missing file is not a surprise later.
+            if (!path.isEmpty() && !isExecutableFile(path)) {
+                notes << tr("The hashcat path %1 was not found on this computer.").arg(path);
+            }
         } else {
             wrongTypes << QString(AppConstants::SettingsKeys::HashcatPath);
         }
