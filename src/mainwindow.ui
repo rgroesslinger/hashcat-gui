@@ -1489,6 +1489,7 @@
     </property>
     <addaction name="actionImport"/>
     <addaction name="actionExport"/>
+    <addaction name="separator"/>
     <addaction name="actionImportSettings"/>
     <addaction name="actionExportSettings"/>
     <addaction name="actionSettings"/>

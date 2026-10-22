@@ -82,7 +82,9 @@ QString commandTooltip(const QString &command)
     QString line;
     for (const QString &part : std::as_const(parts)) {
         const bool endsWithFlag = line.section(QLatin1Char(' '), -1).startsWith(QLatin1Char('-'));
-        if (!line.isEmpty() && line.size() + part.size() > 120 && !endsWithFlag) {
+        // The space between the parts counts too: the line is one character
+        // longer than the two of them together.
+        if (!line.isEmpty() && line.size() + part.size() + 1 > 120 && !endsWithFlag) {
             lines << line;
             line = part;
         } else {
@@ -830,6 +832,10 @@ void MainWindow::loadSession()
 // The mapping applies it when the list of hash types is there; this only
 // checks whether this hashcat knows the one the file names, and it waits for
 // the list while the query that fills it is still on its way.
+//
+// A hash type this hashcat does not know leaves the combo without a
+// selection: the position would point at a different hash type, and cracking
+// with the wrong one is worse than not cracking at all.
 QString MainWindow::restoreHashType(const QJsonObject &values)
 {
     const int id = values.value(QStringLiteral("comboBox_hash_type")).toInt(-1);

@@ -38,8 +38,8 @@ public:
 protected:
     // The dialog opens as large as its content. The height of the
     // word-wrapped labels is only known once they have been polished, so the
-    // fit happens when the dialog is shown - and only then, so that a window
-    // the user has resized is left alone.
+    // fit happens when the dialog is shown - once per open, so that a window
+    // the user has resized in the meantime is left alone.
     void showEvent(QShowEvent *event) override;
 
 private slots:
