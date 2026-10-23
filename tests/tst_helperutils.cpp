@@ -329,16 +329,17 @@ void TestHelperUtils::terminalArgumentsArePinned()
     };
     const Expected expected[] = {
         {"cmd.exe", {"/k"}},
+        {"powershell.exe", {"-NoExit", "-NoProfile", "-Command", "&"}},
+        {"pwsh", {"-NoExit", "-NoProfile", "-Command", "&"}},
         {"xterm", {"-hold", "-e"}},
         {"gnome-terminal", {"--wait", "--"}},
         {"ptyxis", {"--"}},
         {"konsole", {"--hold", "-e"}},
         {"xfce4-terminal", {"--hold", "-x"}},
-        {"alacritty", {"-e"}},
+        {"alacritty", {"--hold", "-e"}},
         {"kitty", {"--hold"}},
         {"foot", {"--hold"}},
         {"wezterm", {"start", "--"}},
-        {"wt.exe", {"-d", "."}},
     };
 
     const QMap<QString, QStringList> &table = HelperUtils::terminalArguments();

@@ -4,7 +4,7 @@
 
 ### New Features
 - **Translations**: Multi-language support with compiled translation catalogs; language can be selected in settings (#12)
-- **Terminal support**: Added Alacritty, kitty, foot, WezTerm, and Windows Terminal (#7)
+- **Terminal support**: Added Alacritty, kitty, foot, WezTerm, Windows PowerShell, and PowerShell 7 (pwsh) (#7)
 - **Test suite**: A broad test suite now covers the core logic, improving reliability and maintainability
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
 - **Export and import**: Settings can be exported to a file and imported again

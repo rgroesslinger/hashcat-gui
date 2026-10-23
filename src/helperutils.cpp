@@ -182,20 +182,37 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
 // command line, for every supported terminal. The entries are pure data -
 // nothing here looks at the filesystem. Terminals whose option takes a single
 // shell-quoted string (terminator -e) are deliberately not listed.
+//
+// PowerShell's -Command must come last: it takes the rest of the command line
+// as the command text, which is what startClicked() builds. The & is the call
+// operator and needs an entry of its own, because a hashcat path with spaces
+// arrives quoted - and a bare quoted string is only a string in PowerShell.
+//
+// gnome-terminal, ptyxis and wezterm have no flag to stay open after the
+// command exits; holding them would need the command wrapped in a shell
+// string, which the line above rules out. cmd.exe /k stays open, but breaks as
+// soon as two arguments need quotes: /K then strips the first and last quote
+// of the whole command line.
 const QMap<QString, QStringList> &HelperUtils::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
         {QStringLiteral("cmd.exe"), {QStringLiteral("/k")}},
+        // No .exe on pwsh so the lookup also resolves on Linux and macOS.
+        {QStringLiteral("powershell.exe"),
+         {QStringLiteral("-NoExit"), QStringLiteral("-NoProfile"), QStringLiteral("-Command"),
+          QStringLiteral("&")}},
+        {QStringLiteral("pwsh"),
+         {QStringLiteral("-NoExit"), QStringLiteral("-NoProfile"), QStringLiteral("-Command"),
+          QStringLiteral("&")}},
         {QStringLiteral("xterm"), {QStringLiteral("-hold"), QStringLiteral("-e")}},
         {QStringLiteral("gnome-terminal"), {QStringLiteral("--wait"), QStringLiteral("--")}},
         {QStringLiteral("ptyxis"), {QStringLiteral("--")}},
         {QStringLiteral("konsole"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
         {QStringLiteral("xfce4-terminal"), {QStringLiteral("--hold"), QStringLiteral("-x")}},
-        {QStringLiteral("alacritty"), {QStringLiteral("-e")}},
+        {QStringLiteral("alacritty"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
         {QStringLiteral("kitty"), {QStringLiteral("--hold")}},
         {QStringLiteral("foot"), {QStringLiteral("--hold")}},
         {QStringLiteral("wezterm"), {QStringLiteral("start"), QStringLiteral("--")}},
-        {QStringLiteral("wt.exe"), {QStringLiteral("-d"), QStringLiteral(".")}},
     };
     return table;
 }
