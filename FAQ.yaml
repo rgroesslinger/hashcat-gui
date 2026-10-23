@@ -15,14 +15,21 @@ items:
       |-----------|-------------------------------------|
       | Linux     | ~/.local/share/hashcat-gui/session.json |
       | Windows   | %APPDATA%\hashcat-gui\session.json |
-  - q: "Why does reading hash types time out on Windows?"
+  - q: "Why does loading the hash types take so long on Windows?"
     a: |
-      Windows Defender real-time protection can significantly delay the process of retrieving hash types. To resolve this, add an exclusion for the hashcat process.
-      Open PowerShell as an administrator and run
+      On start-up the GUI asks hashcat for the list of supported hash types
+      (`--example-hashes --machine-readable`). Hashcat answers this by
+      loading every hash module it ships — on Windows one DLL per module — and
+      Windows Defender's real-time protection scans each of them as it is
+      loaded. The query can therefore take very long, up to the point where it
+      reaches its timeout. The hash type dropdown stays disabled and shows
+      an "Updating..." tooltip in the meantime; the rest of the GUI is not blocked.
+
+      To speed this up, add an exclusion for the hashcat process. Open
+      PowerShell as an administrator and run
 
       ```
       Add-MpPreference -ExclusionProcess 'C:\path\to\hashcat.exe'
       ```
 
-      *Note: Ensure you use the correct path to the hashcat executable, not the GUI.
       Alternatively, you can temporarily disable Windows Defender real-time protection.*

@@ -26,6 +26,7 @@ jobs:
             mingw-w64-ucrt-x86_64-cmake
             mingw-w64-ucrt-x86_64-qt6-base
             mingw-w64-ucrt-x86_64-qt6-tools
+            mingw-w64-ucrt-x86_64-qt6-translations
             zip
 
       - name: Build
@@ -64,16 +65,7 @@ jobs:
           cd "hashcat-gui-${{ github.ref_name }}/"
           ldd hashcat-gui.exe | grep /ucrt64 | awk '{print $3}' | xargs -i cp {} .
           # Run Qt's windows deployment tool
-          windeployqt6.exe hashcat-gui.exe \
-            --release \
-            --no-libraries \
-            --no-translations \
-            --no-quick-import \
-            --no-system-d3d-compiler \
-            --no-system-dxc-compiler \
-            --no-compiler-runtime \
-            --no-opengl-sw \
-            --no-ffmpeg
+          windeployqt6.exe hashcat-gui.exe --release
 
       - name: Zip release artifacts
         shell: msys2 {0}
