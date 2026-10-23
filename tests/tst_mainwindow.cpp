@@ -180,7 +180,8 @@ private slots:
     void groupBoxesFollowTheBuilderPredicates();
     void groupBoxesShareOneTitleAlignment();
     void generalTabGroupBoxesAlignTheirContentToTheTop();
-    void resetFieldsRestoresEveryWidget();
+    void resetSessionRestoresEveryWidget();
+    void resettingTheSessionNeedsAConfirmation();
     void optionDependenciesFollowTheirCheckboxes();
     void modeHintFollowsTheAttackMode();
     void launchValidationFollowsTheWidgets();
@@ -444,20 +445,26 @@ void TestMainWindow::generalTabGroupBoxesAlignTheirContentToTheTop()
 }
 
 // The reset has to bring every widget that holds a value back to its
-// default.
+// default - and only after the user confirmed it, so the box is answered
+// here.
 //
 // The test does not know the widgets: it changes every one of them, resets
 // the form and compares the whole state with a fresh window. A widget the
 // reset forgets - now or after it is added - shows up as a difference, and
 // the list of widgets does not have to be kept in two places.
-void TestMainWindow::resetFieldsRestoresEveryWidget()
+void TestMainWindow::resetSessionRestoresEveryWidget()
 {
     MainWindow fresh;
     MainWindow window;
 
     changeEveryValue(&window);
 
-    QVERIFY(QMetaObject::invokeMethod(&window, "resetFieldsTriggered"));
+    TestEnvironment::ModalRecorder recorder;
+    recorder.acceptConfirmation = true;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "resetSessionTriggered"));
+    QVERIFY(recorder.messageBoxSeen);
 
     QString error;
     const QString freshFile = TestEnvironment::configHome().filePath(QStringLiteral("fresh.json"));
@@ -482,6 +489,26 @@ void TestMainWindow::resetFieldsRestoresEveryWidget()
     const QStringList differing = differingWidgets(resetFile, defaults);
     QVERIFY2(differing.isEmpty(), qPrintable(QStringLiteral("these widgets were not reset: %1")
                                                  .arg(differing.join(QStringLiteral(", ")))));
+}
+
+// The reset is confirmed first, and a box that is closed without a Yes has
+// to leave the session alone: the values the user entered are what the
+// confirmation protects.
+void TestMainWindow::resettingTheSessionNeedsAConfirmation()
+{
+    MainWindow window;
+    window.ui->lineEdit_session->setText(QStringLiteral("keepMe"));
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "resetSessionTriggered"));
+
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Reset Session"));
+    QVERIFY(recorder.text.contains(QStringLiteral("lost")));
+    // The recorder closed the box without confirming: nothing was reset.
+    QCOMPARE(window.ui->lineEdit_session->text(), QStringLiteral("keepMe"));
 }
 
 void TestMainWindow::optionDependenciesFollowTheirCheckboxes()

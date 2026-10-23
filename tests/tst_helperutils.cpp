@@ -406,7 +406,7 @@ void TestHelperUtils::executeHashcatGivesUpOnTimeout()
 
 // The contract with every caller: the caller's arguments go first, --quiet
 // is appended so the output can be read, and the child runs next to its own
-// binary - that is where hashcat looks for its profiles and modules.
+// binary - that is where hashcat looks for its modules.
 void TestHelperUtils::executeHashcatAppendsQuietAndUsesBinaryDirectory()
 {
 #ifdef Q_OS_WIN

@@ -1447,7 +1447,7 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionResetFields"/>
+    <addaction name="actionResetSession"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -1472,9 +1472,9 @@
     <string>About</string>
    </property>
   </action>
-  <action name="actionResetFields">
+  <action name="actionResetSession">
    <property name="text">
-    <string>Reset fields</string>
+    <string>Reset Session</string>
    </property>
   </action>
   <action name="actionQuit">

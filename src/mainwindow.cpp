@@ -260,7 +260,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     /* ---------- menu actions ---------- */
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::aboutTriggered);
-    connect(ui->actionResetFields, &QAction::triggered, this, &MainWindow::resetFieldsTriggered);
+    connect(ui->actionResetSession, &QAction::triggered, this, &MainWindow::resetSessionTriggered);
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::quitTriggered);
     connect(ui->actionExportSession, &QAction::triggered, this, &MainWindow::exportTriggered);
     connect(ui->actionImportSession, &QAction::triggered, this, &MainWindow::importTriggered);
@@ -663,9 +663,19 @@ void MainWindow::importSettingsTriggered()
     }
 }
 
-// Tools → Reset field
-void MainWindow::resetFieldsTriggered()
+// Tools → Reset Session
+void MainWindow::resetSessionTriggered()
 {
+    // Resetting throws away the session the user has set up in the form,
+    // so it is only carried out after the user confirmed it.
+    const auto answer =
+        QMessageBox::question(this, tr("Reset Session"),
+                              tr("Reset every field to its default? The current session is lost."),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (answer != QMessageBox::Yes) {
+        return;
+    }
+
     // Attack tab
     ui->lineEdit_hashfile->clear();
     ui->checkBox_ignoreusername->setChecked(false);

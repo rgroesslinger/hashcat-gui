@@ -44,7 +44,7 @@ private slots:
     void importSettingsTriggered();
     void exportSettingsTriggered();
     void quitTriggered();
-    void resetFieldsTriggered();
+    void resetSessionTriggered();
     void aboutQtTriggered();
     void aboutTriggered();
 
