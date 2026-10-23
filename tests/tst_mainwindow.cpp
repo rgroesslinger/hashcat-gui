@@ -645,13 +645,13 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
         QString hint;
     };
     const QList<Expectation> expectations{
-        {AttackMode::Straight, QStringLiteral("This mode needs at least one word list.")},
+        {AttackMode::Straight, QStringLiteral("This mode needs at least one wordlist.")},
         {AttackMode::Combination,
-         QStringLiteral("This mode needs exactly 2 word lists (left, right).")},
+         QStringLiteral("This mode needs exactly 2 wordlists (left, right).")},
         {AttackMode::BruteForce, QStringLiteral("This mode needs a mask.")},
-        {AttackMode::HybridWordMask, QStringLiteral("This mode needs a word list and a mask.")},
-        {AttackMode::HybridMaskWord, QStringLiteral("This mode needs a word list and a mask.")},
-        {AttackMode::Association, QStringLiteral("This mode needs at least one word list.")},
+        {AttackMode::HybridWordMask, QStringLiteral("This mode needs a wordlist and a mask.")},
+        {AttackMode::HybridMaskWord, QStringLiteral("This mode needs a wordlist and a mask.")},
+        {AttackMode::Association, QStringLiteral("This mode needs at least one wordlist.")},
     };
 
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {

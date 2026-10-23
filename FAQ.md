@@ -34,8 +34,7 @@ On start-up the GUI asks hashcat for the list of supported hash types
 loading every hash module it ships — on Windows one DLL per module — and
 Windows Defender's real-time protection scans each of them as it is
 loaded. The query can therefore take very long, up to the point where it
-reaches its timeout. The hash type dropdown stays disabled and shows
-an "Updating..." tooltip in the meantime; the rest of the GUI is not blocked.
+reaches its timeout.
 
 To speed this up, add an exclusion for the hashcat process. Open
 PowerShell as an administrator and run
@@ -44,6 +43,6 @@ PowerShell as an administrator and run
 Add-MpPreference -ExclusionProcess 'C:\path\to\hashcat.exe'
 ```
 
-Alternatively, you can temporarily disable Windows Defender real-time protection.*
+Alternatively, you can temporarily disable Windows Defender real-time protection.
 
 

@@ -854,7 +854,7 @@ void MainWindow::loadSession()
         QMessageBox::warning(
             this, tr("Session warning"),
             tr("The session file could not be read, so the session was not restored. The file "
-               "was left in place; \"Clear the saved session\" in the settings deletes it.\n\n%1")
+               "was left in place.\n\n%1")
                 .arg(error));
         return;
     }
@@ -1125,17 +1125,17 @@ QString MainWindow::modeHint(AttackMode mode) const
     // Combination mode is the only one that wants an exact number of word
     // lists, and its two lists are the left and the right side.
     if (requirements.minWordlists > 0 && requirements.maxWordlists == requirements.minWordlists) {
-        return tr("This mode needs exactly %1 word lists (left, right).")
+        return tr("This mode needs exactly %1 wordlists (left, right).")
             .arg(requirements.minWordlists);
     }
     if (requirements.needsMask && requirements.minWordlists > 0) {
-        return tr("This mode needs a word list and a mask.");
+        return tr("This mode needs a wordlist and a mask.");
     }
     if (requirements.needsMask) {
         return tr("This mode needs a mask.");
     }
     if (requirements.minWordlists > 0) {
-        return tr("This mode needs at least one word list.");
+        return tr("This mode needs at least one wordlist.");
     }
     return QString();
 }
@@ -1458,7 +1458,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
     // mode needs instead of pointing at the settings.
     case HelperUtils::LaunchError::NoWordlist:
         box.setIcon(QMessageBox::Information);
-        box.setText(tr("This attack mode needs at least one word list."));
+        box.setText(tr("This attack mode needs at least one wordlist."));
         break;
 
     case HelperUtils::LaunchError::WrongWordlistCount: {
@@ -1468,7 +1468,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         const CommandBuilder::ModeRequirements requirements =
             CommandBuilder::modeRequirements(currentAttackMode());
         box.setIcon(QMessageBox::Information);
-        box.setText(tr("This attack mode needs exactly %1 word lists.\nCurrently selected: %2.")
+        box.setText(tr("This attack mode needs exactly %1 wordlists.\nCurrently selected: %2.")
                         .arg(requirements.minWordlists)
                         .arg(detail));
         break;

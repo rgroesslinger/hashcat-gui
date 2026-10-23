@@ -114,7 +114,7 @@
               <item>
                <widget class="QCheckBox" name="checkBox_ignoreusername">
                 <property name="text">
-                 <string>Ignore username in hashfile</string>
+                 <string>Ignore username in hash file</string>
                 </property>
                </widget>
               </item>
@@ -196,7 +196,7 @@
             <item>
              <widget class="QGroupBox" name="groupBox_wordlists">
               <property name="title">
-               <string>Word lists</string>
+               <string>Wordlists</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1202,7 +1202,7 @@
                         </sizepolicy>
                        </property>
                        <property name="toolTip">
-                        <string>How much of the word list hashcat caches in memory, in MB. Lower it if hashcat runs out of memory.</string>
+                        <string>How much of the wordlist hashcat caches in memory, in MB. Lower it if hashcat runs out of memory.</string>
                        </property>
                        <property name="suffix">
                         <string> MB</string>
@@ -1300,7 +1300,7 @@
                         <string>Built-in variables:
 
   &lt;hash&gt; = current hash filename or hash
-  &lt;unixtime&gt; = current unix timestamp</string>
+  &lt;unixtime&gt; = current Unix timestamp</string>
                        </property>
                        <property name="text">
                         <string/>

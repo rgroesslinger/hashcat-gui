@@ -166,7 +166,7 @@
       <item row="3" column="0" colspan="2">
        <widget class="QCheckBox" name="checkBox_use_short_parameters">
         <property name="text">
-         <string>Use &amp;short parameters</string>
+         <string>&amp;Use short parameters</string>
         </property>
        </widget>
       </item>
