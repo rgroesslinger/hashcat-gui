@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>455</width>
-    <height>680</height>
+    <width>520</width>
+    <height>520</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,53 +16,35 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_main">
    <item>
     <widget class="QGroupBox" name="groupBox_hc_path">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
      <property name="title">
-      <string>Hashcat executable</string>
+      <string>Hashcat</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
-     <property name="flat">
-      <bool>false</bool>
-     </property>
-     <property name="checkable">
-      <bool>false</bool>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="label_download">
+     <layout class="QFormLayout" name="formLayout_hashcat">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_hc_path">
         <property name="text">
-         <string/>
+         <string>&amp;Hashcat executable</string>
         </property>
        </widget>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_hc_path">
         <item>
          <widget class="QLineEdit" name="lineEdit_hc_path">
           <property name="minimumSize">
            <size>
-            <width>320</width>
+            <width>260</width>
             <height>0</height>
            </size>
           </property>
-          <property name="readOnly">
-           <bool>true</bool>
+          <property name="placeholderText">
+           <string>Not configured</string>
           </property>
          </widget>
         </item>
@@ -75,49 +57,53 @@
         </item>
        </layout>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_terminal">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="styleSheet">
-      <string notr="true"/>
-     </property>
-     <property name="title">
-      <string>Terminal</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QComboBox" name="comboBox_terminal">
-        <property name="enabled">
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="label_hashcat_status">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="wordWrap">
          <bool>true</bool>
         </property>
+        <property name="visible">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="label_download">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_terminal">
+        <property name="text">
+         <string>&amp;Terminal</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QComboBox" name="comboBox_terminal">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="label_terminal_status">
+        <property name="text">
+         <string/>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="visible">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -126,51 +112,48 @@
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_general">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="title">
       <string>General</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QCheckBox" name="checkBox_use_short_parameters">
+     <layout class="QFormLayout" name="formLayout_general">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_language">
         <property name="text">
-         <string>Use short parameters</string>
+         <string>&amp;Language</string>
         </property>
        </widget>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_color_scheme">
-        <item>
-         <widget class="QLabel" name="label_color_scheme">
-          <property name="text">
-           <string>Color scheme</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboBox_color_scheme">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="comboBox_language">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
-      <item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_color_scheme">
+        <property name="text">
+         <string>&amp;Color scheme</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="comboBox_color_scheme">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
        <widget class="QLabel" name="label_color_scheme_note">
         <property name="text">
          <string>Not all color schemes are available on all platforms.</string>
@@ -180,19 +163,20 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="checkBox_use_short_parameters">
+        <property name="text">
+         <string>Use &amp;short parameters</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="groupBox_session">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="title">
-      <string>Session</string>
+      <string>Session and files</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -201,118 +185,85 @@
       <item>
        <widget class="QCheckBox" name="checkBox_restore_session">
         <property name="text">
-         <string>Restore the last session at startup</string>
+         <string>&amp;Restore the last session at startup</string>
         </property>
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_session_path">
-        <item>
+       <layout class="QFormLayout" name="formLayout_files">
+        <item row="0" column="0">
          <widget class="QLabel" name="label_session_path_text">
           <property name="text">
-           <string>Session file</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+           <string>&amp;Session file</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_session_path">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="toolTip">
-           <string>The file the last session is stored in</string>
-          </property>
-         </widget>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_session_path">
+          <item>
+           <widget class="QLineEdit" name="lineEdit_session_path">
+            <property name="minimumSize">
+             <size>
+              <width>260</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>The file the last session is stored in</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_open_session_folder">
+            <property name="text">
+             <string>Open folder</string>
+            </property>
+            <property name="toolTip">
+             <string>Open the folder the session is stored in</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_clear_session">
-        <item>
-         <spacer name="horizontalSpacer_clear_session">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_clear_session">
-          <property name="text">
-           <string>Clear the saved session</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_configuration">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Configuration</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_configuration">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_settings_path">
-        <item>
+        <item row="1" column="0">
          <widget class="QLabel" name="label_settings_path_text">
           <property name="text">
-           <string>Settings location</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+           <string>Settings &amp;file</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_settings_path">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_open_folder">
-        <item>
-         <spacer name="horizontalSpacer_open_folder">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_open_folder">
-          <property name="text">
-           <string>Open the folder</string>
-          </property>
-         </widget>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_settings_path">
+          <item>
+           <widget class="QLineEdit" name="lineEdit_settings_path">
+            <property name="minimumSize">
+             <size>
+              <width>260</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>The file the settings are stored in</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_open_folder">
+            <property name="text">
+             <string>Open folder</string>
+            </property>
+            <property name="toolTip">
+             <string>Open the folder the settings are stored in</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -320,63 +271,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_language">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Language</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_language">
-      <item>
-       <widget class="QComboBox" name="comboBox_language">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Orientation::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_save">
-       <property name="text">
-        <string>Save</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_cancel">
-       <property name="text">
-        <string>Cancel</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QDialogButtonBox" name="buttonBox"/>
    </item>
   </layout>
  </widget>

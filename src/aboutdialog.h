@@ -29,7 +29,6 @@ protected:
     void showEvent(QShowEvent *event) override;
 
 private slots:
-    void okClicked();
     void copyDetailsClicked();
 
 private:

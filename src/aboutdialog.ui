@@ -391,11 +391,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_ok">
-       <property name="text">
-        <string>OK</string>
-       </property>
-      </widget>
+      <widget class="QDialogButtonBox" name="buttonBox"/>
      </item>
     </layout>
    </item>

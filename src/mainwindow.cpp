@@ -142,9 +142,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->lineEdit_custom_charset3->setToolTip(charsetTip);
     ui->lineEdit_custom_charset4->setToolTip(charsetTip);
 
-    const QString outfileFormatTip =
-        tr("Outfile format to use, separated with commas.\ndefault: 1,2") + QLatin1String("\n\n")
-        + AppConstants::HelpText::OutfileFormats;
+    const QString outfileFormatTip = tr("Outfile format to use, separated by commas.\nDefault: 1,2")
+                                     + QLatin1String("\n\n")
+                                     + AppConstants::HelpText::OutfileFormats;
     ui->lineEdit_outfile_format->setToolTip(outfileFormatTip);
 
     const QString encodingTip =
@@ -156,10 +156,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         tr("Force the internal wordlist encoding to this code. Leave empty to let hashcat decide.")
         + QLatin1String("\n\n") + encodingTip);
 
-    const QString deviceTypeTip = tr("OpenCL device types to use, separated with commas")
+    const QString deviceTypeTip = tr("OpenCL device types to use, separated by commas")
                                   + QLatin1String("\n\n")
                                   + AppConstants::HelpText::OpenClDeviceTypes;
     ui->lineEdit_opencl_device_types->setToolTip(deviceTypeTip);
+
+    ui->comboBox_workload_profile->setToolTip(QString(AppConstants::HelpText::WorkloadProfiles));
 
     auto &settings = SettingsManager::instance();
 
@@ -283,10 +285,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::removeWordlistClicked);
     connect(ui->pushButton_add_wordlist, &QPushButton::clicked, this,
             &MainWindow::addWordlistClicked);
-    connect(ui->toolButton_wordlist_sort_asc, &QToolButton::clicked, this,
-            &MainWindow::wordlistSortAscClicked);
-    connect(ui->toolButton_wordlist_sort_desc, &QToolButton::clicked, this,
-            &MainWindow::wordlistSortDescClicked);
+    connect(ui->toolButton_wordlist_move_up, &QToolButton::clicked, this,
+            &MainWindow::wordlistMoveUpClicked);
+    connect(ui->toolButton_wordlist_move_down, &QToolButton::clicked, this,
+            &MainWindow::wordlistMoveDownClicked);
 
     /* ---------- rules ---------- */
     connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesFile1Toggled);
@@ -1003,7 +1005,10 @@ void MainWindow::initHashAndAttackModes()
             // path so a failed or malformed reply does not leave it stuck on
             // the "Updating..." tooltip forever.
             ui->comboBox_hash_type->setEnabled(true);
-            ui->comboBox_hash_type->setToolTip(QString());
+            ui->comboBox_hash_type->setToolTip(error.isEmpty()
+                                                   ? QString()
+                                                   : tr("The hash types could not be loaded. Check "
+                                                        "the hashcat path in Settings."));
 
             if (!error.isEmpty()) {
                 QMessageBox::warning(this, tr("hashcat error"), error);
@@ -1016,6 +1021,10 @@ void MainWindow::initHashAndAttackModes()
         watcher->setFuture(HelperUtils::executeHashcat(QStringList()
                                                        << AppConstants::Hashcat::ExampleHashes
                                                        << AppConstants::Hashcat::MachineReadable));
+    } else {
+        ui->comboBox_hash_type->setToolTip(
+            tr("Set the hashcat path under %1 → %2 to load the available hash types.")
+                .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text()));
     }
 }
 
@@ -1120,8 +1129,8 @@ void MainWindow::removeWordlistClicked()
 {
     qDeleteAll(ui->listWidget_wordlist->selectedItems());
     ui->pushButton_remove_wordlist->setEnabled(false);
-    ui->toolButton_wordlist_sort_asc->setEnabled(false);
-    ui->toolButton_wordlist_sort_desc->setEnabled(false);
+    ui->toolButton_wordlist_move_up->setEnabled(false);
+    ui->toolButton_wordlist_move_down->setEnabled(false);
     ui->listWidget_wordlist->clearSelection();
 }
 
@@ -1139,7 +1148,7 @@ void MainWindow::addWordlistClicked()
     }
 }
 
-void MainWindow::wordlistSortAscClicked()
+void MainWindow::wordlistMoveUpClicked()
 {
     // currentRow() is -1 when nothing is selected: without the guard below
     // takeItem(-1) returns nullptr and the list ends up with a null entry.
@@ -1152,7 +1161,7 @@ void MainWindow::wordlistSortAscClicked()
     ui->listWidget_wordlist->setCurrentRow(currentRow - 1);
 }
 
-void MainWindow::wordlistSortDescClicked()
+void MainWindow::wordlistMoveDownClicked()
 {
     int currentRow = ui->listWidget_wordlist->currentRow();
     if (currentRow < 0 || currentRow >= ui->listWidget_wordlist->count() - 1) {
@@ -1166,8 +1175,8 @@ void MainWindow::wordlistSortDescClicked()
 void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
 {
     ui->pushButton_remove_wordlist->setEnabled(true);
-    ui->toolButton_wordlist_sort_asc->setEnabled(true);
-    ui->toolButton_wordlist_sort_desc->setEnabled(true);
+    ui->toolButton_wordlist_move_up->setEnabled(true);
+    ui->toolButton_wordlist_move_down->setEnabled(true);
 }
 
 void MainWindow::rulesFile1Toggled(bool checked)

@@ -11,9 +11,11 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QCursor>
+#include <QDialogButtonBox>
 #include <QFileInfo>
 #include <QFont>
 #include <QFutureWatcher>
+#include <QPushButton>
 #include <QShowEvent>
 #include <QLabel>
 #include <QPixmap>
@@ -122,7 +124,14 @@ AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDia
     nameFont.setBold(true);
     ui->label_app_name->setFont(nameFont);
 
-    connect(ui->pushButton_ok, &QPushButton::clicked, this, &AboutDialog::okClicked);
+    // OK is the response of the dialog, so it gets the standard role: Enter
+    // presses it and the dialog accepts. Copy details stays a plain button on
+    // the other side - it acts on the dialog, it does not close it.
+    QPushButton *okButton = ui->buttonBox->addButton(tr("OK"), QDialogButtonBox::AcceptRole);
+    okButton->setObjectName(QStringLiteral("pushButton_ok"));
+    okButton->setDefault(true);
+
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(ui->pushButton_copy_details, &QPushButton::clicked, this,
             &AboutDialog::copyDetailsClicked);
 }
@@ -144,11 +153,6 @@ void AboutDialog::showEvent(QShowEvent *event)
     // The content decides how large the dialog is; the user may then make it
     // whatever size they like.
     resize(sizeHint());
-}
-
-void AboutDialog::okClicked()
-{
-    close();
 }
 
 void AboutDialog::copyDetailsClicked()

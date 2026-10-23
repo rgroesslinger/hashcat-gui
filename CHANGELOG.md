@@ -3,44 +3,34 @@
 ## 0.8.0 (Unreleased)
 
 ### New Features
-- **Translations**: Multi-language support with compiled translation catalogs; language can be selected in settings (system default falls back to English) (#12)
+- **Translations**: Multi-language support with compiled translation catalogs; language can be selected in settings (#12)
 - **Terminal support**: Added Alacritty, kitty, foot, WezTerm, and Windows Terminal (#7)
-- **CLI help**: Added `--version` and `--help` command-line parser support
-- **Test suite**: Integrated `tst_*` binaries into `ctest`, covering the command builder, hash type parser, hashcat launch, profile serializer, settings dialog, about dialog, main window, and translation catalogs
+- **Test suite**: A broad test suite now covers the core logic, improving reliability and maintainability
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
+- **Export and import**: Settings can be exported to a file and imported again
+- **Color scheme**: The application can follow the desktop, or use a light or a dark appearance of its own where the platform supports it
 
 ### Improvements
-- **Settings storage**: Settings are now kept in an INI file on every platform
-- **One file format**: The session the application keeps between two runs and the settings the user exports share one format now; the files of the older versions are not read any more
-- **Session**: The last session is restored at startup only when asked for, and the saved profile can be cleared from the settings
-- **Settings**: Show where the settings and the session are stored, and add a shortcut to open the folder of the settings
-- **Settings**: The settings can be exported to a file and imported again
-- **Color scheme**: The application can follow the desktop, or use a light or a dark appearance of its own where the platform supports it
-- Decoupled business logic from UI for better maintainability and testability
+- Added new application artwork and improved the XDG `.desktop` file entry
+- Bumped the minimum Qt version to 6.8 and moved the build baseline from C++17 to C++20
+- Settings and sessions are now kept in an INI file on every platform. Note that this results in a one-time backwards-incompatible change of the storage format. Settings and session configuration are now versioned; should another incompatible change be required in the future, we can bump this version and keep support for previous formats
+- The `Attack` tab holds the hash input and the mode-specific options; the `General` tab holds the options that are always available
+- A hint below the attack mode selector now states what the selected mode needs: the number of word lists, a mask, or both
 - Refactored default values, help tables, and magic numbers in `src/appconstants.h` (#10)
 - Hardened UTF-8 and string handling by enforcing `QT_NO_CAST_FROM_ASCII` and `QT_NO_CAST_TO_ASCII`
-- `HashcatOptions` and `CommandBuilder`: the command line is built from a UI-independent description; gating rules centralized so visible options and generated command stay in sync
-- **Qt 6.8 & C++20 baseline**: Bumped minimum Qt version to 6.8 and moved build baseline from C++17 to C++20
-- **New artwork**: Added new application artwork and improved the XDG `.desktop` file entry
-- **Persistent command bar**: Moved Start, Copy, and the command preview below the tabs so they stay visible on every tab
-- **More hashcat options**: Added `--increment` with bounds, `--skip`, `--limit`, `--runtime`, `--force`, `--session`, `--status`/`--status-timer`, `--opencl-device-types`, `--hwmon-temp-abort`, `--rule-left`/`--rule-right` single rules for the left/right wordlist, `--encoding-from`/`--encoding-to`, `--hex-wordlist`, and `--potfile-disable`
-- **Clearer tabs**: The Attack tab holds the hash input and the mode-specific word lists, rules, mask, and charset options; the General tab holds the session and limits, performance, resources, and outfile options
-- **Mode hint**: A hint below the attack mode selector now states what the selected mode needs: the number of word lists, a mask, or both
-- Combo boxes in a profile are stored by the identifier of their selected entry instead of its position, so a list that grows - a new hash type, a new attack mode - no longer changes what a saved profile selects
-- **A profile says which version wrote it**: A file with an older format version is applied, and the values it does not know are named; a file with a newer format version is refused, because a name that survived may mean something else there
+- Decoupled the command line building from the UI in `HashcatOptions` and `CommandBuilder`, with the gating rules centralized so the visible options and generated command stay in sync
+- Added `--increment` with bounds, `--skip`, `--limit`, `--runtime`, `--force`, `--session`, `--status`/`--status-timer`, `--opencl-device-types`, `--hwmon-temp-abort`, `--rule-left`/`--rule-right` single rules for the left/right wordlist, `--encoding-from`/`--encoding-to`, `--hex-wordlist`, and `--potfile-disable`
 
 ### Bug Fixes
 - GUI now refuses to start hashcat when configuration is incomplete instead of failing silently
 - Terminal startup failures (wrong path, permissions) now report errors instead of failing silently
-- Profile save/load errors now reach the main window instead of having the serializer open its own dialog; a failed profile load at start-up is now reported as well
-- Hash type saved in a profile is now correctly applied after the background query completes (was dropped at start-up)
-- A profile that names a hash type the installed hashcat does not know now leaves the hash type unselected and says so, instead of silently selecting another one
-- File → Export Profile only announces success when the profile was actually written
-- Hash type selector re-enabled when background query fails or returns malformed JSON
+- Session save/load errors now reach the main window instead of having the serializer open its own dialog; a failed session load at start-up is now reported as well
+- Hash type saved in a session is now correctly applied after the background query completes (was dropped at start-up)
+- A session that names a hash type the installed hashcat does not know now leaves the hash type unselected and says so, instead of silently selecting another one
+- File → Export Session only announces success when the session was actually written
 - `--hash-type` omitted when no hash type is selected (empty selector no longer sends `-m 0`)
-- Attack mode and hash type identifiers use combo box item data, preventing silent fallback to mode/type `0`
 - Sorting the word list with nothing selected no longer passes a null item to `insertItem()`
-- The suggested outfile no longer overwrites user-selected or profile-chosen file names
+- The suggested outfile no longer overwrites user-selected or session-chosen file names
 - Copying to the clipboard no longer crashes on platforms without clipboard support
 - The main window now sizes itself to its content on first show, using the tallest tab for the height and the widest tab for the width; this avoids unnecessary scrollbars, clipped content, and unused space across screen sizes, fonts, DPI, and translations
 

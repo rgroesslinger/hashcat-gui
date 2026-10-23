@@ -176,9 +176,6 @@
                   <height>0</height>
                  </size>
                 </property>
-                <property name="toolTip">
-                 <string>Configure path to hashcat binary in Settings to get available hash types</string>
-                </property>
                </widget>
               </item>
              </layout>
@@ -212,7 +209,7 @@
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_69">
                      <item>
-                      <widget class="QToolButton" name="toolButton_wordlist_sort_asc">
+                      <widget class="QToolButton" name="toolButton_wordlist_move_up">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -231,7 +228,7 @@
                       </widget>
                      </item>
                      <item>
-                      <widget class="QToolButton" name="toolButton_wordlist_sort_desc">
+                      <widget class="QToolButton" name="toolButton_wordlist_move_down">
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -637,9 +634,6 @@
                   <layout class="QGridLayout" name="gridLayout_7">
                    <item row="0" column="0">
                     <widget class="QLineEdit" name="lineEdit_mask">
-                     <property name="toolTip">
-                      <string/>
-                     </property>
                      <property name="text">
                       <string/>
                      </property>
@@ -673,7 +667,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Starting mask length; 0 uses hashcat's default</string>
+                        <string>Minimum mask length; 0 uses hashcat's default</string>
                        </property>
                        <property name="maximum">
                         <number>256</number>
@@ -696,7 +690,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Final mask length; 0 uses hashcat's default</string>
+                        <string>Maximum mask length; 0 uses hashcat's default</string>
                        </property>
                        <property name="maximum">
                         <number>256</number>
@@ -756,9 +750,6 @@
                          <height>0</height>
                         </size>
                        </property>
-                       <property name="toolTip">
-                        <string/>
-                       </property>
                        <property name="text">
                         <string/>
                        </property>
@@ -788,9 +779,6 @@
                          <width>150</width>
                          <height>0</height>
                         </size>
-                       </property>
-                       <property name="toolTip">
-                        <string/>
                        </property>
                        <property name="text">
                         <string/>
@@ -822,9 +810,6 @@
                          <height>0</height>
                         </size>
                        </property>
-                       <property name="toolTip">
-                        <string/>
-                       </property>
                        <property name="text">
                         <string/>
                        </property>
@@ -851,9 +836,6 @@
                          <width>150</width>
                          <height>0</height>
                         </size>
-                       </property>
-                       <property name="toolTip">
-                        <string/>
                        </property>
                       </widget>
                      </item>
@@ -935,7 +917,7 @@
                  <item row="0" column="1">
                   <widget class="QLineEdit" name="lineEdit_session">
                    <property name="toolTip">
-                    <string>Define a specific session name</string>
+                    <string>Name hashcat uses for its restore file and status output.</string>
                    </property>
                   </widget>
                  </item>
@@ -949,7 +931,7 @@
                  <item row="1" column="1">
                   <widget class="QSpinBox" name="spinBox_runtime">
                    <property name="toolTip">
-                    <string>Abort the session after this many seconds; 0 means no limit</string>
+                    <string>Abort the session after this many seconds; unlimited runs until hashcat finishes</string>
                    </property>
                    <property name="suffix">
                     <string> s</string>
@@ -1095,16 +1077,6 @@
                      <property name="enabled">
                       <bool>false</bool>
                      </property>
-                     <property name="toolTip">
-                      <string> # | Performance | Runtime | Power Consumption | Desktop Impact
-   ===+=============+=========+===================+=========
-    1 | Low               |   2 ms    | Low               | Minimal
-    2 | Default         |  12 ms   | Economic     | Noticeable
-    3 | High              |  96 ms   | High              | Unresponsive
-    4 | Nightmare   | 480 ms  | Insane          | Headless
-
-  </string>
-                     </property>
                      <item>
                       <property name="text">
                        <string notr="true">1</string>
@@ -1203,14 +1175,14 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_cpu_affinity">
                        <property name="toolTip">
-                        <string>locks to CPU devices, separate with comma</string>
+                        <string>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_backend_devices">
                        <property name="toolTip">
-                        <string>Devices to use, separated with commas. Leave empty for all devices.</string>
+                        <string>Devices to use, separated by commas. Leave empty for all devices.</string>
                        </property>
                        <property name="text">
                         <string/>
@@ -1219,9 +1191,6 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_opencl_device_types">
-                       <property name="toolTip">
-                        <string>OpenCL device types to use, separated with commas</string>
-                       </property>
                       </widget>
                      </item>
                      <item>
@@ -1231,6 +1200,9 @@
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
+                       </property>
+                       <property name="toolTip">
+                        <string>How much of the word list hashcat caches in memory, in MB. Lower it if hashcat runs out of memory.</string>
                        </property>
                        <property name="suffix">
                         <string> MB</string>
@@ -1266,9 +1238,6 @@
                     <widget class="QSpinBox" name="spinBox_hwmon_temp_abort">
                      <property name="enabled">
                       <bool>false</bool>
-                     </property>
-                     <property name="toolTip">
-                      <string>Temperature in degrees Celsius</string>
                      </property>
                      <property name="suffix">
                       <string> °C</string>
@@ -1367,9 +1336,6 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_outfile_format">
-                       <property name="toolTip">
-                        <string/>
-                       </property>
                        <property name="text">
                         <string notr="true">1,2</string>
                        </property>
@@ -1492,6 +1458,7 @@
     <addaction name="separator"/>
     <addaction name="actionImportSettings"/>
     <addaction name="actionExportSettings"/>
+    <addaction name="separator"/>
     <addaction name="actionSettings"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>

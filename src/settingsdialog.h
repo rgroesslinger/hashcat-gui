@@ -9,6 +9,7 @@
 #include <QDialog>
 #include <QFileDialog>
 #include <QJsonObject>
+#include <QJsonValue>
 #include <QStringList>
 
 namespace Ui
@@ -45,19 +46,36 @@ protected:
 private slots:
     void readSettings();
     void selectPathClicked();
-    void clearSessionClicked();
     void openFolderClicked();
+    void openSessionFolderClicked();
     void saveClicked();
     void cancelClicked();
 
 private:
+    // Where a value comes from. A stored value the dialog no longer offers
+    // falls back to the default, because the dialog has to show something; an
+    // imported one is left alone and named, because the user chose it.
+    enum class ValueSource : quint8 {
+        Stored,
+        Imported,
+    };
+
     // The tests read the widget state through the Ui the same way the main
     // window's tests do: friendship keeps it private instead of widening the
     // dialog's public surface for their sake.
     friend class TestSettingsDialog;
 
+    // Applies one setting to the widget that shows it. Returns a note for the
+    // user, empty when there is nothing to say.
+    QString applyValue(const QString &key, const QJsonValue &value, ValueSource source);
+
     // Fills the rows that show where the settings and the session are stored.
     void updatePathLabels();
+
+    // Says what is wrong with the hashcat path or the terminal selection.
+    void updateStatusLabels();
+    void updateHashcatStatus();
+    void updateTerminalStatus();
 
     // The home directory as a tilde.
     static QString shortenPath(const QString &path);
@@ -68,8 +86,13 @@ private:
     // can tell an actual change from "the user pressed Save".
     QString loadedLanguage;
 
-    // The folder the settings are stored in, empty where there is none to open.
+    // The folders the two files are stored in, empty where there is none to open.
     QString m_settingsFolder;
+    QString m_sessionFolder;
+
+    // The terminal the last applied value named, so a terminal that is no
+    // longer installed can be named instead of just "select one".
+    QString m_configuredTerminal;
 
     // The dialog is fitted to its content once, on the first show.
     bool m_sizedToContent = false;

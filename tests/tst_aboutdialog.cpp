@@ -33,6 +33,7 @@ private slots:
     void linksToTheProjectAndToHashcat();
     void namesTheLicenseOfTheApplication();
     void copyDetailsPutsThemOnTheClipboard();
+    void okAcceptsTheDialog();
     void saysThatNoHashcatIsConfigured();
 };
 
@@ -210,6 +211,21 @@ void TestAboutDialog::copyDetailsPutsThemOnTheClipboard()
     QVERIFY(text.contains(QSysInfo::prettyProductName()));
     // One line per fact, so that a report can quote them one by one.
     QCOMPARE(text.count(QLatin1Char('\n')), 3);
+}
+
+// OK is the response of the dialog: it is the default button, so Enter closes
+// it, and the dialog accepts rather than rejects.
+void TestAboutDialog::okAcceptsTheDialog()
+{
+    AboutDialog dialog;
+
+    QPushButton *ok = dialog.findChild<QPushButton *>(QStringLiteral("pushButton_ok"));
+    QVERIFY(ok);
+    QVERIFY2(ok->isDefault(), "Enter does not press OK");
+    QCOMPARE(ok->text(), QStringLiteral("OK"));
+
+    ok->click();
+    QCOMPARE(dialog.result(), int(QDialog::Accepted));
 }
 
 // Without a hashcat there is no version to show. The label says so instead of

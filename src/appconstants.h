@@ -221,6 +221,13 @@ inline constexpr QLatin1StringView OpenClDeviceTypes{"  1 = CPU\n"
                                                      "  Separate multiple values with commas."};
 inline constexpr QLatin1StringView CommonEncodings{"  utf-8, utf-16le, utf-16be,\n"
                                                    "  iso-8859-1, iso-8859-15, windows-1252"};
+inline constexpr QLatin1StringView WorkloadProfiles{
+    " # | Performance | Runtime | Power Consumption | Desktop Impact\n"
+    "   ===+=============+=========+===================+=========\n"
+    "    1 | Low               |   2 ms    | Low               | Minimal\n"
+    "    2 | Default         |  12 ms   | Economic     | Noticeable\n"
+    "    3 | High              |  96 ms   | High              | Unresponsive\n"
+    "    4 | Nightmare   | 480 ms  | Insane          | Headless"};
 } // namespace HelpText
 
 // Fixed external links. Only the label around a link is translatable.

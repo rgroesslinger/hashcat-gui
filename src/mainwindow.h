@@ -54,8 +54,8 @@ private slots:
     void openOutfileClicked();
     void removeWordlistClicked();
     void addWordlistClicked();
-    void wordlistSortAscClicked();
-    void wordlistSortDescClicked();
+    void wordlistMoveUpClicked();
+    void wordlistMoveDownClicked();
     void wordlistItemClicked(QListWidgetItem *item);
 
     // checkboxes / radio buttons

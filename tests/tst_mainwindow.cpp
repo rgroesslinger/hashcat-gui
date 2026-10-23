@@ -193,7 +193,7 @@ private slots:
     void failedQueryReenablesTheHashTypeCombo_data();
     void failedQueryReenablesTheHashTypeCombo();
     void outfileSuggestionFollowsUntilTheUserTakesOver();
-    void wordlistSortSurvivesAMissingSelection();
+    void wordlistMoveSurvivesAMissingSelection();
     void commandPreviewCarriesTheBinaryName();
     void thePreviewTooltipHoldsTheWholeCommand();
     void copyingTheCommandPutsItOnTheClipboard();
@@ -871,8 +871,9 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
 }
 
 // Every failure path owes the user the state the success path leaves behind:
-// the combo back under their control, no "Updating..." left on it, and no
-// hash type in it. Two ways for hashcat to not answer, both real.
+// the combo back under their control, no "Updating..." left on it, a tooltip
+// that says why it is empty, and no hash type in it. Two ways for hashcat to
+// not answer, both real.
 void TestMainWindow::failedQueryReenablesTheHashTypeCombo_data()
 {
     QTest::addColumn<QByteArray>("script");
@@ -913,7 +914,9 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
     // ... and when the reply turns out to be unusable, the combo comes back
     QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->isEnabled(),
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QVERIFY(window.ui->comboBox_hash_type->toolTip().isEmpty());
+    QCOMPARE(
+        window.ui->comboBox_hash_type->toolTip(),
+        QStringLiteral("The hash types could not be loaded. Check the hashcat path in Settings."));
     QCOMPARE(window.ui->comboBox_hash_type->count(), 0);
 }
 
@@ -945,10 +948,10 @@ void TestMainWindow::outfileSuggestionFollowsUntilTheUserTakesOver()
     QCOMPARE(outfile->text(), QStringLiteral("/tmp/fourth.hash.out"));
 }
 
-// The sort buttons only appear after an item was clicked, but the slots are
+// The move buttons only appear after an item was clicked, but the slots are
 // still slots: called with nothing current - or with nothing there at all -
 // they have to be a no-op instead of a walk through takeItem(-1).
-void TestMainWindow::wordlistSortSurvivesAMissingSelection()
+void TestMainWindow::wordlistMoveSurvivesAMissingSelection()
 {
     MainWindow window;
     QListWidget *list = window.ui->listWidget_wordlist;
@@ -966,18 +969,18 @@ void TestMainWindow::wordlistSortSurvivesAMissingSelection()
     };
     const QStringList before{QStringLiteral("b.txt"), QStringLiteral("a.txt")};
 
-    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortAscClicked"));
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistMoveUpClicked"));
     QCOMPARE(texts(), before);
     QCOMPARE(list->currentRow(), -1);
 
-    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortDescClicked"));
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistMoveDownClicked"));
     QCOMPARE(texts(), before);
     QCOMPARE(list->currentRow(), -1);
 
     // an empty list is the same no-op
     list->clear();
-    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortAscClicked"));
-    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistSortDescClicked"));
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistMoveUpClicked"));
+    QVERIFY(QMetaObject::invokeMethod(&window, "wordlistMoveDownClicked"));
     QCOMPARE(list->count(), 0);
 }
 

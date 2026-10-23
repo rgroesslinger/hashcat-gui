@@ -12,8 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
-#include <QMessageBox>
-#include <QTimer>
+#include <QPushButton>
 
 #include "appconstants.h"
 #include "helperutils.h"
@@ -97,10 +96,11 @@ private slots:
     void selectPathClickedAcceptsAnExecutable();
     void selectPathClickedRejectsAPlainFile();
     void restoreSessionFollowsTheSetting();
-    void clearSessionDeletesTheStoredSession();
-    void clearSessionKeepsTheFileWhenDeclined();
     void shortenPathOnlyShortensTheHomeDirectory();
     void showsWhereTheFilesAreStored();
+    void hashcatPathStatusFollowsTheField();
+    void terminalStatusFollowsTheCombo();
+    void saveIsTheDefaultButton();
     void savedSettingsHoldTheKnownSettings();
     void savedSettingsCoverEveryKnownKey();
     void everyKnownKeyIsTypeChecked();
@@ -310,55 +310,6 @@ void TestSettingsDialog::restoreSessionFollowsTheSetting()
              true);
 }
 
-// The button that clears the saved session asks first, then removes the file
-// the application stores its state in, and says that it did.
-void TestSettingsDialog::clearSessionDeletesTheStoredSession()
-{
-    const QString path = StateFile::sessionFilePath();
-    QDir().mkpath(QFileInfo(path).absolutePath());
-
-    QFile file(path);
-    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    file.write("{}");
-    file.close();
-    QVERIFY(QFile::exists(path));
-
-    SettingsDialog dialog;
-
-    TestEnvironment::ModalRecorder recorder;
-    recorder.acceptConfirmation = true;
-    recorder.start();
-    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearSessionClicked"));
-
-    QVERIFY2(!QFile::exists(path), "the saved session was not deleted");
-    QVERIFY(recorder.messageBoxSeen);
-    QCOMPARE(recorder.title, QStringLiteral("Session cleared"));
-}
-
-// The question is what stands between the button and the file: No leaves the
-// session where it is.
-void TestSettingsDialog::clearSessionKeepsTheFileWhenDeclined()
-{
-    const QString path = StateFile::sessionFilePath();
-    QDir().mkpath(QFileInfo(path).absolutePath());
-
-    QFile file(path);
-    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
-    file.write("{}");
-    file.close();
-
-    SettingsDialog dialog;
-
-    // The recorder closes the box, which answers with No.
-    TestEnvironment::ModalRecorder recorder;
-    recorder.start();
-    QVERIFY(QMetaObject::invokeMethod(&dialog, "clearSessionClicked"));
-
-    QCOMPARE(recorder.title, QStringLiteral("Clear session"));
-    QVERIFY(QFile::exists(path));
-    QFile::remove(path);
-}
-
 // Only a path inside the home directory gets the tilde: a sibling folder
 // whose name begins with the same letters is not in it.
 void TestSettingsDialog::shortenPathOnlyShortensTheHomeDirectory()
@@ -396,8 +347,96 @@ void TestSettingsDialog::showsWhereTheFilesAreStored()
 
     // The settings live in a file on every platform now, so there is a
     // folder to open wherever the path is absolute.
-    const bool inFile = QFileInfo(settingsFile).isAbsolute();
-    QCOMPARE(dialog.ui->pushButton_open_folder->isEnabled(), inFile);
+    const bool settingsInFile = QFileInfo(settingsFile).isAbsolute();
+    QCOMPARE(dialog.ui->pushButton_open_folder->isEnabled(), settingsInFile);
+
+    const bool sessionInFile = QFileInfo(sessionFile).isAbsolute();
+    QCOMPARE(dialog.ui->pushButton_open_session_folder->isEnabled(), sessionInFile);
+
+    QVERIFY(dialog.ui->lineEdit_settings_path->isReadOnly());
+    QVERIFY(dialog.ui->lineEdit_session_path->isReadOnly());
+}
+
+// The path is part of a setting the user may want to change by hand, and an
+// executable that is not there is said right below it instead of only at the
+// next launch.
+void TestSettingsDialog::hashcatPathStatusFollowsTheField()
+{
+    SettingsDialog dialog;
+
+    QVERIFY2(!dialog.ui->lineEdit_hc_path->isReadOnly(),
+             "the path could not be cleared or typed by hand");
+    // A fresh install has no path, and the dialog says that hashcat cannot
+    // be started without one.
+    QVERIFY(!dialog.ui->label_hashcat_status->isHidden());
+    QVERIFY(!dialog.ui->label_hashcat_status->text().isEmpty());
+    QVERIFY(!dialog.ui->label_download->isHidden());
+
+#ifdef Q_OS_WIN
+    QSKIP("Windows does not report the executable bit of the shell stub");
+#else
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-status.bin"),
+                                                         "#!/bin/sh\nexit 0\n");
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+
+    dialog.ui->lineEdit_hc_path->setText(stub);
+    QVERIFY2(dialog.ui->label_hashcat_status->isHidden(),
+             "an executable path was reported as missing");
+    QVERIFY2(dialog.ui->label_download->isHidden(),
+             "the download hint survived a configured executable");
+
+    dialog.ui->lineEdit_hc_path->setText(QStringLiteral("/does/not/exist/hashcat"));
+    QVERIFY2(!dialog.ui->label_hashcat_status->isHidden(),
+             "a path that is not there was not reported");
+    QVERIFY2(!dialog.ui->label_download->isHidden(),
+             "the download hint did not return for a missing executable");
+#endif
+}
+
+// No stored terminal means no selection - and the dialog explains it instead
+// of leaving an empty combo. A selection makes the note go away.
+void TestSettingsDialog::terminalStatusFollowsTheCombo()
+{
+    SettingsDialog dialog;
+
+    if (dialog.ui->comboBox_terminal->count() == 0) {
+        QVERIFY2(!dialog.ui->label_terminal_status->isHidden(),
+                 "the dialog does not say that no terminal was found");
+        return;
+    }
+
+    QCOMPARE(dialog.ui->comboBox_terminal->currentIndex(), -1);
+    QVERIFY(!dialog.ui->label_terminal_status->isHidden());
+
+    dialog.ui->comboBox_terminal->setCurrentIndex(0);
+    QVERIFY2(dialog.ui->label_terminal_status->isHidden(),
+             "a selected terminal was reported as missing");
+
+    // A terminal that was configured and is no longer installed is named,
+    // not just silently replaced by an empty combo.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
+                                       QStringLiteral("a-terminal-that-is-gone"));
+    SettingsDialog missing;
+    QCOMPARE(missing.ui->comboBox_terminal->findText(QStringLiteral("a-terminal-that-is-gone")),
+             -1);
+    QVERIFY(!missing.ui->label_terminal_status->isHidden());
+    QVERIFY(missing.ui->label_terminal_status->text().contains(
+        QStringLiteral("a-terminal-that-is-gone")));
+}
+
+// The dialog button box gives Enter its target: Save is the default button,
+// so Enter cannot trigger Select....
+void TestSettingsDialog::saveIsTheDefaultButton()
+{
+    SettingsDialog dialog;
+
+    QPushButton *save = dialog.findChild<QPushButton *>(QStringLiteral("pushButton_save"));
+    QPushButton *cancel = dialog.findChild<QPushButton *>(QStringLiteral("pushButton_cancel"));
+    QVERIFY(save);
+    QVERIFY(cancel);
+    QVERIFY(save->isDefault());
+    QCOMPARE(save->text(), QStringLiteral("Save"));
+    QCOMPARE(cancel->text(), QStringLiteral("Cancel"));
 }
 
 // The export holds the settings the application runs with, so that they can
