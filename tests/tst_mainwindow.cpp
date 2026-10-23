@@ -182,6 +182,9 @@ private slots:
     void generalTabGroupBoxesAlignTheirContentToTheTop();
     void resetSessionRestoresEveryWidget();
     void resettingTheSessionNeedsAConfirmation();
+    void exampleSessionFileIsValid();
+    void loadExampleSessionNeedsAConfirmation();
+    void loadExampleSessionAppliesTheBundledSession();
     void optionDependenciesFollowTheirCheckboxes();
     void modeHintFollowsTheAttackMode();
     void launchValidationFollowsTheWidgets();
@@ -509,6 +512,93 @@ void TestMainWindow::resettingTheSessionNeedsAConfirmation()
     QVERIFY(recorder.text.contains(QStringLiteral("lost")));
     // The recorder closed the box without confirming: nothing was reset.
     QCOMPARE(window.ui->lineEdit_session->text(), QStringLiteral("keepMe"));
+}
+
+// The example that ships in the binary has to stay a valid session: every
+// widget a session stores is named, and applying it leaves no value behind.
+void TestMainWindow::exampleSessionFileIsValid()
+{
+    const QString file = QString(AppConstants::Files::ExampleSession);
+    QVERIFY2(QFile::exists(file), qPrintable(file));
+
+    QString error;
+    QJsonObject values;
+    int version = -1;
+    QStringList otherSections;
+    QVERIFY2(StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
+                             &otherSections, &error),
+             qPrintable(error));
+    QCOMPARE(version, AppConstants::Sessions::Version);
+    QVERIFY(otherSections.isEmpty());
+
+    MainWindow window;
+    // The hash type list normally arrives from hashcat in the background;
+    // the test only needs the entry the example names.
+    window.ui->comboBox_hash_type->clear();
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("1400 | SHA2-256"), 1400);
+
+    const QStringList notes = window.applySessionFile(values, version, otherSections);
+    QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QLatin1Char('\n'))));
+
+    // A widget added later must be added to the example as well, or loading
+    // it would leave that widget at whatever the user had in the form.
+    const QJsonObject state =
+        WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
+    QStringList missing;
+    for (auto it = state.constBegin(); it != state.constEnd(); ++it) {
+        if (!values.contains(it.key())) {
+            missing << it.key();
+        }
+    }
+    QVERIFY2(missing.isEmpty(), qPrintable(QStringLiteral("the example does not name: %1")
+                                               .arg(missing.join(QStringLiteral(", ")))));
+}
+
+// Like a reset, loading the example throws away the session in the form, so
+// declining the question has to leave it untouched.
+void TestMainWindow::loadExampleSessionNeedsAConfirmation()
+{
+    MainWindow window;
+    window.ui->lineEdit_session->setText(QStringLiteral("keepMe"));
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "loadExampleSessionTriggered"));
+
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.title, QStringLiteral("Load Example Session"));
+    QVERIFY(recorder.text.contains(QStringLiteral("lost")));
+    QVERIFY(recorder.text.contains(QStringLiteral("should recover the password Nice!98")));
+    // The recorder closed the box without confirming: nothing was loaded.
+    QCOMPARE(window.ui->lineEdit_session->text(), QStringLiteral("keepMe"));
+}
+
+// Confirming the question loads the bundled example through the same path an
+// imported session takes.
+void TestMainWindow::loadExampleSessionAppliesTheBundledSession()
+{
+    MainWindow window;
+    window.ui->comboBox_hash_type->clear();
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("1400 | SHA2-256"), 1400);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.acceptConfirmation = true;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "loadExampleSessionTriggered"));
+
+    QCOMPARE(window.ui->comboBox_attack->currentData().toInt(), 3);
+    QCOMPARE(window.ui->comboBox_hash_type->currentData().toInt(), 1400);
+    QCOMPARE(window.ui->lineEdit_hashfile->text(),
+             QStringLiteral("ee3d96862a7b0806e6e0ad7861c46ea2d0b25a5eb9607cf5c837eb9906ca53b6"));
+    QCOMPARE(window.ui->lineEdit_mask->text(), QStringLiteral("?u?1?1?1?2?d?d"));
+    QCOMPARE(window.ui->lineEdit_custom_charset1->text(), QStringLiteral("?l?u"));
+    QCOMPARE(window.ui->lineEdit_custom_charset2->text(), QStringLiteral("!@#$"));
+    QVERIFY(window.ui->checkBox_custom_charset1->isChecked());
+    QVERIFY(window.ui->checkBox_custom_charset2->isChecked());
+    QVERIFY(window.ui->lineEdit_command->text().contains(QStringLiteral("--attack-mode 3")));
+    QVERIFY(window.ui->lineEdit_command->text().contains(QStringLiteral("--hash-type 1400")));
 }
 
 void TestMainWindow::optionDependenciesFollowTheirCheckboxes()

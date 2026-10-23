@@ -9,5 +9,6 @@
         <file>icons/hicolor/64x64/apps/hashcat-gui.png</file>
         <file>icons/hicolor/128x128/apps/hashcat-gui.png</file>
         <file>icons/hicolor/256x256/apps/hashcat-gui.png</file>
+        <file>sessions/example_bruteforce.json</file>
     </qresource>
 </RCC>

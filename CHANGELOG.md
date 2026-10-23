@@ -9,6 +9,7 @@
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
 - **Export and import**: Settings can be exported to a file and imported again
 - **Color scheme**: The application can follow the desktop, or use a light or a dark appearance of its own where the platform supports it
+- **Example session**: A bundled brute-force session to quickly check that the hashcat setup works (Tools → Load Example Session)
 
 ### Improvements
 - Added new application artwork and improved the XDG `.desktop` file entry

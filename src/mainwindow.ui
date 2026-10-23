@@ -1447,6 +1447,8 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionLoadExampleSession"/>
+    <addaction name="separator"/>
     <addaction name="actionResetSession"/>
    </widget>
    <widget class="QMenu" name="menuFile">
@@ -1470,6 +1472,11 @@
   <action name="actionAbout">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="actionLoadExampleSession">
+   <property name="text">
+    <string>Load Example Session</string>
    </property>
   </action>
   <action name="actionResetSession">

@@ -260,6 +260,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     /* ---------- menu actions ---------- */
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::aboutTriggered);
+    connect(ui->actionLoadExampleSession, &QAction::triggered, this,
+            &MainWindow::loadExampleSessionTriggered);
     connect(ui->actionResetSession, &QAction::triggered, this, &MainWindow::resetSessionTriggered);
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::quitTriggered);
     connect(ui->actionExportSession, &QAction::triggered, this, &MainWindow::exportTriggered);
@@ -660,6 +662,40 @@ void MainWindow::importSettingsTriggered()
             initHashAndAttackModes();
         }
         commandChanged();
+    }
+}
+
+// Tools → Load Example Session
+void MainWindow::loadExampleSessionTriggered()
+{
+    // Loading the example replaces the session the user has set up in the
+    // form, so it is only carried out after the user confirmed it.
+    const auto answer = QMessageBox::question(
+        this, tr("Load Example Session"),
+        tr("Load the example session? The current session is lost.\n\n"
+           "The example cracks a test SHA-256 hash; hashcat should recover the password "
+           "Nice!98."),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (answer != QMessageBox::Yes) {
+        return;
+    }
+
+    // The example is compiled into this build, so its format version cannot
+    // be newer than this one; the test keeps the resource current.
+    QString error;
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    if (!StateFile::read(QString(AppConstants::Files::ExampleSession),
+                         AppConstants::FileSections::Session, &values, &version, &otherSections,
+                         &error)) {
+        QMessageBox::warning(this, tr("Load Example Session"), error);
+        return;
+    }
+
+    const QStringList notes = applySessionFile(values, version, otherSections);
+    if (!notes.isEmpty()) {
+        QMessageBox::warning(this, tr("Load Example Session"), notes.join(QLatin1Char('\n')));
     }
 }
 
