@@ -8,6 +8,10 @@
         <translation>O programu</translation>
     </message>
     <message>
+        <source>Graphical user interface for the hashcat password recovery tool</source>
+        <translation>Grafički korisnički interfejs za alatku za oporavak lozinki hashcat</translation>
+    </message>
+    <message>
         <source>Version information</source>
         <translation>Informacije o verziji</translation>
     </message>
@@ -16,8 +20,64 @@
         <translation>[nepoznato]</translation>
     </message>
     <message>
+        <source>System information</source>
+        <translation>Informacije o sistemu</translation>
+    </message>
+    <message>
+        <source>Operating system</source>
+        <translation>Operativni sistem</translation>
+    </message>
+    <message>
+        <source>Links</source>
+        <translation>Veze</translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation>Licenca</translation>
+    </message>
+    <message>
+        <source>Copy the application, toolkit, system and hashcat versions to the clipboard</source>
+        <translation>Kopiraj verzije aplikacije, alata, sistema i hashcat-a u privremenu memoriju</translation>
+    </message>
+    <message>
+        <source>Copy details</source>
+        <translation>Kopiraj detalje</translation>
+    </message>
+    <message>
         <source>OK</source>
         <translation>OK</translation>
+    </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>Kopirano u privremenu memoriju</translation>
+    </message>
+    <message>
+        <source>Project page</source>
+        <translation>Stranica projekta</translation>
+    </message>
+    <message>
+        <source>Report an issue</source>
+        <translation>Prijavi problem</translation>
+    </message>
+    <message>
+        <source>hashcat</source>
+        <translation>hashcat</translation>
+    </message>
+    <message>
+        <source>hashcat FAQ</source>
+        <translation>hashcat FAQ</translation>
+    </message>
+    <message>
+        <source>hashcat-gui is licensed under the %1.</source>
+        <translation>Licenca programa hashcat-gui: %1.</translation>
+    </message>
+    <message>
+        <source>GNU GPL v3.0 or later</source>
+        <translation>GNU GPL v3.0 ili novija</translation>
+    </message>
+    <message>
+        <source>not configured</source>
+        <translation>nije konfigurisano</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -65,16 +125,16 @@
         <translation>Otvori...</translation>
     </message>
     <message>
+        <source>Assume the salt is given in hexadecimal</source>
+        <translation>Pretpostavi da je salt zadat heksadecimalno</translation>
+    </message>
+    <message>
+        <source>Salt is hex</source>
+        <translation>Salt je heks</translation>
+    </message>
+    <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>Ukloni hash sa liste hash-ova kada bude provaljen</translation>
-    </message>
-    <message>
-        <source>Ignore username in hashfile</source>
-        <translation>Zanemari korisničko ime u datoteci sa hashom</translation>
-    </message>
-    <message>
-        <source>Word lists</source>
-        <translation>Liste reči</translation>
     </message>
     <message>
         <source>Move item up</source>
@@ -93,16 +153,128 @@
         <translation>Ukloni</translation>
     </message>
     <message>
+        <source>Assume words in the wordlist are given in hexadecimal</source>
+        <translation>Pretpostavi da su reči u listi reči zadate heksadecimalno</translation>
+    </message>
+    <message>
+        <source>Wordlist is hex</source>
+        <translation>Lista reči je heks</translation>
+    </message>
+    <message>
+        <source>Encoding from:</source>
+        <translation>Kodiranje iz:</translation>
+    </message>
+    <message>
+        <source>Encoding to:</source>
+        <translation>Kodiranje u:</translation>
+    </message>
+    <message>
+        <source>Wordlist rules</source>
+        <translation>Pravila liste reči</translation>
+    </message>
+    <message>
+        <source>Left rule:</source>
+        <translation>Levo pravilo:</translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the left wordlist</source>
+        <translation>Jedno pravilo koje se primenjuje na svaku reč iz leve liste reči</translation>
+    </message>
+    <message>
+        <source>Right rule:</source>
+        <translation>Desno pravilo:</translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the right wordlist</source>
+        <translation>Jedno pravilo koje se primenjuje na svaku reč iz desne liste reči</translation>
+    </message>
+    <message>
+        <source>Charset is hex</source>
+        <translation>Skup znakova je heks</translation>
+    </message>
+    <message>
+        <source>Increment the mask length from the minimum to the maximum</source>
+        <translation>Povećavaj dužinu maske od minimuma do maksimuma</translation>
+    </message>
+    <message>
+        <source>Increment mask length</source>
+        <translation>Povećavanje dužine maske</translation>
+    </message>
+    <message>
+        <source>Min:</source>
+        <translation>Min:</translation>
+    </message>
+    <message>
+        <source>Minimum mask length; 0 uses hashcat&apos;s default</source>
+        <translation>Minimalna dužina maske; 0 koristi podrazumevanu vrednost hashcat-a</translation>
+    </message>
+    <message>
+        <source>Max:</source>
+        <translation>Maks:</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 uses hashcat&apos;s default</source>
+        <translation>Maksimalna dužina maske; 0 koristi podrazumevanu vrednost hashcat-a</translation>
+    </message>
+    <message>
+        <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
+        <translation>Veži hashcat za ove CPU uređaje, odvojene zarezima. Ostavite prazno da hashcat odluči.</translation>
+    </message>
+    <message>
+        <source>Devices to use, separated by commas. Leave empty for all devices.</source>
+        <translation>Uređaji koji se koriste, odvojeni zarezima. Ostavite prazno za sve uređaje.</translation>
+    </message>
+    <message>
+        <source>Abort when a device reaches this temperature</source>
+        <translation>Prekini kada uređaj dostigne ovu temperaturu</translation>
+    </message>
+    <message>
+        <source>Abort above</source>
+        <translation>Prekini iznad</translation>
+    </message>
+    <message>
+        <source> °C</source>
+        <translation> °C</translation>
+    </message>
+    <message>
+        <source>Outfile</source>
+        <translation>Izlazna datoteka</translation>
+    </message>
+    <message>
+        <source>Load Example Session</source>
+        <translation>Učitaj primer sesije</translation>
+    </message>
+    <message>
+        <source>Reset Session</source>
+        <translation>Resetuj sesiju</translation>
+    </message>
+    <message>
+        <source>Import Settings</source>
+        <translation>Uvezi podešavanja</translation>
+    </message>
+    <message>
+        <source>Export Settings</source>
+        <translation>Izvezi podešavanja</translation>
+    </message>
+    <message>
+        <source>Export Session</source>
+        <translation>Izvezi sesiju</translation>
+    </message>
+    <message>
+        <source>Import Session</source>
+        <translation>Uvezi sesiju</translation>
+    </message>
+    <message>
         <source>Mode:</source>
         <translation>Režim:</translation>
     </message>
     <message>
-        <source>Hash type:</source>
-        <translation>Vrsta hash-a:</translation>
+        <source>Attack</source>
+        <translation>Napad</translation>
     </message>
     <message>
-        <source>Configure path to hashcat binary in Settings to get available hash types</source>
-        <translation>Podesite putanju do hashcat programa u Podešavanjima da biste dobili dostupne vrste hash-ova</translation>
+        <source>Hash type:</source>
+        <translation>Vrsta hash-a:</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -119,14 +291,6 @@
     <message>
         <source>Generate rules:</source>
         <translation>Generiši pravila:</translation>
-    </message>
-    <message>
-        <source>Assume charset is given in hex</source>
-        <translation>Pretpostavi da je skup znakova zadat heksadecimalno</translation>
-    </message>
-    <message>
-        <source>Assume salt is given in hex</source>
-        <translation>Pretpostavi da je salt zadat heksadecimalno</translation>
     </message>
     <message>
         <source>Mask</source>
@@ -157,6 +321,70 @@
         <translation>Skup znakova 4:</translation>
     </message>
     <message>
+        <source>Session and limits</source>
+        <translation>Sesija i ograničenja</translation>
+    </message>
+    <message>
+        <source>Session name:</source>
+        <translation>Naziv sesije:</translation>
+    </message>
+    <message>
+        <source>Name hashcat uses for its restore file and status output.</source>
+        <translation>Naziv koji hashcat koristi za svoju datoteku za nastavak i izlaz statusa.</translation>
+    </message>
+    <message>
+        <source>Runtime limit:</source>
+        <translation>Ograničenje trajanja:</translation>
+    </message>
+    <message>
+        <source>Abort the session after this many seconds; unlimited runs until hashcat finishes</source>
+        <translation>Prekini sesiju nakon ovoliko sekundi; „neograničeno“ radi dok hashcat ne završi</translation>
+    </message>
+    <message>
+        <source> s</source>
+        <translation> s</translation>
+    </message>
+    <message>
+        <source>unlimited</source>
+        <translation>neograničeno</translation>
+    </message>
+    <message>
+        <source>Skip:</source>
+        <translation>Preskoči:</translation>
+    </message>
+    <message>
+        <source>Skip this many candidates from the start</source>
+        <translation>Preskoči ovoliko kandidata od početka</translation>
+    </message>
+    <message>
+        <source>Limit:</source>
+        <translation>Ograničenje:</translation>
+    </message>
+    <message>
+        <source>Only test this many candidates after the skipped ones</source>
+        <translation>Testiraj samo ovoliko kandidata posle preskočenih</translation>
+    </message>
+    <message>
+        <source>Update status automatically</source>
+        <translation>Automatski ažuriraj status</translation>
+    </message>
+    <message>
+        <source>Seconds between status updates</source>
+        <translation>Sekundi između ažuriranja statusa</translation>
+    </message>
+    <message>
+        <source>Ignore warnings and start hashcat anyway. Use with care.</source>
+        <translation>Zanemari upozorenja i ipak pokreni hashcat. Koristite oprezno.</translation>
+    </message>
+    <message>
+        <source>Force (ignore warnings)</source>
+        <translation>Prisili (zanemari upozorenja)</translation>
+    </message>
+    <message>
+        <source>Performance</source>
+        <translation>Performanse</translation>
+    </message>
+    <message>
         <source>Resources</source>
         <translation>Resursi</translation>
     </message>
@@ -169,42 +397,40 @@
         <translation>Backend uređaji:</translation>
     </message>
     <message>
+        <source>Device types:</source>
+        <translation>Vrste uređaja:</translation>
+    </message>
+    <message>
         <source>Segment size:</source>
         <translation>Veličina segmenta:</translation>
     </message>
     <message>
-        <source>locks to CPU devices, separate with comma</source>
-        <translation>vezuje za CPU uređaje, odvojene zarezom</translation>
-    </message>
-    <message>
-        <source>devices to use, separate with comma</source>
-        <translation>uređaji za korišćenje, odvojeni zarezom</translation>
+        <source>How much of the wordlist hashcat caches in memory, in MB. Lower it if hashcat runs out of memory.</source>
+        <translation>Količina liste reči koju hashcat kešira u memoriji, u MB. Smanjite vrednost ako hashcat ostane bez memorije.</translation>
     </message>
     <message>
         <source> MB</source>
         <translation> MB</translation>
     </message>
     <message>
-        <source>Output</source>
-        <translation>Izlaz</translation>
-    </message>
-    <message>
         <source>Write recovered hashes to file:</source>
         <translation>Upiši pronađene hash-ove u datoteku:</translation>
     </message>
     <message>
-        <source>Built-in variables:
-
-  &lt;hash&gt; = current hash filename or hash
-  &lt;unixtime&gt; = current unix timestamp</source>
-        <translation>Ugrađene promenljive:
-
-  &lt;hash&gt; = trenutni naziv datoteke sa hashom ili hash
-  &lt;unixtime&gt; = trenutni unix vremenski pečat</translation>
+        <source>Save...</source>
+        <translation>Sačuvaj...</translation>
     </message>
     <message>
         <source>Format:</source>
         <translation>Format:</translation>
+    </message>
+    <message>
+        <source>Do not write recovered hashes to the potfile</source>
+        <translation>Ne upisuj pronađene hash-ove u potfile</translation>
+    </message>
+    <message>
+        <source>Do not write the potfile</source>
+        <translation>Ne upisuj potfile</translation>
     </message>
     <message>
         <source>Start</source>
@@ -215,12 +441,16 @@
         <translation>Kopiraj naredbu u privremenu memoriju</translation>
     </message>
     <message>
-        <source>Advanced</source>
-        <translation>Napredno</translation>
-    </message>
-    <message>
         <source>General</source>
         <translation>Opšte</translation>
+    </message>
+    <message>
+        <source>Ignore username in hash file</source>
+        <translation>Zanemari korisničko ime u datoteci sa hash-ovima</translation>
+    </message>
+    <message>
+        <source>Wordlists</source>
+        <translation>Liste reči</translation>
     </message>
     <message>
         <source>Enable optimized kernels (limits password length)</source>
@@ -235,22 +465,14 @@
         <translation>Zameni profil opterećenja</translation>
     </message>
     <message>
-        <source> # | Performance | Runtime | Power Consumption | Desktop Impact
- ===+=============+=========+===================+=========
-  1 | Low               |   2 ms    | Low               | Minimal
-  2 | Default         |  12 ms   | Economic     | Noticeable
-  3 | High              |  96 ms   | High              | Unresponsive
-  4 | Nightmare   | 480 ms  | Insane          | Headless
+        <source>Built-in variables:
 
-</source>
-        <translation> # | Performansa   |Trajanje | Potrošnja energije| Uticaj na desktop
- ===+=============+=========+===================+=========
-  1 | Nisko         |    2 ms | Nisko             | Minimalno
-  2 | Podrazumevano |   12 ms | Ekonomično        | Primetno
-  3 | Visoko        |   96 ms | Visoko            | Ne reaguje
-  4 | Noćna mora    |  480 ms | Ludo              | Bez desktopa
+  &lt;hash&gt; = current hash filename or hash
+  &lt;unixtime&gt; = current Unix timestamp</source>
+        <translation>Ugrađene promenljive:
 
-</translation>
+  &lt;hash&gt; = naziv trenutne datoteke sa hash-ovima ili hash
+  &lt;unixtime&gt; = trenutna Unix vremenska oznaka</translation>
     </message>
     <message>
         <source>Help</source>
@@ -269,10 +491,6 @@
         <translation>O programu</translation>
     </message>
     <message>
-        <source>Reset fields</source>
-        <translation>Poništi polja</translation>
-    </message>
-    <message>
         <source>Quit</source>
         <translation>Izađi</translation>
     </message>
@@ -285,62 +503,144 @@
         <translation>Podešavanja</translation>
     </message>
     <message>
-        <source>Export Profile</source>
-        <translation>Izvezi profil</translation>
-    </message>
-    <message>
-        <source>Import Profile</source>
-        <translation>Uvezi profil</translation>
-    </message>
-    <message>
-        <source>Outfile format to use, separated with commas.
-default: 1,2</source>
-        <translation>Format izlazne datoteke koji treba koristiti, vrednosti odvojene zarezima.
-Podrazumevano: 1,2</translation>
-    </message>
-    <message>
-        <source>Save Profile</source>
-        <translation>Sačuvaj profil</translation>
-    </message>
-    <message>
         <source>JSON Files (*.json)</source>
         <translation>JSON datoteke (*.json)</translation>
     </message>
     <message>
-        <source>Saved</source>
-        <translation>Sačuvano</translation>
-    </message>
-    <message>
-        <source>Profile saved to %1.</source>
-        <translation>Profil je sačuvan u %1.</translation>
+        <source>The session file could not be read, so the session was not restored. The file was left in place.
+
+%1</source>
+        <translation>Datoteka sesije nije mogla da se pročita, pa sesija nije vraćena. Datoteka je ostavljena kakva jeste.
+
+%1</translation>
     </message>
     <message>
         <source>Save failed</source>
         <translation>Čuvanje nije uspelo</translation>
     </message>
     <message>
-        <source>Load Profile</source>
-        <translation>Učitaj profil</translation>
+        <source>Outfile format to use, separated by commas.
+Default: 1,2</source>
+        <translation>Format izlazne datoteke koji se koristi, odvojen zarezima.
+Podrazumevano: 1,2</translation>
     </message>
     <message>
-        <source>Loaded</source>
-        <translation>Učitano</translation>
+        <source>Common encodings:</source>
+        <translation>Uobičajena kodiranja:</translation>
     </message>
     <message>
-        <source>Profile loaded from %1.</source>
-        <translation>Profil je učitan iz %1.</translation>
+        <source>Force the internal wordlist encoding from this code. Leave empty to let hashcat decide.</source>
+        <translation>Prisili interno kodiranje liste reči iz ovog koda. Ostavite prazno da hashcat odluči.</translation>
     </message>
     <message>
-        <source>Profile warning</source>
-        <translation type="unfinished"></translation>
+        <source>Force the internal wordlist encoding to this code. Leave empty to let hashcat decide.</source>
+        <translation>Prisili interno kodiranje liste reči u ovaj kod. Ostavite prazno da hashcat odluči.</translation>
     </message>
     <message>
-        <source>Load failed</source>
-        <translation>Učitavanje nije uspelo</translation>
+        <source>OpenCL device types to use, separated by commas</source>
+        <translation>OpenCL vrste uređaja koje se koriste, odvojene zarezima</translation>
     </message>
     <message>
-        <source>The profile names the hash type %1, which this hashcat version does not support.</source>
-        <translation type="unfinished"></translation>
+        <source>Exported</source>
+        <translation>Izvezeno</translation>
+    </message>
+    <message>
+        <source>Session exported to %1.</source>
+        <translation>Sesija je izvezena u %1.</translation>
+    </message>
+    <message>
+        <source>Export failed</source>
+        <translation>Izvoz nije uspeo</translation>
+    </message>
+    <message>
+        <source>Import failed</source>
+        <translation>Uvoz nije uspeo</translation>
+    </message>
+    <message>
+        <source>Imported</source>
+        <translation>Uvezeno</translation>
+    </message>
+    <message>
+        <source>Session imported from %1.</source>
+        <translation>Sesija je uvezena iz %1.</translation>
+    </message>
+    <message>
+        <source>Session imported from %1.
+
+%2</source>
+        <translation>Sesija je uvezena iz %1.
+
+%2</translation>
+    </message>
+    <message>
+        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
+        <translation>Datoteku je napravila starija verzija programa hashcat-gui (verzija formata %1; ova verzija čita verziju formata %2).</translation>
+    </message>
+    <message>
+        <source>The file holds sections this import does not use: %1.</source>
+        <translation>Datoteka sadrži odeljke koje ovaj uvoz ne koristi: %1.</translation>
+    </message>
+    <message>
+        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
+        <translation>Datoteka je u verziji formata %1, ali ova verzija čita verziju formata %2, pa nije primenjena. Ažurirajte hashcat-gui da biste je pročitali.</translation>
+    </message>
+    <message>
+        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
+        <translation>Datoteka sesije je u verziji formata %1, ali ova verzija čita verziju formata %2, pa sesija nije vraćena. Datoteka je ostavljena kakva jeste, pa se ni sesija ovog pokretanja ne čuva. Ažurirajte hashcat-gui da biste je pročitali.</translation>
+    </message>
+    <message>
+        <source>Settings exported to %1.</source>
+        <translation>Podešavanja su izvezena u %1.</translation>
+    </message>
+    <message>
+        <source>Settings loaded from %1.</source>
+        <translation>Podešavanja su učitana iz %1.</translation>
+    </message>
+    <message>
+        <source>Review them and save to apply them.</source>
+        <translation>Pregledajte ih i sačuvajte da biste ih primenili.</translation>
+    </message>
+    <message>
+        <source>Load the example session? The current session is lost.
+
+The example cracks a test SHA-256 hash; hashcat should recover the password Nice!98.</source>
+        <translation>Učitati primer sesije? Trenutna sesija će biti izgubljena.
+
+Primer provaljuje probni SHA-256 hash; hashcat bi trebalo da pronađe lozinku Nice!98.</translation>
+    </message>
+    <message>
+        <source>Reset every field to its default? The current session is lost.</source>
+        <translation>Vratiti sva polja na podrazumevane vrednosti? Trenutna sesija će biti izgubljena.</translation>
+    </message>
+    <message>
+        <source>Session warning</source>
+        <translation>Upozorenje o sesiji</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).</source>
+        <translation>Ovaj režim zahteva tačno %1 liste reči (leva, desna).</translation>
+    </message>
+    <message>
+        <source>This mode needs a wordlist and a mask.</source>
+        <translation>Ovaj režim zahteva listu reči i masku.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Ovaj režim zahteva najmanje jednu listu reči.</translation>
+    </message>
+    <message>
+        <source>This attack mode needs at least one wordlist.</source>
+        <translation>Ovaj režim napada zahteva najmanje jednu listu reči.</translation>
+    </message>
+    <message>
+        <source>This attack mode needs exactly %1 wordlists.
+Currently selected: %2.</source>
+        <translation>Ovaj režim napada zahteva tačno %1 liste reči.
+Trenutno izabrano: %2.</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support.</source>
+        <translation>Sesija navodi vrstu hash-a %1, koju ova verzija hashcat-a ne podržava.</translation>
     </message>
     <message>
         <source>Straight</source>
@@ -352,7 +652,7 @@ Podrazumevano: 1,2</translation>
     </message>
     <message>
         <source>Brute-force</source>
-        <translation>Brute-Force</translation>
+        <translation>Brute-force</translation>
     </message>
     <message>
         <source>Hybrid Wordlist + Mask</source>
@@ -377,8 +677,20 @@ Error: %1</source>
 Greška: %1</translation>
     </message>
     <message>
+        <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
+        <translation>Vrste hash-ova nisu mogle da se učitaju. Proverite putanju do hashcat-a u podešavanjima.</translation>
+    </message>
+    <message>
         <source>hashcat error</source>
         <translation>hashcat greška</translation>
+    </message>
+    <message>
+        <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
+        <translation>Podesite putanju do hashcat-a u %1 → %2 da biste učitali dostupne vrste hash-ova.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Ovaj režim zahteva masku.</translation>
     </message>
     <message>
         <source>Open Hash File</source>
@@ -395,6 +707,10 @@ Greška: %1</translation>
     <message>
         <source>Open Rules File</source>
         <translation>Otvori datoteku sa pravilima</translation>
+    </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>Kopirano u privremenu memoriju</translation>
     </message>
     <message>
         <source>Launch failed</source>
@@ -431,8 +747,24 @@ Idite na %2 → %3 da to promenite.</translation>
     <message>
         <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
-        <translation>Konfigurisani terminal &quot;%1&quot; nije dostupan. Dostupni terminali: %2
+        <translation>Konfigurisani terminal „%1“ nije dostupan. Dostupni terminali: %2
 Idite na %3 → %4 da to promenite.</translation>
+    </message>
+    <message>
+        <source>This attack mode needs a mask.</source>
+        <translation>Ovaj režim napada zahteva masku.</translation>
+    </message>
+    <message>
+        <source>The minimum increment length is larger than the maximum.</source>
+        <translation>Minimalna dužina povećavanja veća je od maksimalne.</translation>
+    </message>
+    <message>
+        <source>The increment cannot be combined with the speed-only option.</source>
+        <translation>Povećavanje se ne može kombinovati sa opcijom samo za brzinu.</translation>
+    </message>
+    <message>
+        <source>Removing cracked hashes is not possible in the association attack mode.</source>
+        <translation>Uklanjanje provaljenih hash-ova nije moguće u režimu napada asocijacije.</translation>
     </message>
 </context>
 <context>
@@ -442,28 +774,80 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Podešavanja</translation>
     </message>
     <message>
-        <source>Hashcat executable</source>
-        <translation>hashcat program</translation>
+        <source>Hashcat</source>
+        <translation>Hashcat</translation>
     </message>
     <message>
-        <source>Select</source>
-        <translation>Izaberi</translation>
+        <source>&amp;Hashcat executable</source>
+        <translation>hashcat &amp;program</translation>
     </message>
     <message>
-        <source>Terminal</source>
-        <translation>Terminal</translation>
+        <source>Not configured</source>
+        <translation>Nije konfigurisano</translation>
+    </message>
+    <message>
+        <source>Select...</source>
+        <translation>Izaberi...</translation>
+    </message>
+    <message>
+        <source>&amp;Terminal</source>
+        <translation>&amp;Terminal</translation>
+    </message>
+    <message>
+        <source>&amp;Language</source>
+        <translation>&amp;Jezik</translation>
+    </message>
+    <message>
+        <source>&amp;Color scheme</source>
+        <translation>Še&amp;ma boja</translation>
+    </message>
+    <message>
+        <source>Not all color schemes are available on all platforms.</source>
+        <translation>Nisu sve šeme boja dostupne na svim platformama.</translation>
+    </message>
+    <message>
+        <source>&amp;Use short parameters</source>
+        <translation>Koristi &amp;kratke parametre</translation>
+    </message>
+    <message>
+        <source>Session and files</source>
+        <translation>Sesija i datoteke</translation>
+    </message>
+    <message>
+        <source>&amp;Restore the last session at startup</source>
+        <translation>&amp;Vrati poslednju sesiju pri pokretanju</translation>
+    </message>
+    <message>
+        <source>&amp;Session file</source>
+        <translation>Datoteka &amp;sesije</translation>
+    </message>
+    <message>
+        <source>The file the last session is stored in</source>
+        <translation>Datoteka u kojoj se čuva poslednja sesija</translation>
+    </message>
+    <message>
+        <source>Open folder</source>
+        <translation>Otvori fasciklu</translation>
+    </message>
+    <message>
+        <source>Open the folder the session is stored in</source>
+        <translation>Otvori fasciklu u kojoj se čuva sesija</translation>
+    </message>
+    <message>
+        <source>Settings &amp;file</source>
+        <translation>Datoteka po&amp;dešavanja</translation>
+    </message>
+    <message>
+        <source>The file the settings are stored in</source>
+        <translation>Datoteka u kojoj se čuvaju podešavanja</translation>
+    </message>
+    <message>
+        <source>Open the folder the settings are stored in</source>
+        <translation>Otvori fasciklu u kojoj se čuvaju podešavanja</translation>
     </message>
     <message>
         <source>General</source>
         <translation>Opšte</translation>
-    </message>
-    <message>
-        <source>Use short parameters</source>
-        <translation>Koristi kratke parametre</translation>
-    </message>
-    <message>
-        <source>Language</source>
-        <translation>Jezik</translation>
     </message>
     <message>
         <source>Save</source>
@@ -478,8 +862,60 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Preuzmi sa %1</translation>
     </message>
     <message>
+        <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
+        <translation>Koristi kratke nazive opcija (-m) umesto dugih (--hash-type) u naredbi.</translation>
+    </message>
+    <message>
+        <source>Select a terminal</source>
+        <translation>Izaberite terminal</translation>
+    </message>
+    <message>
         <source>System default</source>
         <translation>Sistemski podrazumevano</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Svetla</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Tamna</translation>
+    </message>
+    <message>
+        <source>The hashcat path %1 was not found on this computer.</source>
+        <translation>Putanja do hashcat-a %1 nije pronađena na ovom računaru.</translation>
+    </message>
+    <message>
+        <source>The terminal %1 is not installed and was not applied.</source>
+        <translation>Terminal %1 nije instaliran i nije primenjen.</translation>
+    </message>
+    <message>
+        <source>The color scheme %1 is not offered and was not applied.</source>
+        <translation>Šema boja %1 nije ponuđena i nije primenjena.</translation>
+    </message>
+    <message>
+        <source>The language %1 is not offered and was not applied.</source>
+        <translation>Jezik %1 nije ponuđen i nije primenjen.</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured; hashcat cannot be started.</source>
+        <translation>Nijedan hashcat program nije konfigurisan; hashcat ne može da se pokrene.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable was not found on this computer.</source>
+        <translation>Konfigurisani hashcat program nije pronađen na ovom računaru.</translation>
+    </message>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the output of hashcat.</source>
+        <translation>Na ovom sistemu nije pronađen nijedan podržani terminal. hashcat-gui treba terminal da bi prikazao izlaz hashcat-a.</translation>
+    </message>
+    <message>
+        <source>Select the terminal hashcat is started in.</source>
+        <translation>Izaberite terminal u kojem se pokreće hashcat.</translation>
+    </message>
+    <message>
+        <source>The configured terminal %1 is not installed.</source>
+        <translation>Konfigurisani terminal %1 nije instaliran.</translation>
     </message>
     <message>
         <source>Select the hashcat executable</source>
@@ -507,7 +943,7 @@ Idite na %3 → %4 da to promenite.</translation>
     </message>
 </context>
 <context>
-    <name>WidgetStateSerializer</name>
+    <name>StateFile</name>
     <message>
         <source>Could not open %1 for writing: %2</source>
         <translation>Nije bilo moguće otvoriti %1 za upis: %2</translation>
@@ -521,12 +957,44 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Nije bilo moguće otvoriti %1 za čitanje: %2</translation>
     </message>
     <message>
-        <source>The file is not a valid JSON file: %1</source>
-        <translation>Datoteka nije važeća JSON datoteka: %1</translation>
+        <source>The file is not valid JSON: %1</source>
+        <translation>Datoteka nije ispravan JSON: %1</translation>
     </message>
     <message>
-        <source>The file does not contain a profile for &quot;%1&quot;.</source>
-        <translation>Datoteka ne sadrži profil za &quot;%1&quot;.</translation>
+        <source>The file does not contain a JSON object.</source>
+        <translation>Datoteka ne sadrži JSON objekat.</translation>
+    </message>
+    <message>
+        <source>The file does not contain any sections.</source>
+        <translation>Datoteka ne sadrži nijedan odeljak.</translation>
+    </message>
+    <message>
+        <source>The file does not contain a %1 section.</source>
+        <translation>Datoteka ne sadrži odeljak %1.</translation>
+    </message>
+    <message>
+        <source>The file does not contain a %1 section; it holds %2.</source>
+        <translation>Datoteka ne sadrži odeljak %1; sadrži %2.</translation>
+    </message>
+    <message>
+        <source>The %1 section does not contain any values.</source>
+        <translation>Odeljak %1 ne sadrži nijednu vrednost.</translation>
+    </message>
+    <message>
+        <source> and </source>
+        <translation> i </translation>
+    </message>
+    <message>
+        <source> and %1 more</source>
+        <translation> i još %1</translation>
+    </message>
+    <message>
+        <source>The file names values this version does not know, so they were not applied: %1.</source>
+        <translation>Datoteka navodi vrednosti koje ova verzija ne poznaje, pa nisu primenjene: %1.</translation>
+    </message>
+    <message>
+        <source>The file holds values of the wrong type, so they were not applied: %1.</source>
+        <translation>Datoteka sadrži vrednosti pogrešnog tipa, pa nisu primenjene: %1.</translation>
     </message>
 </context>
 </TS>
