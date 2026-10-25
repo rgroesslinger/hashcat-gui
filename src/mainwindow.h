@@ -14,6 +14,7 @@
 
 #include "hashcatoptions.h"
 #include "helperutils.h"
+#include "wordlistmonitor.h"
 
 #include <QJsonObject>
 
@@ -58,6 +59,8 @@ private slots:
     void wordlistMoveUpClicked();
     void wordlistMoveDownClicked();
     void wordlistItemClicked(QListWidgetItem *item);
+    void refreshWordlistMonitor();
+    void wordlistAvailabilityChanged(const QString &path, bool available);
 
     // checkboxes / radio buttons
     void outfileToggled(bool checked);
@@ -92,6 +95,9 @@ private:
     friend class TestMainWindow;
 
     Ui::MainWindow *ui;
+
+    // Tells the wordlist rows which of their files are gone.
+    WordlistMonitor m_wordlistMonitor;
 
     // The last outfile name generated from the hash file name, see
     // hashFileTextChanged(). It is not cleared when the user types a name of

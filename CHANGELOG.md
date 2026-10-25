@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### New Features
+- Wordlist entries are watched while the window is open: a row whose file was deleted is marked with a warning icon
+
 ## 0.8.0 (2026-10-25)
 
 ### New Features

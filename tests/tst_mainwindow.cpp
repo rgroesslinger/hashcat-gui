@@ -12,6 +12,7 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QGroupBox>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLineEdit>
@@ -132,6 +133,18 @@ QStringList differingWidgets(const QString &filename, const QJsonObject &referen
     return names;
 }
 
+// A wordlist the monitor can see. The handle is closed at the end of the
+// scope, so the file can be removed again while the window watches it.
+bool writeFile(const QString &path)
+{
+    const QByteArray content = QByteArrayLiteral("password\n");
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return false;
+    }
+    return file.write(content) == content.size();
+}
+
 } // namespace
 
 // A hashcat that answers the query for the hash types.
@@ -192,6 +205,7 @@ private slots:
     void statusTimerReachesTheCommandLine();
     void skipAndLimitAcceptOnlyNumbers();
     void checkedWordlistsEndUpInTheCommand();
+    void missingWordlistsAreMarked();
     void hashTypeComesFromTheItemData();
     void hashTypesAreFilledFromHashcat();
     void failedQueryReenablesTheHashTypeCombo_data();
@@ -915,6 +929,81 @@ void TestMainWindow::checkedWordlistsEndUpInTheCommand()
     QVERIFY(arguments.contains(QStringLiteral("/tmp/a.txt")));
     QVERIFY(arguments.contains(QStringLiteral("/tmp/c.txt")));
     QVERIFY(!arguments.contains(QStringLiteral("/tmp/b.txt")));
+}
+
+// A wordlist can be gone without the row changing: it was deleted, or a
+// restored session names a file that is no longer there. The row has to say
+// so, and the path itself must survive untouched - it is what hashcat is given
+// and what a session stores.
+void TestMainWindow::missingWordlistsAreMarked()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+
+    const QString presentPath = directory.filePath(QStringLiteral("present.txt"));
+    QVERIFY(writeFile(presentPath));
+
+    const QString missingPath = directory.filePath(QStringLiteral("missing.txt"));
+
+    // A configured path keeps the constructor from queueing the settings
+    // dialog; the test spins the event loop below. The watchdog closes the
+    // query's failure warning, whose modal loop would otherwise swallow it.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+    m_watchdog.start();
+
+    MainWindow window;
+    const auto add = [&window](const QString &path) {
+        auto *item = new QListWidgetItem(path, window.ui->listWidget_wordlist);
+        item->setCheckState(Qt::Checked);
+        return item;
+    };
+    QListWidgetItem *present = add(presentPath);
+    QListWidgetItem *missing = add(missingPath);
+
+    QVERIFY(present->icon().isNull());
+    QVERIFY(present->toolTip().isEmpty());
+    QVERIFY(!missing->icon().isNull());
+    QVERIFY(missing->toolTip().contains(missingPath));
+
+    // The indicator is presentation only: text, command and session keep the
+    // path.
+    QCOMPARE(missing->text(), missingPath);
+    QCOMPARE(window.collectHashcatOptions().wordlists, (QStringList{presentPath, missingPath}));
+    const QJsonObject values =
+        WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
+    const QJsonArray items = values.value(QStringLiteral("listWidget_wordlist")).toArray();
+    QCOMPARE(items.size(), 2);
+    QCOMPARE(items.at(1).toObject().value(QStringLiteral("text")).toString(), missingPath);
+
+    // A file that disappears after it was added is marked; one that comes back
+    // is not.
+    QVERIFY(QFile::remove(presentPath));
+    QTRY_VERIFY(!present->icon().isNull());
+    QVERIFY(present->toolTip().contains(presentPath));
+
+    QVERIFY(writeFile(presentPath));
+    QTRY_VERIFY(present->icon().isNull());
+    QVERIFY(present->toolTip().isEmpty());
+
+    // A restored session clears the model and inserts the rows again; the
+    // monitor has to attach to those rows as well.
+    QJsonArray restoredWordlists;
+    QJsonObject restoredWordlist;
+    restoredWordlist[QStringLiteral("text")] = missingPath;
+    restoredWordlist[QStringLiteral("checked")] = true;
+    restoredWordlists.append(restoredWordlist);
+    QJsonObject sessionValues;
+    sessionValues[QStringLiteral("listWidget_wordlist")] = restoredWordlists;
+
+    QVERIFY(window.applySessionFile(sessionValues, AppConstants::Sessions::Version, {}).isEmpty());
+
+    QListWidget *list = window.ui->listWidget_wordlist;
+    QCOMPARE(list->count(), 1);
+    QListWidgetItem *restored = list->item(0);
+    QCOMPARE(restored->text(), missingPath);
+    QVERIFY(!restored->icon().isNull());
+    QVERIFY(restored->toolTip().contains(missingPath));
 }
 
 void TestMainWindow::hashTypeComesFromTheItemData()

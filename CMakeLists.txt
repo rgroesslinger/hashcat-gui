@@ -61,6 +61,8 @@ set(HASHCAT_GUI_SOURCES
     src/statefile.cpp
     src/widgetstateserializer.h
     src/widgetstateserializer.cpp
+    src/wordlistmonitor.h
+    src/wordlistmonitor.cpp
     src/resources.qrc
     src/aboutdialog.ui
     src/mainwindow.ui
@@ -150,6 +152,7 @@ set(HASHCAT_GUI_TESTS
     tst_statefile
     tst_translations
     tst_widgetstateserializer
+    tst_wordlistmonitor
 )
 
 if(NOT BUILD_TESTING)

@@ -24,6 +24,7 @@
 #include <QClipboard>
 #include <QCursor>
 #include <QFutureWatcher>
+#include <QIcon>
 #include <QLayout>
 #include <QScreen>
 #include <QScrollArea>
@@ -31,6 +32,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QStandardPaths>
+#include <QStyle>
 #include <QTextDocument>
 #include <QToolTip>
 
@@ -56,6 +58,18 @@ void activateLayouts(QWidget *widget)
         layout->invalidate();
         layout->activate();
     }
+}
+
+// A tooltip that contains something like "<b>" would be read as markup and
+// mangle the display. Escape such text once, and turn its breaks into <br> for
+// the rich text renderer. Plain text is left alone: escaping it would show
+// entities such as &amp; literally.
+QString escapeRichText(QString text)
+{
+    if (!Qt::mightBeRichText(text)) {
+        return text;
+    }
+    return text.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
 }
 
 // The tooltip of the command preview: the whole command, because the line
@@ -95,12 +109,7 @@ QString commandTooltip(const QString &command)
         lines << line;
     }
 
-    QString text = lines.join(QLatin1Char('\n'));
-    if (!Qt::mightBeRichText(text)) {
-        return text;
-    }
-
-    return text.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
+    return escapeRichText(lines.join(QLatin1Char('\n')));
 }
 
 // Where a file dialog starts: a folder the user knows. A bare file name
@@ -291,6 +300,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::wordlistMoveUpClicked);
     connect(ui->toolButton_wordlist_move_down, &QToolButton::clicked, this,
             &MainWindow::wordlistMoveDownClicked);
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this,
+            &MainWindow::refreshWordlistMonitor);
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this,
+            &MainWindow::refreshWordlistMonitor);
+    // clear() - and with it a session restore or a reset - resets the model
+    // instead of removing the rows one by one.
+    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::modelReset, this,
+            &MainWindow::refreshWordlistMonitor);
+    connect(&m_wordlistMonitor, &WordlistMonitor::availabilityChanged, this,
+            &MainWindow::wordlistAvailabilityChanged);
 
     /* ---------- rules ---------- */
     connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesFile1Toggled);
@@ -352,6 +371,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow()
 {
+    // QMainWindow destroys its child widgets only after the members are gone.
+    // Clearing the wordlist then resets its model, and the monitor member has
+    // to be out of the picture by that point.
+    disconnect(ui->listWidget_wordlist->model(), nullptr, this, nullptr);
     delete ui;
 }
 
@@ -1223,6 +1246,53 @@ void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
     ui->pushButton_remove_wordlist->setEnabled(true);
     ui->toolButton_wordlist_move_up->setEnabled(true);
     ui->toolButton_wordlist_move_down->setEnabled(true);
+}
+
+// The rows are the source of the watched paths: a wordlist arrives through the
+// file dialog, a drop, a session or a reset, and all of them change the model.
+void MainWindow::refreshWordlistMonitor()
+{
+    QStringList paths;
+    paths.reserve(ui->listWidget_wordlist->count());
+    for (int i = 0; i < ui->listWidget_wordlist->count(); ++i) {
+        paths << ui->listWidget_wordlist->item(i)->text();
+    }
+    m_wordlistMonitor.setPaths(paths);
+}
+
+void MainWindow::wordlistAvailabilityChanged(const QString &path, bool available)
+{
+    QListWidget *list = ui->listWidget_wordlist;
+    const QIcon warning = available ? QIcon() : style()->standardIcon(QStyle::SP_MessageBoxWarning);
+
+    for (int i = 0; i < list->count(); ++i) {
+        QListWidgetItem *item = list->item(i);
+        if (item->text() != path) {
+            continue;
+        }
+
+        if (available) {
+            // Item data changes go through itemChanged(), which rebuilds the
+            // preview: leave an available row alone instead of clearing what is
+            // already clear.
+            if (!item->icon().isNull()) {
+                item->setIcon(QIcon());
+            }
+            if (!item->toolTip().isEmpty()) {
+                item->setToolTip(QString());
+            }
+            continue;
+        }
+
+        if (item->icon().isNull()) {
+            item->setIcon(warning);
+        }
+
+        const QString tooltip = escapeRichText(tr("This wordlist does not exist:\n%1").arg(path));
+        if (item->toolTip() != tooltip) {
+            item->setToolTip(tooltip);
+        }
+    }
 }
 
 void MainWindow::rulesFile1Toggled(bool checked)
