@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.0 (Unreleased)
+## 0.8.0 (2026-10-25)
 
 ### New Features
 - **Translations**: Multi-language support with compiled translation catalogs; language can be selected in settings (#12)

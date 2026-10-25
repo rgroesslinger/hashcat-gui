@@ -1,15 +1,11 @@
 # hashcat-gui
 
-A graphical user interface for the password recovery utility [hashcat](https://github.com/hashcat/hashcat/).
-
-![hashcat-gui](/screenshot.png)
-
-## Current status
-
 [![CI Build](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yml/badge.svg)](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yml)
 [![build result](https://build.opensuse.org/projects/home:rgroesslinger/packages/hashcat-gui/badge.svg?type=default)](https://build.opensuse.org/package/show/home:rgroesslinger/hashcat-gui)
 
-✅ Compatible with hashcat v7.1.2
+A graphical user interface for the password recovery utility [hashcat](https://github.com/hashcat/hashcat/).
+
+![hashcat-gui](/screenshot.png)
 
 ## Installation
 
