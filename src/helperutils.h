@@ -81,6 +81,10 @@ public:
 
     static QMap<QString, QStringList> availableTerminals();
 
+    // The note the settings dialog and a failed launch both show when this
+    // system has no terminal hashcat-gui can start hashcat in.
+    static QString noSupportedTerminalMessage();
+
     // Applies the color scheme the user chose.
     //
     // An empty scheme follows the system again - the desktop decides - while

@@ -16,8 +16,16 @@
         <translation>バージョン情報</translation>
     </message>
     <message>
-        <source>[unknown]</source>
-        <translation>[不明]</translation>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates</source>
+        <translation>アップデート</translation>
+    </message>
+    <message>
+        <source>Checking for updates…</source>
+        <translation>アップデートを確認しています…</translation>
     </message>
     <message>
         <source>System information</source>
@@ -76,12 +84,32 @@
         <translation>GNU GPL v3.0 以降</translation>
     </message>
     <message>
-        <source>not configured</source>
-        <translation>未設定</translation>
+        <source>Not configured</source>
+        <translation type="unfinished">未設定</translation>
     </message>
     <message>
         <source>Error: %1</source>
         <translation>エラー: %1</translation>
+    </message>
+    <message>
+        <source>A newer version is available: %1.</source>
+        <translation>新しいバージョンが利用可能です: %1。</translation>
+    </message>
+    <message>
+        <source>Release page</source>
+        <translation>リリースページ</translation>
+    </message>
+    <message>
+        <source>No updates available.</source>
+        <translation>利用可能なアップデートはありません。</translation>
+    </message>
+    <message>
+        <source>Could not check for updates.</source>
+        <translation>アップデートを確認できませんでした。</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: %1</source>
+        <translation>アップデートを確認できませんでした: %1</translation>
     </message>
 </context>
 <context>
@@ -113,20 +141,16 @@
         <translation>hashcat がタイムアウトしました
 %1</translation>
     </message>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation type="unfinished">このシステムでサポートされているターミナルが見つかりません。hashcat の出力を表示するために、hashcat-gui にはターミナルが必要です。</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>Hash file or hash:</source>
         <translation>ハッシュファイルまたはハッシュ:</translation>
-    </message>
-    <message>
-        <source>Open...</source>
-        <translation>開く...</translation>
-    </message>
-    <message>
-        <source>Assume the salt is given in hexadecimal</source>
-        <translation>ソルトが 16 進数で指定されているものとして扱う</translation>
     </message>
     <message>
         <source>Salt is hex</source>
@@ -145,16 +169,8 @@
         <translation>項目を下へ移動</translation>
     </message>
     <message>
-        <source>Add files...</source>
-        <translation>ファイルを追加...</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>削除</translation>
-    </message>
-    <message>
-        <source>Assume words in the wordlist are given in hexadecimal</source>
-        <translation>ワードリスト内の単語が 16 進数で指定されているものとして扱う</translation>
     </message>
     <message>
         <source>Wordlist is hex</source>
@@ -177,24 +193,12 @@
         <translation>左ルール:</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the left wordlist</source>
-        <translation>左のワードリストの各単語に適用する単一のルール</translation>
-    </message>
-    <message>
         <source>Right rule:</source>
         <translation>右ルール:</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the right wordlist</source>
-        <translation>右のワードリストの各単語に適用する単一のルール</translation>
-    </message>
-    <message>
         <source>Charset is hex</source>
         <translation>文字セットは 16 進数</translation>
-    </message>
-    <message>
-        <source>Increment the mask length from the minimum to the maximum</source>
-        <translation>マスク長を最小から最大まで増やす</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -205,16 +209,8 @@
         <translation>最小:</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>マスクの最小長。0 の場合は hashcat の既定値を使用します</translation>
-    </message>
-    <message>
         <source>Max:</source>
         <translation>最大:</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>マスクの最大長。0 の場合は hashcat の既定値を使用します</translation>
     </message>
     <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
@@ -225,20 +221,27 @@
         <translation>使用するデバイス (カンマ区切り)。空欄の場合はすべてのデバイスを使用します。</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature</source>
-        <translation>デバイスがこの温度に達したら中止する</translation>
-    </message>
-    <message>
         <source>Abort above</source>
         <translation>中止する温度</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>出力ファイル</translation>
+    </message>
+    <message>
+        <source>Built-in variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not write recovered hashes to the potfile.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load Example Session</source>
@@ -249,22 +252,6 @@
         <translation>セッションをリセット</translation>
     </message>
     <message>
-        <source>Import Settings</source>
-        <translation>設定をインポート</translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation>設定をエクスポート</translation>
-    </message>
-    <message>
-        <source>Export Session</source>
-        <translation>セッションをエクスポート</translation>
-    </message>
-    <message>
-        <source>Import Session</source>
-        <translation>セッションをインポート</translation>
-    </message>
-    <message>
         <source>Mode:</source>
         <translation>モード:</translation>
     </message>
@@ -273,8 +260,24 @@
         <translation>攻撃</translation>
     </message>
     <message>
+        <source>Open…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume the salt is given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Hash type:</source>
         <translation>ハッシュタイプ:</translation>
+    </message>
+    <message>
+        <source>Add files…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume words in the wordlist are given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rules</source>
@@ -291,6 +294,14 @@
     <message>
         <source>Generate rules:</source>
         <translation>ルールを生成:</translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the left wordlist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the right wordlist.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Mask</source>
@@ -337,14 +348,6 @@
         <translation>実行時間の上限:</translation>
     </message>
     <message>
-        <source>Abort the session after this many seconds; unlimited runs until hashcat finishes</source>
-        <translation>この秒数が経過したらセッションを中止します。「無制限」の場合は hashcat が終了するまで実行します</translation>
-    </message>
-    <message>
-        <source> s</source>
-        <translation> 秒</translation>
-    </message>
-    <message>
         <source>unlimited</source>
         <translation>無制限</translation>
     </message>
@@ -353,24 +356,12 @@
         <translation>スキップ:</translation>
     </message>
     <message>
-        <source>Skip this many candidates from the start</source>
-        <translation>先頭からこの数の候補をスキップする</translation>
-    </message>
-    <message>
         <source>Limit:</source>
         <translation>上限:</translation>
     </message>
     <message>
-        <source>Only test this many candidates after the skipped ones</source>
-        <translation>スキップした候補の後から、この数の候補だけをテストする</translation>
-    </message>
-    <message>
         <source>Update status automatically</source>
         <translation>ステータスを自動的に更新する</translation>
-    </message>
-    <message>
-        <source>Seconds between status updates</source>
-        <translation>ステータス更新の間隔 (秒)</translation>
     </message>
     <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
@@ -409,24 +400,12 @@
         <translation>hashcat がメモリ内にキャッシュするワードリストの量 (MB 単位)。hashcat のメモリが不足する場合は小さくしてください。</translation>
     </message>
     <message>
-        <source> MB</source>
-        <translation> MB</translation>
-    </message>
-    <message>
         <source>Write recovered hashes to file:</source>
         <translation>復元したハッシュをファイルに書き込む:</translation>
     </message>
     <message>
-        <source>Save...</source>
-        <translation>保存...</translation>
-    </message>
-    <message>
         <source>Format:</source>
         <translation>形式:</translation>
-    </message>
-    <message>
-        <source>Do not write recovered hashes to the potfile</source>
-        <translation>復元したハッシュを potfile に書き込まない</translation>
     </message>
     <message>
         <source>Do not write the potfile</source>
@@ -453,6 +432,38 @@
         <translation>ワードリスト</translation>
     </message>
     <message>
+        <source>Increment the mask length from the minimum to the maximum.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip this many candidates from the start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only test this many candidates after the skipped ones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds between status updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>最適化カーネルを有効にする (パスワード長が制限されます)</translation>
     </message>
@@ -465,14 +476,36 @@
         <translation>ワークロードプロファイルを上書きする</translation>
     </message>
     <message>
-        <source>Built-in variables:
-
-  &lt;hash&gt; = current hash filename or hash
-  &lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>組み込み変数:
-
-  &lt;hash&gt; = 現在のハッシュファイル名またはハッシュ
-  &lt;unixtime&gt; = 現在の Unix タイムスタンプ</translation>
+        <source>&#xa0;MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort when a device reaches this temperature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;°C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Session…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Help</source>
@@ -497,10 +530,6 @@
     <message>
         <source>About Qt</source>
         <translation>Qt について</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>設定</translation>
     </message>
     <message>
         <source>JSON Files (*.json)</source>
@@ -537,16 +566,8 @@ Default: 1,2</source>
         <translation>ワードリストの内部エンコードの変換先を、このコードに強制します。空欄の場合は hashcat が決定します。</translation>
     </message>
     <message>
-        <source>OpenCL device types to use, separated by commas</source>
-        <translation>使用する OpenCL デバイスタイプ (カンマ区切り)</translation>
-    </message>
-    <message>
         <source>Exported</source>
         <translation>エクスポート完了</translation>
-    </message>
-    <message>
-        <source>Session exported to %1.</source>
-        <translation>セッションを %1 にエクスポートしました。</translation>
     </message>
     <message>
         <source>Export failed</source>
@@ -559,18 +580,6 @@ Default: 1,2</source>
     <message>
         <source>Imported</source>
         <translation>インポート完了</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.</source>
-        <translation>セッションを %1 からインポートしました。</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.
-
-%2</source>
-        <translation>セッションを %1 からインポートしました。
-
-%2</translation>
     </message>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -593,12 +602,50 @@ Default: 1,2</source>
         <translation>設定を %1 にエクスポートしました。</translation>
     </message>
     <message>
-        <source>Settings loaded from %1.</source>
-        <translation>設定を %1 から読み込みました。</translation>
+        <source>OpenCL device types to use, separated by commas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session exported to “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.
+
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings loaded from “%1”.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Review them and save to apply them.</source>
         <translation>内容を確認し、保存して適用してください。</translation>
+    </message>
+    <message>
+        <source>Load example session</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load the example session? The current session is lost.
@@ -609,12 +656,24 @@ The example cracks a test SHA-256 hash; hashcat should recover the password Nice
 このサンプルはテスト用の SHA-256 ハッシュを解読します。hashcat はパスワード Nice!98 を復元するはずです。</translation>
     </message>
     <message>
+        <source>Reset session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset every field to its default? The current session is lost.</source>
         <translation>すべてのフィールドを既定値にリセットしますか? 現在のセッションは失われます。</translation>
     </message>
     <message>
         <source>Session warning</source>
         <translation>セッションの警告</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load hash types</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This mode needs exactly %1 wordlists (left, right).</source>
@@ -629,14 +688,34 @@ The example cracks a test SHA-256 hash; hashcat should recover the password Nice
         <translation>このモードには少なくとも 1 つのワードリストが必要です。</translation>
     </message>
     <message>
-        <source>This attack mode needs at least one wordlist.</source>
-        <translation>この攻撃モードには少なくとも 1 つのワードリストが必要です。</translation>
+        <source>Open hash file</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This attack mode needs exactly %1 wordlists.
+        <source>Save output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add wordlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open rules file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
-        <translation>この攻撃モードにはちょうど %1 個のワードリストが必要です。
-現在の選択: %2。</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
@@ -667,10 +746,6 @@ Currently selected: %2.</source>
         <translation>関連付け</translation>
     </message>
     <message>
-        <source>Updating...</source>
-        <translation>更新中...</translation>
-    </message>
-    <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>サポートされているハッシュタイプを取得できませんでした。
@@ -681,10 +756,6 @@ Error: %1</source>
         <translation>ハッシュタイプを読み込めませんでした。設定で hashcat のパスを確認してください。</translation>
     </message>
     <message>
-        <source>hashcat error</source>
-        <translation>hashcat エラー</translation>
-    </message>
-    <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>利用可能なハッシュタイプを読み込むには、%1 → %2 で hashcat のパスを設定してください。</translation>
     </message>
@@ -693,20 +764,10 @@ Error: %1</source>
         <translation>このモードにはマスクが必要です。</translation>
     </message>
     <message>
-        <source>Open Hash File</source>
-        <translation>ハッシュファイルを開く</translation>
-    </message>
-    <message>
-        <source>Save Output File</source>
-        <translation>出力ファイルを保存</translation>
-    </message>
-    <message>
-        <source>Add Wordlists</source>
-        <translation>ワードリストを追加</translation>
-    </message>
-    <message>
-        <source>Open Rules File</source>
-        <translation>ルールファイルを開く</translation>
+        <source>This wordlist does not exist:
+%1</source>
+        <translation>このワードリストは存在しません:
+%1</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
@@ -715,10 +776,6 @@ Error: %1</source>
     <message>
         <source>Launch failed</source>
         <translation>起動に失敗しました</translation>
-    </message>
-    <message>
-        <source>Could not start %1: %2</source>
-        <translation>%1 を起動できませんでした: %2</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -741,20 +798,6 @@ Navigate to %2 → %3 to change it.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt; を開いて、起動に使用するターミナルを選択してください。</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>このシステムでサポートされているターミナルが見つかりません。hashcat の出力を表示するために、hashcat-gui にはターミナルが必要です。</translation>
-    </message>
-    <message>
-        <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>設定されたターミナル「%1」は利用できません。利用可能なターミナル: %2
-変更するには %3 → %4 を開いてください。</translation>
-    </message>
-    <message>
-        <source>This attack mode needs a mask.</source>
-        <translation>この攻撃モードにはマスクが必要です。</translation>
-    </message>
-    <message>
         <source>The minimum increment length is larger than the maximum.</source>
         <translation>インクリメントの最小長が最大長より大きくなっています。</translation>
     </message>
@@ -774,20 +817,20 @@ Navigate to %3 → %4 to change it.</source>
         <translation>設定</translation>
     </message>
     <message>
-        <source>Hashcat</source>
-        <translation>Hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;Hashcat executable</source>
-        <translation>hashcat 実行ファイル(&amp;H)</translation>
-    </message>
-    <message>
         <source>Not configured</source>
         <translation>未設定</translation>
     </message>
     <message>
-        <source>Select...</source>
-        <translation>選択...</translation>
+        <source>hashcat</source>
+        <translation type="unfinished">hashcat</translation>
+    </message>
+    <message>
+        <source>&amp;hashcat executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;Terminal</source>
@@ -882,20 +925,24 @@ Navigate to %3 → %4 to change it.</source>
         <translation>ダーク</translation>
     </message>
     <message>
-        <source>The hashcat path %1 was not found on this computer.</source>
-        <translation>hashcat のパス %1 はこのコンピューターで見つかりませんでした。</translation>
+        <source>The hashcat path “%1” was not found on this computer.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The terminal %1 is not installed and was not applied.</source>
-        <translation>ターミナル %1 はインストールされていないため、適用されませんでした。</translation>
+        <source>The terminal “%1” is not installed and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The color scheme %1 is not offered and was not applied.</source>
-        <translation>カラースキーム %1 は提供されていないため、適用されませんでした。</translation>
+        <source>The color scheme “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The language %1 is not offered and was not applied.</source>
-        <translation>言語 %1 は提供されていないため、適用されませんでした。</translation>
+        <source>The language “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not installed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
@@ -906,16 +953,8 @@ Navigate to %3 → %4 to change it.</source>
         <translation>設定された hashcat 実行ファイルはこのコンピューターで見つかりませんでした。</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the output of hashcat.</source>
-        <translation>このシステムでサポートされているターミナルが見つかりません。hashcat の出力を表示するために、hashcat-gui にはターミナルが必要です。</translation>
-    </message>
-    <message>
         <source>Select the terminal hashcat is started in.</source>
         <translation>hashcat を起動するターミナルを選択してください。</translation>
-    </message>
-    <message>
-        <source>The configured terminal %1 is not installed.</source>
-        <translation>設定されたターミナル %1 はインストールされていません。</translation>
     </message>
     <message>
         <source>Select the hashcat executable</source>
@@ -945,18 +984,6 @@ Navigate to %3 → %4 to change it.</source>
 <context>
     <name>StateFile</name>
     <message>
-        <source>Could not open %1 for writing: %2</source>
-        <translation>%1 を書き込み用に開けませんでした: %2</translation>
-    </message>
-    <message>
-        <source>Could not write to %1: %2</source>
-        <translation>%1 に書き込めませんでした: %2</translation>
-    </message>
-    <message>
-        <source>Could not open %1 for reading: %2</source>
-        <translation>%1 を読み取り用に開けませんでした: %2</translation>
-    </message>
-    <message>
         <source>The file is not valid JSON: %1</source>
         <translation>ファイルは有効な JSON ではありません: %1</translation>
     </message>
@@ -969,16 +996,28 @@ Navigate to %3 → %4 to change it.</source>
         <translation>ファイルにセクションが含まれていません。</translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section.</source>
-        <translation>ファイルに %1 セクションが含まれていません。</translation>
+        <source>Could not open “%1” for writing: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section; it holds %2.</source>
-        <translation>ファイルに %1 セクションが含まれていません。含まれているのは %2 です。</translation>
+        <source>Could not write to “%1”: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The %1 section does not contain any values.</source>
-        <translation>%1 セクションに値が含まれていません。</translation>
+        <source>Could not open “%1” for reading: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section; it holds %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The “%1” section does not contain any values.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source> and </source>
@@ -995,6 +1034,33 @@ Navigate to %3 → %4 to change it.</source>
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>ファイルに型が正しくない値が含まれているため、適用されませんでした: %1。</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateChecker</name>
+    <message>
+        <source>GitHub answered with HTTP status %1: %2</source>
+        <translation>GitHub が HTTP ステータス %1 で応答しました: %2</translation>
+    </message>
+    <message>
+        <source>GitHub answered with HTTP status %1.</source>
+        <translation>GitHub が HTTP ステータス %1 で応答しました。</translation>
+    </message>
+    <message>
+        <source>The release information is not valid JSON.</source>
+        <translation>リリース情報が有効な JSON ではありません。</translation>
+    </message>
+    <message>
+        <source>The release information does not name a version.</source>
+        <translation>リリース情報にバージョンが含まれていません。</translation>
+    </message>
+    <message>
+        <source>The release version %1 is not a valid version number.</source>
+        <translation>リリースバージョン %1 は有効なバージョン番号ではありません。</translation>
+    </message>
+    <message>
+        <source>The installed version %1 is not a valid version number.</source>
+        <translation>インストールされているバージョン %1 は有効なバージョン番号ではありません。</translation>
     </message>
 </context>
 </TS>

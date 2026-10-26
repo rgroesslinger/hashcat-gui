@@ -16,8 +16,16 @@
         <translation>版本信息</translation>
     </message>
     <message>
-        <source>[unknown]</source>
-        <translation>[未知]</translation>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates</source>
+        <translation>更新</translation>
+    </message>
+    <message>
+        <source>Checking for updates…</source>
+        <translation>正在检查更新…</translation>
     </message>
     <message>
         <source>System information</source>
@@ -76,12 +84,32 @@
         <translation>GNU GPL v3.0 或更高版本</translation>
     </message>
     <message>
-        <source>not configured</source>
-        <translation>未配置</translation>
+        <source>Not configured</source>
+        <translation type="unfinished">未配置</translation>
     </message>
     <message>
         <source>Error: %1</source>
         <translation>错误：%1</translation>
+    </message>
+    <message>
+        <source>A newer version is available: %1.</source>
+        <translation>有新版本可用：%1。</translation>
+    </message>
+    <message>
+        <source>Release page</source>
+        <translation>发布页面</translation>
+    </message>
+    <message>
+        <source>No updates available.</source>
+        <translation>没有可用的更新。</translation>
+    </message>
+    <message>
+        <source>Could not check for updates.</source>
+        <translation>无法检查更新。</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: %1</source>
+        <translation>无法检查更新：%1</translation>
     </message>
 </context>
 <context>
@@ -113,20 +141,16 @@
         <translation>hashcat 超时
 %1</translation>
     </message>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation type="unfinished">在此系统上未找到受支持的终端。hashcat-gui 需要终端来显示 hashcat 的输出。</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>Hash file or hash:</source>
         <translation>哈希文件或哈希：</translation>
-    </message>
-    <message>
-        <source>Open...</source>
-        <translation>打开...</translation>
-    </message>
-    <message>
-        <source>Assume the salt is given in hexadecimal</source>
-        <translation>假定盐值以十六进制给出</translation>
     </message>
     <message>
         <source>Salt is hex</source>
@@ -145,16 +169,8 @@
         <translation>下移</translation>
     </message>
     <message>
-        <source>Add files...</source>
-        <translation>添加文件...</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>移除</translation>
-    </message>
-    <message>
-        <source>Assume words in the wordlist are given in hexadecimal</source>
-        <translation>假定字典中的单词以十六进制给出</translation>
     </message>
     <message>
         <source>Wordlist is hex</source>
@@ -177,24 +193,12 @@
         <translation>左侧规则：</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the left wordlist</source>
-        <translation>应用于左侧字典中每个单词的单条规则</translation>
-    </message>
-    <message>
         <source>Right rule:</source>
         <translation>右侧规则：</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the right wordlist</source>
-        <translation>应用于右侧字典中每个单词的单条规则</translation>
-    </message>
-    <message>
         <source>Charset is hex</source>
         <translation>字符集为十六进制</translation>
-    </message>
-    <message>
-        <source>Increment the mask length from the minimum to the maximum</source>
-        <translation>将掩码长度从最小值递增到最大值</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -205,16 +209,8 @@
         <translation>最小：</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>掩码最小长度；0 表示使用 hashcat 的默认值</translation>
-    </message>
-    <message>
         <source>Max:</source>
         <translation>最大：</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>掩码最大长度；0 表示使用 hashcat 的默认值</translation>
     </message>
     <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
@@ -225,20 +221,27 @@
         <translation>要使用的设备，以逗号分隔。留空则使用所有设备。</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature</source>
-        <translation>当设备达到此温度时中止</translation>
-    </message>
-    <message>
         <source>Abort above</source>
         <translation>超过以下温度中止</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>输出文件</translation>
+    </message>
+    <message>
+        <source>Built-in variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not write recovered hashes to the potfile.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load Example Session</source>
@@ -249,22 +252,6 @@
         <translation>重置会话</translation>
     </message>
     <message>
-        <source>Import Settings</source>
-        <translation>导入设置</translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation>导出设置</translation>
-    </message>
-    <message>
-        <source>Export Session</source>
-        <translation>导出会话</translation>
-    </message>
-    <message>
-        <source>Import Session</source>
-        <translation>导入会话</translation>
-    </message>
-    <message>
         <source>Mode:</source>
         <translation>模式：</translation>
     </message>
@@ -273,8 +260,24 @@
         <translation>攻击</translation>
     </message>
     <message>
+        <source>Open…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume the salt is given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Hash type:</source>
         <translation>哈希类型：</translation>
+    </message>
+    <message>
+        <source>Add files…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume words in the wordlist are given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rules</source>
@@ -291,6 +294,14 @@
     <message>
         <source>Generate rules:</source>
         <translation>生成规则：</translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the left wordlist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the right wordlist.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Mask</source>
@@ -337,14 +348,6 @@
         <translation>运行时间限制：</translation>
     </message>
     <message>
-        <source>Abort the session after this many seconds; unlimited runs until hashcat finishes</source>
-        <translation>超过此秒数后中止会话；“无限制”表示运行到 hashcat 结束</translation>
-    </message>
-    <message>
-        <source> s</source>
-        <translation> 秒</translation>
-    </message>
-    <message>
         <source>unlimited</source>
         <translation>无限制</translation>
     </message>
@@ -353,24 +356,12 @@
         <translation>跳过：</translation>
     </message>
     <message>
-        <source>Skip this many candidates from the start</source>
-        <translation>从开头跳过这么多个候选项</translation>
-    </message>
-    <message>
         <source>Limit:</source>
         <translation>限制：</translation>
     </message>
     <message>
-        <source>Only test this many candidates after the skipped ones</source>
-        <translation>在跳过的候选项之后，仅测试这么多个候选项</translation>
-    </message>
-    <message>
         <source>Update status automatically</source>
         <translation>自动更新状态</translation>
-    </message>
-    <message>
-        <source>Seconds between status updates</source>
-        <translation>状态更新的间隔秒数</translation>
     </message>
     <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
@@ -409,24 +400,12 @@
         <translation>hashcat 在内存中缓存的字典量，单位为 MB。如果 hashcat 内存不足，请调小此值。</translation>
     </message>
     <message>
-        <source> MB</source>
-        <translation> MB</translation>
-    </message>
-    <message>
         <source>Write recovered hashes to file:</source>
         <translation>将已恢复的哈希写入文件：</translation>
     </message>
     <message>
-        <source>Save...</source>
-        <translation>保存...</translation>
-    </message>
-    <message>
         <source>Format:</source>
         <translation>格式：</translation>
-    </message>
-    <message>
-        <source>Do not write recovered hashes to the potfile</source>
-        <translation>不将已恢复的哈希写入 potfile</translation>
     </message>
     <message>
         <source>Do not write the potfile</source>
@@ -453,6 +432,38 @@
         <translation>字典</translation>
     </message>
     <message>
+        <source>Increment the mask length from the minimum to the maximum.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip this many candidates from the start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only test this many candidates after the skipped ones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds between status updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>启用优化内核（会限制密码长度）</translation>
     </message>
@@ -465,14 +476,36 @@
         <translation>覆盖工作负载配置</translation>
     </message>
     <message>
-        <source>Built-in variables:
-
-  &lt;hash&gt; = current hash filename or hash
-  &lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>内置变量：
-
-  &lt;hash&gt; = 当前哈希文件名或哈希
-  &lt;unixtime&gt; = 当前 Unix 时间戳</translation>
+        <source>&#xa0;MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort when a device reaches this temperature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;°C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Session…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Help</source>
@@ -497,10 +530,6 @@
     <message>
         <source>About Qt</source>
         <translation>关于 Qt</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>设置</translation>
     </message>
     <message>
         <source>JSON Files (*.json)</source>
@@ -537,16 +566,8 @@ Default: 1,2</source>
         <translation>强制内部字典编码的目标编码为此代码。留空则由 hashcat 决定。</translation>
     </message>
     <message>
-        <source>OpenCL device types to use, separated by commas</source>
-        <translation>要使用的 OpenCL 设备类型，以逗号分隔</translation>
-    </message>
-    <message>
         <source>Exported</source>
         <translation>已导出</translation>
-    </message>
-    <message>
-        <source>Session exported to %1.</source>
-        <translation>会话已导出到 %1。</translation>
     </message>
     <message>
         <source>Export failed</source>
@@ -559,18 +580,6 @@ Default: 1,2</source>
     <message>
         <source>Imported</source>
         <translation>已导入</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.</source>
-        <translation>已从 %1 导入会话。</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.
-
-%2</source>
-        <translation>已从 %1 导入会话。
-
-%2</translation>
     </message>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -593,12 +602,50 @@ Default: 1,2</source>
         <translation>设置已导出到 %1。</translation>
     </message>
     <message>
-        <source>Settings loaded from %1.</source>
-        <translation>已从 %1 加载设置。</translation>
+        <source>OpenCL device types to use, separated by commas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session exported to “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.
+
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings loaded from “%1”.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Review them and save to apply them.</source>
         <translation>请检查设置并保存以应用。</translation>
+    </message>
+    <message>
+        <source>Load example session</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load the example session? The current session is lost.
@@ -609,12 +656,24 @@ The example cracks a test SHA-256 hash; hashcat should recover the password Nice
 该示例会破解一个测试用的 SHA-256 哈希；hashcat 应该能恢复出密码 Nice!98。</translation>
     </message>
     <message>
+        <source>Reset session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset every field to its default? The current session is lost.</source>
         <translation>要将所有字段重置为默认值吗？当前会话将丢失。</translation>
     </message>
     <message>
         <source>Session warning</source>
         <translation>会话警告</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load hash types</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This mode needs exactly %1 wordlists (left, right).</source>
@@ -629,14 +688,34 @@ The example cracks a test SHA-256 hash; hashcat should recover the password Nice
         <translation>此模式需要至少一个字典。</translation>
     </message>
     <message>
-        <source>This attack mode needs at least one wordlist.</source>
-        <translation>此攻击模式需要至少一个字典。</translation>
+        <source>Open hash file</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This attack mode needs exactly %1 wordlists.
+        <source>Save output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add wordlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open rules file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
-        <translation>此攻击模式需要恰好 %1 个字典。
-当前已选择：%2。</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
@@ -667,10 +746,6 @@ Currently selected: %2.</source>
         <translation>关联</translation>
     </message>
     <message>
-        <source>Updating...</source>
-        <translation>正在更新...</translation>
-    </message>
-    <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>无法获取支持的哈希类型。
@@ -681,10 +756,6 @@ Error: %1</source>
         <translation>无法加载哈希类型。请在设置中检查 hashcat 路径。</translation>
     </message>
     <message>
-        <source>hashcat error</source>
-        <translation>hashcat 错误</translation>
-    </message>
-    <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>请在 %1 → %2 中设置 hashcat 路径，以加载可用的哈希类型。</translation>
     </message>
@@ -693,20 +764,10 @@ Error: %1</source>
         <translation>此模式需要一个掩码。</translation>
     </message>
     <message>
-        <source>Open Hash File</source>
-        <translation>打开哈希文件</translation>
-    </message>
-    <message>
-        <source>Save Output File</source>
-        <translation>保存输出文件</translation>
-    </message>
-    <message>
-        <source>Add Wordlists</source>
-        <translation>添加字典</translation>
-    </message>
-    <message>
-        <source>Open Rules File</source>
-        <translation>打开规则文件</translation>
+        <source>This wordlist does not exist:
+%1</source>
+        <translation>此字典不存在：
+%1</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
@@ -715,10 +776,6 @@ Error: %1</source>
     <message>
         <source>Launch failed</source>
         <translation>启动失败</translation>
-    </message>
-    <message>
-        <source>Could not start %1: %2</source>
-        <translation>无法启动 %1：%2</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -741,20 +798,6 @@ Navigate to %2 → %3 to change it.</source>
         <translation>请前往 &lt;b&gt;%1 → %2&lt;/b&gt; 选择用于启动的终端。</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>在此系统上未找到受支持的终端。hashcat-gui 需要终端来显示 hashcat 的输出。</translation>
-    </message>
-    <message>
-        <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>配置的终端“%1”不可用。可用的终端：%2
-请前往 %3 → %4 进行修改。</translation>
-    </message>
-    <message>
-        <source>This attack mode needs a mask.</source>
-        <translation>此攻击模式需要一个掩码。</translation>
-    </message>
-    <message>
         <source>The minimum increment length is larger than the maximum.</source>
         <translation>递增的最小长度大于最大长度。</translation>
     </message>
@@ -774,20 +817,20 @@ Navigate to %3 → %4 to change it.</source>
         <translation>设置</translation>
     </message>
     <message>
-        <source>Hashcat</source>
-        <translation>Hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;Hashcat executable</source>
-        <translation>hashcat 可执行文件(&amp;H)</translation>
-    </message>
-    <message>
         <source>Not configured</source>
         <translation>未配置</translation>
     </message>
     <message>
-        <source>Select...</source>
-        <translation>选择...</translation>
+        <source>hashcat</source>
+        <translation type="unfinished">hashcat</translation>
+    </message>
+    <message>
+        <source>&amp;hashcat executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;Terminal</source>
@@ -882,20 +925,24 @@ Navigate to %3 → %4 to change it.</source>
         <translation>深色</translation>
     </message>
     <message>
-        <source>The hashcat path %1 was not found on this computer.</source>
-        <translation>在此计算机上未找到 hashcat 路径 %1。</translation>
+        <source>The hashcat path “%1” was not found on this computer.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The terminal %1 is not installed and was not applied.</source>
-        <translation>终端 %1 未安装，未应用。</translation>
+        <source>The terminal “%1” is not installed and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The color scheme %1 is not offered and was not applied.</source>
-        <translation>未提供配色方案 %1，未应用。</translation>
+        <source>The color scheme “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The language %1 is not offered and was not applied.</source>
-        <translation>未提供语言 %1，未应用。</translation>
+        <source>The language “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not installed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
@@ -906,16 +953,8 @@ Navigate to %3 → %4 to change it.</source>
         <translation>在此计算机上未找到已配置的 hashcat 可执行文件。</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the output of hashcat.</source>
-        <translation>在此系统上未找到受支持的终端。hashcat-gui 需要终端来显示 hashcat 的输出。</translation>
-    </message>
-    <message>
         <source>Select the terminal hashcat is started in.</source>
         <translation>选择用于启动 hashcat 的终端。</translation>
-    </message>
-    <message>
-        <source>The configured terminal %1 is not installed.</source>
-        <translation>已配置的终端 %1 未安装。</translation>
     </message>
     <message>
         <source>Select the hashcat executable</source>
@@ -945,18 +984,6 @@ Navigate to %3 → %4 to change it.</source>
 <context>
     <name>StateFile</name>
     <message>
-        <source>Could not open %1 for writing: %2</source>
-        <translation>无法以写入方式打开 %1：%2</translation>
-    </message>
-    <message>
-        <source>Could not write to %1: %2</source>
-        <translation>无法写入 %1：%2</translation>
-    </message>
-    <message>
-        <source>Could not open %1 for reading: %2</source>
-        <translation>无法以读取方式打开 %1：%2</translation>
-    </message>
-    <message>
         <source>The file is not valid JSON: %1</source>
         <translation>该文件不是有效的 JSON：%1</translation>
     </message>
@@ -969,16 +996,28 @@ Navigate to %3 → %4 to change it.</source>
         <translation>该文件不包含任何部分。</translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section.</source>
-        <translation>该文件不包含 %1 部分。</translation>
+        <source>Could not open “%1” for writing: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section; it holds %2.</source>
-        <translation>该文件不包含 %1 部分；它包含 %2。</translation>
+        <source>Could not write to “%1”: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The %1 section does not contain any values.</source>
-        <translation>%1 部分不包含任何值。</translation>
+        <source>Could not open “%1” for reading: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section; it holds %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The “%1” section does not contain any values.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source> and </source>
@@ -995,6 +1034,33 @@ Navigate to %3 → %4 to change it.</source>
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>该文件包含类型错误的值，因此未应用：%1。</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateChecker</name>
+    <message>
+        <source>GitHub answered with HTTP status %1: %2</source>
+        <translation>GitHub 返回了 HTTP 状态 %1：%2</translation>
+    </message>
+    <message>
+        <source>GitHub answered with HTTP status %1.</source>
+        <translation>GitHub 返回了 HTTP 状态 %1。</translation>
+    </message>
+    <message>
+        <source>The release information is not valid JSON.</source>
+        <translation>发布信息不是有效的 JSON。</translation>
+    </message>
+    <message>
+        <source>The release information does not name a version.</source>
+        <translation>发布信息中未指明版本。</translation>
+    </message>
+    <message>
+        <source>The release version %1 is not a valid version number.</source>
+        <translation>发布版本 %1 不是有效的版本号。</translation>
+    </message>
+    <message>
+        <source>The installed version %1 is not a valid version number.</source>
+        <translation>已安装的版本 %1 不是有效的版本号。</translation>
     </message>
 </context>
 </TS>

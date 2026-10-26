@@ -86,14 +86,14 @@
               <item>
                <widget class="QPushButton" name="pushButton_open_hashfile">
                 <property name="text">
-                 <string>Open...</string>
+                 <string>Open…</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QCheckBox" name="checkBox_hex_salt">
                 <property name="toolTip">
-                 <string>Assume the salt is given in hexadecimal</string>
+                 <string>Assume the salt is given in hexadecimal.</string>
                 </property>
                 <property name="text">
                  <string>Salt is hex</string>
@@ -216,9 +216,6 @@
                        <property name="toolTip">
                         <string>Move item up</string>
                        </property>
-                       <property name="text">
-                        <string notr="true">...</string>
-                       </property>
                        <property name="autoRaise">
                         <bool>true</bool>
                        </property>
@@ -234,9 +231,6 @@
                        </property>
                        <property name="toolTip">
                         <string>Move item down</string>
-                       </property>
-                       <property name="text">
-                        <string notr="true">...</string>
                        </property>
                        <property name="autoRaise">
                         <bool>true</bool>
@@ -257,7 +251,7 @@
                       </sizepolicy>
                      </property>
                      <property name="text">
-                      <string>Add files...</string>
+                      <string>Add files…</string>
                      </property>
                     </widget>
                    </item>
@@ -312,7 +306,7 @@
                <item>
                 <widget class="QCheckBox" name="checkBox_hex_wordlist">
                  <property name="toolTip">
-                  <string>Assume words in the wordlist are given in hexadecimal</string>
+                  <string>Assume words in the wordlist are given in hexadecimal.</string>
                  </property>
                  <property name="text">
                   <string>Wordlist is hex</string>
@@ -409,7 +403,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="text">
-                        <string>Open...</string>
+                        <string>Open…</string>
                        </property>
                       </widget>
                      </item>
@@ -452,7 +446,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="text">
-                        <string>Open...</string>
+                        <string>Open…</string>
                        </property>
                       </widget>
                      </item>
@@ -495,7 +489,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="text">
-                        <string>Open...</string>
+                        <string>Open…</string>
                        </property>
                       </widget>
                      </item>
@@ -591,7 +585,7 @@
                    <item row="0" column="1">
                     <widget class="QLineEdit" name="lineEdit_rule_left">
                      <property name="toolTip">
-                      <string>Single rule applied to each word from the left wordlist</string>
+                      <string>Single rule applied to each word from the left wordlist.</string>
                      </property>
                     </widget>
                    </item>
@@ -605,7 +599,7 @@
                    <item row="1" column="1">
                     <widget class="QLineEdit" name="lineEdit_rule_right">
                      <property name="toolTip">
-                      <string>Single rule applied to each word from the right wordlist</string>
+                      <string>Single rule applied to each word from the right wordlist.</string>
                      </property>
                     </widget>
                    </item>
@@ -645,7 +639,7 @@
                    <item row="1" column="0">
                     <widget class="QCheckBox" name="checkBox_increment">
                      <property name="toolTip">
-                      <string>Increment the mask length from the minimum to the maximum</string>
+                      <string>Increment the mask length from the minimum to the maximum.</string>
                      </property>
                      <property name="text">
                       <string>Increment mask length</string>
@@ -667,7 +661,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Minimum mask length; 0 uses hashcat's default</string>
+                        <string>Minimum mask length; 0 uses hashcat’s default.</string>
                        </property>
                        <property name="maximum">
                         <number>256</number>
@@ -690,7 +684,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Maximum mask length; 0 uses hashcat's default</string>
+                        <string>Maximum mask length; 0 uses hashcat’s default.</string>
                        </property>
                        <property name="maximum">
                         <number>256</number>
@@ -931,10 +925,10 @@
                  <item row="1" column="1">
                   <widget class="QSpinBox" name="spinBox_runtime">
                    <property name="toolTip">
-                    <string>Abort the session after this many seconds; unlimited runs until hashcat finishes</string>
+                    <string>Abort the session after this many seconds; 0 runs until hashcat finishes.</string>
                    </property>
                    <property name="suffix">
-                    <string> s</string>
+                    <string> s</string>
                    </property>
                    <property name="specialValueText">
                     <string>unlimited</string>
@@ -957,7 +951,7 @@
                  <item row="2" column="1">
                   <widget class="QLineEdit" name="lineEdit_skip">
                    <property name="toolTip">
-                    <string>Skip this many candidates from the start</string>
+                    <string>Skip this many candidates from the start.</string>
                    </property>
                   </widget>
                  </item>
@@ -971,7 +965,7 @@
                  <item row="3" column="1">
                   <widget class="QLineEdit" name="lineEdit_limit">
                    <property name="toolTip">
-                    <string>Only test this many candidates after the skipped ones</string>
+                    <string>Only test this many candidates after the skipped ones.</string>
                    </property>
                   </widget>
                  </item>
@@ -990,10 +984,10 @@
                       <bool>false</bool>
                      </property>
                      <property name="toolTip">
-                      <string>Seconds between status updates</string>
+                      <string>Seconds between status updates.</string>
                      </property>
                      <property name="suffix">
-                      <string> s</string>
+                      <string> s</string>
                      </property>
                      <property name="minimum">
                       <number>1</number>
@@ -1079,22 +1073,22 @@
                      </property>
                      <item>
                       <property name="text">
-                       <string notr="true">1</string>
+                       <string notr="true">1 – Low</string>
                       </property>
                      </item>
                      <item>
                       <property name="text">
-                       <string notr="true">2</string>
+                       <string notr="true">2 – Default</string>
                       </property>
                      </item>
                      <item>
                       <property name="text">
-                       <string notr="true">3</string>
+                       <string notr="true">3 – High</string>
                       </property>
                      </item>
                      <item>
                       <property name="text">
-                       <string notr="true">4</string>
+                       <string notr="true">4 – Nightmare</string>
                       </property>
                      </item>
                     </widget>
@@ -1205,7 +1199,7 @@
                         <string>How much of the wordlist hashcat caches in memory, in MB. Lower it if hashcat runs out of memory.</string>
                        </property>
                        <property name="suffix">
-                        <string> MB</string>
+                        <string> MB</string>
                        </property>
                        <property name="minimum">
                         <number>1</number>
@@ -1227,7 +1221,7 @@
                    <item>
                     <widget class="QCheckBox" name="checkBox_hwmon_temp_abort">
                      <property name="toolTip">
-                      <string>Abort when a device reaches this temperature</string>
+                      <string>Abort when a device reaches this temperature.</string>
                      </property>
                      <property name="text">
                       <string>Abort above</string>
@@ -1240,7 +1234,7 @@
                       <bool>false</bool>
                      </property>
                      <property name="suffix">
-                      <string> °C</string>
+                      <string> °C</string>
                      </property>
                      <property name="maximum">
                       <number>200</number>
@@ -1299,8 +1293,8 @@
                        <property name="toolTip">
                         <string>Built-in variables:
 
-  &lt;hash&gt; = current hash filename or hash
-  &lt;unixtime&gt; = current Unix timestamp</string>
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</string>
                        </property>
                        <property name="text">
                         <string/>
@@ -1313,7 +1307,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="text">
-                        <string>Save...</string>
+                        <string>Save…</string>
                        </property>
                       </widget>
                      </item>
@@ -1359,7 +1353,7 @@
                    <item>
                     <widget class="QCheckBox" name="checkBox_potfile_disable">
                      <property name="toolTip">
-                      <string>Do not write recovered hashes to the potfile</string>
+                      <string>Do not write recovered hashes to the potfile.</string>
                      </property>
                      <property name="text">
                       <string>Do not write the potfile</string>
@@ -1496,27 +1490,27 @@
   </action>
   <action name="actionSettings">
    <property name="text">
-    <string>Settings</string>
+    <string>Settings…</string>
    </property>
   </action>
   <action name="actionImportSettings">
    <property name="text">
-    <string>Import Settings</string>
+    <string>Import Settings…</string>
    </property>
   </action>
   <action name="actionExportSettings">
    <property name="text">
-    <string>Export Settings</string>
+    <string>Export Settings…</string>
    </property>
   </action>
   <action name="actionExportSession">
    <property name="text">
-    <string>Export Session</string>
+    <string>Export Session…</string>
    </property>
   </action>
   <action name="actionImportSession">
    <property name="text">
-    <string>Import Session</string>
+    <string>Import Session…</string>
    </property>
   </action>
  </widget>

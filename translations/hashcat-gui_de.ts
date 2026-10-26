@@ -16,8 +16,16 @@
         <translation>Versionsinformationen</translation>
     </message>
     <message>
-        <source>[unknown]</source>
-        <translation>[unbekannt]</translation>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates</source>
+        <translation>Updates</translation>
+    </message>
+    <message>
+        <source>Checking for updates…</source>
+        <translation>Es wird nach Updates gesucht…</translation>
     </message>
     <message>
         <source>System information</source>
@@ -76,12 +84,32 @@
         <translation>GNU GPL v3.0 oder neuer</translation>
     </message>
     <message>
-        <source>not configured</source>
-        <translation>nicht konfiguriert</translation>
+        <source>Not configured</source>
+        <translation type="unfinished">Nicht konfiguriert</translation>
     </message>
     <message>
         <source>Error: %1</source>
         <translation>Fehler: %1</translation>
+    </message>
+    <message>
+        <source>A newer version is available: %1.</source>
+        <translation>Eine neuere Version ist verfügbar: %1.</translation>
+    </message>
+    <message>
+        <source>Release page</source>
+        <translation>Release-Seite</translation>
+    </message>
+    <message>
+        <source>No updates available.</source>
+        <translation>Keine Updates verfügbar.</translation>
+    </message>
+    <message>
+        <source>Could not check for updates.</source>
+        <translation>Die Suche nach Updates ist fehlgeschlagen.</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: %1</source>
+        <translation>Die Suche nach Updates ist fehlgeschlagen: %1</translation>
     </message>
 </context>
 <context>
@@ -113,20 +141,16 @@
         <translation>hashcat hat das Zeitlimit erreicht
 %1</translation>
     </message>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation type="unfinished">Auf diesem System wurde kein unterstütztes Terminal gefunden. hashcat-gui benötigt eines, um die Ausgabe von hashcat anzuzeigen.</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>Hash file or hash:</source>
         <translation>Hash-Datei oder Hash:</translation>
-    </message>
-    <message>
-        <source>Open...</source>
-        <translation>Öffnen...</translation>
-    </message>
-    <message>
-        <source>Assume the salt is given in hexadecimal</source>
-        <translation>Annehmen, dass der Salt hexadezimal angegeben ist</translation>
     </message>
     <message>
         <source>Salt is hex</source>
@@ -145,16 +169,8 @@
         <translation>Eintrag nach unten verschieben</translation>
     </message>
     <message>
-        <source>Add files...</source>
-        <translation>Dateien hinzufügen...</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Entfernen</translation>
-    </message>
-    <message>
-        <source>Assume words in the wordlist are given in hexadecimal</source>
-        <translation>Annehmen, dass die Wörter in der Wortliste hexadezimal angegeben sind</translation>
     </message>
     <message>
         <source>Wordlist is hex</source>
@@ -177,24 +193,12 @@
         <translation>Linke Regel:</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the left wordlist</source>
-        <translation>Einzelne Regel, die auf jedes Wort der linken Wortliste angewendet wird</translation>
-    </message>
-    <message>
         <source>Right rule:</source>
         <translation>Rechte Regel:</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the right wordlist</source>
-        <translation>Einzelne Regel, die auf jedes Wort der rechten Wortliste angewendet wird</translation>
-    </message>
-    <message>
         <source>Charset is hex</source>
         <translation>Zeichensatz ist Hex</translation>
-    </message>
-    <message>
-        <source>Increment the mask length from the minimum to the maximum</source>
-        <translation>Die Maskenlänge vom Minimum bis zum Maximum erhöhen</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -205,16 +209,8 @@
         <translation>Min:</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>Minimale Maskenlänge; 0 verwendet den Standardwert von hashcat</translation>
-    </message>
-    <message>
         <source>Max:</source>
         <translation>Max:</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>Maximale Maskenlänge; 0 verwendet den Standardwert von hashcat</translation>
     </message>
     <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
@@ -225,20 +221,27 @@
         <translation>Zu verwendende Geräte, durch Kommas getrennt. Leer lassen für alle Geräte.</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature</source>
-        <translation>Abbrechen, wenn ein Gerät diese Temperatur erreicht</translation>
-    </message>
-    <message>
         <source>Abort above</source>
         <translation>Abbruch über</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>Ausgabedatei</translation>
+    </message>
+    <message>
+        <source>Built-in variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not write recovered hashes to the potfile.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load Example Session</source>
@@ -249,22 +252,6 @@
         <translation>Sitzung zurücksetzen</translation>
     </message>
     <message>
-        <source>Import Settings</source>
-        <translation>Einstellungen importieren</translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation>Einstellungen exportieren</translation>
-    </message>
-    <message>
-        <source>Export Session</source>
-        <translation>Sitzung exportieren</translation>
-    </message>
-    <message>
-        <source>Import Session</source>
-        <translation>Sitzung importieren</translation>
-    </message>
-    <message>
         <source>Mode:</source>
         <translation>Modus:</translation>
     </message>
@@ -273,8 +260,24 @@
         <translation>Angriff</translation>
     </message>
     <message>
+        <source>Open…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume the salt is given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Hash type:</source>
         <translation>Hash-Typ:</translation>
+    </message>
+    <message>
+        <source>Add files…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume words in the wordlist are given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rules</source>
@@ -291,6 +294,14 @@
     <message>
         <source>Generate rules:</source>
         <translation>Regeln erzeugen:</translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the left wordlist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the right wordlist.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Mask</source>
@@ -337,14 +348,6 @@
         <translation>Laufzeitlimit:</translation>
     </message>
     <message>
-        <source>Abort the session after this many seconds; unlimited runs until hashcat finishes</source>
-        <translation>Sitzung nach dieser Anzahl von Sekunden abbrechen; „unbegrenzt“ läuft, bis hashcat fertig ist</translation>
-    </message>
-    <message>
-        <source> s</source>
-        <translation> s</translation>
-    </message>
-    <message>
         <source>unlimited</source>
         <translation>unbegrenzt</translation>
     </message>
@@ -353,24 +356,12 @@
         <translation>Überspringen:</translation>
     </message>
     <message>
-        <source>Skip this many candidates from the start</source>
-        <translation>Diese Anzahl von Kandidaten am Anfang überspringen</translation>
-    </message>
-    <message>
         <source>Limit:</source>
         <translation>Limit:</translation>
     </message>
     <message>
-        <source>Only test this many candidates after the skipped ones</source>
-        <translation>Nur diese Anzahl von Kandidaten nach den übersprungenen testen</translation>
-    </message>
-    <message>
         <source>Update status automatically</source>
         <translation>Status automatisch aktualisieren</translation>
-    </message>
-    <message>
-        <source>Seconds between status updates</source>
-        <translation>Sekunden zwischen Statusaktualisierungen</translation>
     </message>
     <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
@@ -409,24 +400,12 @@
         <translation>Menge der Wortliste, die hashcat im Arbeitsspeicher zwischenspeichert, in MB. Verringern Sie den Wert, wenn hashcat der Arbeitsspeicher ausgeht.</translation>
     </message>
     <message>
-        <source> MB</source>
-        <translation> MB</translation>
-    </message>
-    <message>
         <source>Write recovered hashes to file:</source>
         <translation>Gefundene Hashes in Datei schreiben:</translation>
     </message>
     <message>
-        <source>Save...</source>
-        <translation>Speichern...</translation>
-    </message>
-    <message>
         <source>Format:</source>
         <translation>Format:</translation>
-    </message>
-    <message>
-        <source>Do not write recovered hashes to the potfile</source>
-        <translation>Gefundene Hashes nicht in das Potfile schreiben</translation>
     </message>
     <message>
         <source>Do not write the potfile</source>
@@ -453,6 +432,38 @@
         <translation>Wortlisten</translation>
     </message>
     <message>
+        <source>Increment the mask length from the minimum to the maximum.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip this many candidates from the start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only test this many candidates after the skipped ones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds between status updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>Optimierte Kernel aktivieren (begrenzt die Passwortlänge)</translation>
     </message>
@@ -465,14 +476,36 @@
         <translation>Workload-Profil überschreiben</translation>
     </message>
     <message>
-        <source>Built-in variables:
-
-  &lt;hash&gt; = current hash filename or hash
-  &lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>Eingebaute Variablen:
-
-  &lt;hash&gt; = aktueller Hash-Dateiname oder Hash
-  &lt;unixtime&gt; = aktueller Unix-Zeitstempel</translation>
+        <source>&#xa0;MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort when a device reaches this temperature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;°C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Session…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Help</source>
@@ -497,10 +530,6 @@
     <message>
         <source>About Qt</source>
         <translation>Über Qt</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Einstellungen</translation>
     </message>
     <message>
         <source>JSON Files (*.json)</source>
@@ -537,16 +566,8 @@ Standard: 1,2</translation>
         <translation>Interne Kodierung der Wortliste auf diesen Code erzwingen. Leer lassen, damit hashcat entscheidet.</translation>
     </message>
     <message>
-        <source>OpenCL device types to use, separated by commas</source>
-        <translation>Zu verwendende OpenCL-Gerätetypen, durch Kommas getrennt</translation>
-    </message>
-    <message>
         <source>Exported</source>
         <translation>Exportiert</translation>
-    </message>
-    <message>
-        <source>Session exported to %1.</source>
-        <translation>Sitzung nach %1 exportiert.</translation>
     </message>
     <message>
         <source>Export failed</source>
@@ -559,18 +580,6 @@ Standard: 1,2</translation>
     <message>
         <source>Imported</source>
         <translation>Importiert</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.</source>
-        <translation>Sitzung aus %1 importiert.</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.
-
-%2</source>
-        <translation>Sitzung aus %1 importiert.
-
-%2</translation>
     </message>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -593,12 +602,50 @@ Standard: 1,2</translation>
         <translation>Einstellungen nach %1 exportiert.</translation>
     </message>
     <message>
-        <source>Settings loaded from %1.</source>
-        <translation>Einstellungen aus %1 geladen.</translation>
+        <source>OpenCL device types to use, separated by commas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session exported to “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.
+
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings loaded from “%1”.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Review them and save to apply them.</source>
         <translation>Prüfen Sie die Einstellungen und speichern Sie, um sie anzuwenden.</translation>
+    </message>
+    <message>
+        <source>Load example session</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load the example session? The current session is lost.
@@ -609,12 +656,24 @@ The example cracks a test SHA-256 hash; hashcat should recover the password Nice
 Das Beispiel knackt einen SHA-256-Test-Hash; hashcat sollte das Passwort Nice!98 wiederherstellen.</translation>
     </message>
     <message>
+        <source>Reset session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset every field to its default? The current session is lost.</source>
         <translation>Jedes Feld auf den Standardwert zurücksetzen? Die aktuelle Sitzung geht verloren.</translation>
     </message>
     <message>
         <source>Session warning</source>
         <translation>Sitzungswarnung</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load hash types</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This mode needs exactly %1 wordlists (left, right).</source>
@@ -629,14 +688,34 @@ Das Beispiel knackt einen SHA-256-Test-Hash; hashcat sollte das Passwort Nice!98
         <translation>Dieser Modus benötigt mindestens eine Wortliste.</translation>
     </message>
     <message>
-        <source>This attack mode needs at least one wordlist.</source>
-        <translation>Dieser Angriffsmodus benötigt mindestens eine Wortliste.</translation>
+        <source>Open hash file</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This attack mode needs exactly %1 wordlists.
+        <source>Save output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add wordlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open rules file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
-        <translation>Dieser Angriffsmodus benötigt genau %1 Wortlisten.
-Aktuell ausgewählt: %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
@@ -667,10 +746,6 @@ Aktuell ausgewählt: %2.</translation>
         <translation>Assoziation</translation>
     </message>
     <message>
-        <source>Updating...</source>
-        <translation>Wird aktualisiert...</translation>
-    </message>
-    <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Die unterstützten Hash-Typen konnten nicht ermittelt werden.
@@ -681,10 +756,6 @@ Fehler: %1</translation>
         <translation>Die Hash-Typen konnten nicht geladen werden. Prüfen Sie den hashcat-Pfad in den Einstellungen.</translation>
     </message>
     <message>
-        <source>hashcat error</source>
-        <translation>hashcat-Fehler</translation>
-    </message>
-    <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>Legen Sie den hashcat-Pfad unter %1 → %2 fest, um die verfügbaren Hash-Typen zu laden.</translation>
     </message>
@@ -693,20 +764,10 @@ Fehler: %1</translation>
         <translation>Dieser Modus benötigt eine Maske.</translation>
     </message>
     <message>
-        <source>Open Hash File</source>
-        <translation>Hash-Datei öffnen</translation>
-    </message>
-    <message>
-        <source>Save Output File</source>
-        <translation>Ausgabedatei speichern</translation>
-    </message>
-    <message>
-        <source>Add Wordlists</source>
-        <translation>Wortlisten hinzufügen</translation>
-    </message>
-    <message>
-        <source>Open Rules File</source>
-        <translation>Regeldatei öffnen</translation>
+        <source>This wordlist does not exist:
+%1</source>
+        <translation>Diese Wortliste existiert nicht:
+%1</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
@@ -715,10 +776,6 @@ Fehler: %1</translation>
     <message>
         <source>Launch failed</source>
         <translation>Start fehlgeschlagen</translation>
-    </message>
-    <message>
-        <source>Could not start %1: %2</source>
-        <translation>%1 konnte nicht gestartet werden: %2</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -741,20 +798,6 @@ Gehen Sie zu %2 → %3, um es zu ändern.</translation>
         <translation>Gehen Sie zu &lt;b&gt;%1 → %2&lt;/b&gt;, um das zum Starten verwendete Terminal auszuwählen.</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>Auf diesem System wurde kein unterstütztes Terminal gefunden. hashcat-gui benötigt eines, um die Ausgabe von hashcat anzuzeigen.</translation>
-    </message>
-    <message>
-        <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>Das konfigurierte Terminal „%1“ ist nicht verfügbar. Verfügbare Terminals: %2
-Gehen Sie zu %3 → %4, um es zu ändern.</translation>
-    </message>
-    <message>
-        <source>This attack mode needs a mask.</source>
-        <translation>Dieser Angriffsmodus benötigt eine Maske.</translation>
-    </message>
-    <message>
         <source>The minimum increment length is larger than the maximum.</source>
         <translation>Die minimale Inkrementlänge ist größer als die maximale.</translation>
     </message>
@@ -774,20 +817,20 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <source>Hashcat</source>
-        <translation>Hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;Hashcat executable</source>
-        <translation>&amp;Hashcat-Programm</translation>
-    </message>
-    <message>
         <source>Not configured</source>
         <translation>Nicht konfiguriert</translation>
     </message>
     <message>
-        <source>Select...</source>
-        <translation>Auswählen...</translation>
+        <source>hashcat</source>
+        <translation type="unfinished">hashcat</translation>
+    </message>
+    <message>
+        <source>&amp;hashcat executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;Terminal</source>
@@ -882,20 +925,24 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
         <translation>Dunkel</translation>
     </message>
     <message>
-        <source>The hashcat path %1 was not found on this computer.</source>
-        <translation>Der hashcat-Pfad %1 wurde auf diesem Computer nicht gefunden.</translation>
+        <source>The hashcat path “%1” was not found on this computer.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The terminal %1 is not installed and was not applied.</source>
-        <translation>Das Terminal %1 ist nicht installiert und wurde nicht angewendet.</translation>
+        <source>The terminal “%1” is not installed and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The color scheme %1 is not offered and was not applied.</source>
-        <translation>Das Farbschema %1 wird nicht angeboten und wurde nicht angewendet.</translation>
+        <source>The color scheme “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The language %1 is not offered and was not applied.</source>
-        <translation>Die Sprache %1 wird nicht angeboten und wurde nicht angewendet.</translation>
+        <source>The language “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not installed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
@@ -906,16 +953,8 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
         <translation>Das konfigurierte hashcat-Programm wurde auf diesem Computer nicht gefunden.</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the output of hashcat.</source>
-        <translation>Auf diesem System wurde kein unterstütztes Terminal gefunden. hashcat-gui benötigt eines, um die Ausgabe von hashcat anzuzeigen.</translation>
-    </message>
-    <message>
         <source>Select the terminal hashcat is started in.</source>
         <translation>Wählen Sie das Terminal aus, in dem hashcat gestartet wird.</translation>
-    </message>
-    <message>
-        <source>The configured terminal %1 is not installed.</source>
-        <translation>Das konfigurierte Terminal %1 ist nicht installiert.</translation>
     </message>
     <message>
         <source>Select the hashcat executable</source>
@@ -945,18 +984,6 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
 <context>
     <name>StateFile</name>
     <message>
-        <source>Could not open %1 for writing: %2</source>
-        <translation>%1 konnte zum Schreiben nicht geöffnet werden: %2</translation>
-    </message>
-    <message>
-        <source>Could not write to %1: %2</source>
-        <translation>In %1 konnte nicht geschrieben werden: %2</translation>
-    </message>
-    <message>
-        <source>Could not open %1 for reading: %2</source>
-        <translation>%1 konnte zum Lesen nicht geöffnet werden: %2</translation>
-    </message>
-    <message>
         <source>The file is not valid JSON: %1</source>
         <translation>Die Datei ist kein gültiges JSON: %1</translation>
     </message>
@@ -969,16 +996,28 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
         <translation>Die Datei enthält keine Abschnitte.</translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section.</source>
-        <translation>Die Datei enthält keinen Abschnitt %1.</translation>
+        <source>Could not open “%1” for writing: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section; it holds %2.</source>
-        <translation>Die Datei enthält keinen Abschnitt %1; sie enthält %2.</translation>
+        <source>Could not write to “%1”: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The %1 section does not contain any values.</source>
-        <translation>Der Abschnitt %1 enthält keine Werte.</translation>
+        <source>Could not open “%1” for reading: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section; it holds %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The “%1” section does not contain any values.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source> and </source>
@@ -995,6 +1034,33 @@ Gehen Sie zu %3 → %4, um es zu ändern.</translation>
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>Die Datei enthält Werte des falschen Typs, daher wurden sie nicht angewendet: %1.</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateChecker</name>
+    <message>
+        <source>GitHub answered with HTTP status %1: %2</source>
+        <translation>GitHub hat mit dem HTTP-Status %1 geantwortet: %2</translation>
+    </message>
+    <message>
+        <source>GitHub answered with HTTP status %1.</source>
+        <translation>GitHub hat mit dem HTTP-Status %1 geantwortet.</translation>
+    </message>
+    <message>
+        <source>The release information is not valid JSON.</source>
+        <translation>Die Release-Informationen sind kein gültiges JSON.</translation>
+    </message>
+    <message>
+        <source>The release information does not name a version.</source>
+        <translation>Die Release-Informationen nennen keine Version.</translation>
+    </message>
+    <message>
+        <source>The release version %1 is not a valid version number.</source>
+        <translation>Die Release-Version %1 ist keine gültige Versionsnummer.</translation>
+    </message>
+    <message>
+        <source>The installed version %1 is not a valid version number.</source>
+        <translation>Die installierte Version %1 ist keine gültige Versionsnummer.</translation>
     </message>
 </context>
 </TS>

@@ -104,7 +104,7 @@
          </size>
         </property>
         <property name="text">
-         <string>[unknown]</string>
+         <string>Unknown</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -124,7 +124,7 @@
       <item row="1" column="1">
        <widget class="QLabel" name="label_hc_gui_version">
         <property name="text">
-         <string>[unknown]</string>
+         <string>Unknown</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -345,7 +345,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string notr="true"> | </string>
+         <string notr="true"> · </string>
         </property>
        </widget>
       </item>
@@ -377,7 +377,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string notr="true"> | </string>
+         <string notr="true"> · </string>
         </property>
        </widget>
       </item>
@@ -409,7 +409,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string notr="true"> | </string>
+         <string notr="true"> · </string>
         </property>
        </widget>
       </item>

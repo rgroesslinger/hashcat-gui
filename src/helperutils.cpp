@@ -233,6 +233,12 @@ QMap<QString, QStringList> HelperUtils::availableTerminals()
     return terminals;
 }
 
+QString HelperUtils::noSupportedTerminalMessage()
+{
+    return tr("No supported terminal was found on this system. "
+              "hashcat-gui needs one to show the hashcat output.");
+}
+
 void HelperUtils::applyColorScheme(const QString &scheme)
 {
     QStyleHints *hints = QGuiApplication::styleHints();

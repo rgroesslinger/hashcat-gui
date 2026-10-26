@@ -253,7 +253,7 @@ void AboutDialog::updateVersionLabel()
     if (path.isEmpty()) {
         // No hashcat is configured, so there is no version to show. The
         // details of a bug report say the same.
-        setVersionLabel(tr("not configured"));
+        setVersionLabel(tr("Not configured"));
     } else {
         ui->label_hc_version_text->setText(QFileInfo(path).fileName());
 

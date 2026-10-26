@@ -425,7 +425,7 @@ void TestSettingsDialog::terminalStatusFollowsTheCombo()
 }
 
 // The dialog button box gives Enter its target: Save is the default button,
-// so Enter cannot trigger Select....
+// so Enter cannot trigger the Select button.
 void TestSettingsDialog::saveIsTheDefaultButton()
 {
     SettingsDialog dialog;

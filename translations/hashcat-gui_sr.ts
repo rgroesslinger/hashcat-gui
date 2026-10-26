@@ -16,8 +16,16 @@
         <translation>Informacije o verziji</translation>
     </message>
     <message>
-        <source>[unknown]</source>
-        <translation>[nepoznato]</translation>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates</source>
+        <translation>Ažuriranja</translation>
+    </message>
+    <message>
+        <source>Checking for updates…</source>
+        <translation>Provera ažuriranja…</translation>
     </message>
     <message>
         <source>System information</source>
@@ -76,12 +84,32 @@
         <translation>GNU GPL v3.0 ili novija</translation>
     </message>
     <message>
-        <source>not configured</source>
-        <translation>nije konfigurisano</translation>
+        <source>Not configured</source>
+        <translation type="unfinished">Nije konfigurisano</translation>
     </message>
     <message>
         <source>Error: %1</source>
         <translation>Greška: %1</translation>
+    </message>
+    <message>
+        <source>A newer version is available: %1.</source>
+        <translation>Dostupna je novija verzija: %1.</translation>
+    </message>
+    <message>
+        <source>Release page</source>
+        <translation>Stranica izdanja</translation>
+    </message>
+    <message>
+        <source>No updates available.</source>
+        <translation>Nema dostupnih ažuriranja.</translation>
+    </message>
+    <message>
+        <source>Could not check for updates.</source>
+        <translation>Nije bilo moguće proveriti ažuriranja.</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: %1</source>
+        <translation>Nije bilo moguće proveriti ažuriranja: %1</translation>
     </message>
 </context>
 <context>
@@ -113,20 +141,16 @@
         <translation>hashcat je dostigao vremenski limit
 %1</translation>
     </message>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation type="unfinished">Na ovom sistemu nije pronađen nijedan podržani terminal. hashcat-gui treba terminal da bi prikazao izlaz hashcat-a.</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>Hash file or hash:</source>
         <translation>Datoteka sa hashom ili hash:</translation>
-    </message>
-    <message>
-        <source>Open...</source>
-        <translation>Otvori...</translation>
-    </message>
-    <message>
-        <source>Assume the salt is given in hexadecimal</source>
-        <translation>Pretpostavi da je salt zadat heksadecimalno</translation>
     </message>
     <message>
         <source>Salt is hex</source>
@@ -145,16 +169,8 @@
         <translation>Pomeri stavku dole</translation>
     </message>
     <message>
-        <source>Add files...</source>
-        <translation>Dodaj datoteke...</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Ukloni</translation>
-    </message>
-    <message>
-        <source>Assume words in the wordlist are given in hexadecimal</source>
-        <translation>Pretpostavi da su reči u listi reči zadate heksadecimalno</translation>
     </message>
     <message>
         <source>Wordlist is hex</source>
@@ -177,24 +193,12 @@
         <translation>Levo pravilo:</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the left wordlist</source>
-        <translation>Jedno pravilo koje se primenjuje na svaku reč iz leve liste reči</translation>
-    </message>
-    <message>
         <source>Right rule:</source>
         <translation>Desno pravilo:</translation>
     </message>
     <message>
-        <source>Single rule applied to each word from the right wordlist</source>
-        <translation>Jedno pravilo koje se primenjuje na svaku reč iz desne liste reči</translation>
-    </message>
-    <message>
         <source>Charset is hex</source>
         <translation>Skup znakova je heks</translation>
-    </message>
-    <message>
-        <source>Increment the mask length from the minimum to the maximum</source>
-        <translation>Povećavaj dužinu maske od minimuma do maksimuma</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -205,16 +209,8 @@
         <translation>Min:</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>Minimalna dužina maske; 0 koristi podrazumevanu vrednost hashcat-a</translation>
-    </message>
-    <message>
         <source>Max:</source>
         <translation>Maks:</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat&apos;s default</source>
-        <translation>Maksimalna dužina maske; 0 koristi podrazumevanu vrednost hashcat-a</translation>
     </message>
     <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
@@ -225,20 +221,27 @@
         <translation>Uređaji koji se koriste, odvojeni zarezima. Ostavite prazno za sve uređaje.</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature</source>
-        <translation>Prekini kada uređaj dostigne ovu temperaturu</translation>
-    </message>
-    <message>
         <source>Abort above</source>
         <translation>Prekini iznad</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>Izlazna datoteka</translation>
+    </message>
+    <message>
+        <source>Built-in variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not write recovered hashes to the potfile.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load Example Session</source>
@@ -249,22 +252,6 @@
         <translation>Resetuj sesiju</translation>
     </message>
     <message>
-        <source>Import Settings</source>
-        <translation>Uvezi podešavanja</translation>
-    </message>
-    <message>
-        <source>Export Settings</source>
-        <translation>Izvezi podešavanja</translation>
-    </message>
-    <message>
-        <source>Export Session</source>
-        <translation>Izvezi sesiju</translation>
-    </message>
-    <message>
-        <source>Import Session</source>
-        <translation>Uvezi sesiju</translation>
-    </message>
-    <message>
         <source>Mode:</source>
         <translation>Režim:</translation>
     </message>
@@ -273,8 +260,24 @@
         <translation>Napad</translation>
     </message>
     <message>
+        <source>Open…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume the salt is given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Hash type:</source>
         <translation>Vrsta hash-a:</translation>
+    </message>
+    <message>
+        <source>Add files…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assume words in the wordlist are given in hexadecimal.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Rules</source>
@@ -291,6 +294,14 @@
     <message>
         <source>Generate rules:</source>
         <translation>Generiši pravila:</translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the left wordlist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single rule applied to each word from the right wordlist.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Mask</source>
@@ -337,14 +348,6 @@
         <translation>Ograničenje trajanja:</translation>
     </message>
     <message>
-        <source>Abort the session after this many seconds; unlimited runs until hashcat finishes</source>
-        <translation>Prekini sesiju nakon ovoliko sekundi; „neograničeno“ radi dok hashcat ne završi</translation>
-    </message>
-    <message>
-        <source> s</source>
-        <translation> s</translation>
-    </message>
-    <message>
         <source>unlimited</source>
         <translation>neograničeno</translation>
     </message>
@@ -353,24 +356,12 @@
         <translation>Preskoči:</translation>
     </message>
     <message>
-        <source>Skip this many candidates from the start</source>
-        <translation>Preskoči ovoliko kandidata od početka</translation>
-    </message>
-    <message>
         <source>Limit:</source>
         <translation>Ograničenje:</translation>
     </message>
     <message>
-        <source>Only test this many candidates after the skipped ones</source>
-        <translation>Testiraj samo ovoliko kandidata posle preskočenih</translation>
-    </message>
-    <message>
         <source>Update status automatically</source>
         <translation>Automatski ažuriraj status</translation>
-    </message>
-    <message>
-        <source>Seconds between status updates</source>
-        <translation>Sekundi između ažuriranja statusa</translation>
     </message>
     <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
@@ -409,24 +400,12 @@
         <translation>Količina liste reči koju hashcat kešira u memoriji, u MB. Smanjite vrednost ako hashcat ostane bez memorije.</translation>
     </message>
     <message>
-        <source> MB</source>
-        <translation> MB</translation>
-    </message>
-    <message>
         <source>Write recovered hashes to file:</source>
         <translation>Upiši pronađene hash-ove u datoteku:</translation>
     </message>
     <message>
-        <source>Save...</source>
-        <translation>Sačuvaj...</translation>
-    </message>
-    <message>
         <source>Format:</source>
         <translation>Format:</translation>
-    </message>
-    <message>
-        <source>Do not write recovered hashes to the potfile</source>
-        <translation>Ne upisuj pronađene hash-ove u potfile</translation>
     </message>
     <message>
         <source>Do not write the potfile</source>
@@ -453,6 +432,38 @@
         <translation>Liste reči</translation>
     </message>
     <message>
+        <source>Increment the mask length from the minimum to the maximum.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 uses hashcat’s default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip this many candidates from the start.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only test this many candidates after the skipped ones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seconds between status updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>Omogući optimizovane kernele (ograničava dužinu lozinke)</translation>
     </message>
@@ -465,14 +476,36 @@
         <translation>Zameni profil opterećenja</translation>
     </message>
     <message>
-        <source>Built-in variables:
-
-  &lt;hash&gt; = current hash filename or hash
-  &lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>Ugrađene promenljive:
-
-  &lt;hash&gt; = naziv trenutne datoteke sa hash-ovima ili hash
-  &lt;unixtime&gt; = trenutna Unix vremenska oznaka</translation>
+        <source>&#xa0;MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort when a device reaches this temperature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&#xa0;°C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Settings…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Session…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Session…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Help</source>
@@ -497,10 +530,6 @@
     <message>
         <source>About Qt</source>
         <translation>O Qt-u</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Podešavanja</translation>
     </message>
     <message>
         <source>JSON Files (*.json)</source>
@@ -537,16 +566,8 @@ Podrazumevano: 1,2</translation>
         <translation>Prisili interno kodiranje liste reči u ovaj kod. Ostavite prazno da hashcat odluči.</translation>
     </message>
     <message>
-        <source>OpenCL device types to use, separated by commas</source>
-        <translation>OpenCL vrste uređaja koje se koriste, odvojene zarezima</translation>
-    </message>
-    <message>
         <source>Exported</source>
         <translation>Izvezeno</translation>
-    </message>
-    <message>
-        <source>Session exported to %1.</source>
-        <translation>Sesija je izvezena u %1.</translation>
     </message>
     <message>
         <source>Export failed</source>
@@ -559,18 +580,6 @@ Podrazumevano: 1,2</translation>
     <message>
         <source>Imported</source>
         <translation>Uvezeno</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.</source>
-        <translation>Sesija je uvezena iz %1.</translation>
-    </message>
-    <message>
-        <source>Session imported from %1.
-
-%2</source>
-        <translation>Sesija je uvezena iz %1.
-
-%2</translation>
     </message>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -593,12 +602,50 @@ Podrazumevano: 1,2</translation>
         <translation>Podešavanja su izvezena u %1.</translation>
     </message>
     <message>
-        <source>Settings loaded from %1.</source>
-        <translation>Podešavanja su učitana iz %1.</translation>
+        <source>OpenCL device types to use, separated by commas.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session exported to “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session imported from “%1”.
+
+%2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings loaded from “%1”.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Review them and save to apply them.</source>
         <translation>Pregledajte ih i sačuvajte da biste ih primenili.</translation>
+    </message>
+    <message>
+        <source>Load example session</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Load the example session? The current session is lost.
@@ -609,12 +656,24 @@ The example cracks a test SHA-256 hash; hashcat should recover the password Nice
 Primer provaljuje probni SHA-256 hash; hashcat bi trebalo da pronađe lozinku Nice!98.</translation>
     </message>
     <message>
+        <source>Reset session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reset every field to its default? The current session is lost.</source>
         <translation>Vratiti sva polja na podrazumevane vrednosti? Trenutna sesija će biti izgubljena.</translation>
     </message>
     <message>
         <source>Session warning</source>
         <translation>Upozorenje o sesiji</translation>
+    </message>
+    <message>
+        <source>Updating…</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load hash types</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>This mode needs exactly %1 wordlists (left, right).</source>
@@ -629,14 +688,34 @@ Primer provaljuje probni SHA-256 hash; hashcat bi trebalo da pronađe lozinku Ni
         <translation>Ovaj režim zahteva najmanje jednu listu reči.</translation>
     </message>
     <message>
-        <source>This attack mode needs at least one wordlist.</source>
-        <translation>Ovaj režim napada zahteva najmanje jednu listu reči.</translation>
+        <source>Open hash file</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This attack mode needs exactly %1 wordlists.
+        <source>Save output file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add wordlists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open rules file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not start “%1”: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
-        <translation>Ovaj režim napada zahteva tačno %1 liste reči.
-Trenutno izabrano: %2.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
@@ -667,10 +746,6 @@ Trenutno izabrano: %2.</translation>
         <translation>Asocijacija</translation>
     </message>
     <message>
-        <source>Updating...</source>
-        <translation>Ažuriranje...</translation>
-    </message>
-    <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Preuzimanje podržanih vrsta hash-ova nije uspelo.
@@ -681,10 +756,6 @@ Greška: %1</translation>
         <translation>Vrste hash-ova nisu mogle da se učitaju. Proverite putanju do hashcat-a u podešavanjima.</translation>
     </message>
     <message>
-        <source>hashcat error</source>
-        <translation>hashcat greška</translation>
-    </message>
-    <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>Podesite putanju do hashcat-a u %1 → %2 da biste učitali dostupne vrste hash-ova.</translation>
     </message>
@@ -693,20 +764,10 @@ Greška: %1</translation>
         <translation>Ovaj režim zahteva masku.</translation>
     </message>
     <message>
-        <source>Open Hash File</source>
-        <translation>Otvori datoteku sa hashom</translation>
-    </message>
-    <message>
-        <source>Save Output File</source>
-        <translation>Sačuvaj izlaznu datoteku</translation>
-    </message>
-    <message>
-        <source>Add Wordlists</source>
-        <translation>Dodaj liste reči</translation>
-    </message>
-    <message>
-        <source>Open Rules File</source>
-        <translation>Otvori datoteku sa pravilima</translation>
+        <source>This wordlist does not exist:
+%1</source>
+        <translation>Ova lista reči ne postoji:
+%1</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
@@ -715,10 +776,6 @@ Greška: %1</translation>
     <message>
         <source>Launch failed</source>
         <translation>Pokretanje nije uspelo</translation>
-    </message>
-    <message>
-        <source>Could not start %1: %2</source>
-        <translation>Nije bilo moguće pokrenuti %1: %2</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -741,20 +798,6 @@ Idite na %2 → %3 da to promenite.</translation>
         <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da izaberete terminal koji se koristi za pokretanje.</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>Na ovom sistemu nije pronađen nijedan podržani terminal. hashcat-gui treba terminal da bi prikazao izlaz hashcat-a.</translation>
-    </message>
-    <message>
-        <source>The configured terminal &quot;%1&quot; is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>Konfigurisani terminal „%1“ nije dostupan. Dostupni terminali: %2
-Idite na %3 → %4 da to promenite.</translation>
-    </message>
-    <message>
-        <source>This attack mode needs a mask.</source>
-        <translation>Ovaj režim napada zahteva masku.</translation>
-    </message>
-    <message>
         <source>The minimum increment length is larger than the maximum.</source>
         <translation>Minimalna dužina povećavanja veća je od maksimalne.</translation>
     </message>
@@ -774,20 +817,20 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Podešavanja</translation>
     </message>
     <message>
-        <source>Hashcat</source>
-        <translation>Hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;Hashcat executable</source>
-        <translation>hashcat &amp;program</translation>
-    </message>
-    <message>
         <source>Not configured</source>
         <translation>Nije konfigurisano</translation>
     </message>
     <message>
-        <source>Select...</source>
-        <translation>Izaberi...</translation>
+        <source>hashcat</source>
+        <translation type="unfinished">hashcat</translation>
+    </message>
+    <message>
+        <source>&amp;hashcat executable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select…</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&amp;Terminal</source>
@@ -882,20 +925,24 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Tamna</translation>
     </message>
     <message>
-        <source>The hashcat path %1 was not found on this computer.</source>
-        <translation>Putanja do hashcat-a %1 nije pronađena na ovom računaru.</translation>
+        <source>The hashcat path “%1” was not found on this computer.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The terminal %1 is not installed and was not applied.</source>
-        <translation>Terminal %1 nije instaliran i nije primenjen.</translation>
+        <source>The terminal “%1” is not installed and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The color scheme %1 is not offered and was not applied.</source>
-        <translation>Šema boja %1 nije ponuđena i nije primenjena.</translation>
+        <source>The color scheme “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The language %1 is not offered and was not applied.</source>
-        <translation>Jezik %1 nije ponuđen i nije primenjen.</translation>
+        <source>The language “%1” is not offered and was not applied.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not installed.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
@@ -906,16 +953,8 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Konfigurisani hashcat program nije pronađen na ovom računaru.</translation>
     </message>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the output of hashcat.</source>
-        <translation>Na ovom sistemu nije pronađen nijedan podržani terminal. hashcat-gui treba terminal da bi prikazao izlaz hashcat-a.</translation>
-    </message>
-    <message>
         <source>Select the terminal hashcat is started in.</source>
         <translation>Izaberite terminal u kojem se pokreće hashcat.</translation>
-    </message>
-    <message>
-        <source>The configured terminal %1 is not installed.</source>
-        <translation>Konfigurisani terminal %1 nije instaliran.</translation>
     </message>
     <message>
         <source>Select the hashcat executable</source>
@@ -945,18 +984,6 @@ Idite na %3 → %4 da to promenite.</translation>
 <context>
     <name>StateFile</name>
     <message>
-        <source>Could not open %1 for writing: %2</source>
-        <translation>Nije bilo moguće otvoriti %1 za upis: %2</translation>
-    </message>
-    <message>
-        <source>Could not write to %1: %2</source>
-        <translation>Nije bilo moguće upisati u %1: %2</translation>
-    </message>
-    <message>
-        <source>Could not open %1 for reading: %2</source>
-        <translation>Nije bilo moguće otvoriti %1 za čitanje: %2</translation>
-    </message>
-    <message>
         <source>The file is not valid JSON: %1</source>
         <translation>Datoteka nije ispravan JSON: %1</translation>
     </message>
@@ -969,16 +996,28 @@ Idite na %3 → %4 da to promenite.</translation>
         <translation>Datoteka ne sadrži nijedan odeljak.</translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section.</source>
-        <translation>Datoteka ne sadrži odeljak %1.</translation>
+        <source>Could not open “%1” for writing: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The file does not contain a %1 section; it holds %2.</source>
-        <translation>Datoteka ne sadrži odeljak %1; sadrži %2.</translation>
+        <source>Could not write to “%1”: %2</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The %1 section does not contain any values.</source>
-        <translation>Odeljak %1 ne sadrži nijednu vrednost.</translation>
+        <source>Could not open “%1” for reading: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file does not contain a “%1” section; it holds %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The “%1” section does not contain any values.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source> and </source>
@@ -995,6 +1034,33 @@ Idite na %3 → %4 da to promenite.</translation>
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>Datoteka sadrži vrednosti pogrešnog tipa, pa nisu primenjene: %1.</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateChecker</name>
+    <message>
+        <source>GitHub answered with HTTP status %1: %2</source>
+        <translation>GitHub je odgovorio HTTP statusom %1: %2</translation>
+    </message>
+    <message>
+        <source>GitHub answered with HTTP status %1.</source>
+        <translation>GitHub je odgovorio HTTP statusom %1.</translation>
+    </message>
+    <message>
+        <source>The release information is not valid JSON.</source>
+        <translation>Informacije o izdanju nisu ispravan JSON.</translation>
+    </message>
+    <message>
+        <source>The release information does not name a version.</source>
+        <translation>Informacije o izdanju ne navode nijednu verziju.</translation>
+    </message>
+    <message>
+        <source>The release version %1 is not a valid version number.</source>
+        <translation>Verzija izdanja %1 nije ispravan broj verzije.</translation>
+    </message>
+    <message>
+        <source>The installed version %1 is not a valid version number.</source>
+        <translation>Instalirana verzija %1 nije ispravan broj verzije.</translation>
     </message>
 </context>
 </TS>

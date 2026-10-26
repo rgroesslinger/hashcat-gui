@@ -34,12 +34,14 @@ struct Language {
     const char *code;
     const char *name;
 };
-// Ordered by each name's native spelling in codepoint order: Latin names
-// interleave alphabetically, non-Latin names cluster after them by codepoint.
+// Sorted alphabetically by language code (ISO 639-1, with region suffix).
+// Keep this order when adding new languages.
 inline constexpr Language Available[] = {
-    {"de", "Deutsch"},  {"en", "English"},     {"es", "Español"},
-    {"fr", "Français"}, {"it", "Italiano"},    {"sr", "Srpski"},
-    {"ja", "日本語"},   {"zh_CN", "简体中文"}, {"ko", "한국어"},
+    {"de", "Deutsch"},    {"en", "English"},     {"es", "Español"},
+    {"fr", "Français"},   {"it", "Italiano"},    {"ja", "日本語"},
+    {"ko", "한국어"},     {"pl", "Polski"},      {"pt_BR", "Português (Brasil)"},
+    {"ru", "Русский"},    {"sr", "Srpski"},      {"tr", "Türkçe"},
+    {"uk", "Українська"}, {"zh_CN", "简体中文"}, {"zh_TW", "繁體中文"},
 };
 // What a fresh install gets before anything was ever saved, and what the
 // dialog falls back to when the key holds a code that is no longer offered:
@@ -201,35 +203,39 @@ inline constexpr QLatin1StringView Hash{"<hash>"};
 } // namespace Placeholders
 
 // Fixed reference tables for the help tooltips. Hashcat syntax, so they are
-// non-translatable constants here.
+// non-translatable constants here. UTF-8 rather than Latin-1: the range in the
+// charset table and the workload levels are prose and carry typographic
+// punctuation, so the caller converts them where it shows them.
 namespace HelpText
 {
-inline constexpr QLatin1StringView BuiltinCharsets{"  ?l = abcdefghijklmnopqrstuvwxyz [a-z]\n"
-                                                   "  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]\n"
-                                                   "  ?d = 0123456789 [0-9]\n"
-                                                   "  ?h = 0123456789abcdef [0-9a-f]\n"
-                                                   "  ?H = 0123456789ABCDEF [0-9A-F]\n"
-                                                   "  ?s =  !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n"
-                                                   "  ?a = ?l?u?d?s\n"
-                                                   "  ?b = 0x00 - 0xff"};
-inline constexpr QLatin1StringView OutfileFormats{"  1 = hash[:salt]\n"
-                                                  "  2 = plain\n"
-                                                  "  3 = hex_plain\n"
-                                                  "  4 = crack_pos\n"
-                                                  "  5 = timestamp absolute\n"
-                                                  "  6 = timestamp relative"};
-inline constexpr QLatin1StringView OpenClDeviceTypes{"  1 = CPU\n"
-                                                     "  2 = GPU\n"
-                                                     "  Separate multiple values with commas."};
-inline constexpr QLatin1StringView CommonEncodings{"  utf-8, utf-16le, utf-16be,\n"
-                                                   "  iso-8859-1, iso-8859-15, windows-1252"};
-inline constexpr QLatin1StringView WorkloadProfiles{
-    " # | Performance | Runtime | Power Consumption | Desktop Impact\n"
-    "   ===+=============+=========+===================+=========\n"
-    "    1 | Low               |   2 ms    | Low               | Minimal\n"
-    "    2 | Default         |  12 ms   | Economic     | Noticeable\n"
-    "    3 | High              |  96 ms   | High              | Unresponsive\n"
-    "    4 | Nightmare   | 480 ms  | Insane          | Headless"};
+inline constexpr const char *BuiltinCharsets = "  ?l = abcdefghijklmnopqrstuvwxyz [a-z]\n"
+                                               "  ?u = ABCDEFGHIJKLMNOPQRSTUVWXYZ [A-Z]\n"
+                                               "  ?d = 0123456789 [0-9]\n"
+                                               "  ?h = 0123456789abcdef [0-9a-f]\n"
+                                               "  ?H = 0123456789ABCDEF [0-9A-F]\n"
+                                               "  ?s =  !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~\n"
+                                               "  ?a = ?l?u?d?s\n"
+                                               "  ?b = 0x00–0xff";
+inline constexpr const char *OutfileFormats = "  1 = hash[:salt]\n"
+                                              "  2 = plain\n"
+                                              "  3 = hex_plain\n"
+                                              "  4 = crack_pos\n"
+                                              "  5 = timestamp absolute\n"
+                                              "  6 = timestamp relative";
+inline constexpr const char *OpenClDeviceTypes = "  1 = CPU\n"
+                                                 "  2 = GPU\n"
+                                                 "  Separate multiple values with commas.";
+inline constexpr const char *CommonEncodings = "  utf-8, utf-16le, utf-16be,\n"
+                                               "  iso-8859-1, iso-8859-15, windows-1252";
+// Hashcat's table as lines: a tooltip is drawn in the proportional UI font, so
+// its columns cannot line up. The units use a no-break space so a line cannot
+// break between value and unit.
+inline constexpr const char *WorkloadProfiles =
+    "Workload profiles:\n"
+    "  1 – Low: 2 ms, low power consumption, minimal desktop impact\n"
+    "  2 – Default: 12 ms, economic power consumption, noticeable desktop impact\n"
+    "  3 – High: 96 ms, high power consumption, unresponsive desktop\n"
+    "  4 – Nightmare: 480 ms, insane power consumption, headless";
 } // namespace HelpText
 
 // Fixed external links. Only the label around a link is translatable.

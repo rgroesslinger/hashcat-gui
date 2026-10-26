@@ -397,7 +397,7 @@ void TestHelperUtils::executeHashcatGivesUpOnTimeout()
         HelperUtils::executeHashcat({QStringLiteral("--help")}, 300).result();
 
     // The child is killed and reaped rather than waited out: a query that can
-    // hang the "Updating..." state forever is what this guards against.
+    // hang the "Updating…" state forever is what this guards against.
     QVERIFY2(elapsed.elapsed() < 10000, qPrintable(QStringLiteral("%1 ms").arg(elapsed.elapsed())));
     QCOMPARE(int(result.exitStatus), int(QProcess::CrashExit));
     QCOMPARE(result.exitCode, -1);

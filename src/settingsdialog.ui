@@ -20,7 +20,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_hc_path">
      <property name="title">
-      <string>Hashcat</string>
+      <string>hashcat</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
@@ -29,7 +29,7 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_hc_path">
         <property name="text">
-         <string>&amp;Hashcat executable</string>
+         <string>&amp;hashcat executable</string>
         </property>
        </widget>
       </item>
@@ -51,7 +51,7 @@
         <item>
          <widget class="QPushButton" name="pushButton_select_path">
           <property name="text">
-           <string>Select...</string>
+           <string>Select…</string>
           </property>
          </widget>
         </item>

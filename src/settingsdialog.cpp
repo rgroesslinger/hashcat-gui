@@ -371,7 +371,7 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
         // applied - the user reviews the dialog before saving - and named, so
         // that the missing file is not a surprise later.
         if (source == ValueSource::Imported && !path.isEmpty() && !isExecutableFile(path)) {
-            return tr("The hashcat path %1 was not found on this computer.").arg(path);
+            return tr("The hashcat path “%1” was not found on this computer.").arg(path);
         }
         return {};
     }
@@ -392,7 +392,7 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
             ui->comboBox_terminal->setCurrentIndex(-1);
             return {};
         }
-        return tr("The terminal %1 is not installed and was not applied.").arg(terminal);
+        return tr("The terminal “%1” is not installed and was not applied.").arg(terminal);
     }
 
     if (key == AppConstants::SettingsKeys::UseShortParameters) {
@@ -418,7 +418,7 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
                 ui->comboBox_color_scheme->findData(QString()));
             return {};
         }
-        return tr("The color scheme %1 is not offered and was not applied.").arg(scheme);
+        return tr("The color scheme “%1” is not offered and was not applied.").arg(scheme);
     }
 
     if (key == AppConstants::SettingsKeys::Language) {
@@ -436,7 +436,7 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
                     AppConstants::SettingsKeys::Language)));
             return {};
         }
-        return tr("The language %1 is not offered and was not applied.").arg(language);
+        return tr("The language “%1” is not offered and was not applied.").arg(language);
     }
 
     return {};
@@ -471,9 +471,7 @@ void SettingsDialog::updateHashcatStatus()
 void SettingsDialog::updateTerminalStatus()
 {
     if (ui->comboBox_terminal->count() == 0) {
-        ui->label_terminal_status->setText(
-            tr("No supported terminal was found on this system. hashcat-gui needs one to show "
-               "the output of hashcat."));
+        ui->label_terminal_status->setText(HelperUtils::noSupportedTerminalMessage());
         ui->label_terminal_status->setVisible(true);
         return;
     }
@@ -482,7 +480,7 @@ void SettingsDialog::updateTerminalStatus()
         ui->label_terminal_status->setText(
             m_configuredTerminal.isEmpty()
                 ? tr("Select the terminal hashcat is started in.")
-                : tr("The configured terminal %1 is not installed.").arg(m_configuredTerminal));
+                : tr("The configured terminal “%1” is not installed.").arg(m_configuredTerminal));
         ui->label_terminal_status->setVisible(true);
         return;
     }

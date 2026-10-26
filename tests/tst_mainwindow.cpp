@@ -328,7 +328,8 @@ void TestMainWindow::commandPreviewFollowsWidgetChanges()
     QVERIFY(preview->text().contains(QStringLiteral("--runtime 60")));
 
     window.ui->checkBox_override_workload_profile->setChecked(true);
-    window.ui->comboBox_workload_profile->setCurrentText(QStringLiteral("2"));
+    // Level 2, addressed by position: the display text is not an identifier.
+    window.ui->comboBox_workload_profile->setCurrentIndex(1);
     QVERIFY(preview->text().contains(QStringLiteral("--workload-profile 2")));
 
     // Radio buttons share the toggle helper and keep their side-effect slot.
@@ -522,7 +523,7 @@ void TestMainWindow::resettingTheSessionNeedsAConfirmation()
     QVERIFY(QMetaObject::invokeMethod(&window, "resetSessionTriggered"));
 
     QVERIFY(recorder.messageBoxSeen);
-    QCOMPARE(recorder.title, QStringLiteral("Reset Session"));
+    QCOMPARE(recorder.title, QStringLiteral("Reset session"));
     QVERIFY(recorder.text.contains(QStringLiteral("lost")));
     // The recorder closed the box without confirming: nothing was reset.
     QCOMPARE(window.ui->lineEdit_session->text(), QStringLiteral("keepMe"));
@@ -581,7 +582,7 @@ void TestMainWindow::loadExampleSessionNeedsAConfirmation()
     QVERIFY(QMetaObject::invokeMethod(&window, "loadExampleSessionTriggered"));
 
     QVERIFY(recorder.messageBoxSeen);
-    QCOMPARE(recorder.title, QStringLiteral("Load Example Session"));
+    QCOMPARE(recorder.title, QStringLiteral("Load example session"));
     QVERIFY(recorder.text.contains(QStringLiteral("lost")));
     QVERIFY(recorder.text.contains(QStringLiteral("should recover the password Nice!98")));
     // The recorder closed the box without confirming: nothing was loaded.
@@ -775,7 +776,7 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     window.ui->checkBox_ignoreusername->setChecked(true);
     window.ui->checkBox_speed_only->setChecked(true);
     window.ui->checkBox_override_workload_profile->setChecked(true);
-    window.ui->comboBox_workload_profile->setCurrentText(QStringLiteral("2"));
+    window.ui->comboBox_workload_profile->setCurrentIndex(1);
     window.ui->checkBox_hex_wordlist->setChecked(true);
     window.ui->lineEdit_encoding_from->setText(QStringLiteral("iso-8859-15"));
     window.ui->lineEdit_encoding_to->setText(QStringLiteral("utf-8"));
@@ -1055,7 +1056,7 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     // The query runs off-thread; until the event loop delivers its result the
     // combo stays parked in the state initHashAndAttackModes() put it in.
     QVERIFY(!window.ui->comboBox_hash_type->isEnabled());
-    QCOMPARE(window.ui->comboBox_hash_type->toolTip(), QStringLiteral("Updating..."));
+    QCOMPARE(window.ui->comboBox_hash_type->toolTip(), QStringLiteral("Updating…"));
 
     // Wait at least as long as the query's own deadline: giving up earlier
     // would fail the test while hashcat could still have answered
@@ -1077,7 +1078,7 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
 }
 
 // Every failure path owes the user the state the success path leaves behind:
-// the combo back under their control, no "Updating..." left on it, a tooltip
+// the combo back under their control, no "Updating…" left on it, a tooltip
 // that says why it is empty, and no hash type in it. Two ways for hashcat to
 // not answer, both real.
 void TestMainWindow::failedQueryReenablesTheHashTypeCombo_data()
@@ -1115,7 +1116,7 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
     // The query starts out exactly like the successful one: parked on the
     // reply, with the tooltip that says so.
     QVERIFY(!window.ui->comboBox_hash_type->isEnabled());
-    QCOMPARE(window.ui->comboBox_hash_type->toolTip(), QStringLiteral("Updating..."));
+    QCOMPARE(window.ui->comboBox_hash_type->toolTip(), QStringLiteral("Updating…"));
 
     // ... and when the reply turns out to be unusable, the combo comes back
     QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->isEnabled(),

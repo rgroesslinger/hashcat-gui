@@ -72,6 +72,17 @@ QString escapeRichText(QString text)
     return text.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
 }
 
+// A menu path names the entry, not the action: the ellipsis of an entry that
+// opens a dialog is not part of "File → Settings".
+QString menuPath(const QString &text)
+{
+    QString path = text;
+    if (path.endsWith(QStringLiteral("…"))) {
+        path.chop(1);
+    }
+    return path.trimmed();
+}
+
 // The tooltip of the command preview: the whole command, because the line
 // edit shows only its beginning.
 //
@@ -143,8 +154,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->lineEdit_limit->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_limit));
 
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
-    const QString charsetTip =
-        tr("Built-in charsets:") + QLatin1String("\n\n") + AppConstants::HelpText::BuiltinCharsets;
+    const QString charsetTip = tr("Built-in charsets:") + QLatin1String("\n\n")
+                               + QString::fromUtf8(AppConstants::HelpText::BuiltinCharsets);
     ui->lineEdit_mask->setToolTip(charsetTip);
     ui->lineEdit_custom_charset1->setToolTip(charsetTip);
     ui->lineEdit_custom_charset2->setToolTip(charsetTip);
@@ -153,11 +164,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     const QString outfileFormatTip = tr("Outfile format to use, separated by commas.\nDefault: 1,2")
                                      + QLatin1String("\n\n")
-                                     + AppConstants::HelpText::OutfileFormats;
+                                     + QString::fromUtf8(AppConstants::HelpText::OutfileFormats);
     ui->lineEdit_outfile_format->setToolTip(outfileFormatTip);
 
-    const QString encodingTip =
-        tr("Common encodings:") + QLatin1String("\n\n") + AppConstants::HelpText::CommonEncodings;
+    const QString encodingTip = tr("Common encodings:") + QLatin1String("\n\n")
+                                + QString::fromUtf8(AppConstants::HelpText::CommonEncodings);
     ui->lineEdit_encoding_from->setToolTip(tr("Force the internal wordlist encoding from this "
                                               "code. Leave empty to let hashcat decide.")
                                            + QLatin1String("\n\n") + encodingTip);
@@ -165,12 +176,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         tr("Force the internal wordlist encoding to this code. Leave empty to let hashcat decide.")
         + QLatin1String("\n\n") + encodingTip);
 
-    const QString deviceTypeTip = tr("OpenCL device types to use, separated by commas")
+    const QString deviceTypeTip = tr("OpenCL device types to use, separated by commas.")
                                   + QLatin1String("\n\n")
-                                  + AppConstants::HelpText::OpenClDeviceTypes;
+                                  + QString::fromUtf8(AppConstants::HelpText::OpenClDeviceTypes);
     ui->lineEdit_opencl_device_types->setToolTip(deviceTypeTip);
 
-    ui->comboBox_workload_profile->setToolTip(QString(AppConstants::HelpText::WorkloadProfiles));
+    ui->comboBox_workload_profile->setToolTip(
+        QString::fromUtf8(AppConstants::HelpText::WorkloadProfiles));
 
     auto &settings = SettingsManager::instance();
 
@@ -471,7 +483,7 @@ void MainWindow::fitToContent()
 void MainWindow::exportTriggered()
 {
     const QString file = QFileDialog::getSaveFileName(
-        this, tr("Export Session"), suggestedExportPath(AppConstants::Files::SessionExport),
+        this, tr("Export session"), suggestedExportPath(AppConstants::Files::SessionExport),
         tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
@@ -483,7 +495,7 @@ void MainWindow::exportTriggered()
         WidgetStateSerializer::toJson(this, {AppConstants::Files::PreviewWidget});
     if (StateFile::write(file, AppConstants::FileSections::Session, AppConstants::Sessions::Version,
                          values, &error)) {
-        QMessageBox::information(this, tr("Exported"), tr("Session exported to %1.").arg(file));
+        QMessageBox::information(this, tr("Exported"), tr("Session exported to “%1”.").arg(file));
     } else {
         QMessageBox::warning(this, tr("Export failed"), error);
     }
@@ -492,7 +504,7 @@ void MainWindow::exportTriggered()
 // File → Import
 void MainWindow::importTriggered()
 {
-    const QString file = QFileDialog::getOpenFileName(this, tr("Import Session"), suggestedFolder(),
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import session"), suggestedFolder(),
                                                       tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
@@ -520,11 +532,11 @@ void MainWindow::importTriggered()
     const QStringList notes = applySessionFile(values, version, otherSections);
 
     if (notes.isEmpty()) {
-        QMessageBox::information(this, tr("Imported"), tr("Session imported from %1.").arg(file));
+        QMessageBox::information(this, tr("Imported"), tr("Session imported from “%1”.").arg(file));
     } else {
         QMessageBox::warning(
             this, tr("Imported"),
-            tr("Session imported from %1.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
+            tr("Session imported from “%1”.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
     }
 }
 
@@ -617,7 +629,7 @@ QString MainWindow::newerSessionNote(int fileVersion) const
 void MainWindow::exportSettingsTriggered()
 {
     const QString file = QFileDialog::getSaveFileName(
-        this, tr("Export Settings"), suggestedExportPath(AppConstants::Files::SettingsExport),
+        this, tr("Export settings"), suggestedExportPath(AppConstants::Files::SettingsExport),
         tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
@@ -637,7 +649,7 @@ void MainWindow::exportSettingsTriggered()
 // File → Import Settings
 void MainWindow::importSettingsTriggered()
 {
-    const QString file = QFileDialog::getOpenFileName(this, tr("Import Settings"),
+    const QString file = QFileDialog::getOpenFileName(this, tr("Import settings"),
                                                       suggestedFolder(), tr("JSON Files (*.json)"));
 
     if (file.isEmpty()) {
@@ -667,7 +679,7 @@ void MainWindow::importSettingsTriggered()
     notes << fileNotes(version, AppConstants::Settings::Version, otherSections);
 
     QStringList message;
-    message << tr("Settings loaded from %1.").arg(file);
+    message << tr("Settings loaded from “%1”.").arg(file);
     message << tr("Review them and save to apply them.");
     message << notes;
 
@@ -694,7 +706,7 @@ void MainWindow::loadExampleSessionTriggered()
     // Loading the example replaces the session the user has set up in the
     // form, so it is only carried out after the user confirmed it.
     const auto answer = QMessageBox::question(
-        this, tr("Load Example Session"),
+        this, tr("Load example session"),
         tr("Load the example session? The current session is lost.\n\n"
            "The example cracks a test SHA-256 hash; hashcat should recover the password "
            "Nice!98."),
@@ -712,13 +724,13 @@ void MainWindow::loadExampleSessionTriggered()
     if (!StateFile::read(QString(AppConstants::Files::ExampleSession),
                          AppConstants::FileSections::Session, &values, &version, &otherSections,
                          &error)) {
-        QMessageBox::warning(this, tr("Load Example Session"), error);
+        QMessageBox::warning(this, tr("Load example session"), error);
         return;
     }
 
     const QStringList notes = applySessionFile(values, version, otherSections);
     if (!notes.isEmpty()) {
-        QMessageBox::warning(this, tr("Load Example Session"), notes.join(QLatin1Char('\n')));
+        QMessageBox::warning(this, tr("Load example session"), notes.join(QLatin1Char('\n')));
     }
 }
 
@@ -728,7 +740,7 @@ void MainWindow::resetSessionTriggered()
     // Resetting throws away the session the user has set up in the form,
     // so it is only carried out after the user confirmed it.
     const auto answer =
-        QMessageBox::question(this, tr("Reset Session"),
+        QMessageBox::question(this, tr("Reset session"),
                               tr("Reset every field to its default? The current session is lost."),
                               QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (answer != QMessageBox::Yes) {
@@ -1035,7 +1047,7 @@ void MainWindow::initHashAndAttackModes()
     auto &settings = SettingsManager::instance();
 
     if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
-        ui->comboBox_hash_type->setToolTip(tr("Updating..."));
+        ui->comboBox_hash_type->setToolTip(tr("Updating…"));
         ui->comboBox_hash_type->setEnabled(false);
 
         // Create a watcher that will be destroyed once finished
@@ -1072,7 +1084,7 @@ void MainWindow::initHashAndAttackModes()
 
             // The combo was disabled while the query ran. Restore it on every
             // path so a failed or malformed reply does not leave it stuck on
-            // the "Updating..." tooltip forever.
+            // the "Updating…" tooltip forever.
             ui->comboBox_hash_type->setEnabled(true);
             ui->comboBox_hash_type->setToolTip(error.isEmpty()
                                                    ? QString()
@@ -1080,7 +1092,7 @@ void MainWindow::initHashAndAttackModes()
                                                         "the hashcat path in Settings."));
 
             if (!error.isEmpty()) {
-                QMessageBox::warning(this, tr("hashcat error"), error);
+                QMessageBox::warning(this, tr("Failed to load hash types"), error);
             } else if (!hashTypeProblem.isEmpty()) {
                 QMessageBox::warning(this, tr("Session warning"), hashTypeProblem);
             }
@@ -1093,7 +1105,8 @@ void MainWindow::initHashAndAttackModes()
     } else {
         ui->comboBox_hash_type->setToolTip(
             tr("Set the hashcat path under %1 → %2 to load the available hash types.")
-                .arg(ui->menuFile->menuAction()->text(), ui->actionSettings->text()));
+                .arg(menuPath(ui->menuFile->menuAction()->text()),
+                     menuPath(ui->actionSettings->text())));
     }
 }
 
@@ -1180,7 +1193,7 @@ void MainWindow::updateOptionDependencies()
 
 void MainWindow::openHashFileClicked()
 {
-    QString hashfile = QFileDialog::getOpenFileName(this, tr("Open Hash File"));
+    QString hashfile = QFileDialog::getOpenFileName(this, tr("Open hash file"));
     if (!hashfile.isEmpty()) {
         ui->lineEdit_hashfile->setText(QDir::toNativeSeparators(hashfile));
     }
@@ -1188,7 +1201,7 @@ void MainWindow::openHashFileClicked()
 
 void MainWindow::openOutfileClicked()
 {
-    QString outfile = QFileDialog::getSaveFileName(this, tr("Save Output File"));
+    QString outfile = QFileDialog::getSaveFileName(this, tr("Save output file"));
     if (!outfile.isEmpty()) {
         ui->lineEdit_outfile->setText(QDir::toNativeSeparators(outfile));
     }
@@ -1205,7 +1218,7 @@ void MainWindow::removeWordlistClicked()
 
 void MainWindow::addWordlistClicked()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this, tr("Add Wordlists"));
+    QStringList files = QFileDialog::getOpenFileNames(this, tr("Add wordlists"));
     QListWidget *w = ui->listWidget_wordlist;
 
     for (const QString &wordlist : std::as_const(files)) {
@@ -1338,7 +1351,7 @@ void MainWindow::generateRulesToggled(bool checked)
 
 void MainWindow::openRulesFile1Clicked()
 {
-    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
+    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open rules file"));
     if (!rulesfile.isEmpty()) {
         ui->lineEdit_rulesfile_1->setText(QDir::toNativeSeparators(rulesfile));
     }
@@ -1346,7 +1359,7 @@ void MainWindow::openRulesFile1Clicked()
 
 void MainWindow::openRulesFile2Clicked()
 {
-    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
+    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open rules file"));
     if (!rulesfile.isEmpty()) {
         ui->lineEdit_rulesfile_2->setText(QDir::toNativeSeparators(rulesfile));
     }
@@ -1354,7 +1367,7 @@ void MainWindow::openRulesFile2Clicked()
 
 void MainWindow::openRulesFile3Clicked()
 {
-    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open Rules File"));
+    QString rulesfile = QFileDialog::getOpenFileName(this, tr("Open rules file"));
     if (!rulesfile.isEmpty()) {
         ui->lineEdit_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
     }
@@ -1465,14 +1478,14 @@ void MainWindow::startClicked()
     if (!proc.startDetached()) {
         QMessageBox::warning(
             this, tr("Launch failed"),
-            tr("Could not start %1: %2").arg(configuredTerminal, proc.errorString()));
+            tr("Could not start “%1”: %2").arg(configuredTerminal, proc.errorString()));
     }
 }
 
 void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &detail)
 {
-    const QString menu = ui->menuFile->menuAction()->text();
-    const QString settingsEntry = ui->actionSettings->text();
+    const QString menu = menuPath(ui->menuFile->menuAction()->text());
+    const QString settingsEntry = menuPath(ui->actionSettings->text());
     const QString configuredTerminal =
         SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal);
 
@@ -1512,13 +1525,12 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         break;
 
     case HelperUtils::LaunchError::NoTerminals:
-        box.setText(tr("No supported terminal was found on this system. "
-                       "hashcat-gui needs one to show the hashcat output."));
+        box.setText(HelperUtils::noSupportedTerminalMessage());
         break;
 
     case HelperUtils::LaunchError::UnknownTerminal:
         box.setTextFormat(Qt::PlainText);
-        box.setText(tr("The configured terminal \"%1\" is not available. Available terminals: %2\n"
+        box.setText(tr("The configured terminal “%1” is not available. Available terminals: %2\n"
                        "Navigate to %3 → %4 to change it.")
                         .arg(configuredTerminal, detail, menu, settingsEntry));
         break;
@@ -1528,7 +1540,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
     // mode needs instead of pointing at the settings.
     case HelperUtils::LaunchError::NoWordlist:
         box.setIcon(QMessageBox::Information);
-        box.setText(tr("This attack mode needs at least one wordlist."));
+        box.setText(tr("This mode needs at least one wordlist."));
         break;
 
     case HelperUtils::LaunchError::WrongWordlistCount: {
@@ -1538,7 +1550,8 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         const CommandBuilder::ModeRequirements requirements =
             CommandBuilder::modeRequirements(currentAttackMode());
         box.setIcon(QMessageBox::Information);
-        box.setText(tr("This attack mode needs exactly %1 wordlists.\nCurrently selected: %2.")
+        box.setText(tr("This mode needs exactly %1 wordlists (left, right).\n"
+                       "Currently selected: %2.")
                         .arg(requirements.minWordlists)
                         .arg(detail));
         break;
@@ -1546,7 +1559,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
 
     case HelperUtils::LaunchError::NoMask:
         box.setIcon(QMessageBox::Information);
-        box.setText(tr("This attack mode needs a mask."));
+        box.setText(tr("This mode needs a mask."));
         break;
 
     case HelperUtils::LaunchError::InvalidIncrement:

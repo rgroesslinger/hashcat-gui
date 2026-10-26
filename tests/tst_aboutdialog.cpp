@@ -278,7 +278,7 @@ void TestAboutDialog::saysThatNoHashcatIsConfigured()
 
     QLabel *label = dialog.findChild<QLabel *>(QStringLiteral("label_hc_version"));
     QVERIFY(label);
-    QCOMPARE(label->text(), QStringLiteral("not configured"));
+    QCOMPARE(label->text(), QStringLiteral("Not configured"));
 }
 
 // The update row starts busy: the progress indicator and the checking label

@@ -49,13 +49,13 @@ bool StateFile::write(const QString &filename, QLatin1StringView section, int ve
     QSaveFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
         setError(errorMessage,
-                 tr("Could not open %1 for writing: %2").arg(filename, file.errorString()));
+                 tr("Could not open “%1” for writing: %2").arg(filename, file.errorString()));
         return false;
     }
 
     const QByteArray data = QJsonDocument(root).toJson(QJsonDocument::Indented);
     if (file.write(data) != data.size() || !file.commit()) {
-        setError(errorMessage, tr("Could not write to %1: %2").arg(filename, file.errorString()));
+        setError(errorMessage, tr("Could not write to “%1”: %2").arg(filename, file.errorString()));
         return false;
     }
 
@@ -79,7 +79,7 @@ bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonOb
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         setError(errorMessage,
-                 tr("Could not open %1 for reading: %2").arg(filename, file.errorString()));
+                 tr("Could not open “%1” for reading: %2").arg(filename, file.errorString()));
         return false;
     }
 
@@ -120,8 +120,8 @@ bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonOb
 
     if (!sections.contains(QString(section))) {
         const QString message =
-            others.isEmpty() ? tr("The file does not contain a %1 section.").arg(QString(section))
-                             : tr("The file does not contain a %1 section; it holds %2.")
+            others.isEmpty() ? tr("The file does not contain a “%1” section.").arg(QString(section))
+                             : tr("The file does not contain a “%1” section; it holds %2.")
                                    .arg(QString(section), nameList(others));
         setError(errorMessage, message);
         return false;
@@ -130,7 +130,7 @@ bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonOb
     const QJsonObject sectionObject = sections.value(QString(section)).toObject();
     if (!sectionObject.value(QStringLiteral("values")).isObject()) {
         setError(errorMessage,
-                 tr("The %1 section does not contain any values.").arg(QString(section)));
+                 tr("The “%1” section does not contain any values.").arg(QString(section)));
         return false;
     }
 
