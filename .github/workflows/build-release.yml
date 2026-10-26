@@ -32,25 +32,12 @@ jobs:
       - name: Build
         shell: msys2 {0}
         run: |
-          cmake -B build
+          # Same configuration as the OBS packages
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTING=OFF \
+            -DHASHCAT_GUI_REQUIRE_TRANSLATIONS=ON
           cmake --build build
-
-      # A green compile is not enough for something that gets shipped: the
-      # suite CI runs has to pass here too. --no-tests=error turns "no tests
-      # were found" (Qt6 Test missing) into a failure instead of a no-op.
-      - name: Test
-        shell: msys2 {0}
-        run: ctest --test-dir build --output-on-failure --no-tests=error
-
-      # The .qm files are embedded in the executable, so a build without
-      # qt6-tools would quietly ship an untranslated binary. One rule for
-      # every catalog lrelease produced, without naming them: the file has
-      # to be there and it has to hold something. An unmatched glob stays
-      # literal, so this also fails when no catalog was built at all.
-      - name: Check the translations were built
-        shell: msys2 {0}
-        run: |
-          for qm in build/*.qm; do test -s "$qm" || exit 1; done
 
       - name: Copy executable and dependencies
         shell: msys2 {0}

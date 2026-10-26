@@ -58,7 +58,7 @@ With the dependencies installed, the build is identical on both platforms:
 ```
 cd hashcat-gui/
 cmake -B build
-cmake --build build
+cmake --build build -j$(nproc)
 ```
 
 ### Build targets
@@ -109,7 +109,7 @@ cmake --build build --target clang-format
 `.clang-tidy` runs over the sources in `src/` and the tests in `tests/` from a target:
 
 ```
-cmake --build build --target clang-tidy
+cmake --build build --target clang-tidy -j$(nproc)
 ```
 
 Its findings are warnings rather than errors, so the build still succeeds. Editor tooling that understands a compile database is served by the `compile_commands.json` CMake already writes into the build directory.
@@ -117,7 +117,7 @@ Its findings are warnings rather than errors, so the build still succeeds. Edito
 `clazy` analyzes the same sources for Qt-specific issues:
 
 ```
-cmake --build build --target clazy
+cmake --build build --target clazy -j$(nproc)
 ```
 
 The `clazy` target checks `level0` and `level1` by default.
