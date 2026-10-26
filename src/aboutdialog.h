@@ -8,6 +8,10 @@
 
 #include <QDialog>
 
+class QTimer;
+class UpdateChecker;
+struct UpdateCheckResult;
+
 namespace Ui
 {
 class AboutDialog;
@@ -37,8 +41,19 @@ private:
     // dialog's public surface for their sake.
     friend class TestAboutDialog;
 
+    // The update checker is replaceable so a test can answer without a
+    // network. Production uses the constructor above and gets a checker of
+    // its own.
+    AboutDialog(UpdateChecker *checker, int indicatorDelayMs, QWidget *parent = nullptr);
+
     // Fills the row that holds the version of hashcat.
     void updateVersionLabel();
+
+    // Wires the update check: a one-shot timer starts the request after the
+    // progress indicator has been on screen for a moment.
+    void setupUpdateCheck(UpdateChecker *checker, int indicatorDelayMs);
+    void startUpdateCheck();
+    void showUpdateResult(const UpdateCheckResult &result);
 
     // Shows the version of hashcat. The text is wrapped, so a long message
     // grows the dialog instead of being cut off.
@@ -69,6 +84,13 @@ private:
 
     // The dialog is fitted to its content once, on the first show.
     bool m_sizedToContent = false;
+
+    // The update check: the timer keeps the progress indicator visible for
+    // at least its interval, and the flag makes sure an About window that is
+    // shown again does not ask GitHub a second time.
+    QTimer *m_updateTimer = nullptr;
+    UpdateChecker *m_updateChecker = nullptr;
+    bool m_updateCheckStarted = false;
 
     Ui::AboutDialog *ui;
 };

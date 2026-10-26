@@ -7,6 +7,7 @@
 #include "ui_aboutdialog.h"
 #include "helperutils.h"
 #include "settingsmanager.h"
+#include "updatechecker.h"
 #include "appconstants.h"
 #include <QApplication>
 #include <QClipboard>
@@ -23,6 +24,7 @@
 #include <QStringList>
 #include <QTextLayout>
 #include <QTextOption>
+#include <QTimer>
 #include <QToolTip>
 
 namespace
@@ -92,18 +94,26 @@ QString wrapText(const QString &text, const QFont &font, int width)
 }
 } // namespace
 
-AboutDialog::AboutDialog(QWidget *parent) : QDialog(parent), ui(new Ui::AboutDialog)
+AboutDialog::AboutDialog(QWidget *parent)
+    : AboutDialog(nullptr, AppConstants::UpdateCheck::IndicatorDelayMs, parent)
+{
+}
+
+AboutDialog::AboutDialog(UpdateChecker *checker, int indicatorDelayMs, QWidget *parent)
+    : QDialog(parent), ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
 
     // hashcat's answer is not markup: a path or an error with "<" in it would
     // be read as a tag and disappear from the label.
     ui->label_hc_version->setTextFormat(Qt::PlainText);
+    ui->label_update_result->setTextFormat(Qt::PlainText);
 
     updateVersionLabel();
     updateSystemLabels();
     updateLinks();
     updateLicense();
+    setupUpdateCheck(checker, indicatorDelayMs);
 
     // The logo is scaled to the size the .ui gives the label, in device
     // pixels, so the artwork stays sharp on a high-dpi display without the
@@ -144,6 +154,13 @@ AboutDialog::~AboutDialog()
 void AboutDialog::showEvent(QShowEvent *event)
 {
     QDialog::showEvent(event);
+
+    // The timer starts when the dialog is actually on screen, not when it is
+    // constructed: the progress indicator has to be visible before the
+    // request can make it disappear again.
+    if (!m_updateCheckStarted) {
+        m_updateTimer->start();
+    }
 
     if (m_sizedToContent) {
         return;
@@ -284,4 +301,64 @@ void AboutDialog::setVersionLabel(const QString &text)
     // will be shown in.
     const int width = ui->label_hc_version->minimumWidth();
     ui->label_hc_version->setText(wrapText(text, ui->label_hc_version->font(), width));
+}
+
+// The update row starts in its busy state: the result and the link only
+// appear once there is something to say.
+void AboutDialog::setupUpdateCheck(UpdateChecker *checker, int indicatorDelayMs)
+{
+    ui->label_update_result->hide();
+    ui->label_update_link->hide();
+
+    m_updateTimer = new QTimer(this);
+    m_updateTimer->setSingleShot(true);
+    m_updateTimer->setInterval(indicatorDelayMs);
+    connect(m_updateTimer, &QTimer::timeout, this, &AboutDialog::startUpdateCheck);
+
+    // A checker passed in belongs to its caller - the tests keep it on the
+    // stack. The checker this dialog creates itself is a child and is
+    // destroyed along with the dialog, together with its network reply.
+    m_updateChecker = checker ? checker : new UpdateChecker(this);
+    connect(m_updateChecker, &UpdateChecker::finished, this, &AboutDialog::showUpdateResult);
+}
+
+void AboutDialog::startUpdateCheck()
+{
+    if (m_updateCheckStarted) {
+        return;
+    }
+    m_updateCheckStarted = true;
+    m_updateChecker->check();
+}
+
+// Replaces the progress indicator with the answer. The result label is plain
+// text because the error comes from the network and could contain markup; the
+// link is a constant anchor built here.
+void AboutDialog::showUpdateResult(const UpdateCheckResult &result)
+{
+    ui->label_update_checking->hide();
+    ui->progressBar_update->hide();
+    ui->label_update_result->show();
+    ui->label_update_link->hide();
+
+    switch (result.status) {
+    case UpdateCheckResult::Status::UpdateAvailable:
+        ui->label_update_result->setText(
+            tr("A newer version is available: %1.").arg(result.latestVersion));
+        setLink(ui->label_update_link, AppConstants::Urls::LatestReleasePage, tr("Release page"));
+        ui->label_update_link->show();
+        break;
+    case UpdateCheckResult::Status::UpToDate:
+        ui->label_update_result->setText(tr("No updates available."));
+        break;
+    case UpdateCheckResult::Status::Failed:
+    default:
+        ui->label_update_result->setText(
+            result.detail.isEmpty() ? tr("Could not check for updates.")
+                                    : tr("Could not check for updates: %1").arg(result.detail));
+        break;
+    }
+
+    // The answer can be taller than the indicator it replaces.
+    adjustSize();
 }

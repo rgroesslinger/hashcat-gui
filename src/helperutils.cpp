@@ -55,8 +55,9 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
 
         if (!proc.waitForFinished(timeoutMs)) {
             proc.kill();
-            // Reap the killed child instead of letting QProcess::waitForFinished
-            // return immediately and destroy a still-running process.
+            // kill() is asynchronous: the wait blocks until the process has
+            // actually exited, so the destructor of proc is not left with a
+            // process that is still running.
             proc.waitForFinished(5000);
             result.standardError = tr("hashcat timed out\n%1").arg(proc.errorString());
             return result;

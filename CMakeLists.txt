@@ -37,7 +37,7 @@ set(CMAKE_AUTOUIC ON)
 # The tests live in tests/ but include ui_*.h generated from src/*.ui
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-find_package(Qt6 6.8 COMPONENTS Core Gui Widgets Concurrent REQUIRED)
+find_package(Qt6 6.8 COMPONENTS Core Gui Widgets Concurrent Network REQUIRED)
 
 # Everything the application is made of except main().
 set(HASHCAT_GUI_SOURCES
@@ -59,6 +59,8 @@ set(HASHCAT_GUI_SOURCES
     src/settingsmanager.cpp
     src/statefile.h
     src/statefile.cpp
+    src/updatechecker.h
+    src/updatechecker.cpp
     src/widgetstateserializer.h
     src/widgetstateserializer.cpp
     src/wordlistmonitor.h
@@ -74,7 +76,8 @@ set(HASHCAT_GUI_SOURCES
 # the qrc objects and static initializers cannot be dropped as unreferenced.
 add_library(hashcat-gui-core OBJECT ${HASHCAT_GUI_SOURCES})
 target_include_directories(hashcat-gui-core PUBLIC src)
-target_link_libraries(hashcat-gui-core PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent)
+target_link_libraries(hashcat-gui-core PUBLIC
+    Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::Network)
 target_compile_features(hashcat-gui-core PUBLIC cxx_std_20)
 
 # Reject Qt's implicit byte/ASCII <-> QString conversions so every literal has
@@ -151,6 +154,7 @@ set(HASHCAT_GUI_TESTS
     tst_settingsdialog
     tst_statefile
     tst_translations
+    tst_updatechecker
     tst_widgetstateserializer
     tst_wordlistmonitor
 )

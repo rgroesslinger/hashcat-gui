@@ -8,12 +8,36 @@
 #include <QClipboard>
 #include <QGroupBox>
 #include <QLabel>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QSysInfo>
 
 #include "aboutdialog.h"
 #include "appconstants.h"
 #include "settingsmanager.h"
+#include "updatechecker.h"
+
+namespace
+{
+// A checker that answers without a network. The result is emitted from
+// check(), so a test can inspect both the busy state before it and the answer
+// after it.
+class FakeUpdateChecker : public UpdateChecker
+{
+public:
+    UpdateCheckResult result;
+    int checks = 0;
+    bool answers = false;
+
+    void check() override
+    {
+        ++checks;
+        if (answers) {
+            emit finished(result);
+        }
+    }
+};
+} // namespace
 
 // The About dialog opens as large as its content: the size in the .ui would
 // clip the content under a large font or a longer version string and leave an
@@ -24,6 +48,7 @@ class TestAboutDialog : public QObject
     Q_OBJECT
 
 private slots:
+    void initTestCase();
     void fitsItsContent();
     void longVersionTextWrapsInsteadOfWidening();
     void groupBoxesShareOneTitleAlignment();
@@ -35,11 +60,24 @@ private slots:
     void copyDetailsPutsThemOnTheClipboard();
     void okAcceptsTheDialog();
     void saysThatNoHashcatIsConfigured();
+    void updateCheckShowsProgressBeforeTheResult();
+    void updateCheckReportsNewerVersion();
+    void updateCheckReportsLatestVersion();
+    void updateCheckReportsFailure();
+    void closingBeforeTheDelaySkipsTheCheck();
+    void updateCheckRunsOnlyOnce();
 };
+
+void TestAboutDialog::initTestCase()
+{
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.8.0"));
+    qRegisterMetaType<UpdateCheckResult>("UpdateCheckResult");
+}
 
 void TestAboutDialog::fitsItsContent()
 {
-    AboutDialog dialog;
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker, 60000);
     dialog.show();
     QCoreApplication::processEvents();
 
@@ -51,7 +89,8 @@ void TestAboutDialog::fitsItsContent()
 
 void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
 {
-    AboutDialog dialog;
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker, 60000);
     dialog.show();
     QCoreApplication::processEvents();
 
@@ -240,6 +279,150 @@ void TestAboutDialog::saysThatNoHashcatIsConfigured()
     QLabel *label = dialog.findChild<QLabel *>(QStringLiteral("label_hc_version"));
     QVERIFY(label);
     QCOMPARE(label->text(), QStringLiteral("not configured"));
+}
+
+// The update row starts busy: the progress indicator and the checking label
+// are visible, the answer and the release link are not.
+void TestAboutDialog::updateCheckShowsProgressBeforeTheResult()
+{
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker, 60000);
+    dialog.show();
+    QCoreApplication::processEvents();
+
+    QLabel *checking = dialog.findChild<QLabel *>(QStringLiteral("label_update_checking"));
+    QProgressBar *progress = dialog.findChild<QProgressBar *>(QStringLiteral("progressBar_update"));
+    QLabel *result = dialog.findChild<QLabel *>(QStringLiteral("label_update_result"));
+    QLabel *link = dialog.findChild<QLabel *>(QStringLiteral("label_update_link"));
+    QVERIFY(checking);
+    QVERIFY(progress);
+    QVERIFY(result);
+    QVERIFY(link);
+
+    QVERIFY(checking->isVisible());
+    QVERIFY(progress->isVisible());
+    QCOMPARE(progress->minimum(), 0);
+    QCOMPARE(progress->maximum(), 0);
+    // A hairline, not a bar that spans the row: the check is a footnote of
+    // the dialog.
+    QVERIFY(progress->maximumHeight() < progress->fontMetrics().height());
+    QVERIFY(progress->maximumWidth() < progress->parentWidget()->width());
+    QVERIFY(!result->isVisible());
+    QVERIFY(!link->isVisible());
+    QCOMPARE(checker.checks, 0);
+}
+
+void TestAboutDialog::updateCheckReportsNewerVersion()
+{
+    FakeUpdateChecker checker;
+    checker.answers = true;
+    checker.result.status = UpdateCheckResult::Status::UpdateAvailable;
+    checker.result.latestVersion = QStringLiteral("0.9.0");
+
+    AboutDialog dialog(&checker, 0);
+    dialog.show();
+
+    QTRY_COMPARE(checker.checks, 1);
+
+    QLabel *checking = dialog.findChild<QLabel *>(QStringLiteral("label_update_checking"));
+    QProgressBar *progress = dialog.findChild<QProgressBar *>(QStringLiteral("progressBar_update"));
+    QLabel *result = dialog.findChild<QLabel *>(QStringLiteral("label_update_result"));
+    QLabel *link = dialog.findChild<QLabel *>(QStringLiteral("label_update_link"));
+    QVERIFY(checking);
+    QVERIFY(progress);
+    QVERIFY(result);
+    QVERIFY(link);
+
+    QTRY_VERIFY(!checking->isVisible());
+    QVERIFY(!progress->isVisible());
+    QVERIFY(result->isVisible());
+    QVERIFY(result->text().contains(QStringLiteral("0.9.0")));
+    // The version of the running application is one row above; repeating it
+    // here would only make the line longer.
+    QVERIFY(!result->text().contains(QStringLiteral("0.8.0")));
+    QVERIFY(link->isVisible());
+    QVERIFY(link->openExternalLinks());
+    QVERIFY(link->text().contains(QString(AppConstants::Urls::LatestReleasePage)));
+    QCOMPARE(link->toolTip(), QString(AppConstants::Urls::LatestReleasePage));
+}
+
+void TestAboutDialog::updateCheckReportsLatestVersion()
+{
+    FakeUpdateChecker checker;
+    checker.answers = true;
+    checker.result.status = UpdateCheckResult::Status::UpToDate;
+    checker.result.latestVersion = QStringLiteral("0.8.0");
+
+    AboutDialog dialog(&checker, 0);
+    dialog.show();
+
+    QTRY_COMPARE(checker.checks, 1);
+
+    QProgressBar *progress = dialog.findChild<QProgressBar *>(QStringLiteral("progressBar_update"));
+    QLabel *result = dialog.findChild<QLabel *>(QStringLiteral("label_update_result"));
+    QLabel *link = dialog.findChild<QLabel *>(QStringLiteral("label_update_link"));
+    QVERIFY(progress);
+    QVERIFY(result);
+    QVERIFY(link);
+
+    QTRY_VERIFY(result->isVisible());
+    QVERIFY(!progress->isVisible());
+    // Direct, and without the version the rows above already show.
+    QCOMPARE(result->text(), QStringLiteral("No updates available."));
+    QVERIFY(!link->isVisible());
+}
+
+void TestAboutDialog::updateCheckReportsFailure()
+{
+    FakeUpdateChecker checker;
+    checker.answers = true;
+    checker.result.status = UpdateCheckResult::Status::Failed;
+    checker.result.detail = QStringLiteral("network unreachable");
+
+    AboutDialog dialog(&checker, 0);
+    dialog.show();
+
+    QTRY_COMPARE(checker.checks, 1);
+
+    QLabel *result = dialog.findChild<QLabel *>(QStringLiteral("label_update_result"));
+    QLabel *link = dialog.findChild<QLabel *>(QStringLiteral("label_update_link"));
+    QVERIFY(result);
+    QVERIFY(link);
+
+    QTRY_VERIFY(result->isVisible());
+    QVERIFY(result->text().contains(QStringLiteral("network unreachable")));
+    QVERIFY(!link->isVisible());
+}
+
+// An About dialog that is closed before the delay must not leave a request
+// behind.
+void TestAboutDialog::closingBeforeTheDelaySkipsTheCheck()
+{
+    FakeUpdateChecker checker;
+    {
+        AboutDialog dialog(&checker, 200);
+        dialog.show();
+        QCoreApplication::processEvents();
+        QCOMPARE(checker.checks, 0);
+        dialog.close();
+    }
+
+    QTest::qWait(300);
+    QCOMPARE(checker.checks, 0);
+}
+
+// Showing the same dialog again does not ask GitHub a second time.
+void TestAboutDialog::updateCheckRunsOnlyOnce()
+{
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker, 0);
+    dialog.show();
+    QTRY_COMPARE(checker.checks, 1);
+
+    dialog.hide();
+    dialog.show();
+    QTest::qWait(100);
+    QCOMPARE(checker.checks, 1);
 }
 
 int main(int argc, char *argv[])

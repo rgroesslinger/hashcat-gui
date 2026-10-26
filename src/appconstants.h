@@ -240,10 +240,26 @@ inline constexpr QLatin1StringView HashcatFaq{
     "https://hashcat.net/wiki/doku.php?id=frequently_asked_questions"};
 inline constexpr QLatin1StringView Project{"https://github.com/rgroesslinger/hashcat-gui"};
 inline constexpr QLatin1StringView Issues{"https://github.com/rgroesslinger/hashcat-gui/issues"};
+// The latest release as the GitHub API reports it, and the page a user can
+// open to read about it.
+inline constexpr QLatin1StringView LatestReleaseApi{
+    "https://api.github.com/repos/rgroesslinger/hashcat-gui/releases/latest"};
+inline constexpr QLatin1StringView LatestReleasePage{
+    "https://github.com/rgroesslinger/hashcat-gui/releases/latest"};
 // The license of the application.
 inline constexpr QLatin1StringView License{
     "https://github.com/rgroesslinger/hashcat-gui/blob/master/LICENSE"};
 } // namespace Urls
+
+// How the About dialog asks GitHub for a newer release.
+namespace UpdateCheck
+{
+// The progress indicator stays on screen at least this long before the
+// request starts, so a fast answer cannot make it flash.
+inline constexpr int IndicatorDelayMs = 1000;
+// A request that hangs must not keep the dialog busy forever.
+inline constexpr int RequestTimeoutMs = 10000;
+} // namespace UpdateCheck
 
 // Command line tokens that belong to hashcat itself.
 namespace Hashcat

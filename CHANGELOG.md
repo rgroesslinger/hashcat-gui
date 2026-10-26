@@ -3,7 +3,8 @@
 ## Unreleased
 
 ### New Features
-- Wordlist entries are watched while the window is open: a row whose file was deleted is marked with a warning icon
+- Wordlist entries are watched while the window is open: a row whose file does not exist is marked with a warning icon
+- The About dialog now checks for updates
 
 ## 0.8.0 (2026-10-25)
 
