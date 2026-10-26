@@ -81,6 +81,12 @@ public:
 
     static QMap<QString, QStringList> availableTerminals();
 
+    // The hashcat executable on the PATH, empty when this system has none.
+    //
+    // The settings dialog only offers it: a configured path is never replaced
+    // by the one this lookup finds.
+    static QString findHashcatInPath();
+
     // The note the settings dialog and a failed launch both show when this
     // system has no terminal hashcat-gui can start hashcat in.
     static QString noSupportedTerminalMessage();

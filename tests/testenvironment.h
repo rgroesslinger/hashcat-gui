@@ -8,6 +8,7 @@
 
 #include <QApplication>
 #include <QAbstractButton>
+#include <QByteArray>
 #include <QCoreApplication>
 #include <QDialog>
 #include <QFile>
@@ -92,6 +93,50 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
     return path;
 #endif
 }
+
+// A file named `name` that the platform's executable search accepts, for the
+// tests of the PATH lookup. Nothing runs it: on Windows a shell script is not
+// an image, so the running test binary is copied instead.
+inline QString writeSearchableExecutable(const QString &name)
+{
+#ifdef Q_OS_WIN
+    static QTemporaryDir dir;
+    if (!dir.isValid()) {
+        return {};
+    }
+
+    const QString path = dir.filePath(name);
+    // Several tests ask for the same name; the first copy is good enough.
+    if (QFile::exists(path)) {
+        return path;
+    }
+    if (!QFile::copy(QCoreApplication::applicationFilePath(), path)) {
+        return {};
+    }
+    return path;
+#else
+    return writeShellStub(name, "#!/bin/sh\nexit 0\n");
+#endif
+}
+
+// Sets PATH for the lifetime of the guard and restores it afterwards, so a
+// failed check cannot leak the lookup configuration into the next test.
+class PathGuard
+{
+public:
+    explicit PathGuard(const QByteArray &path) : m_previous(qgetenv("PATH"))
+    {
+        qputenv("PATH", path);
+    }
+
+    ~PathGuard() { qputenv("PATH", m_previous); }
+
+    PathGuard(const PathGuard &) = delete;
+    PathGuard &operator=(const PathGuard &) = delete;
+
+private:
+    QByteArray m_previous;
+};
 
 // Drives the dialogs a file dialog opens, and records - while closing - any
 // message box. A box that should not have appeared must neither hang the

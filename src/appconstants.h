@@ -270,6 +270,13 @@ inline constexpr int RequestTimeoutMs = 10000;
 // Command line tokens that belong to hashcat itself.
 namespace Hashcat
 {
+// The executable looked up on PATH when no path is configured. Fixed hashcat
+// names: the Windows build ships hashcat.exe, the Unix builds hashcat.bin.
+#ifdef Q_OS_WIN
+inline constexpr QLatin1StringView ExecutableName{"hashcat.exe"};
+#else
+inline constexpr QLatin1StringView ExecutableName{"hashcat.bin"};
+#endif
 inline constexpr QLatin1StringView Quiet{"--quiet"};
 inline constexpr QLatin1StringView ExampleHashes{"--example-hashes"};
 inline constexpr QLatin1StringView MachineReadable{"--machine-readable"};

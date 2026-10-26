@@ -233,6 +233,13 @@ QMap<QString, QStringList> HelperUtils::availableTerminals()
     return terminals;
 }
 
+QString HelperUtils::findHashcatInPath()
+{
+    // QStandardPaths checks that the file exists and can be executed; the
+    // platform's executable name already carries its suffix.
+    return QStandardPaths::findExecutable(QString(AppConstants::Hashcat::ExecutableName));
+}
+
 QString HelperUtils::noSupportedTerminalMessage()
 {
     return tr("No supported terminal was found on this system. "

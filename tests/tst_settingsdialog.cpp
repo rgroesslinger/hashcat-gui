@@ -99,6 +99,9 @@ private slots:
     void shortenPathOnlyShortensTheHomeDirectory();
     void showsWhereTheFilesAreStored();
     void hashcatPathStatusFollowsTheField();
+    void detectsHashcatFromPathWhenNoPathConfigured();
+    void doesNotReplaceAConfiguredPath();
+    void leavesThePathEmptyWhenHashcatIsNotOnPath();
     void terminalStatusFollowsTheCombo();
     void saveIsTheDefaultButton();
     void savedSettingsHoldTheKnownSettings();
@@ -364,6 +367,10 @@ void TestSettingsDialog::hashcatPathStatusFollowsTheField()
 {
     SettingsDialog dialog;
 
+    // The dialog may already offer the hashcat it found on this machine's
+    // PATH; the empty state is what this test is about.
+    dialog.ui->lineEdit_hc_path->clear();
+
     QVERIFY2(!dialog.ui->lineEdit_hc_path->isReadOnly(),
              "the path could not be cleared or typed by hand");
     // A fresh install has no path, and the dialog says that hashcat cannot
@@ -391,6 +398,58 @@ void TestSettingsDialog::hashcatPathStatusFollowsTheField()
     QVERIFY2(!dialog.ui->label_download->isHidden(),
              "the download hint did not return for a missing executable");
 #endif
+}
+
+// A fresh install offers the hashcat PATH already finds. Offering it is not
+// storing it: only Save writes the path.
+void TestSettingsDialog::detectsHashcatFromPathWhenNoPathConfigured()
+{
+    const QString stub =
+        TestEnvironment::writeSearchableExecutable(QString(AppConstants::Hashcat::ExecutableName));
+    QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
+
+    TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
+
+    SettingsDialog dialog;
+
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QDir::toNativeSeparators(stub));
+    // Looking it up is not a user choice, so Cancel must not leave it behind.
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath),
+             QString());
+
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath),
+             QDir::toNativeSeparators(stub));
+}
+
+// The lookup only fills an empty field. A path the user chose stays, even
+// when another executable is on PATH.
+void TestSettingsDialog::doesNotReplaceAConfiguredPath()
+{
+    const QString configured = QStringLiteral("/user/chosen/hashcat");
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, configured);
+
+    const QString stub =
+        TestEnvironment::writeSearchableExecutable(QString(AppConstants::Hashcat::ExecutableName));
+    QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
+    TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
+
+    SettingsDialog dialog;
+
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), configured);
+}
+
+// No executable on PATH: the field stays empty instead of showing a path the
+// system cannot start.
+void TestSettingsDialog::leavesThePathEmptyWhenHashcatIsNotOnPath()
+{
+    QTemporaryDir empty;
+    QVERIFY(empty.isValid());
+    TestEnvironment::PathGuard guard(empty.path().toUtf8());
+
+    SettingsDialog dialog;
+
+    QCOMPARE(dialog.ui->lineEdit_hc_path->text(), QString());
 }
 
 // No stored terminal means no selection - and the dialog explains it instead

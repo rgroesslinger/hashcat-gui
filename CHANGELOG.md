@@ -3,8 +3,9 @@
 ## Unreleased
 
 ### New Features
-- Wordlist entries are watched while the window is open: a row whose file does not exist is marked with a warning icon
-- The About dialog now checks for updates
+- Wordlist entries are watched while the window is open: a row whose file does not exist is marked with a warning icon (#15)
+- The About dialog now checks for updates (#16)
+- The settings dialog offers the hashcat found on the system PATH when no path is configured (#17)
 
 ## 0.8.0 (2026-10-25)
 
@@ -20,7 +21,7 @@
 ### Improvements
 - Added new application artwork and improved the XDG `.desktop` file entry
 - Bumped the minimum Qt version to 6.8 and moved the build baseline from C++17 to C++20
-- Settings and sessions are now kept in an INI file on every platform. Note that this results in a one-time backwards-incompatible change of the storage format. Settings and session configuration are now versioned; should another incompatible change be required in the future, we can bump this version and keep support for previous formats
+- Settings and sessions are now stored in a unified file format across all platforms. Note that this results in a one-time backwards-incompatible change of the storage format. Settings and session configuration are now versioned; should another incompatible change be required in the future, we can bump this version and keep support for previous formats
 - The `Attack` tab holds the hash input and the mode-specific options; the `General` tab holds the options that are always available
 - A hint below the attack mode selector now states what the selected mode needs: the number of word lists, a mask, or both
 - Refactored default values, help tables, and magic numbers in `src/appconstants.h` (#10)

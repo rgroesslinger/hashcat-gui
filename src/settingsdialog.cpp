@@ -184,6 +184,17 @@ void SettingsDialog::readSettings()
         applyValue(key, value, ValueSource::Stored);
     }
 
+    // Nothing configured: offer the hashcat PATH already finds, so a fresh
+    // install does not have to point at a binary it could start as it is. Only
+    // an empty field is filled - a path the user chose is never replaced - and
+    // nothing is stored until Save.
+    if (ui->lineEdit_hc_path->text().isEmpty()) {
+        const QString onPath = HelperUtils::findHashcatInPath();
+        if (!onPath.isEmpty()) {
+            ui->lineEdit_hc_path->setText(QDir::toNativeSeparators(onPath));
+        }
+    }
+
     // What the combo shows is what Save will store, so that is what counts as
     // "unchanged": a stale code that fell back to "System default" must not
     // read as a pending change and trigger a restart.

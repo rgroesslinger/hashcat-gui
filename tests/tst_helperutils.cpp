@@ -31,6 +31,8 @@ private slots:
     void validateOptions_data();
     void validateOptions();
     void terminalArgumentsArePinned();
+    void findHashcatInPathFindsTheExecutable();
+    void findHashcatInPathIsEmptyWithoutOne();
     void executeHashcatWithoutAPath();
     void executeHashcatCapturesOutput();
     void executeHashcatGivesUpOnTimeout();
@@ -347,6 +349,30 @@ void TestHelperUtils::terminalArgumentsArePinned()
     for (const Expected &entry : expected) {
         QCOMPARE(table.value(QString::fromLatin1(entry.terminal)), entry.arguments);
     }
+}
+
+// The lookup follows PATH and only reports a file this system can execute.
+void TestHelperUtils::findHashcatInPathFindsTheExecutable()
+{
+    const QString stub =
+        TestEnvironment::writeSearchableExecutable(QString(AppConstants::Hashcat::ExecutableName));
+    QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
+
+    TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
+
+    const QString found = HelperUtils::findHashcatInPath();
+    QVERIFY2(!found.isEmpty(), "the executable on PATH was not found");
+    QCOMPARE(QFileInfo(found).canonicalFilePath(), QFileInfo(stub).canonicalFilePath());
+}
+
+void TestHelperUtils::findHashcatInPathIsEmptyWithoutOne()
+{
+    QTemporaryDir empty;
+    QVERIFY(empty.isValid());
+
+    TestEnvironment::PathGuard guard(empty.path().toUtf8());
+
+    QCOMPARE(HelperUtils::findHashcatInPath(), QString());
 }
 
 void TestHelperUtils::executeHashcatWithoutAPath()
