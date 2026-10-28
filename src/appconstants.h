@@ -192,6 +192,10 @@ inline constexpr int IncrementMax = 0;    // 0 = hashcat default
 namespace Validation
 {
 inline constexpr QLatin1StringView Digits{"^[0-9]*$"};
+// -D takes a number list of the device types 1 (CPU) and 2 (GPU); 3, the
+// accelerators, is gone with hashcat 8.0.0. Spaces around the numbers are
+// fine, as in hashcat's own number list.
+inline constexpr QLatin1StringView DeviceTypes{"^\\s*([12]\\s*(,\\s*[12]\\s*)*)?$"};
 } // namespace Validation
 
 // Placeholders the user can type into the outfile field.

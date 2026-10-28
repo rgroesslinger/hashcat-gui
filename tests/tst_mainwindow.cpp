@@ -204,6 +204,7 @@ private slots:
     void widgetsFlowIntoTheOptions();
     void statusTimerReachesTheCommandLine();
     void skipAndLimitAcceptOnlyNumbers();
+    void deviceTypesAcceptOnlyTheSupportedOnes();
     void checkedWordlistsEndUpInTheCommand();
     void missingWordlistsAreMarked();
     void hashTypeComesFromTheItemData();
@@ -895,6 +896,33 @@ void TestMainWindow::skipAndLimitAcceptOnlyNumbers()
     QVERIFY(limit->text().isEmpty());
 }
 
+// -D 3, the accelerators, is gone with hashcat 8.0.0. The field only lets the
+// device types 1 (CPU) and 2 (GPU) through, with the spaces around the
+// numbers that hashcat's own number list accepts.
+void TestMainWindow::deviceTypesAcceptOnlyTheSupportedOnes()
+{
+    MainWindow window;
+
+    QLineEdit *deviceTypes = window.ui->lineEdit_opencl_device_types;
+    QVERIFY(deviceTypes->validator() != nullptr);
+
+    const auto accepts = [&deviceTypes](const QString &text) {
+        deviceTypes->setText(text);
+        return deviceTypes->hasAcceptableInput();
+    };
+
+    // Empty means "let hashcat decide" and stays allowed.
+    QVERIFY(accepts(QString()));
+    QVERIFY(accepts(QStringLiteral("1")));
+    QVERIFY(accepts(QStringLiteral("2")));
+    QVERIFY(accepts(QStringLiteral("1,2")));
+    QVERIFY(accepts(QStringLiteral("1, 2")));
+
+    QVERIFY(!accepts(QStringLiteral("3")));
+    QVERIFY(!accepts(QStringLiteral("1,3")));
+    QVERIFY(!accepts(QStringLiteral("0")));
+}
+
 void TestMainWindow::checkedWordlistsEndUpInTheCommand()
 {
     MainWindow window;
@@ -931,6 +959,11 @@ void TestMainWindow::missingWordlistsAreMarked()
 
     const QString missingPath = directory.filePath(QStringLiteral("missing.txt"));
 
+    // A directory is a valid wordlist input since hashcat 8.0.0, so a row
+    // naming one must not be marked as missing.
+    const QString directoryPath = directory.filePath(QStringLiteral("wordlists"));
+    QVERIFY(QDir().mkpath(directoryPath));
+
     // A configured path keeps the constructor from queueing the settings
     // dialog; the test spins the event loop below. The watchdog closes the
     // query's failure warning, whose modal loop would otherwise swallow it.
@@ -946,20 +979,24 @@ void TestMainWindow::missingWordlistsAreMarked()
     };
     QListWidgetItem *present = add(presentPath);
     QListWidgetItem *missing = add(missingPath);
+    QListWidgetItem *wordlistDirectory = add(directoryPath);
 
     QVERIFY(present->icon().isNull());
     QVERIFY(present->toolTip().isEmpty());
     QVERIFY(!missing->icon().isNull());
     QVERIFY(missing->toolTip().contains(missingPath));
+    QVERIFY(wordlistDirectory->icon().isNull());
+    QVERIFY(wordlistDirectory->toolTip().isEmpty());
 
     // The indicator is presentation only: text, command and session keep the
     // path.
     QCOMPARE(missing->text(), missingPath);
-    QCOMPARE(window.collectHashcatOptions().wordlists, (QStringList{presentPath, missingPath}));
+    QCOMPARE(window.collectHashcatOptions().wordlists,
+             (QStringList{presentPath, missingPath, directoryPath}));
     const QJsonObject values =
         WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
     const QJsonArray items = values.value(QStringLiteral("listWidget_wordlist")).toArray();
-    QCOMPARE(items.size(), 2);
+    QCOMPARE(items.size(), 3);
     QCOMPARE(items.at(1).toObject().value(QStringLiteral("text")).toString(), missingPath);
 
     // A file that disappears after it was added is marked; one that comes back

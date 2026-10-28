@@ -43,8 +43,9 @@ bool WordlistMonitor::isAvailable(const QString &path) const
 void WordlistMonitor::recheck()
 {
     for (const QString &path : std::as_const(m_paths)) {
-        // A directory is not a wordlist, even though it exists.
-        const bool available = QFileInfo(path).isFile();
+        // Since hashcat 8.0.0 a directory is a valid wordlist input (the
+        // wordlist and table feeds take one), so it counts as available.
+        const bool available = QFileInfo(path).exists();
         if (m_available.contains(path) && m_available.value(path) == available) {
             continue;
         }

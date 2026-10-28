@@ -34,6 +34,7 @@ class TestWordlistMonitor : public QObject
 private slots:
     void reportsTheStateOfEveryPath();
     void removingAndRestoringAFileChangesTheState();
+    void removingAndRecreatingADirectoryChangesTheState();
     void replacingAFileKeepsItWatched();
     void restoringTheDirectoryChangesTheStateBack();
 };
@@ -64,11 +65,11 @@ void TestWordlistMonitor::reportsTheStateOfEveryPath()
     QCOMPARE(spy.at(1).at(0).toString(), missingPath);
     QCOMPARE(spy.at(1).at(1).toBool(), false);
     QCOMPARE(spy.at(2).at(0).toString(), directoryPath);
-    QCOMPARE(spy.at(2).at(1).toBool(), false);
+    QCOMPARE(spy.at(2).at(1).toBool(), true);
 
     QVERIFY(monitor.isAvailable(presentPath));
     QVERIFY(!monitor.isAvailable(missingPath));
-    QVERIFY(!monitor.isAvailable(directoryPath));
+    QVERIFY(monitor.isAvailable(directoryPath));
 }
 
 void TestWordlistMonitor::removingAndRestoringAFileChangesTheState()
@@ -92,6 +93,36 @@ void TestWordlistMonitor::removingAndRestoringAFileChangesTheState()
     QVERIFY(!monitor.isAvailable(path));
 
     QVERIFY(writeFile(path));
+    QTRY_COMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(0).toString(), path);
+    QCOMPARE(spy.at(1).at(1).toBool(), true);
+    QVERIFY(monitor.isAvailable(path));
+}
+
+// A directory is a wordlist input since hashcat 8.0.0, so a row naming one
+// is available - and its removal and recreation have to be noticed just like
+// a file's.
+void TestWordlistMonitor::removingAndRecreatingADirectoryChangesTheState()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+
+    const QString path = directory.filePath(QStringLiteral("wordlists"));
+    QVERIFY(QDir().mkpath(path));
+
+    WordlistMonitor monitor;
+    monitor.setPaths({path});
+    QVERIFY(monitor.isAvailable(path));
+
+    QSignalSpy spy(&monitor, &WordlistMonitor::availabilityChanged);
+
+    QVERIFY(QDir(path).removeRecursively());
+    QTRY_COMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toString(), path);
+    QCOMPARE(spy.at(0).at(1).toBool(), false);
+    QVERIFY(!monitor.isAvailable(path));
+
+    QVERIFY(QDir().mkpath(path));
     QTRY_COMPARE(spy.count(), 2);
     QCOMPARE(spy.at(1).at(0).toString(), path);
     QCOMPARE(spy.at(1).at(1).toBool(), true);

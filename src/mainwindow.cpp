@@ -153,6 +153,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->lineEdit_skip->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_skip));
     ui->lineEdit_limit->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_limit));
 
+    // -D 3 (the accelerators) is gone with hashcat 8.0.0. The field was free
+    // text, so a 3 typed here only failed after the launch, in the terminal;
+    // the validator keeps the accepted device types where the user sees it.
+    const QRegularExpression deviceTypes{QString(AppConstants::Validation::DeviceTypes)};
+    ui->lineEdit_opencl_device_types->setValidator(
+        new QRegularExpressionValidator(deviceTypes, ui->lineEdit_opencl_device_types));
+
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
     const QString charsetTip = tr("Built-in charsets:") + QLatin1String("\n\n")
                                + QString::fromUtf8(AppConstants::HelpText::BuiltinCharsets);
@@ -1044,7 +1051,11 @@ void MainWindow::initHashAndAttackModes()
             QString error;
             QString hashTypeProblem;
 
-            // Check if the command failed
+            // Check if the command failed. Exit codes changed in hashcat
+            // 8.0.0 (-2 is now a wrong attack command, -12 an unusable file,
+            // -13 a bridge failure, all of them -1 before), but this only
+            // wants "did it work", and the GUI has no per-cause message: a
+            // reader must not turn this into per-code handling.
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
                 error = tr("Failed to obtain supported hash types.\nError: %1")
                             .arg(result.standardError);
