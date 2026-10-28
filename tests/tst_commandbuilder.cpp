@@ -26,9 +26,9 @@ private slots:
     void argumentLayout_data();
     void argumentLayout();
     void uiDefaultsAreNotRepeated();
-    void hexCharsetFollowsTheMaskModes();
+    void hexCharsetFollowsTheCharsetModes();
     void advancedOptionsAreEmitted();
-    void incrementFollowsMaskModesAndTheFlag();
+    void incrementFollowsItsOwnModesAndTheFlag();
     void wordlistRulesFollowTheirSide();
     void wordlistOptionsFollowWordlistModes();
     void statusTimerNeedsStatus();
@@ -37,6 +37,8 @@ private slots:
     void outfileIsOptInAndExpanded();
     void expandOutfileTemplateSubstitutesUnixTimeAndHash();
     void nonAsciiArgumentsSurviveVerbatim();
+    void maskMarkersAreCounted();
+    void positionalInputsFollowTheMode();
     void modeRequirements_data();
     void modeRequirements();
     void parameterSpelling();
@@ -103,22 +105,25 @@ void TestCommandBuilder::argumentLayout_data()
     QTest::addColumn<int>("mode");
     QTest::addColumn<QStringList>("expected");
 
+    // Rules apply in every attack mode since hashcat 8.0.0, so every row
+    // carries the -r file and none of them falls back to -g.
     QTest::newRow("straight") << int(AttackMode::Straight)
                               << QStringList{"--attack-mode", "0",        "--rules-file",
                                              "r.rule",        "hash.txt", "dict.txt"};
     QTest::newRow("combination") << int(AttackMode::Combination)
-                                 << QStringList{"--attack-mode", "1", "hash.txt", "dict.txt"};
-    QTest::newRow("brute force") << int(AttackMode::BruteForce)
-                                 << QStringList{"--attack-mode", "3",        "--custom-charset1",
-                                                "abc",           "hash.txt", "?d?d"};
+                                 << QStringList{"--attack-mode", "1",        "--rules-file",
+                                                "r.rule",        "hash.txt", "dict.txt"};
+    QTest::newRow("brute force") << int(
+        AttackMode::BruteForce) << QStringList{"--attack-mode",     "3",   "--rules-file", "r.rule",
+                                               "--custom-charset1", "abc", "hash.txt",     "?d?d"};
     QTest::newRow("hybrid wordlist + mask")
         << int(AttackMode::HybridWordMask)
-        << QStringList{"--attack-mode", "6",   "--custom-charset1", "abc", "hash.txt",
-                       "dict.txt",      "?d?d"};
+        << QStringList{"--attack-mode", "6",        "--rules-file", "r.rule", "--custom-charset1",
+                       "abc",           "hash.txt", "dict.txt",     "?d?d"};
     QTest::newRow("hybrid mask + wordlist")
         << int(AttackMode::HybridMaskWord)
-        << QStringList{"--attack-mode", "7",    "--custom-charset1", "abc",
-                       "hash.txt",      "?d?d", "dict.txt"};
+        << QStringList{"--attack-mode", "7",        "--rules-file", "r.rule",  "--custom-charset1",
+                       "abc",           "hash.txt", "?d?d",         "dict.txt"};
     QTest::newRow("association") << int(AttackMode::Association)
                                  << QStringList{"--attack-mode", "9",        "--rules-file",
                                                 "r.rule",        "hash.txt", "dict.txt"};
@@ -162,19 +167,20 @@ void TestCommandBuilder::uiDefaultsAreNotRepeated()
     QCOMPARE(CommandBuilder::build(options), full);
 }
 
-// --hex-charset describes masks and custom charsets. Hashcat accepts it in
-// every attack mode but ignores it outside the mask modes, so the builder
-// must not let a stale checkbox reach modes 0, 1 and 9.
-void TestCommandBuilder::hexCharsetFollowsTheMaskModes()
+// --hex-charset describes masks and custom charsets. The PCFG feed takes the
+// same markers in its mask= setting, so mode 4 emits it as well; mode 8 has
+// no mask field, and in the other modes hashcat would accept and ignore it.
+void TestCommandBuilder::hexCharsetFollowsTheCharsetModes()
 {
     const QList<AttackMode> modes{
-        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
-        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+        AttackMode::Straight,       AttackMode::Combination, AttackMode::BruteForce,
+        AttackMode::Pcfg,           AttackMode::Table,       AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+        AttackMode::Hybrid,
     };
-    const QSet<AttackMode> maskModes{
-        AttackMode::BruteForce,
-        AttackMode::HybridWordMask,
-        AttackMode::HybridMaskWord,
+    const QSet<AttackMode> charsetModes{
+        AttackMode::BruteForce,     AttackMode::Pcfg,   AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Hybrid,
     };
 
     for (const AttackMode mode : modes) {
@@ -183,7 +189,7 @@ void TestCommandBuilder::hexCharsetFollowsTheMaskModes()
         options.hexCharset = true;
 
         const QStringList arguments = CommandBuilder::build(options);
-        QCOMPARE(arguments.contains(QStringLiteral("--hex-charset")), maskModes.contains(mode));
+        QCOMPARE(arguments.contains(QStringLiteral("--hex-charset")), charsetModes.contains(mode));
     }
 }
 
@@ -255,13 +261,18 @@ void TestCommandBuilder::advancedOptionsAreEmitted()
     QCOMPARE(CommandBuilder::build(options), expected);
 }
 
-void TestCommandBuilder::incrementFollowsMaskModesAndTheFlag()
+void TestCommandBuilder::incrementFollowsItsOwnModesAndTheFlag()
 {
     const QList<AttackMode> modes{
-        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
-        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+        AttackMode::Straight,       AttackMode::Combination, AttackMode::BruteForce,
+        AttackMode::Pcfg,           AttackMode::Table,       AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+        AttackMode::Hybrid,
     };
-    const QSet<AttackMode> maskModes{
+    // Mode 12 conflicts with -i upstream, and mode 1 takes it there but has
+    // no mask in the GUI, so the flag is offered in the three mask modes
+    // where a mask is in use.
+    const QSet<AttackMode> incrementModes{
         AttackMode::BruteForce,
         AttackMode::HybridWordMask,
         AttackMode::HybridMaskWord,
@@ -278,7 +289,7 @@ void TestCommandBuilder::incrementFollowsMaskModesAndTheFlag()
         const bool emitted = arguments.contains(QStringLiteral("--increment"))
                              && arguments.contains(QStringLiteral("--increment-min"))
                              && arguments.contains(QStringLiteral("--increment-max"));
-        QCOMPARE(emitted, maskModes.contains(mode));
+        QCOMPARE(emitted, incrementModes.contains(mode));
     }
 
     // The bounds are part of the increment option; without the flag they
@@ -295,18 +306,20 @@ void TestCommandBuilder::incrementFollowsMaskModesAndTheFlag()
 void TestCommandBuilder::wordlistRulesFollowTheirSide()
 {
     const QList<AttackMode> modes{
-        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
-        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+        AttackMode::Straight,       AttackMode::Combination, AttackMode::BruteForce,
+        AttackMode::Pcfg,           AttackMode::Table,       AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+        AttackMode::Hybrid,
     };
     const QSet<AttackMode> leftModes{
-        AttackMode::Straight,
-        AttackMode::Combination,
-        AttackMode::HybridWordMask,
-        AttackMode::Association,
+        AttackMode::Straight,       AttackMode::Combination, AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+        AttackMode::Hybrid,
     };
     const QSet<AttackMode> rightModes{
         AttackMode::Combination,
         AttackMode::HybridMaskWord,
+        AttackMode::Hybrid,
     };
 
     for (const AttackMode mode : modes) {
@@ -336,12 +349,23 @@ void TestCommandBuilder::wordlistRulesFollowTheirSide()
 void TestCommandBuilder::wordlistOptionsFollowWordlistModes()
 {
     const QList<AttackMode> modes{
-        AttackMode::Straight,       AttackMode::Combination,    AttackMode::BruteForce,
-        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Association,
+        AttackMode::Straight,       AttackMode::Combination, AttackMode::BruteForce,
+        AttackMode::Pcfg,           AttackMode::Table,       AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+        AttackMode::Hybrid,
     };
-    const QSet<AttackMode> wordlistModes{
+    // The table feed reads its wordlist itself and refuses the encoding
+    // pair, but takes --hex-wordlist; the mask-only modes read no wordlist
+    // at all.
+    const QSet<AttackMode> hexWordlistModes{
+        AttackMode::Straight,       AttackMode::Combination,    AttackMode::Table,
+        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Generic,
+        AttackMode::Association,    AttackMode::Hybrid,
+    };
+    const QSet<AttackMode> encodingModes{
         AttackMode::Straight,       AttackMode::Combination, AttackMode::HybridWordMask,
-        AttackMode::HybridMaskWord, AttackMode::Association,
+        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+        AttackMode::Hybrid,
     };
 
     for (const AttackMode mode : modes) {
@@ -352,10 +376,11 @@ void TestCommandBuilder::wordlistOptionsFollowWordlistModes()
         options.encodingTo = QStringLiteral("utf-8");
 
         const QStringList arguments = CommandBuilder::build(options);
-        const bool emitted = arguments.contains(QStringLiteral("--hex-wordlist"))
-                             && arguments.contains(QStringLiteral("--encoding-from"))
-                             && arguments.contains(QStringLiteral("--encoding-to"));
-        QCOMPARE(emitted, wordlistModes.contains(mode));
+        QCOMPARE(arguments.contains(QStringLiteral("--hex-wordlist")),
+                 hexWordlistModes.contains(mode));
+        QCOMPARE(arguments.contains(QStringLiteral("--encoding-from")),
+                 encodingModes.contains(mode));
+        QCOMPARE(arguments.contains(QStringLiteral("--encoding-to")), encodingModes.contains(mode));
     }
 }
 
@@ -554,6 +579,176 @@ void TestCommandBuilder::nonAsciiArgumentsSurviveVerbatim()
     QVERIFY(commandLine.contains(QByteArray::fromHex("c3b6")));
 }
 
+// ?w and ?q name word positions in the mask of attack mode 12. They are not
+// simply the question marks in the mask: ?? is a literal, ?W and ?Q are not
+// the markers, and every other ?x is a charset token.
+void TestCommandBuilder::maskMarkersAreCounted()
+{
+    const auto markers = [](const QString &mask) { return CommandBuilder::maskMarkers(mask); };
+
+    // No markers at all.
+    QCOMPARE(markers(QString()).word, 0);
+    QCOMPARE(markers(QString()).second, 0);
+    QCOMPARE(markers(QStringLiteral("?d?d?d")).word, 0);
+    QCOMPARE(markers(QStringLiteral("?W?Q")).word, 0);
+    QCOMPARE(markers(QStringLiteral("?W?Q")).second, 0);
+
+    // The word position.
+    QCOMPARE(markers(QStringLiteral("?w")).word, 1);
+    QCOMPARE(markers(QStringLiteral("?w")).second, 0);
+
+    // The second word after the first.
+    auto both = markers(QStringLiteral("?w?q"));
+    QCOMPARE(both.word, 1);
+    QCOMPARE(both.second, 1);
+    QVERIFY(!both.secondBeforeWord);
+
+    // A ?q before the first ?w has no first word to follow; hashcat refuses
+    // that mask, and the launch validation says so before hashcat runs.
+    auto reversed = markers(QStringLiteral("?q?w"));
+    QCOMPARE(reversed.word, 1);
+    QCOMPARE(reversed.second, 1);
+    QVERIFY(reversed.secondBeforeWord);
+
+    // More than one ?q; only the first one matters for the flag.
+    auto twice = markers(QStringLiteral("?w?q?q"));
+    QCOMPARE(twice.word, 1);
+    QCOMPARE(twice.second, 2);
+    QVERIFY(!twice.secondBeforeWord);
+
+    // ?? is a literal question mark, so neither pair holds a marker.
+    QCOMPARE(markers(QStringLiteral("??w")).word, 0);
+    QCOMPARE(markers(QStringLiteral("??w")).second, 0);
+    QCOMPARE(markers(QStringLiteral("??q")).second, 0);
+
+    // A custom charset token before the marker is no second word.
+    auto custom = markers(QStringLiteral("?1?w"));
+    QCOMPARE(custom.word, 1);
+    QCOMPARE(custom.second, 0);
+    QVERIFY(!custom.secondBeforeWord);
+
+    // A mask of markers, mixed with plain characters.
+    auto mixed = markers(QStringLiteral("?d?w?d?q"));
+    QCOMPARE(mixed.word, 1);
+    QCOMPARE(mixed.second, 1);
+    QVERIFY(!mixed.secondBeforeWord);
+
+    // A trailing ? stands for itself and starts no token.
+    QCOMPARE(markers(QStringLiteral("abc?")).word, 0);
+}
+
+// The positional tail is what hashcat parses per attack mode, so its order
+// is part of the command's meaning: the table feed stops at the first
+// key=value token, and the settings of mode 9 replace the wordlist.
+void TestCommandBuilder::positionalInputsFollowTheMode()
+{
+    // PCFG: the rulesets come before the settings, and every setting is one
+    // argv token.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Pcfg;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.pcfgRulesets << QStringLiteral("one.pcfg") << QStringLiteral("two.pcfg");
+        options.pcfgScale = QStringLiteral("2");
+        options.pcfgWeights = QStringLiteral("2:1");
+        options.pcfgMask = QStringLiteral("?u?l?l?l");
+        options.pcfgExtraSettings << QStringLiteral("omen=1");
+
+        const QStringList expected{"--attack-mode", "4",       "hash.txt",    "one.pcfg",
+                                   "two.pcfg",      "scale=2", "weights=2:1", "mask=?u?l?l?l",
+                                   "omen=1"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // An empty ruleset list means the one bundled default, so the settings
+    // follow the hash directly.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Pcfg;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.pcfgCostmax = QStringLiteral("32");
+
+        const QStringList expected{"--attack-mode", "4", "hash.txt", "costmax=32"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // Table: the wordlist, then every table, then the settings - a setting
+    // before the table list is the form hashcat answers with its usage line.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Table;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.wordlists << QStringLiteral("dict.txt");
+        options.tableFiles << QStringLiteral("table1.txt") << QStringLiteral("table2.txt");
+        options.tableIdentity = QStringLiteral("0");
+        options.tableCap = QStringLiteral("4294967295");
+        options.tableExtraSettings << QStringLiteral("more=1");
+
+        const QStringList expected{"--attack-mode", "5",          "hash.txt",   "dict.txt",
+                                   "table1.txt",    "table2.txt", "identity=0", "cap=4294967295",
+                                   "more=1"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // Generic feed: the feed name and its arguments, in order. An empty name
+    // must not reach the command line as an empty token.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Generic;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.feedName = QStringLiteral("wordlist");
+        options.feedArguments << QStringLiteral("dict.txt") << QStringLiteral("second.txt");
+
+        const QStringList expected{"--attack-mode", "8",        "hash.txt",
+                                   "wordlist",      "dict.txt", "second.txt"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+
+        options.feedName.clear();
+        const QStringList nameless{"--attack-mode", "8", "hash.txt", "dict.txt", "second.txt"};
+        QCOMPARE(CommandBuilder::build(options), nameless);
+    }
+
+    // Association without a wordlist: the settings follow the hash, each as
+    // its own argv element - splitting the settings line must never merge
+    // tokens into one argument.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Association;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.associationSettings << QStringLiteral("phases=words,rules")
+                                    << QStringLiteral("rules.rulemax=300");
+
+        const QStringList expected{"--attack-mode", "9", "hash.txt", "phases=words,rules",
+                                   "rules.rulemax=300"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // Association with a wordlist: the tail is the wordlist and nothing
+    // else; the GUI refuses the combination with settings.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Association;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.wordlists << QStringLiteral("dict.txt");
+
+        const QStringList expected{"--attack-mode", "9", "hash.txt", "dict.txt"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // Hybrid: the mask is the first positional after the hash, the wordlists
+    // follow it - the ?w in the mask names where a word goes.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Hybrid;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.mask = QStringLiteral("?w?d");
+        options.wordlists << QStringLiteral("a.txt") << QStringLiteral("b.txt");
+
+        const QStringList expected{"--attack-mode", "12", "hash.txt", "?w?d", "a.txt", "b.txt"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+}
+
 // What each attack mode needs from the user. These numbers are what the
 // launch validation and the hint under the mode selector work with.
 void TestCommandBuilder::modeRequirements_data()
@@ -566,9 +761,15 @@ void TestCommandBuilder::modeRequirements_data()
     QTest::newRow("straight") << int(AttackMode::Straight) << 1 << -1 << false;
     QTest::newRow("combination") << int(AttackMode::Combination) << 2 << 2 << false;
     QTest::newRow("brute force") << int(AttackMode::BruteForce) << 0 << -1 << true;
+    QTest::newRow("pcfg") << int(AttackMode::Pcfg) << 0 << -1 << false;
+    QTest::newRow("table") << int(AttackMode::Table) << 1 << 1 << false;
     QTest::newRow("hybrid word + mask") << int(AttackMode::HybridWordMask) << 1 << -1 << true;
     QTest::newRow("hybrid mask + word") << int(AttackMode::HybridMaskWord) << 1 << -1 << true;
-    QTest::newRow("association") << int(AttackMode::Association) << 1 << -1 << false;
+    QTest::newRow("generic") << int(AttackMode::Generic) << 0 << -1 << false;
+    // Zero wordlists is the form that reads the words from the hash file;
+    // one is the GUI's cap for the paired form, hashcat takes two.
+    QTest::newRow("association") << int(AttackMode::Association) << 0 << 1 << false;
+    QTest::newRow("hybrid") << int(AttackMode::Hybrid) << 1 << 2 << true;
 }
 
 void TestCommandBuilder::modeRequirements()
@@ -640,44 +841,64 @@ void TestCommandBuilder::unknownParameterIsEmpty()
     QVERIFY(CommandBuilder::parameterName(static_cast<CommandBuilder::Parameter>(4711)).isEmpty());
 }
 
+// Which attack mode consumes which part of the UI. The table is the whole
+// contract: a mode added to the builder has to be written down here, and the
+// main window's group boxes work from the same predicates.
 void TestCommandBuilder::predicates()
 {
     using Mode = AttackMode;
 
-    QVERIFY(CommandBuilder::attackUsesMask(Mode::BruteForce));
-    QVERIFY(CommandBuilder::attackUsesMask(Mode::HybridWordMask));
-    QVERIFY(CommandBuilder::attackUsesMask(Mode::HybridMaskWord));
-    QVERIFY(!CommandBuilder::attackUsesMask(Mode::Straight));
-    QVERIFY(!CommandBuilder::attackUsesMask(Mode::Combination));
-    QVERIFY(!CommandBuilder::attackUsesMask(Mode::Association));
+    struct Expectation {
+        Mode mode;
+        bool mask;
+        bool increment;
+        bool wordlists;
+        bool rules;
+        bool ruleLeft;
+        bool ruleRight;
+        bool customCharset;
+        bool hexWordlist;
+        bool wordlistEncoding;
+    };
+    const QList<Expectation> expectations{
+        // mode               mask   incr   words  rules  left   right  charset hexwl  enc
+        {Mode::Straight, false, false, true, true, true, false, false, true, true},
+        {Mode::Combination, false, false, true, true, true, true, false, true, true},
+        {Mode::BruteForce, true, true, false, true, false, false, true, false, false},
+        {Mode::Pcfg, false, false, false, true, false, false, true, false, false},
+        {Mode::Table, false, false, true, true, false, false, false, true, false},
+        {Mode::HybridWordMask, true, true, true, true, true, false, true, true, true},
+        {Mode::HybridMaskWord, true, true, true, true, true, true, true, true, true},
+        {Mode::Generic, false, false, false, true, true, false, false, true, true},
+        {Mode::Association, false, false, true, true, true, false, false, true, true},
+        {Mode::Hybrid, true, false, true, true, true, true, true, true, true},
+    };
 
-    QVERIFY(!CommandBuilder::attackUsesWordlists(Mode::BruteForce));
-    QVERIFY(CommandBuilder::attackUsesWordlists(Mode::Straight));
-    QVERIFY(CommandBuilder::attackUsesWordlists(Mode::Combination));
-    QVERIFY(CommandBuilder::attackUsesWordlists(Mode::HybridWordMask));
-    QVERIFY(CommandBuilder::attackUsesWordlists(Mode::HybridMaskWord));
-    QVERIFY(CommandBuilder::attackUsesWordlists(Mode::Association));
+    const auto name = [](Mode mode) {
+        return qPrintable(QStringLiteral("attack mode %1").arg(int(mode)));
+    };
 
-    QVERIFY(CommandBuilder::attackUsesRules(Mode::Straight));
-    QVERIFY(CommandBuilder::attackUsesRules(Mode::Association));
-    QVERIFY(!CommandBuilder::attackUsesRules(Mode::Combination));
-    QVERIFY(!CommandBuilder::attackUsesRules(Mode::BruteForce));
-    QVERIFY(!CommandBuilder::attackUsesRules(Mode::HybridWordMask));
-    QVERIFY(!CommandBuilder::attackUsesRules(Mode::HybridMaskWord));
-
-    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::Straight));
-    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::Combination));
-    QVERIFY(!CommandBuilder::attackUsesRuleLeft(Mode::BruteForce));
-    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::HybridWordMask));
-    QVERIFY(!CommandBuilder::attackUsesRuleLeft(Mode::HybridMaskWord));
-    QVERIFY(CommandBuilder::attackUsesRuleLeft(Mode::Association));
-
-    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::Straight));
-    QVERIFY(CommandBuilder::attackUsesRuleRight(Mode::Combination));
-    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::BruteForce));
-    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::HybridWordMask));
-    QVERIFY(CommandBuilder::attackUsesRuleRight(Mode::HybridMaskWord));
-    QVERIFY(!CommandBuilder::attackUsesRuleRight(Mode::Association));
+    for (const Expectation &expected : expectations) {
+        QVERIFY2(CommandBuilder::attackUsesMask(expected.mode) == expected.mask,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesIncrement(expected.mode) == expected.increment,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesWordlists(expected.mode) == expected.wordlists,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesRules(expected.mode) == expected.rules,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesRuleLeft(expected.mode) == expected.ruleLeft,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesRuleRight(expected.mode) == expected.ruleRight,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesCustomCharset(expected.mode) == expected.customCharset,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesHexWordlist(expected.mode) == expected.hexWordlist,
+                 name(expected.mode));
+        QVERIFY2(CommandBuilder::attackUsesWordlistEncoding(expected.mode)
+                     == expected.wordlistEncoding,
+                 name(expected.mode));
+    }
 }
 
 int main(int argc, char *argv[])

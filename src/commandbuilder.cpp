@@ -13,36 +13,86 @@
 bool CommandBuilder::attackUsesMask(AttackMode mode)
 {
     return mode == AttackMode::BruteForce || mode == AttackMode::HybridWordMask
+           || mode == AttackMode::HybridMaskWord || mode == AttackMode::Hybrid;
+}
+
+// -i walks a mask up from its minimum length. Hashcat takes it in mode 1 as
+// well, but that mode has no mask in the GUI - the increment widgets live in
+// the mask group - and mode 12 conflicts with it upstream, so the flag is
+// offered where a mask is in use and incrementing is accepted.
+bool CommandBuilder::attackUsesIncrement(AttackMode mode)
+{
+    return mode == AttackMode::BruteForce || mode == AttackMode::HybridWordMask
            || mode == AttackMode::HybridMaskWord;
 }
 
-// Attack mode 3 takes only the mask, every other mode takes at least one
-// word list
+// Modes 3, 4 and 8 make their candidates without a word list; every other
+// mode reads at least one. Which of them read exactly one is a question of
+// ModeRequirements, not of this predicate.
 bool CommandBuilder::attackUsesWordlists(AttackMode mode)
 {
-    return mode != AttackMode::BruteForce;
+    return mode != AttackMode::BruteForce && mode != AttackMode::Pcfg
+           && mode != AttackMode::Generic;
 }
 
+// Rules apply in every attack mode since hashcat 8.0.0 (upstream AM_ALL);
+// rules now work in 1, 3, 6, 7 and 12 as well, where the GUI used to leave
+// the group box empty.
 bool CommandBuilder::attackUsesRules(AttackMode mode)
 {
-    return mode == AttackMode::Straight || mode == AttackMode::Association;
+    return mode == AttackMode::Straight || mode == AttackMode::Combination
+           || mode == AttackMode::BruteForce || mode == AttackMode::Pcfg
+           || mode == AttackMode::Table || mode == AttackMode::HybridWordMask
+           || mode == AttackMode::HybridMaskWord || mode == AttackMode::Generic
+           || mode == AttackMode::Association || mode == AttackMode::Hybrid;
 }
 
 // -j applies to the wordlist on the left. That is the only wordlist in modes
-// 0, 6 and 9, and the first one in combination mode. Hashcat accepts -j in
-// every attack mode and silently ignores it where there is no left wordlist,
-// so each side is gated on its own instead of being tied to mode 1.
+// 0, 6 and 9, and the first one in combination mode. Modes 4 and 5 are left
+// out on purpose: their candidates come from the device engine, which refuses
+// --rule-left late, and upstream's own advice there is to use -r.
 bool CommandBuilder::attackUsesRuleLeft(AttackMode mode)
 {
     return mode == AttackMode::Straight || mode == AttackMode::Combination
-           || mode == AttackMode::HybridWordMask || mode == AttackMode::Association;
+           || mode == AttackMode::HybridWordMask || mode == AttackMode::HybridMaskWord
+           || mode == AttackMode::Generic || mode == AttackMode::Association
+           || mode == AttackMode::Hybrid;
 }
 
 // -k applies to the wordlist on the right, which only combination mode (two
-// wordlists) and mask + wordlist mode provide.
+// wordlists) and the mask + wordlist modes provide.
 bool CommandBuilder::attackUsesRuleRight(AttackMode mode)
 {
-    return mode == AttackMode::Combination || mode == AttackMode::HybridMaskWord;
+    return mode == AttackMode::Combination || mode == AttackMode::HybridMaskWord
+           || mode == AttackMode::Hybrid;
+}
+
+// Custom charsets name parts of a mask (-1 ... -4). The PCFG feed takes the
+// same markers in its mask= setting, so mode 4 needs them as well; mode 8
+// has no mask field of its own.
+bool CommandBuilder::attackUsesCustomCharset(AttackMode mode)
+{
+    return mode == AttackMode::BruteForce || mode == AttackMode::Pcfg
+           || mode == AttackMode::HybridWordMask || mode == AttackMode::HybridMaskWord
+           || mode == AttackMode::Hybrid;
+}
+
+bool CommandBuilder::attackUsesHexWordlist(AttackMode mode)
+{
+    return mode == AttackMode::Straight || mode == AttackMode::Combination
+           || mode == AttackMode::Table || mode == AttackMode::HybridWordMask
+           || mode == AttackMode::HybridMaskWord || mode == AttackMode::Generic
+           || mode == AttackMode::Association || mode == AttackMode::Hybrid;
+}
+
+// The table feed reads its wordlist itself and refuses the encoding pair;
+// every other wordlist mode takes it.
+bool CommandBuilder::attackUsesWordlistEncoding(AttackMode mode)
+{
+    return mode == AttackMode::Straight || mode == AttackMode::Combination
+           || mode == AttackMode::HybridWordMask || mode == AttackMode::HybridMaskWord
+           || mode == AttackMode::Generic || mode == AttackMode::Association
+           || mode == AttackMode::Hybrid;
 }
 
 QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QString &hashFile)
@@ -56,6 +106,53 @@ QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QStr
     return outfile;
 }
 
+// The markers of attack mode 12. ?? is a literal question mark, every other
+// ?x is a charset token, and the markers exist only in lower case - ?W and
+// ?Q are not them.
+CommandBuilder::MaskMarkers CommandBuilder::maskMarkers(const QString &mask)
+{
+    MaskMarkers markers;
+
+    for (int i = 0; i < mask.size(); ++i) {
+        if (mask.at(i) != QLatin1Char('?')) {
+            continue;
+        }
+        if (i + 1 >= mask.size()) {
+            break; // a trailing ? stands for itself
+        }
+
+        const QChar token = mask.at(++i);
+        if (token == QLatin1Char('?')) {
+            continue; // the literal pair is consumed
+        }
+        if (token == QLatin1Char('w')) {
+            ++markers.word;
+        } else if (token == QLatin1Char('q')) {
+            ++markers.second;
+            if (markers.word == 0) {
+                markers.secondBeforeWord = true;
+            }
+        }
+    }
+
+    return markers;
+}
+
+namespace
+{
+
+// One positional key=value setting of the feed modes. An empty value means
+// "not set" and stays out of the command line; hashcat refuses a key it is
+// given more than once, so there is exactly one field per key.
+void appendSetting(QStringList &arguments, QLatin1StringView key, const QString &value)
+{
+    if (!value.isEmpty()) {
+        arguments << QStringLiteral("%1=%2").arg(QString(key), value);
+    }
+}
+
+} // namespace
+
 // What the user has to provide for the attack mode: hashcat's own argument
 // validation decides which numbers of word lists a mode accepts.
 //
@@ -68,14 +165,42 @@ CommandBuilder::ModeRequirements CommandBuilder::modeRequirements(AttackMode mod
 
     requirements.needsMask = attackUsesMask(mode);
 
-    if (mode == AttackMode::Combination) {
+    switch (mode) {
+    case AttackMode::Combination:
         // Combination multiplies two word lists. Hashcat answers every other
         // number with a usage error.
         requirements.minWordlists = 2;
         requirements.maxWordlists = 2;
-    } else if (attackUsesWordlists(mode)) {
+        break;
+    case AttackMode::Table:
+        // The table feed treats every argument after the wordlist as a
+        // table, so exactly one wordlist and at least one table.
+        requirements.minWordlists = 1;
+        requirements.maxWordlists = 1;
+        break;
+    case AttackMode::Association:
+        // The GUI caps the pairing at one wordlist; hashcat reads two.
+        // Without one the words come from the hash file, so zero is valid.
+        requirements.minWordlists = 0;
+        requirements.maxWordlists = 1;
+        break;
+    case AttackMode::Hybrid:
+        // The ?w/?q hybrid pairs one or two wordlists with the mask.
+        requirements.minWordlists = 1;
+        requirements.maxWordlists = 2;
+        break;
+    case AttackMode::BruteForce:
+    case AttackMode::Pcfg:
+    case AttackMode::Generic:
+        // These modes never read the wordlist list: it is hidden in the UI
+        // and the builder does not emit it, so a row left checked there must
+        // not count towards a limit. max stays -1, "unchecked".
+        requirements.minWordlists = 0;
+        break;
+    default:
         // Any number of word lists, but at least one.
         requirements.minWordlists = 1;
+        break;
     }
 
     return requirements;
@@ -222,6 +347,11 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     case AttackMode::HybridMaskWord:
         maskBeforeDict = options.mask;
         break;
+    case AttackMode::Hybrid:
+        // hash mask wordlists - the ?w in the mask names where a word from
+        // the list goes.
+        maskBeforeDict = options.mask;
+        break;
     default:
         break;
     }
@@ -242,9 +372,10 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameterName(Parameter::Limit, useShort) << options.limit;
     }
 
-    // Incrementing only makes sense while a mask is in use. The two bounds
-    // are part of the same option: without the flag they would be ignored.
-    if (attackUsesMask(mode) && options.increment) {
+    // Incrementing only makes sense while a mask is in use, and only in the
+    // modes that accept the flag: the two bounds are part of the same option,
+    // and without the flag they would be ignored.
+    if (attackUsesIncrement(mode) && options.increment) {
         arguments << parameterName(Parameter::Increment, useShort);
         if (options.incrementMin > 0) {
             arguments << parameterName(Parameter::IncrementMin, useShort)
@@ -260,7 +391,7 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     // disables the group box for the other attack modes; here that gating is
     // expressed directly so a stale checkbox cannot leak -1 ... -4 into a
     // command that does not use them.
-    if (attackUsesMask(mode)) {
+    if (attackUsesCustomCharset(mode)) {
         static const Parameter charsetParameters[4] = {
             Parameter::CustomCharset1,
             Parameter::CustomCharset2,
@@ -277,7 +408,7 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
 
     // --hex-charset describes the masks and custom charsets only; in the
     // other attack modes hashcat would accept and ignore it.
-    if (attackUsesMask(mode) && options.hexCharset) {
+    if (attackUsesCustomCharset(mode) && options.hexCharset) {
         arguments << parameterName(Parameter::HexCharset, useShort);
     }
 
@@ -285,11 +416,12 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameterName(Parameter::HexSalt, useShort);
     }
 
-    // Wordlist interpretation only applies while a wordlist is read.
-    if (attackUsesWordlists(mode)) {
-        if (options.hexWordlist) {
-            arguments << parameterName(Parameter::HexWordlist, useShort);
-        }
+    // Wordlist interpretation only applies while a wordlist is read, and the
+    // table feed takes neither: it reads its wordlist itself.
+    if (attackUsesHexWordlist(mode) && options.hexWordlist) {
+        arguments << parameterName(Parameter::HexWordlist, useShort);
+    }
+    if (attackUsesWordlistEncoding(mode)) {
         if (!options.encodingFrom.isEmpty()) {
             arguments << parameterName(Parameter::EncodingFrom, useShort) << options.encodingFrom;
         }
@@ -329,16 +461,74 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << options.hashFile;
     }
 
-    if (!maskBeforeDict.isEmpty()) {
-        arguments << maskBeforeDict;
-    }
-
-    if (attackUsesWordlists(mode)) {
+    // The positional tail, which hashcat parses per attack mode: the word
+    // lists around a mask in the hybrid modes, key=value settings behind the
+    // positional inputs of the feed modes, and the feed itself in mode 8.
+    switch (mode) {
+    case AttackMode::Pcfg:
+        // The rulesets come first, the settings behind them; an empty list
+        // of rulesets means the one bundled default.
+        arguments << options.pcfgRulesets;
+        appendSetting(arguments, AppConstants::HashcatSettings::Scale, options.pcfgScale);
+        appendSetting(arguments, AppConstants::HashcatSettings::Costmax, options.pcfgCostmax);
+        appendSetting(arguments, AppConstants::HashcatSettings::Weights, options.pcfgWeights);
+        appendSetting(arguments, AppConstants::HashcatSettings::Threads, options.pcfgThreads);
+        appendSetting(arguments, AppConstants::HashcatSettings::Kbits, options.pcfgKbits);
+        appendSetting(arguments, AppConstants::HashcatSettings::Maxword, options.pcfgMaxword);
+        appendSetting(arguments, AppConstants::HashcatSettings::Maxgain, options.pcfgMaxgain);
+        appendSetting(arguments, AppConstants::HashcatSettings::Walk, options.pcfgWalk);
+        appendSetting(arguments, AppConstants::HashcatSettings::Mask, options.pcfgMask);
+        for (const QString &token : options.pcfgExtraSettings) {
+            if (!token.isEmpty()) {
+                arguments << token;
+            }
+        }
+        break;
+    case AttackMode::Table:
+        // The table feed stops its positional scan at the first key=value
+        // token, so the wordlist and every table have to come before the
+        // settings.
         arguments << options.wordlists;
-    }
+        arguments << options.tableFiles;
+        appendSetting(arguments, AppConstants::HashcatSettings::Identity, options.tableIdentity);
+        appendSetting(arguments, AppConstants::HashcatSettings::Template, options.tableTemplate);
+        appendSetting(arguments, AppConstants::HashcatSettings::Single, options.tableSingle);
+        appendSetting(arguments, AppConstants::HashcatSettings::Cap, options.tableCap);
+        appendSetting(arguments, AppConstants::HashcatSettings::Maxperm, options.tableMaxperm);
+        for (const QString &token : options.tableExtraSettings) {
+            if (!token.isEmpty()) {
+                arguments << token;
+            }
+        }
+        break;
+    case AttackMode::Generic:
+        // The feed name and its arguments; the count and meaning of the
+        // arguments are the feed's own business.
+        if (!options.feedName.isEmpty()) {
+            arguments << options.feedName;
+        }
+        arguments << options.feedArguments;
+        break;
+    case AttackMode::Association:
+        // Either the wordlist the hashes are paired with, or the settings
+        // that name the phases to run; hashcat reads the settings line as a
+        // path when a wordlist is there.
+        arguments << options.wordlists;
+        arguments << options.associationSettings;
+        break;
+    default:
+        if (!maskBeforeDict.isEmpty()) {
+            arguments << maskBeforeDict;
+        }
 
-    if (!maskAfterDict.isEmpty()) {
-        arguments << maskAfterDict;
+        if (attackUsesWordlists(mode)) {
+            arguments << options.wordlists;
+        }
+
+        if (!maskAfterDict.isEmpty()) {
+            arguments << maskAfterDict;
+        }
+        break;
     }
 
     return arguments;

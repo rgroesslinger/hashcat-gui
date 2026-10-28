@@ -219,11 +219,12 @@ void TestHelperUtils::validateOptions_data()
         << int(AttackMode::HybridMaskWord) << QStringList() << QStringLiteral("?a?a?a?a") << false
         << 0 << 0 << false << false << int(HelperUtils::LaunchError::NoWordlist) << QString();
 
-    // Association reads its hints from a word list; hashcat refuses the
-    // command without one (user_options.c: association needs hc_argc >= 2).
+    // Hashcat 8.0.0 reads the words of an association attack from the hash
+    // file: without a wordlist the mode runs, and the settings line names the
+    // phases to run.
     QTest::newRow("association without a word list")
         << int(AttackMode::Association) << QStringList() << QString() << false << 0 << 0 << false
-        << false << int(HelperUtils::LaunchError::NoWordlist) << QString();
+        << false << int(HelperUtils::LaunchError::None) << QString();
 
     QTest::newRow("increment bounds that fit")
         << int(AttackMode::BruteForce) << QStringList() << QStringLiteral("?a?a?a?a") << true << 4
@@ -284,7 +285,13 @@ void TestHelperUtils::validateOptions_data()
     // The mode requirements are reported before the option conflicts.
     QTest::newRow("association without a word list and remove")
         << int(AttackMode::Association) << QStringList() << QString() << false << 0 << 0 << false
-        << true << int(HelperUtils::LaunchError::NoWordlist) << QString();
+        << true << int(HelperUtils::LaunchError::RemoveInAssociation) << QString();
+
+    // The GUI caps the pairing at one wordlist; hashcat reads two, but the
+    // list offers no second role for a second list.
+    QTest::newRow("association with two word lists")
+        << int(AttackMode::Association) << two << QString() << false << 0 << 0 << false << false
+        << int(HelperUtils::LaunchError::WrongWordlistCount) << QStringLiteral("2");
 }
 
 void TestHelperUtils::validateOptions()

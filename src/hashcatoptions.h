@@ -17,9 +17,14 @@ enum class AttackMode : std::uint8_t {
     Straight = 0,
     Combination = 1,
     BruteForce = 3,
+    Pcfg = 4,
+    Table = 5,
     HybridWordMask = 6,
     HybridMaskWord = 7,
-    Association = 9
+    Generic = 8,
+    Association = 9,
+    // The ?w/?q hybrid; 1, 6 and 7 are rewritten into it internally.
+    Hybrid = 12
 };
 
 // One UI independent description of a hashcat invocation.
@@ -107,6 +112,41 @@ struct HashcatOptions {
 
     // The ticked wordlists, in list order
     QStringList wordlists;
+
+    // -a 4 (PCFG): the rulesets as positional arguments, then key=value
+    // settings. Every value defaults to "not set" and stays out of the
+    // command line; an empty ruleset list means the one bundled default.
+    QStringList pcfgRulesets;
+    QString pcfgScale;
+    QString pcfgCostmax;
+    QString pcfgWeights;
+    QString pcfgThreads;
+    QString pcfgKbits;
+    QString pcfgMaxword;
+    QString pcfgMaxgain;
+    QString pcfgWalk;
+    QString pcfgMask;
+    // Settings the GUI has no field for, passed through as typed.
+    QStringList pcfgExtraSettings;
+
+    // -a 5 (table): the one wordlist (wordlists above), then the tables,
+    // then key=value settings.
+    QStringList tableFiles;
+    QString tableIdentity;
+    QString tableTemplate;
+    QString tableSingle;
+    QString tableCap;
+    QString tableMaxperm;
+    QStringList tableExtraSettings;
+
+    // -a 8 (generic feed): the feed name (a bundled name or a path) and its
+    // positional arguments, in order. Their count is feed specific.
+    QString feedName;
+    QStringList feedArguments;
+
+    // -a 9 (association): key=value settings, only in the form without a
+    // wordlist - with one, hashcat reads the settings line as a path.
+    QStringList associationSettings;
 };
 
 #endif // HASHCATOPTIONS_H

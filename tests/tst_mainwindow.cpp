@@ -388,10 +388,10 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
     };
     const QList<Expectation> expectations{
         {AttackMode::Straight, true, true, true, false, false},
-        {AttackMode::Combination, true, false, true, true, false},
-        {AttackMode::BruteForce, false, false, false, false, true},
-        {AttackMode::HybridWordMask, true, false, true, false, true},
-        {AttackMode::HybridMaskWord, true, false, false, true, true},
+        {AttackMode::Combination, true, true, true, true, false},
+        {AttackMode::BruteForce, false, true, false, false, true},
+        {AttackMode::HybridWordMask, true, true, true, false, true},
+        {AttackMode::HybridMaskWord, true, true, true, true, true},
         {AttackMode::Association, true, true, true, false, false},
     };
 
@@ -663,7 +663,9 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
         {AttackMode::BruteForce, QStringLiteral("This mode needs a mask.")},
         {AttackMode::HybridWordMask, QStringLiteral("This mode needs a wordlist and a mask.")},
         {AttackMode::HybridMaskWord, QStringLiteral("This mode needs a wordlist and a mask.")},
-        {AttackMode::Association, QStringLiteral("This mode needs at least one wordlist.")},
+        // Since hashcat 8.0.0 the words come from the hash file when there is
+        // no wordlist, so the mode owes the user nothing here.
+        {AttackMode::Association, QString()},
     };
 
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
@@ -752,6 +754,11 @@ void TestMainWindow::launchValidationFollowsTheWidgets()
     // stays enabled so the user can clear it.
     window.ui->comboBox_attack->setCurrentIndex(5); // association
     QCOMPARE(int(window.ui->comboBox_attack->currentData().toInt()), int(AttackMode::Association));
+
+    // The three wordlists of the combination step are one too many for the
+    // pairing; the cap takes the first one.
+    window.ui->listWidget_wordlist->item(2)->setCheckState(Qt::Unchecked);
+    window.ui->listWidget_wordlist->item(1)->setCheckState(Qt::Unchecked);
     QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
              int(HelperUtils::LaunchError::None));
 

@@ -198,6 +198,27 @@ inline constexpr QLatin1StringView Digits{"^[0-9]*$"};
 inline constexpr QLatin1StringView DeviceTypes{"^\\s*([12]\\s*(,\\s*[12]\\s*)*)?$"};
 } // namespace Validation
 
+// The positional settings of the feed modes (-a 4, -a 5) and of the
+// association attack, written as key=value after the positional inputs.
+// Protocol tokens, so they are never translated.
+namespace HashcatSettings
+{
+inline constexpr QLatin1StringView Scale{"scale"};
+inline constexpr QLatin1StringView Costmax{"costmax"};
+inline constexpr QLatin1StringView Weights{"weights"};
+inline constexpr QLatin1StringView Threads{"threads"};
+inline constexpr QLatin1StringView Kbits{"kbits"};
+inline constexpr QLatin1StringView Maxword{"maxword"};
+inline constexpr QLatin1StringView Maxgain{"maxgain"};
+inline constexpr QLatin1StringView Walk{"walk"};
+inline constexpr QLatin1StringView Mask{"mask"};
+inline constexpr QLatin1StringView Identity{"identity"};
+inline constexpr QLatin1StringView Template{"template"};
+inline constexpr QLatin1StringView Single{"single"};
+inline constexpr QLatin1StringView Cap{"cap"};
+inline constexpr QLatin1StringView Maxperm{"maxperm"};
+} // namespace HashcatSettings
+
 // Placeholders the user can type into the outfile field.
 namespace Placeholders
 {
