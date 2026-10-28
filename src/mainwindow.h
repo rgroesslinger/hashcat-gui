@@ -189,8 +189,18 @@ private:
     // this hashcat does not know.
     QString applyPendingHashType();
 
-    // Gives the window the size its current tab actually needs once, on the
-    // first show. See showEvent().
+    // Shows the mode hint and the groups the mode uses, and hides the rest.
+    // Shared by the normal refresh and the envelope measurement, which walks
+    // every mode before the window is sized.
+    void applyAttackModeView(AttackMode mode);
+
+    // The largest minimum the attack tab can need: every mode's groups and
+    // hint in one size. Measured before the visible mode is restored.
+    QSize attackModeEnvelope();
+
+    // Gives the window the size its tabs need once, on the first show. The
+    // attack tab contributes the envelope of all its modes, so changing modes
+    // cannot introduce a scrollbar. See showEvent().
     void fitToContent();
 
     // The fit in showEvent() runs a single time; a later show (hide/restore)

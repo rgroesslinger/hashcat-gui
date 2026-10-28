@@ -539,8 +539,11 @@ void MainWindow::showEvent(QShowEvent *event)
 }
 
 // Give the window the size the tabs need: the tallest tab decides the height,
-// the widest one the width. No scrollbar when the content fits, and no empty
-// strip when it is shorter.
+// the widest one the width. A shorter tab keeps an empty strip; a taller one
+// gets a scrollbar only when the screen is too small. The attack tab is
+// measured across every mode, not only the selected one: its groups are
+// hidden per mode, and a mode the user switches to later must not turn the
+// window into a scroll area.
 void MainWindow::fitToContent()
 {
     QWidget *currentTab = ui->tabWidget_main->currentWidget();
@@ -552,11 +555,18 @@ void MainWindow::fitToContent()
         return;
     }
 
+    // The attack tab's own minimum describes the selected mode alone.
+    const QSize attackEnvelope = attackModeEnvelope();
+
     // Hidden pages report the minima they had before their layouts first ran.
     // Resolve every page first, then take the largest minimum in each
     // direction independently: one tab can be the height reference while
     // another is the width reference.
-    QList<QScrollArea *> areas;
+    struct TabMinimum {
+        QScrollArea *area;
+        QSize minimum;
+    };
+    QList<TabMinimum> tabMinima;
     QSize contentMinimum(0, 0);
     for (int i = 0; i < ui->tabWidget_main->count(); ++i) {
         QWidget *tab = ui->tabWidget_main->widget(i);
@@ -568,10 +578,14 @@ void MainWindow::fitToContent()
             continue;
         }
         activateLayouts(area->widget());
-        areas.append(area);
-        contentMinimum = contentMinimum.expandedTo(area->widget()->minimumSizeHint());
+        QSize minimum = area->widget()->minimumSizeHint();
+        if (area == ui->scrollArea_attack && !attackEnvelope.isEmpty()) {
+            minimum = attackEnvelope;
+        }
+        tabMinima.append({area, minimum});
+        contentMinimum = contentMinimum.expandedTo(minimum);
     }
-    if (areas.isEmpty()) {
+    if (tabMinima.isEmpty()) {
         return;
     }
 
@@ -597,11 +611,10 @@ void MainWindow::fitToContent()
     // its width so that content does not need a horizontal scrollbar as well.
     const int viewportHeight = target.height() - chrome.height();
     int requiredWidth = 0;
-    for (const QScrollArea *area : areas) {
-        const QSize minimum = area->widget()->minimumSizeHint();
-        int width = minimum.width();
-        if (minimum.height() > viewportHeight) {
-            width += area->verticalScrollBar()->sizeHint().width();
+    for (const TabMinimum &tab : std::as_const(tabMinima)) {
+        int width = tab.minimum.width();
+        if (tab.minimum.height() > viewportHeight) {
+            width += tab.area->verticalScrollBar()->sizeHint().width();
         }
         requiredWidth = qMax(requiredWidth, width);
     }
@@ -611,6 +624,41 @@ void MainWindow::fitToContent()
     }
 
     resize(target);
+}
+
+// The window must hold every attack mode without a scrollbar, but the tab
+// only reports the selected mode's minimum: the groups the other modes use are
+// hidden. Walk every mode once, with updates off, and take the largest minimum
+// in each direction. The widest and the tallest mode need not be the same one.
+QSize MainWindow::attackModeEnvelope()
+{
+    QWidget *content = ui->scrollArea_attack->widget();
+    if (!content) {
+        return QSize();
+    }
+    // The combo is filled in the constructor; keep a defensive fallback for a
+    // window whose modes are not set up yet.
+    if (ui->comboBox_attack->count() == 0) {
+        return content->minimumSizeHint();
+    }
+
+    const AttackMode current = currentAttackMode();
+    const bool updates = content->updatesEnabled();
+    content->setUpdatesEnabled(false);
+
+    QSize envelope(0, 0);
+    for (int i = 0; i < ui->comboBox_attack->count(); ++i) {
+        const auto mode = static_cast<AttackMode>(ui->comboBox_attack->itemData(i).toInt());
+        applyAttackModeView(mode);
+        activateLayouts(content);
+        envelope = envelope.expandedTo(content->minimumSizeHint());
+    }
+
+    // Leave the tab showing the mode the user (or a restored session) chose.
+    applyAttackModeView(current);
+    activateLayouts(content);
+    content->setUpdatesEnabled(updates);
+    return envelope;
 }
 
 /*************** Menu Bar ***************/
@@ -1309,13 +1357,21 @@ void MainWindow::attackIndexChanged([[maybe_unused]] int index)
 
 void MainWindow::updateViewAttackMode()
 {
-    const AttackMode mode = static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
+    applyAttackModeView(currentAttackMode());
+    updateOptionDependencies();
+    commandChanged();
+}
 
-    // Use the very predicates CommandBuilder applies, so the widgets show
-    // exactly the options that end up in the command line and the two can
-    // never drift apart. The mode-specific groups are hidden rather than
-    // disabled: a disabled group still takes its share of the tab, so the
-    // window would keep the height of its busiest mode in every other one.
+// Shows the mode hint and the groups the mode uses, and hides the rest. The
+// very predicates CommandBuilder applies are used, so the widgets show
+// exactly the options that end up in the command line and the two can never
+// drift apart. Groups are hidden rather than disabled so the form only shows
+// the options the mode uses; the window keeps room for the busiest mode
+// anyway, see attackModeEnvelope(). Fitting the window measures this once per
+// mode, so the hint text has to be here as well - it sets the width the
+// window has to hold.
+void MainWindow::applyAttackModeView(AttackMode mode)
+{
     const bool usesMask = CommandBuilder::attackUsesMask(mode);
     const bool usesRuleLeft = CommandBuilder::attackUsesRuleLeft(mode);
     const bool usesRuleRight = CommandBuilder::attackUsesRuleRight(mode);
@@ -1364,9 +1420,6 @@ void MainWindow::updateViewAttackMode()
     // Tell the user what the mode expects, so the launch validation does not
     // have to be the first thing that explains it.
     ui->label_mode_hint->setText(modeHint(mode));
-
-    updateOptionDependencies();
-    commandChanged();
 }
 
 // The attack mode the user selected.

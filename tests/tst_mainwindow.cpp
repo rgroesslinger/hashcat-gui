@@ -224,6 +224,7 @@ private slots:
     void sessionHashTypeSurvivesTheAsynchronousQuery();
     void sessionWithAnUnknownHashTypeSelectsNothing();
     void windowFitsItsContent();
+    void windowFitsEveryAttackMode();
     void commandBarStaysVisibleOnEveryTab();
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
@@ -1716,6 +1717,19 @@ void TestMainWindow::windowFitsItsContent()
     QVERIFY(generalArea->widget()->minimumSizeHint().width()
             > attackContent->minimumSizeHint().width());
 
+    // The attack tab hides the groups the other modes need, so its minimum is
+    // that of the selected mode. The window has to hold all of them: measure
+    // each mode through the same combo switch the user uses.
+    QSize attackEnvelope(0, 0);
+    const int attackIndex = window.ui->comboBox_attack->currentIndex();
+    for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
+        window.ui->comboBox_attack->setCurrentIndex(i);
+        QCoreApplication::processEvents();
+        attackEnvelope = attackEnvelope.expandedTo(attackContent->minimumSizeHint());
+    }
+    window.ui->comboBox_attack->setCurrentIndex(attackIndex);
+    QCoreApplication::processEvents();
+
     // The size fitToContent() should have produced: the common window chrome
     // plus the largest content minimum in each direction. A tab whose content
     // is taller than the final viewport also needs room for its vertical
@@ -1727,14 +1741,17 @@ void TestMainWindow::windowFitsItsContent()
         QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
         QVERIFY(tabArea);
         QVERIFY(tabArea->widget());
-        contentMinimum = contentMinimum.expandedTo(tabArea->widget()->minimumSizeHint());
+        const QSize minimum =
+            tabArea == attackArea ? attackEnvelope : tabArea->widget()->minimumSizeHint();
+        contentMinimum = contentMinimum.expandedTo(minimum);
     }
     QSize natural = chrome + contentMinimum;
     const int viewportHeight = natural.boundedTo(cap).height() - chrome.height();
     int requiredWidth = 0;
     for (int i = 0; i < window.ui->tabWidget_main->count(); ++i) {
         QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
-        const QSize minimum = tabArea->widget()->minimumSizeHint();
+        const QSize minimum =
+            tabArea == attackArea ? attackEnvelope : tabArea->widget()->minimumSizeHint();
         int width = minimum.width();
         if (minimum.height() > viewportHeight) {
             width += tabArea->verticalScrollBar()->sizeHint().width();
@@ -1777,10 +1794,12 @@ void TestMainWindow::windowFitsItsContent()
     QCoreApplication::processEvents();
 
     if (natural.height() <= cap.height()) {
-        // The content fits the screen: no scrollbar, and no empty strip below
-        // it - the content is exactly as tall as it needs to be.
+        // The content fits the screen: no scrollbar, and no empty strip
+        // beyond the envelope the window was sized to. A shorter mode keeps
+        // the rest of the envelope empty on purpose, so that switching modes
+        // never resizes the window.
         QTRY_VERIFY(!attackArea->verticalScrollBar()->isVisible());
-        QVERIFY(attackContent->height() - attackContent->minimumSizeHint().height() < 30);
+        QVERIFY(attackContent->height() - attackEnvelope.height() < 30);
     } else {
         // The content is taller than the screen: the window stays on-screen
         // and the scroll area has to show its scrollbar.
@@ -1792,6 +1811,61 @@ void TestMainWindow::windowFitsItsContent()
     // the window was sized for less than the content needed and the scroll
     // area showed a scrollbar for content that fitted.
     QVERIFY(!window.ui->label_mode_hint->wordWrap());
+}
+
+// A window sized to the attack-mode envelope must not show a scrollbar when
+// the mode changes, and switching must not resize it: the size is chosen once,
+// on the first show. The offscreen test screen is smaller than the envelope,
+// so the window is grown here; a window manager that clamps that makes the
+// check impossible, and the test skips instead of failing.
+void TestMainWindow::windowFitsEveryAttackMode()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+    m_watchdog.start();
+
+    MainWindow window;
+    window.show();
+    QCoreApplication::processEvents();
+
+    QScrollArea *attackArea = window.ui->scrollArea_attack;
+    QComboBox *attackCombo = window.ui->comboBox_attack;
+    QVERIFY(attackArea);
+    QVERIFY(attackArea->widget());
+    QVERIFY(attackCombo->count() > 1);
+
+    const int startIndex = attackCombo->currentIndex();
+    QVERIFY(startIndex >= 0);
+    QSize envelope(0, 0);
+    for (int i = 0; i < attackCombo->count(); ++i) {
+        attackCombo->setCurrentIndex(i);
+        QCoreApplication::processEvents();
+        envelope = envelope.expandedTo(attackArea->widget()->minimumSizeHint());
+    }
+    attackCombo->setCurrentIndex(startIndex);
+    QCoreApplication::processEvents();
+
+    // The helper the fit uses has to measure the same envelope and restore
+    // the selected mode, not leave the last measured one on screen.
+    QCOMPARE(window.attackModeEnvelope(), envelope);
+    QCOMPARE(attackCombo->currentIndex(), startIndex);
+
+    const QSize chrome = window.size() - attackArea->size();
+    const QSize needed = chrome + envelope;
+    window.resize(needed + QSize(40, 40));
+    QCoreApplication::processEvents();
+    if (window.width() < needed.width() || window.height() < needed.height()) {
+        QSKIP("The screen is too small to hold the attack-mode envelope");
+    }
+
+    const QSize fittedSize = window.size();
+    for (int i = 0; i < attackCombo->count(); ++i) {
+        attackCombo->setCurrentIndex(i);
+        QCoreApplication::processEvents();
+        QCOMPARE(window.size(), fittedSize);
+        QTRY_VERIFY(!attackArea->verticalScrollBar()->isVisible());
+        QTRY_VERIFY(!attackArea->horizontalScrollBar()->isVisible());
+    }
 }
 
 // The command bar belongs to the window, not to one tab: switching tabs must
