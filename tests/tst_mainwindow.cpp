@@ -199,6 +199,7 @@ private slots:
     void loadExampleSessionNeedsAConfirmation();
     void loadExampleSessionAppliesTheBundledSession();
     void optionDependenciesFollowTheirCheckboxes();
+    void outfileJsonTakesOverFromTheFormatField();
     void modeHintFollowsTheAttackMode();
     void hashRecipeRowFollowsTheHashType();
     void launchValidationFollowsTheWidgets();
@@ -689,6 +690,36 @@ void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
     QVERIFY(!window.ui->spinBox_hwmon_temp_abort->isEnabled());
 }
 
+// JSON and the format field are exclusive: the box takes the field over,
+// keeps its value, and the builder suppresses --outfile-format.
+void TestMainWindow::outfileJsonTakesOverFromTheFormatField()
+{
+    MainWindow window;
+
+    window.ui->lineEdit_outfile_format->setText(QStringLiteral("1,2,3"));
+    QVERIFY(window.ui->lineEdit_outfile_format->isEnabled());
+
+    window.ui->checkBox_outfile_json->setChecked(true);
+    QVERIFY(!window.ui->lineEdit_outfile_format->isEnabled());
+    // The value survives, so switching back restores what was typed.
+    QCOMPARE(window.ui->lineEdit_outfile_format->text(), QStringLiteral("1,2,3"));
+    QVERIFY(!window.generateArguments().contains(QStringLiteral("--outfile-format")));
+
+    window.ui->checkBox_outfile_json->setChecked(false);
+    QVERIFY(window.ui->lineEdit_outfile_format->isEnabled());
+    QCOMPARE(window.generateArguments().value(
+                 window.generateArguments().indexOf(QStringLiteral("--outfile-format")) + 1),
+             QStringLiteral("1,2,3"));
+
+    // The rules-concat box only exists next to the files it joins; the
+    // generated-rules radio is the other half of the same choice.
+    QVERIFY(window.ui->checkBox_rules_concat->isEnabled());
+    window.ui->radioButton_generate_rules->setChecked(true);
+    QVERIFY(!window.ui->checkBox_rules_concat->isEnabled());
+    window.ui->radioButton_use_rules_file->setChecked(true);
+    QVERIFY(window.ui->checkBox_rules_concat->isEnabled());
+}
+
 // The hint under the mode selector has to tell the user what the mode needs,
 // otherwise the launch validation is the first thing that explains it.
 void TestMainWindow::modeHintFollowsTheAttackMode()
@@ -918,6 +949,11 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     window.ui->lineEdit_association_settings->setText(
         QStringLiteral("phases=words,rules rules.rulemax=300"));
 
+    // The tier 2 options.
+    window.ui->checkBox_rules_concat->setChecked(true);
+    window.ui->checkBox_outfile_json->setChecked(true);
+    window.ui->lineEdit_cache_path->setText(QStringLiteral("/tmp/hc-cache"));
+
     const HashcatOptions options = window.collectHashcatOptions();
     QCOMPARE(options.hashFile, QStringLiteral("/tmp/example.hash"));
     QCOMPARE(options.mask, QStringLiteral("?d?d"));
@@ -961,6 +997,9 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QCOMPARE(options.feedArguments, QStringList{QStringLiteral("dict.txt")});
     QCOMPARE(options.associationSettings, (QStringList{QStringLiteral("phases=words,rules"),
                                                        QStringLiteral("rules.rulemax=300")}));
+    QVERIFY(options.rulesConcat);
+    QVERIFY(options.outfileJson);
+    QCOMPARE(options.cachePath, QStringLiteral("/tmp/hc-cache"));
 
     // Untouched fields keep the values the .ui file starts with
     QCOMPARE(options.outfileFormat, AppConstants::Defaults::OutfileFormat);

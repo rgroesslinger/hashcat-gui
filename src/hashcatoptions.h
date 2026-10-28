@@ -53,6 +53,9 @@ struct HashcatOptions {
     // Files selected for -r, in list order. Only filled for attack modes
     // that accept rules.
     QStringList rulesFiles;
+    // --rules-concat passes every rules file to hashcat in one run. Only
+    // emitted together with the files it joins.
+    bool rulesConcat = false;
     // Number of generated rules for -g, 0 means "do not pass -g"
     int generateRules = 0;
 
@@ -108,6 +111,10 @@ struct HashcatOptions {
     // The template as typed, with <unixtime> and <hash> still in it
     QString outfile;
     QString outfileFormat = AppConstants::Defaults::OutfileFormat;
+    // --outfile-json wins over --outfile-format: the two are exclusive.
+    bool outfileJson = false;
+    // --cache-path, an existing directory hashcat keeps its cache in
+    QString cachePath;
 
     QString cpuAffinity;
     QString backendDevices = AppConstants::Defaults::BackendDevices;

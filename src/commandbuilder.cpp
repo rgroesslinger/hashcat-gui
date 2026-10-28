@@ -214,6 +214,7 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
     static const QMap<Parameter, QPair<QString, QString>> parameterMap = {
         {Parameter::AttackMode, {QStringLiteral("-a"), QStringLiteral("--attack-mode")}},
         {Parameter::BackendDevices, {QStringLiteral("-d"), QStringLiteral("--backend-devices")}},
+        {Parameter::CachePath, {QString(), QStringLiteral("--cache-path")}},
         {Parameter::CpuAffinity, {QString(), QStringLiteral("--cpu-affinity")}},
         {Parameter::CustomCharset1, {QStringLiteral("-1"), QStringLiteral("--custom-charset1")}},
         {Parameter::CustomCharset2, {QStringLiteral("-2"), QStringLiteral("--custom-charset2")}},
@@ -239,10 +240,12 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
          {QStringLiteral("-O"), QStringLiteral("--optimized-kernel-enable")}},
         {Parameter::Outfile, {QStringLiteral("-o"), QStringLiteral("--outfile")}},
         {Parameter::OutfileFormat, {QString(), QStringLiteral("--outfile-format")}},
+        {Parameter::OutfileJson, {QString(), QStringLiteral("--outfile-json")}},
         {Parameter::PotfileDisable, {QString(), QStringLiteral("--potfile-disable")}},
         {Parameter::Remove, {QString(), QStringLiteral("--remove")}},
         {Parameter::RuleLeft, {QStringLiteral("-j"), QStringLiteral("--rule-left")}},
         {Parameter::RuleRight, {QStringLiteral("-k"), QStringLiteral("--rule-right")}},
+        {Parameter::RulesConcat, {QString(), QStringLiteral("--rules-concat")}},
         {Parameter::RulesFile, {QStringLiteral("-r"), QStringLiteral("--rules-file")}},
         {Parameter::Runtime, {QString(), QStringLiteral("--runtime")}},
         {Parameter::Session, {QString(), QStringLiteral("--session")}},
@@ -329,6 +332,11 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     if (attackUsesRules(mode)) {
         for (const QString &rulesFile : options.rulesFiles) {
             arguments << parameterName(Parameter::RulesFile, useShort) << rulesFile;
+        }
+        // The flag joins the -r files above into one run; without them it
+        // has nothing to join, and hashcat would answer with its usage line.
+        if (!options.rulesFiles.isEmpty() && options.rulesConcat) {
+            arguments << parameterName(Parameter::RulesConcat, useShort);
         }
         if (options.rulesFiles.isEmpty() && options.generateRules > 0) {
             arguments << parameterName(Parameter::GenerateRules, useShort)
@@ -444,8 +452,16 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
                   << expandOutfileTemplate(options.outfile, options.hashFile);
     }
 
-    if (options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
+    // The two outfile shapes are exclusive; JSON wins, so a session that
+    // holds both still produces a valid command.
+    if (options.outfileJson) {
+        arguments << parameterName(Parameter::OutfileJson, useShort);
+    } else if (options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
         arguments << parameterName(Parameter::OutfileFormat, useShort) << options.outfileFormat;
+    }
+
+    if (!options.cachePath.isEmpty()) {
+        arguments << parameterName(Parameter::CachePath, useShort) << options.cachePath;
     }
 
     if (!options.cpuAffinity.isEmpty()) {

@@ -551,6 +551,13 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
         return LaunchError::RemoveInAssociation;
     }
 
+    // hashcat refuses a cache path that is not an existing directory; the
+    // browse dialog only offers directories, so this one is a hand edit or
+    // a directory that has gone away.
+    if (!options.cachePath.trimmed().isEmpty() && !QFileInfo(options.cachePath).isDir()) {
+        return LaunchError::InvalidCachePath;
+    }
+
     return LaunchError::None;
 }
 

@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
+#include <QTemporaryDir>
 
 #include <iterator>
 
@@ -36,6 +37,7 @@ private slots:
     void associationSettingsAreValidated();
     void maskMarkersAreValidated();
     void hashRecipeIsRequiredFor4000();
+    void cachePathNeedsAnExistingDirectory();
     void terminalArgumentsArePinned();
     void findHashcatInPathFindsTheExecutable();
     void findHashcatInPathIsEmptyWithoutOne();
@@ -698,6 +700,38 @@ void TestHelperUtils::hashRecipeIsRequiredFor4000()
     // and must not keep the run from starting.
     options.hashType = 1000;
     QCOMPARE(int(HelperUtils::validateOptions(options)), int(HelperUtils::LaunchError::None));
+}
+
+// hashcat only accepts an existing directory as its cache path; the browse
+// dialog offers directories, so a failure here is a hand edit or a
+// directory that has gone away.
+void TestHelperUtils::cachePathNeedsAnExistingDirectory()
+{
+    HashcatOptions options;
+    options.attackMode = AttackMode::Straight;
+    options.wordlists = QStringList{QStringLiteral("/tmp/a.txt")};
+
+    // Empty means "hashcat decides", so it is never checked.
+    QCOMPARE(int(HelperUtils::validateOptions(options)), int(HelperUtils::LaunchError::None));
+
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+
+    options.cachePath = directory.path();
+    QCOMPARE(int(HelperUtils::validateOptions(options)), int(HelperUtils::LaunchError::None));
+
+    // A file is no directory.
+    QFile file(directory.filePath(QStringLiteral("plain.txt")));
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+    options.cachePath = file.fileName();
+    QCOMPARE(int(HelperUtils::validateOptions(options)),
+             int(HelperUtils::LaunchError::InvalidCachePath));
+
+    // Neither is a directory that has gone away.
+    options.cachePath = directory.filePath(QStringLiteral("gone"));
+    QCOMPARE(int(HelperUtils::validateOptions(options)),
+             int(HelperUtils::LaunchError::InvalidCachePath));
 }
 
 // The mapping startClicked() builds its command line from: pin every

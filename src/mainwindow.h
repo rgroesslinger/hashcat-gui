@@ -56,6 +56,7 @@ private slots:
     void startClicked();
     void openHashFileClicked();
     void openOutfileClicked();
+    void openCachePathClicked();
     void removeWordlistClicked();
     void addWordlistClicked();
     void wordlistMoveUpClicked();

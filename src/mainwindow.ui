@@ -75,6 +75,9 @@
               </item>
               <item>
                <widget class="QLineEdit" name="lineEdit_hashfile">
+               <property name="toolTip">
+                 <string>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</string>
+               </property>
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
@@ -106,6 +109,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_65">
               <item>
                <widget class="QCheckBox" name="checkBox_remove">
+                 <property name="toolTip">
+                   <string>Remove already-cracked hashes from the pot file so a later run does not report them again. Refused in attack mode 9.</string>
+                 </property>
                 <property name="text">
                  <string>Remove hash from hash list once it is cracked</string>
                 </property>
@@ -113,6 +119,9 @@
               </item>
               <item>
                <widget class="QCheckBox" name="checkBox_ignoreusername">
+                 <property name="toolTip">
+                   <string>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</string>
+                 </property>
                 <property name="text">
                  <string>Ignore username in hash file</string>
                 </property>
@@ -131,6 +140,9 @@
               </item>
               <item>
                <widget class="QComboBox" name="comboBox_attack">
+               <property name="toolTip">
+                 <string>Attack mode. Each choice reveals its own options below.</string>
+               </property>
                 <property name="minimumSize">
                  <size>
                   <width>150</width>
@@ -841,6 +853,9 @@
                  </item>
                  <item row="1" column="0">
              <widget class="QLineEdit" name="lineEdit_table_identity">
+               <property name="toolTip">
+                 <string>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</string>
+               </property>
               <property name="minimumSize">
                <size>
                 <width>90</width>
@@ -861,6 +876,9 @@
                  </item>
                  <item row="1" column="1">
              <widget class="QLineEdit" name="lineEdit_table_template">
+               <property name="toolTip">
+                 <string>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</string>
+               </property>
               <property name="minimumSize">
                <size>
                 <width>90</width>
@@ -881,6 +899,9 @@
                  </item>
                  <item row="1" column="2">
              <widget class="QLineEdit" name="lineEdit_table_single">
+               <property name="toolTip">
+                 <string>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</string>
+               </property>
               <property name="minimumSize">
                <size>
                 <width>90</width>
@@ -901,6 +922,9 @@
                  </item>
                  <item row="3" column="0">
              <widget class="QLineEdit" name="lineEdit_table_cap">
+               <property name="toolTip">
+                 <string>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</string>
+               </property>
               <property name="minimumSize">
                <size>
                 <width>90</width>
@@ -921,6 +945,9 @@
                  </item>
                  <item row="3" column="1">
              <widget class="QLineEdit" name="lineEdit_table_maxperm">
+               <property name="toolTip">
+                 <string>How many of one word's cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</string>
+               </property>
               <property name="minimumSize">
                <size>
                 <width>90</width>
@@ -983,6 +1010,9 @@
                  </item>
                  <item>
              <widget class="QLineEdit" name="lineEdit_feed">
+               <property name="toolTip">
+                 <string>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</string>
+               </property>
               <property name="placeholderText">
                <string>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</string>
               </property>
@@ -1008,6 +1038,9 @@
                  </item>
                  <item>
              <widget class="QLineEdit" name="lineEdit_feed_argument">
+               <property name="toolTip">
+                 <string>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</string>
+               </property>
              </widget>
                  </item>
                  <item>
@@ -1127,6 +1160,9 @@
                     <layout class="QHBoxLayout" name="horizontalLayout_28">
                      <item>
                       <widget class="QCheckBox" name="checkBox_rulesfile_1">
+                        <property name="toolTip">
+                          <string>Enable rules file slot 1 for this run.</string>
+                        </property>
                        <property name="text">
                         <string>Rules file:</string>
                        </property>
@@ -1134,6 +1170,9 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_rulesfile_1">
+                        <property name="toolTip">
+                          <string>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</string>
+                        </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -1170,6 +1209,9 @@
                     <layout class="QHBoxLayout" name="horizontalLayout_37">
                      <item>
                       <widget class="QCheckBox" name="checkBox_rulesfile_2">
+                        <property name="toolTip">
+                          <string>Enable rules file slot 2 for this run.</string>
+                        </property>
                        <property name="text">
                         <string>Rules file:</string>
                        </property>
@@ -1177,6 +1219,9 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_rulesfile_2">
+                        <property name="toolTip">
+                          <string>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</string>
+                        </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -1213,6 +1258,9 @@
                     <layout class="QHBoxLayout" name="horizontalLayout_44">
                      <item>
                       <widget class="QCheckBox" name="checkBox_rulesfile_3">
+                        <property name="toolTip">
+                          <string>Enable rules file slot 3 for this run.</string>
+                        </property>
                        <property name="text">
                         <string>Rules file:</string>
                        </property>
@@ -1220,6 +1268,9 @@
                      </item>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_rulesfile_3">
+                        <property name="toolTip">
+                          <string>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</string>
+                        </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -1256,6 +1307,9 @@
                     <layout class="QHBoxLayout" name="horizontalLayout_30">
                      <item>
                       <widget class="QRadioButton" name="radioButton_generate_rules">
+                        <property name="toolTip">
+                          <string>Generate the rules automatically instead of reading them from a file.</string>
+                        </property>
                        <property name="text">
                         <string>Generate rules:</string>
                        </property>
@@ -1266,6 +1320,9 @@
                      </item>
                      <item>
                       <widget class="QSpinBox" name="spinBox_generate_rules">
+                        <property name="toolTip">
+                          <string>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</string>
+                        </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
@@ -1298,6 +1355,20 @@
                         </size>
                        </property>
                       </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_rules_concat">
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_rules_concat">
+                       <property name="toolTip">
+                        <string>Pass every rules file to hashcat in one run, instead of one run per file.</string>
+                       </property>
+                       <property name="text">
+                        <string>Join -r files into one list</string>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </item>
@@ -1369,6 +1440,9 @@
                <layout class="QVBoxLayout" name="verticalLayout_7">
                 <item>
                  <widget class="QCheckBox" name="checkBox_hex_charset">
+                   <property name="toolTip">
+                     <string>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</string>
+                   </property>
                   <property name="text">
                    <string>Charset is hex</string>
                   </property>
@@ -1730,6 +1804,9 @@
                   <layout class="QHBoxLayout" name="horizontalLayout_status">
                    <item>
                     <widget class="QCheckBox" name="checkBox_status">
+                      <property name="toolTip">
+                        <string>Keep updating the run status (speed, progress, ETA) instead of printing one final line.</string>
+                      </property>
                      <property name="text">
                       <string>Update status automatically</string>
                      </property>
@@ -1809,10 +1886,41 @@
                  </item>
                  <item>
                   <widget class="QCheckBox" name="checkBox_speed_only">
+                    <property name="toolTip">
+                      <string>Print only the attack's speed and quit, without cracking. Useful for benchmarking and comparing settings.</string>
+                    </property>
                    <property name="text">
                     <string>Return expected speed of the attack, then quit</string>
                    </property>
                   </widget>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_cache_path">
+                   <item>
+                    <widget class="QLabel" name="label_cache_path">
+                     <property name="text">
+                      <string>Cache path:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="lineEdit_cache_path">
+                     <property name="toolTip">
+                      <string>Directory hashcat keeps its cache in. Must exist.</string>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="pushButton_open_cache_path">
+                     <property name="text">
+                      <string>Browse…</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
                 </layout>
                </widget>
@@ -1901,6 +2009,9 @@
                    </item>
                    <item>
                     <widget class="QSpinBox" name="spinBox_hwmon_temp_abort">
+                      <property name="toolTip">
+                        <string>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</string>
+                      </property>
                      <property name="enabled">
                       <bool>false</bool>
                      </property>
@@ -2003,6 +2114,16 @@
                       <widget class="QLineEdit" name="lineEdit_outfile_format">
                        <property name="text">
                         <string notr="true">1,2</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QCheckBox" name="checkBox_outfile_json">
+                       <property name="toolTip">
+                        <string>Write the outfile as JSON. The outfile format is ignored.</string>
+                       </property>
+                       <property name="text">
+                        <string>Write JSON</string>
                        </property>
                       </widget>
                      </item>

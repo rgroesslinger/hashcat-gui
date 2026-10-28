@@ -71,6 +71,7 @@ public:
         InvalidAssociationSetting,       // a mode 9 token that is not key=value
         AssociationSettingsWithWordlist, // settings only with no wordlist
         NoHashRecipe,                    // hash mode 4000 without its recipe
+        InvalidCachePath,                // --cache-path is not an existing directory
     };
 
     // Checks everything that has to hold before hashcat can be started.

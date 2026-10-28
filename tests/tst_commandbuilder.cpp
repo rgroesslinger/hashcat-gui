@@ -23,6 +23,7 @@ private slots:
     void noHashTypeWhileNoneIsSelected();
     void hashTypeComesBeforeTheAttackMode();
     void hashRecipeFollowsItsMode();
+    void tierTwoOptionsFollowTheirConditions();
     void fileRulesWinOverGeneratedRules();
     void argumentLayout_data();
     void argumentLayout();
@@ -113,6 +114,75 @@ void TestCommandBuilder::hashRecipeFollowsItsMode()
     options.hashRecipe = QStringLiteral("   ");
     const QStringList blank{"--hash-type", "4000", "--attack-mode", "0"};
     QCOMPARE(CommandBuilder::build(options), blank);
+}
+
+// The tier 2 options: --rules-concat only next to the files it joins,
+// --outfile-json instead of --outfile-format, --cache-path verbatim.
+void TestCommandBuilder::tierTwoOptionsFollowTheirConditions()
+{
+    // --rules-concat joins the -r files above; without files it has nothing
+    // to join and hashcat answers with its usage line.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Straight;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.wordlists << QStringLiteral("dict.txt");
+        options.rulesFiles << QStringLiteral("one.rule") << QStringLiteral("two.rule");
+        options.rulesConcat = true;
+
+        const QStringList arguments = CommandBuilder::build(options);
+        const qsizetype concat = arguments.indexOf(QStringLiteral("--rules-concat"));
+        QVERIFY(concat >= 0);
+        // The join flag comes after the files it joins.
+        QVERIFY(concat > arguments.indexOf(QStringLiteral("two.rule")));
+
+        options.rulesFiles.clear();
+        options.generateRules = 4;
+        QVERIFY(!CommandBuilder::build(options).contains(QStringLiteral("--rules-concat")));
+    }
+
+    // JSON wins over the format: the two are exclusive upstream, and a
+    // session can hold both.
+    {
+        HashcatOptions options;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.outfileEnabled = true;
+        options.outfile = QStringLiteral("out.txt");
+        options.outfileFormat = QStringLiteral("1,2,3");
+        options.outfileJson = true;
+
+        const QStringList arguments = CommandBuilder::build(options);
+        QVERIFY(arguments.contains(QStringLiteral("--outfile-json")));
+        QVERIFY(!arguments.contains(QStringLiteral("--outfile-format")));
+        QVERIFY(!arguments.contains(QStringLiteral("1,2,3")));
+    }
+
+    // Without JSON the format keeps its old place.
+    {
+        HashcatOptions options;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.outfileEnabled = true;
+        options.outfile = QStringLiteral("out.txt");
+        options.outfileFormat = QStringLiteral("1,2,3");
+
+        const QStringList arguments = CommandBuilder::build(options);
+        QVERIFY(!arguments.contains(QStringLiteral("--outfile-json")));
+        QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--outfile-format")) + 1),
+                 QStringLiteral("1,2,3"));
+    }
+
+    // The cache path is passed as one token; empty stays out.
+    {
+        HashcatOptions options;
+        options.hashFile = QStringLiteral("hash.txt");
+
+        QVERIFY(!CommandBuilder::build(options).contains(QStringLiteral("--cache-path")));
+
+        options.cachePath = QStringLiteral("/tmp/hc-cache");
+        const QStringList arguments = CommandBuilder::build(options);
+        QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--cache-path")) + 1),
+                 QStringLiteral("/tmp/hc-cache"));
+    }
 }
 
 void TestCommandBuilder::fileRulesWinOverGeneratedRules()

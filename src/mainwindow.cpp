@@ -306,6 +306,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnToggle(ui->checkBox_rulesfile_1);
     notifyOnToggle(ui->checkBox_rulesfile_2);
     notifyOnToggle(ui->checkBox_rulesfile_3);
+    notifyOnToggle(ui->checkBox_rules_concat);
     notifyOnText(ui->lineEdit_rulesfile_1);
     notifyOnText(ui->lineEdit_rulesfile_2);
     notifyOnText(ui->lineEdit_rulesfile_3);
@@ -356,6 +357,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnToggle(ui->checkBox_outfile);
     notifyOnText(ui->lineEdit_outfile);
     notifyOnText(ui->lineEdit_outfile_format);
+    notifyOnToggle(ui->checkBox_outfile_json);
+    notifyOnText(ui->lineEdit_cache_path);
     notifyOnText(ui->lineEdit_cpu_affinity);
     notifyOnText(ui->lineEdit_backend_devices);
     notifyOnText(ui->lineEdit_session);
@@ -483,6 +486,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::openHashFileClicked);
     connect(ui->pushButton_open_outfile, &QPushButton::clicked, this,
             &MainWindow::openOutfileClicked);
+    connect(ui->pushButton_open_cache_path, &QPushButton::clicked, this,
+            &MainWindow::openCachePathClicked);
     connect(ui->pushButton_start, &QPushButton::clicked, this, &MainWindow::startClicked);
     connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this,
             &MainWindow::copyCommandToClipboard);
@@ -492,6 +497,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this,
             &MainWindow::attackIndexChanged);
     connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
+    // JSON and the format field are exclusive; the value stays in the field
+    // so switching back restores what was typed.
+    connect(ui->checkBox_outfile_json, &QCheckBox::toggled, this,
+            [this](bool checked) { ui->lineEdit_outfile_format->setEnabled(!checked); });
 
     /* ---------- dependent widgets ---------- */
     connect(ui->checkBox_increment, &QCheckBox::toggled, this,
@@ -892,6 +901,7 @@ void MainWindow::resetSessionTriggered()
     ui->checkBox_rulesfile_1->setChecked(false);
     ui->checkBox_rulesfile_2->setChecked(false);
     ui->checkBox_rulesfile_3->setChecked(false);
+    ui->checkBox_rules_concat->setChecked(false);
     ui->lineEdit_rulesfile_1->clear();
     ui->lineEdit_rulesfile_2->clear();
     ui->lineEdit_rulesfile_3->clear();
@@ -939,6 +949,8 @@ void MainWindow::resetSessionTriggered()
     ui->checkBox_outfile->setChecked(false);
     ui->lineEdit_outfile->clear();
     ui->lineEdit_outfile_format->setText(AppConstants::Defaults::OutfileFormat);
+    ui->checkBox_outfile_json->setChecked(false);
+    ui->lineEdit_cache_path->clear();
     ui->lineEdit_cpu_affinity->clear();
     ui->lineEdit_backend_devices->setText(AppConstants::Defaults::BackendDevices);
 
@@ -1423,6 +1435,16 @@ void MainWindow::openOutfileClicked()
     }
 }
 
+void MainWindow::openCachePathClicked()
+{
+    // hashcat only accepts an existing directory here, so the dialog offers
+    // no file name to invent.
+    const QString path = QFileDialog::getExistingDirectory(this, tr("Open cache directory"));
+    if (!path.isEmpty()) {
+        ui->lineEdit_cache_path->setText(QDir::toNativeSeparators(path));
+    }
+}
+
 void MainWindow::removeWordlistClicked()
 {
     removeSelectedRows(ui->listWidget_wordlist);
@@ -1632,6 +1654,9 @@ void MainWindow::useRulesFileToggled(bool checked)
     ui->checkBox_rulesfile_1->setEnabled(checked);
     ui->checkBox_rulesfile_2->setEnabled(checked);
     ui->checkBox_rulesfile_3->setEnabled(checked);
+    // The join flag is only meaningful next to the files it joins; the
+    // generated-rules radio is the other half of the same choice.
+    ui->checkBox_rules_concat->setEnabled(checked);
     if (checked) {
         rulesFile1Toggled(ui->checkBox_rulesfile_1->isChecked());
         rulesFile2Toggled(ui->checkBox_rulesfile_2->isChecked());
@@ -1968,6 +1993,13 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         box.setText(tr("The minimum increment length is larger than the maximum."));
         break;
 
+    // The path below is user supplied, so plain text: a '<' in it would be
+    // taken for markup by the default AutoText.
+    case HelperUtils::LaunchError::InvalidCachePath:
+        box.setTextFormat(Qt::PlainText);
+        box.setText(tr("The cache path must be an existing directory:\n%1").arg(detail));
+        break;
+
     case HelperUtils::LaunchError::IncrementWithSpeedOnly:
         box.setIcon(QMessageBox::Information);
         box.setText(tr("The increment cannot be combined with the speed-only option."));
@@ -2046,6 +2078,9 @@ HashcatOptions MainWindow::collectHashcatOptions()
                 options.rulesFiles << edits[i]->text();
             }
         }
+        // Stored as a plain bool: the builder only emits it next to the -r
+        // files, so a ticked box with generated rules selected stays silent.
+        options.rulesConcat = ui->checkBox_rules_concat->isChecked();
     } else if (ui->radioButton_generate_rules->isChecked()) {
         options.generateRules = ui->spinBox_generate_rules->value();
     }
@@ -2090,6 +2125,8 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.outfileEnabled = ui->checkBox_outfile->isChecked();
     options.outfile = ui->lineEdit_outfile->text();
     options.outfileFormat = ui->lineEdit_outfile_format->text();
+    options.outfileJson = ui->checkBox_outfile_json->isChecked();
+    options.cachePath = ui->lineEdit_cache_path->text();
     options.cpuAffinity = ui->lineEdit_cpu_affinity->text();
     options.backendDevices = ui->lineEdit_backend_devices->text();
     options.openclDeviceTypes = ui->lineEdit_opencl_device_types->text();
