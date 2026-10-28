@@ -2156,7 +2156,8 @@ HashcatOptions MainWindow::collectHashcatOptions()
     // hidden field can still hold a value a session stored, and the launch
     // validation is where a combination that cannot work is refused.
     const auto splitSettings = [](const QString &text) {
-        return text.split(QRegularExpression(QStringLiteral("\\s+")), Qt::SkipEmptyParts);
+        static const QRegularExpression separator{QStringLiteral("\\s+")};
+        return text.split(separator, Qt::SkipEmptyParts);
     };
 
     options.pcfgRulesets = listItems(ui->listWidget_pcfg_rulesets);

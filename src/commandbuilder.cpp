@@ -362,11 +362,9 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         maskAfterDict = options.mask;
         break;
     case AttackMode::HybridMaskWord:
-        maskBeforeDict = options.mask;
-        break;
     case AttackMode::Hybrid:
-        // hash mask wordlists - the ?w in the mask names where a word from
-        // the list goes.
+        // The mask comes before the wordlists. In the hybrid mode 12 the
+        // ?w in the mask names where a word from the list goes.
         maskBeforeDict = options.mask;
         break;
     default:

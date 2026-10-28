@@ -624,7 +624,7 @@ void TestHelperUtils::maskMarkersAreValidated()
     const QStringList one{QStringLiteral("/tmp/a.txt")};
     const QStringList two{QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")};
 
-    const auto hybridError = [&one, &two](const QString &mask, const QStringList &wordlists) {
+    const auto hybridError = [](const QString &mask, const QStringList &wordlists) {
         HashcatOptions options;
         options.attackMode = AttackMode::Hybrid;
         options.mask = mask;

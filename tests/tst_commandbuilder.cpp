@@ -975,30 +975,28 @@ void TestCommandBuilder::predicates()
         {Mode::Hybrid, true, false, true, true, true, true, true, true, true},
     };
 
-    const auto name = [](Mode mode) {
-        return qPrintable(QStringLiteral("attack mode %1").arg(int(mode)));
-    };
+    const auto name = [](Mode mode) { return QStringLiteral("attack mode %1").arg(int(mode)); };
 
     for (const Expectation &expected : expectations) {
         QVERIFY2(CommandBuilder::attackUsesMask(expected.mode) == expected.mask,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesIncrement(expected.mode) == expected.increment,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesWordlists(expected.mode) == expected.wordlists,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesRules(expected.mode) == expected.rules,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesRuleLeft(expected.mode) == expected.ruleLeft,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesRuleRight(expected.mode) == expected.ruleRight,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesCustomCharset(expected.mode) == expected.customCharset,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesHexWordlist(expected.mode) == expected.hexWordlist,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
         QVERIFY2(CommandBuilder::attackUsesWordlistEncoding(expected.mode)
                      == expected.wordlistEncoding,
-                 name(expected.mode));
+                 qPrintable(name(expected.mode)));
     }
 }
 
