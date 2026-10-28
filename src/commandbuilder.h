@@ -36,6 +36,7 @@ public:
         Force,
         GenerateRules,
         HashType,
+        HashRecipe,
         HexCharset,
         HexSalt,
         HexWordlist,

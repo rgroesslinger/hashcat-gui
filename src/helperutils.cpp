@@ -483,6 +483,14 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
         }
     }
 
+    // Hash mode 4000 describes its hashes as a recipe; without one hashcat
+    // refuses the run, and the row that takes the recipe only exists for
+    // this type - so the combination cannot be fixed from a visible control.
+    if (options.hashType == AppConstants::Hashcat::RecipeHashType
+        && options.hashRecipe.trimmed().isEmpty()) {
+        return LaunchError::NoHashRecipe;
+    }
+
     // The hybrid mode 12 pairs the wordlists with the mask by markers; the
     // markers have to line up with what is selected.
     if (options.attackMode == AttackMode::Hybrid) {

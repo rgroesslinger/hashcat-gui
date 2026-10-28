@@ -100,6 +100,25 @@ void addFilesToList(QListWidget *list, const QString &dialogTitle, QWidget *pare
     }
 }
 
+// The argument list as the preview and the clipboard show it: one token per
+// argument, joined with spaces. The hash recipe is a single argument that
+// contains spaces, so it is quoted for display - a copied command must not
+// split it. The argv handed to hashcat keeps the token unquoted.
+QStringList displayArguments(const QStringList &arguments)
+{
+    QStringList display = arguments;
+#ifdef Q_OS_WIN
+    const QChar quote = QLatin1Char('"');
+#else
+    const QChar quote = QLatin1Char('\'');
+#endif
+    const qsizetype recipe = display.indexOf(QString(AppConstants::Hashcat::HashRecipe));
+    if (recipe >= 0 && recipe + 1 < display.size()) {
+        display[recipe + 1] = quote + display.at(recipe + 1) + quote;
+    }
+    return display;
+}
+
 // The tooltip of the command preview: the whole command, because the line
 // edit shows only its beginning.
 //
@@ -242,6 +261,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     initHashAndAttackModes();
     updateViewAttackMode();
+    // The hash type list arrives asynchronously, but the recipe row can only
+    // be hidden for the empty combo; every later change comes through the
+    // connection set up below.
+    updateHashTypeDependencies();
 
     /* ---------- save the session on quit ---------- */
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::saveSession);
@@ -268,7 +291,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Attack tab
     notifyOnIndex(ui->comboBox_hash_type);
+    // The recipe row belongs to hash mode 4000 alone; the combo decides.
+    connect(ui->comboBox_hash_type, &QComboBox::currentIndexChanged, this,
+            &MainWindow::updateHashTypeDependencies);
     notifyOnText(ui->lineEdit_hashfile);
+    notifyOnText(ui->lineEdit_hash_recipe);
     notifyOnToggle(ui->checkBox_hex_charset);
     notifyOnToggle(ui->checkBox_hex_salt);
     // Word lists
@@ -849,6 +876,7 @@ void MainWindow::resetSessionTriggered()
 
     // Attack tab
     ui->lineEdit_hashfile->clear();
+    ui->lineEdit_hash_recipe->clear();
     ui->checkBox_ignoreusername->setChecked(false);
     ui->checkBox_remove->setChecked(false);
     ui->listWidget_wordlist->clear();
@@ -1062,6 +1090,17 @@ QString MainWindow::restoreHashType(const QJsonObject &values)
 
     m_pendingHashTypeId = -1;
     return {};
+}
+
+// The recipe belongs to hash mode 4000 alone, so its row only exists where
+// hashcat reads it. The value itself is left in the field: the builder drops
+// a stale recipe for any other type, so switching away and back keeps it.
+void MainWindow::updateHashTypeDependencies()
+{
+    const bool recipe =
+        ui->comboBox_hash_type->currentData().toInt() == AppConstants::Hashcat::RecipeHashType;
+    ui->label_hash_recipe->setVisible(recipe);
+    ui->lineEdit_hash_recipe->setVisible(recipe);
 }
 
 // Applies the hash type a session asked for, now that the list of hash
@@ -1918,6 +1957,12 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
                        "file. Clear either the settings line or the wordlist list."));
         break;
 
+    case HelperUtils::LaunchError::NoHashRecipe:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The hash type 4000 describes its hashes as a recipe, for example\n"
+                       "md5(md5(salt) . pass). Enter it in the hash recipe field."));
+        break;
+
     case HelperUtils::LaunchError::InvalidIncrement:
         box.setIcon(QMessageBox::Information);
         box.setText(tr("The minimum increment length is larger than the maximum."));
@@ -1953,7 +1998,7 @@ void MainWindow::commandChanged()
     const QStringList arguments = generateArguments();
 
     const QString command = (binary.isEmpty() ? QString() : binary + QLatin1Char(' '))
-                            + arguments.join(QLatin1Char(' '));
+                            + displayArguments(arguments).join(QLatin1Char(' '));
     ui->lineEdit_command->setText(command);
     ui->lineEdit_command->setCursorPosition(0);
 
@@ -1975,6 +2020,7 @@ HashcatOptions MainWindow::collectHashcatOptions()
     // -m out entirely instead of asking for hash type 0.
     const QVariant hashType = ui->comboBox_hash_type->currentData();
     options.hashType = hashType.isValid() ? hashType.toInt() : -1;
+    options.hashRecipe = ui->lineEdit_hash_recipe->text();
 
     options.attackMode = static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
 

@@ -200,6 +200,7 @@ private slots:
     void loadExampleSessionAppliesTheBundledSession();
     void optionDependenciesFollowTheirCheckboxes();
     void modeHintFollowsTheAttackMode();
+    void hashRecipeRowFollowsTheHashType();
     void launchValidationFollowsTheWidgets();
     void widgetsFlowIntoTheOptions();
     void statusTimerReachesTheCommandLine();
@@ -748,6 +749,50 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
 
 // The launch validation works on what the window collects, so the two have to
 // agree: what the widgets show is what the validation complains about.
+// The recipe row belongs to hash mode 4000 alone, and the recipe is one
+// argument - the preview quotes it so a copied command does not split at
+// its spaces.
+void TestMainWindow::hashRecipeRowFollowsTheHashType()
+{
+    MainWindow window;
+
+    // The combo stays empty until the hashcat query answers; a fresh window
+    // therefore shows no recipe row.
+    QVERIFY(window.ui->lineEdit_hash_recipe->isHidden());
+
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("4000 | Hashcat"), 4000);
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"), 1000);
+
+    window.ui->comboBox_hash_type->setCurrentIndex(1); // NTLM
+    QVERIFY(window.ui->label_hash_recipe->isHidden());
+    QVERIFY(window.ui->lineEdit_hash_recipe->isHidden());
+
+    window.ui->comboBox_hash_type->setCurrentIndex(0); // 4000
+    QVERIFY(!window.ui->label_hash_recipe->isHidden());
+    QVERIFY(!window.ui->lineEdit_hash_recipe->isHidden());
+
+    // The recipe reaches the command as exactly one token, spaces included,
+    // and the preview quotes it for display and for the clipboard.
+    window.ui->lineEdit_hash_recipe->setText(QStringLiteral("md5(md5(salt) . pass)"));
+
+    const QStringList arguments = window.generateArguments();
+    const qsizetype flag = arguments.indexOf(QStringLiteral("--hash-recipe"));
+    QVERIFY(flag >= 0);
+    QCOMPARE(arguments.at(flag + 1), QStringLiteral("md5(md5(salt) . pass)"));
+
+    const QString preview = window.ui->lineEdit_command->text();
+#ifdef Q_OS_WIN
+    QVERIFY(preview.contains(QStringLiteral("\"md5(md5(salt) . pass)\"")));
+#else
+    QVERIFY(preview.contains(QStringLiteral("'md5(md5(salt) . pass)'")));
+#endif
+
+    // Switching the type away drops the flag even though the field still
+    // holds the recipe: hashcat refuses the flag for any other type.
+    window.ui->comboBox_hash_type->setCurrentIndex(1);
+    QVERIFY(!window.generateArguments().contains(QStringLiteral("--hash-recipe")));
+}
+
 void TestMainWindow::launchValidationFollowsTheWidgets()
 {
     MainWindow window;

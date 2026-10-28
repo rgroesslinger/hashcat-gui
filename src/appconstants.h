@@ -312,6 +312,11 @@ inline constexpr QLatin1StringView Quiet{"--quiet"};
 inline constexpr QLatin1StringView ExampleHashes{"--example-hashes"};
 inline constexpr QLatin1StringView MachineReadable{"--machine-readable"};
 inline constexpr QLatin1StringView Version{"--version"};
+// The flag that carries the recipe of hash mode 4000. Both the builder and
+// the preview need the token: the preview quotes the value that follows it.
+inline constexpr QLatin1StringView HashRecipe{"--hash-recipe"};
+// The only hash mode that takes a hash recipe.
+inline constexpr int RecipeHashType = 4000;
 // How long hashcat is given to answer a query such as --example-hashes
 inline constexpr int QueryTimeoutMs = 20000;
 } // namespace Hashcat

@@ -101,6 +101,9 @@ private slots:
     void attackIndexChanged(int index);
 
     void commandChanged();
+    // The recipe row belongs to hash mode 4000 alone; the hash type combo
+    // decides whether it exists.
+    void updateHashTypeDependencies();
     void copyCommandToClipboard();
 
 private:

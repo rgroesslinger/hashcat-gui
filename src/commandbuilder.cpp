@@ -224,6 +224,7 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
         {Parameter::Force, {QString(), QStringLiteral("--force")}},
         {Parameter::GenerateRules, {QStringLiteral("-g"), QStringLiteral("--generate-rules")}},
         {Parameter::HashType, {QStringLiteral("-m"), QStringLiteral("--hash-type")}},
+        {Parameter::HashRecipe, {QString(), QString(AppConstants::Hashcat::HashRecipe)}},
         {Parameter::HexCharset, {QString(), QStringLiteral("--hex-charset")}},
         {Parameter::HexSalt, {QString(), QStringLiteral("--hex-salt")}},
         {Parameter::HexWordlist, {QString(), QStringLiteral("--hex-wordlist")}},
@@ -277,6 +278,14 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     if (options.hashType >= 0) {
         arguments << parameterName(Parameter::HashType, useShort)
                   << QString::number(options.hashType);
+    }
+
+    // The recipe belongs to hash mode 4000; hashcat refuses the flag for
+    // every other type, so a stale value a session carried is left out
+    // instead of breaking the run.
+    if (options.hashType == AppConstants::Hashcat::RecipeHashType
+        && !options.hashRecipe.trimmed().isEmpty()) {
+        arguments << parameterName(Parameter::HashRecipe, useShort) << options.hashRecipe;
     }
 
     arguments << parameterName(Parameter::AttackMode, useShort)

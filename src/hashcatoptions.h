@@ -41,6 +41,10 @@ struct HashcatOptions {
     // -1 while no hash type is selected: -m is then left out
     int hashType = -1;
 
+    // --hash-recipe, the recipe of hash mode 4000. Emitted only for that
+    // type, so a stale value a session carries never reaches the command.
+    QString hashRecipe;
+
     AttackMode attackMode = AttackMode::Straight;
 
     bool remove = false;

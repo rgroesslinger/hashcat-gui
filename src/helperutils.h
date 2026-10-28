@@ -70,6 +70,7 @@ public:
         InvalidTableSetting,             // a mode 5 setting out of range or twice
         InvalidAssociationSetting,       // a mode 9 token that is not key=value
         AssociationSettingsWithWordlist, // settings only with no wordlist
+        NoHashRecipe,                    // hash mode 4000 without its recipe
     };
 
     // Checks everything that has to hold before hashcat can be started.

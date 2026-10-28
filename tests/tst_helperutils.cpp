@@ -35,6 +35,7 @@ private slots:
     void tableSettingsAreValidated();
     void associationSettingsAreValidated();
     void maskMarkersAreValidated();
+    void hashRecipeIsRequiredFor4000();
     void terminalArgumentsArePinned();
     void findHashcatInPathFindsTheExecutable();
     void findHashcatInPathIsEmptyWithoutOne();
@@ -677,6 +678,26 @@ void TestHelperUtils::maskMarkersAreValidated()
     // A mask without the markers is fine in every mode.
     brute.mask = QStringLiteral("?d?d");
     QCOMPARE(int(HelperUtils::validateOptions(brute)), int(HelperUtils::LaunchError::None));
+}
+
+// Hash mode 4000 describes its hashes as a recipe; without one hashcat
+// refuses the run, and the row that takes it only exists for this type.
+void TestHelperUtils::hashRecipeIsRequiredFor4000()
+{
+    HashcatOptions options;
+    options.attackMode = AttackMode::Straight;
+    options.hashType = AppConstants::Hashcat::RecipeHashType;
+    options.wordlists = QStringList{QStringLiteral("/tmp/a.txt")};
+    QCOMPARE(int(HelperUtils::validateOptions(options)),
+             int(HelperUtils::LaunchError::NoHashRecipe));
+
+    options.hashRecipe = QStringLiteral("md5(md5(salt) . pass)");
+    QCOMPARE(int(HelperUtils::validateOptions(options)), int(HelperUtils::LaunchError::None));
+
+    // A stale recipe next to any other hash type is left out by the builder
+    // and must not keep the run from starting.
+    options.hashType = 1000;
+    QCOMPARE(int(HelperUtils::validateOptions(options)), int(HelperUtils::LaunchError::None));
 }
 
 // The mapping startClicked() builds its command line from: pin every

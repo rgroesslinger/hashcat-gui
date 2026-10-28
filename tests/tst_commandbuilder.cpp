@@ -22,6 +22,7 @@ private slots:
     void defaultsProduceTheBareCommandLine();
     void noHashTypeWhileNoneIsSelected();
     void hashTypeComesBeforeTheAttackMode();
+    void hashRecipeFollowsItsMode();
     void fileRulesWinOverGeneratedRules();
     void argumentLayout_data();
     void argumentLayout();
@@ -82,6 +83,36 @@ void TestCommandBuilder::hashTypeComesBeforeTheAttackMode()
     options.useShortParameters = true;
     const QStringList shortForm{"-m", "1000", "-a", "0"};
     QCOMPARE(CommandBuilder::build(options), shortForm);
+}
+
+// --hash-recipe belongs to hash mode 4000; the recipe is one argv token and
+// keeps its spaces.
+void TestCommandBuilder::hashRecipeFollowsItsMode()
+{
+    HashcatOptions options;
+    options.hashType = AppConstants::Hashcat::RecipeHashType;
+    options.hashRecipe = QStringLiteral("md5(md5(salt) . pass)");
+
+    const QStringList withRecipe{"--hash-type",           "4000",          "--hash-recipe",
+                                 "md5(md5(salt) . pass)", "--attack-mode", "0"};
+    QCOMPARE(CommandBuilder::build(options), withRecipe);
+
+    options.useShortParameters = true;
+    const QStringList shortForm{"-m", "4000", "--hash-recipe", "md5(md5(salt) . pass)", "-a", "0"};
+    QCOMPARE(CommandBuilder::build(options), shortForm);
+
+    // A recipe for any other hash type is left out: hashcat refuses the flag
+    // there, and a session file can store a stale value.
+    options.useShortParameters = false;
+    options.hashType = 1000;
+    const QStringList stale{"--hash-type", "1000", "--attack-mode", "0"};
+    QCOMPARE(CommandBuilder::build(options), stale);
+
+    // Whitespace is no recipe either.
+    options.hashType = AppConstants::Hashcat::RecipeHashType;
+    options.hashRecipe = QStringLiteral("   ");
+    const QStringList blank{"--hash-type", "4000", "--attack-mode", "0"};
+    QCOMPARE(CommandBuilder::build(options), blank);
 }
 
 void TestCommandBuilder::fileRulesWinOverGeneratedRules()
