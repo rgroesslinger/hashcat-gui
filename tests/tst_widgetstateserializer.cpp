@@ -72,7 +72,7 @@ struct Form {
         radioButton->setObjectName(QStringLiteral("radioButton_plain"));
 
         spinBox = new QSpinBox(&widget);
-        spinBox->setObjectName(QStringLiteral("spinBox_segment_size"));
+        spinBox->setObjectName(QStringLiteral("spinBox_runtime"));
 
         doubleSpinBox = new QDoubleSpinBox(&widget);
         doubleSpinBox->setObjectName(QStringLiteral("doubleSpinBox_ratio"));
@@ -255,7 +255,7 @@ void TestWidgetStateSerializer::ignoredWidgetsAreNotSaved()
 
     QVERIFY(!values.contains(QStringLiteral("lineEdit_command")));
     QVERIFY(!values.contains(QStringLiteral("-m 0 --quiet")));
-    QVERIFY(values.contains(QStringLiteral("spinBox_segment_size")));
+    QVERIFY(values.contains(QStringLiteral("spinBox_runtime")));
 }
 
 // The values do hold the value; the loader was told to leave lineEdit_command
@@ -343,7 +343,7 @@ void TestWidgetStateSerializer::aValueOfTheWrongTypeIsNotApplied()
     QJsonObject values;
     // A check box wants a boolean, a spin box a number, a line edit a text.
     values.insert(QStringLiteral("checkBox_rules"), QStringLiteral("invalidString"));
-    values.insert(QStringLiteral("spinBox_segment_size"), QStringLiteral("64"));
+    values.insert(QStringLiteral("spinBox_runtime"), QStringLiteral("64"));
     values.insert(QStringLiteral("lineEdit_command"), 42);
 
     Form restored;
@@ -357,7 +357,7 @@ void TestWidgetStateSerializer::aValueOfTheWrongTypeIsNotApplied()
     // The widgets are walked by type, so the names come in that order.
     QCOMPARE(result.wrongTypes,
              QStringList({QStringLiteral("lineEdit_command"), QStringLiteral("checkBox_rules"),
-                          QStringLiteral("spinBox_segment_size")}));
+                          QStringLiteral("spinBox_runtime")}));
     QVERIFY(result.unknownKeys.isEmpty());
 
     // The widgets keep the values they had.
@@ -372,7 +372,7 @@ void TestWidgetStateSerializer::aValueOfTheWrongTypeIsNotApplied()
 void TestWidgetStateSerializer::aFractionalNumberIsNotAppliedToASpinBox()
 {
     QJsonObject values;
-    values.insert(QStringLiteral("spinBox_segment_size"), 3.5);
+    values.insert(QStringLiteral("spinBox_runtime"), 3.5);
 
     Form restored;
     restored.spinBox->setValue(32);
@@ -380,7 +380,7 @@ void TestWidgetStateSerializer::aFractionalNumberIsNotAppliedToASpinBox()
     const WidgetStateSerializer::ApplyResult result =
         WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
-    QCOMPARE(result.wrongTypes, QStringList{QStringLiteral("spinBox_segment_size")});
+    QCOMPARE(result.wrongTypes, QStringList{QStringLiteral("spinBox_runtime")});
     QVERIFY(result.unknownKeys.isEmpty());
     QCOMPARE(restored.spinBox->value(), 32);
 }

@@ -15,7 +15,6 @@
                 "checkBox_increment": false,
                 "checkBox_optimized_kernel": false,
                 "checkBox_outfile": false,
-                "checkBox_override_workload_profile": false,
                 "checkBox_potfile_disable": false,
                 "checkBox_remove": false,
                 "checkBox_rulesfile_1": false,
@@ -25,7 +24,6 @@
                 "checkBox_status": false,
                 "comboBox_attack": 3,
                 "comboBox_hash_type": 1400,
-                "comboBox_workload_profile": 1,
                 "lineEdit_backend_devices": "",
                 "lineEdit_cpu_affinity": "",
                 "lineEdit_custom_charset1": "?l?u",
@@ -56,7 +54,6 @@
                 "spinBox_increment_max": 0,
                 "spinBox_increment_min": 0,
                 "spinBox_runtime": 0,
-                "spinBox_segment_size": 32,
                 "spinBox_status_timer": 10
             },
             "version": 1

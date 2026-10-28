@@ -54,14 +54,12 @@ public:
         RuleRight,
         RulesFile,
         Runtime,
-        SegmentSize,
         Session,
         Skip,
         SpeedOnly,
         Status,
         StatusTimer,
         Username,
-        WorkloadProfile,
     };
 
     // What an attack mode needs from the user before hashcat can run.

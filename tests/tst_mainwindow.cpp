@@ -315,8 +315,9 @@ void TestMainWindow::commandPreviewFollowsWidgetChanges()
     window.ui->lineEdit_backend_devices->setText(QStringLiteral("1,2"));
     QVERIFY(preview->text().contains(QStringLiteral("--backend-devices 1,2")));
 
-    window.ui->spinBox_segment_size->setValue(64);
-    QVERIFY(preview->text().contains(QStringLiteral("--segment-size 64")));
+    window.ui->checkBox_hwmon_temp_abort->setChecked(true);
+    window.ui->spinBox_hwmon_temp_abort->setValue(85);
+    QVERIFY(preview->text().contains(QStringLiteral("--hwmon-temp-abort 85")));
 
     window.ui->lineEdit_session->setText(QStringLiteral("job"));
     QVERIFY(preview->text().contains(QStringLiteral("--session job")));
@@ -326,11 +327,6 @@ void TestMainWindow::commandPreviewFollowsWidgetChanges()
 
     window.ui->spinBox_runtime->setValue(60);
     QVERIFY(preview->text().contains(QStringLiteral("--runtime 60")));
-
-    window.ui->checkBox_override_workload_profile->setChecked(true);
-    // Level 2, addressed by position: the display text is not an identifier.
-    window.ui->comboBox_workload_profile->setCurrentIndex(1);
-    QVERIFY(preview->text().contains(QStringLiteral("--workload-profile 2")));
 
     // Radio buttons share the toggle helper and keep their side-effect slot.
     window.ui->radioButton_generate_rules->setChecked(true);
@@ -775,8 +771,6 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     window.ui->checkBox_remove->setChecked(true);
     window.ui->checkBox_ignoreusername->setChecked(true);
     window.ui->checkBox_speed_only->setChecked(true);
-    window.ui->checkBox_override_workload_profile->setChecked(true);
-    window.ui->comboBox_workload_profile->setCurrentIndex(1);
     window.ui->checkBox_hex_wordlist->setChecked(true);
     window.ui->lineEdit_encoding_from->setText(QStringLiteral("iso-8859-15"));
     window.ui->lineEdit_encoding_to->setText(QStringLiteral("utf-8"));
@@ -803,7 +797,6 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(options.remove);
     QVERIFY(options.ignoreUsername);
     QVERIFY(options.speedOnly);
-    QCOMPARE(options.workloadProfile, QStringLiteral("2"));
     QVERIFY(options.hexWordlist);
     QCOMPARE(options.encodingFrom, QStringLiteral("iso-8859-15"));
     QCOMPARE(options.encodingTo, QStringLiteral("utf-8"));
@@ -827,7 +820,6 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     // Untouched fields keep the values the .ui file starts with
     QCOMPARE(options.outfileFormat, AppConstants::Defaults::OutfileFormat);
     QCOMPARE(options.backendDevices, AppConstants::Defaults::BackendDevices);
-    QCOMPARE(options.segmentSize, int(AppConstants::Defaults::SegmentSize));
 
     // The suggested outfile never switches output on by itself
     QVERIFY(!options.outfileEnabled);
@@ -836,7 +828,6 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(arguments.contains(QStringLiteral("--remove")));
     QVERIFY(arguments.contains(QStringLiteral("--username")));
     QVERIFY(arguments.contains(QStringLiteral("--speed-only")));
-    QVERIFY(arguments.contains(QStringLiteral("--workload-profile")));
     QVERIFY(arguments.contains(QStringLiteral("--force")));
     QVERIFY(arguments.contains(QStringLiteral("--session")));
     QVERIFY(arguments.contains(QStringLiteral("--runtime")));
@@ -855,13 +846,7 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(!arguments.contains(QStringLiteral("--increment")));
     QVERIFY(arguments.contains(QStringLiteral("--rule-left")));
     QVERIFY(!arguments.contains(QStringLiteral("--rule-right")));
-    QVERIFY(!arguments.contains(QStringLiteral("--segment-size")));
     QVERIFY(!arguments.contains(QStringLiteral("--outfile")));
-
-    // ... and a segment size that is no longer the default does show up
-    window.ui->spinBox_segment_size->setValue(64);
-    QCOMPARE(window.collectHashcatOptions().segmentSize, 64);
-    QVERIFY(window.generateArguments().contains(QStringLiteral("--segment-size")));
 }
 
 void TestMainWindow::statusTimerReachesTheCommandLine()
@@ -1278,7 +1263,7 @@ void TestMainWindow::theSessionRoundTrips()
 
     MainWindow writer;
     writer.ui->comboBox_attack->setCurrentIndex(2); // brute-force, not the default straight
-    writer.ui->spinBox_segment_size->setValue(64);  // not the default 32
+    writer.ui->spinBox_runtime->setValue(64);       // not the default 0
     writer.saveSession();
 
     const QString session = writer.sessionFile();
@@ -1314,12 +1299,12 @@ void TestMainWindow::theSessionRoundTrips()
     // A new window runs loadSession() in its constructor...
     MainWindow reloaded;
     QCOMPARE(reloaded.ui->comboBox_attack->currentIndex(), 2);
-    QCOMPARE(reloaded.ui->spinBox_segment_size->value(), 64);
+    QCOMPARE(reloaded.ui->spinBox_runtime->value(), 64);
 
     // ...and the preview reflects the restored state, not the defaults the
     // widgets held before the session arrived.
     QCOMPARE(reloaded.ui->lineEdit_command->text(),
-             QStringLiteral("hashcat --attack-mode 3 --segment-size 64"));
+             QStringLiteral("hashcat --attack-mode 3 --runtime 64"));
 }
 
 // The session is stored only while it is wanted: the session of an earlier
@@ -1649,7 +1634,7 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("session.json"));
 
     QJsonObject values;
-    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
     values.insert(QStringLiteral("aWidgetFromTheFuture"), QStringLiteral("something"));
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version, values, nullptr));
@@ -1670,7 +1655,7 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
     QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
 
     // The value that named a widget was applied...
-    QCOMPARE(window.ui->spinBox_segment_size->value(), 64);
+    QCOMPARE(window.ui->spinBox_runtime->value(), 64);
     // ... and the one that named nothing is named in the notes.
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
@@ -1683,7 +1668,7 @@ void TestMainWindow::aNewerSessionIsRefused()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("newer.json"));
 
     QJsonObject values;
-    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version + 1, values, nullptr));
 
@@ -1706,7 +1691,7 @@ void TestMainWindow::aNewerSessionIsRefused()
     QCOMPARE(recorder.title, QStringLiteral("Import failed"));
     QVERIFY(recorder.text.contains(
         QStringLiteral("format version %1").arg(AppConstants::Sessions::Version + 1)));
-    QVERIFY(window.ui->spinBox_segment_size->value() != 64);
+    QVERIFY(window.ui->spinBox_runtime->value() != 64);
 }
 
 // A file an older version wrote is applied, and the note says why a value it
@@ -1716,7 +1701,7 @@ void TestMainWindow::anOlderSessionIsAppliedWithANote()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("older.json"));
 
     QJsonObject values;
-    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version - 1, values, nullptr));
 
@@ -1735,7 +1720,7 @@ void TestMainWindow::anOlderSessionIsAppliedWithANote()
 
     QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
 
-    QCOMPARE(window.ui->spinBox_segment_size->value(), 64);
+    QCOMPARE(window.ui->spinBox_runtime->value(), 64);
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Imported"));
     QVERIFY(recorder.text.contains(QStringLiteral("older version")));
@@ -1787,7 +1772,7 @@ void TestMainWindow::anOlderStartupSessionIsAppliedWithANote()
     QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
 
     QJsonObject values;
-    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
     QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version - 1, values, nullptr));
 
@@ -1804,7 +1789,7 @@ void TestMainWindow::anOlderStartupSessionIsAppliedWithANote()
     MainWindow window;
 
     // The value that named a widget was applied...
-    QCOMPARE(window.ui->spinBox_segment_size->value(), 64);
+    QCOMPARE(window.ui->spinBox_runtime->value(), 64);
     // ... and the note says that the file was made by an older version.
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Session warning"));
@@ -1829,7 +1814,7 @@ void TestMainWindow::aNewerStartupSessionIsLeftAlone()
     QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
 
     QJsonObject values;
-    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
     QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version + 1, values, nullptr));
 
@@ -1837,7 +1822,7 @@ void TestMainWindow::aNewerStartupSessionIsLeftAlone()
     MainWindow window;
 
     QCOMPARE(m_closedModals, 1);
-    QVERIFY(window.ui->spinBox_segment_size->value() != 64);
+    QVERIFY(window.ui->spinBox_runtime->value() != 64);
     QVERIFY(QFile::exists(session));
 }
 
@@ -1850,7 +1835,7 @@ void TestMainWindow::aNewerSessionSurvivesTheExit()
     QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
 
     QJsonObject values;
-    values.insert(QStringLiteral("spinBox_segment_size"), 64);
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
     QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version + 1, values, nullptr));
     const QJsonObject before = readJsonObject(session);
@@ -1957,7 +1942,7 @@ void TestMainWindow::theStartupShowsNoBox()
 
     // A session the application wrote itself.
     MainWindow writer;
-    writer.ui->spinBox_segment_size->setValue(64);
+    writer.ui->spinBox_runtime->setValue(64);
     writer.saveSession();
 
     m_watchdog.start();
@@ -1966,7 +1951,7 @@ void TestMainWindow::theStartupShowsNoBox()
     // The window opened without a box...
     QCOMPARE(m_closedModals, 0);
     // ... and the session was restored.
-    QCOMPARE(reloaded.ui->spinBox_segment_size->value(), 64);
+    QCOMPARE(reloaded.ui->spinBox_runtime->value(), 64);
 }
 
 int main(int argc, char *argv[])

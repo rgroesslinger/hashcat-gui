@@ -144,12 +144,11 @@ void TestCommandBuilder::argumentLayout()
 
 void TestCommandBuilder::uiDefaultsAreNotRepeated()
 {
-    // The three fields the UI pre-fills are left out of the command, because
+    // The fields the UI pre-fills are left out of the command, because
     // hashcat would do exactly the same with them.
     HashcatOptions options;
     options.outfileFormat = AppConstants::Defaults::OutfileFormat;
     options.backendDevices = AppConstants::Defaults::BackendDevices;
-    options.segmentSize = AppConstants::Defaults::SegmentSize;
 
     const QStringList bare{"--attack-mode", "0"};
     QCOMPARE(CommandBuilder::build(options), bare);
@@ -157,10 +156,9 @@ void TestCommandBuilder::uiDefaultsAreNotRepeated()
     // ... and are passed as soon as they differ
     options.outfileFormat = QStringLiteral("1");
     options.backendDevices = QStringLiteral("1,2");
-    options.segmentSize = 64;
 
-    const QStringList full{"--attack-mode",     "0",   "--outfile-format", "1",
-                           "--backend-devices", "1,2", "--segment-size",   "64"};
+    const QStringList full{"--attack-mode",     "0",  "--outfile-format", "1",
+                           "--backend-devices", "1,2"};
     QCOMPARE(CommandBuilder::build(options), full);
 }
 
@@ -457,13 +455,13 @@ void TestCommandBuilder::shortFallsBackToLong()
     options.hashType = 1000;
     options.remove = true;
     options.ignoreUsername = true;
-    options.workloadProfile = QStringLiteral("2");
+    options.openclDeviceTypes = QStringLiteral("1");
     options.cpuAffinity = QStringLiteral("1-4");
 
     // --cpu-affinity has no short form; asking for one must not produce an
     // empty argument, which hashcat would read as a stray operand
-    const QStringList expected{"-m", "1000",           "-a", "0", "--remove", "--username", "-w",
-                               "2",  "--cpu-affinity", "1-4"};
+    const QStringList expected{"-m",         "1000",           "-a",  "0",  "--remove",
+                               "--username", "--cpu-affinity", "1-4", "-D", "1"};
     const QStringList arguments = CommandBuilder::build(options);
     QCOMPARE(arguments, expected);
 
@@ -617,19 +615,18 @@ void TestCommandBuilder::parameterSpelling()
     // every enumerator has to be spelled out, otherwise the option silently
     // vanishes from the command line
     const Parameter all[] = {
-        Parameter::AttackMode,      Parameter::BackendDevices,  Parameter::CpuAffinity,
-        Parameter::CustomCharset1,  Parameter::CustomCharset2,  Parameter::CustomCharset3,
-        Parameter::CustomCharset4,  Parameter::EncodingFrom,    Parameter::EncodingTo,
-        Parameter::Force,           Parameter::GenerateRules,   Parameter::HashType,
-        Parameter::HexCharset,      Parameter::HexSalt,         Parameter::HexWordlist,
-        Parameter::HwmonTempAbort,  Parameter::Increment,       Parameter::IncrementMax,
-        Parameter::IncrementMin,    Parameter::Limit,           Parameter::OpenclDeviceTypes,
-        Parameter::OptimizedKernel, Parameter::Outfile,         Parameter::OutfileFormat,
-        Parameter::PotfileDisable,  Parameter::Remove,          Parameter::RuleLeft,
-        Parameter::RuleRight,       Parameter::RulesFile,       Parameter::Runtime,
-        Parameter::SegmentSize,     Parameter::Session,         Parameter::Skip,
-        Parameter::SpeedOnly,       Parameter::Status,          Parameter::StatusTimer,
-        Parameter::Username,        Parameter::WorkloadProfile,
+        Parameter::AttackMode,      Parameter::BackendDevices, Parameter::CpuAffinity,
+        Parameter::CustomCharset1,  Parameter::CustomCharset2, Parameter::CustomCharset3,
+        Parameter::CustomCharset4,  Parameter::EncodingFrom,   Parameter::EncodingTo,
+        Parameter::Force,           Parameter::GenerateRules,  Parameter::HashType,
+        Parameter::HexCharset,      Parameter::HexSalt,        Parameter::HexWordlist,
+        Parameter::HwmonTempAbort,  Parameter::Increment,      Parameter::IncrementMax,
+        Parameter::IncrementMin,    Parameter::Limit,          Parameter::OpenclDeviceTypes,
+        Parameter::OptimizedKernel, Parameter::Outfile,        Parameter::OutfileFormat,
+        Parameter::PotfileDisable,  Parameter::Remove,         Parameter::RuleLeft,
+        Parameter::RuleRight,       Parameter::RulesFile,      Parameter::Runtime,
+        Parameter::Session,         Parameter::Skip,           Parameter::SpeedOnly,
+        Parameter::Status,          Parameter::StatusTimer,    Parameter::Username,
     };
     for (const Parameter key : all) {
         QVERIFY2(!CommandBuilder::parameterName(key).isEmpty(), "an enum has no long spelling");

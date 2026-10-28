@@ -168,16 +168,15 @@ inline constexpr int Version = 1;
 } // namespace Sessions
 
 // Values the widgets start with. The identical defaults are baked into the
-// .ui files (lineEdit_outfile_format = "1,2", lineEdit_backend_devices is empty,
-// spinBox_segment_size = 32, comboBox_workload_profile items "1".."4"), so these
-// constants only describe what code constructing the widgets itself gets.
+// .ui files (lineEdit_outfile_format = "1,2", lineEdit_backend_devices is empty),
+// so these constants only describe what code constructing the widgets itself
+// gets.
 namespace Defaults
 {
 inline constexpr QLatin1StringView OutfileFormat{"1,2"};
 // Empty means "let hashcat use every backend device". Hashcat device ids
 // start at 1, so there is no valid zero value to store here.
 inline constexpr QLatin1StringView BackendDevices{};
-inline constexpr int SegmentSize = 32; // MB
 inline constexpr QLatin1StringView OutfileSuffix{".out"};
 inline constexpr int Runtime = 0;         // seconds, 0 = unlimited
 inline constexpr int StatusTimer = 10;    // seconds, hashcat's own default
@@ -203,9 +202,9 @@ inline constexpr QLatin1StringView Hash{"<hash>"};
 } // namespace Placeholders
 
 // Fixed reference tables for the help tooltips. Hashcat syntax, so they are
-// non-translatable constants here. UTF-8 rather than Latin-1: the range in the
-// charset table and the workload levels are prose and carry typographic
-// punctuation, so the caller converts them where it shows them.
+// non-translatable constants here. UTF-8 rather than Latin-1: the charset
+// table carries typographic punctuation, so the caller converts it where it
+// shows it.
 namespace HelpText
 {
 inline constexpr const char *BuiltinCharsets = "  ?l = abcdefghijklmnopqrstuvwxyz [a-z]\n"
@@ -227,15 +226,6 @@ inline constexpr const char *OpenClDeviceTypes = "  1 = CPU\n"
                                                  "  Separate multiple values with commas.";
 inline constexpr const char *CommonEncodings = "  utf-8, utf-16le, utf-16be,\n"
                                                "  iso-8859-1, iso-8859-15, windows-1252";
-// Hashcat's table as lines: a tooltip is drawn in the proportional UI font, so
-// its columns cannot line up. The units use a no-break space so a line cannot
-// break between value and unit.
-inline constexpr const char *WorkloadProfiles =
-    "Workload profiles:\n"
-    "  1 – Low: 2 ms, low power consumption, minimal desktop impact\n"
-    "  2 – Default: 12 ms, economic power consumption, noticeable desktop impact\n"
-    "  3 – High: 96 ms, high power consumption, unresponsive desktop\n"
-    "  4 – Nightmare: 480 ms, insane power consumption, headless";
 } // namespace HelpText
 
 // Fixed external links. Only the label around a link is translatable.

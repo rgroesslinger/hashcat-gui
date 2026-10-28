@@ -181,16 +181,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                                   + QString::fromUtf8(AppConstants::HelpText::OpenClDeviceTypes);
     ui->lineEdit_opencl_device_types->setToolTip(deviceTypeTip);
 
-    ui->comboBox_workload_profile->setToolTip(
-        QString::fromUtf8(AppConstants::HelpText::WorkloadProfiles));
-
     auto &settings = SettingsManager::instance();
-
-    // The workload levels carry only display text in the .ui file; give each
-    // one an id so a session stores the level and not its position.
-    for (int i = 0; i < ui->comboBox_workload_profile->count(); ++i) {
-        ui->comboBox_workload_profile->setItemData(i, i + 1);
-    }
 
     initHashAndAttackModes();
     updateViewAttackMode();
@@ -262,7 +253,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnText(ui->lineEdit_outfile_format);
     notifyOnText(ui->lineEdit_cpu_affinity);
     notifyOnText(ui->lineEdit_backend_devices);
-    notifyOnValue(ui->spinBox_segment_size);
     notifyOnText(ui->lineEdit_session);
     notifyOnValue(ui->spinBox_runtime);
     notifyOnText(ui->lineEdit_skip);
@@ -273,8 +263,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnToggle(ui->checkBox_potfile_disable);
     notifyOnToggle(ui->checkBox_optimized_kernel);
     notifyOnToggle(ui->checkBox_speed_only);
-    notifyOnToggle(ui->checkBox_override_workload_profile);
-    notifyOnIndex(ui->comboBox_workload_profile);
     notifyOnText(ui->lineEdit_opencl_device_types);
     notifyOnToggle(ui->checkBox_hwmon_temp_abort);
     notifyOnValue(ui->spinBox_hwmon_temp_abort);
@@ -357,8 +345,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->pushButton_start, &QPushButton::clicked, this, &MainWindow::startClicked);
     connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this,
             &MainWindow::copyCommandToClipboard);
-    connect(ui->checkBox_override_workload_profile, &QCheckBox::toggled,
-            ui->comboBox_workload_profile, &QComboBox::setEnabled);
     // attackIndexChanged() refreshes the preview through
     // updateViewAttackMode(); connecting it to commandChanged() as well would
     // rebuild the preview twice for every mode change.
@@ -791,7 +777,6 @@ void MainWindow::resetSessionTriggered()
     ui->lineEdit_outfile_format->setText(AppConstants::Defaults::OutfileFormat);
     ui->lineEdit_cpu_affinity->clear();
     ui->lineEdit_backend_devices->setText(AppConstants::Defaults::BackendDevices);
-    ui->spinBox_segment_size->setValue(AppConstants::Defaults::SegmentSize);
 
     ui->lineEdit_session->clear();
     ui->spinBox_runtime->setValue(AppConstants::Defaults::Runtime);
@@ -803,8 +788,6 @@ void MainWindow::resetSessionTriggered()
     ui->checkBox_potfile_disable->setChecked(false);
     ui->checkBox_optimized_kernel->setChecked(false);
     ui->checkBox_speed_only->setChecked(false);
-    ui->checkBox_override_workload_profile->setChecked(false);
-    ui->comboBox_workload_profile->setCurrentIndex(0);
     ui->lineEdit_opencl_device_types->clear();
     ui->checkBox_hwmon_temp_abort->setChecked(false);
     ui->spinBox_hwmon_temp_abort->setValue(AppConstants::Defaults::HwmonTempAbort);
@@ -1656,11 +1639,6 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.incrementMin = ui->spinBox_increment_min->value();
     options.incrementMax = ui->spinBox_increment_max->value();
     options.speedOnly = ui->checkBox_speed_only->isChecked();
-    // The combo carries the workload level as item data; read that instead of
-    // the display text, which is only a label.
-    if (ui->checkBox_override_workload_profile->isChecked()) {
-        options.workloadProfile = ui->comboBox_workload_profile->currentData().toString();
-    }
     options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
 
     QCheckBox *charsetBoxes[4] = {
@@ -1694,7 +1672,6 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.openclDeviceTypes = ui->lineEdit_opencl_device_types->text();
     options.hwmonTempAbort = ui->checkBox_hwmon_temp_abort->isChecked();
     options.hwmonTempAbortCelsius = ui->spinBox_hwmon_temp_abort->value();
-    options.segmentSize = ui->spinBox_segment_size->value();
     options.hashFile = ui->lineEdit_hashfile->text();
 
     const auto wordlists =

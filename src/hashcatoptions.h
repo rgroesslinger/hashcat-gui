@@ -51,8 +51,6 @@ struct HashcatOptions {
     QString mask;
 
     bool speedOnly = false;
-    // Empty means "do not pass -w"
-    QString workloadProfile;
     bool optimizedKernel = false;
 
     // Execution scheduling and output state, independent of the attack mode.
@@ -104,8 +102,6 @@ struct HashcatOptions {
 
     QString cpuAffinity;
     QString backendDevices = AppConstants::Defaults::BackendDevices;
-
-    int segmentSize = AppConstants::Defaults::SegmentSize;
 
     QString hashFile;
 

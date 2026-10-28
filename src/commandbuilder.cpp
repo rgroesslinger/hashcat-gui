@@ -119,14 +119,12 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
         {Parameter::RuleRight, {QStringLiteral("-k"), QStringLiteral("--rule-right")}},
         {Parameter::RulesFile, {QStringLiteral("-r"), QStringLiteral("--rules-file")}},
         {Parameter::Runtime, {QString(), QStringLiteral("--runtime")}},
-        {Parameter::SegmentSize, {QStringLiteral("-c"), QStringLiteral("--segment-size")}},
         {Parameter::Session, {QString(), QStringLiteral("--session")}},
         {Parameter::Skip, {QStringLiteral("-s"), QStringLiteral("--skip")}},
         {Parameter::SpeedOnly, {QString(), QStringLiteral("--speed-only")}},
         {Parameter::Status, {QString(), QStringLiteral("--status")}},
         {Parameter::StatusTimer, {QString(), QStringLiteral("--status-timer")}},
         {Parameter::Username, {QString(), QStringLiteral("--username")}},
-        {Parameter::WorkloadProfile, {QStringLiteral("-w"), QStringLiteral("--workload-profile")}},
     };
 
     auto it = parameterMap.constFind(key);
@@ -232,10 +230,6 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameterName(Parameter::SpeedOnly, useShort);
     }
 
-    if (!options.workloadProfile.isEmpty()) {
-        arguments << parameterName(Parameter::WorkloadProfile, useShort) << options.workloadProfile;
-    }
-
     if (options.optimizedKernel) {
         arguments << parameterName(Parameter::OptimizedKernel, useShort);
     }
@@ -329,11 +323,6 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     if (options.hwmonTempAbort) {
         arguments << parameterName(Parameter::HwmonTempAbort, useShort)
                   << QString::number(options.hwmonTempAbortCelsius);
-    }
-
-    if (options.segmentSize != AppConstants::Defaults::SegmentSize) {
-        arguments << parameterName(Parameter::SegmentSize, useShort)
-                  << QString::number(options.segmentSize);
     }
 
     if (!options.hashFile.isEmpty()) {
