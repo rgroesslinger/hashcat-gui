@@ -217,6 +217,16 @@ void TestCommandBuilder::argumentLayout_data()
     QTest::newRow("brute force") << int(
         AttackMode::BruteForce) << QStringList{"--attack-mode",     "3",   "--rules-file", "r.rule",
                                                "--custom-charset1", "abc", "hash.txt",     "?d?d"};
+    // PCFG: -r and the custom charsets apply, the wordlist and the modeless
+    // mask do not (mode 4's mask is its own mask= setting).
+    QTest::newRow("pcfg") << int(AttackMode::Pcfg)
+                          << QStringList{"--attack-mode",     "4",   "--rules-file", "r.rule",
+                                         "--custom-charset1", "abc", "hash.txt"};
+    // Table: -r applies, the table feed reads the wordlist itself and takes
+    // no custom charset or mask.
+    QTest::newRow("table") << int(AttackMode::Table)
+                           << QStringList{"--attack-mode", "5",        "--rules-file",
+                                          "r.rule",        "hash.txt", "dict.txt"};
     QTest::newRow("hybrid wordlist + mask")
         << int(AttackMode::HybridWordMask)
         << QStringList{"--attack-mode", "6",        "--rules-file", "r.rule", "--custom-charset1",
@@ -225,9 +235,20 @@ void TestCommandBuilder::argumentLayout_data()
         << int(AttackMode::HybridMaskWord)
         << QStringList{"--attack-mode", "7",        "--rules-file", "r.rule",  "--custom-charset1",
                        "abc",           "hash.txt", "?d?d",         "dict.txt"};
+    // Generic feed: -r applies; the wordlist list and the mask do not, and
+    // the feed's own arguments are not part of this setup.
+    QTest::newRow("generic") << int(AttackMode::Generic)
+                             << QStringList{"--attack-mode", "8", "--rules-file", "r.rule",
+                                            "hash.txt"};
     QTest::newRow("association") << int(AttackMode::Association)
                                  << QStringList{"--attack-mode", "9",        "--rules-file",
                                                 "r.rule",        "hash.txt", "dict.txt"};
+    // Hybrid 12: the mask comes before the wordlists, -1 and -r apply, and
+    // -i is refused by the mode (so it is never emitted).
+    QTest::newRow("hybrid") << int(AttackMode::Hybrid)
+                            << QStringList{"--attack-mode",     "12",  "--rules-file", "r.rule",
+                                           "--custom-charset1", "abc", "hash.txt",     "?d?d",
+                                           "dict.txt"};
 }
 
 void TestCommandBuilder::argumentLayout()
@@ -743,6 +764,17 @@ void TestCommandBuilder::maskMarkersAreCounted()
 // key=value token, and the settings of mode 9 replace the wordlist.
 void TestCommandBuilder::positionalInputsFollowTheMode()
 {
+    // An empty PCFG run names neither a ruleset nor a setting: the bundled
+    // default-passwords ruleset is implicit.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Pcfg;
+        options.hashFile = QStringLiteral("hash.txt");
+
+        const QStringList expected{"--attack-mode", "4", "hash.txt"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
     // PCFG: the rulesets come before the settings, and every setting is one
     // argv token.
     {
@@ -807,6 +839,12 @@ void TestCommandBuilder::positionalInputsFollowTheMode()
         options.feedName.clear();
         const QStringList nameless{"--attack-mode", "8", "hash.txt", "dict.txt", "second.txt"};
         QCOMPARE(CommandBuilder::build(options), nameless);
+
+        // A feed that takes no arguments: the tail is the name alone.
+        options.feedName = QStringLiteral("random");
+        options.feedArguments.clear();
+        const QStringList argumentless{"--attack-mode", "8", "hash.txt", "random"};
+        QCOMPARE(CommandBuilder::build(options), argumentless);
     }
 
     // Association without a wordlist: the settings follow the hash, each as
@@ -917,18 +955,46 @@ void TestCommandBuilder::parameterSpelling()
     // every enumerator has to be spelled out, otherwise the option silently
     // vanishes from the command line
     const Parameter all[] = {
-        Parameter::AttackMode,      Parameter::BackendDevices, Parameter::CpuAffinity,
-        Parameter::CustomCharset1,  Parameter::CustomCharset2, Parameter::CustomCharset3,
-        Parameter::CustomCharset4,  Parameter::EncodingFrom,   Parameter::EncodingTo,
-        Parameter::Force,           Parameter::GenerateRules,  Parameter::HashType,
-        Parameter::HexCharset,      Parameter::HexSalt,        Parameter::HexWordlist,
-        Parameter::HwmonTempAbort,  Parameter::Increment,      Parameter::IncrementMax,
-        Parameter::IncrementMin,    Parameter::Limit,          Parameter::OpenclDeviceTypes,
-        Parameter::OptimizedKernel, Parameter::Outfile,        Parameter::OutfileFormat,
-        Parameter::PotfileDisable,  Parameter::Remove,         Parameter::RuleLeft,
-        Parameter::RuleRight,       Parameter::RulesFile,      Parameter::Runtime,
-        Parameter::Session,         Parameter::Skip,           Parameter::SpeedOnly,
-        Parameter::Status,          Parameter::StatusTimer,    Parameter::Username,
+        Parameter::AttackMode,
+        Parameter::BackendDevices,
+        Parameter::CachePath,
+        Parameter::CpuAffinity,
+        Parameter::CustomCharset1,
+        Parameter::CustomCharset2,
+        Parameter::CustomCharset3,
+        Parameter::CustomCharset4,
+        Parameter::EncodingFrom,
+        Parameter::EncodingTo,
+        Parameter::Force,
+        Parameter::GenerateRules,
+        Parameter::HashType,
+        Parameter::HashRecipe,
+        Parameter::HexCharset,
+        Parameter::HexSalt,
+        Parameter::HexWordlist,
+        Parameter::HwmonTempAbort,
+        Parameter::Increment,
+        Parameter::IncrementMax,
+        Parameter::IncrementMin,
+        Parameter::Limit,
+        Parameter::OpenclDeviceTypes,
+        Parameter::OptimizedKernel,
+        Parameter::Outfile,
+        Parameter::OutfileFormat,
+        Parameter::OutfileJson,
+        Parameter::PotfileDisable,
+        Parameter::Remove,
+        Parameter::RuleLeft,
+        Parameter::RuleRight,
+        Parameter::RulesConcat,
+        Parameter::RulesFile,
+        Parameter::Runtime,
+        Parameter::Session,
+        Parameter::Skip,
+        Parameter::SpeedOnly,
+        Parameter::Status,
+        Parameter::StatusTimer,
+        Parameter::Username,
     };
     for (const Parameter key : all) {
         QVERIFY2(!CommandBuilder::parameterName(key).isEmpty(), "an enum has no long spelling");

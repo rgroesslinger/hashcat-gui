@@ -969,7 +969,10 @@ void MainWindow::resetSessionTriggered()
     ui->spinBox_hwmon_temp_abort->setValue(AppConstants::Defaults::HwmonTempAbort);
 
     // The attack combo points at index 0 again, so the mode-specific groups
-    // hide; the pass also refreshes the hint and the dependencies.
+    // hide; the pass also refreshes the hint and the dependencies. The recipe
+    // row is refreshed separately: the combo may already have been at index 0,
+    // in which case setCurrentIndex() emits no signal.
+    updateHashTypeDependencies();
     updateViewAttackMode();
 }
 

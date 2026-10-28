@@ -19,6 +19,8 @@ private slots:
     void errorIsClearedOnSuccess();
     void nonNumericKeysAreSkipped();
     void entriesWithoutANameAreSkipped();
+    void hashcat8ModesParseInOrder();
+    void bannerPrefixedReplyIsRejected();
     void unusableReplyIsRejected();
     void invalidReplyIsRejected();
     void failedParseKeepsThePreviousList();
@@ -87,6 +89,47 @@ void TestHashcatInfoParser::entriesWithoutANameAreSkipped()
     QVERIFY(HashcatInfoParser::parseExampleHashes(raw, hashModes));
     QCOMPARE(hashModes.size(), 1);
     QCOMPARE(hashModes.value(0), QStringLiteral("0 | MD5"));
+}
+
+// The 8.0.0 numbering: the renumbered modes arrive in the 40000-44000 range
+// and the old numbers are gone from --example-hashes. The list is keyed by
+// quint32 and has to come out in numeric order, whatever order the JSON used.
+void TestHashcatInfoParser::hashcat8ModesParseInOrder()
+{
+    const QString raw = QStringLiteral(R"({
+    "99999": {"name": "Vendor"},
+    "40032": {"name": "PBKDF2-HMAC-SHA1"},
+    "40009": {"name": "sha224"},
+    "73000": {"name": "Second vendor"},
+    "40000": {"name": "SHA2-256"}
+})");
+
+    QMap<quint32, QString> hashModes;
+    QVERIFY(HashcatInfoParser::parseExampleHashes(raw, hashModes));
+
+    const QList<quint32> expectedKeys{40000, 40009, 40032, 73000, 99999};
+    QCOMPARE(hashModes.keys(), expectedKeys);
+    QCOMPARE(hashModes.value(40000), QStringLiteral("40000 | SHA2-256"));
+    QCOMPARE(hashModes.value(40009), QStringLiteral("40009 | sha224"));
+    QCOMPARE(hashModes.value(40032), QStringLiteral("40032 | PBKDF2-HMAC-SHA1"));
+
+    // The pre-8.0.0 number is not part of the reply, so nothing invents it.
+    QVERIFY(!hashModes.contains(12000));
+}
+
+// HelperUtils::executeHashcat() appends --quiet for a reason: fromJson skips
+// leading whitespace only, so an unquiet banner would fail the parse at char
+// zero. This pins the contract that makes the flag load-bearing.
+void TestHashcatInfoParser::bannerPrefixedReplyIsRejected()
+{
+    const QString raw = QStringLiteral("hashcat (v8.0.0) starting in autodetect mode\n\n"
+                                       R"({"40009":{"name":"sha224"}})");
+
+    QMap<quint32, QString> hashModes;
+    QString errorMessage;
+    QVERIFY(!HashcatInfoParser::parseExampleHashes(raw, hashModes, &errorMessage));
+    QVERIFY(!errorMessage.isEmpty());
+    QVERIFY(hashModes.isEmpty());
 }
 
 // Everything skippable at once: parsing succeeds per entry, but the reply
