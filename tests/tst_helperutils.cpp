@@ -30,6 +30,11 @@ private slots:
     void validateLaunch();
     void validateOptions_data();
     void validateOptions();
+    void feedModeRequirements();
+    void pcfgSettingsAreValidated();
+    void tableSettingsAreValidated();
+    void associationSettingsAreValidated();
+    void maskMarkersAreValidated();
     void terminalArgumentsArePinned();
     void findHashcatInPathFindsTheExecutable();
     void findHashcatInPathIsEmptyWithoutOne();
@@ -288,10 +293,11 @@ void TestHelperUtils::validateOptions_data()
         << true << int(HelperUtils::LaunchError::RemoveInAssociation) << QString();
 
     // The GUI caps the pairing at one wordlist; hashcat reads two, but the
-    // list offers no second role for a second list.
+    // list offers no second role for a second list. The mode has a range
+    // (0 or 1), so the error is the at-most one, not the exact count.
     QTest::newRow("association with two word lists")
         << int(AttackMode::Association) << two << QString() << false << 0 << 0 << false << false
-        << int(HelperUtils::LaunchError::WrongWordlistCount) << QStringLiteral("2");
+        << int(HelperUtils::LaunchError::TooManyWordlists) << QStringLiteral("2");
 }
 
 void TestHelperUtils::validateOptions()
@@ -326,6 +332,351 @@ void TestHelperUtils::validateOptions()
 
     // The same has to hold when the caller does not care about the detail
     QCOMPARE(int(HelperUtils::validateOptions(options, nullptr)), expected);
+}
+
+// What the feed modes owe beyond the shared checks: the table a mode 5 run
+// reads, the feed name of mode 8 and the wordlist caps.
+void TestHelperUtils::feedModeRequirements()
+{
+    const QStringList one{QStringLiteral("/tmp/a.txt")};
+    const QStringList two{QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")};
+
+    // Mode 5 takes exactly one wordlist: none is a missing list, two is one
+    // too many - and without a table there is nothing to run.
+    HashcatOptions table;
+    table.attackMode = AttackMode::Table;
+    table.tableFiles = QStringList{QStringLiteral("/tmp/table.txt")};
+    QCOMPARE(int(HelperUtils::validateOptions(table)), int(HelperUtils::LaunchError::NoWordlist));
+
+    table.wordlists = one;
+    QCOMPARE(int(HelperUtils::validateOptions(table)), int(HelperUtils::LaunchError::None));
+
+    table.wordlists = two;
+    QCOMPARE(int(HelperUtils::validateOptions(table)),
+             int(HelperUtils::LaunchError::TooManyWordlists));
+
+    table.wordlists = one;
+    table.tableFiles.clear();
+    QCOMPARE(int(HelperUtils::validateOptions(table)), int(HelperUtils::LaunchError::NoTable));
+
+    // Mode 8 needs a feed name. The argument count is the feed's own
+    // business - random and stdin take none, wordlist needs a path - so a
+    // blanket check here would block the feeds that need no argument.
+    HashcatOptions feed;
+    feed.attackMode = AttackMode::Generic;
+    QCOMPARE(int(HelperUtils::validateOptions(feed)), int(HelperUtils::LaunchError::NoFeed));
+
+    feed.feedName = QStringLiteral("random");
+    QCOMPARE(int(HelperUtils::validateOptions(feed)), int(HelperUtils::LaunchError::None));
+
+    feed.feedName = QStringLiteral("wordlist");
+    feed.feedArguments = one;
+    QCOMPARE(int(HelperUtils::validateOptions(feed)), int(HelperUtils::LaunchError::None));
+
+    // Mode 9 pairs at most one wordlist in this GUI.
+    HashcatOptions association;
+    association.attackMode = AttackMode::Association;
+    association.wordlists = two;
+    QCOMPARE(int(HelperUtils::validateOptions(association)),
+             int(HelperUtils::LaunchError::TooManyWordlists));
+
+    // Mode 12 takes the two wordlists its markers name; a third is refused
+    // before the markers are looked at.
+    HashcatOptions hybrid;
+    hybrid.attackMode = AttackMode::Hybrid;
+    hybrid.mask = QStringLiteral("?d?w?d?q");
+    hybrid.wordlists = two;
+    QCOMPARE(int(HelperUtils::validateOptions(hybrid)), int(HelperUtils::LaunchError::None));
+
+    hybrid.wordlists << QStringLiteral("/tmp/c.txt");
+    QCOMPARE(int(HelperUtils::validateOptions(hybrid)),
+             int(HelperUtils::LaunchError::TooManyWordlists));
+}
+
+// The mode 4 settings: the feed parses them only after the backend devices
+// are set up, and maxgain is never checked upstream at all.
+void TestHelperUtils::pcfgSettingsAreValidated()
+{
+    const auto expect = [](const HashcatOptions &options,
+                           HelperUtils::LaunchError expected) -> void {
+        QString detail(QStringLiteral("stale"));
+        QCOMPARE(int(HelperUtils::validateOptions(options, &detail)), int(expected));
+        // The same has to hold when the caller does not care about the detail
+        QCOMPARE(int(HelperUtils::validateOptions(options, nullptr)), int(expected));
+    };
+
+    HashcatOptions clean;
+    clean.attackMode = AttackMode::Pcfg;
+    clean.pcfgRulesets =
+        QStringList{QStringLiteral("/tmp/one.pcfg"), QStringLiteral("/tmp/two.pcfg")};
+    clean.pcfgScale = QStringLiteral("2");
+    clean.pcfgCostmax = QStringLiteral("40");
+    clean.pcfgWeights = QStringLiteral("2:1");
+    clean.pcfgMask = QStringLiteral("?u?l?l?l?l?d?d?d");
+    clean.pcfgExtraSettings = QStringList{QStringLiteral("omen=0"), QStringLiteral("pwmin=8")};
+    expect(clean, HelperUtils::LaunchError::None);
+
+    struct Case {
+        QString HashcatOptions::*field;
+        QString value;
+        QString reported; // the detail: the setting as the feed sees it
+    };
+    const Case typedCases[]{
+        {&HashcatOptions::pcfgScale, QStringLiteral("0"), QStringLiteral("scale=0")},
+        {&HashcatOptions::pcfgScale, QStringLiteral("65"), QStringLiteral("scale=65")},
+        {&HashcatOptions::pcfgCostmax, QStringLiteral("0"), QStringLiteral("costmax=0")},
+        {&HashcatOptions::pcfgCostmax, QStringLiteral("65"), QStringLiteral("costmax=65")},
+        {&HashcatOptions::pcfgThreads, QStringLiteral("17"), QStringLiteral("threads=17")},
+        {&HashcatOptions::pcfgKbits, QStringLiteral("28"), QStringLiteral("kbits=28")},
+        {&HashcatOptions::pcfgWalk, QStringLiteral("2"), QStringLiteral("walk=2")},
+        // maxword is 0, 16 or 32.
+        {&HashcatOptions::pcfgMaxword, QStringLiteral("15"), QStringLiteral("maxword=15")},
+        // maxgain's declared 1.0-64.0 range is the one check upstream never
+        // makes, so this one exists only here.
+        {&HashcatOptions::pcfgMaxgain, QStringLiteral("0.5"), QStringLiteral("maxgain=0.5")},
+        {&HashcatOptions::pcfgMaxgain, QStringLiteral("65"), QStringLiteral("maxgain=65")},
+    };
+    for (const Case &bad : typedCases) {
+        HashcatOptions options = clean;
+        options.*bad.field = bad.value;
+        QString detail;
+        QCOMPARE(int(HelperUtils::validateOptions(options, &detail)),
+                 int(HelperUtils::LaunchError::InvalidPcfgSetting));
+        QCOMPARE(detail, bad.reported);
+    }
+
+    // weights: a plain colon separated list of values above zero, one per
+    // ruleset - an empty list is the one bundled default.
+    const QStringList weightCases{QStringLiteral("0"), QStringLiteral("a:b"),
+                                  QStringLiteral("1:1")};
+    for (const QString &weights : weightCases) {
+        HashcatOptions options = clean;
+        options.pcfgRulesets.clear();
+        options.pcfgWeights = weights;
+        QCOMPARE(int(HelperUtils::validateOptions(options)),
+                 int(HelperUtils::LaunchError::InvalidPcfgSetting));
+    }
+
+    // The grammar held to the mask refuses the pair with omen=1, and the
+    // hint words from the accounts have no source while the mask is on.
+    const QStringList maskConflicts{QStringLiteral("omen=1"), QStringLiteral("hintaccount=8")};
+    for (const QString &token : maskConflicts) {
+        HashcatOptions options = clean;
+        options.pcfgExtraSettings = QStringList{token};
+        QCOMPARE(int(HelperUtils::validateOptions(options)),
+                 int(HelperUtils::LaunchError::InvalidPcfgSetting));
+    }
+
+    // A mask with the hybrid markers is mode 12's rewriting, not a grammar.
+    HashcatOptions markers = clean;
+    markers.pcfgMask = QStringLiteral("?u?w");
+    expect(markers, HelperUtils::LaunchError::InvalidPcfgSetting);
+
+    // The conflicts only count with a mask, and a named source (or
+    // hintaccount=0) is no conflict at all.
+    HashcatOptions hintwords = clean;
+    hintwords.pcfgExtraSettings =
+        QStringList{QStringLiteral("hintaccount=8"), QStringLiteral("hintwords=w")};
+    expect(hintwords, HelperUtils::LaunchError::None);
+
+    HashcatOptions noHint = clean;
+    noHint.pcfgExtraSettings = QStringList{QStringLiteral("hintaccount=0")};
+    expect(noHint, HelperUtils::LaunchError::None);
+
+    HashcatOptions noMask = clean;
+    noMask.pcfgMask.clear();
+    noMask.pcfgExtraSettings = QStringList{QStringLiteral("omen=1")};
+    expect(noMask, HelperUtils::LaunchError::None);
+
+    // A bare token before the first setting would be read as another
+    // ruleset.
+    HashcatOptions bare = clean;
+    bare.pcfgExtraSettings = QStringList{QStringLiteral("pwmin")};
+    QString detail;
+    QCOMPARE(int(HelperUtils::validateOptions(bare, &detail)),
+             int(HelperUtils::LaunchError::InvalidPcfgSetting));
+    QCOMPARE(detail, QStringLiteral("pwmin"));
+
+    // The GUI can create a repeated key itself: a typed field plus an extra
+    // token. Every feed refuses one, but only after device init.
+    HashcatOptions repeated = clean;
+    repeated.pcfgExtraSettings = QStringList{QStringLiteral("scale=3")};
+    QCOMPARE(int(HelperUtils::validateOptions(repeated, &detail)),
+             int(HelperUtils::LaunchError::InvalidPcfgSetting));
+    QCOMPARE(detail, QStringLiteral("scale: given more than once"));
+}
+
+// The mode 5 settings, for the same late-failure reason as the mode 4 ones.
+void TestHelperUtils::tableSettingsAreValidated()
+{
+    HashcatOptions clean;
+    clean.attackMode = AttackMode::Table;
+    clean.wordlists = QStringList{QStringLiteral("/tmp/a.txt")};
+    clean.tableFiles = QStringList{QStringLiteral("/tmp/table.txt")};
+    clean.tableIdentity = QStringLiteral("1");
+    clean.tableTemplate = QStringLiteral("0");
+    clean.tableSingle = QStringLiteral("0");
+    clean.tableCap = QStringLiteral("0");
+    clean.tableMaxperm = QStringLiteral("1048576");
+    QCOMPARE(int(HelperUtils::validateOptions(clean)), int(HelperUtils::LaunchError::None));
+
+    // The three flags: empty (the default), 0 or 1.
+    HashcatOptions flag = clean;
+    flag.tableTemplate = QStringLiteral("2");
+    QString detail;
+    QCOMPARE(int(HelperUtils::validateOptions(flag, &detail)),
+             int(HelperUtils::LaunchError::InvalidTableSetting));
+    QCOMPARE(detail, QStringLiteral("template=2"));
+
+    // One substitution needs the other positions left alone.
+    HashcatOptions substitution = clean;
+    substitution.tableSingle = QStringLiteral("1");
+    substitution.tableIdentity = QStringLiteral("0");
+    QCOMPARE(int(HelperUtils::validateOptions(substitution, &detail)),
+             int(HelperUtils::LaunchError::InvalidTableSetting));
+    QCOMPARE(detail, QStringLiteral("identity=0"));
+
+    // cap and maxperm reach beyond every Qt integer type, so their bounds
+    // are checked here, not by a spin box.
+    HashcatOptions cap = clean;
+    cap.tableCap = QStringLiteral("4294967296");
+    QCOMPARE(int(HelperUtils::validateOptions(cap, &detail)),
+             int(HelperUtils::LaunchError::InvalidTableSetting));
+    QCOMPARE(detail, QStringLiteral("cap=4294967296"));
+
+    HashcatOptions maxperm = clean;
+    maxperm.tableMaxperm = QStringLiteral("18446744073709551616"); // 2^64
+    QCOMPARE(int(HelperUtils::validateOptions(maxperm, &detail)),
+             int(HelperUtils::LaunchError::InvalidTableSetting));
+    QCOMPARE(detail, QStringLiteral("maxperm=18446744073709551616"));
+
+    // A bare extra token would be read as another table.
+    HashcatOptions bare = clean;
+    bare.tableExtraSettings = QStringList{QStringLiteral("cap")};
+    QCOMPARE(int(HelperUtils::validateOptions(bare, &detail)),
+             int(HelperUtils::LaunchError::InvalidTableSetting));
+    QCOMPARE(detail, QStringLiteral("cap"));
+
+    // The typed field plus an extra token: the same repeated key the feed
+    // refuses only after device init.
+    HashcatOptions repeated = clean;
+    repeated.tableExtraSettings = QStringList{QStringLiteral("cap=5")};
+    QCOMPARE(int(HelperUtils::validateOptions(repeated, &detail)),
+             int(HelperUtils::LaunchError::InvalidTableSetting));
+    QCOMPARE(detail, QStringLiteral("cap: given more than once"));
+
+    // A full run with the extra line.
+    HashcatOptions full = clean;
+    full.tableExtraSettings = QStringList{QStringLiteral("cache=1"), QStringLiteral("pwmax=64")};
+    QCOMPARE(int(HelperUtils::validateOptions(full)), int(HelperUtils::LaunchError::None));
+}
+
+// The mode 9 settings line: the two forms are alternatives, and a token
+// that is not a setting would become a wordlist upstream.
+void TestHelperUtils::associationSettingsAreValidated()
+{
+    const QStringList valid{QStringLiteral("phases=words,rules"),
+                            QStringLiteral("rules.rulemax=300")};
+
+    HashcatOptions clean;
+    clean.attackMode = AttackMode::Association;
+    clean.associationSettings = valid;
+    QCOMPARE(int(HelperUtils::validateOptions(clean)), int(HelperUtils::LaunchError::None));
+
+    // The shape is about the key only: hashcat reports the missing phase
+    // itself, once the session starts.
+    HashcatOptions emptyPhase;
+    emptyPhase.attackMode = AttackMode::Association;
+    emptyPhase.associationSettings = QStringList{QStringLiteral("phases=")};
+    QCOMPARE(int(HelperUtils::validateOptions(emptyPhase)), int(HelperUtils::LaunchError::None));
+
+    // A token that fails the shape is not refused at all upstream: it would
+    // either fail as a path naming the setting, or silently add a second
+    // wordlist. This check is the one hashcat cannot make for us.
+    const QStringList malformed{QStringLiteral("phases words,rules"), QStringLiteral("=x"),
+                                QStringLiteral("9=x"), QStringLiteral("-x=1")};
+    for (const QString &token : malformed) {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Association;
+        options.associationSettings = QStringList{token};
+        QString detail;
+        QCOMPARE(int(HelperUtils::validateOptions(options, &detail)),
+                 int(HelperUtils::LaunchError::InvalidAssociationSetting));
+        QCOMPARE(detail, token);
+    }
+
+    // With a wordlist the two files are paired by line and no setting is
+    // accepted; the combination is reported before the shape.
+    HashcatOptions both;
+    both.attackMode = AttackMode::Association;
+    both.wordlists = QStringList{QStringLiteral("/tmp/a.txt")};
+    both.associationSettings = QStringList{QStringLiteral("phases words,rules")};
+    QCOMPARE(int(HelperUtils::validateOptions(both)),
+             int(HelperUtils::LaunchError::AssociationSettingsWithWordlist));
+}
+
+// The mode 12 mask markers, and the markers in the modes that rewrite them.
+void TestHelperUtils::maskMarkersAreValidated()
+{
+    const QStringList one{QStringLiteral("/tmp/a.txt")};
+    const QStringList two{QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")};
+
+    const auto hybridError = [&one, &two](const QString &mask, const QStringList &wordlists) {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Hybrid;
+        options.mask = mask;
+        options.wordlists = wordlists;
+        return int(HelperUtils::validateOptions(options));
+    };
+
+    QCOMPARE(hybridError(QStringLiteral("?d?w?d"), one), int(HelperUtils::LaunchError::None));
+    QCOMPARE(hybridError(QStringLiteral("?w?q"), two), int(HelperUtils::LaunchError::None));
+    // An escaped marker pair stands for the literal characters.
+    QCOMPARE(hybridError(QStringLiteral("??w"), one),
+             int(HelperUtils::LaunchError::MaskNeedsWordMarker));
+
+    QCOMPARE(hybridError(QStringLiteral("?d?d?d"), one),
+             int(HelperUtils::LaunchError::MaskNeedsWordMarker));
+    QCOMPARE(hybridError(QStringLiteral("?w?w"), one),
+             int(HelperUtils::LaunchError::MaskMultipleWordMarkers));
+    QCOMPARE(hybridError(QStringLiteral("?w?q?q"), one),
+             int(HelperUtils::LaunchError::MaskMultipleQMarks));
+    QCOMPARE(hybridError(QStringLiteral("?q?w"), one),
+             int(HelperUtils::LaunchError::MaskQBeforeWord));
+    // The markers have to line up with what is selected.
+    QCOMPARE(hybridError(QStringLiteral("?w?q"), one),
+             int(HelperUtils::LaunchError::MaskQWithoutWordlist));
+    QCOMPARE(hybridError(QStringLiteral("?w"), two),
+             int(HelperUtils::LaunchError::SecondWordlistWithoutQ));
+
+    // The increment is refused in mode 12 as well: the widget is hidden
+    // there and collect drops the flag, so this is defence in depth.
+    HashcatOptions increment;
+    increment.attackMode = AttackMode::Hybrid;
+    increment.mask = QStringLiteral("?w");
+    increment.wordlists = one;
+    increment.increment = true;
+    QCOMPARE(int(HelperUtils::validateOptions(increment)),
+             int(HelperUtils::LaunchError::IncrementInMode12));
+
+    // The other mask modes would take the markers for their literal ?w/?q
+    // or rewrite them.
+    HashcatOptions brute;
+    brute.attackMode = AttackMode::BruteForce;
+    brute.mask = QStringLiteral("?w?d");
+    QCOMPARE(int(HelperUtils::validateOptions(brute)),
+             int(HelperUtils::LaunchError::MaskMarkersNotAllowed));
+
+    HashcatOptions hybridWord;
+    hybridWord.attackMode = AttackMode::HybridWordMask;
+    hybridWord.wordlists = one;
+    hybridWord.mask = QStringLiteral("?d?q");
+    QCOMPARE(int(HelperUtils::validateOptions(hybridWord)),
+             int(HelperUtils::LaunchError::MaskMarkersNotAllowed));
+
+    // A mask without the markers is fine in every mode.
+    brute.mask = QStringLiteral("?d?d");
+    QCOMPARE(int(HelperUtils::validateOptions(brute)), int(HelperUtils::LaunchError::None));
 }
 
 // The mapping startClicked() builds its command line from: pin every

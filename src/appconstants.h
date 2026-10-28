@@ -203,6 +203,11 @@ inline constexpr QLatin1StringView WeightsList{"^[0-9]+(:[0-9]+)*$"};
 inline constexpr QLatin1StringView MaxwordValue{"^(0|16|32)?$"};
 inline constexpr QLatin1StringView DecimalNumber{"^[0-9]+([.][0-9]+)?$"};
 inline constexpr QLatin1StringView BinaryFlag{"^[01]?$"};
+// The shape upstream calls a setting (feed_param_is_setting(), deliberately
+// shape based: a misspelled key has to be reported as an unknown setting, not
+// as a filename). A mode 9 token that fails this shape would be read as a
+// wordlist instead, silently or with a path error naming the setting.
+inline constexpr QLatin1StringView AssociationSetting{"^[A-Za-z][A-Za-z0-9._-]*="};
 } // namespace Validation
 
 // The positional settings of the feed modes (-a 4, -a 5) and of the
@@ -219,6 +224,10 @@ inline constexpr QLatin1StringView Maxword{"maxword"};
 inline constexpr QLatin1StringView Maxgain{"maxgain"};
 inline constexpr QLatin1StringView Walk{"walk"};
 inline constexpr QLatin1StringView Mask{"mask"};
+inline constexpr QLatin1StringView Omen{"omen"};
+inline constexpr QLatin1StringView Hintaccount{"hintaccount"};
+inline constexpr QLatin1StringView Hintwords{"hintwords"};
+inline constexpr QLatin1StringView Hintfile{"hintfile"};
 inline constexpr QLatin1StringView Identity{"identity"};
 inline constexpr QLatin1StringView Template{"template"};
 inline constexpr QLatin1StringView Single{"single"};

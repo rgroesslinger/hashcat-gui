@@ -1808,7 +1808,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
     case HelperUtils::LaunchError::WrongWordlistCount: {
         // The wording below uses minWordlists as the exact count. That is only
         // correct while Combination is the sole mode with maxWordlists >= 0,
-        // and there min == max; a mode with a range needs different wording.
+        // and there min == max; a mode with a range reports TooManyWordlists.
         const CommandBuilder::ModeRequirements requirements =
             CommandBuilder::modeRequirements(currentAttackMode());
         box.setIcon(QMessageBox::Information);
@@ -1819,9 +1819,103 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         break;
     }
 
+    case HelperUtils::LaunchError::TooManyWordlists: {
+        const CommandBuilder::ModeRequirements requirements =
+            CommandBuilder::modeRequirements(currentAttackMode());
+        box.setIcon(QMessageBox::Information);
+        QString text = tr("This mode takes at most %1 wordlists.\nCurrently selected: %2.")
+                           .arg(requirements.maxWordlists)
+                           .arg(detail);
+        if (currentAttackMode() == AttackMode::Association) {
+            text += QLatin1Char('\n')
+                    + tr("Hashcat pairs the two files by line here; this GUI offers "
+                         "only one wordlist for that role.");
+        }
+        box.setText(text);
+        break;
+    }
+
     case HelperUtils::LaunchError::NoMask:
         box.setIcon(QMessageBox::Information);
         box.setText(tr("This mode needs a mask."));
+        break;
+
+    case HelperUtils::LaunchError::NoTable:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("This mode needs at least one table."));
+        break;
+
+    case HelperUtils::LaunchError::NoFeed:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("This mode needs a feed: a bundled name (wordlist, stdin, random, …) "
+                       "or the path of a feed file."));
+        break;
+
+    case HelperUtils::LaunchError::MaskNeedsWordMarker:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("This mode pairs the wordlists with the mask; the mask needs a ?w "
+                       "for the word."));
+        break;
+
+    case HelperUtils::LaunchError::MaskMultipleWordMarkers:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The mask contains more than one ?w."));
+        break;
+
+    case HelperUtils::LaunchError::MaskQBeforeWord:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The mask contains a ?q before the first ?w."));
+        break;
+
+    case HelperUtils::LaunchError::MaskMultipleQMarks:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The mask contains more than one ?q."));
+        break;
+
+    case HelperUtils::LaunchError::MaskQWithoutWordlist:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The mask names a second word with ?q, but only one wordlist "
+                       "is selected."));
+        break;
+
+    case HelperUtils::LaunchError::SecondWordlistWithoutQ:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("Two wordlists are selected, but the mask has no ?q for the "
+                       "second one."));
+        break;
+
+    case HelperUtils::LaunchError::IncrementInMode12:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The increment is not offered in this hybrid mode."));
+        break;
+
+    case HelperUtils::LaunchError::MaskMarkersNotAllowed:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The ?w and ?q markers are only offered in the hybrid mode "
+                       "(mask + wordlists)."));
+        break;
+
+    // The three settings errors name a value or token the user typed, so
+    // they are set to plain text explicitly: a value containing '<' would
+    // be taken for markup by the default AutoText.
+    case HelperUtils::LaunchError::InvalidPcfgSetting:
+    case HelperUtils::LaunchError::InvalidTableSetting:
+        box.setIcon(QMessageBox::Information);
+        box.setTextFormat(Qt::PlainText);
+        box.setText(tr("The setting “%1” is not valid for this mode.").arg(detail));
+        break;
+
+    case HelperUtils::LaunchError::InvalidAssociationSetting:
+        box.setIcon(QMessageBox::Information);
+        box.setTextFormat(Qt::PlainText);
+        box.setText(
+            tr("The token “%1” is not a setting; settings are written as key=value.").arg(detail));
+        break;
+
+    case HelperUtils::LaunchError::AssociationSettingsWithWordlist:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("The settings line applies only while the words come from the hash "
+                       "file. Clear either the settings line or the wordlist list."));
         break;
 
     case HelperUtils::LaunchError::InvalidIncrement:
