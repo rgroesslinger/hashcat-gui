@@ -341,6 +341,726 @@
              </widget>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_association_settings">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+             <widget class="QLabel" name="label_association_settings">
+              <property name="visible">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Settings (no wordlist):</string>
+              </property>
+             </widget>
+              </item>
+              <item>
+             <widget class="QLineEdit" name="lineEdit_association_settings">
+              <property name="visible">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">phases=words,rules</string>
+              </property>
+             </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_pcfg">
+              <property name="visible">
+               <bool>false</bool>
+              </property>
+              <property name="title">
+               <string>PCFG</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_pcfg">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_pcfg">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_pcfg_list">
+                   <item>
+             <widget class="QListWidget" name="listWidget_pcfg_rulesets">
+              <property name="minimumSize">
+               <size>
+                <width>420</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>80</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Double-click a row to edit it. Empty runs the bundled default-passwords; hints is also bundled.</string>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+              </property>
+             </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_pcfg_buttons">
+                     <item>
+             <widget class="QPushButton" name="pushButton_open_pcfg_ruleset">
+              <property name="text">
+               <string>Add files…</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QPushButton" name="pushButton_remove_pcfg_ruleset">
+              <property name="text">
+               <string>Remove</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QToolButton" name="toolButton_pcfg_ruleset_up">
+              <property name="toolTip">
+               <string>Move item up</string>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::ArrowType::UpArrow</enum>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QToolButton" name="toolButton_pcfg_ruleset_down">
+              <property name="toolTip">
+               <string>Move item down</string>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::ArrowType::DownArrow</enum>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+                 <spacer name="horizontalSpacer_pcfg_buttons">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_pcfg">
+                 <item row="0" column="0">
+             <widget class="QLabel" name="label_pcfg_scale">
+              <property name="text">
+               <string>Scale:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="1" column="0">
+             <widget class="QLineEdit" name="lineEdit_pcfg_scale">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Quantisation steps per bit (1–64)</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">1</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="0" column="1">
+             <widget class="QLabel" name="label_pcfg_costmax">
+              <property name="text">
+               <string>Costmax:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="1" column="1">
+             <widget class="QLineEdit" name="lineEdit_pcfg_costmax">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Highest cost level to enumerate (1–64)</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">64</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="0" column="2">
+             <widget class="QLabel" name="label_pcfg_weights">
+              <property name="text">
+               <string>Weights:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="1" column="2">
+             <widget class="QLineEdit" name="lineEdit_pcfg_weights">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">1</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="2" column="0">
+             <widget class="QLabel" name="label_pcfg_threads">
+              <property name="text">
+               <string>Threads:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="3" column="0">
+             <widget class="QLineEdit" name="lineEdit_pcfg_threads">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Cores that generate base words (0–16); 0 runs on the calling thread</string>
+              </property>
+              <property name="placeholderText">
+               <string>auto</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="2" column="1">
+             <widget class="QLabel" name="label_pcfg_kbits">
+              <property name="text">
+               <string>Kbits:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="3" column="1">
+             <widget class="QLineEdit" name="lineEdit_pcfg_kbits">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Bits one inner loop may span (0–27)</string>
+              </property>
+              <property name="placeholderText">
+               <string>auto</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="2" column="2">
+             <widget class="QLabel" name="label_pcfg_maxword">
+              <property name="text">
+               <string>Maxword:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="3" column="2">
+             <widget class="QLineEdit" name="lineEdit_pcfg_maxword">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</string>
+              </property>
+              <property name="placeholderText">
+               <string>auto</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="4" column="0">
+             <widget class="QLabel" name="label_pcfg_maxgain">
+              <property name="text">
+               <string>Maxgain:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="5" column="0">
+             <widget class="QLineEdit" name="lineEdit_pcfg_maxgain">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>1.0–64.0; decimal point is a dot, not the locale separator</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">1.5</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="4" column="1">
+             <widget class="QLabel" name="label_pcfg_walk">
+              <property name="text">
+               <string>Walk:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="5" column="1">
+             <widget class="QLineEdit" name="lineEdit_pcfg_walk">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>1 steps the last token instead of unraking it</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">1</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="4" column="2">
+             <widget class="QLabel" name="label_pcfg_mask">
+              <property name="text">
+               <string>Mask:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="5" column="2">
+             <widget class="QLineEdit" name="lineEdit_pcfg_mask">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">?u?l?l?l?l?d?d?d</string>
+              </property>
+             </widget>
+                 </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_pcfg_extra">
+                <item>
+             <widget class="QLabel" name="label_pcfg_extra">
+              <property name="text">
+               <string>Extra settings (key=value):</string>
+              </property>
+              <property name="toolTip">
+               <string>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</string>
+              </property>
+             </widget>
+                </item>
+                <item>
+             <widget class="QLineEdit" name="lineEdit_pcfg_extra">
+              <property name="toolTip">
+               <string>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</string>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">omen=1</string>
+              </property>
+             </widget>
+                </item>
+               </layout>
+              </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_table">
+              <property name="visible">
+               <bool>false</bool>
+              </property>
+              <property name="title">
+               <string>Table</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_table">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_table">
+                 <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_table_list">
+                   <item>
+             <widget class="QListWidget" name="listWidget_tables">
+              <property name="minimumSize">
+               <size>
+                <width>420</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Every argument after the wordlist is a table; double-click to edit</string>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+              </property>
+             </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_table_buttons">
+                     <item>
+             <widget class="QPushButton" name="pushButton_open_table">
+              <property name="text">
+               <string>Add tables…</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QPushButton" name="pushButton_remove_table">
+              <property name="text">
+               <string>Remove</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+                 <spacer name="horizontalSpacer_table_buttons">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QGridLayout" name="gridLayout_table">
+                 <item row="0" column="0">
+             <widget class="QLabel" name="label_table_identity">
+              <property name="text">
+               <string>Identity:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="1" column="0">
+             <widget class="QLineEdit" name="lineEdit_table_identity">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">1</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="0" column="1">
+             <widget class="QLabel" name="label_table_template">
+              <property name="text">
+               <string>Template:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="1" column="1">
+             <widget class="QLineEdit" name="lineEdit_table_template">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">0</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="0" column="2">
+             <widget class="QLabel" name="label_table_single">
+              <property name="text">
+               <string>Single:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="1" column="2">
+             <widget class="QLineEdit" name="lineEdit_table_single">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">0</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="2" column="0">
+             <widget class="QLabel" name="label_table_cap">
+              <property name="text">
+               <string>Cap:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="3" column="0">
+             <widget class="QLineEdit" name="lineEdit_table_cap">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">0</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="2" column="1">
+             <widget class="QLabel" name="label_table_maxperm">
+              <property name="text">
+               <string>Maxperm:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item row="3" column="1">
+             <widget class="QLineEdit" name="lineEdit_table_maxperm">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="placeholderText">
+               <string notr="true">1048576</string>
+              </property>
+             </widget>
+                 </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_table_extra">
+                <item>
+             <widget class="QLabel" name="label_table_extra">
+              <property name="text">
+               <string>Extra settings (key=value):</string>
+              </property>
+              <property name="toolTip">
+               <string>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</string>
+              </property>
+             </widget>
+                </item>
+                <item>
+             <widget class="QLineEdit" name="lineEdit_table_extra">
+              <property name="toolTip">
+               <string>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</string>
+              </property>
+             </widget>
+                </item>
+               </layout>
+              </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_feed">
+              <property name="visible">
+               <bool>false</bool>
+              </property>
+              <property name="title">
+               <string>Generic feed</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_feed">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_feed_name">
+                 <item>
+             <widget class="QLabel" name="label_feed">
+              <property name="text">
+               <string>Feed:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item>
+             <widget class="QLineEdit" name="lineEdit_feed">
+              <property name="placeholderText">
+               <string>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</string>
+              </property>
+             </widget>
+                 </item>
+                 <item>
+             <widget class="QPushButton" name="pushButton_open_feed">
+              <property name="text">
+               <string>Browse…</string>
+              </property>
+             </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_feed_argument">
+                 <item>
+             <widget class="QLabel" name="label_feed_argument">
+              <property name="text">
+               <string>Argument:</string>
+              </property>
+             </widget>
+                 </item>
+                 <item>
+             <widget class="QLineEdit" name="lineEdit_feed_argument">
+             </widget>
+                 </item>
+                 <item>
+             <widget class="QPushButton" name="pushButton_add_feed_argument">
+              <property name="text">
+               <string>Add</string>
+              </property>
+             </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+             <widget class="QListWidget" name="listWidget_feed_arguments">
+              <property name="minimumSize">
+               <size>
+                <width>420</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>80</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Arguments the feed reads, in order; double-click a row to edit</string>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+              </property>
+             </widget>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_feed_buttons">
+                 <item>
+             <widget class="QPushButton" name="pushButton_remove_feed_argument">
+              <property name="text">
+               <string>Remove</string>
+              </property>
+             </widget>
+                 </item>
+                 <item>
+             <widget class="QToolButton" name="toolButton_feed_argument_up">
+              <property name="toolTip">
+               <string>Move item up</string>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::ArrowType::UpArrow</enum>
+              </property>
+             </widget>
+                 </item>
+                 <item>
+             <widget class="QToolButton" name="toolButton_feed_argument_down">
+              <property name="toolTip">
+               <string>Move item down</string>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::ArrowType::DownArrow</enum>
+              </property>
+             </widget>
+                 </item>
+                 <item>
+                 <spacer name="horizontalSpacer_feed_buttons">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <layout class="QHBoxLayout" name="horizontalLayout_17">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_10">

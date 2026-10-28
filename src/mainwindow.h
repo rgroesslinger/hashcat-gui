@@ -23,6 +23,8 @@ namespace Ui
 class MainWindow;
 }
 
+class QListWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -61,6 +63,19 @@ private slots:
     void wordlistItemClicked(QListWidgetItem *item);
     void refreshWordlistMonitor();
     void wordlistAvailabilityChanged(const QString &path, bool available);
+
+    // the PCFG, table and feed groups
+    void addPcfgRulesetClicked();
+    void removePcfgRulesetClicked();
+    void pcfgRulesetMoveUpClicked();
+    void pcfgRulesetMoveDownClicked();
+    void addTableClicked();
+    void removeTableClicked();
+    void addFeedClicked();
+    void addFeedArgumentClicked();
+    void removeFeedArgumentClicked();
+    void feedArgumentMoveUpClicked();
+    void feedArgumentMoveDownClicked();
 
     // checkboxes / radio buttons
     void outfileToggled(bool checked);
@@ -137,6 +152,13 @@ private:
     // widgets.
     HashcatOptions collectHashcatOptions();
     QStringList generateArguments();
+
+    // Row handling of the editable argument lists (PCFG rulesets, tables,
+    // feed arguments). The wordlist list keeps its own handlers: its rows
+    // carry a check state the helpers would not preserve.
+    static QStringList listItems(const QListWidget *list);
+    static void removeSelectedRows(QListWidget *list);
+    static void moveSelectedRow(QListWidget *list, int delta);
 
     // Presents what HelperUtils::validateLaunch() reported
     void showLaunchError(HelperUtils::LaunchError error, const QString &detail);

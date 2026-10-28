@@ -31,10 +31,13 @@
 #include <QScrollBar>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QIntValidator>
 #include <QStandardPaths>
 #include <QStyle>
 #include <QTextDocument>
 #include <QToolTip>
+
+#include <utility>
 
 #if defined(Q_OS_WIN)
 #include <process.h>
@@ -81,6 +84,20 @@ QString menuPath(const QString &text)
         path.chop(1);
     }
     return path.trimmed();
+}
+
+// Adds the chosen files to an argument list, once each. The dialog hands out
+// '/' separated paths, which are stored in the platform's own form so the
+// rows look like the paths the user works with everywhere else.
+void addFilesToList(QListWidget *list, const QString &dialogTitle, QWidget *parent)
+{
+    const QStringList files = QFileDialog::getOpenFileNames(parent, dialogTitle);
+    for (const QString &file : std::as_const(files)) {
+        const QString native = QDir::toNativeSeparators(file);
+        if (!native.isEmpty() && list->findItems(native, Qt::MatchExactly).isEmpty()) {
+            list->addItem(native);
+        }
+    }
 }
 
 // The tooltip of the command preview: the whole command, because the line
@@ -159,6 +176,39 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     const QRegularExpression deviceTypes{QString(AppConstants::Validation::DeviceTypes)};
     ui->lineEdit_opencl_device_types->setValidator(
         new QRegularExpressionValidator(deviceTypes, ui->lineEdit_opencl_device_types));
+
+    // The settings of the PCFG and table feeds, which hashcat parses itself
+    // - and only after it has set up the backend devices, long after the
+    // preview is gone. The ranges a spin box would hold stay line edits
+    // (the feed also takes its defaults, which no spin box can show), so
+    // they get validators of their own.
+    ui->lineEdit_pcfg_scale->setValidator(new QIntValidator(1, 64, ui->lineEdit_pcfg_scale));
+    ui->lineEdit_pcfg_costmax->setValidator(new QIntValidator(1, 64, ui->lineEdit_pcfg_costmax));
+    ui->lineEdit_pcfg_threads->setValidator(new QIntValidator(0, 16, ui->lineEdit_pcfg_threads));
+    ui->lineEdit_pcfg_kbits->setValidator(new QIntValidator(0, 27, ui->lineEdit_pcfg_kbits));
+    ui->lineEdit_pcfg_walk->setValidator(new QIntValidator(0, 1, ui->lineEdit_pcfg_walk));
+
+    // The shapes that are not a plain integer range: the colon separated
+    // weights list, maxword's multiple of 16, the dot separated decimal and
+    // the 0/1 flags of the table feed.
+    const std::pair<QLineEdit *, QLatin1StringView> feedShapes[] = {
+        {ui->lineEdit_pcfg_weights, AppConstants::Validation::WeightsList},
+        {ui->lineEdit_pcfg_maxword, AppConstants::Validation::MaxwordValue},
+        {ui->lineEdit_pcfg_maxgain, AppConstants::Validation::DecimalNumber},
+        {ui->lineEdit_table_identity, AppConstants::Validation::BinaryFlag},
+        {ui->lineEdit_table_template, AppConstants::Validation::BinaryFlag},
+        {ui->lineEdit_table_single, AppConstants::Validation::BinaryFlag},
+    };
+    for (const auto &[edit, shape] : feedShapes) {
+        edit->setValidator(
+            new QRegularExpressionValidator(QRegularExpression(QString(shape)), edit));
+    }
+    // cap and maxperm reach beyond every Qt integer type (0…0xffffffff and a
+    // full u64); the digits are filtered here, the bounds in validateOptions.
+    ui->lineEdit_table_cap->setValidator(
+        new QRegularExpressionValidator(digits, ui->lineEdit_table_cap));
+    ui->lineEdit_table_maxperm->setValidator(
+        new QRegularExpressionValidator(digits, ui->lineEdit_table_maxperm));
 
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
     const QString charsetTip = tr("Built-in charsets:") + QLatin1String("\n\n")
@@ -250,6 +300,27 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     notifyOnText(ui->lineEdit_custom_charset2);
     notifyOnText(ui->lineEdit_custom_charset3);
     notifyOnText(ui->lineEdit_custom_charset4);
+    // The feed modes (PCFG, table, generic) and the association settings
+    // line. The feed argument field is left out on purpose: it only reaches
+    // the command through its list, via the Add button.
+    notifyOnText(ui->lineEdit_association_settings);
+    notifyOnText(ui->lineEdit_pcfg_scale);
+    notifyOnText(ui->lineEdit_pcfg_costmax);
+    notifyOnText(ui->lineEdit_pcfg_weights);
+    notifyOnText(ui->lineEdit_pcfg_threads);
+    notifyOnText(ui->lineEdit_pcfg_kbits);
+    notifyOnText(ui->lineEdit_pcfg_maxword);
+    notifyOnText(ui->lineEdit_pcfg_maxgain);
+    notifyOnText(ui->lineEdit_pcfg_walk);
+    notifyOnText(ui->lineEdit_pcfg_mask);
+    notifyOnText(ui->lineEdit_pcfg_extra);
+    notifyOnText(ui->lineEdit_table_identity);
+    notifyOnText(ui->lineEdit_table_template);
+    notifyOnText(ui->lineEdit_table_single);
+    notifyOnText(ui->lineEdit_table_cap);
+    notifyOnText(ui->lineEdit_table_maxperm);
+    notifyOnText(ui->lineEdit_table_extra);
+    notifyOnText(ui->lineEdit_feed);
     // The two hash file options stay on the Attack tab; everything from the
     // outfile on belongs to the General tab.
     notifyOnToggle(ui->checkBox_remove);
@@ -317,6 +388,42 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::refreshWordlistMonitor);
     connect(&m_wordlistMonitor, &WordlistMonitor::availabilityChanged, this,
             &MainWindow::wordlistAvailabilityChanged);
+
+    /* ---------- PCFG, table and feed ---------- */
+    // The three editable lists announce every change through their model,
+    // which covers the in-place editing as well as the buttons.
+    for (QListWidget *list :
+         {ui->listWidget_pcfg_rulesets, ui->listWidget_tables, ui->listWidget_feed_arguments}) {
+        connect(list->model(), &QAbstractItemModel::rowsInserted, this,
+                [this] { commandChanged(); });
+        connect(list->model(), &QAbstractItemModel::rowsRemoved, this,
+                [this] { commandChanged(); });
+        connect(list, &QListWidget::itemChanged, this, [this] { commandChanged(); });
+    }
+    connect(ui->pushButton_open_pcfg_ruleset, &QPushButton::clicked, this,
+            &MainWindow::addPcfgRulesetClicked);
+    connect(ui->pushButton_remove_pcfg_ruleset, &QPushButton::clicked, this,
+            &MainWindow::removePcfgRulesetClicked);
+    connect(ui->toolButton_pcfg_ruleset_up, &QToolButton::clicked, this,
+            &MainWindow::pcfgRulesetMoveUpClicked);
+    connect(ui->toolButton_pcfg_ruleset_down, &QToolButton::clicked, this,
+            &MainWindow::pcfgRulesetMoveDownClicked);
+    connect(ui->pushButton_open_table, &QPushButton::clicked, this, &MainWindow::addTableClicked);
+    connect(ui->pushButton_remove_table, &QPushButton::clicked, this,
+            &MainWindow::removeTableClicked);
+    connect(ui->pushButton_open_feed, &QPushButton::clicked, this, &MainWindow::addFeedClicked);
+    connect(ui->pushButton_add_feed_argument, &QPushButton::clicked, this,
+            &MainWindow::addFeedArgumentClicked);
+    // Typing an argument and pressing Enter is the natural sequence; without
+    // this connection the button would be the only way to add one.
+    connect(ui->lineEdit_feed_argument, &QLineEdit::returnPressed, this,
+            &MainWindow::addFeedArgumentClicked);
+    connect(ui->pushButton_remove_feed_argument, &QPushButton::clicked, this,
+            &MainWindow::removeFeedArgumentClicked);
+    connect(ui->toolButton_feed_argument_up, &QToolButton::clicked, this,
+            &MainWindow::feedArgumentMoveUpClicked);
+    connect(ui->toolButton_feed_argument_down, &QToolButton::clicked, this,
+            &MainWindow::feedArgumentMoveDownClicked);
 
     /* ---------- rules ---------- */
     connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesFile1Toggled);
@@ -762,6 +869,28 @@ void MainWindow::resetSessionTriggered()
     ui->lineEdit_rulesfile_3->clear();
     ui->lineEdit_rule_left->clear();
     ui->lineEdit_rule_right->clear();
+    ui->lineEdit_association_settings->clear();
+    ui->listWidget_pcfg_rulesets->clear();
+    ui->lineEdit_pcfg_scale->clear();
+    ui->lineEdit_pcfg_costmax->clear();
+    ui->lineEdit_pcfg_weights->clear();
+    ui->lineEdit_pcfg_threads->clear();
+    ui->lineEdit_pcfg_kbits->clear();
+    ui->lineEdit_pcfg_maxword->clear();
+    ui->lineEdit_pcfg_maxgain->clear();
+    ui->lineEdit_pcfg_walk->clear();
+    ui->lineEdit_pcfg_mask->clear();
+    ui->lineEdit_pcfg_extra->clear();
+    ui->listWidget_tables->clear();
+    ui->lineEdit_table_identity->clear();
+    ui->lineEdit_table_template->clear();
+    ui->lineEdit_table_single->clear();
+    ui->lineEdit_table_cap->clear();
+    ui->lineEdit_table_maxperm->clear();
+    ui->lineEdit_table_extra->clear();
+    ui->lineEdit_feed->clear();
+    ui->lineEdit_feed_argument->clear();
+    ui->listWidget_feed_arguments->clear();
     ui->spinBox_generate_rules->setValue(1);
     ui->lineEdit_mask->clear();
     ui->checkBox_increment->setChecked(false);
@@ -799,8 +928,9 @@ void MainWindow::resetSessionTriggered()
     ui->checkBox_hwmon_temp_abort->setChecked(false);
     ui->spinBox_hwmon_temp_abort->setValue(AppConstants::Defaults::HwmonTempAbort);
 
-    updateOptionDependencies();
-    commandChanged();
+    // The attack combo points at index 0 again, so the mode-specific groups
+    // hide; the pass also refreshes the hint and the dependencies.
+    updateViewAttackMode();
 }
 
 // File → Settings
@@ -1023,9 +1153,13 @@ void MainWindow::initHashAndAttackModes()
     attackModes.insert(AttackMode::Straight, tr("Straight"));
     attackModes.insert(AttackMode::Combination, tr("Combination"));
     attackModes.insert(AttackMode::BruteForce, tr("Brute-force"));
+    attackModes.insert(AttackMode::Pcfg, tr("PCFG"));
+    attackModes.insert(AttackMode::Table, tr("Table"));
     attackModes.insert(AttackMode::HybridWordMask, tr("Hybrid Wordlist + Mask"));
     attackModes.insert(AttackMode::HybridMaskWord, tr("Hybrid Mask + Wordlist"));
+    attackModes.insert(AttackMode::Generic, tr("Generic (feed)"));
     attackModes.insert(AttackMode::Association, tr("Association"));
+    attackModes.insert(AttackMode::Hybrid, tr("Hybrid (mask + ?w/?q)"));
 
     // The numeric id travels as item data: the displayed text is what a
     // translation changes, the id is what has to end up on the command line.
@@ -1115,20 +1249,53 @@ void MainWindow::updateViewAttackMode()
 
     // Use the very predicates CommandBuilder applies, so the widgets show
     // exactly the options that end up in the command line and the two can
-    // never drift apart.
+    // never drift apart. The mode-specific groups are hidden rather than
+    // disabled: a disabled group still takes its share of the tab, so the
+    // window would keep the height of its busiest mode in every other one.
     const bool usesMask = CommandBuilder::attackUsesMask(mode);
     const bool usesRuleLeft = CommandBuilder::attackUsesRuleLeft(mode);
     const bool usesRuleRight = CommandBuilder::attackUsesRuleRight(mode);
-    ui->groupBox_wordlists->setEnabled(CommandBuilder::attackUsesWordlists(mode));
-    ui->groupBox_rules->setEnabled(CommandBuilder::attackUsesRules(mode));
+    const bool usesIncrement = CommandBuilder::attackUsesIncrement(mode);
+    ui->groupBox_wordlists->setVisible(CommandBuilder::attackUsesWordlists(mode));
+    ui->groupBox_rules->setVisible(CommandBuilder::attackUsesRules(mode));
+    // The group starts out disabled in the .ui file, so it keeps the
+    // enabled gate next to the visibility one: it is visible only while one
+    // of the two sides applies, and enabled exactly then.
+    ui->groupBox_wordlist_rules->setVisible(usesRuleLeft || usesRuleRight);
     ui->groupBox_wordlist_rules->setEnabled(usesRuleLeft || usesRuleRight);
     ui->label_rule_left->setEnabled(usesRuleLeft);
     ui->lineEdit_rule_left->setEnabled(usesRuleLeft);
     ui->label_rule_right->setEnabled(usesRuleRight);
     ui->lineEdit_rule_right->setEnabled(usesRuleRight);
-    ui->groupBox_custom_charset->setEnabled(usesMask);
-    ui->groupBox_mask->setEnabled(usesMask);
-    ui->checkBox_hex_charset->setEnabled(usesMask);
+    ui->groupBox_custom_charset->setVisible(CommandBuilder::attackUsesCustomCharset(mode));
+    ui->groupBox_mask->setVisible(usesMask);
+    ui->checkBox_hex_charset->setVisible(CommandBuilder::attackUsesCustomCharset(mode));
+
+    // The feed modes get a group each, and mode 9 one extra row: the
+    // settings line that bounds a run whose words come from the hash file.
+    ui->groupBox_pcfg->setVisible(mode == AttackMode::Pcfg);
+    ui->groupBox_table->setVisible(mode == AttackMode::Table);
+    ui->groupBox_feed->setVisible(mode == AttackMode::Generic);
+    ui->label_association_settings->setVisible(mode == AttackMode::Association);
+    ui->lineEdit_association_settings->setVisible(mode == AttackMode::Association);
+
+    // Inside the wordlist group: only the modes that read a wordlist take
+    // the wordlist options, and only the ones hashcat lets name an
+    // encoding.
+    ui->checkBox_hex_wordlist->setVisible(CommandBuilder::attackUsesHexWordlist(mode));
+    const bool usesEncoding = CommandBuilder::attackUsesWordlistEncoding(mode);
+    ui->label_encoding_from->setVisible(usesEncoding);
+    ui->lineEdit_encoding_from->setVisible(usesEncoding);
+    ui->label_encoding_to->setVisible(usesEncoding);
+    ui->lineEdit_encoding_to->setVisible(usesEncoding);
+
+    // Inside the mask group: hashcat 8.0.0 refuses -i in mode 12, so the
+    // increment row only exists where the flag is offered.
+    ui->checkBox_increment->setVisible(usesIncrement);
+    ui->label_increment_min->setVisible(usesIncrement);
+    ui->spinBox_increment_min->setVisible(usesIncrement);
+    ui->label_increment_max->setVisible(usesIncrement);
+    ui->spinBox_increment_max->setVisible(usesIncrement);
 
     // Tell the user what the mode expects, so the launch validation does not
     // have to be the first thing that explains it.
@@ -1150,22 +1317,38 @@ AttackMode MainWindow::currentAttackMode() const
 // the hint and the launch validation cannot tell the user different things.
 QString MainWindow::modeHint(AttackMode mode) const
 {
-    const CommandBuilder::ModeRequirements requirements = CommandBuilder::modeRequirements(mode);
-
-    // Combination mode is the only one that wants an exact number of word
-    // lists, and its two lists are the left and the right side.
-    if (requirements.minWordlists > 0 && requirements.maxWordlists == requirements.minWordlists) {
-        return tr("This mode needs exactly %1 wordlists (left, right).")
-            .arg(requirements.minWordlists);
-    }
-    if (requirements.needsMask && requirements.minWordlists > 0) {
-        return tr("This mode needs a wordlist and a mask.");
-    }
-    if (requirements.needsMask) {
-        return tr("This mode needs a mask.");
-    }
-    if (requirements.minWordlists > 0) {
+    // A sentence per mode, broken into lines by hand: the label must not
+    // wrap (a wrapping label asks its layout for more height than its size
+    // hint announced, and the window fit only ever measured the hint), so
+    // the breaks are part of the text and every line stays short enough for
+    // the tab.
+    switch (mode) {
+    case AttackMode::Straight:
         return tr("This mode needs at least one wordlist.");
+    case AttackMode::Combination:
+        return tr("This mode needs exactly 2 wordlists (left, right).");
+    case AttackMode::BruteForce:
+        return tr("This mode needs a mask.");
+    case AttackMode::Pcfg:
+        return tr("This mode runs hashcat's bundled default-passwords ruleset;\n"
+                  "name one or more to use your own.");
+    case AttackMode::Table:
+        return tr("This mode needs one wordlist and at least one table.");
+    case AttackMode::HybridWordMask:
+    case AttackMode::HybridMaskWord:
+        return tr("This mode needs a wordlist and a mask.");
+    case AttackMode::Generic:
+        return tr("This mode needs a feed. Arguments depend on the feed —\n"
+                  "random and stdin need none, wordlist needs a path.");
+    case AttackMode::Association:
+        return tr("This mode takes at most one wordlist; without one the words come from\n"
+                  "the hash file and the settings line can bound the run "
+                  "(phases=words,rules;\n"
+                  "the default adds a grammar phase that never ends). With a wordlist\n"
+                  "the two files are paired by line and no settings are accepted.");
+    case AttackMode::Hybrid:
+        return tr("This mode needs a mask with exactly one ?w; a ?q after ?w\n"
+                  "names a second wordlist.");
     }
     return QString();
 }
@@ -1203,11 +1386,10 @@ void MainWindow::openOutfileClicked()
 
 void MainWindow::removeWordlistClicked()
 {
-    qDeleteAll(ui->listWidget_wordlist->selectedItems());
+    removeSelectedRows(ui->listWidget_wordlist);
     ui->pushButton_remove_wordlist->setEnabled(false);
     ui->toolButton_wordlist_move_up->setEnabled(false);
     ui->toolButton_wordlist_move_down->setEnabled(false);
-    ui->listWidget_wordlist->clearSelection();
 }
 
 void MainWindow::addWordlistClicked()
@@ -1224,28 +1406,114 @@ void MainWindow::addWordlistClicked()
     }
 }
 
-void MainWindow::wordlistMoveUpClicked()
+QStringList MainWindow::listItems(const QListWidget *list)
 {
-    // currentRow() is -1 when nothing is selected: without the guard below
+    QStringList items;
+    items.reserve(list->count());
+    for (int i = 0; i < list->count(); ++i) {
+        items << list->item(i)->text();
+    }
+    return items;
+}
+
+void MainWindow::removeSelectedRows(QListWidget *list)
+{
+    // The rows know their list and take themselves out of it when deleted.
+    const QList<QListWidgetItem *> selected = list->selectedItems();
+    for (QListWidgetItem *item : selected) {
+        delete item;
+    }
+    list->clearSelection();
+}
+
+void MainWindow::moveSelectedRow(QListWidget *list, int delta)
+{
+    // currentRow() is -1 when nothing is selected: without the guards below
     // takeItem(-1) returns nullptr and the list ends up with a null entry.
-    int currentRow = ui->listWidget_wordlist->currentRow();
-    if (currentRow <= 0) {
+    const int currentRow = list->currentRow();
+    const int targetRow = currentRow + delta;
+    if (currentRow < 0 || targetRow < 0 || targetRow >= list->count()) {
         return;
     }
-    QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
-    ui->listWidget_wordlist->insertItem(currentRow - 1, currentItem);
-    ui->listWidget_wordlist->setCurrentRow(currentRow - 1);
+    QListWidgetItem *item = list->takeItem(currentRow);
+    list->insertItem(targetRow, item);
+    list->setCurrentRow(targetRow);
+}
+
+void MainWindow::addPcfgRulesetClicked()
+{
+    addFilesToList(ui->listWidget_pcfg_rulesets, tr("Add rulesets"), this);
+}
+
+void MainWindow::removePcfgRulesetClicked()
+{
+    removeSelectedRows(ui->listWidget_pcfg_rulesets);
+}
+
+void MainWindow::pcfgRulesetMoveUpClicked()
+{
+    moveSelectedRow(ui->listWidget_pcfg_rulesets, -1);
+}
+
+void MainWindow::pcfgRulesetMoveDownClicked()
+{
+    moveSelectedRow(ui->listWidget_pcfg_rulesets, 1);
+}
+
+void MainWindow::addTableClicked()
+{
+    addFilesToList(ui->listWidget_tables, tr("Add tables"), this);
+}
+
+void MainWindow::removeTableClicked()
+{
+    removeSelectedRows(ui->listWidget_tables);
+}
+
+void MainWindow::addFeedClicked()
+{
+    // Only a file path goes through the dialog: the bundled feeds (random,
+    // wordlist, …) are names the user types.
+    const QString file = QFileDialog::getOpenFileName(this, tr("Open feed file"));
+    if (!file.isEmpty()) {
+        ui->lineEdit_feed->setText(QDir::toNativeSeparators(file));
+    }
+}
+
+void MainWindow::addFeedArgumentClicked()
+{
+    // The argument field is a staging area: what reaches the command line is
+    // the list, one argv token per row.
+    const QString argument = ui->lineEdit_feed_argument->text().trimmed();
+    if (!argument.isEmpty()) {
+        ui->listWidget_feed_arguments->addItem(argument);
+        ui->lineEdit_feed_argument->clear();
+    }
+}
+
+void MainWindow::removeFeedArgumentClicked()
+{
+    removeSelectedRows(ui->listWidget_feed_arguments);
+}
+
+void MainWindow::feedArgumentMoveUpClicked()
+{
+    moveSelectedRow(ui->listWidget_feed_arguments, -1);
+}
+
+void MainWindow::feedArgumentMoveDownClicked()
+{
+    moveSelectedRow(ui->listWidget_feed_arguments, 1);
+}
+
+void MainWindow::wordlistMoveUpClicked()
+{
+    moveSelectedRow(ui->listWidget_wordlist, -1);
 }
 
 void MainWindow::wordlistMoveDownClicked()
 {
-    int currentRow = ui->listWidget_wordlist->currentRow();
-    if (currentRow < 0 || currentRow >= ui->listWidget_wordlist->count() - 1) {
-        return;
-    }
-    QListWidgetItem *currentItem = ui->listWidget_wordlist->takeItem(currentRow);
-    ui->listWidget_wordlist->insertItem(currentRow + 1, currentItem);
-    ui->listWidget_wordlist->setCurrentRow(currentRow + 1);
+    moveSelectedRow(ui->listWidget_wordlist, 1);
 }
 
 void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
@@ -1646,7 +1914,11 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.ruleRight = ui->lineEdit_rule_right->text();
 
     options.mask = ui->lineEdit_mask->text();
-    options.increment = ui->checkBox_increment->isChecked();
+    // The increment widgets are hidden in the modes that refuse the flag
+    // (mode 12), so a session that stored a checked box there must not put
+    // -i on the command line.
+    options.increment = CommandBuilder::attackUsesIncrement(options.attackMode)
+                        && ui->checkBox_increment->isChecked();
     options.incrementMin = ui->spinBox_increment_min->value();
     options.incrementMax = ui->spinBox_increment_max->value();
     options.speedOnly = ui->checkBox_speed_only->isChecked();
@@ -1692,6 +1964,41 @@ HashcatOptions MainWindow::collectHashcatOptions()
             options.wordlists << item->text();
         }
     }
+
+    // The feed modes. Every value is read unconditionally: a disabled or
+    // hidden field can still hold a value a session stored, and the launch
+    // validation is where a combination that cannot work is refused.
+    const auto splitSettings = [](const QString &text) {
+        return text.split(QRegularExpression(QStringLiteral("\\s+")), Qt::SkipEmptyParts);
+    };
+
+    options.pcfgRulesets = listItems(ui->listWidget_pcfg_rulesets);
+    options.pcfgScale = ui->lineEdit_pcfg_scale->text().trimmed();
+    options.pcfgCostmax = ui->lineEdit_pcfg_costmax->text().trimmed();
+    options.pcfgWeights = ui->lineEdit_pcfg_weights->text().trimmed();
+    options.pcfgThreads = ui->lineEdit_pcfg_threads->text().trimmed();
+    options.pcfgKbits = ui->lineEdit_pcfg_kbits->text().trimmed();
+    options.pcfgMaxword = ui->lineEdit_pcfg_maxword->text().trimmed();
+    options.pcfgMaxgain = ui->lineEdit_pcfg_maxgain->text().trimmed();
+    options.pcfgWalk = ui->lineEdit_pcfg_walk->text().trimmed();
+    options.pcfgMask = ui->lineEdit_pcfg_mask->text().trimmed();
+    options.pcfgExtraSettings = splitSettings(ui->lineEdit_pcfg_extra->text());
+
+    options.tableFiles = listItems(ui->listWidget_tables);
+    options.tableIdentity = ui->lineEdit_table_identity->text().trimmed();
+    options.tableTemplate = ui->lineEdit_table_template->text().trimmed();
+    options.tableSingle = ui->lineEdit_table_single->text().trimmed();
+    options.tableCap = ui->lineEdit_table_cap->text().trimmed();
+    options.tableMaxperm = ui->lineEdit_table_maxperm->text().trimmed();
+    options.tableExtraSettings = splitSettings(ui->lineEdit_table_extra->text());
+
+    options.feedName = ui->lineEdit_feed->text().trimmed();
+    options.feedArguments = listItems(ui->listWidget_feed_arguments);
+
+    // The settings line of mode 9 stays as typed even next to a wordlist:
+    // the launch validation names both controls instead of silently dropping
+    // what the user typed, and the preview keeps showing it.
+    options.associationSettings = splitSettings(ui->lineEdit_association_settings->text());
 
     return options;
 }

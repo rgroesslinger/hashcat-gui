@@ -190,7 +190,7 @@ private slots:
     void freshWindowMatchesTheDefaultOptions();
     void commandPreviewFollowsWidgetChanges();
     void attackModeIdsTravelAsItemData();
-    void groupBoxesFollowTheBuilderPredicates();
+    void widgetsFollowTheBuilderPredicates();
     void groupBoxesShareOneTitleAlignment();
     void generalTabGroupBoxesAlignTheirContentToTheTop();
     void resetSessionRestoresEveryWidget();
@@ -355,7 +355,7 @@ void TestMainWindow::attackModeIdsTravelAsItemData()
 {
     MainWindow window;
 
-    const QList<int> expected{0, 1, 3, 6, 7, 9};
+    const QList<int> expected{0, 1, 3, 4, 5, 6, 7, 8, 9, 12};
     QList<int> actual;
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
         actual << window.ui->comboBox_attack->itemData(i).toInt();
@@ -371,29 +371,47 @@ void TestMainWindow::attackModeIdsTravelAsItemData()
     }
 }
 
-void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
+// Which widgets each mode shows. The predicates are the same ones the
+// builder emits with, so what the user sees and what reaches the command
+// line can never drift apart; the same table tst_commandbuilder::predicates
+// pins for the builder.
+//
+// The mode-specific groups are hidden, not disabled: a disabled group still
+// takes its share of the tab, so the window would keep the height of its
+// busiest mode in every other one. A hidden widget reports isHidden(); the
+// window itself is never shown here, so isVisible() would answer for the
+// window, not for the gating.
+void TestMainWindow::widgetsFollowTheBuilderPredicates()
 {
     MainWindow window;
 
-    // What each mode owes the widgets, independent of the predicates
-    // updateViewAttackMode() switches on: the same table
-    // tst_commandbuilder::predicates pins for the builder.
     struct Expectation {
         AttackMode mode;
+        bool mask;
+        bool increment;
         bool wordlists;
         bool rules;
         bool ruleLeft;
         bool ruleRight;
-        bool mask;
+        bool customCharset;
+        bool hexWordlist;
+        bool wordlistEncoding;
     };
     const QList<Expectation> expectations{
-        {AttackMode::Straight, true, true, true, false, false},
-        {AttackMode::Combination, true, true, true, true, false},
-        {AttackMode::BruteForce, false, true, false, false, true},
-        {AttackMode::HybridWordMask, true, true, true, false, true},
-        {AttackMode::HybridMaskWord, true, true, true, true, true},
-        {AttackMode::Association, true, true, true, false, false},
+        // mode                mask   incr   words  rules  left   right  charset hexwl  enc
+        {AttackMode::Straight, false, false, true, true, true, false, false, true, true},
+        {AttackMode::Combination, false, false, true, true, true, true, false, true, true},
+        {AttackMode::BruteForce, true, true, false, true, false, false, true, false, false},
+        {AttackMode::Pcfg, false, false, false, true, false, false, true, false, false},
+        {AttackMode::Table, false, false, true, true, false, false, false, true, false},
+        {AttackMode::HybridWordMask, true, true, true, true, true, false, true, true, true},
+        {AttackMode::HybridMaskWord, true, true, true, true, true, true, true, true, true},
+        {AttackMode::Generic, false, false, false, true, true, false, false, true, true},
+        {AttackMode::Association, false, false, true, true, true, false, false, true, true},
+        {AttackMode::Hybrid, true, false, true, true, true, true, true, true, true},
     };
+
+    const auto shown = [](QWidget *widget) { return !widget->isHidden(); };
 
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
         // -1 first, so that every iteration really changes the index and runs
@@ -412,18 +430,42 @@ void TestMainWindow::groupBoxesFollowTheBuilderPredicates()
         }
         QVERIFY2(expected, "no expectation written down for this attack mode");
 
-        QCOMPARE(window.ui->groupBox_wordlists->isEnabled(), expected->wordlists);
-        QCOMPARE(window.ui->groupBox_rules->isEnabled(), expected->rules);
-        QCOMPARE(window.ui->groupBox_wordlist_rules->isEnabled(),
+        QCOMPARE(shown(window.ui->groupBox_wordlists), expected->wordlists);
+        QCOMPARE(shown(window.ui->groupBox_rules), expected->rules);
+        QCOMPARE(shown(window.ui->groupBox_wordlist_rules),
                  expected->ruleLeft || expected->ruleRight);
+        // The rule fields stay enabled-gated: they live inside a group that
+        // the mode may share with the other rule.
         QCOMPARE(window.ui->label_rule_left->isEnabled(), expected->ruleLeft);
         QCOMPARE(window.ui->lineEdit_rule_left->isEnabled(), expected->ruleLeft);
         QCOMPARE(window.ui->label_rule_right->isEnabled(), expected->ruleRight);
         QCOMPARE(window.ui->lineEdit_rule_right->isEnabled(), expected->ruleRight);
-        QCOMPARE(window.ui->groupBox_mask->isEnabled(), expected->mask);
-        QCOMPARE(window.ui->groupBox_custom_charset->isEnabled(), expected->mask);
-        // --hex-charset belongs to the mask modes for the same reason.
-        QCOMPARE(window.ui->checkBox_hex_charset->isEnabled(), expected->mask);
+        QCOMPARE(shown(window.ui->groupBox_mask), expected->mask);
+        QCOMPARE(shown(window.ui->groupBox_custom_charset), expected->customCharset);
+        QCOMPARE(shown(window.ui->checkBox_hex_charset), expected->customCharset);
+
+        // The feed modes get a group each; mode 9 gets one extra row: the
+        // settings line that bounds a run whose words come from the hash file.
+        QCOMPARE(shown(window.ui->groupBox_pcfg), mode == AttackMode::Pcfg);
+        QCOMPARE(shown(window.ui->groupBox_table), mode == AttackMode::Table);
+        QCOMPARE(shown(window.ui->groupBox_feed), mode == AttackMode::Generic);
+        QCOMPARE(shown(window.ui->label_association_settings), mode == AttackMode::Association);
+        QCOMPARE(shown(window.ui->lineEdit_association_settings), mode == AttackMode::Association);
+
+        // Inside the wordlist group: the options only the modes that read a
+        // wordlist (and that hashcat lets name an encoding) take.
+        QCOMPARE(shown(window.ui->checkBox_hex_wordlist), expected->hexWordlist);
+        QCOMPARE(shown(window.ui->label_encoding_from), expected->wordlistEncoding);
+        QCOMPARE(shown(window.ui->lineEdit_encoding_from), expected->wordlistEncoding);
+        QCOMPARE(shown(window.ui->label_encoding_to), expected->wordlistEncoding);
+        QCOMPARE(shown(window.ui->lineEdit_encoding_to), expected->wordlistEncoding);
+
+        // Inside the mask group: hashcat 8.0.0 refuses -i in mode 12.
+        QCOMPARE(shown(window.ui->checkBox_increment), expected->increment);
+        QCOMPARE(shown(window.ui->label_increment_min), expected->increment);
+        QCOMPARE(shown(window.ui->spinBox_increment_min), expected->increment);
+        QCOMPARE(shown(window.ui->label_increment_max), expected->increment);
+        QCOMPARE(shown(window.ui->spinBox_increment_max), expected->increment);
     }
 }
 
@@ -656,16 +698,31 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
         AttackMode mode;
         QString hint;
     };
+    // The hints break into lines by hand - the label must not wrap, see the
+    // comment in modeHint() - so the expected texts carry the same breaks.
     const QList<Expectation> expectations{
         {AttackMode::Straight, QStringLiteral("This mode needs at least one wordlist.")},
         {AttackMode::Combination,
          QStringLiteral("This mode needs exactly 2 wordlists (left, right).")},
         {AttackMode::BruteForce, QStringLiteral("This mode needs a mask.")},
+        {AttackMode::Pcfg,
+         QStringLiteral("This mode runs hashcat's bundled default-passwords ruleset;\n"
+                        "name one or more to use your own.")},
+        {AttackMode::Table, QStringLiteral("This mode needs one wordlist and at least one table.")},
         {AttackMode::HybridWordMask, QStringLiteral("This mode needs a wordlist and a mask.")},
         {AttackMode::HybridMaskWord, QStringLiteral("This mode needs a wordlist and a mask.")},
-        // Since hashcat 8.0.0 the words come from the hash file when there is
-        // no wordlist, so the mode owes the user nothing here.
-        {AttackMode::Association, QString()},
+        {AttackMode::Generic,
+         QStringLiteral("This mode needs a feed. Arguments depend on the feed —\n"
+                        "random and stdin need none, wordlist needs a path.")},
+        {AttackMode::Association,
+         QStringLiteral("This mode takes at most one wordlist; without one the words come from\n"
+                        "the hash file and the settings line can bound the run "
+                        "(phases=words,rules;\n"
+                        "the default adds a grammar phase that never ends). With a wordlist\n"
+                        "the two files are paired by line and no settings are accepted.")},
+        {AttackMode::Hybrid,
+         QStringLiteral("This mode needs a mask with exactly one ?w; a ?q after ?w\n"
+                        "names a second wordlist.")},
     };
 
     for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
@@ -752,7 +809,7 @@ void TestMainWindow::launchValidationFollowsTheWidgets()
     // group box is disabled), but the command line carries no -i, so the
     // launch validation has to ignore it. --remove is refused, and its box
     // stays enabled so the user can clear it.
-    window.ui->comboBox_attack->setCurrentIndex(5); // association
+    window.ui->comboBox_attack->setCurrentIndex(8); // association
     QCOMPARE(int(window.ui->comboBox_attack->currentData().toInt()), int(AttackMode::Association));
 
     // The three wordlists of the combination step are one too many for the
@@ -799,6 +856,23 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     window.ui->checkBox_hwmon_temp_abort->setChecked(true);
     window.ui->spinBox_hwmon_temp_abort->setValue(85);
 
+    // The feed modes and the association line: read unconditionally, because
+    // a hidden field can still hold a value a session stored; a combination
+    // that cannot work is the launch validation's answer, not a dropped
+    // value here.
+    window.ui->listWidget_pcfg_rulesets->addItem(QStringLiteral("/tmp/one.pcfg"));
+    window.ui->listWidget_pcfg_rulesets->addItem(QStringLiteral("/tmp/two.pcfg"));
+    window.ui->lineEdit_pcfg_scale->setText(QStringLiteral("2"));
+    window.ui->lineEdit_pcfg_weights->setText(QStringLiteral("2:1"));
+    window.ui->lineEdit_pcfg_extra->setText(QStringLiteral("omen=1  pwmin=8"));
+    window.ui->listWidget_tables->addItem(QStringLiteral("/tmp/table.txt"));
+    window.ui->lineEdit_table_identity->setText(QStringLiteral("1"));
+    window.ui->lineEdit_table_cap->setText(QStringLiteral("4294967295"));
+    window.ui->lineEdit_feed->setText(QStringLiteral("wordlist"));
+    window.ui->listWidget_feed_arguments->addItem(QStringLiteral("dict.txt"));
+    window.ui->lineEdit_association_settings->setText(
+        QStringLiteral("phases=words,rules rules.rulemax=300"));
+
     const HashcatOptions options = window.collectHashcatOptions();
     QCOMPARE(options.hashFile, QStringLiteral("/tmp/example.hash"));
     QCOMPARE(options.mask, QStringLiteral("?d?d"));
@@ -810,7 +884,10 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QCOMPARE(options.encodingTo, QStringLiteral("utf-8"));
     QCOMPARE(options.ruleLeft, QStringLiteral("c"));
     QCOMPARE(options.ruleRight, QStringLiteral("^x"));
-    QVERIFY(options.increment);
+    // The increment box is checked, but straight mode offers no -i: the
+    // collect gating drops the flag while the bounds still arrive - a stale
+    // pair must not block the other modes.
+    QVERIFY(!options.increment);
     QCOMPARE(options.incrementMin, 2);
     QCOMPARE(options.incrementMax, 8);
     QCOMPARE(options.session, QStringLiteral("job"));
@@ -824,6 +901,21 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QCOMPARE(options.openclDeviceTypes, QStringLiteral("1,2"));
     QVERIFY(options.hwmonTempAbort);
     QCOMPARE(options.hwmonTempAbortCelsius, 85);
+    QCOMPARE(options.pcfgRulesets,
+             (QStringList{QStringLiteral("/tmp/one.pcfg"), QStringLiteral("/tmp/two.pcfg")}));
+    QCOMPARE(options.pcfgScale, QStringLiteral("2"));
+    QCOMPARE(options.pcfgWeights, QStringLiteral("2:1"));
+    // The extra line is a settings run: whitespace separates the tokens, and
+    // a run of spaces must not leave an empty one behind.
+    QCOMPARE(options.pcfgExtraSettings,
+             (QStringList{QStringLiteral("omen=1"), QStringLiteral("pwmin=8")}));
+    QCOMPARE(options.tableFiles, QStringList{QStringLiteral("/tmp/table.txt")});
+    QCOMPARE(options.tableIdentity, QStringLiteral("1"));
+    QCOMPARE(options.tableCap, QStringLiteral("4294967295"));
+    QCOMPARE(options.feedName, QStringLiteral("wordlist"));
+    QCOMPARE(options.feedArguments, QStringList{QStringLiteral("dict.txt")});
+    QCOMPARE(options.associationSettings, (QStringList{QStringLiteral("phases=words,rules"),
+                                                       QStringLiteral("rules.rulemax=300")}));
 
     // Untouched fields keep the values the .ui file starts with
     QCOMPARE(options.outfileFormat, AppConstants::Defaults::OutfileFormat);
@@ -855,6 +947,14 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(arguments.contains(QStringLiteral("--rule-left")));
     QVERIFY(!arguments.contains(QStringLiteral("--rule-right")));
     QVERIFY(!arguments.contains(QStringLiteral("--outfile")));
+
+    // The increment widgets are hidden in the hybrid mode (12), which
+    // refuses -i: a checked box a session stored there must not reach the
+    // options.
+    window.ui->comboBox_attack->setCurrentIndex(9); // hybrid
+    QCOMPARE(int(window.collectHashcatOptions().attackMode), int(AttackMode::Hybrid));
+    QVERIFY(window.ui->checkBox_increment->isChecked());
+    QVERIFY(!window.collectHashcatOptions().increment);
 }
 
 void TestMainWindow::statusTimerReachesTheCommandLine()

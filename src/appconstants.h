@@ -196,6 +196,13 @@ inline constexpr QLatin1StringView Digits{"^[0-9]*$"};
 // accelerators, is gone with hashcat 8.0.0. Spaces around the numbers are
 // fine, as in hashcat's own number list.
 inline constexpr QLatin1StringView DeviceTypes{"^\\s*([12]\\s*(,\\s*[12]\\s*)*)?$"};
+// The shapes the feeds of the attack modes 4 and 5 parse themselves and a
+// plain integer validator cannot hold: the colon separated weights list,
+// maxword's multiple of 16, the dot separated decimal and the 0/1 flags.
+inline constexpr QLatin1StringView WeightsList{"^[0-9]+(:[0-9]+)*$"};
+inline constexpr QLatin1StringView MaxwordValue{"^(0|16|32)?$"};
+inline constexpr QLatin1StringView DecimalNumber{"^[0-9]+([.][0-9]+)?$"};
+inline constexpr QLatin1StringView BinaryFlag{"^[01]?$"};
 } // namespace Validation
 
 // The positional settings of the feed modes (-a 4, -a 5) and of the
