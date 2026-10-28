@@ -213,6 +213,7 @@ private slots:
     void hashTypesAreFilledFromHashcat();
     void failedQueryReenablesTheHashTypeCombo_data();
     void failedQueryReenablesTheHashTypeCombo();
+    void changingTheBinaryReRunsTheQuery();
     void outfileSuggestionFollowsUntilTheUserTakesOver();
     void wordlistMoveSurvivesAMissingSelection();
     void commandPreviewCarriesTheBinaryName();
@@ -1338,6 +1339,57 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
         window.ui->comboBox_hash_type->toolTip(),
         QStringLiteral("The hash types could not be loaded. Check the hashcat path in Settings."));
     QCOMPARE(window.ui->comboBox_hash_type->count(), 0);
+}
+
+// Accepting Settings again with the same binary leaves the list alone; a
+// changed binary re-runs the query and replaces it with the modes the new
+// one reports (which resets the selection - the old id may not exist there).
+void TestMainWindow::changingTheBinaryReRunsTheQuery()
+{
+    const QString stubA = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-settings-a"),
+        "#!/bin/sh\n"
+        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+        "exit 0\n");
+    const QString stubB =
+        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-settings-b"),
+                                        "#!/bin/sh\n"
+                                        "printf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"
+                                        "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stubA.isEmpty() && !stubB.isEmpty(), "the shell stubs could not be written");
+#endif
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() == 2,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    window.ui->comboBox_hash_type->setCurrentIndex(1); // NTLM
+
+    // The dialog takes its values from the settings, so the path is set
+    // before it opens; the recorder saves it, which is what a user pressing
+    // Save does.
+    TestEnvironment::ModalRecorder recorder;
+    recorder.saveSettingsDialog = true;
+    recorder.start();
+
+    // Same path: no new query, so the list and the selection stay as they
+    // are. A re-query would clear the combo and disable it synchronously.
+    QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
+    QVERIFY(window.ui->comboBox_hash_type->isEnabled());
+    QVERIFY(window.ui->comboBox_hash_type->toolTip().isEmpty());
+    QCOMPARE(window.ui->comboBox_hash_type->count(), 2);
+    QCOMPARE(window.ui->comboBox_hash_type->currentIndex(), 1);
+
+    // Changed path: the query runs again and the new list replaces the old.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubB);
+    QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() == 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400u);
 }
 
 // The suggestion may follow the hash file name only as long as nobody else

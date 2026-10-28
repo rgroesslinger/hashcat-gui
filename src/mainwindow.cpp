@@ -978,9 +978,13 @@ void MainWindow::settingsTriggered()
 {
     SettingsDialog settingsDialog(this);
     if (settingsDialog.exec() == QDialog::Accepted) {
-        // If SettingsDialog was saved and there are no hash types yet maybe we can populate them
-        // now
-        if (ui->comboBox_hash_type->count() == 0) {
+        // Re-run the query when the binary changed: its list replaces the one
+        // on screen - which resets the hash type selection, expected because
+        // the new binary may not offer the selected id - or when nothing was
+        // ever loaded and the path may be usable now.
+        const QString hashcatPath =
+            SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+        if (hashcatPath != m_queriedHashcatPath || ui->comboBox_hash_type->count() == 0) {
             initHashAndAttackModes();
         }
         // The settings can change the binary name and the short/long parameter
@@ -1220,8 +1224,14 @@ void MainWindow::initHashAndAttackModes()
 
     // Hash types
     auto &settings = SettingsManager::instance();
+    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 
-    if (!settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
+    // Remember which binary this list comes from. An empty path records
+    // "nothing queried" just as well, so the first configured path counts as
+    // a change too - see settingsTriggered().
+    m_queriedHashcatPath = hashcatPath;
+
+    if (!hashcatPath.isEmpty()) {
         ui->comboBox_hash_type->setToolTip(tr("Updating…"));
         ui->comboBox_hash_type->setEnabled(false);
 

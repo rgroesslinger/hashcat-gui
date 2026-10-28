@@ -202,6 +202,11 @@ private:
     // constructor has already loaded the session. The stored id waits
     // here and is applied once the items exist, see initHashAndAttackModes().
     int m_pendingHashTypeId = -1;
+
+    // The binary the current hash-type list came from. Settings re-runs the
+    // query when the configured path no longer matches, so a changed binary
+    // replaces the list instead of leaving the old one on screen.
+    QString m_queriedHashcatPath;
 };
 
 #endif // MAINWINDOW_H
