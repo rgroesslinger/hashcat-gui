@@ -3,9 +3,20 @@
 ## Unreleased
 
 ### New Features
+- Support for hashcat 8.0.0: the attack mode selector offers all ten of its modes - the PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) modes join the existing ones, each with its own options that only appear where they apply (#18)
 - Wordlist entries are watched while the window is open: a row whose file does not exist is marked with a warning icon (#15)
 - The About dialog now checks for updates (#16)
 - The settings dialog offers the hashcat found on the system PATH when no path is configured (#17)
+- New options: `--hash-recipe` for hash mode 4000, `--rules-concat` to pass several `-r` files in one run, `--outfile-json` in place of the outfile format, and `--cache-path`
+- The feed modes are validated before launch: PCFG and table settings (range, repeated keys, a grammar held to the mask with `omen=1` or hint words without a source), the hybrid mode's `?w`/`?q` markers against the selected wordlists, the association settings line next to a wordlist, and a cache path that is not a directory
+
+### Improvements
+- hashcat 8.0.0 or newer is required; the segment size (`-c`) and workload profile (`-w`) options were removed along with it
+- A directory can be selected as a wordlist or a table input: hashcat reads every file in it, so such a row is no longer flagged as missing
+
+### Notes
+- The association mode (9) starts with `phases=words,rules,pcfg`, whose grammar phase never ends; bound the run with `phases=words,rules` in the settings line - the hint below the mode selector says the same
+- `--rule-left` and `--rule-right` are not offered for the PCFG and table modes; use `-r` rule files there
 
 ## 0.8.0 (2026-10-25)
 
