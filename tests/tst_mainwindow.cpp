@@ -1176,12 +1176,19 @@ void TestMainWindow::missingWordlistsAreMarked()
     QListWidgetItem *missing = add(missingPath);
     QListWidgetItem *wordlistDirectory = add(directoryPath);
 
-    QVERIFY(present->icon().isNull());
+    // A usable path shows its type: a file for the file, a folder for the
+    // folder. The warning takes the icon's place once the path is gone.
+    QVERIFY(!present->icon().isNull());
+    QVERIFY(!wordlistDirectory->icon().isNull());
+    QVERIFY(present->icon().cacheKey() != wordlistDirectory->icon().cacheKey());
     QVERIFY(present->toolTip().isEmpty());
-    QVERIFY(!missing->icon().isNull());
-    QVERIFY(missing->toolTip().contains(missingPath));
-    QVERIFY(wordlistDirectory->icon().isNull());
     QVERIFY(wordlistDirectory->toolTip().isEmpty());
+    QVERIFY(!missing->icon().isNull());
+    QVERIFY(missing->icon().cacheKey() != present->icon().cacheKey());
+    QVERIFY(missing->toolTip().contains(missingPath));
+
+    const qint64 fileIconKey = present->icon().cacheKey();
+    const qint64 warningIconKey = missing->icon().cacheKey();
 
     // The indicator is presentation only: text, command and session keep the
     // path.
@@ -1197,11 +1204,11 @@ void TestMainWindow::missingWordlistsAreMarked()
     // A file that disappears after it was added is marked; one that comes back
     // is not.
     QVERIFY(QFile::remove(presentPath));
-    QTRY_VERIFY(!present->icon().isNull());
+    QTRY_COMPARE(present->icon().cacheKey(), warningIconKey);
     QVERIFY(present->toolTip().contains(presentPath));
 
     QVERIFY(writeFile(presentPath));
-    QTRY_VERIFY(present->icon().isNull());
+    QTRY_COMPARE(present->icon().cacheKey(), fileIconKey);
     QVERIFY(present->toolTip().isEmpty());
 
     // A restored session clears the model and inserts the rows again; the
@@ -1220,7 +1227,7 @@ void TestMainWindow::missingWordlistsAreMarked()
     QCOMPARE(list->count(), 1);
     QListWidgetItem *restored = list->item(0);
     QCOMPARE(restored->text(), missingPath);
-    QVERIFY(!restored->icon().isNull());
+    QCOMPARE(restored->icon().cacheKey(), warningIconKey);
     QVERIFY(restored->toolTip().contains(missingPath));
 }
 
@@ -1305,41 +1312,38 @@ void TestMainWindow::folderPathsAreMarked()
     QListWidget *tables = window.ui->listWidget_tables;
 
     QVERIFY(row(pcfg, trained));
-    QVERIFY(row(pcfg, trained)->icon().isNull());
+    QVERIFY(!row(pcfg, trained)->icon().isNull());
     QVERIFY(row(pcfg, trained)->toolTip().isEmpty());
+    const qint64 folderIconKey = row(pcfg, trained)->icon().cacheKey();
 
     QVERIFY(!row(pcfg, untrained)->icon().isNull());
+    QVERIFY(row(pcfg, untrained)->icon().cacheKey() != folderIconKey);
     QVERIFY(row(pcfg, untrained)->toolTip().contains(QStringLiteral("Grammar/grammar.txt")));
+    const qint64 warningIconKey = row(pcfg, untrained)->icon().cacheKey();
 
     // A bundled name is resolved by hashcat, so the GUI must not call it
-    // missing.
+    // missing - and it has no file or folder to show a type for.
     QVERIFY(row(pcfg, QStringLiteral("default-passwords"))->icon().isNull());
+    QVERIFY(row(pcfg, QStringLiteral("default-passwords"))->toolTip().isEmpty());
 
-    QVERIFY(row(tables, tableFile)->icon().isNull());
+    // A table is a file: it shows the file icon, and a folder is marked as
+    // unusable whatever it holds.
+    QVERIFY(!row(tables, tableFile)->icon().isNull());
+    QVERIFY(row(tables, tableFile)->icon().cacheKey() != folderIconKey);
+    QVERIFY(row(tables, tableFile)->toolTip().isEmpty());
     QVERIFY(!row(tables, tableFolder)->icon().isNull());
+    QCOMPARE(row(tables, tableFolder)->icon().cacheKey(), warningIconKey);
     QVERIFY(row(tables, tableFolder)->toolTip().contains(QStringLiteral("must be a file")));
 
     QVERIFY(!empty->icon().isNull());
+    QCOMPARE(empty->icon().cacheKey(), warningIconKey);
     QVERIFY(empty->toolTip().contains(QStringLiteral("no wordlists")));
 
-    // Wordlist rows are edited in place like the others; the same handler
-    // has to drop the warning when the text becomes a usable path.
-    empty->setText(tableFile);
-    QTRY_VERIFY(empty->icon().isNull());
-    QVERIFY(empty->toolTip().isEmpty());
-
-    // A row whose text is replaced is re-checked: the same path is fine as a
-    // file and refused as a folder.
-    auto *edited = new QListWidgetItem(tableFile, tables);
-    QVERIFY(edited->icon().isNull());
-    edited->setText(tableFolder);
-    QTRY_VERIFY(!edited->icon().isNull());
-    QVERIFY(edited->toolTip().contains(QStringLiteral("must be a file")));
-
-    // The grammar arriving later clears the warning on its own row.
+    // The grammar arriving later turns the warning back into the folder the
+    // row names.
     QVERIFY(QDir().mkpath(untrained + QStringLiteral("/Grammar")));
     QVERIFY(writeFile(untrained + QStringLiteral("/Grammar/grammar.txt")));
-    QTRY_VERIFY(row(pcfg, untrained)->icon().isNull());
+    QTRY_COMPARE(row(pcfg, untrained)->icon().cacheKey(), folderIconKey);
     QVERIFY(row(pcfg, untrained)->toolTip().isEmpty());
 }
 

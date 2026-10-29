@@ -76,8 +76,8 @@ lists, build system, translations, packaging) also check `build-release.yml`, CI
   folder and a ruleset folder without `Grammar/grammar.txt` are unusable, and both can gain
   the missing entry later. Its `Kind` decides what is usable - wordlists and PCFG take a
   folder, tables never do, and a bare ruleset name such as `default-passwords` is resolved by
-  hashcat and never flagged. A missing or unusable path gets a warning icon/tooltip;
-  available rows stay untouched.
+  hashcat and never flagged. A missing or unusable path replaces the file/folder icon of its row
+  with the warning icon and a tooltip.
 
 ### Adding a hashcat option
 

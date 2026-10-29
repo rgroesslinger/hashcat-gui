@@ -170,6 +170,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 {
     ui->setupUi(this);
 
+    // The path rows say what they are at a glance: a file, a folder, or the
+    // warning of a path hashcat cannot use. The style owns the pixmaps, and
+    // the rows are compared by icon key, so these are asked for once.
+    m_fileIcon = style()->standardIcon(QStyle::SP_FileIcon);
+    m_folderIcon = style()->standardIcon(QStyle::SP_DirIcon);
+    m_warningIcon = style()->standardIcon(QStyle::SP_MessageBoxWarning);
+
     // -s and -l take a plain number; a digit-only validator keeps a value
     // hashcat would refuse to start from ever reaching the command line.
     const QRegularExpression digits{QString(AppConstants::Validation::Digits)};
@@ -405,11 +412,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // instead of removing the rows one by one.
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::modelReset, this,
             &MainWindow::refreshWordlistMonitor);
-    // A row can be edited in place like the PCFG and table rows, so the path
-    // after an edit is a new one to watch. The check state changes with it;
-    // that re-checks the same paths, which changes nothing.
-    connect(ui->listWidget_wordlist, &QListWidget::itemChanged, this,
-            &MainWindow::refreshWordlistMonitor);
     connect(&m_wordlistMonitor, &PathMonitor::availabilityChanged, this,
             &MainWindow::wordlistAvailabilityChanged);
 
@@ -425,17 +427,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         connect(list, &QListWidget::itemChanged, this, [this] { commandChanged(); });
     }
 
-    // The two path lists own a monitor each. Their rows are edited rather than
-    // only inserted, so itemChanged() is a source of paths as well; the row
-    // handler blocks the list while it writes an icon or tooltip, so those
-    // writes do not feed back into the monitor.
+    // The two path lists own a monitor each. A session restore re-inserts
+    // their rows instead of editing them, so insertion and the model reset are
+    // the events that bring a path under watch.
     connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::rowsInserted, this,
             &MainWindow::refreshPcfgMonitor);
     connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::rowsRemoved, this,
             &MainWindow::refreshPcfgMonitor);
     connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::modelReset, this,
-            &MainWindow::refreshPcfgMonitor);
-    connect(ui->listWidget_pcfg_rulesets, &QListWidget::itemChanged, this,
             &MainWindow::refreshPcfgMonitor);
     connect(&m_pcfgMonitor, &PathMonitor::availabilityChanged, this,
             &MainWindow::pcfgAvailabilityChanged);
@@ -445,8 +444,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->listWidget_tables->model(), &QAbstractItemModel::rowsRemoved, this,
             &MainWindow::refreshTableMonitor);
     connect(ui->listWidget_tables->model(), &QAbstractItemModel::modelReset, this,
-            &MainWindow::refreshTableMonitor);
-    connect(ui->listWidget_tables, &QListWidget::itemChanged, this,
             &MainWindow::refreshTableMonitor);
     connect(&m_tableMonitor, &PathMonitor::availabilityChanged, this,
             &MainWindow::tableAvailabilityChanged);
@@ -1790,12 +1787,25 @@ QString MainWindow::unavailableTooltip(PathMonitor::Kind kind, const QString &pa
 void MainWindow::setRowAvailability(QListWidget *list, PathMonitor::Kind kind, const QString &path,
                                     bool available)
 {
-    // Writing an icon or a tooltip is an item change, which for the path lists
-    // feeds back into the monitor. The blocker keeps that loop out: the state
-    // is already the one the write records.
+    // Writing an icon or a tooltip is an item change, which for every list
+    // rebuilds the preview. The blocker keeps that out: the decoration is not
+    // part of the command.
     const QSignalBlocker blocker(list);
 
-    const QIcon warning = available ? QIcon() : style()->standardIcon(QStyle::SP_MessageBoxWarning);
+    // A usable path shows what it is; an unusable one cannot be trusted with
+    // a type, so the warning takes the icon's place. A bundled ruleset name has
+    // neither a file nor a folder behind it and stays without one.
+    const QFileInfo info(path);
+    QIcon icon;
+    if (!available) {
+        icon = m_warningIcon;
+    } else if (info.isDir()) {
+        icon = m_folderIcon;
+    } else if (info.isFile()) {
+        icon = m_fileIcon;
+    }
+
+    const QString tooltip = available ? QString() : unavailableTooltip(kind, path);
 
     for (int i = 0; i < list->count(); ++i) {
         QListWidgetItem *item = list->item(i);
@@ -1803,24 +1813,9 @@ void MainWindow::setRowAvailability(QListWidget *list, PathMonitor::Kind kind, c
             continue;
         }
 
-        if (available) {
-            // Item data changes go through itemChanged(), which refreshes the
-            // monitor and rebuilds the preview: leave an available row alone
-            // instead of clearing what is already clear.
-            if (!item->icon().isNull()) {
-                item->setIcon(QIcon());
-            }
-            if (!item->toolTip().isEmpty()) {
-                item->setToolTip(QString());
-            }
-            continue;
+        if (item->icon().cacheKey() != icon.cacheKey()) {
+            item->setIcon(icon);
         }
-
-        if (item->icon().isNull()) {
-            item->setIcon(warning);
-        }
-
-        const QString tooltip = unavailableTooltip(kind, path);
         if (item->toolTip() != tooltip) {
             item->setToolTip(tooltip);
         }

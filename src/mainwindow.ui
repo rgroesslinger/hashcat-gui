@@ -538,7 +538,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Double-click a row to edit it. A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Empty runs the bundled default-passwords; hints is also bundled.</string>
+               <string>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Empty runs the bundled default-passwords; hints is also bundled.</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -906,7 +906,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Every argument after the wordlist is a table; double-click to edit</string>
+               <string>Every argument after the wordlist is a table</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -1192,7 +1192,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Arguments the feed reads, in order; double-click a row to edit</string>
+               <string>Arguments the feed reads, in order</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>

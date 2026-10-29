@@ -9,6 +9,7 @@
 #include <QMainWindow>
 #include <QListWidgetItem>
 #include <QComboBox>
+#include <QIcon>
 #include <QProcess>
 #include <QShowEvent>
 
@@ -126,6 +127,13 @@ private:
     PathMonitor m_pcfgMonitor{PathMonitor::Kind::Pcfg};
     PathMonitor m_tableMonitor{PathMonitor::Kind::Table};
 
+    // What a path row is decorated with: the type of the path while it is
+    // usable, the warning otherwise. Built once, because a refresh compares
+    // against them and does not want to rebuild the style's icons.
+    QIcon m_fileIcon;
+    QIcon m_folderIcon;
+    QIcon m_warningIcon;
+
     // The last outfile name generated from the hash file name, see
     // hashFileTextChanged(). It is not cleared when the user types a name of
     // their own: the field is only overwritten again while it still holds
@@ -180,8 +188,9 @@ private:
     static void addPathsToList(QListWidget *list, const QStringList &paths, bool checkRows);
 
     // Rebuilds a monitor's watched set from the rows of its list, and marks or
-    // clears one row. The row write blocks the list's signals: an icon change
-    // would otherwise re-enter the refresh through itemChanged().
+    // clears one row. The row write blocks the list's signals: an icon is not
+    // a change to the command, so it must not rebuild the preview through
+    // itemChanged().
     static void refreshMonitor(QListWidget *list, PathMonitor &monitor);
     void setRowAvailability(QListWidget *list, PathMonitor::Kind kind, const QString &path,
                             bool available);
