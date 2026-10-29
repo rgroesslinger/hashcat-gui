@@ -21,6 +21,21 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_3">
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <property name="leftMargin">
+     <number>6</number>
+    </property>
+    <property name="topMargin">
+     <number>6</number>
+    </property>
+    <property name="rightMargin">
+     <number>6</number>
+    </property>
+    <property name="bottomMargin">
+     <number>6</number>
+    </property>
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget_main">
       <property name="enabled">
@@ -46,6 +61,9 @@
         <string>Attack</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_13">
+        <property name="spacing">
+         <number>4</number>
+        </property>
         <item>
          <widget class="QScrollArea" name="scrollArea_attack">
           <property name="frameShape">
@@ -64,8 +82,14 @@
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_38">
+            <property name="spacing">
+             <number>4</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_27">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <item>
                <widget class="QLabel" name="label_hashfile">
                 <property name="text">
@@ -107,6 +131,9 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_65">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <item>
                <widget class="QCheckBox" name="checkBox_remove">
                  <property name="toolTip">
@@ -131,6 +158,9 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_29">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <item>
                <widget class="QLabel" name="label_attack_mode">
                 <property name="text">
@@ -194,6 +224,9 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_hash_recipe">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -254,12 +287,24 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_wordlists">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_13">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_17">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_69">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QToolButton" name="toolButton_wordlist_move_up">
                        <property name="enabled">
@@ -336,7 +381,7 @@
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>160</height>
+                     <height>140</height>
                     </size>
                    </property>
                    <property name="acceptDrops">
@@ -367,6 +412,9 @@
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_encoding">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item>
                   <widget class="QLabel" name="label_encoding_from">
                    <property name="text">
@@ -394,6 +442,9 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_association_settings">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -443,10 +494,19 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_pcfg">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_pcfg">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_pcfg_list">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
              <widget class="QListWidget" name="listWidget_pcfg_rulesets">
               <property name="minimumSize">
@@ -474,6 +534,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_pcfg_buttons">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
              <widget class="QPushButton" name="pushButton_open_pcfg_ruleset">
               <property name="text">
@@ -533,6 +596,9 @@
                  </item>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_pcfg">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                  <item row="0" column="0">
              <widget class="QLabel" name="label_pcfg_scale">
               <property name="text">
@@ -746,6 +812,9 @@
                </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_pcfg_extra">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
                 <item>
              <widget class="QLabel" name="label_pcfg_extra">
               <property name="text">
@@ -783,10 +852,19 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_table">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_table">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_table_list">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
              <widget class="QListWidget" name="listWidget_tables">
               <property name="minimumSize">
@@ -814,6 +892,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_table_buttons">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
              <widget class="QPushButton" name="pushButton_open_table">
               <property name="text">
@@ -847,6 +928,9 @@
                  </item>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_table">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                  <item row="0" column="0">
              <widget class="QLabel" name="label_table_identity">
               <property name="text">
@@ -968,6 +1052,9 @@
                </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_table_extra">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
                 <item>
              <widget class="QLabel" name="label_table_extra">
               <property name="text">
@@ -1002,8 +1089,14 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_feed">
+               <property name="spacing">
+                <number>4</number>
+               </property>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_feed_name">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item>
              <widget class="QLabel" name="label_feed">
               <property name="text">
@@ -1032,6 +1125,9 @@
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_feed_argument">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item>
              <widget class="QLabel" name="label_feed_argument">
               <property name="text">
@@ -1082,6 +1178,9 @@
                </item>
                <item>
                 <layout class="QHBoxLayout" name="horizontalLayout_feed_buttons">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <item>
              <widget class="QPushButton" name="pushButton_remove_feed_argument">
               <property name="text">
@@ -1135,8 +1234,14 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_10">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
                 <item>
                  <widget class="QGroupBox" name="groupBox_rules">
                   <property name="title">
@@ -1146,6 +1251,9 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_18">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <widget class="QRadioButton" name="radioButton_use_rules_file">
                      <property name="text">
@@ -1161,6 +1269,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_28">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_rulesfile_1">
                         <property name="toolTip">
@@ -1210,6 +1321,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_37">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_rulesfile_2">
                         <property name="toolTip">
@@ -1259,6 +1373,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_44">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_rulesfile_3">
                         <property name="toolTip">
@@ -1308,6 +1425,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_30">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QRadioButton" name="radioButton_generate_rules">
                         <property name="toolTip">
@@ -1363,6 +1483,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_rules_concat">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_rules_concat">
                        <property name="toolTip">
@@ -1374,22 +1497,6 @@
                       </widget>
                      </item>
                     </layout>
-                   </item>
-                   <item>
-                    <spacer name="verticalSpacer">
-                     <property name="orientation">
-                      <enum>Qt::Orientation::Vertical</enum>
-                     </property>
-                     <property name="sizeType">
-                      <enum>QSizePolicy::Policy::Expanding</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>20</width>
-                       <height>40</height>
-                      </size>
-                     </property>
-                    </spacer>
                    </item>
                   </layout>
                  </widget>
@@ -1406,6 +1513,9 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QGridLayout" name="gridLayout_combination_rules">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item row="0" column="0">
                     <widget class="QLabel" name="label_rule_left">
                      <property name="text">
@@ -1441,6 +1551,9 @@
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_7">
+                <property name="spacing">
+                 <number>4</number>
+                </property>
                 <item>
                  <widget class="QGroupBox" name="groupBox_mask">
                   <property name="title">
@@ -1450,6 +1563,9 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QGridLayout" name="gridLayout_7">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item row="0" column="0">
                     <widget class="QLineEdit" name="lineEdit_mask">
                      <property name="text">
@@ -1472,6 +1588,9 @@
                    </item>
                    <item row="2" column="0">
                     <layout class="QHBoxLayout" name="horizontalLayout_increment">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QLabel" name="label_increment_min">
                        <property name="text">
@@ -1545,8 +1664,14 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_9">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_64">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset1">
                        <property name="text">
@@ -1577,6 +1702,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_68">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset2">
                        <property name="text">
@@ -1607,6 +1735,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_70">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset3">
                        <property name="text">
@@ -1637,6 +1768,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_71">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset4">
                        <property name="text">
@@ -1677,14 +1811,17 @@
              </layout>
             </item>
             <item>
-             <spacer name="verticalSpacer_3">
+             <spacer name="verticalSpacer_attack">
               <property name="orientation">
                <enum>Qt::Orientation::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Policy::Expanding</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
                 <width>20</width>
-                <height>40</height>
+                <height>0</height>
                </size>
               </property>
              </spacer>
@@ -1703,6 +1840,9 @@
         <string>General</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_23">
+        <property name="spacing">
+         <number>4</number>
+        </property>
         <item>
          <widget class="QScrollArea" name="scrollArea_general">
           <property name="frameShape">
@@ -1721,8 +1861,14 @@
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_39">
+            <property name="spacing">
+             <number>4</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_advanced_top">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <item>
                <widget class="QGroupBox" name="groupBox_session_and_limits">
                 <property name="title">
@@ -1732,6 +1878,9 @@
                  <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_session">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignTop</set>
                  </property>
@@ -1805,6 +1954,9 @@
                  </item>
                  <item row="4" column="0" colspan="2">
                   <layout class="QHBoxLayout" name="horizontalLayout_status">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <widget class="QCheckBox" name="checkBox_status">
                       <property name="toolTip">
@@ -1877,6 +2029,9 @@
                  <bool>false</bool>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignTop</set>
                  </property>
@@ -1899,6 +2054,9 @@
                  </item>
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_cache_path">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <widget class="QLabel" name="label_cache_path">
                      <property name="text">
@@ -1932,6 +2090,9 @@
             </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_25">
+              <property name="spacing">
+               <number>4</number>
+              </property>
               <item>
                <widget class="QGroupBox" name="groupBox_resources">
                 <property name="title">
@@ -1941,13 +2102,22 @@
                  <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_12">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignTop</set>
                  </property>
                  <item row="0" column="0">
                   <layout class="QHBoxLayout" name="horizontalLayout_31">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <layout class="QVBoxLayout" name="verticalLayout_26">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QLabel" name="label_cpu_affinity">
                        <property name="text">
@@ -1973,6 +2143,9 @@
                    </item>
                    <item>
                     <layout class="QVBoxLayout" name="verticalLayout_27">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_cpu_affinity">
                        <property name="toolTip">
@@ -2000,6 +2173,9 @@
                  </item>
                  <item row="1" column="0">
                   <layout class="QHBoxLayout" name="horizontalLayout_hwmon">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <widget class="QCheckBox" name="checkBox_hwmon_temp_abort">
                      <property name="toolTip">
@@ -2056,11 +2232,17 @@
                  <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_25">
+                 <property name="spacing">
+                  <number>4</number>
+                 </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignTop</set>
                  </property>
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
+                   <property name="spacing">
+                    <number>4</number>
+                   </property>
                    <item>
                     <widget class="QCheckBox" name="checkBox_outfile">
                      <property name="text">
@@ -2070,6 +2252,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_63">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QLineEdit" name="lineEdit_outfile">
                        <property name="enabled">
@@ -2100,6 +2285,9 @@
                    </item>
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_38">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
                      <item>
                       <widget class="QLabel" name="label_outfile_format">
                        <property name="enabled">
@@ -2185,6 +2373,9 @@
     </item>
     <item row="1" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_42">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <item>
        <widget class="QPushButton" name="pushButton_start">
         <property name="text">
