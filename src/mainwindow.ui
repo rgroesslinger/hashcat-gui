@@ -412,6 +412,9 @@
                    <property name="selectionMode">
                     <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>Only checked rows are used. A folder is one wordlist: hashcat reads the files directly inside it.</string>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -538,7 +541,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Empty runs the bundled default-passwords; hints is also bundled.</string>
+               <string>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat's bundled default-passwords runs. hints is also bundled.</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -906,7 +909,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Every argument after the wordlist is a table</string>
+               <string>Every checked row after the wordlist is a table</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -1192,7 +1195,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Arguments the feed reads, in order</string>
+               <string>Arguments the feed reads, in order; only checked rows are used</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>

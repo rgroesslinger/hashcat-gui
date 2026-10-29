@@ -1582,7 +1582,7 @@ void MainWindow::removeWordlistClicked()
     ui->toolButton_wordlist_move_down->setEnabled(false);
 }
 
-void MainWindow::addPathsToList(QListWidget *list, const QStringList &paths, bool checkRows)
+void MainWindow::addPathsToList(QListWidget *list, const QStringList &paths)
 {
     // The dialog hands out '/' separated paths, which are stored in the
     // platform's own form so the rows look like the paths the user works with
@@ -1594,32 +1594,33 @@ void MainWindow::addPathsToList(QListWidget *list, const QStringList &paths, boo
         }
 
         auto *item = new QListWidgetItem(native, list);
-        if (checkRows) {
-            item->setCheckState(Qt::Checked);
-        }
+        item->setCheckState(Qt::Checked);
     }
 }
 
 void MainWindow::addWordlistClicked()
 {
     addPathsToList(ui->listWidget_wordlist,
-                   QFileDialog::getOpenFileNames(this, tr("Add wordlists")), true);
+                   QFileDialog::getOpenFileNames(this, tr("Add wordlists")));
 }
 
 void MainWindow::addWordlistFolderClicked()
 {
     const QString folder = QFileDialog::getExistingDirectory(this, tr("Add wordlist folder"));
     if (!folder.isEmpty()) {
-        addPathsToList(ui->listWidget_wordlist, {folder}, true);
+        addPathsToList(ui->listWidget_wordlist, {folder});
     }
 }
 
-QStringList MainWindow::listItems(const QListWidget *list)
+QStringList MainWindow::checkedItems(const QListWidget *list)
 {
     QStringList items;
     items.reserve(list->count());
     for (int i = 0; i < list->count(); ++i) {
-        items << list->item(i)->text();
+        const QListWidgetItem *item = list->item(i);
+        if (item->checkState() == Qt::Checked) {
+            items << item->text();
+        }
     }
     return items;
 }
@@ -1651,14 +1652,14 @@ void MainWindow::moveSelectedRow(QListWidget *list, int delta)
 void MainWindow::addPcfgRulesetClicked()
 {
     addPathsToList(ui->listWidget_pcfg_rulesets,
-                   QFileDialog::getOpenFileNames(this, tr("Add rulesets")), false);
+                   QFileDialog::getOpenFileNames(this, tr("Add rulesets")));
 }
 
 void MainWindow::addPcfgRulesetFolderClicked()
 {
     const QString folder = QFileDialog::getExistingDirectory(this, tr("Add ruleset folder"));
     if (!folder.isEmpty()) {
-        addPathsToList(ui->listWidget_pcfg_rulesets, {folder}, false);
+        addPathsToList(ui->listWidget_pcfg_rulesets, {folder});
     }
 }
 
@@ -1679,8 +1680,7 @@ void MainWindow::pcfgRulesetMoveDownClicked()
 
 void MainWindow::addTableClicked()
 {
-    addPathsToList(ui->listWidget_tables, QFileDialog::getOpenFileNames(this, tr("Add tables")),
-                   false);
+    addPathsToList(ui->listWidget_tables, QFileDialog::getOpenFileNames(this, tr("Add tables")));
 }
 
 void MainWindow::removeTableClicked()
@@ -1701,10 +1701,12 @@ void MainWindow::addFeedClicked()
 void MainWindow::addFeedArgumentClicked()
 {
     // The argument field is a staging area: what reaches the command line is
-    // the list, one argv token per row.
+    // the list, one argv token per row - checked, like a path row, so it can
+    // be taken out of one run without being lost.
     const QString argument = ui->lineEdit_feed_argument->text().trimmed();
     if (!argument.isEmpty()) {
-        ui->listWidget_feed_arguments->addItem(argument);
+        auto *item = new QListWidgetItem(argument, ui->listWidget_feed_arguments);
+        item->setCheckState(Qt::Checked);
         ui->lineEdit_feed_argument->clear();
     }
 }
@@ -2364,13 +2366,10 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.hwmonTempAbortCelsius = ui->spinBox_hwmon_temp_abort->value();
     options.hashFile = ui->lineEdit_hashfile->text();
 
-    const auto wordlists =
-        ui->listWidget_wordlist->findItems(QStringLiteral("*"), Qt::MatchWildcard);
-    for (const QListWidgetItem *item : wordlists) {
-        if (item->checkState() == Qt::Checked) {
-            options.wordlists << item->text();
-        }
-    }
+    // Every argument list - the wordlists included - passes only its checked
+    // rows: an unchecked row stays in the list and in the session, but not in
+    // the command.
+    options.wordlists = checkedItems(ui->listWidget_wordlist);
 
     // The feed modes. Every value is read unconditionally: a disabled or
     // hidden field can still hold a value a session stored, and the launch
@@ -2380,7 +2379,7 @@ HashcatOptions MainWindow::collectHashcatOptions()
         return text.split(separator, Qt::SkipEmptyParts);
     };
 
-    options.pcfgRulesets = listItems(ui->listWidget_pcfg_rulesets);
+    options.pcfgRulesets = checkedItems(ui->listWidget_pcfg_rulesets);
     options.pcfgScale = ui->lineEdit_pcfg_scale->text().trimmed();
     options.pcfgCostmax = ui->lineEdit_pcfg_costmax->text().trimmed();
     options.pcfgWeights = ui->lineEdit_pcfg_weights->text().trimmed();
@@ -2392,7 +2391,7 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.pcfgMask = ui->lineEdit_pcfg_mask->text().trimmed();
     options.pcfgExtraSettings = splitSettings(ui->lineEdit_pcfg_extra->text());
 
-    options.tableFiles = listItems(ui->listWidget_tables);
+    options.tableFiles = checkedItems(ui->listWidget_tables);
     options.tableIdentity = ui->lineEdit_table_identity->text().trimmed();
     options.tableTemplate = ui->lineEdit_table_template->text().trimmed();
     options.tableSingle = ui->lineEdit_table_single->text().trimmed();
@@ -2401,7 +2400,7 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.tableExtraSettings = splitSettings(ui->lineEdit_table_extra->text());
 
     options.feedName = ui->lineEdit_feed->text().trimmed();
-    options.feedArguments = listItems(ui->listWidget_feed_arguments);
+    options.feedArguments = checkedItems(ui->listWidget_feed_arguments);
 
     // The settings line of mode 9 stays as typed even next to a wordlist:
     // the launch validation names both controls instead of silently dropping

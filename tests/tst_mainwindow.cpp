@@ -939,16 +939,20 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     // a hidden field can still hold a value a session stored; a combination
     // that cannot work is the launch validation's answer, not a dropped
     // value here.
-    window.ui->listWidget_pcfg_rulesets->addItem(QStringLiteral("/tmp/one.pcfg"));
-    window.ui->listWidget_pcfg_rulesets->addItem(QStringLiteral("/tmp/two.pcfg"));
+    const auto addRow = [](QListWidget *list, const QString &text) {
+        auto *item = new QListWidgetItem(text, list);
+        item->setCheckState(Qt::Checked);
+    };
+    addRow(window.ui->listWidget_pcfg_rulesets, QStringLiteral("/tmp/one.pcfg"));
+    addRow(window.ui->listWidget_pcfg_rulesets, QStringLiteral("/tmp/two.pcfg"));
     window.ui->lineEdit_pcfg_scale->setText(QStringLiteral("2"));
     window.ui->lineEdit_pcfg_weights->setText(QStringLiteral("2:1"));
     window.ui->lineEdit_pcfg_extra->setText(QStringLiteral("omen=1  pwmin=8"));
-    window.ui->listWidget_tables->addItem(QStringLiteral("/tmp/table.txt"));
+    addRow(window.ui->listWidget_tables, QStringLiteral("/tmp/table.txt"));
     window.ui->lineEdit_table_identity->setText(QStringLiteral("1"));
     window.ui->lineEdit_table_cap->setText(QStringLiteral("4294967295"));
     window.ui->lineEdit_feed->setText(QStringLiteral("wordlist"));
-    window.ui->listWidget_feed_arguments->addItem(QStringLiteral("dict.txt"));
+    addRow(window.ui->listWidget_feed_arguments, QStringLiteral("dict.txt"));
     window.ui->lineEdit_association_settings->setText(
         QStringLiteral("phases=words,rules rules.rulemax=300"));
 
@@ -1034,6 +1038,19 @@ void TestMainWindow::widgetsFlowIntoTheOptions()
     QVERIFY(arguments.contains(QStringLiteral("--rule-left")));
     QVERIFY(!arguments.contains(QStringLiteral("--rule-right")));
     QVERIFY(!arguments.contains(QStringLiteral("--outfile")));
+
+    // A row that is unchecked stays in the list and keeps its place, but is
+    // not passed to hashcat - in every list, not only the wordlists.
+    window.ui->listWidget_pcfg_rulesets->item(1)->setCheckState(Qt::Unchecked);
+    window.ui->listWidget_tables->item(0)->setCheckState(Qt::Unchecked);
+    window.ui->listWidget_feed_arguments->item(0)->setCheckState(Qt::Unchecked);
+    const HashcatOptions reduced = window.collectHashcatOptions();
+    QCOMPARE(reduced.pcfgRulesets, QStringList{QStringLiteral("/tmp/one.pcfg")});
+    QVERIFY(reduced.tableFiles.isEmpty());
+    QVERIFY(reduced.feedArguments.isEmpty());
+    QCOMPARE(window.ui->listWidget_pcfg_rulesets->count(), 2);
+    QCOMPARE(window.ui->listWidget_tables->count(), 1);
+    QCOMPARE(window.ui->listWidget_feed_arguments->count(), 1);
 
     // The increment widgets are hidden in the hybrid mode (12), which
     // refuses -i: a checked box a session stored there must not reach the
@@ -1241,23 +1258,26 @@ void TestMainWindow::addingPathsKeepsTheListClean()
     QListWidget *wordlists = window.ui->listWidget_wordlist;
     MainWindow::addPathsToList(wordlists,
                                {QStringLiteral("/tmp/a.txt"), QString(),
-                                QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")},
-                               true);
+                                QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")});
     QCOMPARE(wordlists->count(), 2);
     QCOMPARE(wordlists->item(0)->text(), QStringLiteral("/tmp/a.txt"));
     QCOMPARE(wordlists->item(0)->checkState(), Qt::Checked);
     QCOMPARE(wordlists->item(1)->checkState(), Qt::Checked);
 
     // A path that is already a row is not added twice.
-    MainWindow::addPathsToList(wordlists, {QStringLiteral("/tmp/a.txt")}, true);
+    MainWindow::addPathsToList(wordlists, {QStringLiteral("/tmp/a.txt")});
     QCOMPARE(wordlists->count(), 2);
 
-    // The PCFG rows stay without a check state: a checkbox column there would
-    // mean nothing, and a session would store the state as if it did.
+    // Every list takes part in the command the same way: a new row starts
+    // checked, and unchecking it keeps the row without passing it on.
     QListWidget *rulesets = window.ui->listWidget_pcfg_rulesets;
-    MainWindow::addPathsToList(rulesets, {QStringLiteral("/tmp/one.pcfg")}, false);
+    MainWindow::addPathsToList(rulesets, {QStringLiteral("/tmp/one.pcfg")});
     QCOMPARE(rulesets->count(), 1);
-    QVERIFY(!rulesets->item(0)->data(Qt::CheckStateRole).isValid());
+    QCOMPARE(rulesets->item(0)->checkState(), Qt::Checked);
+
+    QListWidget *tables = window.ui->listWidget_tables;
+    MainWindow::addPathsToList(tables, {QStringLiteral("/tmp/table.txt")});
+    QCOMPARE(tables->item(0)->checkState(), Qt::Checked);
 }
 
 // A wordlist folder, a ruleset folder and a table are judged by different

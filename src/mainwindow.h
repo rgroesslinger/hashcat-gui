@@ -173,19 +173,21 @@ private:
     HashcatOptions collectHashcatOptions();
     QStringList generateArguments();
 
-    // Row handling of the editable argument lists (PCFG rulesets, tables,
-    // feed arguments). The wordlist list keeps its own handlers: its rows
-    // carry a check state the helpers would not preserve.
-    static QStringList listItems(const QListWidget *list);
+    // Row handling shared by every argument list. The wordlist slots are thin
+    // wrappers around it: their buttons follow the selection, so they update
+    // that too.
+    //
+    // checkedItems() is what reaches the command: an unchecked row stays in
+    // the list - it keeps its place, its path and its text - but is left out.
+    static QStringList checkedItems(const QListWidget *list);
     static void removeSelectedRows(QListWidget *list);
     static void moveSelectedRow(QListWidget *list, int delta);
 
     // The file and folder dialogs end here: the paths that are not rows yet,
-    // once each, in the platform's own separator form. checkRows is the
-    // wordlist's check state; the other lists stay without one, or a checkbox
-    // column would appear there and a session would store a state that means
-    // nothing.
-    static void addPathsToList(QListWidget *list, const QStringList &paths, bool checkRows);
+    // once each, in the platform's own separator form. Every row starts
+    // checked; unchecking it later keeps the row in the list but leaves it out
+    // of the command.
+    static void addPathsToList(QListWidget *list, const QStringList &paths);
 
     // Rebuilds a monitor's watched set from the rows of its list, and marks or
     // clears one row. The row write blocks the list's signals: an icon is not
