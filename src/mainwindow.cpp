@@ -29,6 +29,7 @@
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QSignalBlocker>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QIntValidator>
@@ -84,20 +85,6 @@ QString menuPath(const QString &text)
         path.chop(1);
     }
     return path.trimmed();
-}
-
-// Adds the chosen files to an argument list, once each. The dialog hands out
-// '/' separated paths, which are stored in the platform's own form so the
-// rows look like the paths the user works with everywhere else.
-void addFilesToList(QListWidget *list, const QString &dialogTitle, QWidget *parent)
-{
-    const QStringList files = QFileDialog::getOpenFileNames(parent, dialogTitle);
-    for (const QString &file : std::as_const(files)) {
-        const QString native = QDir::toNativeSeparators(file);
-        if (!native.isEmpty() && list->findItems(native, Qt::MatchExactly).isEmpty()) {
-            list->addItem(native);
-        }
-    }
 }
 
 // The argument list as the preview and the clipboard show it: one token per
@@ -404,6 +391,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::removeWordlistClicked);
     connect(ui->pushButton_add_wordlist, &QPushButton::clicked, this,
             &MainWindow::addWordlistClicked);
+    connect(ui->pushButton_add_wordlist_folder, &QPushButton::clicked, this,
+            &MainWindow::addWordlistFolderClicked);
     connect(ui->toolButton_wordlist_move_up, &QToolButton::clicked, this,
             &MainWindow::wordlistMoveUpClicked);
     connect(ui->toolButton_wordlist_move_down, &QToolButton::clicked, this,
@@ -416,7 +405,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // instead of removing the rows one by one.
     connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::modelReset, this,
             &MainWindow::refreshWordlistMonitor);
-    connect(&m_wordlistMonitor, &WordlistMonitor::availabilityChanged, this,
+    // A row can be edited in place like the PCFG and table rows, so the path
+    // after an edit is a new one to watch. The check state changes with it;
+    // that re-checks the same paths, which changes nothing.
+    connect(ui->listWidget_wordlist, &QListWidget::itemChanged, this,
+            &MainWindow::refreshWordlistMonitor);
+    connect(&m_wordlistMonitor, &PathMonitor::availabilityChanged, this,
             &MainWindow::wordlistAvailabilityChanged);
 
     /* ---------- PCFG, table and feed ---------- */
@@ -430,8 +424,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 [this] { commandChanged(); });
         connect(list, &QListWidget::itemChanged, this, [this] { commandChanged(); });
     }
+
+    // The two path lists own a monitor each. Their rows are edited rather than
+    // only inserted, so itemChanged() is a source of paths as well; the row
+    // handler blocks the list while it writes an icon or tooltip, so those
+    // writes do not feed back into the monitor.
+    connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::rowsInserted, this,
+            &MainWindow::refreshPcfgMonitor);
+    connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::rowsRemoved, this,
+            &MainWindow::refreshPcfgMonitor);
+    connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::modelReset, this,
+            &MainWindow::refreshPcfgMonitor);
+    connect(ui->listWidget_pcfg_rulesets, &QListWidget::itemChanged, this,
+            &MainWindow::refreshPcfgMonitor);
+    connect(&m_pcfgMonitor, &PathMonitor::availabilityChanged, this,
+            &MainWindow::pcfgAvailabilityChanged);
+
+    connect(ui->listWidget_tables->model(), &QAbstractItemModel::rowsInserted, this,
+            &MainWindow::refreshTableMonitor);
+    connect(ui->listWidget_tables->model(), &QAbstractItemModel::rowsRemoved, this,
+            &MainWindow::refreshTableMonitor);
+    connect(ui->listWidget_tables->model(), &QAbstractItemModel::modelReset, this,
+            &MainWindow::refreshTableMonitor);
+    connect(ui->listWidget_tables, &QListWidget::itemChanged, this,
+            &MainWindow::refreshTableMonitor);
+    connect(&m_tableMonitor, &PathMonitor::availabilityChanged, this,
+            &MainWindow::tableAvailabilityChanged);
+
     connect(ui->pushButton_open_pcfg_ruleset, &QPushButton::clicked, this,
             &MainWindow::addPcfgRulesetClicked);
+    connect(ui->pushButton_open_pcfg_ruleset_folder, &QPushButton::clicked, this,
+            &MainWindow::addPcfgRulesetFolderClicked);
     connect(ui->pushButton_remove_pcfg_ruleset, &QPushButton::clicked, this,
             &MainWindow::removePcfgRulesetClicked);
     connect(ui->toolButton_pcfg_ruleset_up, &QToolButton::clicked, this,
@@ -520,9 +543,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     // QMainWindow destroys its child widgets only after the members are gone.
-    // Clearing the wordlist then resets its model, and the monitor member has
-    // to be out of the picture by that point.
+    // Clearing a list then resets its model, and the monitor members have to be
+    // out of the picture by that point.
     disconnect(ui->listWidget_wordlist->model(), nullptr, this, nullptr);
+    disconnect(ui->listWidget_pcfg_rulesets->model(), nullptr, this, nullptr);
+    disconnect(ui->listWidget_tables->model(), nullptr, this, nullptr);
     delete ui;
 }
 
@@ -1560,17 +1585,35 @@ void MainWindow::removeWordlistClicked()
     ui->toolButton_wordlist_move_down->setEnabled(false);
 }
 
+void MainWindow::addPathsToList(QListWidget *list, const QStringList &paths, bool checkRows)
+{
+    // The dialog hands out '/' separated paths, which are stored in the
+    // platform's own form so the rows look like the paths the user works with
+    // everywhere else. A path that is already a row is not added twice.
+    for (const QString &path : paths) {
+        const QString native = QDir::toNativeSeparators(path);
+        if (native.isEmpty() || !list->findItems(native, Qt::MatchExactly).isEmpty()) {
+            continue;
+        }
+
+        auto *item = new QListWidgetItem(native, list);
+        if (checkRows) {
+            item->setCheckState(Qt::Checked);
+        }
+    }
+}
+
 void MainWindow::addWordlistClicked()
 {
-    QStringList files = QFileDialog::getOpenFileNames(this, tr("Add wordlists"));
-    QListWidget *w = ui->listWidget_wordlist;
+    addPathsToList(ui->listWidget_wordlist,
+                   QFileDialog::getOpenFileNames(this, tr("Add wordlists")), true);
+}
 
-    for (const QString &wordlist : std::as_const(files)) {
-        // A file has been selected and it is not already in the list
-        if (!wordlist.isEmpty() && w->findItems(wordlist, Qt::MatchExactly).isEmpty()) {
-            QListWidgetItem *newItem = new QListWidgetItem(wordlist, w);
-            newItem->setCheckState(Qt::Checked);
-        }
+void MainWindow::addWordlistFolderClicked()
+{
+    const QString folder = QFileDialog::getExistingDirectory(this, tr("Add wordlist folder"));
+    if (!folder.isEmpty()) {
+        addPathsToList(ui->listWidget_wordlist, {folder}, true);
     }
 }
 
@@ -1610,7 +1653,16 @@ void MainWindow::moveSelectedRow(QListWidget *list, int delta)
 
 void MainWindow::addPcfgRulesetClicked()
 {
-    addFilesToList(ui->listWidget_pcfg_rulesets, tr("Add rulesets"), this);
+    addPathsToList(ui->listWidget_pcfg_rulesets,
+                   QFileDialog::getOpenFileNames(this, tr("Add rulesets")), false);
+}
+
+void MainWindow::addPcfgRulesetFolderClicked()
+{
+    const QString folder = QFileDialog::getExistingDirectory(this, tr("Add ruleset folder"));
+    if (!folder.isEmpty()) {
+        addPathsToList(ui->listWidget_pcfg_rulesets, {folder}, false);
+    }
 }
 
 void MainWindow::removePcfgRulesetClicked()
@@ -1630,7 +1682,8 @@ void MainWindow::pcfgRulesetMoveDownClicked()
 
 void MainWindow::addTableClicked()
 {
-    addFilesToList(ui->listWidget_tables, tr("Add tables"), this);
+    addPathsToList(ui->listWidget_tables, QFileDialog::getOpenFileNames(this, tr("Add tables")),
+                   false);
 }
 
 void MainWindow::removeTableClicked()
@@ -1691,21 +1744,57 @@ void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
     ui->toolButton_wordlist_move_down->setEnabled(true);
 }
 
-// The rows are the source of the watched paths: a wordlist arrives through the
-// file dialog, a drop, a session or a reset, and all of them change the model.
-void MainWindow::refreshWordlistMonitor()
+// The rows are the source of the watched paths: a path arrives through the file
+// dialog, a drop, a session or a reset, and all of them change the model.
+void MainWindow::refreshMonitor(QListWidget *list, PathMonitor &monitor)
 {
     QStringList paths;
-    paths.reserve(ui->listWidget_wordlist->count());
-    for (int i = 0; i < ui->listWidget_wordlist->count(); ++i) {
-        paths << ui->listWidget_wordlist->item(i)->text();
+    paths.reserve(list->count());
+    for (int i = 0; i < list->count(); ++i) {
+        paths << list->item(i)->text();
     }
-    m_wordlistMonitor.setPaths(paths);
+    monitor.setPaths(paths);
 }
 
-void MainWindow::wordlistAvailabilityChanged(const QString &path, bool available)
+// Why a row hashcat cannot use is unusable, in the terms of its list. The path
+// may contain markup-like text, so the result is escaped for the rich text
+// tooltip.
+QString MainWindow::unavailableTooltip(PathMonitor::Kind kind, const QString &path)
 {
-    QListWidget *list = ui->listWidget_wordlist;
+    const bool folder = QFileInfo(path).isDir();
+
+    switch (kind) {
+    case PathMonitor::Kind::Wordlist:
+        if (folder) {
+            return escapeRichText(tr("This folder has no wordlists. hashcat reads the regular "
+                                     "files directly inside it, not subfolders."));
+        }
+        return escapeRichText(tr("This wordlist does not exist:\n%1").arg(path));
+    case PathMonitor::Kind::Pcfg:
+        if (folder) {
+            return escapeRichText(
+                tr("This ruleset folder has no Grammar/grammar.txt:\n%1").arg(path));
+        }
+        return escapeRichText(tr("This ruleset does not exist:\n%1").arg(path));
+    case PathMonitor::Kind::Table:
+        if (folder) {
+            return escapeRichText(
+                tr("A table must be a file; hashcat does not read a folder:\n%1").arg(path));
+        }
+        return escapeRichText(tr("This table does not exist:\n%1").arg(path));
+    }
+
+    return {};
+}
+
+void MainWindow::setRowAvailability(QListWidget *list, PathMonitor::Kind kind, const QString &path,
+                                    bool available)
+{
+    // Writing an icon or a tooltip is an item change, which for the path lists
+    // feeds back into the monitor. The blocker keeps that loop out: the state
+    // is already the one the write records.
+    const QSignalBlocker blocker(list);
+
     const QIcon warning = available ? QIcon() : style()->standardIcon(QStyle::SP_MessageBoxWarning);
 
     for (int i = 0; i < list->count(); ++i) {
@@ -1715,9 +1804,9 @@ void MainWindow::wordlistAvailabilityChanged(const QString &path, bool available
         }
 
         if (available) {
-            // Item data changes go through itemChanged(), which rebuilds the
-            // preview: leave an available row alone instead of clearing what is
-            // already clear.
+            // Item data changes go through itemChanged(), which refreshes the
+            // monitor and rebuilds the preview: leave an available row alone
+            // instead of clearing what is already clear.
             if (!item->icon().isNull()) {
                 item->setIcon(QIcon());
             }
@@ -1731,11 +1820,41 @@ void MainWindow::wordlistAvailabilityChanged(const QString &path, bool available
             item->setIcon(warning);
         }
 
-        const QString tooltip = escapeRichText(tr("This wordlist does not exist:\n%1").arg(path));
+        const QString tooltip = unavailableTooltip(kind, path);
         if (item->toolTip() != tooltip) {
             item->setToolTip(tooltip);
         }
     }
+}
+
+void MainWindow::refreshWordlistMonitor()
+{
+    refreshMonitor(ui->listWidget_wordlist, m_wordlistMonitor);
+}
+
+void MainWindow::refreshPcfgMonitor()
+{
+    refreshMonitor(ui->listWidget_pcfg_rulesets, m_pcfgMonitor);
+}
+
+void MainWindow::refreshTableMonitor()
+{
+    refreshMonitor(ui->listWidget_tables, m_tableMonitor);
+}
+
+void MainWindow::wordlistAvailabilityChanged(const QString &path, bool available)
+{
+    setRowAvailability(ui->listWidget_wordlist, PathMonitor::Kind::Wordlist, path, available);
+}
+
+void MainWindow::pcfgAvailabilityChanged(const QString &path, bool available)
+{
+    setRowAvailability(ui->listWidget_pcfg_rulesets, PathMonitor::Kind::Pcfg, path, available);
+}
+
+void MainWindow::tableAvailabilityChanged(const QString &path, bool available)
+{
+    setRowAvailability(ui->listWidget_tables, PathMonitor::Kind::Table, path, available);
 }
 
 void MainWindow::rulesFile1Toggled(bool checked)
@@ -2005,6 +2124,15 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         box.setText(text);
         break;
     }
+
+    // The row is user supplied, so plain text: a '<' in the path would be
+    // taken for markup by the default AutoText.
+    case HelperUtils::LaunchError::WordlistMustBeFile:
+        box.setTextFormat(Qt::PlainText);
+        box.setText(tr("This wordlist has to be a file: hashcat reads it as the multiplied "
+                       "wordlist (the ?q side), and a folder cannot be used there:\n%1")
+                        .arg(detail));
+        break;
 
     case HelperUtils::LaunchError::NoMask:
         box.setIcon(QMessageBox::Information);

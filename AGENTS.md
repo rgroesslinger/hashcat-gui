@@ -60,7 +60,7 @@ lists, build system, translations, packaging) also check `build-release.yml`, CI
   terminal; `WidgetStateSerializer` + `StateFile` persist sessions; settings go through
   `SettingsManager::instance()`. Keep argv order stable: preview, clipboard and tests depend
   on it. UI-free logic (CommandBuilder, HashcatInfoParser, HelperUtils, StateFile,
-  WidgetStateSerializer, SettingsManager, UpdateChecker, WordlistMonitor) stays testable.
+  WidgetStateSerializer, SettingsManager, UpdateChecker, PathMonitor) stays testable.
 - Attack-mode gating predicates live in `CommandBuilder` and are reused for group-box
   enablement; `modeRequirements()` derives mode hint and launch validation from them.
 - Launch: `HelperUtils::validateOptions()` (mode needs), then `validateLaunch()` (path,
@@ -71,8 +71,13 @@ lists, build system, translations, packaging) also check `build-release.yml`, CI
   (`friend class TestAboutDialog`).
 - `AboutDialog` sizes to `sizeHint()` in `showEvent`, not the constructor: wrapped labels get
   their height after polish; once per open, so user resizes survive hide/show.
-- `WordlistMonitor` watches each wordlist's parent directory (`QFileSystemWatcher` cannot watch
-  a missing path). A missing file gets a warning icon/tooltip; available rows stay untouched.
+- `PathMonitor` watches each input's parent directory (`QFileSystemWatcher` cannot watch a
+  missing path), plus the directory itself for wordlists and PCFG rulesets: an empty wordlist
+  folder and a ruleset folder without `Grammar/grammar.txt` are unusable, and both can gain
+  the missing entry later. Its `Kind` decides what is usable - wordlists and PCFG take a
+  folder, tables never do, and a bare ruleset name such as `default-passwords` is resolved by
+  hashcat and never flagged. A missing or unusable path gets a warning icon/tooltip;
+  available rows stay untouched.
 
 ### Adding a hashcat option
 

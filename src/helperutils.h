@@ -48,8 +48,11 @@ public:
         NoWordlist,         // the mode reads word lists, none is selected
         WrongWordlistCount, // the mode wants an exact number of word lists
         TooManyWordlists,   // more word lists than the mode accepts
-        NoMask,             // the mode brute-forces a mask, none is given
-        InvalidIncrement,   // the increment bounds contradict each other
+        // The wordlist hashcat multiplies (?q) is read by one feed instance
+        // from start to end, so unlike the base it cannot be a folder.
+        WordlistMustBeFile,
+        NoMask,           // the mode brute-forces a mask, none is given
+        InvalidIncrement, // the increment bounds contradict each other
         // hashcat 8.0.0 silently ignores -i under --speed-only (it allows the
         // flag for ACT_CRACK | ACT_STDOUT | ACT_KEYSPACE), so refusing the
         // combination is a GUI policy: incrementing would make a fixed speed

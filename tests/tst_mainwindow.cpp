@@ -209,6 +209,8 @@ private slots:
     void deviceTypesAcceptOnlyTheSupportedOnes();
     void checkedWordlistsEndUpInTheCommand();
     void missingWordlistsAreMarked();
+    void addingPathsKeepsTheListClean();
+    void folderPathsAreMarked();
     void hashTypeComesFromTheItemData();
     void hashTypesAreFilledFromHashcat();
     void failedQueryReenablesTheHashTypeCombo_data();
@@ -1152,9 +1154,10 @@ void TestMainWindow::missingWordlistsAreMarked()
     const QString missingPath = directory.filePath(QStringLiteral("missing.txt"));
 
     // A directory is a valid wordlist input since hashcat 8.0.0, so a row
-    // naming one must not be marked as missing.
+    // naming one with a wordlist in it must not be marked as missing.
     const QString directoryPath = directory.filePath(QStringLiteral("wordlists"));
     QVERIFY(QDir().mkpath(directoryPath));
+    QVERIFY(writeFile(QDir(directoryPath).filePath(QStringLiteral("words.txt"))));
 
     // A configured path keeps the constructor from queueing the settings
     // dialog; the test spins the event loop below. The watchdog closes the
@@ -1219,6 +1222,125 @@ void TestMainWindow::missingWordlistsAreMarked()
     QCOMPARE(restored->text(), missingPath);
     QVERIFY(!restored->icon().isNull());
     QVERIFY(restored->toolTip().contains(missingPath));
+}
+
+// Both dialogs end in the same helper, so what it does to the list is what a
+// selection does - including the check state the wordlist needs and the other
+// lists must not store.
+void TestMainWindow::addingPathsKeepsTheListClean()
+{
+    MainWindow window;
+
+    QListWidget *wordlists = window.ui->listWidget_wordlist;
+    MainWindow::addPathsToList(wordlists,
+                               {QStringLiteral("/tmp/a.txt"), QString(),
+                                QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")},
+                               true);
+    QCOMPARE(wordlists->count(), 2);
+    QCOMPARE(wordlists->item(0)->text(), QStringLiteral("/tmp/a.txt"));
+    QCOMPARE(wordlists->item(0)->checkState(), Qt::Checked);
+    QCOMPARE(wordlists->item(1)->checkState(), Qt::Checked);
+
+    // A path that is already a row is not added twice.
+    MainWindow::addPathsToList(wordlists, {QStringLiteral("/tmp/a.txt")}, true);
+    QCOMPARE(wordlists->count(), 2);
+
+    // The PCFG rows stay without a check state: a checkbox column there would
+    // mean nothing, and a session would store the state as if it did.
+    QListWidget *rulesets = window.ui->listWidget_pcfg_rulesets;
+    MainWindow::addPathsToList(rulesets, {QStringLiteral("/tmp/one.pcfg")}, false);
+    QCOMPARE(rulesets->count(), 1);
+    QVERIFY(!rulesets->item(0)->data(Qt::CheckStateRole).isValid());
+}
+
+// A wordlist folder, a ruleset folder and a table are judged by different
+// rules; the rows have to show which of them hashcat can use, and have to
+// recover when the missing piece arrives.
+void TestMainWindow::folderPathsAreMarked()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+
+    const QString trained = directory.filePath(QStringLiteral("trained"));
+    QVERIFY(QDir().mkpath(trained + QStringLiteral("/Grammar")));
+    QVERIFY(writeFile(trained + QStringLiteral("/Grammar/grammar.txt")));
+
+    const QString untrained = directory.filePath(QStringLiteral("untrained"));
+    QVERIFY(QDir().mkpath(untrained));
+
+    const QString tableFile = directory.filePath(QStringLiteral("table.txt"));
+    QVERIFY(writeFile(tableFile));
+
+    // A folder with a table file in it is still not a table.
+    const QString tableFolder = directory.filePath(QStringLiteral("tables"));
+    QVERIFY(QDir().mkpath(tableFolder));
+    QVERIFY(writeFile(tableFolder + QStringLiteral("/inside.txt")));
+
+    const QString emptyFolder = directory.filePath(QStringLiteral("empty"));
+    QVERIFY(QDir().mkpath(emptyFolder));
+
+    // A configured path keeps the constructor from queueing the settings
+    // dialog; the test spins the event loop below. The watchdog closes the
+    // query's failure warning, whose modal loop would otherwise swallow it.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+    m_watchdog.start();
+
+    MainWindow window;
+
+    window.ui->listWidget_pcfg_rulesets->addItem(trained);
+    window.ui->listWidget_pcfg_rulesets->addItem(untrained);
+    window.ui->listWidget_pcfg_rulesets->addItem(QStringLiteral("default-passwords"));
+    window.ui->listWidget_tables->addItem(tableFile);
+    window.ui->listWidget_tables->addItem(tableFolder);
+    auto *empty = new QListWidgetItem(emptyFolder, window.ui->listWidget_wordlist);
+    empty->setCheckState(Qt::Checked);
+
+    const auto row = [](QListWidget *list, const QString &text) -> QListWidgetItem * {
+        const QList<QListWidgetItem *> matches = list->findItems(text, Qt::MatchExactly);
+        return matches.isEmpty() ? nullptr : matches.first();
+    };
+
+    QListWidget *pcfg = window.ui->listWidget_pcfg_rulesets;
+    QListWidget *tables = window.ui->listWidget_tables;
+
+    QVERIFY(row(pcfg, trained));
+    QVERIFY(row(pcfg, trained)->icon().isNull());
+    QVERIFY(row(pcfg, trained)->toolTip().isEmpty());
+
+    QVERIFY(!row(pcfg, untrained)->icon().isNull());
+    QVERIFY(row(pcfg, untrained)->toolTip().contains(QStringLiteral("Grammar/grammar.txt")));
+
+    // A bundled name is resolved by hashcat, so the GUI must not call it
+    // missing.
+    QVERIFY(row(pcfg, QStringLiteral("default-passwords"))->icon().isNull());
+
+    QVERIFY(row(tables, tableFile)->icon().isNull());
+    QVERIFY(!row(tables, tableFolder)->icon().isNull());
+    QVERIFY(row(tables, tableFolder)->toolTip().contains(QStringLiteral("must be a file")));
+
+    QVERIFY(!empty->icon().isNull());
+    QVERIFY(empty->toolTip().contains(QStringLiteral("no wordlists")));
+
+    // Wordlist rows are edited in place like the others; the same handler
+    // has to drop the warning when the text becomes a usable path.
+    empty->setText(tableFile);
+    QTRY_VERIFY(empty->icon().isNull());
+    QVERIFY(empty->toolTip().isEmpty());
+
+    // A row whose text is replaced is re-checked: the same path is fine as a
+    // file and refused as a folder.
+    auto *edited = new QListWidgetItem(tableFile, tables);
+    QVERIFY(edited->icon().isNull());
+    edited->setText(tableFolder);
+    QTRY_VERIFY(!edited->icon().isNull());
+    QVERIFY(edited->toolTip().contains(QStringLiteral("must be a file")));
+
+    // The grammar arriving later clears the warning on its own row.
+    QVERIFY(QDir().mkpath(untrained + QStringLiteral("/Grammar")));
+    QVERIFY(writeFile(untrained + QStringLiteral("/Grammar/grammar.txt")));
+    QTRY_VERIFY(row(pcfg, untrained)->icon().isNull());
+    QVERIFY(row(pcfg, untrained)->toolTip().isEmpty());
 }
 
 void TestMainWindow::hashTypeComesFromTheItemData()

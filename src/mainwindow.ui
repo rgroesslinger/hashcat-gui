@@ -353,6 +353,22 @@
                     </widget>
                    </item>
                    <item>
+                    <widget class="QPushButton" name="pushButton_add_wordlist_folder">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="toolTip">
+                      <string>hashcat reads every file directly inside the folder as one wordlist.</string>
+                     </property>
+                     <property name="text">
+                      <string>Add folder…</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QPushButton" name="pushButton_remove_wordlist">
                      <property name="enabled">
                       <bool>false</bool>
@@ -522,7 +538,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Double-click a row to edit it. Empty runs the bundled default-passwords; hints is also bundled.</string>
+               <string>Double-click a row to edit it. A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Empty runs the bundled default-passwords; hints is also bundled.</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -541,6 +557,16 @@
              <widget class="QPushButton" name="pushButton_open_pcfg_ruleset">
               <property name="text">
                <string>Add files…</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QPushButton" name="pushButton_open_pcfg_ruleset_folder">
+              <property name="toolTip">
+               <string>A ruleset folder needs a Grammar/grammar.txt.</string>
+              </property>
+              <property name="text">
+               <string>Add folder…</string>
               </property>
              </widget>
                      </item>

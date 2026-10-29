@@ -14,7 +14,7 @@
 
 #include "hashcatoptions.h"
 #include "helperutils.h"
-#include "wordlistmonitor.h"
+#include "pathmonitor.h"
 
 #include <QJsonObject>
 
@@ -59,6 +59,7 @@ private slots:
     void openCachePathClicked();
     void removeWordlistClicked();
     void addWordlistClicked();
+    void addWordlistFolderClicked();
     void wordlistMoveUpClicked();
     void wordlistMoveDownClicked();
     void wordlistItemClicked(QListWidgetItem *item);
@@ -67,11 +68,16 @@ private slots:
 
     // the PCFG, table and feed groups
     void addPcfgRulesetClicked();
+    void addPcfgRulesetFolderClicked();
     void removePcfgRulesetClicked();
     void pcfgRulesetMoveUpClicked();
     void pcfgRulesetMoveDownClicked();
+    void refreshPcfgMonitor();
+    void pcfgAvailabilityChanged(const QString &path, bool available);
     void addTableClicked();
     void removeTableClicked();
+    void refreshTableMonitor();
+    void tableAvailabilityChanged(const QString &path, bool available);
     void addFeedClicked();
     void addFeedArgumentClicked();
     void removeFeedArgumentClicked();
@@ -115,8 +121,10 @@ private:
 
     Ui::MainWindow *ui;
 
-    // Tells the wordlist rows which of their files are gone.
-    WordlistMonitor m_wordlistMonitor;
+    // Tell the rows of each list which of their paths hashcat can use.
+    PathMonitor m_wordlistMonitor{PathMonitor::Kind::Wordlist};
+    PathMonitor m_pcfgMonitor{PathMonitor::Kind::Pcfg};
+    PathMonitor m_tableMonitor{PathMonitor::Kind::Table};
 
     // The last outfile name generated from the hash file name, see
     // hashFileTextChanged(). It is not cleared when the user types a name of
@@ -163,6 +171,21 @@ private:
     static QStringList listItems(const QListWidget *list);
     static void removeSelectedRows(QListWidget *list);
     static void moveSelectedRow(QListWidget *list, int delta);
+
+    // The file and folder dialogs end here: the paths that are not rows yet,
+    // once each, in the platform's own separator form. checkRows is the
+    // wordlist's check state; the other lists stay without one, or a checkbox
+    // column would appear there and a session would store a state that means
+    // nothing.
+    static void addPathsToList(QListWidget *list, const QStringList &paths, bool checkRows);
+
+    // Rebuilds a monitor's watched set from the rows of its list, and marks or
+    // clears one row. The row write blocks the list's signals: an icon change
+    // would otherwise re-enter the refresh through itemChanged().
+    static void refreshMonitor(QListWidget *list, PathMonitor &monitor);
+    void setRowAvailability(QListWidget *list, PathMonitor::Kind kind, const QString &path,
+                            bool available);
+    static QString unavailableTooltip(PathMonitor::Kind kind, const QString &path);
 
     // Presents what HelperUtils::validateLaunch() reported
     void showLaunchError(HelperUtils::LaunchError error, const QString &detail);

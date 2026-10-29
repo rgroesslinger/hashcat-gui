@@ -185,6 +185,21 @@ bool repeatedSetting(const QStringList &keys, const QStringList &tokens, QString
     return false;
 }
 
+// The wordlist hashcat multiplies (its ?q slot): the second row of combination
+// and of mode 12. Everything else is a base wordlist and takes a folder - mode 7
+// spells its mask first, but hashcat reads the dictionary as the base, and its
+// rewrite leaves no second list at all.
+int amplifierWordlistRow(AttackMode mode)
+{
+    switch (mode) {
+    case AttackMode::Combination:
+    case AttackMode::Hybrid:
+        return 1;
+    default:
+        return -1;
+    }
+}
+
 // Every extra token of the PCFG and table feeds must be a setting: the
 // positional arguments end at the first key=value, so a bare token after one
 // would be read as another ruleset or table.
@@ -523,6 +538,20 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
         const CommandBuilder::MaskMarkers markers = CommandBuilder::maskMarkers(options.mask);
         if (markers.word > 0 || markers.second > 0) {
             return LaunchError::MaskMarkersNotAllowed;
+        }
+    }
+
+    // A folder is a base wordlist; the list hashcat multiplies is read by one
+    // feed instance and has to be a file. The row follows from the mode, so the
+    // dialog can name the one that has to be changed.
+    const int amplifier = amplifierWordlistRow(options.attackMode);
+    if (amplifier >= 0 && amplifier < wordlistCount) {
+        const QString &path = options.wordlists.at(amplifier);
+        if (!path.isEmpty() && QFileInfo(path).isDir()) {
+            if (detail) {
+                *detail = path;
+            }
+            return LaunchError::WordlistMustBeFile;
         }
     }
 

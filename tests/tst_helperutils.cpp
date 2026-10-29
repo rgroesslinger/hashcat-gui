@@ -32,6 +32,7 @@ private slots:
     void validateOptions_data();
     void validateOptions();
     void feedModeRequirements();
+    void amplifierFolderIsRefused();
     void pcfgSettingsAreValidated();
     void tableSettingsAreValidated();
     void associationSettingsAreValidated();
@@ -394,6 +395,88 @@ void TestHelperUtils::feedModeRequirements()
     hybrid.wordlists << QStringLiteral("/tmp/c.txt");
     QCOMPARE(int(HelperUtils::validateOptions(hybrid)),
              int(HelperUtils::LaunchError::TooManyWordlists));
+}
+
+// A folder is a base wordlist; the list hashcat multiplies is read by one feed
+// instance and has to be a file. Which row that is follows from the mode, so a
+// folder in the wrong slot is refused before the run starts.
+void TestHelperUtils::amplifierFolderIsRefused()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+
+    const QString folder = directory.filePath(QStringLiteral("wordlists"));
+    QVERIFY(QDir().mkpath(folder));
+    const QString file = directory.filePath(QStringLiteral("words.txt"));
+    QFile words(file);
+    QVERIFY(words.open(QIODevice::WriteOnly));
+    QCOMPARE(words.write("password\n"), qint64(9));
+    words.close();
+
+    const auto expect = [](const HashcatOptions &options, HelperUtils::LaunchError expected,
+                           const QString &expectedDetail = QString()) -> void {
+        QString detail(QStringLiteral("stale"));
+        QCOMPARE(int(HelperUtils::validateOptions(options, &detail)), int(expected));
+        QCOMPARE(detail, expectedDetail);
+        QCOMPARE(int(HelperUtils::validateOptions(options, nullptr)), int(expected));
+    };
+
+    // Combination: the first list is the base, the second is multiplied.
+    HashcatOptions combination;
+    combination.attackMode = AttackMode::Combination;
+    combination.wordlists = {folder, file};
+    expect(combination, HelperUtils::LaunchError::None);
+
+    combination.wordlists = {file, folder};
+    expect(combination, HelperUtils::LaunchError::WordlistMustBeFile, folder);
+
+    // Mode 12: the same split, the ?q row is the second one.
+    HashcatOptions hybrid;
+    hybrid.attackMode = AttackMode::Hybrid;
+    hybrid.mask = QStringLiteral("?w?q");
+    hybrid.wordlists = {folder, file};
+    expect(hybrid, HelperUtils::LaunchError::None);
+
+    hybrid.wordlists = {file, folder};
+    expect(hybrid, HelperUtils::LaunchError::WordlistMustBeFile, folder);
+
+    // Mode 7 spells its mask first, but hashcat reads the dictionary as the
+    // base, so a folder is fine there.
+    HashcatOptions maskWord;
+    maskWord.attackMode = AttackMode::HybridMaskWord;
+    maskWord.mask = QStringLiteral("?d");
+    maskWord.wordlists = {folder};
+    expect(maskWord, HelperUtils::LaunchError::None);
+
+    // The other wordlist modes take a folder as well.
+    HashcatOptions straight;
+    straight.attackMode = AttackMode::Straight;
+    straight.wordlists = {folder};
+    expect(straight, HelperUtils::LaunchError::None);
+
+    HashcatOptions table;
+    table.attackMode = AttackMode::Table;
+    table.wordlists = {folder};
+    table.tableFiles = {file};
+    expect(table, HelperUtils::LaunchError::None);
+
+    HashcatOptions wordMask;
+    wordMask.attackMode = AttackMode::HybridWordMask;
+    wordMask.mask = QStringLiteral("?d?d");
+    wordMask.wordlists = {folder};
+    expect(wordMask, HelperUtils::LaunchError::None);
+
+    HashcatOptions association;
+    association.attackMode = AttackMode::Association;
+    association.wordlists = {folder};
+    expect(association, HelperUtils::LaunchError::None);
+
+    // An amplifier row that is missing altogether is the count check's
+    // business, not this one.
+    HashcatOptions oneForCombination;
+    oneForCombination.attackMode = AttackMode::Combination;
+    oneForCombination.wordlists = {folder};
+    expect(oneForCombination, HelperUtils::LaunchError::WrongWordlistCount, QStringLiteral("1"));
 }
 
 // The mode 4 settings: the feed parses them only after the backend devices
