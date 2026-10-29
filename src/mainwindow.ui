@@ -240,6 +240,9 @@
               <property name="text">
                <string/>
               </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -1439,16 +1442,6 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_7">
                 <item>
-                 <widget class="QCheckBox" name="checkBox_hex_charset">
-                   <property name="toolTip">
-                     <string>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</string>
-                   </property>
-                  <property name="text">
-                   <string>Charset is hex</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
                  <widget class="QGroupBox" name="groupBox_mask">
                   <property name="title">
                    <string>Mask</string>
@@ -1665,6 +1658,16 @@
                       </widget>
                      </item>
                     </layout>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_hex_charset">
+                     <property name="toolTip">
+                      <string>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</string>
+                     </property>
+                     <property name="text">
+                      <string>Charset is hex</string>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </widget>

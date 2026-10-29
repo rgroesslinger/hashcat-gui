@@ -555,8 +555,21 @@ void MainWindow::fitToContent()
         return;
     }
 
-    // The attack tab's own minimum describes the selected mode alone.
-    const QSize attackEnvelope = attackModeEnvelope();
+    // The scroll area's own sizeHint is capped and does not describe the tab
+    // content. Derive the window chrome from the geometry it has on first
+    // show: the difference between the window and the scroll area that fills
+    // it holds the menu bar, margins, tab bar and frame, and is the same for
+    // every tab.
+    const QSize chrome = size() - currentArea->size();
+
+    // A screen too small for the content keeps the window on-screen; the
+    // scroll areas stay in place and show their scrollbars as the fallback.
+    // The margin leaves room for the window decorations.
+    const QScreen *scr = screen();
+    QSize cap;
+    if (scr) {
+        cap = scr->availableGeometry().size() - QSize(40, 80);
+    }
 
     // Hidden pages report the minima they had before their layouts first ran.
     // Resolve every page first, then take the largest minimum in each
@@ -566,59 +579,74 @@ void MainWindow::fitToContent()
         QScrollArea *area;
         QSize minimum;
     };
-    QList<TabMinimum> tabMinima;
-    QSize contentMinimum(0, 0);
-    for (int i = 0; i < ui->tabWidget_main->count(); ++i) {
-        QWidget *tab = ui->tabWidget_main->widget(i);
-        if (!tab) {
-            continue;
+
+    // The width decides how far a wrapping widget - the mode hint - rewraps,
+    // and its wrapped height in turn decides whether a tab needs room for a
+    // vertical scrollbar, which adds to the width. Measure once without
+    // wrapping, then again at the width the first pass chose, and repeat
+    // while the width is still moving.
+    QSize target;
+    int contentWidth = 0;
+    for (int pass = 0; pass < 3; ++pass) {
+        // The attack tab's own minimum describes the selected mode alone.
+        const QSize attackEnvelope = attackModeEnvelope(contentWidth);
+
+        QList<TabMinimum> tabMinima;
+        QSize contentMinimum(0, 0);
+        for (int i = 0; i < ui->tabWidget_main->count(); ++i) {
+            QWidget *tab = ui->tabWidget_main->widget(i);
+            if (!tab) {
+                continue;
+            }
+            QScrollArea *area = tab->findChild<QScrollArea *>();
+            if (!area || !area->widget()) {
+                continue;
+            }
+            activateLayouts(area->widget());
+            QSize minimum = area->widget()->minimumSizeHint();
+            if (contentWidth > 0) {
+                // A wrapping widget announces a single line in its minimum
+                // size hint; the height it needs at the tab width is a
+                // heightForWidth() question, which the layouts pass up.
+                const int wrapped = area->widget()->heightForWidth(contentWidth);
+                if (wrapped > minimum.height()) {
+                    minimum.setHeight(wrapped);
+                }
+            }
+            if (area == ui->scrollArea_attack && !attackEnvelope.isEmpty()) {
+                minimum = attackEnvelope;
+            }
+            tabMinima.append({area, minimum});
+            contentMinimum = contentMinimum.expandedTo(minimum);
         }
-        QScrollArea *area = tab->findChild<QScrollArea *>();
-        if (!area || !area->widget()) {
-            continue;
+        if (tabMinima.isEmpty()) {
+            return;
         }
-        activateLayouts(area->widget());
-        QSize minimum = area->widget()->minimumSizeHint();
-        if (area == ui->scrollArea_attack && !attackEnvelope.isEmpty()) {
-            minimum = attackEnvelope;
+
+        target = chrome + contentMinimum;
+        if (scr) {
+            target = target.boundedTo(cap);
         }
-        tabMinima.append({area, minimum});
-        contentMinimum = contentMinimum.expandedTo(minimum);
-    }
-    if (tabMinima.isEmpty()) {
-        return;
+
+        // A tab taller than the final viewport shows a vertical scrollbar.
+        // Reserve its width so that content does not need a horizontal
+        // scrollbar as well.
+        const int viewportHeight = target.height() - chrome.height();
+        int requiredWidth = 0;
+        for (const TabMinimum &tab : std::as_const(tabMinima)) {
+            int width = tab.minimum.width();
+            if (tab.minimum.height() > viewportHeight) {
+                width += tab.area->verticalScrollBar()->sizeHint().width();
+            }
+            requiredWidth = qMax(requiredWidth, width);
+        }
+        if (requiredWidth == contentWidth) {
+            break;
+        }
+        contentWidth = requiredWidth;
     }
 
-    // The scroll area's own sizeHint is capped and does not describe the tab
-    // content. Derive the window chrome from the geometry it has on first
-    // show: the difference between the window and the scroll area that fills
-    // it holds the menu bar, margins, tab bar and frame, and is the same for
-    // every tab.
-    const QSize chrome = size() - currentArea->size();
-    QSize target = chrome + contentMinimum;
-
-    // A screen too small for the content keeps the window on-screen; the
-    // scroll areas stay in place and show their scrollbars as the fallback.
-    // The margin leaves room for the window decorations.
-    const QScreen *scr = screen();
-    QSize cap;
-    if (scr) {
-        cap = scr->availableGeometry().size() - QSize(40, 80);
-        target = target.boundedTo(cap);
-    }
-
-    // A tab taller than the final viewport shows a vertical scrollbar. Reserve
-    // its width so that content does not need a horizontal scrollbar as well.
-    const int viewportHeight = target.height() - chrome.height();
-    int requiredWidth = 0;
-    for (const TabMinimum &tab : std::as_const(tabMinima)) {
-        int width = tab.minimum.width();
-        if (tab.minimum.height() > viewportHeight) {
-            width += tab.area->verticalScrollBar()->sizeHint().width();
-        }
-        requiredWidth = qMax(requiredWidth, width);
-    }
-    target.setWidth(chrome.width() + requiredWidth);
+    target.setWidth(chrome.width() + contentWidth);
     if (scr) {
         target.setWidth(qMin(target.width(), cap.width()));
     }
@@ -630,7 +658,12 @@ void MainWindow::fitToContent()
 // only reports the selected mode's minimum: the groups the other modes use are
 // hidden. Walk every mode once, with updates off, and take the largest minimum
 // in each direction. The widest and the tallest mode need not be the same one.
-QSize MainWindow::attackModeEnvelope()
+//
+// A wrapping widget (the mode hint) announces one line in its minimum size
+// hint, no matter how long its text is: wrapWidth is the content width it
+// wraps at, so that the height it really needs enters the envelope. Zero
+// measures without that correction, for the caller that has no width yet.
+QSize MainWindow::attackModeEnvelope(int wrapWidth)
 {
     QWidget *content = ui->scrollArea_attack->widget();
     if (!content) {
@@ -651,7 +684,14 @@ QSize MainWindow::attackModeEnvelope()
         const auto mode = static_cast<AttackMode>(ui->comboBox_attack->itemData(i).toInt());
         applyAttackModeView(mode);
         activateLayouts(content);
-        envelope = envelope.expandedTo(content->minimumSizeHint());
+        QSize minimum = content->minimumSizeHint();
+        if (wrapWidth > 0) {
+            const int wrapped = content->heightForWidth(wrapWidth);
+            if (wrapped > minimum.height()) {
+                minimum.setHeight(wrapped);
+            }
+        }
+        envelope = envelope.expandedTo(minimum);
     }
 
     // Leave the tab showing the mode the user (or a restored session) chose.
@@ -1389,7 +1429,6 @@ void MainWindow::applyAttackModeView(AttackMode mode)
     ui->lineEdit_rule_right->setEnabled(usesRuleRight);
     ui->groupBox_custom_charset->setVisible(CommandBuilder::attackUsesCustomCharset(mode));
     ui->groupBox_mask->setVisible(usesMask);
-    ui->checkBox_hex_charset->setVisible(CommandBuilder::attackUsesCustomCharset(mode));
 
     // The feed modes get a group each, and mode 9 one extra row: the
     // settings line that bounds a run whose words come from the hash file.
@@ -1434,11 +1473,12 @@ AttackMode MainWindow::currentAttackMode() const
 // the hint and the launch validation cannot tell the user different things.
 QString MainWindow::modeHint(AttackMode mode) const
 {
-    // A sentence per mode, broken into lines by hand: the label must not
-    // wrap (a wrapping label asks its layout for more height than its size
-    // hint announced, and the window fit only ever measured the hint), so
-    // the breaks are part of the text and every line stays short enough for
-    // the tab.
+    // A sentence per mode. The label wraps at the tab width (wordWrap in the
+    // .ui file), so the texts stay free of line breaks and translations can
+    // rewrap as they like. The height a wrapped hint needs is not part of a
+    // minimum size hint - a wrapping label reports one line - so the fit
+    // reserves it through heightForWidth() at the final width,
+    // see attackModeEnvelope() and fitToContent().
     switch (mode) {
     case AttackMode::Straight:
         return tr("This mode needs at least one wordlist.");
@@ -1447,7 +1487,7 @@ QString MainWindow::modeHint(AttackMode mode) const
     case AttackMode::BruteForce:
         return tr("This mode needs a mask.");
     case AttackMode::Pcfg:
-        return tr("This mode runs hashcat's bundled default-passwords ruleset;\n"
+        return tr("This mode runs hashcat's bundled default-passwords ruleset; "
                   "name one or more to use your own.");
     case AttackMode::Table:
         return tr("This mode needs one wordlist and at least one table.");
@@ -1455,16 +1495,17 @@ QString MainWindow::modeHint(AttackMode mode) const
     case AttackMode::HybridMaskWord:
         return tr("This mode needs a wordlist and a mask.");
     case AttackMode::Generic:
-        return tr("This mode needs a feed. Arguments depend on the feed —\n"
+        return tr("This mode needs a feed. Arguments depend on the feed — "
                   "random and stdin need none, wordlist needs a path.");
     case AttackMode::Association:
-        return tr("This mode takes at most one wordlist; without one the words come from\n"
-                  "the hash file and the settings line can bound the run "
-                  "(phases=words,rules;\n"
-                  "the default adds a grammar phase that never ends). With a wordlist\n"
-                  "the two files are paired by line and no settings are accepted.");
+        // The settings grammar (phases, the never-ending default) is the
+        // settings line's own tooltip; the hint keeps only what the mode
+        // needs, in the wording of modeRequirements().
+        return tr("This mode needs at most one wordlist. Without one the words come from the "
+                  "hash file and the settings line can bound the run; with one the two files "
+                  "are paired by line.");
     case AttackMode::Hybrid:
-        return tr("This mode needs a mask with exactly one ?w; a ?q after ?w\n"
+        return tr("This mode needs a mask with exactly one ?w; a ?q after ?w "
                   "names a second wordlist.");
     }
     return QString();

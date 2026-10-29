@@ -195,8 +195,11 @@ private:
     void applyAttackModeView(AttackMode mode);
 
     // The largest minimum the attack tab can need: every mode's groups and
-    // hint in one size. Measured before the visible mode is restored.
-    QSize attackModeEnvelope();
+    // hint in one size. Measured before the visible mode is restored. A
+    // wrapping widget announces one line in its minimum size hint, so
+    // wrapWidth - the content width it wraps at - adds the height it really
+    // needs; zero measures without that correction.
+    QSize attackModeEnvelope(int wrapWidth);
 
     // Gives the window the size its tabs need once, on the first show. The
     // attack tab contributes the envelope of all its modes, so changing modes

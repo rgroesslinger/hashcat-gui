@@ -445,8 +445,9 @@ void TestMainWindow::widgetsFollowTheBuilderPredicates()
         QCOMPARE(window.ui->label_rule_right->isEnabled(), expected->ruleRight);
         QCOMPARE(window.ui->lineEdit_rule_right->isEnabled(), expected->ruleRight);
         QCOMPARE(shown(window.ui->groupBox_mask), expected->mask);
+        // The hex-charset checkbox lives inside the charset group and takes
+        // its visibility from it: same predicate, so the group carries it.
         QCOMPARE(shown(window.ui->groupBox_custom_charset), expected->customCharset);
-        QCOMPARE(shown(window.ui->checkBox_hex_charset), expected->customCharset);
 
         // The feed modes get a group each; mode 9 gets one extra row: the
         // settings line that bounds a run whose words come from the hash file.
@@ -732,30 +733,28 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
         AttackMode mode;
         QString hint;
     };
-    // The hints break into lines by hand - the label must not wrap, see the
-    // comment in modeHint() - so the expected texts carry the same breaks.
+    // The hints wrap at the tab width (wordWrap in the .ui file), so the
+    // texts carry no breaks - see the comment in modeHint().
     const QList<Expectation> expectations{
         {AttackMode::Straight, QStringLiteral("This mode needs at least one wordlist.")},
         {AttackMode::Combination,
          QStringLiteral("This mode needs exactly 2 wordlists (left, right).")},
         {AttackMode::BruteForce, QStringLiteral("This mode needs a mask.")},
         {AttackMode::Pcfg,
-         QStringLiteral("This mode runs hashcat's bundled default-passwords ruleset;\n"
+         QStringLiteral("This mode runs hashcat's bundled default-passwords ruleset; "
                         "name one or more to use your own.")},
         {AttackMode::Table, QStringLiteral("This mode needs one wordlist and at least one table.")},
         {AttackMode::HybridWordMask, QStringLiteral("This mode needs a wordlist and a mask.")},
         {AttackMode::HybridMaskWord, QStringLiteral("This mode needs a wordlist and a mask.")},
         {AttackMode::Generic,
-         QStringLiteral("This mode needs a feed. Arguments depend on the feed —\n"
+         QStringLiteral("This mode needs a feed. Arguments depend on the feed — "
                         "random and stdin need none, wordlist needs a path.")},
         {AttackMode::Association,
-         QStringLiteral("This mode takes at most one wordlist; without one the words come from\n"
-                        "the hash file and the settings line can bound the run "
-                        "(phases=words,rules;\n"
-                        "the default adds a grammar phase that never ends). With a wordlist\n"
-                        "the two files are paired by line and no settings are accepted.")},
+         QStringLiteral("This mode needs at most one wordlist. Without one the words come from "
+                        "the hash file and the settings line can bound the run; with one the "
+                        "two files are paired by line.")},
         {AttackMode::Hybrid,
-         QStringLiteral("This mode needs a mask with exactly one ?w; a ?q after ?w\n"
+         QStringLiteral("This mode needs a mask with exactly one ?w; a ?q after ?w "
                         "names a second wordlist.")},
     };
 
@@ -1717,48 +1716,83 @@ void TestMainWindow::windowFitsItsContent()
     QVERIFY(generalArea->widget()->minimumSizeHint().width()
             > attackContent->minimumSizeHint().width());
 
-    // The attack tab hides the groups the other modes need, so its minimum is
-    // that of the selected mode. The window has to hold all of them: measure
-    // each mode through the same combo switch the user uses.
-    QSize attackEnvelope(0, 0);
-    const int attackIndex = window.ui->comboBox_attack->currentIndex();
-    for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
-        window.ui->comboBox_attack->setCurrentIndex(i);
-        QCoreApplication::processEvents();
-        attackEnvelope = attackEnvelope.expandedTo(attackContent->minimumSizeHint());
-    }
-    window.ui->comboBox_attack->setCurrentIndex(attackIndex);
-    QCoreApplication::processEvents();
-
     // The size fitToContent() should have produced: the common window chrome
     // plus the largest content minimum in each direction. A tab whose content
     // is taller than the final viewport also needs room for its vertical
-    // scrollbar, otherwise it would show a horizontal one as well.
+    // scrollbar, otherwise it would show a horizontal one as well. The width
+    // decides how far the wrapping mode hint rewraps, and its wrapped height
+    // in turn decides the scrollbar - so the fit goes through the same
+    // passes: once without wrapping, then again at the width the pass before
+    // chose, while the width is still moving.
     const QSize chrome = window.size() - attackArea->size();
     const QSize cap = window.screen()->availableGeometry().size() - QSize(40, 80);
-    QSize contentMinimum(0, 0);
-    for (int i = 0; i < window.ui->tabWidget_main->count(); ++i) {
-        QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
-        QVERIFY(tabArea);
-        QVERIFY(tabArea->widget());
-        const QSize minimum =
-            tabArea == attackArea ? attackEnvelope : tabArea->widget()->minimumSizeHint();
-        contentMinimum = contentMinimum.expandedTo(minimum);
-    }
-    QSize natural = chrome + contentMinimum;
-    const int viewportHeight = natural.boundedTo(cap).height() - chrome.height();
-    int requiredWidth = 0;
-    for (int i = 0; i < window.ui->tabWidget_main->count(); ++i) {
-        QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
-        const QSize minimum =
-            tabArea == attackArea ? attackEnvelope : tabArea->widget()->minimumSizeHint();
-        int width = minimum.width();
-        if (minimum.height() > viewportHeight) {
-            width += tabArea->verticalScrollBar()->sizeHint().width();
+
+    // The attack tab hides the groups the other modes need, so its minimum is
+    // that of the selected mode. The window has to hold all of them: measure
+    // each mode through the same combo switch the user uses.
+    const int attackIndex = window.ui->comboBox_attack->currentIndex();
+    const auto attackEnvelopeOf = [&](int wrapWidth) {
+        QSize envelope(0, 0);
+        for (int i = 0; i < window.ui->comboBox_attack->count(); ++i) {
+            window.ui->comboBox_attack->setCurrentIndex(i);
+            QCoreApplication::processEvents();
+            QSize minimum = attackContent->minimumSizeHint();
+            if (wrapWidth > 0) {
+                const int wrapped = attackContent->heightForWidth(wrapWidth);
+                if (wrapped > minimum.height()) {
+                    minimum.setHeight(wrapped);
+                }
+            }
+            envelope = envelope.expandedTo(minimum);
         }
-        requiredWidth = qMax(requiredWidth, width);
+        window.ui->comboBox_attack->setCurrentIndex(attackIndex);
+        QCoreApplication::processEvents();
+        return envelope;
+    };
+
+    QSize attackEnvelope;
+    QSize natural;
+    int contentWidth = 0;
+    for (int pass = 0; pass < 3; ++pass) {
+        attackEnvelope = attackEnvelopeOf(contentWidth);
+        QSize contentMinimum(0, 0);
+        QList<QScrollArea *> tabAreas;
+        QList<QSize> minima;
+        for (int i = 0; i < window.ui->tabWidget_main->count(); ++i) {
+            QScrollArea *tabArea = window.ui->tabWidget_main->widget(i)->findChild<QScrollArea *>();
+            QVERIFY(tabArea);
+            QVERIFY(tabArea->widget());
+            tabAreas.append(tabArea);
+            if (tabArea == attackArea) {
+                minima.append(attackEnvelope);
+            } else {
+                QSize minimum = tabArea->widget()->minimumSizeHint();
+                if (contentWidth > 0) {
+                    const int wrapped = tabArea->widget()->heightForWidth(contentWidth);
+                    if (wrapped > minimum.height()) {
+                        minimum.setHeight(wrapped);
+                    }
+                }
+                minima.append(minimum);
+            }
+            contentMinimum = contentMinimum.expandedTo(minima.last());
+        }
+        natural = chrome + contentMinimum;
+        const int viewportHeight = natural.boundedTo(cap).height() - chrome.height();
+        int requiredWidth = 0;
+        for (int i = 0; i < tabAreas.count(); ++i) {
+            int width = minima[i].width();
+            if (minima[i].height() > viewportHeight) {
+                width += tabAreas[i]->verticalScrollBar()->sizeHint().width();
+            }
+            requiredWidth = qMax(requiredWidth, width);
+        }
+        if (requiredWidth == contentWidth) {
+            break;
+        }
+        contentWidth = requiredWidth;
     }
-    natural.setWidth(chrome.width() + requiredWidth);
+    natural.setWidth(chrome.width() + contentWidth);
     const QSize target = natural.boundedTo(cap);
 
     // The window has to be big enough for the content: a scrollbar for
@@ -1806,11 +1840,12 @@ void TestMainWindow::windowFitsItsContent()
         QTRY_VERIFY(attackArea->verticalScrollBar()->isVisible());
     }
 
-    // Regression: the hint under the mode selector must not wrap. A wrapped
-    // label asks its layout for more height than its size hint announced, so
-    // the window was sized for less than the content needed and the scroll
-    // area showed a scrollbar for content that fitted.
-    QVERIFY(!window.ui->label_mode_hint->wordWrap());
+    // The hint under the mode selector wraps at the tab width, and the fit
+    // reserves the height that needs: a wrapping label announces a single
+    // line in its minimum size hint, no matter how long its text is. The
+    // checks above - no scrollbar for content that fits, no empty strip
+    // beyond the envelope - are what pin that accounting down.
+    QVERIFY(window.ui->label_mode_hint->wordWrap());
 }
 
 // A window sized to the attack-mode envelope must not show a scrollbar when
@@ -1836,18 +1871,28 @@ void TestMainWindow::windowFitsEveryAttackMode()
 
     const int startIndex = attackCombo->currentIndex();
     QVERIFY(startIndex >= 0);
+
+    // The fit wraps the mode hint at the content width, and the envelope the
+    // helper reports has to include the height that costs - measured at the
+    // width the content actually has.
+    const int wrapWidth = attackArea->widget()->width();
     QSize envelope(0, 0);
     for (int i = 0; i < attackCombo->count(); ++i) {
         attackCombo->setCurrentIndex(i);
         QCoreApplication::processEvents();
-        envelope = envelope.expandedTo(attackArea->widget()->minimumSizeHint());
+        QSize minimum = attackArea->widget()->minimumSizeHint();
+        const int wrapped = attackArea->widget()->heightForWidth(wrapWidth);
+        if (wrapped > minimum.height()) {
+            minimum.setHeight(wrapped);
+        }
+        envelope = envelope.expandedTo(minimum);
     }
     attackCombo->setCurrentIndex(startIndex);
     QCoreApplication::processEvents();
 
     // The helper the fit uses has to measure the same envelope and restore
     // the selected mode, not leave the last measured one on screen.
-    QCOMPARE(window.attackModeEnvelope(), envelope);
+    QCOMPARE(window.attackModeEnvelope(wrapWidth), envelope);
     QCOMPARE(attackCombo->currentIndex(), startIndex);
 
     const QSize chrome = window.size() - attackArea->size();
