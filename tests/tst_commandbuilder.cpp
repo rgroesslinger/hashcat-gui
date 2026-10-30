@@ -476,18 +476,18 @@ void TestCommandBuilder::wordlistOptionsFollowWordlistModes()
         AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
         AttackMode::Hybrid,
     };
-    // The table feed reads its wordlist itself and refuses the encoding
-    // pair, but takes --hex-wordlist; the mask-only modes read no wordlist
-    // at all.
+    // The table feed reads its wordlist itself, but takes both the hex option
+    // and the encoding pair like every other mode that reads one; the
+    // mask-only modes read no wordlist at all.
     const QSet<AttackMode> hexWordlistModes{
         AttackMode::Straight,       AttackMode::Combination,    AttackMode::Table,
         AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Generic,
         AttackMode::Association,    AttackMode::Hybrid,
     };
     const QSet<AttackMode> encodingModes{
-        AttackMode::Straight,       AttackMode::Combination, AttackMode::HybridWordMask,
-        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
-        AttackMode::Hybrid,
+        AttackMode::Straight,       AttackMode::Combination,    AttackMode::Table,
+        AttackMode::HybridWordMask, AttackMode::HybridMaskWord, AttackMode::Generic,
+        AttackMode::Association,    AttackMode::Hybrid,
     };
 
     for (const AttackMode mode : modes) {
@@ -1033,7 +1033,7 @@ void TestCommandBuilder::predicates()
         {Mode::Combination, false, false, true, true, true, true, false, true, true},
         {Mode::BruteForce, true, true, false, true, false, false, true, false, false},
         {Mode::Pcfg, false, false, false, true, false, false, true, false, false},
-        {Mode::Table, false, false, true, true, false, false, false, true, false},
+        {Mode::Table, false, false, true, true, false, false, false, true, true},
         {Mode::HybridWordMask, true, true, true, true, true, false, true, true, true},
         {Mode::HybridMaskWord, true, true, true, true, true, true, true, true, true},
         {Mode::Generic, false, false, false, true, true, false, false, true, true},

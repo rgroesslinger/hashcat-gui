@@ -452,7 +452,7 @@ void TestMainWindow::widgetsFollowTheBuilderPredicates()
         {AttackMode::Combination, false, false, true, true, true, true, false, true, true},
         {AttackMode::BruteForce, true, true, false, true, false, false, true, false, false},
         {AttackMode::Pcfg, false, false, false, true, false, false, true, false, false},
-        {AttackMode::Table, false, false, true, true, false, false, false, true, false},
+        {AttackMode::Table, false, false, true, true, false, false, false, true, true},
         {AttackMode::HybridWordMask, true, true, true, true, true, false, true, true, true},
         {AttackMode::HybridMaskWord, true, true, true, true, true, true, true, true, true},
         {AttackMode::Generic, false, false, false, true, true, false, false, true, true},

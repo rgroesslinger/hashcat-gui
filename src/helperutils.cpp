@@ -151,6 +151,20 @@ bool hasSetting(const QStringList &tokens, QLatin1StringView key)
                        [&prefix](const QString &token) { return token.startsWith(prefix); });
 }
 
+// The value of the first token with the given key, or an empty string. A
+// typed field and an extra token are the same setting to the feed, so the
+// checks have to read either of them.
+QString settingValue(const QStringList &tokens, QLatin1StringView key)
+{
+    const QString prefix = QString(key) + QLatin1Char('=');
+    for (const QString &token : tokens) {
+        if (token.startsWith(prefix)) {
+            return token.mid(prefix.size());
+        }
+    }
+    return QString();
+}
+
 // The keys of the settings a typed field holds, counted once per field that
 // is not empty. The field's own name is the key it is emitted under.
 QStringList
@@ -238,6 +252,9 @@ HelperUtils::LaunchError checkPcfgSettings(const HashcatOptions &options, QStrin
         qlonglong min;
         qlonglong max;
     };
+    // These are the feed's own parameter bounds. The auto default for threads
+    // (16 on a fast hash, 8 on a slow one, capped by the machine) only fills
+    // an absent setting; it does not widen the range a named one may take.
     const Bound bounds[] = {
         {options.pcfgScale, AppConstants::HashcatSettings::Scale, 1, 64},
         {options.pcfgCostmax, AppConstants::HashcatSettings::Costmax, 1, 64},
@@ -282,7 +299,14 @@ HelperUtils::LaunchError checkPcfgSettings(const HashcatOptions &options, QStrin
         }
     }
 
-    const QString mask = options.pcfgMask.trimmed();
+    // The mask may come from the typed field or from the extra settings line;
+    // the feed sees one key either way, so every check below has to as well.
+    QString mask = options.pcfgMask.trimmed();
+    if (mask.isEmpty()) {
+        mask =
+            settingValue(options.pcfgExtraSettings, AppConstants::HashcatSettings::Mask).trimmed();
+    }
+
     if (!mask.isEmpty()) {
         // The ?w/?q markers belong to the hybrid mode 12, where hashcat
         // rewrites them; the PCFG grammar would take them literally.
@@ -311,6 +335,16 @@ HelperUtils::LaunchError checkPcfgSettings(const HashcatOptions &options, QStrin
                 && !hasSetting(options.pcfgExtraSettings, AppConstants::HashcatSettings::Hintwords)
                 && !hasSetting(options.pcfgExtraSettings,
                                AppConstants::HashcatSettings::Hintfile)) {
+                return fail(named(AppConstants::HashcatSettings::Mask, mask));
+            }
+        }
+    }
+
+    // The feed refuses a named charset without a mask rather than ignoring it.
+    // The builder emits one only while its checkbox is on and it has a value.
+    if (mask.isEmpty()) {
+        for (const auto &charset : options.customCharsets) {
+            if (charset.enabled && !charset.value.isEmpty()) {
                 return fail(named(AppConstants::HashcatSettings::Mask, mask));
             }
         }

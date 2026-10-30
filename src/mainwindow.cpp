@@ -598,11 +598,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     // QMainWindow destroys its child widgets only after the members are gone.
-    // Clearing a list then resets its model, and the monitor members have to be
-    // out of the picture by that point.
+    // Clearing a list then resets its model, and the handlers read ui and the
+    // monitor members, which have to be out of the picture by that point.
     disconnect(ui->listWidget_wordlist->model(), nullptr, this, nullptr);
     disconnect(ui->listWidget_pcfg_rulesets->model(), nullptr, this, nullptr);
     disconnect(ui->listWidget_tables->model(), nullptr, this, nullptr);
+    disconnect(ui->listWidget_feed_arguments->model(), nullptr, this, nullptr);
     delete ui;
 }
 

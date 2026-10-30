@@ -574,6 +574,44 @@ void TestHelperUtils::pcfgSettingsAreValidated()
     noMask.pcfgExtraSettings = QStringList{QStringLiteral("omen=1")};
     expect(noMask, HelperUtils::LaunchError::None);
 
+    // A custom charset is accepted only inside a mask, which the feed refuses
+    // rather than ignoring. The builder emits one only while its checkbox is
+    // on and it has a value.
+    HashcatOptions charsetNoMask = clean;
+    charsetNoMask.pcfgMask.clear();
+    charsetNoMask.customCharsets[0].enabled = true;
+    charsetNoMask.customCharsets[0].value = QStringLiteral("abc");
+    QString charsetDetail;
+    QCOMPARE(int(HelperUtils::validateOptions(charsetNoMask, &charsetDetail)),
+             int(HelperUtils::LaunchError::InvalidPcfgSetting));
+    QCOMPARE(charsetDetail, QStringLiteral("mask="));
+
+    HashcatOptions charsetWithMask = clean;
+    charsetWithMask.customCharsets[0].enabled = true;
+    charsetWithMask.customCharsets[0].value = QStringLiteral("abc");
+    expect(charsetWithMask, HelperUtils::LaunchError::None);
+
+    HashcatOptions charsetDisabled = charsetNoMask;
+    charsetDisabled.customCharsets[0].enabled = false;
+    expect(charsetDisabled, HelperUtils::LaunchError::None);
+
+    HashcatOptions charsetEmpty = charsetNoMask;
+    charsetEmpty.customCharsets[0].value.clear();
+    expect(charsetEmpty, HelperUtils::LaunchError::None);
+
+    // mask= is a setting like any other, so the extra line may carry it; then
+    // the charset has its mask, and the mask conflicts are checked against
+    // that value as well.
+    HashcatOptions charsetViaExtra = charsetNoMask;
+    charsetViaExtra.pcfgExtraSettings = QStringList{QStringLiteral("mask=?l?l")};
+    expect(charsetViaExtra, HelperUtils::LaunchError::None);
+
+    HashcatOptions omenViaExtra = charsetNoMask;
+    omenViaExtra.customCharsets[0] = HashcatOptions::Charset();
+    omenViaExtra.pcfgExtraSettings =
+        QStringList{QStringLiteral("mask=?l?l"), QStringLiteral("omen=1")};
+    expect(omenViaExtra, HelperUtils::LaunchError::InvalidPcfgSetting);
+
     // A bare token before the first setting would be read as another
     // ruleset.
     HashcatOptions bare = clean;

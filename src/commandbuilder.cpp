@@ -85,14 +85,15 @@ bool CommandBuilder::attackUsesHexWordlist(AttackMode mode)
            || mode == AttackMode::Association || mode == AttackMode::Hybrid;
 }
 
-// The table feed reads its wordlist itself and refuses the encoding pair;
-// every other wordlist mode takes it.
+// The table feed reads its own wordlist, but hashcat still hands what it
+// produces through the shared transform, so the encoding pair applies there
+// like it does for every other wordlist mode.
 bool CommandBuilder::attackUsesWordlistEncoding(AttackMode mode)
 {
     return mode == AttackMode::Straight || mode == AttackMode::Combination
-           || mode == AttackMode::HybridWordMask || mode == AttackMode::HybridMaskWord
-           || mode == AttackMode::Generic || mode == AttackMode::Association
-           || mode == AttackMode::Hybrid;
+           || mode == AttackMode::Table || mode == AttackMode::HybridWordMask
+           || mode == AttackMode::HybridMaskWord || mode == AttackMode::Generic
+           || mode == AttackMode::Association || mode == AttackMode::Hybrid;
 }
 
 QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QString &hashFile)
@@ -431,8 +432,8 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameterName(Parameter::HexSalt, useShort);
     }
 
-    // Wordlist interpretation only applies while a wordlist is read, and the
-    // table feed takes neither: it reads its wordlist itself.
+    // Both options describe how a wordlist line is read, so they only apply
+    // where one is read; the table feed reads its own but takes both.
     if (attackUsesHexWordlist(mode) && options.hexWordlist) {
         arguments << parameterName(Parameter::HexWordlist, useShort);
     }
