@@ -10,5 +10,27 @@
         <file>icons/hicolor/128x128/apps/hashcat-gui.png</file>
         <file>icons/hicolor/256x256/apps/hashcat-gui.png</file>
         <file>sessions/example_bruteforce.json</file>
+        <file>sessions/example_straight.json</file>
+        <file>sessions/example_combination.json</file>
+        <file>sessions/example_pcfg.json</file>
+        <file>sessions/example_table.json</file>
+        <file>sessions/example_hybrid_word_mask.json</file>
+        <file>sessions/example_hybrid_mask_word.json</file>
+        <file>sessions/example_generic.json</file>
+        <file>sessions/example_association.json</file>
+        <file>sessions/example_hybrid.json</file>
+        <file>sessions/data/straight_words.txt</file>
+        <file>sessions/data/straight.rule</file>
+        <file>sessions/data/combination_left.txt</file>
+        <file>sessions/data/combination_right.txt</file>
+        <file>sessions/data/table_words.txt</file>
+        <file>sessions/data/substitutions.table</file>
+        <file>sessions/data/hybrid_word_mask_words.txt</file>
+        <file>sessions/data/hybrid_mask_word_words.txt</file>
+        <file>sessions/data/generic_words_a.txt</file>
+        <file>sessions/data/generic_words_b.txt</file>
+        <file>sessions/data/association.hash</file>
+        <file>sessions/data/hybrid_left.txt</file>
+        <file>sessions/data/hybrid_right.txt</file>
     </qresource>
 </RCC>

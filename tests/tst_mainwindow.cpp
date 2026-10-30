@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QAction>
 #include <QClipboard>
 #include <QComboBox>
 #include <QDoubleSpinBox>
@@ -18,7 +19,9 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMenu>
 #include <QRadioButton>
+#include <QSet>
 #include <QSpinBox>
 #include <QStandardPaths>
 #include <QScrollArea>
@@ -28,8 +31,11 @@
 #include <QToolTip>
 #include <QWidget>
 
+#include <utility>
+
 #include "appconstants.h"
 #include "commandbuilder.h"
+#include "examples.h"
 #include "hashcatoptions.h"
 #include "mainwindow.h"
 #include "settingsmanager.h"
@@ -145,6 +151,31 @@ bool writeFile(const QString &path)
     return file.write(content) == content.size();
 }
 
+// The data paths a session names, with the <examples>/ token still in place.
+void collectExamplePaths(const QJsonValue &value, QStringList *paths)
+{
+    if (value.isString()) {
+        const QString text = value.toString();
+        if (text.contains(QString(Examples::DataPrefix))) {
+            paths->append(text);
+        }
+        return;
+    }
+    if (value.isObject()) {
+        const QJsonObject object = value.toObject();
+        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+            collectExamplePaths(it.value(), paths);
+        }
+        return;
+    }
+    if (value.isArray()) {
+        const QJsonArray array = value.toArray();
+        for (const auto &entry : array) {
+            collectExamplePaths(entry, paths);
+        }
+    }
+}
+
 } // namespace
 
 // A hashcat that answers the query for the hash types.
@@ -195,9 +226,11 @@ private slots:
     void generalTabGroupBoxesAlignTheirContentToTheTop();
     void resetSessionRestoresEveryWidget();
     void resettingTheSessionNeedsAConfirmation();
-    void exampleSessionFileIsValid();
+    void exampleSessionsCoverEveryAttackMode();
+    void exampleSessionFilesAreValid();
     void loadExampleSessionNeedsAConfirmation();
     void loadExampleSessionAppliesTheBundledSession();
+    void loadExampleSessionUnpacksItsDataFiles();
     void optionDependenciesFollowTheirCheckboxes();
     void outfileJsonTakesOverFromTheFormatField();
     void modeHintFollowsTheAttackMode();
@@ -246,6 +279,8 @@ private slots:
     void theStartupShowsNoBox();
 
 private:
+    static QAction *exampleAction(MainWindow &window, AttackMode mode);
+
     QString m_savedHashcatPath;
     QString m_savedTerminal;
     bool m_savedShortParameters = false;
@@ -283,8 +318,13 @@ void TestMainWindow::cleanup()
     // The round-trip test writes a session into the redirected data
     // directory, and that directory lives for the whole run: every later
     // window would silently load whatever was left there.
-    QFile::remove(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                      .filePath(AppConstants::Files::SessionFile));
+    const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QFile::remove(QDir(appData).filePath(AppConstants::Files::SessionFile));
+
+    // Loading an example unpacks its data below the same directory. It is
+    // replaced on every load, so removing it only keeps one test from seeing
+    // what another left behind.
+    QDir(QDir(appData).filePath(QString(Examples::DataDirectory))).removeRecursively();
 
     auto &settings = SettingsManager::instance();
     settings.setKey(AppConstants::SettingsKeys::HashcatPath, m_savedHashcatPath);
@@ -578,57 +618,147 @@ void TestMainWindow::resettingTheSessionNeedsAConfirmation()
     QCOMPARE(window.ui->lineEdit_session->text(), QStringLiteral("keepMe"));
 }
 
-// The example that ships in the binary has to stay a valid session: every
-// widget a session stores is named, and applying it leaves no value behind.
-void TestMainWindow::exampleSessionFileIsValid()
+QAction *TestMainWindow::exampleAction(MainWindow &window, AttackMode mode)
 {
-    const QString file = QString(AppConstants::Files::ExampleSession);
-    QVERIFY2(QFile::exists(file), qPrintable(file));
-
-    QString error;
-    QJsonObject values;
-    int version = -1;
-    QStringList otherSections;
-    QVERIFY2(StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
-                             &otherSections, &error),
-             qPrintable(error));
-    QCOMPARE(version, AppConstants::Sessions::Version);
-    QVERIFY(otherSections.isEmpty());
-
-    MainWindow window;
-    // The hash type list normally arrives from hashcat in the background;
-    // the test only needs the entry the example names.
-    window.ui->comboBox_hash_type->clear();
-    window.ui->comboBox_hash_type->addItem(QStringLiteral("1400 | SHA2-256"), 1400);
-
-    const QStringList notes = window.applySessionFile(values, version, otherSections);
-    QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QLatin1Char('\n'))));
-
-    // A widget added later must be added to the example as well, or loading
-    // it would leave that widget at whatever the user had in the form.
-    const QJsonObject state =
-        WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
-    QStringList missing;
-    for (auto it = state.constBegin(); it != state.constEnd(); ++it) {
-        if (!values.contains(it.key())) {
-            missing << it.key();
+    const QList<QAction *> actions = window.ui->menuLoadExampleSession->actions();
+    for (QAction *action : actions) {
+        if (action->data().toInt() == static_cast<int>(mode)) {
+            return action;
         }
     }
-    QVERIFY2(missing.isEmpty(), qPrintable(QStringLiteral("the example does not name: %1")
-                                               .arg(missing.join(QStringLiteral(", ")))));
+    return nullptr;
 }
 
-// Like a reset, loading the example throws away the session in the form, so
+// Every supported attack mode has exactly one example, and the examples do not
+// repeat a hash type or a password: the set is meant to exercise the modes,
+// not to test the same hash ten times.
+void TestMainWindow::exampleSessionsCoverEveryAttackMode()
+{
+    MainWindow window;
+
+    int modeCount = 0;
+    for (const AttackMode mode : AllAttackModes) {
+        ++modeCount;
+        int examples = 0;
+        for (const Examples::Entry &entry : Examples::All) {
+            if (entry.attackMode == mode) {
+                ++examples;
+            }
+        }
+        QVERIFY2(examples == 1, qPrintable(QStringLiteral("mode %1 has %2 examples")
+                                               .arg(static_cast<int>(mode))
+                                               .arg(examples)));
+
+        QAction *action = exampleAction(window, mode);
+        QVERIFY2(
+            action,
+            qPrintable(QStringLiteral("mode %1 has no menu entry").arg(static_cast<int>(mode))));
+        QCOMPARE(action->data().toInt(), static_cast<int>(mode));
+    }
+
+    QCOMPARE(window.ui->menuLoadExampleSession->actions().size(), modeCount);
+
+    QSet<int> hashTypes;
+    QSet<QString> passwords;
+    for (const Examples::Entry &entry : Examples::All) {
+        QVERIFY2(QFile::exists(QString(entry.resource)), qPrintable(QString(entry.resource)));
+        QVERIFY2(!hashTypes.contains(entry.hashType),
+                 qPrintable(QStringLiteral("hash type %1 is used twice").arg(entry.hashType)));
+        hashTypes.insert(entry.hashType);
+        QVERIFY(!entry.password.isEmpty());
+        const QString password = QString(entry.password);
+        QVERIFY2(!passwords.contains(password),
+                 qPrintable(QStringLiteral("password %1 is used twice").arg(password)));
+        passwords.insert(password);
+    }
+
+    for (const QLatin1StringView &resource : Examples::DataFiles) {
+        QVERIFY2(QFile::exists(QString(resource)), qPrintable(QString(resource)));
+    }
+}
+
+// The examples that ship in the binary have to stay valid sessions: every
+// widget a session stores is named, and applying one leaves no value behind.
+void TestMainWindow::exampleSessionFilesAreValid()
+{
+    MainWindow window;
+
+    for (const Examples::Entry &entry : Examples::All) {
+        const QString file = QString(entry.resource);
+        QVERIFY2(QFile::exists(file), qPrintable(file));
+
+        QString error;
+        QJsonObject values;
+        int version = -1;
+        QStringList otherSections;
+        QVERIFY2(StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
+                                 &otherSections, &error),
+                 qPrintable(error));
+        QCOMPARE(version, AppConstants::Sessions::Version);
+        QVERIFY(otherSections.isEmpty());
+
+        // The hash type list normally arrives from hashcat in the background;
+        // the tests only need the entry the example names.
+        window.ui->comboBox_hash_type->clear();
+        window.ui->comboBox_hash_type->addItem(QString::number(entry.hashType), entry.hashType);
+
+        const QStringList notes = window.applySessionFile(values, version, otherSections);
+        QVERIFY2(notes.isEmpty(),
+                 qPrintable(QStringLiteral("%1: %2").arg(file, notes.join(QLatin1Char('\n')))));
+
+        QCOMPARE(window.ui->comboBox_attack->currentData().toInt(),
+                 static_cast<int>(entry.attackMode));
+        QCOMPARE(window.ui->comboBox_hash_type->currentData().toInt(), entry.hashType);
+
+        // A widget added later must be added to every example as well, or
+        // loading one would leave that widget at whatever the user had in the
+        // form.
+        const QJsonObject state =
+            WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
+        QStringList missing;
+        for (auto it = state.constBegin(); it != state.constEnd(); ++it) {
+            if (!values.contains(it.key())) {
+                missing << it.key();
+            }
+        }
+        QVERIFY2(missing.isEmpty(), qPrintable(QStringLiteral("%1 does not name: %2")
+                                                   .arg(file, missing.join(QStringLiteral(", ")))));
+
+        // A data path that no resource is bundled under would fail only when
+        // the example is loaded, with a missing wordlist or rules file.
+        QStringList paths;
+        collectExamplePaths(values, &paths);
+        for (const QString &path : std::as_const(paths)) {
+            const QString name = QFileInfo(path).fileName();
+            bool found = false;
+            for (const QLatin1StringView &resource : Examples::DataFiles) {
+                if (QFileInfo(QString(resource)).fileName() == name) {
+                    found = true;
+                    break;
+                }
+            }
+            QVERIFY2(found,
+                     qPrintable(
+                         QStringLiteral("%1 names %2, which has no bundled file").arg(file, path)));
+        }
+    }
+}
+
+// Like a reset, loading an example throws away the session in the form, so
 // declining the question has to leave it untouched.
 void TestMainWindow::loadExampleSessionNeedsAConfirmation()
 {
     MainWindow window;
     window.ui->lineEdit_session->setText(QStringLiteral("keepMe"));
 
+    QAction *action = exampleAction(window, AttackMode::BruteForce);
+    QVERIFY(action);
+    QCOMPARE(action->text(), QStringLiteral("Brute-force"));
+
     TestEnvironment::ModalRecorder recorder;
     recorder.start();
 
-    QVERIFY(QMetaObject::invokeMethod(&window, "loadExampleSessionTriggered"));
+    action->trigger();
 
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Load example session"));
@@ -646,11 +776,14 @@ void TestMainWindow::loadExampleSessionAppliesTheBundledSession()
     window.ui->comboBox_hash_type->clear();
     window.ui->comboBox_hash_type->addItem(QStringLiteral("1400 | SHA2-256"), 1400);
 
+    QAction *action = exampleAction(window, AttackMode::BruteForce);
+    QVERIFY(action);
+
     TestEnvironment::ModalRecorder recorder;
     recorder.acceptConfirmation = true;
     recorder.start();
 
-    QVERIFY(QMetaObject::invokeMethod(&window, "loadExampleSessionTriggered"));
+    action->trigger();
 
     QCOMPARE(window.ui->comboBox_attack->currentData().toInt(), 3);
     QCOMPARE(window.ui->comboBox_hash_type->currentData().toInt(), 1400);
@@ -663,6 +796,38 @@ void TestMainWindow::loadExampleSessionAppliesTheBundledSession()
     QVERIFY(window.ui->checkBox_custom_charset2->isChecked());
     QVERIFY(window.ui->lineEdit_command->text().contains(QStringLiteral("--attack-mode 3")));
     QVERIFY(window.ui->lineEdit_command->text().contains(QStringLiteral("--hash-type 1400")));
+}
+
+// The data an example names lives in the resources, so loading it has to
+// unpack every file and replace the token before the session is applied.
+void TestMainWindow::loadExampleSessionUnpacksItsDataFiles()
+{
+    MainWindow window;
+    window.ui->comboBox_hash_type->clear();
+    window.ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
+
+    QAction *action = exampleAction(window, AttackMode::Straight);
+    QVERIFY(action);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.acceptConfirmation = true;
+    recorder.start();
+
+    action->trigger();
+
+    const QString directory =
+        QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+            .filePath(QString(Examples::DataDirectory));
+    for (const QLatin1StringView &resource : Examples::DataFiles) {
+        const QString path = QDir(directory).filePath(QFileInfo(QString(resource)).fileName());
+        QVERIFY2(QFile::exists(path), qPrintable(path));
+    }
+
+    QCOMPARE(window.ui->comboBox_attack->currentData().toInt(), 0);
+    QVERIFY(window.ui->lineEdit_command->text().contains(QDir::toNativeSeparators(directory)));
+    QVERIFY(!window.ui->lineEdit_command->text().contains(QString(Examples::DataPrefix)));
+    QVERIFY(window.ui->lineEdit_command->text().contains(
+        QDir::toNativeSeparators(QDir(directory).filePath(QStringLiteral("straight.rule")))));
 }
 
 void TestMainWindow::optionDependenciesFollowTheirCheckboxes()

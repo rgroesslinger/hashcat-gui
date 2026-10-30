@@ -1,0 +1,4 @@
+# The bundled example data is embedded verbatim by resources.qrc and read back
+# by hashcat when an example session is loaded. A checkout's core.autocrlf must
+# not change the bytes that end up inside the binary.
+src/sessions/data/** text eol=lf

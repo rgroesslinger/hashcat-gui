@@ -49,6 +49,7 @@ set(HASHCAT_GUI_SOURCES
     src/appconstants.h
     src/commandbuilder.h
     src/commandbuilder.cpp
+    src/examples.h
     src/hashcatinfoparser.h
     src/hashcatinfoparser.cpp
     src/hashcatoptions.h

@@ -27,6 +27,14 @@ enum class AttackMode : std::uint8_t {
     Hybrid = 12
 };
 
+// The attack modes in the order the combo box and the example menu show them.
+inline constexpr AttackMode AllAttackModes[] = {
+    AttackMode::Straight,       AttackMode::Combination, AttackMode::BruteForce,
+    AttackMode::Pcfg,           AttackMode::Table,       AttackMode::HybridWordMask,
+    AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+    AttackMode::Hybrid,
+};
+
 // One UI independent description of a hashcat invocation.
 //
 // MainWindow fills it from the widgets, CommandBuilder turns it into an

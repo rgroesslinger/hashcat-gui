@@ -48,7 +48,7 @@ private slots:
     void importSettingsTriggered();
     void exportSettingsTriggered();
     void quitTriggered();
-    void loadExampleSessionTriggered();
+    void loadExampleSession(AttackMode mode);
     void resetSessionTriggered();
     void aboutQtTriggered();
     void aboutTriggered();
@@ -141,6 +141,15 @@ private:
     QString m_suggestedOutfile;
 
     void initHashAndAttackModes();
+    // The example submenu is built once: initHashAndAttackModes() runs again
+    // on settings changes, and adding the actions there would duplicate them.
+    void initExampleSessionMenu();
+    // The translated name of an attack mode, shared by the combo box and the
+    // example submenu so the two cannot drift apart.
+    QString attackModeName(AttackMode mode) const;
+    // Unpacks the example data files and returns the native directory with a
+    // trailing separator, ready to replace Examples::DataPrefix.
+    bool materializeExampleData(QString *directory, QString *error);
     void updateViewAttackMode();
     void updateOptionDependencies();
 

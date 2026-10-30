@@ -148,8 +148,6 @@ inline constexpr QLatin1StringView SessionFile{"session.json"};
 // Suggested names for the files the File menu exports.
 inline constexpr QLatin1StringView SessionExport{"hashcat-gui-session.json"};
 inline constexpr QLatin1StringView SettingsExport{"hashcat-gui-settings.json"};
-// The bundled brute-force example, compiled in through resources.qrc.
-inline constexpr QLatin1StringView ExampleSession{":/sessions/example_bruteforce.json"};
 // The command preview: it is regenerated on every change, so it must never
 // be part of a stored session.
 inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};

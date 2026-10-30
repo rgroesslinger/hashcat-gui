@@ -10,15 +10,20 @@
 #include "settingsmanager.h"
 #include "appconstants.h"
 #include "commandbuilder.h"
+#include "examples.h"
 #include "hashcatinfoparser.h"
 #include "helperutils.h"
 #include "statefile.h"
 #include "widgetstateserializer.h"
+#include <QAction>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QJsonArray>
+#include <QMenu>
 #include <QMessageBox>
 #include <QProcess>
+#include <QSaveFile>
 #include <QAbstractButton>
 #include <QAbstractItemModel>
 #include <QClipboard>
@@ -164,6 +169,60 @@ QString suggestedExportPath(QLatin1StringView fileName)
 {
     return QDir(suggestedFolder()).filePath(QString(fileName));
 }
+
+// Whether a session asks for one of the bundled example data files. Only such
+// a session pays the unpacking cost; the brute-force example has no data.
+bool containsExamplePrefix(const QJsonValue &value)
+{
+    if (value.isString()) {
+        return value.toString().contains(QString(Examples::DataPrefix));
+    }
+    if (value.isObject()) {
+        const QJsonObject object = value.toObject();
+        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+            if (containsExamplePrefix(it.value())) {
+                return true;
+            }
+        }
+    }
+    if (value.isArray()) {
+        const QJsonArray array = value.toArray();
+        for (const auto &entry : array) {
+            if (containsExamplePrefix(entry)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+// Replaces the <examples>/ token in every string of the session, including the
+// text of list rows, with the directory the resources were unpacked to.
+QJsonValue withExamplePaths(const QJsonValue &value, const QString &directory)
+{
+    if (value.isString()) {
+        QString text = value.toString();
+        text.replace(QString(Examples::DataPrefix), directory);
+        return text;
+    }
+    if (value.isObject()) {
+        const QJsonObject object = value.toObject();
+        QJsonObject result;
+        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+            result.insert(it.key(), withExamplePaths(it.value(), directory));
+        }
+        return result;
+    }
+    if (value.isArray()) {
+        const QJsonArray array = value.toArray();
+        QJsonArray result;
+        for (const auto &entry : array) {
+            result.append(withExamplePaths(entry, directory));
+        }
+        return result;
+    }
+    return value;
+}
 } // namespace
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -254,6 +313,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     auto &settings = SettingsManager::instance();
 
     initHashAndAttackModes();
+    initExampleSessionMenu();
     updateViewAttackMode();
     // The hash type list arrives asynchronously, but the recipe row can only
     // be hidden for the empty combo; every later change comes through the
@@ -371,8 +431,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     /* ---------- menu actions ---------- */
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::aboutTriggered);
-    connect(ui->actionLoadExampleSession, &QAction::triggered, this,
-            &MainWindow::loadExampleSessionTriggered);
     connect(ui->actionResetSession, &QAction::triggered, this, &MainWindow::resetSessionTriggered);
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::quitTriggered);
     connect(ui->actionExportSession, &QAction::triggered, this, &MainWindow::exportTriggered);
@@ -954,38 +1012,104 @@ void MainWindow::importSettingsTriggered()
     }
 }
 
-// Tools → Load Example Session
-void MainWindow::loadExampleSessionTriggered()
+// Tools → Load Example Session → <attack mode>
+void MainWindow::loadExampleSession(AttackMode mode)
 {
+    const Examples::Entry *entry = nullptr;
+    for (const Examples::Entry &candidate : Examples::All) {
+        if (candidate.attackMode == mode) {
+            entry = &candidate;
+            break;
+        }
+    }
+    if (!entry) {
+        return;
+    }
+
     // Loading the example replaces the session the user has set up in the
     // form, so it is only carried out after the user confirmed it.
     const auto answer = QMessageBox::question(
         this, tr("Load example session"),
-        tr("Load the example session? The current session is lost.\n\n"
-           "The example cracks a test SHA-256 hash; hashcat should recover the password "
-           "Nice!98."),
+        tr("Load the %1 example? The current session is lost.\n\n"
+           "The example cracks a test hash; hashcat should recover the password %2.")
+            .arg(attackModeName(mode), QString(entry->password)),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (answer != QMessageBox::Yes) {
         return;
     }
 
-    // The example is compiled into this build, so its format version cannot
-    // be newer than this one; the test keeps the resource current.
+    // The examples are compiled into this build, so their format version
+    // cannot be newer than this one; the test keeps the resources current.
     QString error;
     QJsonObject values;
     int version = 0;
     QStringList otherSections;
-    if (!StateFile::read(QString(AppConstants::Files::ExampleSession),
-                         AppConstants::FileSections::Session, &values, &version, &otherSections,
-                         &error)) {
+    if (!StateFile::read(QString(entry->resource), AppConstants::FileSections::Session, &values,
+                         &version, &otherSections, &error)) {
         QMessageBox::warning(this, tr("Load example session"), error);
         return;
+    }
+
+    // The wordlists, rules and tables of an example are resources too, and
+    // hashcat can only read real files: unpack them first, then point the
+    // session at that directory.
+    if (containsExamplePrefix(values)) {
+        QString directory;
+        if (!materializeExampleData(&directory, &error)) {
+            QMessageBox::warning(this, tr("Load example session"), error);
+            return;
+        }
+        values = withExamplePaths(values, directory).toObject();
     }
 
     const QStringList notes = applySessionFile(values, version, otherSections);
     if (!notes.isEmpty()) {
         QMessageBox::warning(this, tr("Load example session"), notes.join(QLatin1Char('\n')));
     }
+}
+
+// Writes every bundled data file to the example directory, replacing the
+// copy a previous load left there. The whole set is written, not only the
+// files the selected session names: the files are tiny, and an example must
+// never depend on what another one unpacked before it.
+bool MainWindow::materializeExampleData(QString *directory, QString *error)
+{
+    const QString target = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                               .filePath(QString(Examples::DataDirectory));
+    if (!QDir().mkpath(target)) {
+        *error = tr("Could not create the example directory “%1”.").arg(target);
+        return false;
+    }
+
+    for (const QLatin1StringView &resource : Examples::DataFiles) {
+        QFile source{QString(resource)};
+        if (!source.open(QIODevice::ReadOnly)) {
+            *error = tr("Could not read the bundled file “%1”: %2")
+                         .arg(QString(resource), source.errorString());
+            return false;
+        }
+
+        QSaveFile destination{QDir(target).filePath(QFileInfo(QString(resource)).fileName())};
+        if (!destination.open(QIODevice::WriteOnly)) {
+            *error = tr("Could not write “%1”: %2")
+                         .arg(destination.fileName(), destination.errorString());
+            return false;
+        }
+
+        const QByteArray data = source.readAll();
+        if (destination.write(data) != data.size() || !destination.commit()) {
+            *error = tr("Could not write “%1”: %2")
+                         .arg(destination.fileName(), destination.errorString());
+            return false;
+        }
+    }
+
+    QString prefix = QDir::toNativeSeparators(target);
+    if (!prefix.endsWith(QDir::separator())) {
+        prefix += QDir::separator();
+    }
+    *directory = std::move(prefix);
+    return true;
 }
 
 // Tools → Reset Session
@@ -1319,28 +1443,53 @@ bool MainWindow::sessionFileIsUnderstood(const QString &file) const
     return version <= AppConstants::Sessions::Version;
 }
 
+QString MainWindow::attackModeName(AttackMode mode) const
+{
+    switch (mode) {
+    case AttackMode::Straight:
+        return tr("Straight");
+    case AttackMode::Combination:
+        return tr("Combination");
+    case AttackMode::BruteForce:
+        return tr("Brute-force");
+    case AttackMode::Pcfg:
+        return tr("PCFG");
+    case AttackMode::Table:
+        return tr("Table");
+    case AttackMode::HybridWordMask:
+        return tr("Hybrid Wordlist + Mask");
+    case AttackMode::HybridMaskWord:
+        return tr("Hybrid Mask + Wordlist");
+    case AttackMode::Generic:
+        return tr("Generic (feed)");
+    case AttackMode::Association:
+        return tr("Association");
+    case AttackMode::Hybrid:
+        return tr("Hybrid (mask + ?w/?q)");
+    }
+    return {};
+}
+
+void MainWindow::initExampleSessionMenu()
+{
+    for (const Examples::Entry &entry : Examples::All) {
+        QAction *action = ui->menuLoadExampleSession->addAction(attackModeName(entry.attackMode));
+        action->setData(static_cast<int>(entry.attackMode));
+        connect(action, &QAction::triggered, this,
+                [this, mode = entry.attackMode] { loadExampleSession(mode); });
+    }
+}
+
 void MainWindow::initHashAndAttackModes()
 {
     ui->comboBox_attack->clear();
     ui->comboBox_hash_type->clear();
 
-    // Attack modes
-    QMap<AttackMode, QString> attackModes;
-    attackModes.insert(AttackMode::Straight, tr("Straight"));
-    attackModes.insert(AttackMode::Combination, tr("Combination"));
-    attackModes.insert(AttackMode::BruteForce, tr("Brute-force"));
-    attackModes.insert(AttackMode::Pcfg, tr("PCFG"));
-    attackModes.insert(AttackMode::Table, tr("Table"));
-    attackModes.insert(AttackMode::HybridWordMask, tr("Hybrid Wordlist + Mask"));
-    attackModes.insert(AttackMode::HybridMaskWord, tr("Hybrid Mask + Wordlist"));
-    attackModes.insert(AttackMode::Generic, tr("Generic (feed)"));
-    attackModes.insert(AttackMode::Association, tr("Association"));
-    attackModes.insert(AttackMode::Hybrid, tr("Hybrid (mask + ?w/?q)"));
-
-    // The numeric id travels as item data: the displayed text is what a
-    // translation changes, the id is what has to end up on the command line.
-    for (auto it = attackModes.constBegin(); it != attackModes.constEnd(); ++it) {
-        ui->comboBox_attack->addItem(it.value(), static_cast<int>(it.key()));
+    // Attack modes. The numeric id travels as item data: the displayed text
+    // is what a translation changes, the id is what has to end up on the
+    // command line.
+    for (const AttackMode mode : AllAttackModes) {
+        ui->comboBox_attack->addItem(attackModeName(mode), static_cast<int>(mode));
     }
 
     // Hash types
