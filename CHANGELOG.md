@@ -12,6 +12,7 @@
 
 ### Improvements
 - hashcat 8.0.0 or newer is required; the segment size (`-c`) and workload profile (`-w`) options were removed along with it
+- Sessions written before a widget was removed no longer warn about the values it named; a name the application never used is still reported
 - A folder can be selected as a wordlist (the base lists only - the multiplied `?q` list has to be a file) and as a PCFG ruleset when it holds a `Grammar/grammar.txt`; a table is still a file only
 - Wordlists and PCFG rulesets offer an “Add folder…” button; an empty wordlist folder, a ruleset folder without a grammar and a folder in the table list are marked, and a folder in the `?q` slot is refused before launch
 - Wordlist, ruleset and table rows show whether their path is a file or a folder; a path hashcat cannot use shows the warning icon instead

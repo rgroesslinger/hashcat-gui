@@ -162,9 +162,22 @@ inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 // widgets that no longer exist. An older file is applied and the values it
 // cannot use are named; a file of a newer format is refused, because a name
 // that survived may mean something else there.
+//
+// A removed widget is not a rename: the version stays, and its name goes to
+// RetiredWidgetNames so that every session written before the removal loads
+// without a warning. A retired name is never reused.
 namespace Sessions
 {
 inline constexpr int Version = 1;
+
+// The object names of widgets that were removed. Their values cannot be
+// applied, and reporting them would hit every session written before the
+// removal - not a hand edit or a file of another version.
+inline constexpr QLatin1StringView RetiredWidgetNames[] = {
+    QLatin1StringView{"checkBox_override_workload_profile"},
+    QLatin1StringView{"comboBox_workload_profile"},
+    QLatin1StringView{"spinBox_segment_size"},
+};
 } // namespace Sessions
 
 // Values the widgets start with. The identical defaults are baked into the

@@ -231,6 +231,9 @@ private slots:
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
     void theImportNamesTheValuesTheSessionDoesNotKnow();
+    void theImportIgnoresRetiredWidgetNames();
+    void aStartupSessionWithRetiredNamesStaysQuiet();
+    void retiredWidgetNamesAreNotReused();
     void aNewerSessionIsRefused();
     void anOlderSessionIsAppliedWithANote();
     void aNewerSettingsFileIsRefused();
@@ -2204,6 +2207,94 @@ void TestMainWindow::theImportNamesTheValuesTheSessionDoesNotKnow()
     // ... and the one that named nothing is named in the notes.
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
+}
+
+// A session written before a widget was removed still names it. The retired
+// name is dropped without a note - warning about it would hit every session of
+// that version - while a name that was never ours is still reported.
+void TestMainWindow::theImportIgnoresRetiredWidgetNames()
+{
+    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("retired.json"));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
+    values.insert(QStringLiteral("spinBox_segment_size"), 32);
+    values.insert(QStringLiteral("comboBox_workload_profile"), 2);
+    values.insert(QStringLiteral("checkBox_override_workload_profile"), true);
+    values.insert(QStringLiteral("aWidgetFromTheFuture"), QStringLiteral("something"));
+    QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-retired"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
+
+    // The value that named a widget was applied...
+    QCOMPARE(window.ui->spinBox_runtime->value(), 64);
+    // ... the name that was never ours is still named...
+    QVERIFY(recorder.messageBoxSeen);
+    QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
+    // ... and the retired ones are not.
+    for (const QLatin1StringView &retired : AppConstants::Sessions::RetiredWidgetNames) {
+        QVERIFY2(!recorder.text.contains(QString(retired)), qPrintable(recorder.text));
+    }
+}
+
+// The startup stays quiet for a session that names a retired widget: the file
+// was written by this application, and the value it holds cannot come back.
+void TestMainWindow::aStartupSessionWithRetiredNamesStaysQuiet()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
+    values.insert(QStringLiteral("spinBox_segment_size"), 32);
+    values.insert(QStringLiteral("comboBox_workload_profile"), 2);
+    values.insert(QStringLiteral("checkBox_override_workload_profile"), true);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-retired-startup"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    m_watchdog.start();
+    MainWindow window;
+
+    QCOMPARE(m_closedModals, 0);
+    QCOMPARE(window.ui->spinBox_runtime->value(), 64);
+}
+
+// A retired name is never reused: a widget that took one again would have its
+// session value dropped silently on load. The list only holds names no widget
+// has anymore.
+void TestMainWindow::retiredWidgetNamesAreNotReused()
+{
+    MainWindow window;
+    const QJsonObject state =
+        WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
+
+    for (const QLatin1StringView &retired : AppConstants::Sessions::RetiredWidgetNames) {
+        QVERIFY2(!state.contains(QString(retired)),
+                 qPrintable(QStringLiteral("a widget still carries the retired name %1")
+                                .arg(QString(retired))));
+    }
 }
 
 // A file with a newer format version is not applied at all: a value whose

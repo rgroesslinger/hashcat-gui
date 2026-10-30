@@ -127,6 +127,10 @@ it goes through `attackIndexChanged()`.
 - Per-section versions (`Sessions::Version`, `Settings::Version`): widget names and setting
   keys change independently. Bump on a rename, not an addition (an added key is reported by
   name); this is not the application version.
+- Removing a widget is neither: keep the version and add the object name to
+  `AppConstants::Sessions::RetiredWidgetNames`, which `MainWindow::applySessionFile()` passes as
+  ignored. A session written before the removal then loads without a note, while a name that was
+  never ours is still reported. A retired name is never reused; `tst_mainwindow` enforces it.
 - A newer version is refused before applying: a bump signals a rename, so a surviving name may
   mean something else. An older file is applied and unapplicable values are named; unknown or
   wrong-typed values in the same version are skipped and named, not refused.

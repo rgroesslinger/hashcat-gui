@@ -794,11 +794,19 @@ void MainWindow::importTriggered()
 QStringList MainWindow::applySessionFile(const QJsonObject &values, int version,
                                          const QStringList &otherSections)
 {
+    // A retired widget's value cannot be applied, but it is not news: every
+    // session written before the removal names it. Dropping the name keeps the
+    // note for the values that were never ours.
+    QStringList ignoredWidgets{AppConstants::Files::PreviewWidget};
+    for (const QLatin1StringView &retired : AppConstants::Sessions::RetiredWidgetNames) {
+        ignoredWidgets.append(QString(retired));
+    }
+
     // The hash combo has no items yet - the query that fills it runs
     // asynchronously. Remember the stored hash type; the reply applies it
     // once the items exist.
     const WidgetStateSerializer::ApplyResult notApplied =
-        WidgetStateSerializer::applyToWidgets(values, this, {AppConstants::Files::PreviewWidget});
+        WidgetStateSerializer::applyToWidgets(values, this, ignoredWidgets);
     const QString problem = restoreHashType(values);
     commandChanged();
 
