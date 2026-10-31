@@ -914,7 +914,7 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
          QStringLiteral("This mode needs exactly 2 wordlists (left, right).")},
         {AttackMode::BruteForce, QStringLiteral("This mode needs a mask.")},
         {AttackMode::Pcfg,
-         QStringLiteral("This mode runs hashcat's bundled default-passwords ruleset; "
+         QStringLiteral("This mode runs hashcat’s bundled default-passwords ruleset; "
                         "name one or more to use your own.")},
         {AttackMode::Table, QStringLiteral("This mode needs one wordlist and at least one table.")},
         {AttackMode::HybridWordMask, QStringLiteral("This mode needs a wordlist and a mask.")},
