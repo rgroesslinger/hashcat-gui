@@ -9,6 +9,7 @@
 #include <QMainWindow>
 #include <QListWidgetItem>
 #include <QComboBox>
+#include <QFutureWatcher>
 #include <QIcon>
 #include <QProcess>
 #include <QShowEvent>
@@ -263,6 +264,12 @@ private:
     // query when the configured path no longer matches, so a changed binary
     // replaces the list instead of leaving the old one on screen.
     QString m_queriedHashcatPath;
+
+    // The query of the latest initHashAndAttackModes() call. An earlier one
+    // can still be in flight, and its reply describes a binary this list no
+    // longer comes from: only the watcher held here may fill the combo. Null
+    // means no query is on its way.
+    QFutureWatcher<HashcatResult> *m_hashTypeWatcher = nullptr;
 };
 
 #endif // MAINWINDOW_H

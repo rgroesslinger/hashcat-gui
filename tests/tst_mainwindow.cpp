@@ -20,6 +20,7 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMenu>
+#include <QPointer>
 #include <QRadioButton>
 #include <QSet>
 #include <QSpinBox>
@@ -249,6 +250,8 @@ private slots:
     void failedQueryReenablesTheHashTypeCombo_data();
     void failedQueryReenablesTheHashTypeCombo();
     void changingTheBinaryReRunsTheQuery();
+    void staleQueryDoesNotReplaceTheNewerList_data();
+    void staleQueryDoesNotReplaceTheNewerList();
     void outfileSuggestionFollowsUntilTheUserTakesOver();
     void wordlistMoveSurvivesAMissingSelection();
     void commandPreviewCarriesTheBinaryName();
@@ -1704,6 +1707,89 @@ void TestMainWindow::changingTheBinaryReRunsTheQuery()
     QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() == 1,
                              AppConstants::Hashcat::QueryTimeoutMs);
     QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400u);
+}
+
+// The reply of a query an earlier init started describes a binary the list no
+// longer comes from. It must not replace the newer list - and must not fill the
+// combo after the path was cleared. The first stub holds its answer until the
+// test lets it go, so the two replies cannot race by accident.
+void TestMainWindow::staleQueryDoesNotReplaceTheNewerList_data()
+{
+    QTest::addColumn<bool>("clearPath");
+
+    QTest::newRow("changed binary") << false;
+    QTest::newRow("cleared path") << true;
+}
+
+void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QFETCH(bool, clearPath);
+
+    QTemporaryDir release;
+    QVERIFY(release.isValid());
+    const QString releaseFile = release.filePath(QStringLiteral("release"));
+
+    QByteArray slowScript = "#!/bin/sh\n"
+                            "while [ ! -e '";
+    slowScript += releaseFile.toUtf8();
+    slowScript += "' ]; do sleep 0.05; done\n"
+                  "printf '{\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+                  "exit 0\n";
+
+    const QString slowStub =
+        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-stale"), slowScript);
+    const QString fastStub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-current"), "#!/bin/sh\n"
+                                                "printf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"
+                                                "exit 0\n");
+    QVERIFY2(!slowStub.isEmpty() && !fastStub.isEmpty(), "the shell stubs could not be written");
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, slowStub);
+
+    MainWindow window;
+
+    // The first query is still on its way; it is the one that will answer last.
+    QPointer<QFutureWatcher<HashcatResult>> staleQuery = window.m_hashTypeWatcher;
+    QVERIFY2(!staleQuery.isNull(), "the first query was not started");
+    QVERIFY(!window.ui->comboBox_hash_type->isEnabled());
+
+    // A second init supersedes it before the stub has answered.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       clearPath ? QString() : fastStub);
+    window.initHashAndAttackModes();
+
+    if (clearPath) {
+        QCOMPARE(window.ui->comboBox_hash_type->count(), 0);
+        QVERIFY(window.ui->comboBox_hash_type->isEnabled());
+        QVERIFY(window.ui->comboBox_hash_type->toolTip().contains(QStringLiteral("Settings")));
+    } else {
+        QTRY_COMPARE_WITH_TIMEOUT(window.ui->comboBox_hash_type->count(), 1,
+                                  AppConstants::Hashcat::QueryTimeoutMs);
+        QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400u);
+    }
+
+    // Let the first query answer. Its watcher is deleted once its reply is
+    // handled, so the pointer turning null proves the stale reply has arrived.
+    QFile releaseFlag(releaseFile);
+    QVERIFY(releaseFlag.open(QIODevice::WriteOnly));
+    releaseFlag.close();
+    QTRY_VERIFY_WITH_TIMEOUT(staleQuery.isNull(), AppConstants::Hashcat::QueryTimeoutMs);
+
+    // The stale reply changed nothing: the current list is still the newer
+    // one - or still empty after the path was cleared.
+    if (clearPath) {
+        QCOMPARE(window.ui->comboBox_hash_type->count(), 0);
+        QVERIFY(window.ui->comboBox_hash_type->isEnabled());
+        QVERIFY(window.ui->comboBox_hash_type->toolTip().contains(QStringLiteral("Settings")));
+    } else {
+        QCOMPARE(window.ui->comboBox_hash_type->count(), 1);
+        QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400u);
+        QVERIFY(window.ui->comboBox_hash_type->isEnabled());
+    }
+#endif
 }
 
 // The suggestion may follow the hash file name only as long as nobody else

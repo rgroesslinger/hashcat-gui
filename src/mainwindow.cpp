@@ -1006,7 +1006,7 @@ void MainWindow::importSettingsTriggered()
         // An import can change the binary name and the short/long parameter
         // choice too, so the preview and the hash types need the same refresh
         // as after the settings were saved from the menu.
-        if (ui->comboBox_hash_type->count() == 0) {
+        if (ui->comboBox_hash_type->count() == 0 && !m_hashTypeWatcher) {
             initHashAndAttackModes();
         }
         commandChanged();
@@ -1227,10 +1227,11 @@ void MainWindow::settingsTriggered()
         // Re-run the query when the binary changed: its list replaces the one
         // on screen - which resets the hash type selection, expected because
         // the new binary may not offer the selected id - or when nothing was
-        // ever loaded and the path may be usable now.
+        // ever loaded, no query is on its way, and the path may be usable now.
         const QString hashcatPath =
             SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-        if (hashcatPath != m_queriedHashcatPath || ui->comboBox_hash_type->count() == 0) {
+        if (hashcatPath != m_queriedHashcatPath
+            || (ui->comboBox_hash_type->count() == 0 && !m_hashTypeWatcher)) {
             initHashAndAttackModes();
         }
         // The settings can change the binary name and the short/long parameter
@@ -1486,6 +1487,11 @@ void MainWindow::initHashAndAttackModes()
     ui->comboBox_attack->clear();
     ui->comboBox_hash_type->clear();
 
+    // A query of an earlier call may still be running: its reply describes a
+    // binary this list no longer comes from. Clearing the member invalidates
+    // it; the watcher below replaces it when this call starts a new query.
+    m_hashTypeWatcher = nullptr;
+
     // Attack modes. The numeric id travels as item data: the displayed text
     // is what a translation changes, the id is what has to end up on the
     // command line.
@@ -1506,13 +1512,25 @@ void MainWindow::initHashAndAttackModes()
         ui->comboBox_hash_type->setToolTip(tr("Updating…"));
         ui->comboBox_hash_type->setEnabled(false);
 
-        // Create a watcher that will be destroyed once finished
-        QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
+        // The watcher is destroyed once its reply is handled. It is the
+        // current query from here on, so the reply below is allowed to fill
+        // the combo.
+        auto *watcher = new QFutureWatcher<HashcatResult>(this);
+        m_hashTypeWatcher = watcher;
 
         // When the future is finished, fill the combo with the parsed types.
         connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
             const HashcatResult &result = watcher->result();
             watcher->deleteLater();
+
+            // A later initHashAndAttackModes() call has superseded this query:
+            // its reply belongs to a binary the combo no longer shows, so it
+            // must not touch the list - and must not consume the hash type a
+            // session is still waiting for.
+            if (watcher != m_hashTypeWatcher) {
+                return;
+            }
+            m_hashTypeWatcher = nullptr;
 
             QString error;
             QString hashTypeProblem;
@@ -1558,11 +1576,15 @@ void MainWindow::initHashAndAttackModes()
             }
         });
 
-        // Kick off the asynchronous process
+        // Assigned above, before the future is set: a query that finishes at
+        // once must not look stale to its own handler.
         watcher->setFuture(HelperUtils::executeHashcat(QStringList()
                                                        << AppConstants::Hashcat::ExampleHashes
                                                        << AppConstants::Hashcat::MachineReadable));
     } else {
+        // A query an earlier call started disabled the combo. Without a new
+        // one there is nothing to wait for, so it goes back to the user.
+        ui->comboBox_hash_type->setEnabled(true);
         ui->comboBox_hash_type->setToolTip(
             tr("Set the hashcat path under %1 → %2 to load the available hash types.")
                 .arg(menuPath(ui->menuFile->menuAction()->text()),
