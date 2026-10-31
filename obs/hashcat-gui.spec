@@ -5,7 +5,7 @@
 Name:           hashcat-gui
 Version:        0.8.0
 Release:        0
-Summary:        Qt-based GUI for hashcat (Password recovery utility)
+Summary:        Graphical user interface for hashcat
 License:        GPL-3.0-or-later
 URL:            https://github.com/rgroesslinger/hashcat-gui/
 Source0:        https://github.com/rgroesslinger/hashcat-gui/archive/v%{version}.tar.gz
@@ -35,7 +35,7 @@ BuildRequires: debbuild-macros
 %endif
 
 %description
-A Qt-based GUI for hashcat, a powerful password recovery utility
+A graphical user interface for hashcat, the password recovery utility.
 
 %prep
 %setup -q

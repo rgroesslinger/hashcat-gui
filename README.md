@@ -3,13 +3,13 @@
 [![CI Build](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yml/badge.svg)](https://github.com/rgroesslinger/hashcat-gui/actions/workflows/ci.yml)
 [![build result](https://build.opensuse.org/projects/home:rgroesslinger/packages/hashcat-gui/badge.svg?type=default)](https://build.opensuse.org/package/show/home:rgroesslinger/hashcat-gui)
 
-A graphical user interface for the password recovery utility [hashcat](https://github.com/hashcat/hashcat/).
+A graphical user interface for [hashcat](https://github.com/hashcat/hashcat/), the password recovery utility.
 
 ![hashcat-gui](/screenshot.png)
 
 ## Features
 
-hashcat-gui puts hashcat's attack toolbox behind a native desktop interface: choose the mode, fill in the options that apply, and see the exact command it will run.
+Get a native desktop interface around hashcat's attack toolbox: choose the mode, fill in the options that apply, and see the exact command it will run.
 
 - **Every hashcat 8 attack mode** — all ten, from straight and combination to PCFG, table, generic feed, association and the `?w`/`?q` hybrid, each revealing only the options it uses.
 - **No black box** — a live preview shows the exact `hashcat` command and copies it to the clipboard, with optional short parameter names.

@@ -53,7 +53,7 @@
        <item>
         <widget class="QLabel" name="label_app_description">
          <property name="text">
-          <string>Graphical user interface for the hashcat password recovery tool</string>
+          <string>Graphical user interface for hashcat, the password recovery utility</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
