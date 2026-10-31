@@ -7,6 +7,19 @@ A graphical user interface for the password recovery utility [hashcat](https://g
 
 ![hashcat-gui](/screenshot.png)
 
+## Features
+
+hashcat-gui puts hashcat's attack toolbox behind a native desktop interface: choose the mode, fill in the options that apply, and see the exact command it will run.
+
+- **Every hashcat 8 attack mode** — all ten, from straight and combination to PCFG, table, generic feed, association and the `?w`/`?q` hybrid, each revealing only the options it uses.
+- **No black box** — a live preview shows the exact `hashcat` command and copies it to the clipboard, with optional short parameter names.
+- **A working example for every attack mode** — Tools → Load Example Session runs a bundled session with its own wordlist, rules or table, so you can verify the setup before using your own data.
+- **Sessions that survive a restart** — the last session is restored automatically; sessions and settings can be exported and imported.
+- **Real list management** — several wordlists, rule slots, PCFG rulesets, tables and feed arguments with add/move/remove, per-row include checkboxes and folder support.
+- **Runs where you already work** — hashcat starts detached in your terminal of choice: GNOME Terminal, Konsole, Xfce, Ptyxis, Alacritty, kitty, foot, WezTerm, PowerShell or pwsh.
+- **Fits the desktop** — 15 UI languages, system/light/dark color scheme, and per-option tooltips with hashcat's reference tables.
+- **Native packaging** — packages for openSUSE, Fedora, Debian and Ubuntu, a Windows build, and a built-in update check.
+
 ## Installation
 
 hashcat 8.0.0 or newer is required.
