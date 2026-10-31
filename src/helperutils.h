@@ -26,6 +26,9 @@
 struct HashcatResult {
     QProcess::ExitStatus exitStatus = QProcess::CrashExit;
     int exitCode = -1;
+    // The query hit its deadline. The status members alone cannot tell that
+    // from a crash: the process was killed to end the wait.
+    bool timedOut = false;
     QString standardOutput;
     QString standardError;
 };

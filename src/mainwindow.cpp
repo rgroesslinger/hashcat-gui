@@ -1570,6 +1570,17 @@ void MainWindow::initHashAndAttackModes()
                                                         "the hashcat path in Settings."));
 
             if (!error.isEmpty()) {
+#ifdef Q_OS_WIN
+                if (result.timedOut) {
+                    // The FAQ names Windows Defender as the usual cause of a
+                    // query that runs into its deadline; on other platforms a
+                    // timeout has no such explanation to offer.
+                    error += tr("\n\nThis can be caused by Windows Defender or other "
+                                "anti-virus software. See the <a href=\"%1\">FAQ entry</a> "
+                                "for a remedy.")
+                                 .arg(QString(AppConstants::Urls::FaqHashTypesTimeout));
+                }
+#endif
                 QMessageBox::warning(this, tr("Failed to load hash types"), error);
             } else if (!hashTypeProblem.isEmpty()) {
                 QMessageBox::warning(this, tr("Session warning"), hashTypeProblem);

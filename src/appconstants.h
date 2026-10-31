@@ -297,6 +297,11 @@ inline constexpr QLatin1StringView LatestReleasePage{
 // The license of the application.
 inline constexpr QLatin1StringView License{
     "https://github.com/rgroesslinger/hashcat-gui/blob/master/LICENSE"};
+// The FAQ entry that explains the slow hash type query on Windows. The anchor
+// is the heading in FAQ.yaml; changing that heading breaks this link.
+inline constexpr QLatin1StringView FaqHashTypesTimeout{
+    "https://github.com/rgroesslinger/hashcat-gui/blob/master/FAQ.md"
+    "#why-does-loading-the-hash-types-take-so-long-on-windows"};
 } // namespace Urls
 
 // How the About dialog asks GitHub for a newer release.

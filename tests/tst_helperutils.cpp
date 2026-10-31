@@ -982,6 +982,7 @@ void TestHelperUtils::executeHashcatCapturesOutput()
 
     QCOMPARE(int(result.exitStatus), int(QProcess::NormalExit));
     QCOMPARE(result.exitCode, 0);
+    QVERIFY(!result.timedOut);
     QVERIFY(result.standardOutput.contains(QStringLiteral("NTLM")));
 }
 
@@ -1005,6 +1006,7 @@ void TestHelperUtils::executeHashcatGivesUpOnTimeout()
     QVERIFY2(elapsed.elapsed() < 10000, qPrintable(QStringLiteral("%1 ms").arg(elapsed.elapsed())));
     QCOMPARE(int(result.exitStatus), int(QProcess::CrashExit));
     QCOMPARE(result.exitCode, -1);
+    QVERIFY(result.timedOut);
     QVERIFY(result.standardError.contains(QStringLiteral("timed out")));
 }
 

@@ -63,6 +63,7 @@ QFuture<HashcatResult> HelperUtils::executeHashcat(const QStringList &args, int 
             // actually exited, so the destructor of proc is not left with a
             // process that is still running.
             proc.waitForFinished(5000);
+            result.timedOut = true;
             result.standardError = tr("hashcat timed out\n%1").arg(proc.errorString());
             return result;
         }
