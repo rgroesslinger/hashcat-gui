@@ -404,8 +404,8 @@ void TestSettingsDialog::hashcatPathStatusFollowsTheField()
 // storing it: only Save writes the path.
 void TestSettingsDialog::detectsHashcatFromPathWhenNoPathConfigured()
 {
-    const QString stub =
-        TestEnvironment::writeSearchableExecutable(QString(AppConstants::Hashcat::ExecutableName));
+    const QString stub = TestEnvironment::writeSearchableExecutable(
+        QString(AppConstants::Hashcat::ExecutableNames[0]));
     QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
 
     TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
@@ -429,8 +429,8 @@ void TestSettingsDialog::doesNotReplaceAConfiguredPath()
     const QString configured = QStringLiteral("/user/chosen/hashcat");
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, configured);
 
-    const QString stub =
-        TestEnvironment::writeSearchableExecutable(QString(AppConstants::Hashcat::ExecutableName));
+    const QString stub = TestEnvironment::writeSearchableExecutable(
+        QString(AppConstants::Hashcat::ExecutableNames[0]));
     QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
     TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
 

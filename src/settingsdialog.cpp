@@ -503,7 +503,7 @@ void SettingsDialog::selectPathClicked()
 {
     QFileDialog fileDialog(this, tr("Select the hashcat executable"));
     fileDialog.setFileMode(QFileDialog::ExistingFile);
-    fileDialog.setNameFilter(tr("Executable Files (*.exe *.bin);;All Files (*)"));
+    fileDialog.setNameFilter(tr("Executable Files (*.exe *.bin hashcat);;All Files (*)"));
 
     if (fileDialog.exec() == QDialog::Accepted) {
         QString fileName = fileDialog.selectedFiles().constFirst();

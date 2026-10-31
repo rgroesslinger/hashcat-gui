@@ -41,6 +41,8 @@ private slots:
     void cachePathNeedsAnExistingDirectory();
     void terminalArgumentsArePinned();
     void findHashcatInPathFindsTheExecutable();
+    void findHashcatInPathProbesBothUnixNames_data();
+    void findHashcatInPathProbesBothUnixNames();
     void findHashcatInPathIsEmptyWithoutOne();
     void executeHashcatWithoutAPath();
     void executeHashcatCapturesOutput();
@@ -888,8 +890,8 @@ void TestHelperUtils::terminalArgumentsArePinned()
 // The lookup follows PATH and only reports a file this system can execute.
 void TestHelperUtils::findHashcatInPathFindsTheExecutable()
 {
-    const QString stub =
-        TestEnvironment::writeSearchableExecutable(QString(AppConstants::Hashcat::ExecutableName));
+    const QString stub = TestEnvironment::writeSearchableExecutable(
+        QString(AppConstants::Hashcat::ExecutableNames[0]));
     QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
 
     TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
@@ -897,6 +899,48 @@ void TestHelperUtils::findHashcatInPathFindsTheExecutable()
     const QString found = HelperUtils::findHashcatInPath();
     QVERIFY2(!found.isEmpty(), "the executable on PATH was not found");
     QCOMPARE(QFileInfo(found).canonicalFilePath(), QFileInfo(stub).canonicalFilePath());
+}
+
+// Unix has two names for the same binary: `make install` and the distribution
+// packages install "hashcat", the release archive ships "hashcat.bin". Both
+// have to be found, and the installed name wins when both are there. Every row
+// gets its own directory, so one row cannot see a file another wrote.
+void TestHelperUtils::findHashcatInPathProbesBothUnixNames_data()
+{
+    QTest::addColumn<QStringList>("names");
+    QTest::addColumn<QString>("expected");
+
+    QTest::newRow("installed name only")
+        << QStringList{QStringLiteral("hashcat")} << QStringLiteral("hashcat");
+    QTest::newRow("archive name only")
+        << QStringList{QStringLiteral("hashcat.bin")} << QStringLiteral("hashcat.bin");
+    QTest::newRow("both") << QStringList{QStringLiteral("hashcat.bin"), QStringLiteral("hashcat")}
+                          << QStringLiteral("hashcat");
+}
+
+void TestHelperUtils::findHashcatInPathProbesBothUnixNames()
+{
+#ifdef Q_OS_WIN
+    QSKIP("the Windows build has one executable name");
+#else
+    QFETCH(QStringList, names);
+    QFETCH(QString, expected);
+
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+
+    for (const QString &name : names) {
+        const QString stub = TestEnvironment::writeSearchableExecutable(name, directory.path());
+        QVERIFY2(!stub.isEmpty(),
+                 qPrintable(QStringLiteral("the %1 stub could not be written").arg(name)));
+    }
+
+    TestEnvironment::PathGuard guard(directory.path().toUtf8());
+
+    const QString found = HelperUtils::findHashcatInPath();
+    QVERIFY2(!found.isEmpty(), "the executable on PATH was not found");
+    QCOMPARE(QFileInfo(found).fileName(), expected);
+#endif
 }
 
 void TestHelperUtils::findHashcatInPathIsEmptyWithoutOne()

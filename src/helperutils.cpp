@@ -680,9 +680,16 @@ QMap<QString, QStringList> HelperUtils::availableTerminals()
 
 QString HelperUtils::findHashcatInPath()
 {
-    // QStandardPaths checks that the file exists and can be executed; the
-    // platform's executable name already carries its suffix.
-    return QStandardPaths::findExecutable(QString(AppConstants::Hashcat::ExecutableName));
+    // QStandardPaths checks that the file exists and can be executed; every
+    // name already carries the platform's suffix. The installed name comes
+    // first, the release archive's second - see ExecutableNames.
+    for (const QLatin1StringView name : AppConstants::Hashcat::ExecutableNames) {
+        const QString path = QStandardPaths::findExecutable(QString(name));
+        if (!path.isEmpty()) {
+            return path;
+        }
+    }
+    return {};
 }
 
 QString HelperUtils::noSupportedTerminalMessage()

@@ -11,6 +11,7 @@
 #include <QByteArray>
 #include <QCoreApplication>
 #include <QDialog>
+#include <QDir>
 #include <QFile>
 #include <QFileDialog>
 #include <QGroupBox>
@@ -67,9 +68,11 @@ inline void redirectBaseDirectories()
 
 // A hashcat stand-in the tests can execute. Returns an empty path where a #!
 // script cannot run (Windows) or be written; callers QSKIP on Windows and
-// treat an empty path as a hard failure elsewhere.
+// treat an empty path as a hard failure elsewhere. An empty directory puts the
+// stub in a scratch directory shared by every caller.
 inline QString writeShellStub([[maybe_unused]] const QString &name,
-                              [[maybe_unused]] const QByteArray &content)
+                              [[maybe_unused]] const QByteArray &content,
+                              [[maybe_unused]] const QString &directory = QString())
 {
 #ifdef Q_OS_WIN
     // Windows only starts real images: CreateProcess cannot run a #! script,
@@ -77,12 +80,12 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
     // would fail. Skip the stub tests instead of reporting that failure.
     return {};
 #else
-    static QTemporaryDir dir;
-    if (!dir.isValid()) {
+    static QTemporaryDir scratch;
+    if (directory.isEmpty() && !scratch.isValid()) {
         return {};
     }
 
-    QString path = dir.filePath(name);
+    QString path = QDir(directory.isEmpty() ? scratch.path() : directory).filePath(name);
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         return {};
@@ -96,16 +99,18 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
 
 // A file named `name` that the platform's executable search accepts, for the
 // tests of the PATH lookup. Nothing runs it: on Windows a shell script is not
-// an image, so the running test binary is copied instead.
-inline QString writeSearchableExecutable(const QString &name)
+// an image, so the running test binary is copied instead. An empty directory
+// puts it in a scratch directory shared by every caller; a caller that needs
+// a clean PATH passes its own.
+inline QString writeSearchableExecutable(const QString &name, const QString &directory = QString())
 {
 #ifdef Q_OS_WIN
-    static QTemporaryDir dir;
-    if (!dir.isValid()) {
+    static QTemporaryDir scratch;
+    if (directory.isEmpty() && !scratch.isValid()) {
         return {};
     }
 
-    const QString path = dir.filePath(name);
+    QString path = QDir(directory.isEmpty() ? scratch.path() : directory).filePath(name);
     // Several tests ask for the same name; the first copy is good enough.
     if (QFile::exists(path)) {
         return path;
@@ -115,7 +120,7 @@ inline QString writeSearchableExecutable(const QString &name)
     }
     return path;
 #else
-    return writeShellStub(name, "#!/bin/sh\nexit 0\n");
+    return writeShellStub(name, "#!/bin/sh\nexit 0\n", directory);
 #endif
 }
 
