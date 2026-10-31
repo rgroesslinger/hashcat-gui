@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.runs-on }}
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      CTEST_PARALLEL_LEVEL: 4
     strategy:
       matrix:
         compiler: [linux-gcc, linux-clang, windows-gcc, windows-clang]
