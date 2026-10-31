@@ -9,16 +9,13 @@ A graphical user interface for [hashcat](https://github.com/hashcat/hashcat/), t
 
 ## Features
 
-Get a native desktop interface around hashcat's attack toolbox: choose the mode, fill in the options that apply, and see the exact command it will run.
-
-- **Every hashcat 8 attack mode** — all ten, from straight and combination to PCFG, table, generic feed, association and the `?w`/`?q` hybrid, each revealing only the options it uses.
-- **No black box** — a live preview shows the exact `hashcat` command and copies it to the clipboard, with optional short parameter names.
-- **A working example for every attack mode** — Tools → Load Example Session runs a bundled session with its own wordlist, rules or table, so you can verify the setup before using your own data.
-- **Sessions that survive a restart** — the last session is restored automatically; sessions and settings can be exported and imported.
-- **Real list management** — several wordlists, rule slots, PCFG rulesets, tables and feed arguments with add/move/remove, per-row include checkboxes and folder support.
-- **Runs where you already work** — hashcat starts detached in your terminal of choice: GNOME Terminal, Konsole, Xfce, Ptyxis, Alacritty, kitty, foot, WezTerm, PowerShell or pwsh.
-- **Fits the desktop** — 15 UI languages, system/light/dark color scheme, and per-option tooltips with hashcat's reference tables.
-- **Native packaging** — packages for openSUSE, Fedora, Debian and Ubuntu, a Windows build, and a built-in update check.
+- **All hashcat attack modes** — straight, combination, brute force, PCFG, table, generic feed and association, plus hybrid modes that pair a character mask with wordlists.
+- **Preview the command** — the preview shows the exact `hashcat` command, with optional short parameter names, which can be copied to the clipboard.
+- **A runnable example for each mode** — `Tools → Load Example Session` opens a bundled session with its own wordlist, rules or table, so you can check the setup before running your own data.
+- **Session saving** — the last session is restored automatically; sessions and settings can be exported and imported.
+- **Real list management** — several wordlists, rule slots, PCFG rulesets, tables and feed arguments with per-row include checkboxes.
+- **Runs in your own terminal** — hashcat starts detached in GNOME Terminal, Konsole, Xfce, Ptyxis, Alacritty, kitty, foot, WezTerm, PowerShell or pwsh.
+- **Native packaging** — packages for openSUSE, Fedora, Debian, Ubuntu, and a Windows build.
 
 ## Installation
 

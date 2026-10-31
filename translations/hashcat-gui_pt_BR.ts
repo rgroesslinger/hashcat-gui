@@ -8,8 +8,8 @@
         <translation>Sobre</translation>
     </message>
     <message>
-        <source>Graphical user interface for the hashcat password recovery tool</source>
-        <translation>Interface gráfica para a ferramenta de recuperação de senhas hashcat</translation>
+        <source>Graphical user interface for hashcat, the password recovery utility</source>
+        <translation>Interface gráfica para o hashcat, o utilitário de recuperação de senhas</translation>
     </message>
     <message>
         <source>Version information</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Desconhecido</translation>
     </message>
     <message>
         <source>Updates</source>
@@ -85,7 +85,7 @@
     </message>
     <message>
         <source>Not configured</source>
-        <translation type="unfinished">Não configurado</translation>
+        <translation>Não configurado</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -143,7 +143,7 @@
     </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation type="unfinished">Nenhum terminal suportado foi encontrado neste sistema. O hashcat-gui precisa de um para mostrar a saída do hashcat.</translation>
+        <translation>Nenhum terminal compatível foi encontrado neste sistema. O hashcat-gui precisa de um para mostrar a saída do hashcat.</translation>
     </message>
 </context>
 <context>
@@ -157,12 +157,24 @@
         <translation>Arquivo de hashes ou hash:</translation>
     </message>
     <message>
+        <source>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</source>
+        <translation>O hash a quebrar, o caminho de um arquivo de hashes ou uma captura WPA .hccapx. Cole aqui um único hash ou aponte para um arquivo.</translation>
+    </message>
+    <message>
         <source>Salt is hex</source>
         <translation>O salt é hexadecimal</translation>
     </message>
     <message>
+        <source>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</source>
+        <translation>Remover do potfile os hashes já quebrados para que uma execução posterior não os informe de novo. Recusado no modo de ataque 9.</translation>
+    </message>
+    <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>Remover o hash da lista de hashes depois de quebrado</translation>
+    </message>
+    <message>
+        <source>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</source>
+        <translation>Ignorar a parte @username dos hashes (nos modos de hash que a incluem) para que a mesma palavra possa servir a várias contas.</translation>
     </message>
     <message>
         <source>Ignore username in hash file</source>
@@ -173,8 +185,22 @@
         <translation>Modo:</translation>
     </message>
     <message>
+        <source>Attack mode. Each choice reveals its own options below.</source>
+        <translation>Modo de ataque. Cada opção mostra suas próprias opções abaixo.</translation>
+    </message>
+    <message>
         <source>Hash type:</source>
         <translation>Tipo de hash:</translation>
+    </message>
+    <message>
+        <source>Hash recipe:</source>
+        <translation>Receita do hash:</translation>
+    </message>
+    <message>
+        <source>Unix: &apos;md5(md5(salt) . pass)&apos;
+               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</source>
+        <translation>Unix: &apos;md5(md5(salt) . pass)&apos;
+               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</translation>
     </message>
     <message>
         <source>Wordlists</source>
@@ -189,8 +215,20 @@
         <translation>Mover item para baixo</translation>
     </message>
     <message>
+        <source>hashcat reads every file directly inside the folder as one wordlist.</source>
+        <translation>O hashcat lê cada arquivo diretamente dentro da pasta como uma única lista de palavras.</translation>
+    </message>
+    <message>
+        <source>Add folder…</source>
+        <translation>Adicionar pasta…</translation>
+    </message>
+    <message>
         <source>Remove</source>
         <translation>Remover</translation>
+    </message>
+    <message>
+        <source>Only checked rows are used. A folder is one wordlist: hashcat reads the files directly inside it.</source>
+        <translation>Somente as linhas marcadas são usadas. Uma pasta é uma lista de palavras: o hashcat lê os arquivos diretamente dentro dela.</translation>
     </message>
     <message>
         <source>Wordlist is hex</source>
@@ -205,6 +243,202 @@
         <translation>Codificação de destino:</translation>
     </message>
     <message>
+        <source>Settings (no wordlist):</source>
+        <translation>Configurações (sem lista de palavras):</translation>
+    </message>
+    <message>
+        <source>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</source>
+        <translation>Configurações posicionais, separadas por espaços. Usadas somente quando nenhuma lista de palavras está selecionada: com uma lista, o hashcat emparelha os dois arquivos linha a linha. “phases” escolhe quais fases são executadas, da mais barata para a mais cara; o padrão “words,rules,pcfg” só termina quando é interrompido. Configurações com prefixo de fase: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</translation>
+    </message>
+    <message>
+        <source>PCFG</source>
+        <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</source>
+        <translation>Uma linha é um arquivo de conjunto de regras, uma pasta com um Grammar/grammar.txt ou um nome incluído. Somente as linhas marcadas são usadas; se nenhuma estiver marcada, o default-passwords incluído no hashcat é executado. hints também é incluído.</translation>
+    </message>
+    <message>
+        <source>A ruleset folder needs a Grammar/grammar.txt.</source>
+        <translation>Uma pasta de conjunto de regras precisa de um Grammar/grammar.txt.</translation>
+    </message>
+    <message>
+        <source>Scale:</source>
+        <translation>Scale:</translation>
+    </message>
+    <message>
+        <source>Quantization steps per bit (1–64)</source>
+        <translation>Passos de quantização por bit (1–64)</translation>
+    </message>
+    <message>
+        <source>Costmax:</source>
+        <translation>Costmax:</translation>
+    </message>
+    <message>
+        <source>Highest cost level to enumerate (1–64)</source>
+        <translation>Nível de custo mais alto a enumerar (1–64)</translation>
+    </message>
+    <message>
+        <source>Weights:</source>
+        <translation>Weights:</translation>
+    </message>
+    <message>
+        <source>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</source>
+        <translation>Um valor por conjunto de regras, números simples separados por dois-pontos, p. ex., 2:1 para dois conjuntos de regras. A quantidade deve corresponder ao número de conjuntos de regras.</translation>
+    </message>
+    <message>
+        <source>Threads:</source>
+        <translation>Threads:</translation>
+    </message>
+    <message>
+        <source>Cores that generate base words (0–16); 0 runs on the calling thread</source>
+        <translation>Núcleos que geram palavras-base (0–16); 0 executa na thread chamadora</translation>
+    </message>
+    <message>
+        <source>auto</source>
+        <translation>auto</translation>
+    </message>
+    <message>
+        <source>Kbits:</source>
+        <translation>Kbits:</translation>
+    </message>
+    <message>
+        <source>Bits one inner loop may span (0–27)</source>
+        <translation>Bits que um loop interno pode abranger (0–27)</translation>
+    </message>
+    <message>
+        <source>Maxword:</source>
+        <translation>Maxword:</translation>
+    </message>
+    <message>
+        <source>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</source>
+        <translation>Candidatos que o kernel constrói por palavra-base: 0, 16 ou 32 (múltiplo de 16)</translation>
+    </message>
+    <message>
+        <source>Maxgain:</source>
+        <translation>Maxgain:</translation>
+    </message>
+    <message>
+        <source>1.0–64.0; decimal point is a dot, not the locale separator</source>
+        <translation>1.0–64.0; o separador decimal é um ponto, não o separador da localidade</translation>
+    </message>
+    <message>
+        <source>Walk:</source>
+        <translation>Walk:</translation>
+    </message>
+    <message>
+        <source>1 steps the last token instead of unraking it</source>
+        <translation>1 avança o último token passo a passo em vez de aplicar “unraking” a ele</translation>
+    </message>
+    <message>
+        <source>Mask:</source>
+        <translation>Máscara:</translation>
+    </message>
+    <message>
+        <source>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</source>
+        <translation>Limitar a gramática aos candidatos que esta máscara admite; não pode ser combinado com omen=1, nem com hintaccount enquanto as palavras de dica vierem das contas (informe hintwords ou hintfile em vez disso)</translation>
+    </message>
+    <message>
+        <source>Extra settings (key=value):</source>
+        <translation>Configurações extras (key=value):</translation>
+    </message>
+    <message>
+        <source>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</source>
+        <translation>Configurações key=value adicionais, separadas por espaços: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Tudo depois do primeiro key=value é uma configuração, portanto os conjuntos de regras devem vir primeiro.</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Tabela</translation>
+    </message>
+    <message>
+        <source>Every checked row after the wordlist is a table</source>
+        <translation>Toda linha marcada após a lista de palavras é uma tabela</translation>
+    </message>
+    <message>
+        <source>Add tables…</source>
+        <translation>Adicionar tabelas…</translation>
+    </message>
+    <message>
+        <source>Identity:</source>
+        <translation>Identity:</translation>
+    </message>
+    <message>
+        <source>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</source>
+        <translation>Se deixar um token inalterado é uma de suas opções: 1 (padrão) o mantém, 0 o descarta para que a tabela produza apenas variações. Não pode ser combinado com single=1.</translation>
+    </message>
+    <message>
+        <source>Template:</source>
+        <translation>Template:</translation>
+    </message>
+    <message>
+        <source>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</source>
+        <translation>1 lê a lista de palavras como um conjunto de padrões: nenhuma palavra é retornada inalterada, e palavras que não correspondem a nenhuma regra são descartadas. 0 (padrão) mantém as palavras inalteradas.</translation>
+    </message>
+    <message>
+        <source>Single:</source>
+        <translation>Single:</translation>
+    </message>
+    <message>
+        <source>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</source>
+        <translation>single=1 faz cada candidato carregar exatamente uma substituição, em vez do produto cartesiano de todas as posições correspondentes; geralmente é um ataque diferente e mais barato.</translation>
+    </message>
+    <message>
+        <source>Cap:</source>
+        <translation>Cap:</translation>
+    </message>
+    <message>
+        <source>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</source>
+        <translation>Máximo de substituições que uma fonte pode carregar em uma palavra; 0 significa sem limite. Limita apenas o produto cartesiano no lado do host, não uma execução com single=1.</translation>
+    </message>
+    <message>
+        <source>Maxperm:</source>
+        <translation>Maxperm:</translation>
+    </message>
+    <message>
+        <source>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</source>
+        <translation>Quantos elementos do produto cartesiano de uma palavra o host enumera antes de desistir; 0 significa sem limite. Nenhuma célula do dispositivo é cortada.</translation>
+    </message>
+    <message>
+        <source>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</source>
+        <translation>Configurações key=value adicionais, separadas por espaços. Tudo depois do primeiro key=value é uma configuração, portanto as tabelas devem vir primeiro.</translation>
+    </message>
+    <message>
+        <source>Generic feed</source>
+        <translation>Feed genérico</translation>
+    </message>
+    <message>
+        <source>Feed:</source>
+        <translation>Feed:</translation>
+    </message>
+    <message>
+        <source>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</source>
+        <translation>Gerador de candidatos. Qualquer coisa que contenha uma barra é tratada como caminho de feed; caso contrário, o hashcat procura feed_&lt;name&gt; em seu diretório de feeds. Os argumentos abaixo são específicos de cada feed.</translation>
+    </message>
+    <message>
+        <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
+        <translation>wordlist, stdin, random, association, pcfg, table, hybrid, mask ou um caminho de feed</translation>
+    </message>
+    <message>
+        <source>Browse…</source>
+        <translation>Procurar…</translation>
+    </message>
+    <message>
+        <source>Argument:</source>
+        <translation>Argumento:</translation>
+    </message>
+    <message>
+        <source>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</source>
+        <translation>Argumento passado ao feed. Seu significado e quantidade dependem do feed (o feed wordlist recebe caminhos de listas de palavras); tokens extras vão direto para o feed.</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Adicionar</translation>
+    </message>
+    <message>
+        <source>Arguments the feed reads, in order; only checked rows are used</source>
+        <translation>Argumentos que o feed lê, em ordem; somente as linhas marcadas são usadas</translation>
+    </message>
+    <message>
         <source>Rules</source>
         <translation>Regras</translation>
     </message>
@@ -213,12 +447,52 @@
         <translation>Usar arquivos de regras:</translation>
     </message>
     <message>
+        <source>Enable rules file slot 1 for this run.</source>
+        <translation>Ativar o slot 1 de arquivo de regras nesta execução.</translation>
+    </message>
+    <message>
         <source>Rules file:</source>
         <translation>Arquivo de regras:</translation>
     </message>
     <message>
+        <source>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
+        <translation>Arquivo de regras do slot 1; aplicado a cada palavra. Deixe em branco para não usar o slot.</translation>
+    </message>
+    <message>
+        <source>Enable rules file slot 2 for this run.</source>
+        <translation>Ativar o slot 2 de arquivo de regras nesta execução.</translation>
+    </message>
+    <message>
+        <source>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
+        <translation>Arquivo de regras do slot 2; aplicado a cada palavra. Deixe em branco para não usar o slot.</translation>
+    </message>
+    <message>
+        <source>Enable rules file slot 3 for this run.</source>
+        <translation>Ativar o slot 3 de arquivo de regras nesta execução.</translation>
+    </message>
+    <message>
+        <source>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
+        <translation>Arquivo de regras do slot 3; aplicado a cada palavra. Deixe em branco para não usar o slot.</translation>
+    </message>
+    <message>
+        <source>Generate the rules automatically instead of reading them from a file.</source>
+        <translation>Gerar as regras automaticamente em vez de lê-las de um arquivo.</translation>
+    </message>
+    <message>
         <source>Generate rules:</source>
         <translation>Gerar regras:</translation>
+    </message>
+    <message>
+        <source>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</source>
+        <translation>Quantas regras gerar para o ataque de busca de regras. Nenhum arquivo de regras é lido, o hashcat as constrói sozinho; use um arquivo de regras existente com os slots acima.</translation>
+    </message>
+    <message>
+        <source>Pass every rules file to hashcat in one run, instead of one run per file.</source>
+        <translation>Passar todos os arquivos de regras ao hashcat em uma única execução, em vez de uma execução por arquivo.</translation>
+    </message>
+    <message>
+        <source>Join -r files into one list</source>
+        <translation>Unir os arquivos -r em uma única lista</translation>
     </message>
     <message>
         <source>Wordlist rules</source>
@@ -231,6 +505,10 @@
     <message>
         <source>Right rule:</source>
         <translation>Regra direita:</translation>
+    </message>
+    <message>
+        <source>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</source>
+        <translation>Interpretar os conjuntos de caracteres personalizados como bytes hexadecimais. Aplica-se aos conjuntos de caracteres personalizados de 1 a 4.</translation>
     </message>
     <message>
         <source>Charset is hex</source>
@@ -310,59 +588,63 @@
     </message>
     <message>
         <source>Open…</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir…</translation>
     </message>
     <message>
         <source>Assume the salt is given in hexadecimal.</source>
-        <translation type="unfinished"></translation>
+        <translation>Presumir que o salt é informado em hexadecimal.</translation>
     </message>
     <message>
         <source>Add files…</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar arquivos…</translation>
     </message>
     <message>
         <source>Assume words in the wordlist are given in hexadecimal.</source>
-        <translation type="unfinished"></translation>
+        <translation>Presumir que as palavras da lista de palavras são informadas em hexadecimal.</translation>
     </message>
     <message>
         <source>Single rule applied to each word from the left wordlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Regra única aplicada a cada palavra da lista de palavras da esquerda.</translation>
     </message>
     <message>
         <source>Single rule applied to each word from the right wordlist.</source>
-        <translation type="unfinished"></translation>
+        <translation>Regra única aplicada a cada palavra da lista de palavras da direita.</translation>
     </message>
     <message>
         <source>Increment the mask length from the minimum to the maximum.</source>
-        <translation type="unfinished"></translation>
+        <translation>Incrementar o comprimento da máscara do mínimo ao máximo.</translation>
     </message>
     <message>
         <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprimento mínimo da máscara; 0 usa o padrão do hashcat.</translation>
     </message>
     <message>
         <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprimento máximo da máscara; 0 usa o padrão do hashcat.</translation>
     </message>
     <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Abortar a sessão após este número de segundos; 0 executa até o hashcat terminar.</translation>
     </message>
     <message>
         <source>&#xa0;s</source>
-        <translation type="unfinished"></translation>
+        <translation>&#xa0;s</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pular este número de candidatos desde o início.</translation>
     </message>
     <message>
         <source>Only test this many candidates after the skipped ones.</source>
-        <translation type="unfinished"></translation>
+        <translation>Testar apenas este número de candidatos depois dos pulados.</translation>
+    </message>
+    <message>
+        <source>Keep updating the run status (speed, progress, ETA) instead of printing one final line.</source>
+        <translation>Continuar atualizando o status da execução (velocidade, progresso, tempo estimado) em vez de imprimir uma única linha final.</translation>
     </message>
     <message>
         <source>Seconds between status updates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Segundos entre as atualizações de status.</translation>
     </message>
     <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
@@ -381,12 +663,12 @@
         <translation>Ativar kernels otimizados (limita o comprimento da senha)</translation>
     </message>
     <message>
-        <source>Return expected speed of the attack, then quit</source>
-        <translation>Retornar a velocidade esperada do ataque e sair</translation>
+        <source>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</source>
+        <translation>Mostrar apenas a velocidade do ataque e sair, sem quebrar. Útil para benchmarks e para comparar configurações.</translation>
     </message>
     <message>
-        <source>Override workload profile</source>
-        <translation>Substituir o perfil de carga de trabalho</translation>
+        <source>Return expected speed of the attack, then quit</source>
+        <translation>Retornar a velocidade esperada do ataque e sair</translation>
     </message>
     <message>
         <source>Resources</source>
@@ -405,10 +687,6 @@
         <translation>Tipos de dispositivo:</translation>
     </message>
     <message>
-        <source>Segment size:</source>
-        <translation>Tamanho do segmento:</translation>
-    </message>
-    <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
         <translation>Fixar o hashcat a estes dispositivos de CPU, separados por vírgulas. Deixe em branco para que o hashcat decida.</translation>
     </message>
@@ -417,59 +695,66 @@
         <translation>Dispositivos a usar, separados por vírgulas. Deixe em branco para usar todos os dispositivos.</translation>
     </message>
     <message>
-        <source>How much of the wordlist hashcat caches in memory, in MB. Lower it if hashcat runs out of memory.</source>
-        <translation>Quanto da lista de palavras o hashcat mantém em cache na memória, em MB. Reduza o valor se o hashcat ficar sem memória.</translation>
-    </message>
-    <message>
-        <source>&#xa0;MB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Abort when a device reaches this temperature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Abortar quando um dispositivo atingir esta temperatura.</translation>
     </message>
     <message>
         <source>&#xa0;°C</source>
-        <translation type="unfinished"></translation>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Built-in variables:
 
 &lt;hash&gt; = current hash filename or hash
 &lt;unixtime&gt; = current Unix timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Variáveis integradas:
+
+&lt;hash&gt; = nome do arquivo de hashes atual ou hash
+&lt;unixtime&gt; = carimbo de data/hora Unix atual</translation>
     </message>
     <message>
         <source>Save…</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar…</translation>
     </message>
     <message>
         <source>Do not write recovered hashes to the potfile.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não gravar os hashes recuperados no potfile.</translation>
     </message>
     <message>
         <source>Settings…</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações…</translation>
     </message>
     <message>
         <source>Import Settings…</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar configurações…</translation>
     </message>
     <message>
         <source>Export Settings…</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar configurações…</translation>
     </message>
     <message>
         <source>Export Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar sessão…</translation>
     </message>
     <message>
         <source>Import Session…</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar sessão…</translation>
     </message>
     <message>
         <source>Abort above</source>
         <translation>Abortar acima de</translation>
+    </message>
+    <message>
+        <source>Cache path:</source>
+        <translation>Caminho do cache:</translation>
+    </message>
+    <message>
+        <source>Directory hashcat keeps its cache in. Must exist.</source>
+        <translation>Diretório em que o hashcat mantém seu cache. Deve existir.</translation>
+    </message>
+    <message>
+        <source>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</source>
+        <translation>Abortar a sessão quando o ponto quente de um dispositivo OpenCL exceder este número de graus Celsius. 0 desativa o limite térmico.</translation>
     </message>
     <message>
         <source>Outfile</source>
@@ -482,6 +767,14 @@
     <message>
         <source>Format:</source>
         <translation>Formato:</translation>
+    </message>
+    <message>
+        <source>Write the outfile as JSON. The outfile format is ignored.</source>
+        <translation>Gravar o arquivo de saída como JSON. O formato do arquivo de saída é ignorado.</translation>
+    </message>
+    <message>
+        <source>Write JSON</source>
+        <translation>Gravar JSON</translation>
     </message>
     <message>
         <source>Do not write the potfile</source>
@@ -591,41 +884,43 @@ Padrão: 1,2</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipos de dispositivo OpenCL a usar, separados por vírgulas.</translation>
     </message>
     <message>
         <source>Export session</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar sessão</translation>
     </message>
     <message>
         <source>Session exported to “%1”.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sessão exportada para “%1”.</translation>
     </message>
     <message>
         <source>Import session</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar sessão</translation>
     </message>
     <message>
         <source>Session imported from “%1”.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sessão importada de “%1”.</translation>
     </message>
     <message>
         <source>Session imported from “%1”.
 
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Sessão importada de “%1”.
+
+%2</translation>
     </message>
     <message>
         <source>Export settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar configurações</translation>
     </message>
     <message>
         <source>Import settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar configurações</translation>
     </message>
     <message>
         <source>Settings loaded from “%1”.</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurações carregadas de “%1”.</translation>
     </message>
     <message>
         <source>Review them and save to apply them.</source>
@@ -633,19 +928,11 @@ Padrão: 1,2</translation>
     </message>
     <message>
         <source>Load example session</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load the example session? The current session is lost.
-
-The example cracks a test SHA-256 hash; hashcat should recover the password Nice!98.</source>
-        <translation>Carregar a sessão de exemplo? A sessão atual será perdida.
-
-O exemplo quebra um hash SHA-256 de teste; o hashcat deve recuperar a senha Nice!98.</translation>
+        <translation>Carregar sessão de exemplo</translation>
     </message>
     <message>
         <source>Reset session</source>
-        <translation type="unfinished"></translation>
+        <translation>Redefinir sessão</translation>
     </message>
     <message>
         <source>Reset every field to its default? The current session is lost.</source>
@@ -692,46 +979,132 @@ O exemplo quebra um hash SHA-256 de teste; o hashcat deve recuperar a senha Nice
         <translation>Híbrido: máscara + lista de palavras</translation>
     </message>
     <message>
+        <source>Generic (feed)</source>
+        <translation>Genérico (feed)</translation>
+    </message>
+    <message>
         <source>Association</source>
         <translation>Associação</translation>
     </message>
     <message>
+        <source>Hybrid (mask + ?w/?q)</source>
+        <translation>Híbrido (máscara + ?w/?q)</translation>
+    </message>
+    <message>
         <source>Updating…</source>
-        <translation type="unfinished"></translation>
+        <translation>Atualizando…</translation>
     </message>
     <message>
         <source>Failed to load hash types</source>
-        <translation type="unfinished"></translation>
+        <translation>Falha ao carregar os tipos de hash</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly 2 wordlists (left, right).</source>
+        <translation>Este modo precisa de exatamente 2 listas de palavras (esquerda, direita).</translation>
+    </message>
+    <message>
+        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
+        <translation>Este modo executa o conjunto de regras default-passwords incluído no hashcat; informe um ou mais para usar os seus.</translation>
+    </message>
+    <message>
+        <source>This mode needs one wordlist and at least one table.</source>
+        <translation>Este modo precisa de uma lista de palavras e de pelo menos uma tabela.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed. Arguments depend on the feed — random and stdin need none, wordlist needs a path.</source>
+        <translation>Este modo precisa de um feed. Os argumentos dependem do feed: random e stdin não precisam de nenhum, wordlist precisa de um caminho.</translation>
+    </message>
+    <message>
+        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
+        <translation>Este modo precisa de no máximo uma lista de palavras. Sem ela, as palavras vêm do arquivo de hashes e a linha de configurações pode limitar a execução; com uma, os dois arquivos são emparelhados linha a linha.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
+        <translation>Este modo precisa de uma máscara com exatamente um ?w; um ?q depois de ?w indica uma segunda lista de palavras.</translation>
     </message>
     <message>
         <source>Open hash file</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir arquivo de hashes</translation>
     </message>
     <message>
         <source>Save output file</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar arquivo de saída</translation>
+    </message>
+    <message>
+        <source>Open cache directory</source>
+        <translation>Abrir diretório de cache</translation>
     </message>
     <message>
         <source>Add wordlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionar listas de palavras</translation>
+    </message>
+    <message>
+        <source>Add wordlist folder</source>
+        <translation>Adicionar pasta de listas de palavras</translation>
+    </message>
+    <message>
+        <source>Add rulesets</source>
+        <translation>Adicionar conjuntos de regras</translation>
+    </message>
+    <message>
+        <source>Add ruleset folder</source>
+        <translation>Adicionar pasta de conjunto de regras</translation>
+    </message>
+    <message>
+        <source>Add tables</source>
+        <translation>Adicionar tabelas</translation>
+    </message>
+    <message>
+        <source>Open feed file</source>
+        <translation>Abrir arquivo de feed</translation>
+    </message>
+    <message>
+        <source>This folder has no wordlists. hashcat reads the regular files directly inside it, not subfolders.</source>
+        <translation>Esta pasta não tem listas de palavras. O hashcat lê os arquivos comuns diretamente dentro dela, não as subpastas.</translation>
+    </message>
+    <message>
+        <source>This ruleset folder has no Grammar/grammar.txt:
+%1</source>
+        <translation>Esta pasta de conjunto de regras não tem Grammar/grammar.txt:
+%1</translation>
+    </message>
+    <message>
+        <source>This ruleset does not exist:
+%1</source>
+        <translation>Este conjunto de regras não existe:
+%1</translation>
+    </message>
+    <message>
+        <source>A table must be a file; hashcat does not read a folder:
+%1</source>
+        <translation>Uma tabela deve ser um arquivo; o hashcat não lê uma pasta:
+%1</translation>
+    </message>
+    <message>
+        <source>This table does not exist:
+%1</source>
+        <translation>Esta tabela não existe:
+%1</translation>
     </message>
     <message>
         <source>Open rules file</source>
-        <translation type="unfinished"></translation>
+        <translation>Abrir arquivo de regras</translation>
     </message>
     <message>
         <source>Could not start “%1”: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível iniciar “%1”: %2</translation>
     </message>
     <message>
         <source>The configured terminal “%1” is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
-        <translation type="unfinished"></translation>
+        <translation>O terminal configurado “%1” não está disponível. Terminais disponíveis: %2
+Acesse %3 → %4 para alterá-lo.</translation>
     </message>
     <message>
         <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este modo precisa de exatamente %1 listas de palavras (esquerda, direita).
+Selecionadas no momento: %2.</translation>
     </message>
     <message>
         <source>Failed to obtain supported hash types.
@@ -748,16 +1121,32 @@ Erro: %1</translation>
         <translation>Defina o caminho do hashcat em %1 → %2 para carregar os tipos de hash disponíveis.</translation>
     </message>
     <message>
-        <source>This mode needs exactly %1 wordlists (left, right).</source>
-        <translation>Este modo precisa de exatamente %1 listas de palavras (esquerda, direita).</translation>
-    </message>
-    <message>
         <source>This mode needs a wordlist and a mask.</source>
         <translation>Este modo precisa de uma lista de palavras e de uma máscara.</translation>
     </message>
     <message>
         <source>This mode needs a mask.</source>
         <translation>Este modo precisa de uma máscara.</translation>
+    </message>
+    <message>
+        <source>Load the %1 example? The current session is lost.
+
+The example cracks a test hash; hashcat should recover the password %2.</source>
+        <translation>Carregar o exemplo %1? A sessão atual será perdida.
+
+O exemplo quebra um hash de teste; o hashcat deve recuperar a senha %2.</translation>
+    </message>
+    <message>
+        <source>Could not create the example directory “%1”.</source>
+        <translation>Não foi possível criar o diretório de exemplo “%1”.</translation>
+    </message>
+    <message>
+        <source>Could not read the bundled file “%1”: %2</source>
+        <translation>Não foi possível ler o arquivo incluído “%1”: %2</translation>
+    </message>
+    <message>
+        <source>Could not write “%1”: %2</source>
+        <translation>Não foi possível gravar “%1”: %2</translation>
     </message>
     <message>
         <source>This mode needs at least one wordlist.</source>
@@ -798,8 +1187,88 @@ Acesse %2 → %3 para alterá-lo.</translation>
         <translation>Acesse &lt;b&gt;%1 → %2&lt;/b&gt; para selecionar o terminal usado na inicialização.</translation>
     </message>
     <message>
+        <source>This mode takes at most %1 wordlists.
+Currently selected: %2.</source>
+        <translation>Este modo aceita no máximo %1 listas de palavras.
+Selecionadas no momento: %2.</translation>
+    </message>
+    <message>
+        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
+        <translation>Aqui o hashcat emparelha os dois arquivos linha a linha; esta interface oferece apenas uma lista de palavras para esse papel.</translation>
+    </message>
+    <message>
+        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
+%1</source>
+        <translation>Esta lista de palavras deve ser um arquivo: o hashcat a lê como a lista de palavras multiplicada (o lado ?q), e uma pasta não pode ser usada ali:
+%1</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one table.</source>
+        <translation>Este modo precisa de pelo menos uma tabela.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
+        <translation>Este modo precisa de um feed: um nome incluído (wordlist, stdin, random, …) ou o caminho de um arquivo de feed.</translation>
+    </message>
+    <message>
+        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
+        <translation>Este modo emparelha as listas de palavras com a máscara; a máscara precisa de um ?w para a palavra.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?w.</source>
+        <translation>A máscara contém mais de um ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains a ?q before the first ?w.</source>
+        <translation>A máscara contém um ?q antes do primeiro ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?q.</source>
+        <translation>A máscara contém mais de um ?q.</translation>
+    </message>
+    <message>
+        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
+        <translation>A máscara indica uma segunda palavra com ?q, mas apenas uma lista de palavras está selecionada.</translation>
+    </message>
+    <message>
+        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
+        <translation>Duas listas de palavras estão selecionadas, mas a máscara não tem ?q para a segunda.</translation>
+    </message>
+    <message>
+        <source>The increment is not offered in this hybrid mode.</source>
+        <translation>O incremento não é oferecido neste modo híbrido.</translation>
+    </message>
+    <message>
+        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
+        <translation>Os marcadores ?w e ?q só são oferecidos no modo híbrido (máscara + listas de palavras).</translation>
+    </message>
+    <message>
+        <source>The setting “%1” is not valid for this mode.</source>
+        <translation>A configuração “%1” não é válida para este modo.</translation>
+    </message>
+    <message>
+        <source>The token “%1” is not a setting; settings are written as key=value.</source>
+        <translation>O token “%1” não é uma configuração; as configurações são escritas como key=value.</translation>
+    </message>
+    <message>
+        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
+        <translation>A linha de configurações só se aplica enquanto as palavras vêm do arquivo de hashes. Limpe a linha de configurações ou a lista de listas de palavras.</translation>
+    </message>
+    <message>
+        <source>The hash type 4000 describes its hashes as a recipe, for example
+md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
+        <translation>O tipo de hash 4000 descreve seus hashes como uma receita, por exemplo
+md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
+    </message>
+    <message>
         <source>The minimum increment length is larger than the maximum.</source>
         <translation>O comprimento mínimo do incremento é maior que o máximo.</translation>
+    </message>
+    <message>
+        <source>The cache path must be an existing directory:
+%1</source>
+        <translation>O caminho do cache deve ser um diretório existente:
+%1</translation>
     </message>
     <message>
         <source>The increment cannot be combined with the speed-only option.</source>
@@ -822,15 +1291,15 @@ Acesse %2 → %3 para alterá-lo.</translation>
     </message>
     <message>
         <source>hashcat</source>
-        <translation type="unfinished">hashcat</translation>
+        <translation>hashcat</translation>
     </message>
     <message>
         <source>&amp;hashcat executable</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Executável do hashcat</translation>
     </message>
     <message>
         <source>Select…</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar…</translation>
     </message>
     <message>
         <source>&amp;Terminal</source>
@@ -926,23 +1395,27 @@ Acesse %2 → %3 para alterá-lo.</translation>
     </message>
     <message>
         <source>The hashcat path “%1” was not found on this computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>O caminho do hashcat “%1” não foi encontrado neste computador.</translation>
     </message>
     <message>
         <source>The terminal “%1” is not installed and was not applied.</source>
-        <translation type="unfinished"></translation>
+        <translation>O terminal “%1” não está instalado e não foi aplicado.</translation>
     </message>
     <message>
         <source>The color scheme “%1” is not offered and was not applied.</source>
-        <translation type="unfinished"></translation>
+        <translation>O esquema de cores “%1” não é oferecido e não foi aplicado.</translation>
     </message>
     <message>
         <source>The language “%1” is not offered and was not applied.</source>
-        <translation type="unfinished"></translation>
+        <translation>O idioma “%1” não é oferecido e não foi aplicado.</translation>
     </message>
     <message>
         <source>The configured terminal “%1” is not installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>O terminal configurado “%1” não está instalado.</translation>
+    </message>
+    <message>
+        <source>Executable Files (*.exe *.bin hashcat);;All Files (*)</source>
+        <translation>Arquivos executáveis (*.exe *.bin hashcat);;Todos os arquivos (*)</translation>
     </message>
     <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
@@ -959,10 +1432,6 @@ Acesse %2 → %3 para alterá-lo.</translation>
     <message>
         <source>Select the hashcat executable</source>
         <translation>Selecionar o executável do hashcat</translation>
-    </message>
-    <message>
-        <source>Executable Files (*.exe *.bin);;All Files (*)</source>
-        <translation>Arquivos executáveis (*.exe *.bin);;Todos os arquivos (*)</translation>
     </message>
     <message>
         <source>Invalid file</source>
@@ -997,27 +1466,27 @@ Acesse %2 → %3 para alterá-lo.</translation>
     </message>
     <message>
         <source>Could not open “%1” for writing: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível abrir “%1” para gravação: %2</translation>
     </message>
     <message>
         <source>Could not write to “%1”: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível gravar em “%1”: %2</translation>
     </message>
     <message>
         <source>Could not open “%1” for reading: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Não foi possível abrir “%1” para leitura: %2</translation>
     </message>
     <message>
         <source>The file does not contain a “%1” section.</source>
-        <translation type="unfinished"></translation>
+        <translation>O arquivo não contém uma seção “%1”.</translation>
     </message>
     <message>
         <source>The file does not contain a “%1” section; it holds %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>O arquivo não contém uma seção “%1”; ele contém %2.</translation>
     </message>
     <message>
         <source>The “%1” section does not contain any values.</source>
-        <translation type="unfinished"></translation>
+        <translation>A seção “%1” não contém nenhum valor.</translation>
     </message>
     <message>
         <source> and </source>

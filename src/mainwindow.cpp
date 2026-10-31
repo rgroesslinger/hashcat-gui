@@ -1689,7 +1689,7 @@ QString MainWindow::modeHint(AttackMode mode) const
     case AttackMode::BruteForce:
         return tr("This mode needs a mask.");
     case AttackMode::Pcfg:
-        return tr("This mode runs hashcat's bundled default-passwords ruleset; "
+        return tr("This mode runs hashcat’s bundled default-passwords ruleset; "
                   "name one or more to use your own.");
     case AttackMode::Table:
         return tr("This mode needs one wordlist and at least one table.");
@@ -2295,7 +2295,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
                            .arg(detail);
         if (currentAttackMode() == AttackMode::Association) {
             text += QLatin1Char('\n')
-                    + tr("Hashcat pairs the two files by line here; this GUI offers "
+                    + tr("hashcat pairs the two files by line here; this GUI offers "
                          "only one wordlist for that role.");
         }
         box.setText(text);
