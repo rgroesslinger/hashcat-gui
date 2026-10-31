@@ -1431,7 +1431,7 @@ void TestMainWindow::addingPathsKeepsTheListClean()
                                {QStringLiteral("/tmp/a.txt"), QString(),
                                 QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")});
     QCOMPARE(wordlists->count(), 2);
-    QCOMPARE(wordlists->item(0)->text(), QStringLiteral("/tmp/a.txt"));
+    QCOMPARE(wordlists->item(0)->text(), QDir::toNativeSeparators(QStringLiteral("/tmp/a.txt")));
     QCOMPARE(wordlists->item(0)->checkState(), Qt::Checked);
     QCOMPARE(wordlists->item(1)->checkState(), Qt::Checked);
 

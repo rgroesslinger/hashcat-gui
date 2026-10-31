@@ -26,7 +26,19 @@ bool isBundledName(const QString &path)
 bool hasWordlistFiles(const QString &path)
 {
     const QDir folder(path);
-    return !folder.entryInfoList(QDir::Files | QDir::NoDotAndDotDot).isEmpty();
+    // hashcat's scan_directory() skips names starting with '.' on every platform,
+    // but QDir only treats those as hidden on Unix: on Windows a dotfile is an
+    // ordinary file, and QDir::Files hides the attribute-hidden ones instead.
+    // Ask for both and apply hashcat's rule, so the folder is judged the way the
+    // feed will read it.
+    const QFileInfoList entries =
+        folder.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
+    for (const QFileInfo &info : entries) {
+        if (!info.fileName().startsWith(QLatin1Char('.'))) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace
 
