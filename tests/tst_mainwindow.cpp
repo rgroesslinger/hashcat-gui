@@ -17,6 +17,7 @@
 #include <QAction>
 #include <QClipboard>
 #include <QComboBox>
+#include <QCompleter>
 #include <QDir>
 #include <QDoubleSpinBox>
 #include <QFile>
@@ -219,6 +220,7 @@ private slots:
     void cleanup();
     void freshWindowMatchesTheDefaultOptions();
     void commandPreviewFollowsWidgetChanges();
+    void hashTypeComboIsSearchable();
     void attackModeIdsTravelAsItemData();
     void widgetsFollowTheBuilderPredicates();
     void groupBoxesShareOneTitleAlignment();
@@ -400,6 +402,29 @@ void TestMainWindow::commandPreviewFollowsWidgetChanges()
 
     window.ui->checkBox_increment->setChecked(true);
     QVERIFY(preview->text().contains(QStringLiteral("--increment")));
+}
+
+void TestMainWindow::hashTypeComboIsSearchable()
+{
+    MainWindow window;
+
+    // The constructor makes the field editable and gives it a completer.
+    QVERIFY(window.ui->comboBox_hash_type->isEditable());
+    QCompleter *completer = window.ui->comboBox_hash_type->completer();
+    QVERIFY(completer != nullptr);
+
+    // The list arrives asynchronously and is refilled as hashcat changes, so
+    // the completer is bound to the combo's own model, not a snapshot taken
+    // at construction: it has to follow every later clear()/addItem().
+    QVERIFY(completer->model() == window.ui->comboBox_hash_type->model());
+
+    // A hundred entries that differ only in case make case-insensitivity the
+    // whole feature.
+    QCOMPARE(completer->caseSensitivity(), Qt::CaseInsensitive);
+
+    // The completer's popup does not realize its filter under the offscreen
+    // platform used by the tests, so the filtered match itself cannot be
+    // observed here; the configuration above is what the feature depends on.
 }
 
 void TestMainWindow::attackModeIdsTravelAsItemData()

@@ -21,6 +21,7 @@
 #include <QAbstractItemModel>
 #include <QAction>
 #include <QClipboard>
+#include <QCompleter>
 #include <QCursor>
 #include <QDir>
 #include <QFileDialog>
@@ -231,6 +232,17 @@ QJsonValue withExamplePaths(const QJsonValue &value, const QString &directory)
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // The hash type list is searchable through a completer. It must be editable
+    // before the completer is set - a completer on a non-editable combo is
+    // refused - and NoInsert keeps a name the completer does not match from
+    // becoming the selection, so the current id is always a real one.
+    ui->comboBox_hash_type->setEditable(true);
+    ui->comboBox_hash_type->setInsertPolicy(QComboBox::NoInsert);
+    QCompleter *hashTypeCompleter = ui->comboBox_hash_type->completer();
+    hashTypeCompleter->setCompletionMode(QCompleter::PopupCompletion);
+    hashTypeCompleter->setFilterMode(Qt::MatchContains);
+    hashTypeCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 
     // The path rows say what they are at a glance: a file, a folder, or the
     // warning of a path hashcat cannot use. The style owns the pixmaps, and

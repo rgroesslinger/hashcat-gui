@@ -12,6 +12,7 @@
 - The feed modes are validated before launch: PCFG and table settings (range, repeated keys, a grammar held to the mask with `omen=1` or hint words without a source), the hybrid mode's `?w`/`?q` markers against the selected wordlists, the association settings line next to a wordlist, and a cache path that is not a directory
 - A folder can be selected as a wordlist (the base lists only - the multiplied `?q` list has to be a file) and as a PCFG ruleset when it holds a `Grammar/grammar.txt`; a table is still a file only
 - Wordlists and PCFG rulesets offer an “Add folder…” button; an empty wordlist folder, a ruleset folder without a grammar and a folder in the table list are marked, and a folder in the `?q` slot is refused before launch
+- The hash type selector is searchable and provides auto completions
 
 ## 0.8.0 (2026-10-25)
 
