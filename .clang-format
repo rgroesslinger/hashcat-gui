@@ -1,10 +1,27 @@
+# base is LLVM coding style, add only things that diverge from this style!
 BasedOnStyle: LLVM
+
+# enforce C++20
 Standard: c++20
+
+# 4 spaces indent
 IndentWidth: 4
-AccessModifierOffset: -4                   # public:/private: at column 0
-BreakBeforeBraces: Linux                   # functions Allman, control statements attached (Qt house style)
-InsertBraces: true                         # keep readability-braces-around-statements quiet (clang-format >= 15)
-BreakBeforeBinaryOperators: NonAssignment  # wrapped binary operators start the line (Qt house style)
-AllowShortFunctionsOnASingleLine: InlineOnly  # only inline functions merge onto one line (Qt house style)
-SortIncludes: Never                        # keep the hand-grouped include order
-ColumnLimit: 100                           # Qt/KDE convention
+
+# public:/private: at column 0
+AccessModifierOffset: -4
+
+# break before braces on function, namespace and class definitions
+BreakBeforeBraces: Linux
+
+# keep readability-braces-around-statements quiet
+InsertBraces: true
+
+# In case we have an if statement with multiple lines the operator should be
+# at the beginning of the line but we do not want to break assignments
+BreakBeforeBinaryOperators: NonAssignment
+
+# keep lambda formatting multi-line if not empty
+AllowShortFunctionsOnASingleLine: Empty
+
+# line breaking
+ColumnLimit: 100

@@ -4,19 +4,20 @@
  */
 
 #include "helperutils.h"
-#include "settingsmanager.h"
+
 #include "appconstants.h"
 #include "commandbuilder.h"
-#include <QProcess>
-#include <QRegularExpression>
-#include <QString>
-#include <QStandardPaths>
+#include "settingsmanager.h"
+
 #include <QFileInfo>
 #include <QFuture>
 #include <QGuiApplication>
+#include <QProcess>
+#include <QRegularExpression>
+#include <QStandardPaths>
+#include <QString>
 #include <QStyleHints>
 #include <QtConcurrent/QtConcurrentRun>
-
 #include <algorithm>
 #include <utility>
 

@@ -3,6 +3,7 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "pathmonitor.h"
 #include "testenvironment.h"
 
 #include <QDir>
@@ -10,8 +11,6 @@
 #include <QSaveFile>
 #include <QSignalSpy>
 #include <QTemporaryDir>
-
-#include "pathmonitor.h"
 
 namespace
 {

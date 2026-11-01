@@ -3,7 +3,13 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "appconstants.h"
+#include "helperutils.h"
+#include "settingsdialog.h"
+#include "settingsmanager.h"
+#include "statefile.h"
 #include "testenvironment.h"
+#include "ui_settingsdialog.h"
 
 #include <QDir>
 #include <QFile>
@@ -13,14 +19,6 @@
 #include <QJsonObject>
 #include <QLabel>
 #include <QPushButton>
-
-#include "appconstants.h"
-#include "helperutils.h"
-#include "settingsdialog.h"
-#include "settingsmanager.h"
-#include "statefile.h"
-#include "ui_settingsdialog.h"
-
 #include <iterator>
 
 namespace

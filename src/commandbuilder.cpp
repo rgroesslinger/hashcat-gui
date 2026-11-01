@@ -4,6 +4,7 @@
  */
 
 #include "commandbuilder.h"
+
 #include "appconstants.h"
 
 #include <QDateTime>

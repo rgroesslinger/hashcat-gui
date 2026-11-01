@@ -4,6 +4,7 @@
  */
 
 #include "statefile.h"
+
 #include "appconstants.h"
 
 #include <QDir>

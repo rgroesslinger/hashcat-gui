@@ -4,11 +4,13 @@
  */
 
 #include "settingsdialog.h"
-#include "ui_settingsdialog.h"
-#include "settingsmanager.h"
-#include "helperutils.h"
-#include "statefile.h"
+
 #include "appconstants.h"
+#include "helperutils.h"
+#include "settingsmanager.h"
+#include "statefile.h"
+#include "ui_settingsdialog.h"
+
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDir>
@@ -19,7 +21,6 @@
 #include <QPushButton>
 #include <QShowEvent>
 #include <QUrl>
-
 #include <algorithm>
 #include <iterator>
 

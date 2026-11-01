@@ -9,7 +9,6 @@
 #include <QLatin1StringView>
 #include <QString>
 #include <QtGlobal>
-
 #include <type_traits>
 
 // Application wide constants.

@@ -7,7 +7,6 @@
 
 #include <QDir>
 #include <QFileInfo>
-
 #include <utility>
 
 namespace

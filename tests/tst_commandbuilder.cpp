@@ -3,14 +3,13 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "appconstants.h"
+#include "commandbuilder.h"
+#include "hashcatoptions.h"
 #include "testenvironment.h"
 
 #include <QDateTime>
 #include <QSet>
-
-#include "appconstants.h"
-#include "commandbuilder.h"
-#include "hashcatoptions.h"
 
 // Everything the argument rules promise: what reaches the hashcat command
 // line, in which order, and what is deliberately left out of it.

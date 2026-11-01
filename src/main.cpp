@@ -3,15 +3,16 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "appconstants.h"
+#include "helperutils.h"
+#include "mainwindow.h"
+#include "settingsmanager.h"
+
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QIcon>
 #include <QLocale>
 #include <QTranslator>
-#include "mainwindow.h"
-#include "settingsmanager.h"
-#include "helperutils.h"
-#include "appconstants.h"
 
 int main(int argc, char *argv[])
 {

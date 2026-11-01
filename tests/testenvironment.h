@@ -6,8 +6,8 @@
 #ifndef TESTENVIRONMENT_H
 #define TESTENVIRONMENT_H
 
-#include <QApplication>
 #include <QAbstractButton>
+#include <QApplication>
 #include <QByteArray>
 #include <QCoreApplication>
 #include <QDialog>
@@ -134,7 +134,10 @@ public:
         qputenv("PATH", path);
     }
 
-    ~PathGuard() { qputenv("PATH", m_previous); }
+    ~PathGuard()
+    {
+        qputenv("PATH", m_previous);
+    }
 
     PathGuard(const PathGuard &) = delete;
     PathGuard &operator=(const PathGuard &) = delete;

@@ -3,7 +3,11 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "aboutdialog.h"
+#include "appconstants.h"
+#include "settingsmanager.h"
 #include "testenvironment.h"
+#include "updatechecker.h"
 
 #include <QClipboard>
 #include <QGroupBox>
@@ -11,11 +15,6 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSysInfo>
-
-#include "aboutdialog.h"
-#include "appconstants.h"
-#include "settingsmanager.h"
-#include "updatechecker.h"
 
 namespace
 {

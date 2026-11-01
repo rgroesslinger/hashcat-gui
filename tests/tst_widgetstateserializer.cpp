@@ -4,6 +4,7 @@
  */
 
 #include "testenvironment.h"
+#include "widgetstateserializer.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -14,8 +15,6 @@
 #include <QListWidget>
 #include <QRadioButton>
 #include <QSpinBox>
-
-#include "widgetstateserializer.h"
 
 // What the mapping between a form and its values does: every widget type the
 // serializer knows, the fields the caller asked to keep out, and the names of

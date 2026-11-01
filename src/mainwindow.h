@@ -6,19 +6,18 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QListWidgetItem>
-#include <QComboBox>
-#include <QFutureWatcher>
-#include <QIcon>
-#include <QProcess>
-#include <QShowEvent>
-
 #include "hashcatoptions.h"
 #include "helperutils.h"
 #include "pathmonitor.h"
 
+#include <QComboBox>
+#include <QFutureWatcher>
+#include <QIcon>
 #include <QJsonObject>
+#include <QListWidgetItem>
+#include <QMainWindow>
+#include <QProcess>
+#include <QShowEvent>
 
 namespace Ui
 {

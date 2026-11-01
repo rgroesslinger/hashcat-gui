@@ -6,17 +6,16 @@
 #ifndef HELPERUTILS_H
 #define HELPERUTILS_H
 
-#include <QCoreApplication>
-#include <QMap>
-#include <QString>
-#include <QStringList>
-#include <QProcess>
-#include <QFuture>
-
-#include <cstdint>
-
 #include "appconstants.h"
 #include "hashcatoptions.h"
+
+#include <QCoreApplication>
+#include <QFuture>
+#include <QMap>
+#include <QProcess>
+#include <QString>
+#include <QStringList>
+#include <cstdint>
 
 // Result of a single hashcat invocation.
 //

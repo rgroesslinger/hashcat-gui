@@ -3,12 +3,11 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "appconstants.h"
 #include "testenvironment.h"
 
 #include <QDir>
 #include <QFile>
-
-#include "appconstants.h"
 
 // What main() loads from and what the settings dialog offers have to be the
 // same thing: the catalogs are inside the binary - not files sitting next to

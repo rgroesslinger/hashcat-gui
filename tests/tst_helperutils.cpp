@@ -3,19 +3,17 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
-#include "testenvironment.h"
-
-#include <QElapsedTimer>
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
-#include <QTemporaryDir>
-
-#include <iterator>
-
 #include "appconstants.h"
 #include "helperutils.h"
 #include "settingsmanager.h"
+#include "testenvironment.h"
+
+#include <QDir>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QFileInfo>
+#include <QTemporaryDir>
+#include <iterator>
 
 // The conditions that keep Execute from starting anything, the terminal
 // table, and the hashcat helper process itself.
@@ -52,7 +50,10 @@ private slots:
 
 private:
     // The stubs only make sense where a #! line does
-    bool stubsAvailable() const { return !m_okScript.isEmpty(); }
+    bool stubsAvailable() const
+    {
+        return !m_okScript.isEmpty();
+    }
 
     QString m_okScript;
     QString m_sleepingScript;

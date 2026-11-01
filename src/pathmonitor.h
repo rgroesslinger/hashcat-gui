@@ -10,7 +10,6 @@
 #include <QHash>
 #include <QObject>
 #include <QStringList>
-
 #include <cstdint>
 
 // Keeps track of whether the paths of one list are usable by hashcat.

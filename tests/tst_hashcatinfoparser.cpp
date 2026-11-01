@@ -3,9 +3,8 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
-#include "testenvironment.h"
-
 #include "hashcatinfoparser.h"
+#include "testenvironment.h"
 
 // The parser decides what reaches the hash type list on screen. A reply that
 // cannot be used must leave that list alone and say why; a usable one must

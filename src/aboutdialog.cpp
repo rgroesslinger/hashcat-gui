@@ -4,11 +4,13 @@
  */
 
 #include "aboutdialog.h"
-#include "ui_aboutdialog.h"
+
+#include "appconstants.h"
 #include "helperutils.h"
 #include "settingsmanager.h"
+#include "ui_aboutdialog.h"
 #include "updatechecker.h"
-#include "appconstants.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QCursor>
@@ -16,12 +18,12 @@
 #include <QFileInfo>
 #include <QFont>
 #include <QFutureWatcher>
-#include <QPushButton>
-#include <QShowEvent>
 #include <QLabel>
 #include <QPixmap>
-#include <QSysInfo>
+#include <QPushButton>
+#include <QShowEvent>
 #include <QStringList>
+#include <QSysInfo>
 #include <QTextLayout>
 #include <QTextOption>
 #include <QTimer>

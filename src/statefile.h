@@ -7,8 +7,8 @@
 #define STATEFILE_H
 
 #include <QCoreApplication>
-#include <QLatin1StringView>
 #include <QJsonObject>
+#include <QLatin1StringView>
 #include <QString>
 #include <QStringList>
 

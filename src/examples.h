@@ -6,9 +6,9 @@
 #ifndef EXAMPLES_H
 #define EXAMPLES_H
 
-#include <QLatin1StringView>
-
 #include "hashcatoptions.h"
+
+#include <QLatin1StringView>
 
 // The bundled example sessions, one per supported attack mode.
 //

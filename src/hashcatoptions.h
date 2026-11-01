@@ -6,11 +6,11 @@
 #ifndef HASHCATOPTIONS_H
 #define HASHCATOPTIONS_H
 
+#include "appconstants.h"
+
 #include <QString>
 #include <QStringList>
 #include <cstdint>
-
-#include "appconstants.h"
 
 // Supported attack modes, as numbered by hashcat (-a).
 enum class AttackMode : std::uint8_t {

@@ -4,40 +4,42 @@
  */
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+
 #include "aboutdialog.h"
-#include "settingsdialog.h"
-#include "settingsmanager.h"
 #include "appconstants.h"
 #include "commandbuilder.h"
 #include "examples.h"
 #include "hashcatinfoparser.h"
 #include "helperutils.h"
+#include "settingsdialog.h"
+#include "settingsmanager.h"
 #include "statefile.h"
+#include "ui_mainwindow.h"
 #include "widgetstateserializer.h"
+
+#include <QAbstractButton>
+#include <QAbstractItemModel>
 #include <QAction>
+#include <QClipboard>
+#include <QCursor>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFutureWatcher>
+#include <QIcon>
+#include <QIntValidator>
 #include <QJsonArray>
+#include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QProcess>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QSaveFile>
-#include <QAbstractButton>
-#include <QAbstractItemModel>
-#include <QClipboard>
-#include <QCursor>
-#include <QFutureWatcher>
-#include <QIcon>
-#include <QLayout>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSignalBlocker>
-#include <QRegularExpression>
-#include <QRegularExpressionValidator>
-#include <QIntValidator>
 #include <QStandardPaths>
 #include <QStyle>
 #include <QTextDocument>

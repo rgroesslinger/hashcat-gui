@@ -4,6 +4,7 @@
  */
 
 #include "settingsmanager.h"
+
 #include <QCoreApplication>
 
 SettingsManager::SettingsManager()

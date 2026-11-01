@@ -4,6 +4,7 @@
  */
 
 #include "updatechecker.h"
+
 #include "appconstants.h"
 
 #include <QCoreApplication>

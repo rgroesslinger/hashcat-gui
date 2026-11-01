@@ -6,12 +6,11 @@
 #ifndef COMMANDBUILDER_H
 #define COMMANDBUILDER_H
 
+#include "hashcatoptions.h"
+
 #include <QString>
 #include <QStringList>
-
 #include <cstdint>
-
-#include "hashcatoptions.h"
 
 // Turns a HashcatOptions into the hashcat argument vector.
 //

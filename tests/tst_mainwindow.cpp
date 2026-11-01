@@ -3,15 +3,24 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "appconstants.h"
+#include "commandbuilder.h"
+#include "examples.h"
+#include "hashcatoptions.h"
+#include "mainwindow.h"
+#include "settingsmanager.h"
+#include "statefile.h"
 #include "testenvironment.h"
+#include "ui_mainwindow.h"
+#include "widgetstateserializer.h"
 
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
 #include <QAction>
 #include <QClipboard>
 #include <QComboBox>
+#include <QDir>
 #include <QDoubleSpinBox>
+#include <QFile>
+#include <QFileInfo>
 #include <QGroupBox>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -22,27 +31,16 @@
 #include <QMenu>
 #include <QPointer>
 #include <QRadioButton>
+#include <QScreen>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QSet>
 #include <QSpinBox>
 #include <QStandardPaths>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QScreen>
 #include <QTimer>
 #include <QToolTip>
 #include <QWidget>
-
 #include <utility>
-
-#include "appconstants.h"
-#include "commandbuilder.h"
-#include "examples.h"
-#include "hashcatoptions.h"
-#include "mainwindow.h"
-#include "settingsmanager.h"
-#include "ui_mainwindow.h"
-#include "statefile.h"
-#include "widgetstateserializer.h"
 
 namespace
 {

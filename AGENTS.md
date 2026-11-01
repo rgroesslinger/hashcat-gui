@@ -63,21 +63,21 @@ lists, build system, translations, packaging) also check `build-release.yml`, CI
   WidgetStateSerializer, SettingsManager, UpdateChecker, PathMonitor) stays testable.
 - Attack-mode gating predicates live in `CommandBuilder` and are reused for group-box
   enablement; `modeRequirements()` derives mode hint and launch validation from them.
+- Bundled example sessions (`Tools → Load Example Session`) live in `src/examples.h` (data,
+  not hashcat option docs): one `Entry` per attack mode in `All`, ordered like the combo. The
+  session JSON and its wordlists/rules/tables are `:/sessions/…` qrc resources whose paths are
+  prefixed with `Examples::DataPrefix` and unpacked into `Examples::DataDirectory` at load.
 - Launch: `HelperUtils::validateOptions()` (mode needs), then `validateLaunch()` (path,
   binary, terminal). hashcat starts detached (`CREATE_NEW_CONSOLE` on Windows).
 - `UpdateChecker` (About dialog) is async over `QNetworkAccessManager` to GitHub. Tests never
   contact GitHub: `evaluateResponse()` parses canned JSON, `tst_updatechecker` uses a loopback
   `QTcpServer`, and `AboutDialog` injects a checker via its private constructor
   (`friend class TestAboutDialog`).
-- `AboutDialog` sizes to `sizeHint()` in `showEvent`, not the constructor: wrapped labels get
-  their height after polish; once per open, so user resizes survive hide/show.
-- `PathMonitor` watches each input's parent directory (`QFileSystemWatcher` cannot watch a
-  missing path), plus the directory itself for wordlists and PCFG rulesets: an empty wordlist
-  folder and a ruleset folder without `Grammar/grammar.txt` are unusable, and both can gain
-  the missing entry later. Its `Kind` decides what is usable - wordlists and PCFG take a
-  folder, tables never do, and a bare ruleset name such as `default-passwords` is resolved by
-  hashcat and never flagged. A missing or unusable path replaces the file/folder icon of its row
-  with the warning icon and a tooltip.
+- `PathMonitor` decides which rows count as usable: its `Kind` rules - only wordlists and
+  PCFG rulesets may be folders (an empty wordlist folder, and a ruleset without
+  `Grammar/grammar.txt`, are unusable), tables are file-only, and a bare ruleset name such as
+  `default-passwords` is resolved by hashcat and never flagged. A missing or unusable path
+  swaps the row's file/folder icon for a warning icon with a tooltip.
 - Every row of the wordlist, ruleset, table and feed lists carries a check state: an unchecked
   row keeps its place and its session entry, but is left out of the command and out of the
   launch validation.
@@ -104,41 +104,30 @@ it goes through `attackIndexChanged()`.
 
 ### WidgetStateSerializer
 
-- Converts a widget tree to/from JSON. Known children (`QLineEdit`, `QCheckBox`, `QComboBox`,
-  `QRadioButton`, `QSpinBox`, `QDoubleSpinBox`, `QListWidget`) are keyed by `objectName`; those
-  names are the session format. Qt-created internals and unnamed widgets are skipped.
-- `applyToWidgets()` returns names no widget claimed (foreign/old file, hand edit) and names
-  the widget cannot take; the caller reports both.
+- Converts a widget tree to/from JSON; the object names it keys on are the session format.
+  Returns the values nothing claimed and the wrong-typed ones - the caller reports both
+  (mechanics: `widgetstateserializer.h`).
 - Combo values are item data (attack id, hash id, workload level), never display text. Only a
   combo without item data falls back to position; an unknown identifier leaves it untouched.
-- `AppConstants::Files::PreviewWidget` is excluded; the file itself is `StateFile`'s business.
 
 ### StateFile
 
-- One envelope for session and settings: `sections`, each with `version` and `values`. Frozen:
-  changing it makes older files unreadable; section versions live inside and cannot protect it.
-- Writes replace the whole file, never merge: the caller decides every section (one per file
-  today). A combined file would write all explicitly, not merge, which keeps stale/foreign
-  sections alive.
-- Section names are constants (`AppConstants::FileSections`), never class names; the session
-  section was once the class name, so a rename would orphan every saved session.
-- `session.json` is a constant named after its section; its version cannot protect the name —
-  a rename would leave every existing session unread.
-- Per-section versions (`Sessions::Version`, `Settings::Version`): widget names and setting
-  keys change independently. Bump on a rename, not an addition (an added key is reported by
-  name); this is not the application version.
-- Removing a widget is neither: keep the version and add the object name to
-  `AppConstants::Sessions::RetiredWidgetNames`, which `MainWindow::applySessionFile()` passes as
-  ignored. A session written before the removal then loads without a note, while a name that was
-  never ours is still reported. A retired name is never reused; `tst_mainwindow` enforces it.
-- A newer version is refused before applying: a bump signals a rename, so a surviving name may
-  mean something else. An older file is applied and unapplicable values are named; unknown or
-  wrong-typed values in the same version are skipped and named, not refused.
-- Never destroy an unknown file: leave it, report it at start, overwrite only when this version
-  understands it.
-- The class owns only the envelope (no widgets/settings); the caller passes and compares the
-  version. Another section's file is refused by name; a multi-section file is read for the
-  wanted one, and the others are named.
+The envelope rules are commented at length in `statefile.h` and `appconstants.h`; the traps
+worth remembering before touching either:
+
+- The envelope (the file's shape) is frozen; per-section versions
+  (`AppConstants::Sessions::Version`, `Settings::Version`) are bumped on a widget/setting
+  *rename*, never on an addition.
+- Section names and `session.json` are constants, not class names - the session section was
+  once keyed by class name, so renaming either orphans every saved file (and a version bump
+  cannot protect a name).
+- A removed widget is neither: its object name goes into
+  `AppConstants::Sessions::RetiredWidgetNames` (never reuse a retired one; `tst_mainwindow`
+  enforces it) and the version stays.
+- A newer version is refused; an older one is applied with unknown/wrong-typed values named.
+  Never destroy a file this version cannot understand - leave it and report it.
+- The class owns only the envelope; the caller passes and compares the version, and writes
+  replace the whole file (no merging) - the caller decides every section.
 
 ### Settings
 
@@ -159,8 +148,7 @@ it goes through `attackIndexChanged()`.
 - Protocol tokens, settings keys, defaults and file names go in `src/appconstants.h`. Fixed
   hashcat syntax/help tables stay non-translatable.
 - Non-QObject classes needing `tr()` use `Q_DECLARE_TR_FUNCTIONS(...)`.
-- Style: 4-space indent, 100 columns, Allman functions, wrapped operators at line start, no
-  include sorting (`clang-format` enforces it).
+- Style follows `.clang-format` (enforced by the `clang-format` target).
 - Comments carry the *why* (constraint, platform quirk, trade-off), not what the code says.
 
 **Translations**
@@ -171,7 +159,7 @@ it goes through `attackIndexChanged()`.
   release refresh once by hand and commit them; new strings arrive untranslated.
 - Adding a language: update `HASHCAT_GUI_TRANSLATIONS` and
   `AppConstants::Languages::Available` (English has no catalog); `tst_translations` enforces
-  the match.
+  the match, but skips when the build produced no embedded `.qm` (no LinguistTools).
 
 **Tests**
 - Use `TestEnvironment::run`, not `QTEST_MAIN`: it redirects XDG config/data/cache dirs so

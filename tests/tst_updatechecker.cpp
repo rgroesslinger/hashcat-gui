@@ -4,6 +4,7 @@
  */
 
 #include "testenvironment.h"
+#include "updatechecker.h"
 
 #include <QHostAddress>
 #include <QNetworkAccessManager>
@@ -12,8 +13,6 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QUrl>
-
-#include "updatechecker.h"
 
 namespace
 {
@@ -55,7 +54,10 @@ public:
         });
     }
 
-    QByteArray request() const { return m_request; }
+    QByteArray request() const
+    {
+        return m_request;
+    }
 
     QUrl url(const QString &path = QStringLiteral("/latest")) const
     {

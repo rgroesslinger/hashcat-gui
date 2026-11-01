@@ -3,14 +3,13 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "appconstants.h"
+#include "statefile.h"
 #include "testenvironment.h"
 
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
-
-#include "appconstants.h"
-#include "statefile.h"
 
 // The envelope of the files the application writes: the session it keeps
 // between two runs and the settings the user exports share it, so the class

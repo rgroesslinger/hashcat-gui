@@ -6,17 +6,16 @@
 #include "widgetstateserializer.h"
 
 #include <QAbstractSpinBox>
-#include <QLineEdit>
 #include <QCheckBox>
 #include <QComboBox>
-#include <QRadioButton>
-#include <QSpinBox>
 #include <QDoubleSpinBox>
-#include <QListWidget>
-#include <QListWidgetItem>
 #include <QJsonArray>
 #include <QJsonObject>
-
+#include <QLineEdit>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QRadioButton>
+#include <QSpinBox>
 #include <algorithm>
 
 // Whether the entries of a combo box carry identifiers (item data) at all.
@@ -55,9 +54,7 @@ static bool isApplicationWidget(const QWidget *widget)
            && !parent->metaObject()->inherits(&QComboBox::staticMetaObject);
 }
 
-WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent)
-{
-}
+WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent) {}
 
 QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &ignoredWidgets)
 {
