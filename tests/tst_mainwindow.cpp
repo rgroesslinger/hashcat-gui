@@ -264,6 +264,7 @@ private slots:
     void commandBarStaysVisibleOnEveryTab();
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
+    void noShortcutCombinesControlAndAlt();
     void theImportNamesTheValuesTheSessionDoesNotKnow();
     void theImportIgnoresRetiredWidgetNames();
     void aStartupSessionWithRetiredNamesStaysQuiet();
@@ -2421,6 +2422,29 @@ void TestMainWindow::theSettingsAreImportedThroughTheFileMenu()
     const QString preview = window.ui->lineEdit_command->text();
     QVERIFY2(preview.startsWith(QStringLiteral("hashcat-from-the-file")), qPrintable(preview));
     QVERIFY2(preview.contains(QStringLiteral(" -a 0")), qPrintable(preview));
+}
+
+// Ctrl+Alt is how Qt reports AltGr on Windows unless the application starts
+// with -platform windows:altgr. A shortcut on that combination would swallow
+// characters such as Euro on German and French layouts while the user types
+// into the hash or mask field. Keeping the pair out of the action list is the
+// only portable guard; a test cannot see AltGr itself.
+void TestMainWindow::noShortcutCombinesControlAndAlt()
+{
+    MainWindow window;
+
+    const auto actions = window.findChildren<QAction *>();
+    QVERIFY(!actions.isEmpty());
+    for (const QAction *action : actions) {
+        const QKeySequence shortcut = action->shortcut();
+        for (int i = 0; i < shortcut.count(); ++i) {
+            const Qt::KeyboardModifiers modifiers = shortcut[i].keyboardModifiers();
+            QVERIFY2(
+                !(modifiers.testFlag(Qt::ControlModifier) && modifiers.testFlag(Qt::AltModifier)),
+                qPrintable(
+                    QStringLiteral("%1: %2").arg(action->objectName(), shortcut.toString())));
+        }
+    }
 }
 
 // A session file that names a widget this version does not know - it was

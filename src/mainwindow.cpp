@@ -84,14 +84,15 @@ QString escapeRichText(QString text)
 }
 
 // A menu path names the entry, not the action: the ellipsis of an entry that
-// opens a dialog is not part of "File → Settings".
+// opens a dialog is not part of "File → Settings", and neither is the
+// mnemonic marker (the titles read "&File" so Alt+F can reach them).
 QString menuPath(const QString &text)
 {
     QString path = text;
     if (path.endsWith(QStringLiteral("…"))) {
         path.chop(1);
     }
-    return path.trimmed();
+    return path.remove(QLatin1Char('&')).trimmed();
 }
 
 // The argument list as the preview and the clipboard show it: one token per
@@ -287,7 +288,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
     const QString charsetTip = tr("Built-in charsets:") + QLatin1String("\n\n")
                                + QString::fromUtf8(AppConstants::HelpText::BuiltinCharsets);
-    ui->lineEdit_mask->setToolTip(charsetTip);
+    ui->lineEdit_mask->setToolTip(tr("Password candidate mask. ?1–?4 insert a custom charset, "
+                                     "?w inserts the wordlist word and ?q a second wordlist word "
+                                     "in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.")
+                                  + QLatin1String("\n\n") + charsetTip);
     ui->lineEdit_custom_charset1->setToolTip(charsetTip);
     ui->lineEdit_custom_charset2->setToolTip(charsetTip);
     ui->lineEdit_custom_charset3->setToolTip(charsetTip);

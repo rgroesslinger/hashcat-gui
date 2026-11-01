@@ -100,7 +100,7 @@
               <item>
                <widget class="QLineEdit" name="lineEdit_hashfile">
                <property name="toolTip">
-                 <string>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</string>
+                 <string>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</string>
                </property>
                 <property name="enabled">
                  <bool>true</bool>
@@ -112,8 +112,14 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_open_hashfile">
+                <property name="toolTip">
+                 <string>Choose a file of hashes.</string>
+                </property>
                 <property name="text">
                  <string>Open…</string>
+                </property>
+                <property name="accessibleName">
+                 <string>Open hash file</string>
                 </property>
                </widget>
               </item>
@@ -137,7 +143,7 @@
               <item>
                <widget class="QCheckBox" name="checkBox_remove">
                  <property name="toolTip">
-                   <string>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</string>
+                   <string>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</string>
                  </property>
                 <property name="text">
                  <string>Remove hash from hash list once it is cracked</string>
@@ -147,7 +153,7 @@
               <item>
                <widget class="QCheckBox" name="checkBox_ignoreusername">
                  <property name="toolTip">
-                   <string>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</string>
+                   <string>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</string>
                  </property>
                 <property name="text">
                  <string>Ignore username in hash file</string>
@@ -255,8 +261,7 @@
                <bool>false</bool>
                 </property>
                 <property name="toolTip">
-               <string>Unix: 'md5(md5(salt) . pass)'
-               Windows: &quot;md5('abc' . pass)&quot;</string>
+               <string>Hash recipe, e.g. 'md5(md5(salt) . pass)'. Wrap it in the shell’s outer quote and inner strings in the other; PowerShell needs a backtick before $.</string>
                 </property>
                </widget>
               </item>
@@ -319,6 +324,9 @@
                        <property name="arrowType">
                         <enum>Qt::ArrowType::UpArrow</enum>
                        </property>
+                       <property name="accessibleName">
+                        <string>Move selected wordlist up</string>
+                       </property>
                       </widget>
                      </item>
                      <item>
@@ -335,17 +343,26 @@
                        <property name="arrowType">
                         <enum>Qt::ArrowType::DownArrow</enum>
                        </property>
+                       <property name="accessibleName">
+                        <string>Move selected wordlist down</string>
+                       </property>
                       </widget>
                      </item>
                     </layout>
                    </item>
                    <item>
                     <widget class="QPushButton" name="pushButton_add_wordlist">
+                     <property name="toolTip">
+                      <string>Add one or more wordlist files. Each checked row is passed to hashcat.</string>
+                     </property>
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Add wordlists</string>
                      </property>
                      <property name="text">
                       <string>Add files…</string>
@@ -363,6 +380,9 @@
                      <property name="toolTip">
                       <string>hashcat reads every file directly inside the folder as one wordlist.</string>
                      </property>
+                     <property name="accessibleName">
+                      <string>Add wordlist folder</string>
+                     </property>
                      <property name="text">
                       <string>Add folder…</string>
                      </property>
@@ -370,6 +390,9 @@
                    </item>
                    <item>
                     <widget class="QPushButton" name="pushButton_remove_wordlist">
+                     <property name="toolTip">
+                      <string>Remove the selected wordlists.</string>
+                     </property>
                      <property name="enabled">
                       <bool>false</bool>
                      </property>
@@ -378,6 +401,9 @@
                        <horstretch>0</horstretch>
                        <verstretch>0</verstretch>
                       </sizepolicy>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Remove wordlists</string>
                      </property>
                      <property name="text">
                       <string>Remove</string>
@@ -492,7 +518,7 @@
                <bool>false</bool>
               </property>
               <property name="toolTip">
-               <string>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</string>
+               <string>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">phases=words,rules</string>
@@ -541,7 +567,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</string>
+               <string>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -558,6 +584,12 @@
                      </property>
                      <item>
              <widget class="QPushButton" name="pushButton_open_pcfg_ruleset">
+              <property name="toolTip">
+               <string>Add one or more PCFG ruleset files.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Add PCFG rulesets</string>
+              </property>
               <property name="text">
                <string>Add files…</string>
               </property>
@@ -568,6 +600,9 @@
               <property name="toolTip">
                <string>A ruleset folder needs a Grammar/grammar.txt.</string>
               </property>
+              <property name="accessibleName">
+               <string>Add ruleset folder</string>
+              </property>
               <property name="text">
                <string>Add folder…</string>
               </property>
@@ -575,6 +610,12 @@
                      </item>
                      <item>
              <widget class="QPushButton" name="pushButton_remove_pcfg_ruleset">
+              <property name="toolTip">
+               <string>Remove the selected rulesets.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Remove rulesets</string>
+              </property>
               <property name="text">
                <string>Remove</string>
               </property>
@@ -591,6 +632,9 @@
               <property name="arrowType">
                <enum>Qt::ArrowType::UpArrow</enum>
               </property>
+              <property name="accessibleName">
+               <string>Move selected ruleset up</string>
+              </property>
              </widget>
                      </item>
                      <item>
@@ -603,6 +647,9 @@
               </property>
               <property name="arrowType">
                <enum>Qt::ArrowType::DownArrow</enum>
+              </property>
+              <property name="accessibleName">
+               <string>Move selected ruleset down</string>
               </property>
              </widget>
                      </item>
@@ -690,7 +737,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</string>
+               <string>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">1</string>
@@ -759,7 +806,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</string>
+               <string>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</string>
               </property>
               <property name="placeholderText">
                <string>auto</string>
@@ -805,7 +852,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>1 steps the last token instead of unraking it</string>
+               <string>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">1</string>
@@ -828,7 +875,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</string>
+               <string>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">?u?l?l?l?l?d?d?d</string>
@@ -850,14 +897,14 @@
                <string>Extra settings (key=value):</string>
               </property>
               <property name="toolTip">
-               <string>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</string>
+               <string>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</string>
               </property>
              </widget>
                 </item>
                 <item>
              <widget class="QLineEdit" name="lineEdit_pcfg_extra">
               <property name="toolTip">
-               <string>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</string>
+               <string>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">omen=1</string>
@@ -926,6 +973,9 @@
                      </property>
                      <item>
              <widget class="QPushButton" name="pushButton_open_table">
+              <property name="toolTip">
+               <string>Add one or more table files.</string>
+              </property>
               <property name="text">
                <string>Add tables…</string>
               </property>
@@ -933,6 +983,12 @@
                      </item>
                      <item>
              <widget class="QPushButton" name="pushButton_remove_table">
+              <property name="toolTip">
+               <string>Remove the selected tables.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Remove tables</string>
+              </property>
               <property name="text">
                <string>Remove</string>
               </property>
@@ -970,7 +1026,7 @@
                  <item row="1" column="0">
              <widget class="QLineEdit" name="lineEdit_table_identity">
                <property name="toolTip">
-                 <string>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</string>
+                 <string>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</string>
                </property>
               <property name="minimumSize">
                <size>
@@ -993,7 +1049,7 @@
                  <item row="1" column="1">
              <widget class="QLineEdit" name="lineEdit_table_template">
                <property name="toolTip">
-                 <string>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</string>
+                 <string>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</string>
                </property>
               <property name="minimumSize">
                <size>
@@ -1016,7 +1072,7 @@
                  <item row="1" column="2">
              <widget class="QLineEdit" name="lineEdit_table_single">
                <property name="toolTip">
-                 <string>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</string>
+                 <string>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</string>
                </property>
               <property name="minimumSize">
                <size>
@@ -1039,7 +1095,7 @@
                  <item row="3" column="0">
              <widget class="QLineEdit" name="lineEdit_table_cap">
                <property name="toolTip">
-                 <string>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</string>
+                 <string>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</string>
                </property>
               <property name="minimumSize">
                <size>
@@ -1062,7 +1118,7 @@
                  <item row="3" column="1">
              <widget class="QLineEdit" name="lineEdit_table_maxperm">
                <property name="toolTip">
-                 <string>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</string>
+                 <string>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</string>
                </property>
               <property name="minimumSize">
                <size>
@@ -1090,14 +1146,14 @@
                <string>Extra settings (key=value):</string>
               </property>
               <property name="toolTip">
-               <string>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</string>
+               <string>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</string>
               </property>
              </widget>
                 </item>
                 <item>
              <widget class="QLineEdit" name="lineEdit_table_extra">
               <property name="toolTip">
-               <string>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</string>
+               <string>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</string>
               </property>
              </widget>
                 </item>
@@ -1136,7 +1192,7 @@
                  <item>
              <widget class="QLineEdit" name="lineEdit_feed">
                <property name="toolTip">
-                 <string>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</string>
+                 <string>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</string>
                </property>
               <property name="placeholderText">
                <string>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</string>
@@ -1145,6 +1201,12 @@
                  </item>
                  <item>
              <widget class="QPushButton" name="pushButton_open_feed">
+              <property name="toolTip">
+               <string>Browse for a feed plugin instead of naming it.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Browse for a feed plugin</string>
+              </property>
               <property name="text">
                <string>Browse…</string>
               </property>
@@ -1167,12 +1229,15 @@
                  <item>
              <widget class="QLineEdit" name="lineEdit_feed_argument">
                <property name="toolTip">
-                 <string>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</string>
+                 <string>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</string>
                </property>
              </widget>
                  </item>
                  <item>
              <widget class="QPushButton" name="pushButton_add_feed_argument">
+              <property name="toolTip">
+               <string>Add an argument for the feed, in order.</string>
+              </property>
               <property name="text">
                <string>Add</string>
               </property>
@@ -1212,6 +1277,12 @@
                  </property>
                  <item>
              <widget class="QPushButton" name="pushButton_remove_feed_argument">
+              <property name="toolTip">
+               <string>Remove the selected feed arguments.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Remove feed arguments</string>
+              </property>
               <property name="text">
                <string>Remove</string>
               </property>
@@ -1228,6 +1299,9 @@
               <property name="arrowType">
                <enum>Qt::ArrowType::UpArrow</enum>
               </property>
+              <property name="accessibleName">
+               <string>Move selected feed argument up</string>
+              </property>
              </widget>
                  </item>
                  <item>
@@ -1240,6 +1314,9 @@
               </property>
               <property name="arrowType">
                <enum>Qt::ArrowType::DownArrow</enum>
+              </property>
+              <property name="accessibleName">
+               <string>Move selected feed argument down</string>
               </property>
              </widget>
                  </item>
@@ -1285,6 +1362,9 @@
                    </property>
                    <item>
                     <widget class="QRadioButton" name="radioButton_use_rules_file">
+                     <property name="toolTip">
+                      <string>Read rules from the files below instead of generating them.</string>
+                     </property>
                      <property name="text">
                       <string>Use rules files:</string>
                      </property>
@@ -1307,7 +1387,7 @@
                           <string>Enable rules file slot 1 for this run.</string>
                         </property>
                        <property name="text">
-                        <string>Rules file:</string>
+                        <string>Rules file 1:</string>
                        </property>
                       </widget>
                      </item>
@@ -1338,11 +1418,17 @@
                      </item>
                      <item>
                       <widget class="QPushButton" name="pushButton_open_rulesfile_1">
+                       <property name="toolTip">
+                        <string>Choose the rule file for slot 1.</string>
+                       </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
                        <property name="text">
                         <string>Open…</string>
+                       </property>
+                       <property name="accessibleName">
+                        <string>Open rules file 1</string>
                        </property>
                       </widget>
                      </item>
@@ -1359,7 +1445,7 @@
                           <string>Enable rules file slot 2 for this run.</string>
                         </property>
                        <property name="text">
-                        <string>Rules file:</string>
+                        <string>Rules file 2:</string>
                        </property>
                       </widget>
                      </item>
@@ -1390,11 +1476,17 @@
                      </item>
                      <item>
                       <widget class="QPushButton" name="pushButton_open_rulesfile_2">
+                       <property name="toolTip">
+                        <string>Choose the rule file for slot 2.</string>
+                       </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
                        <property name="text">
                         <string>Open…</string>
+                       </property>
+                       <property name="accessibleName">
+                        <string>Open rules file 2</string>
                        </property>
                       </widget>
                      </item>
@@ -1411,7 +1503,7 @@
                           <string>Enable rules file slot 3 for this run.</string>
                         </property>
                        <property name="text">
-                        <string>Rules file:</string>
+                        <string>Rules file 3:</string>
                        </property>
                       </widget>
                      </item>
@@ -1442,11 +1534,17 @@
                      </item>
                      <item>
                       <widget class="QPushButton" name="pushButton_open_rulesfile_3">
+                       <property name="toolTip">
+                        <string>Choose the rule file for slot 3.</string>
+                       </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
                        <property name="text">
                         <string>Open…</string>
+                       </property>
+                       <property name="accessibleName">
+                        <string>Open rules file 3</string>
                        </property>
                       </widget>
                      </item>
@@ -1473,7 +1571,7 @@
                      <item>
                       <widget class="QSpinBox" name="spinBox_generate_rules">
                         <property name="toolTip">
-                          <string>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</string>
+                          <string>Number of random rules hashcat generates (-g). Only used with Generate rules; no rule file is read.</string>
                         </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -1518,7 +1616,7 @@
                      <item>
                       <widget class="QCheckBox" name="checkBox_rules_concat">
                        <property name="toolTip">
-                        <string>Pass every rules file to hashcat in one run, instead of one run per file.</string>
+                        <string>Treat every -r file as one list: rule counts add instead of multiplying.</string>
                        </property>
                        <property name="text">
                         <string>Join -r files into one list</string>
@@ -1825,7 +1923,7 @@
                    <item>
                     <widget class="QCheckBox" name="checkBox_hex_charset">
                      <property name="toolTip">
-                      <string>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</string>
+                      <string>Interpret the mask and custom charsets as hexadecimal bytes.</string>
                      </property>
                      <property name="text">
                       <string>Charset is hex</string>
@@ -2002,7 +2100,7 @@
                       <bool>false</bool>
                      </property>
                      <property name="toolTip">
-                      <string>Seconds between status updates.</string>
+                      <string>Seconds between status updates; only used when automatic status is enabled.</string>
                      </property>
                      <property name="suffix">
                       <string> s</string>
@@ -2066,6 +2164,9 @@
                  </property>
                  <item>
                   <widget class="QCheckBox" name="checkBox_optimized_kernel">
+                   <property name="toolTip">
+                    <string>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</string>
+                   </property>
                    <property name="text">
                     <string>Enable optimized kernels (limits password length)</string>
                    </property>
@@ -2074,7 +2175,7 @@
                  <item>
                   <widget class="QCheckBox" name="checkBox_speed_only">
                     <property name="toolTip">
-                      <string>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</string>
+                      <string>Print only the attack’s speed, then quit; no cracking.</string>
                     </property>
                    <property name="text">
                     <string>Return expected speed of the attack, then quit</string>
@@ -2105,6 +2206,12 @@
                    </item>
                    <item>
                     <widget class="QPushButton" name="pushButton_open_cache_path">
+                     <property name="toolTip">
+                      <string>Choose the cache directory.</string>
+                     </property>
+                     <property name="accessibleName">
+                      <string>Choose cache directory</string>
+                     </property>
                      <property name="text">
                       <string>Browse…</string>
                      </property>
@@ -2218,7 +2325,7 @@
                    <item>
                     <widget class="QSpinBox" name="spinBox_hwmon_temp_abort">
                       <property name="toolTip">
-                        <string>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</string>
+                        <string>Abort when any backend device exceeds this temperature in °C; 0 disables it.</string>
                       </property>
                      <property name="enabled">
                       <bool>false</bool>
@@ -2274,6 +2381,9 @@
                    </property>
                    <item>
                     <widget class="QCheckBox" name="checkBox_outfile">
+                     <property name="toolTip">
+                      <string>Write recovered hashes to the file below, in the selected formats.</string>
+                     </property>
                      <property name="text">
                       <string>Write recovered hashes to file:</string>
                      </property>
@@ -2290,7 +2400,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Built-in variables:
+                        <string>The file the recovered hashes are written to. Format variables:
 
 &lt;hash&gt; = current hash filename or hash
 &lt;unixtime&gt; = current Unix timestamp</string>
@@ -2302,11 +2412,17 @@
                      </item>
                      <item>
                       <widget class="QPushButton" name="pushButton_open_outfile">
+                       <property name="toolTip">
+                        <string>Choose the outfile path.</string>
+                       </property>
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
                        <property name="text">
                         <string>Save…</string>
+                       </property>
+                       <property name="accessibleName">
+                        <string>Choose outfile</string>
                        </property>
                       </widget>
                      </item>
@@ -2407,6 +2523,9 @@
       </property>
       <item>
        <widget class="QPushButton" name="pushButton_start">
+        <property name="toolTip">
+         <string>Run hashcat in a terminal with these options.</string>
+        </property>
         <property name="text">
          <string>Start</string>
         </property>
@@ -2422,6 +2541,9 @@
         </property>
         <property name="icon">
          <iconset theme="QIcon::ThemeIcon::EditCopy"/>
+        </property>
+        <property name="accessibleName">
+         <string>Copy command</string>
         </property>
        </widget>
       </item>
@@ -2447,14 +2569,14 @@
    </property>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionAboutQt"/>
     <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
-     <string>Tools</string>
+     <string>&amp;Tools</string>
     </property>
     <widget class="QMenu" name="menuLoadExampleSession">
      <property name="title">
@@ -2467,7 +2589,7 @@
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <addaction name="actionImportSession"/>
     <addaction name="actionExportSession"/>
@@ -2497,6 +2619,9 @@
    <property name="text">
     <string>Quit</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
   <action name="actionAboutQt">
    <property name="text">
@@ -2507,25 +2632,40 @@
    <property name="text">
     <string>Settings…</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+,</string>
+   </property>
   </action>
   <action name="actionImportSettings">
    <property name="text">
     <string>Import Settings…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+O</string>
    </property>
   </action>
   <action name="actionExportSettings">
    <property name="text">
     <string>Export Settings…</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
   </action>
   <action name="actionExportSession">
    <property name="text">
     <string>Export Session…</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+E</string>
+   </property>
   </action>
   <action name="actionImportSession">
    <property name="text">
     <string>Import Session…</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+I</string>
    </property>
   </action>
  </widget>
