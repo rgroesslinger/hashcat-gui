@@ -22,6 +22,7 @@
 #include <QDoubleSpinBox>
 #include <QFile>
 #include <QFileInfo>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -176,6 +177,21 @@ void collectExamplePaths(const QJsonValue &value, QStringList *paths)
     }
 }
 
+// A group box in a row is as tall as its tallest neighbour. Without top
+// alignment Qt spreads the children of the shorter boxes over that height or
+// centers them, so the content would not start at the same height.
+QStringList groupBoxesWithoutTopAlignment(QWidget *page)
+{
+    QStringList offenders;
+    const auto boxes = page->findChildren<QGroupBox *>();
+    for (QGroupBox *box : boxes) {
+        if (!(box->layout()->alignment() & Qt::AlignTop)) {
+            offenders << box->objectName();
+        }
+    }
+    return offenders;
+}
+
 } // namespace
 
 // A hashcat that answers the query for the hash types.
@@ -225,6 +241,7 @@ private slots:
     void widgetsFollowTheBuilderPredicates();
     void groupBoxesShareOneTitleAlignment();
     void generalTabGroupBoxesAlignTheirContentToTheTop();
+    void attackTabGroupBoxesAlignTheirContentToTheTop();
     void resetSessionRestoresEveryWidget();
     void resettingTheSessionNeedsAConfirmation();
     void exampleSessionsCoverEveryAttackMode();
@@ -564,18 +581,32 @@ void TestMainWindow::generalTabGroupBoxesAlignTheirContentToTheTop()
 {
     MainWindow window;
 
-    const QList<QGroupBox *> boxes = window.ui->tab_general->findChildren<QGroupBox *>();
-    QVERIFY(!boxes.isEmpty());
-
-    QStringList offenders;
-    for (QGroupBox *box : boxes) {
-        if (!(box->layout()->alignment() & Qt::AlignTop)) {
-            offenders << box->objectName();
-        }
-    }
+    const QStringList offenders = groupBoxesWithoutTopAlignment(window.ui->tab_general);
     QVERIFY2(offenders.isEmpty(),
              qPrintable(QStringLiteral("group boxes whose content is not top aligned: %1")
                             .arg(offenders.join(QStringLiteral(", ")))));
+}
+
+// The attack tab's boxes sit in rows too: the rules box is stretched by the
+// mask and charset boxes next to it, and vice versa.
+void TestMainWindow::attackTabGroupBoxesAlignTheirContentToTheTop()
+{
+    MainWindow window;
+
+    const QStringList offenders = groupBoxesWithoutTopAlignment(window.ui->tab_attack);
+    QVERIFY2(offenders.isEmpty(),
+             qPrintable(QStringLiteral("group boxes whose content is not top aligned: %1")
+                            .arg(offenders.join(QStringLiteral(", ")))));
+
+    // The settings grids next to the PCFG and table lists are stretched by the
+    // lists; their rows have to stay at the top as well.
+    for (const QString &name :
+         {QStringLiteral("gridLayout_pcfg"), QStringLiteral("gridLayout_table")}) {
+        auto *grid = window.ui->tab_attack->findChild<QGridLayout *>(name);
+        QVERIFY2(grid, qPrintable(QStringLiteral("missing layout: %1").arg(name)));
+        QVERIFY2(grid->alignment() & Qt::AlignTop,
+                 qPrintable(QStringLiteral("layout not top aligned: %1").arg(name)));
+    }
 }
 
 // The reset has to bring every widget that holds a value back to its

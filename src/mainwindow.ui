@@ -292,6 +292,9 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_wordlists">
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignTop</set>
+               </property>
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -539,6 +542,9 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_pcfg">
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignTop</set>
+               </property>
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -563,7 +569,7 @@
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>80</height>
+                <height>120</height>
                </size>
               </property>
               <property name="toolTip">
@@ -672,6 +678,9 @@
                  </item>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_pcfg">
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignTop</set>
+                   </property>
                    <property name="spacing">
                     <number>4</number>
                    </property>
@@ -928,6 +937,9 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_table">
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignTop</set>
+               </property>
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -952,7 +964,7 @@
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>60</height>
+                <height>120</height>
                </size>
               </property>
               <property name="toolTip">
@@ -1013,6 +1025,9 @@
                  </item>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_table">
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignTop</set>
+                   </property>
                    <property name="spacing">
                     <number>4</number>
                    </property>
@@ -1174,6 +1189,9 @@
                <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_feed">
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignTop</set>
+               </property>
                <property name="spacing">
                 <number>4</number>
                </property>
@@ -1357,6 +1375,9 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_18">
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignTop</set>
+                   </property>
                    <property name="spacing">
                     <number>4</number>
                    </property>
@@ -1640,6 +1661,9 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QGridLayout" name="gridLayout_combination_rules">
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignTop</set>
+                   </property>
                    <property name="spacing">
                     <number>4</number>
                    </property>
@@ -1690,6 +1714,9 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QGridLayout" name="gridLayout_7">
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignTop</set>
+                   </property>
                    <property name="spacing">
                     <number>4</number>
                    </property>
@@ -1791,6 +1818,9 @@
                    <set>Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_9">
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignTop</set>
+                   </property>
                    <property name="spacing">
                     <number>4</number>
                    </property>

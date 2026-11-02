@@ -11,7 +11,9 @@
 
 #include <QClipboard>
 #include <QGroupBox>
+#include <QHash>
 #include <QLabel>
+#include <QLayout>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSysInfo>
@@ -49,8 +51,10 @@ class TestAboutDialog : public QObject
 private slots:
     void initTestCase();
     void fitsItsContent();
+    void resizingKeepsTheContentAtTheTop();
     void longVersionTextWrapsInsteadOfWidening();
     void groupBoxesShareOneTitleAlignment();
+    void groupBoxesAlignTheirContentToTheTop();
     void showsTheLogoAndTheApplicationName();
     void versionLabelShowsPlainText();
     void showsTheToolkitAndTheOperatingSystem();
@@ -84,6 +88,56 @@ void TestAboutDialog::fitsItsContent()
 
     // The user may make the dialog whatever size they like afterwards.
     QVERIFY(dialog.minimumSize() != dialog.maximumSize());
+}
+
+// The dialog is shown at its size hint, but the user may enlarge it. Top
+// alignment keeps the rows at their natural height instead of spreading them
+// over the extra space, and the trailing spacer keeps the links together
+// instead of pushing them apart.
+void TestAboutDialog::resizingKeepsTheContentAtTheTop()
+{
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker, 60000);
+    dialog.show();
+    QCoreApplication::processEvents();
+
+    const QStringList names{
+        QStringLiteral("label_app_name"),    QStringLiteral("label_app_description"),
+        QStringLiteral("label_hc_version"),  QStringLiteral("label_qt_version"),
+        QStringLiteral("label_os"),          QStringLiteral("label_link_project"),
+        QStringLiteral("label_license_gui"),
+    };
+    QHash<QString, int> heights;
+    for (const QString &name : names) {
+        QLabel *label = dialog.findChild<QLabel *>(name);
+        QVERIFY2(label, qPrintable(name));
+        heights.insert(name, label->height());
+    }
+    QLabel *firstLink = dialog.findChild<QLabel *>(QStringLiteral("label_link_project"));
+    QVERIFY(firstLink);
+    const int firstLinkX = firstLink->x();
+    QLabel *logo = dialog.findChild<QLabel *>(QStringLiteral("label_logo"));
+    QVERIFY(logo);
+    const int logoY = logo->y();
+
+    dialog.resize(dialog.width(), dialog.height() + 200);
+    QCoreApplication::processEvents();
+    for (const QString &name : names) {
+        QLabel *label = dialog.findChild<QLabel *>(name);
+        QVERIFY2(label, qPrintable(name));
+        QVERIFY2(label->height() == heights.value(name),
+                 qPrintable(QStringLiteral("%1: height %2, expected %3")
+                                .arg(name)
+                                .arg(label->height())
+                                .arg(heights.value(name))));
+    }
+    // The logo has a fixed height, so a growing header row would center it
+    // instead of stretching it.
+    QCOMPARE(logo->y(), logoY);
+
+    dialog.resize(dialog.width() + 200, dialog.height());
+    QCoreApplication::processEvents();
+    QCOMPARE(firstLink->x(), firstLinkX);
 }
 
 void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
@@ -123,6 +177,24 @@ void TestAboutDialog::groupBoxesShareOneTitleAlignment()
     AboutDialog dialog;
 
     TestEnvironment::checkGroupBoxTitleAlignment(&dialog);
+}
+
+// Same rule as in the main window: a group box must not spread its content
+// over the extra height when the dialog is enlarged.
+void TestAboutDialog::groupBoxesAlignTheirContentToTheTop()
+{
+    AboutDialog dialog;
+
+    QStringList offenders;
+    const auto boxes = dialog.findChildren<QGroupBox *>();
+    for (QGroupBox *box : boxes) {
+        if (!(box->layout()->alignment() & Qt::AlignTop)) {
+            offenders << box->objectName();
+        }
+    }
+    QVERIFY2(offenders.isEmpty(),
+             qPrintable(QStringLiteral("group boxes whose content is not top aligned: %1")
+                            .arg(offenders.join(QStringLiteral(", ")))));
 }
 
 // The dialog opens with the artwork of the application and its name, so it

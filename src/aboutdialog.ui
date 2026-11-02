@@ -19,6 +19,9 @@
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_header">
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignTop</set>
+     </property>
      <item>
       <widget class="QLabel" name="label_logo">
        <property name="minimumSize">
@@ -40,6 +43,9 @@
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_header">
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignTop</set>
+       </property>
        <item>
         <widget class="QLabel" name="label_app_name">
          <property name="text">
@@ -79,6 +85,9 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_versions">
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignTop</set>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_hc_version_text">
         <property name="text">
@@ -247,6 +256,9 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_system">
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignTop</set>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label_qt_version_text">
         <property name="text">
@@ -314,6 +326,9 @@
       <bool>false</bool>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_links">
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignTop</set>
+      </property>
       <property name="spacing">
        <number>0</number>
       </property>
@@ -432,6 +447,19 @@
         </property>
        </widget>
       </item>
+      <item>
+       <spacer name="horizontalSpacer_links">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
      </layout>
     </widget>
    </item>
@@ -447,6 +475,9 @@
       <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_license">
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignTop</set>
+      </property>
       <item>
        <widget class="QLabel" name="label_license_gui">
         <property name="text">
