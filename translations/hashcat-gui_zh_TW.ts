@@ -157,24 +157,12 @@
         <translation>雜湊檔案或雜湊：</translation>
     </message>
     <message>
-        <source>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</source>
-        <translation>要破解的雜湊、雜湊檔案的路徑，或 .hccapx WPA 擷取檔。可在此貼上單一雜湊，或指定一個檔案。</translation>
-    </message>
-    <message>
         <source>Salt is hex</source>
         <translation>鹽值為十六進位</translation>
     </message>
     <message>
-        <source>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</source>
-        <translation>從 potfile 中移除已破解的雜湊，使之後的執行不再重複回報。在攻擊模式 9 中會被拒絕。</translation>
-    </message>
-    <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>破解後從雜湊清單中移除該雜湊</translation>
-    </message>
-    <message>
-        <source>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</source>
-        <translation>忽略雜湊中的 @username 部分（適用於包含該部分的雜湊模式），使同一個單字可以符合多個帳號。</translation>
     </message>
     <message>
         <source>Ignore username in hash file</source>
@@ -195,12 +183,6 @@
     <message>
         <source>Hash recipe:</source>
         <translation>雜湊配方：</translation>
-    </message>
-    <message>
-        <source>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</source>
-        <translation>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</translation>
     </message>
     <message>
         <source>Wordlists</source>
@@ -247,16 +229,8 @@
         <translation>設定（無字典）：</translation>
     </message>
     <message>
-        <source>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</source>
-        <translation>位置設定，以空格分隔。僅在未選擇字典時使用：選擇字典後，hashcat 會逐行配對兩個檔案。「phases」選擇要執行的階段，從成本最低的開始；預設的「words,rules,pcfg」只有在被停止時才會結束。帶階段前綴的設定：「rules.rulefile」、「rules.rulemax」、「words.hints」、「pcfg.hintaccount」、…</translation>
-    </message>
-    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
-    </message>
-    <message>
-        <source>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</source>
-        <translation>一列可以是規則集檔案、包含 Grammar/grammar.txt 的資料夾，或內建名稱。僅使用已勾選的列；若沒有勾選任何列，則執行 hashcat 內建的 default-passwords。hints 也是內建的。</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -268,7 +242,7 @@
     </message>
     <message>
         <source>Quantization steps per bit (1–64)</source>
-        <translation>每位元的量化步數 (1–64)</translation>
+        <translation>每位元的量化步數（1–64）</translation>
     </message>
     <message>
         <source>Costmax:</source>
@@ -276,23 +250,19 @@
     </message>
     <message>
         <source>Highest cost level to enumerate (1–64)</source>
-        <translation>要列舉的最高成本等級 (1–64)</translation>
+        <translation>要列舉的最高成本等級（1–64）</translation>
     </message>
     <message>
         <source>Weights:</source>
         <translation>Weights:</translation>
     </message>
     <message>
-        <source>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</source>
-        <translation>每個規則集一個值，為以冒號分隔的純數字，例如兩個規則集寫作 2:1。值的數量必須與規則集的數量一致。</translation>
-    </message>
-    <message>
         <source>Threads:</source>
         <translation>執行緒：</translation>
     </message>
     <message>
-        <source>Cores that generate base words (0–16); 0 runs on the calling thread</source>
-        <translation>產生基礎單字的核心數 (0–16)；0 表示在呼叫端執行緒中執行</translation>
+        <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
+        <translation>產生基礎單字的核心數（0–16）；0 表示在呼叫端執行緒中執行。</translation>
     </message>
     <message>
         <source>auto</source>
@@ -304,55 +274,39 @@
     </message>
     <message>
         <source>Bits one inner loop may span (0–27)</source>
-        <translation>一個內層迴圈可跨越的位元數 (0–27)</translation>
+        <translation>一個內層迴圈可跨越的位元數（0–27）</translation>
     </message>
     <message>
         <source>Maxword:</source>
         <translation>Maxword:</translation>
     </message>
     <message>
-        <source>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</source>
-        <translation>核心為每個基礎單字建立的候選數：0、16 或 32（16 的倍數）</translation>
-    </message>
-    <message>
         <source>Maxgain:</source>
         <translation>Maxgain:</translation>
     </message>
     <message>
-        <source>1.0–64.0; decimal point is a dot, not the locale separator</source>
-        <translation>1.0–64.0；小數點為英文句點，而非地區設定中的分隔符號</translation>
+        <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
+        <translation>1.0–64.0；小數點為英文句點，而非地區設定中的分隔符號。</translation>
     </message>
     <message>
         <source>Walk:</source>
         <translation>Walk:</translation>
     </message>
     <message>
-        <source>1 steps the last token instead of unraking it</source>
-        <translation>1 表示對最後一個 token 逐步前進，而不是對其執行「unraking」</translation>
-    </message>
-    <message>
         <source>Mask:</source>
         <translation>遮罩：</translation>
     </message>
     <message>
-        <source>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</source>
-        <translation>將語法限制在此遮罩允許的候選範圍內；不能與 omen=1 同時使用，且在提示字來自帳號時也不能與 hintaccount 同時使用（請改用 hintwords 或 hintfile）</translation>
-    </message>
-    <message>
         <source>Extra settings (key=value):</source>
-        <translation>額外設定 (key=value)：</translation>
-    </message>
-    <message>
-        <source>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</source>
-        <translation>以空格分隔的額外 key=value 設定：omen、cache、lookup、pwmin、pwmax、hintaccount、hintwords、hintfile、hintrank、hintrepeat。第一個 key=value 之後的所有內容都視為設定，因此規則集必須放在前面。</translation>
+        <translation>額外設定（key=value）：</translation>
     </message>
     <message>
         <source>Table</source>
         <translation>表格</translation>
     </message>
     <message>
-        <source>Every checked row after the wordlist is a table</source>
-        <translation>字典之後每個已勾選的列都是一個表格</translation>
+        <source>Every checked row after the wordlist is a table.</source>
+        <translation>字典之後每個已勾選的列都是一個表格。</translation>
     </message>
     <message>
         <source>Add tables…</source>
@@ -363,44 +317,20 @@
         <translation>Identity:</translation>
     </message>
     <message>
-        <source>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</source>
-        <translation>是否將保持 token 不變作為其選擇之一：1（預設）保留，0 捨棄，使表格只產生變體。不能與 single=1 同時使用。</translation>
-    </message>
-    <message>
         <source>Template:</source>
         <translation>Template:</translation>
-    </message>
-    <message>
-        <source>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</source>
-        <translation>1 將字典讀作一組模式：任何單字都不會原樣傳回，且不符合任何規則的單字會被捨棄。0（預設）保留未更改的單字。</translation>
     </message>
     <message>
         <source>Single:</source>
         <translation>Single:</translation>
     </message>
     <message>
-        <source>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</source>
-        <translation>single=1 使每個候選恰好帶有一處取代，而不是所有符合位置的笛卡兒積；通常是一種不同且成本較低的攻擊。</translation>
-    </message>
-    <message>
         <source>Cap:</source>
         <translation>Cap:</translation>
     </message>
     <message>
-        <source>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</source>
-        <translation>一個來源在單字中最多可帶有的取代數；0 表示不限制。僅限制主機端的笛卡兒積，不限制 single=1 的執行。</translation>
-    </message>
-    <message>
         <source>Maxperm:</source>
         <translation>Maxperm:</translation>
-    </message>
-    <message>
-        <source>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</source>
-        <translation>主機在放棄之前列舉一個單字笛卡兒積中的多少項；0 表示不限制。裝置單元從不會被截斷。</translation>
-    </message>
-    <message>
-        <source>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</source>
-        <translation>以空格分隔的額外 key=value 設定。第一個 key=value 之後的所有內容都視為設定，因此表格必須放在前面。</translation>
     </message>
     <message>
         <source>Generic feed</source>
@@ -409,10 +339,6 @@
     <message>
         <source>Feed:</source>
         <translation>Feed:</translation>
-    </message>
-    <message>
-        <source>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</source>
-        <translation>候選產生器。包含斜線的內容會被視為 feed 路徑；否則 hashcat 會在其 feeds 目錄下尋找 feed_&lt;name&gt;。下方的參數取決於具體的 feed。</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -427,16 +353,12 @@
         <translation>參數：</translation>
     </message>
     <message>
-        <source>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</source>
-        <translation>傳遞給 feed 的參數。其意義與數量取決於 feed（wordlist feed 接受字典路徑）；多餘的 token 會直接交給 feed。</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <source>Arguments the feed reads, in order; only checked rows are used</source>
-        <translation>feed 依序讀取的參數；僅使用已勾選的列</translation>
+        <source>Arguments the feed reads, in order; only checked rows are used.</source>
+        <translation>feed 依序讀取的參數；僅使用已勾選的列。</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -451,11 +373,7 @@
         <translation>為本次執行啟用規則檔案插槽 1。</translation>
     </message>
     <message>
-        <source>Rules file:</source>
-        <translation>規則檔案：</translation>
-    </message>
-    <message>
-        <source>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>插槽 1 的規則檔案；套用於每個單字。留空則不使用該插槽。</translation>
     </message>
     <message>
@@ -463,7 +381,7 @@
         <translation>為本次執行啟用規則檔案插槽 2。</translation>
     </message>
     <message>
-        <source>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>插槽 2 的規則檔案；套用於每個單字。留空則不使用該插槽。</translation>
     </message>
     <message>
@@ -471,7 +389,7 @@
         <translation>為本次執行啟用規則檔案插槽 3。</translation>
     </message>
     <message>
-        <source>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>插槽 3 的規則檔案；套用於每個單字。留空則不使用該插槽。</translation>
     </message>
     <message>
@@ -481,14 +399,6 @@
     <message>
         <source>Generate rules:</source>
         <translation>產生規則：</translation>
-    </message>
-    <message>
-        <source>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</source>
-        <translation>為規則尋找攻擊產生多少條規則。不會讀取規則檔案，hashcat 會自行建立規則；若要使用現有規則檔案，請改用上方的插槽。</translation>
-    </message>
-    <message>
-        <source>Pass every rules file to hashcat in one run, instead of one run per file.</source>
-        <translation>將所有規則檔案在一次執行中傳給 hashcat，而不是每個檔案執行一次。</translation>
     </message>
     <message>
         <source>Join -r files into one list</source>
@@ -507,16 +417,224 @@
         <translation>右側規則：</translation>
     </message>
     <message>
-        <source>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</source>
-        <translation>將自訂字元集解讀為十六進位位元組。適用於自訂字元集 1 至 4。</translation>
-    </message>
-    <message>
         <source>Charset is hex</source>
         <translation>字元集為十六進位</translation>
     </message>
     <message>
         <source>Mask</source>
         <translation>遮罩</translation>
+    </message>
+    <message>
+        <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
+        <translation>雜湊、雜湊檔案，或 .hc22000/.hccapx 格式的 WPA 擷取檔。</translation>
+    </message>
+    <message>
+        <source>Choose a file of hashes.</source>
+        <translation>選擇一個雜湊檔案。</translation>
+    </message>
+    <message>
+        <source>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</source>
+        <translation>重寫雜湊檔案，移除已破解的雜湊（包括 potfile 中已有的）；potfile 不會被修改。在攻擊模式 9 下會被拒絕。</translation>
+    </message>
+    <message>
+        <source>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</source>
+        <translation>忽略模式分隔符號（通常為「:」）之前的使用者名稱，使共用同一雜湊的帳號只被破解一次。</translation>
+    </message>
+    <message>
+        <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
+        <translation>雜湊配方，例如「md5(md5(salt) . pass)」。請用 Shell 的外層引號包住整個配方，內部字串則使用另一種引號；PowerShell 需要在 $ 前加反引號。</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist up</source>
+        <translation>上移所選字典</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down</source>
+        <translation>下移所選字典</translation>
+    </message>
+    <message>
+        <source>Add one or more wordlist files. Each checked row is passed to hashcat.</source>
+        <translation>新增一個或多個字典檔案。每個已勾選的列都會傳遞給 hashcat。</translation>
+    </message>
+    <message>
+        <source>Remove the selected wordlists.</source>
+        <translation>移除所選字典。</translation>
+    </message>
+    <message>
+        <source>Remove wordlists</source>
+        <translation>移除字典</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
+        <translation>用於攻擊模式 9、以空格分隔的 key=value 設定，例如 phases=words,rules 或 rules.rulefile=…。僅在沒有字典時使用。</translation>
+    </message>
+    <message>
+        <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
+        <translation>規則集檔案、包含 Grammar/grammar.txt 的資料夾，或內建名稱。未勾選的列會被略過；若一列都未勾選，則執行 default-passwords。</translation>
+    </message>
+    <message>
+        <source>Add one or more PCFG ruleset files.</source>
+        <translation>新增一個或多個 PCFG 規則集檔案。</translation>
+    </message>
+    <message>
+        <source>Add PCFG rulesets</source>
+        <translation>新增 PCFG 規則集</translation>
+    </message>
+    <message>
+        <source>Remove the selected rulesets.</source>
+        <translation>移除所選規則集。</translation>
+    </message>
+    <message>
+        <source>Remove rulesets</source>
+        <translation>移除規則集</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset up</source>
+        <translation>上移所選規則集</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down</source>
+        <translation>下移所選規則集</translation>
+    </message>
+    <message>
+        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>每個規則集對應一個普通數字，以冒號分隔，例如 2:1；數字的個數必須與規則集的數量一致。</translation>
+    </message>
+    <message>
+        <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
+        <translation>核心建構的候選最大長度，以 4 位元組字為單位：0（自動）、16 或 32。</translation>
+    </message>
+    <message>
+        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
+        <translation>設為 1 時，在順序允許的情況下直接步進到下一個基礎單字，而不是透過 unranking 計算；候選內容相同，只是關閉了快速路徑。</translation>
+    </message>
+    <message>
+        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
+        <translation>僅列舉此遮罩允許的候選；會排除 omen=1，也會排除 hintaccount，除非提示單字來自 hintwords 或 hintfile。</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
+        <translation>以空格分隔的 key=value 設定：omen、cache、lookup、pwmin、pwmax、hintaccount、hintwords、hintfile、hintrank、hintrepeat。規則集放在最前面。</translation>
+    </message>
+    <message>
+        <source>Add one or more table files.</source>
+        <translation>新增一個或多個表格檔案。</translation>
+    </message>
+    <message>
+        <source>Remove the selected tables.</source>
+        <translation>移除所選表格。</translation>
+    </message>
+    <message>
+        <source>Remove tables</source>
+        <translation>移除表格</translation>
+    </message>
+    <message>
+        <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
+        <translation>設為 1（預設）時，token 會作為一個選項原樣保留；設為 0 時捨棄它，表格只產生變體。identity=0 會排除 single=1。</translation>
+    </message>
+    <message>
+        <source>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</source>
+        <translation>設為 1 時，將字典作為模式讀取：不會原樣傳回任何單字，未符合的單字會被捨棄。設為 0（預設）時則保留它們。</translation>
+    </message>
+    <message>
+        <source>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</source>
+        <translation>single=1：每個候選只做一次替換，而不是取笛卡兒積；候選較少，但在快速雜湊上主機的工作量較大。</translation>
+    </message>
+    <message>
+        <source>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</source>
+        <translation>每個來源單字只保留前 N 個替換；0 表示不限制。也適用於 single=1。</translation>
+    </message>
+    <message>
+        <source>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</source>
+        <translation>主機在放棄之前列舉一個單字的笛卡兒積的多少；0 表示不限制。</translation>
+    </message>
+    <message>
+        <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
+        <translation>以空格分隔的 key=value 設定；第一個之後的所有內容都是設定，因此表格要放在最前面。</translation>
+    </message>
+    <message>
+        <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
+        <translation>feed 名稱或路徑。包含斜線表示路徑；否則 hashcat 會在其 feed 目錄中依序嘗試 feed_&lt;name&gt;、rust_&lt;name&gt; 和 &lt;name&gt;。</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin instead of naming it.</source>
+        <translation>瀏覽選取 feed 外掛程式，而不是輸入其名稱。</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin</source>
+        <translation>瀏覽 feed 外掛程式</translation>
+    </message>
+    <message>
+        <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
+        <translation>傳遞給 feed 的參數；意義和數量取決於 feed（wordlist feed 接受字典路徑）。</translation>
+    </message>
+    <message>
+        <source>Add an argument for the feed, in order.</source>
+        <translation>為 feed 依序新增一個參數。</translation>
+    </message>
+    <message>
+        <source>Remove the selected feed arguments.</source>
+        <translation>移除所選 feed 參數。</translation>
+    </message>
+    <message>
+        <source>Remove feed arguments</source>
+        <translation>移除 feed 參數</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument up</source>
+        <translation>上移所選 feed 參數</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down</source>
+        <translation>下移所選 feed 參數</translation>
+    </message>
+    <message>
+        <source>Read rules from the files below instead of generating them.</source>
+        <translation>從下方的檔案讀取規則，而不是產生規則。</translation>
+    </message>
+    <message>
+        <source>Rules file 1:</source>
+        <translation>規則檔案 1：</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 1.</source>
+        <translation>選擇插槽 1 的規則檔案。</translation>
+    </message>
+    <message>
+        <source>Open rules file 1</source>
+        <translation>開啟規則檔案 1</translation>
+    </message>
+    <message>
+        <source>Rules file 2:</source>
+        <translation>規則檔案 2：</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 2.</source>
+        <translation>選擇插槽 2 的規則檔案。</translation>
+    </message>
+    <message>
+        <source>Open rules file 2</source>
+        <translation>開啟規則檔案 2</translation>
+    </message>
+    <message>
+        <source>Rules file 3:</source>
+        <translation>規則檔案 3：</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 3.</source>
+        <translation>選擇插槽 3 的規則檔案。</translation>
+    </message>
+    <message>
+        <source>Open rules file 3</source>
+        <translation>開啟規則檔案 3</translation>
+    </message>
+    <message>
+        <source>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</source>
+        <translation>hashcat 產生的隨機規則數量（-g）。僅在使用「產生規則」時有效；不會讀取規則檔案。</translation>
+    </message>
+    <message>
+        <source>Treat every -r file as one list: rule counts add instead of multiplying.</source>
+        <translation>將每個 -r 檔案視為一個清單：規則數量相加而不是相乘。</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -549,6 +667,10 @@
     <message>
         <source>Charset 4:</source>
         <translation>字元集 4：</translation>
+    </message>
+    <message>
+        <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
+        <translation>將遮罩和自訂字元集解譯為十六進位位元組。</translation>
     </message>
     <message>
         <source>General</source>
@@ -585,6 +707,10 @@
     <message>
         <source>Update status automatically</source>
         <translation>自動更新狀態</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+I</source>
+        <translation>Ctrl+Shift+I</translation>
     </message>
     <message>
         <source>Open…</source>
@@ -643,10 +769,6 @@
         <translation>持續更新執行狀態（速度、進度、預計剩餘時間），而不是只列印最後一行。</translation>
     </message>
     <message>
-        <source>Seconds between status updates.</source>
-        <translation>狀態更新之間的間隔秒數。</translation>
-    </message>
-    <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
         <translation>忽略警告並強制啟動 hashcat。請謹慎使用。</translation>
     </message>
@@ -663,12 +785,16 @@
         <translation>啟用最佳化核心（會限制密碼長度）</translation>
     </message>
     <message>
-        <source>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</source>
-        <translation>只輸出攻擊速度然後結束，不進行破解。適用於效能基準測試和比較設定。</translation>
-    </message>
-    <message>
         <source>Return expected speed of the attack, then quit</source>
         <translation>輸出攻擊的預期速度，然後結束</translation>
+    </message>
+    <message>
+        <source>Choose the cache directory.</source>
+        <translation>選擇快取目錄。</translation>
+    </message>
+    <message>
+        <source>Choose cache directory</source>
+        <translation>選擇快取目錄</translation>
     </message>
     <message>
         <source>Resources</source>
@@ -695,22 +821,12 @@
         <translation>要使用的裝置，以逗號分隔。留空則使用所有裝置。</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature.</source>
-        <translation>當裝置達到此溫度時中止。</translation>
+        <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
+        <translation>當任一後端裝置超過此溫度（°C）時中止；0 表示停用。</translation>
     </message>
     <message>
         <source>&#xa0;°C</source>
         <translation>&#xa0;°C</translation>
-    </message>
-    <message>
-        <source>Built-in variables:
-
-&lt;hash&gt; = current hash filename or hash
-&lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>內建變數：
-
-&lt;hash&gt; = 目前的雜湊檔案名稱或雜湊
-&lt;unixtime&gt; = 目前的 Unix 時間戳記</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -721,20 +837,56 @@
         <translation>不將已復原的雜湊寫入 potfile。</translation>
     </message>
     <message>
+        <source>Copy command</source>
+        <translation>複製命令</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>說明(&amp;H)</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>工具(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>檔案(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
         <source>Settings…</source>
         <translation>設定…</translation>
+    </message>
+    <message>
+        <source>Ctrl+,</source>
+        <translation>Ctrl+,</translation>
     </message>
     <message>
         <source>Import Settings…</source>
         <translation>匯入設定…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+O</source>
+        <translation>Ctrl+Shift+O</translation>
+    </message>
+    <message>
         <source>Export Settings…</source>
         <translation>匯出設定…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
         <source>Export Session…</source>
         <translation>匯出工作階段…</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+E</source>
+        <translation>Ctrl+Shift+E</translation>
     </message>
     <message>
         <source>Import Session…</source>
@@ -753,16 +905,34 @@
         <translation>hashcat 儲存其快取的目錄。必須存在。</translation>
     </message>
     <message>
-        <source>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</source>
-        <translation>當 OpenCL 裝置熱點溫度超過此攝氏度數時中止工作階段。0 表示停用溫度限制。</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>輸出檔案</translation>
     </message>
     <message>
+        <source>Write recovered hashes to the file below, in the selected formats.</source>
+        <translation>將已復原的雜湊依所選格式寫入下方的檔案。</translation>
+    </message>
+    <message>
         <source>Write recovered hashes to file:</source>
         <translation>將已復原的雜湊寫入檔案：</translation>
+    </message>
+    <message>
+        <source>The file the recovered hashes are written to. Format variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation>寫入已復原雜湊的檔案。格式變數：
+
+&lt;hash&gt; = 目前的雜湊檔案名稱或雜湊
+&lt;unixtime&gt; = 目前的 Unix 時間戳記</translation>
+    </message>
+    <message>
+        <source>Choose the outfile path.</source>
+        <translation>選擇輸出檔案路徑。</translation>
+    </message>
+    <message>
+        <source>Choose outfile</source>
+        <translation>選擇輸出檔案</translation>
     </message>
     <message>
         <source>Format:</source>
@@ -781,6 +951,10 @@
         <translation>不寫入 potfile</translation>
     </message>
     <message>
+        <source>Run hashcat in a terminal with these options.</source>
+        <translation>在終端機中使用這些選項執行 hashcat。</translation>
+    </message>
+    <message>
         <source>Start</source>
         <translation>開始</translation>
     </message>
@@ -789,24 +963,24 @@
         <translation>將命令複製到剪貼簿</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>說明</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>工具</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>檔案</translation>
-    </message>
-    <message>
         <source>About</source>
         <translation>關於</translation>
     </message>
     <message>
         <source>Load Example Session</source>
         <translation>載入範例工作階段</translation>
+    </message>
+    <message>
+        <source>Seconds between status updates; only used when automatic status is enabled.</source>
+        <translation>狀態更新之間的間隔秒數；僅在啟用自動狀態時使用。</translation>
+    </message>
+    <message>
+        <source>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</source>
+        <translation>使用 hashcat 的最佳化核心（-O）；它們會限制密碼的最大長度。</translation>
+    </message>
+    <message>
+        <source>Print only the attack’s speed, then quit; no cracking.</source>
+        <translation>僅輸出攻擊速度，然後結束；不進行破解。</translation>
     </message>
     <message>
         <source>Reset Session</source>
@@ -1011,7 +1185,7 @@ Default: 1,2</source>
         <translation>此模式需要一個字典和至少一個表格。</translation>
     </message>
     <message>
-        <source>This mode needs a feed. Arguments depend on the feed — random and stdin need none, wordlist needs a path.</source>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
         <translation>此模式需要一個 feed。參數取決於 feed：random 和 stdin 不需要參數，wordlist 需要一個路徑。</translation>
     </message>
     <message>
@@ -1129,6 +1303,10 @@ Error: %1</source>
         <translation>此模式需要一個遮罩。</translation>
     </message>
     <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>密碼候選遮罩。?1–?4 插入自訂字元集，?w 插入字典中的單字，?q 在「混合（遮罩 + ?w/?q）」模式下插入第二個字典中的單字，?? 表示字面的 ?。</translation>
+    </message>
+    <message>
         <source>Load the %1 example? The current session is lost.
 
 The example cracks a test hash; hashcat should recover the password %2.</source>
@@ -1147,6 +1325,14 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
     <message>
         <source>Could not write “%1”: %2</source>
         <translation>無法寫入「%1」：%2</translation>
+    </message>
+    <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+這可能是由 Windows Defender 或其他防毒軟體引起的。解決方法請參閱&lt;a href=&quot;%1&quot;&gt;常見問題項目&lt;/a&gt;。</translation>
     </message>
     <message>
         <source>This mode needs at least one wordlist.</source>
@@ -1187,9 +1373,9 @@ Navigate to %2 → %3 to change it.</source>
         <translation>請前往 &lt;b&gt;%1 → %2&lt;/b&gt; 選擇用於啟動的終端機。</translation>
     </message>
     <message>
-        <source>This mode takes at most %1 wordlists.
+        <source>Maximum number of wordlists for this mode: %1.
 Currently selected: %2.</source>
-        <translation>此模式最多接受 %1 個字典。
+        <translation>此模式的字典數量上限為 %1。
 目前已選擇：%2 個。</translation>
     </message>
     <message>
@@ -1286,16 +1472,16 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>設定</translation>
     </message>
     <message>
+        <source>hashcat executable</source>
+        <translation>hashcat 可執行檔</translation>
+    </message>
+    <message>
         <source>Not configured</source>
         <translation>未設定</translation>
     </message>
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;hashcat executable</source>
-        <translation>hashcat 可執行檔(&amp;H)</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1320,6 +1506,10 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>並非所有色彩配置在所有平台上都可用。</translation>
+    </message>
+    <message>
+        <source>&amp;Parameters</source>
+        <translation>參數(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Use short parameters</source>

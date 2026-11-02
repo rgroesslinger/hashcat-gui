@@ -330,7 +330,7 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameterName(Parameter::PotfileDisable, useShort);
     }
 
-    // rules - either existing rule files or a number of generated rules
+    // rules - either existing rules files or a number of generated rules
     if (attackUsesRules(mode)) {
         for (const QString &rulesFile : options.rulesFiles) {
             arguments << parameterName(Parameter::RulesFile, useShort) << rulesFile;

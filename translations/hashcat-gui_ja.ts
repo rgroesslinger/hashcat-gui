@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ja">
+<TS version="2.1" language="ja" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -153,20 +153,60 @@
         <translation>ハッシュファイルまたはハッシュ:</translation>
     </message>
     <message>
+        <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
+        <translation>ハッシュ、ハッシュのファイル、または .hc22000/.hccapx 形式の WPA キャプチャ。</translation>
+    </message>
+    <message>
+        <source>Choose a file of hashes.</source>
+        <translation>ハッシュのファイルを選択します。</translation>
+    </message>
+    <message>
         <source>Salt is hex</source>
         <translation>ソルトは 16 進数</translation>
+    </message>
+    <message>
+        <source>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</source>
+        <translation>解読済みのハッシュ (potfile に記録済みのものを含む) を除いてハッシュファイルを書き直します。potfile は変更されません。攻撃モード 9 では拒否されます。</translation>
     </message>
     <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>解読したハッシュをハッシュリストから削除する</translation>
     </message>
     <message>
+        <source>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</source>
+        <translation>モードの区切り文字 (通常は「:」) より前のユーザー名を無視し、同じハッシュを共有するアカウントを 1 回だけ解読します。</translation>
+    </message>
+    <message>
+        <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
+        <translation>ハッシュレシピ (例: 「md5(md5(salt) . pass)」)。シェルの外側の引用符でレシピ全体を囲み、内側の文字列にはもう一方の引用符を使います。PowerShell では $ の前にバッククォートが必要です。</translation>
+    </message>
+    <message>
         <source>Move item up</source>
         <translation>項目を上へ移動</translation>
     </message>
     <message>
+        <source>Move selected wordlist up</source>
+        <translation>選択したワードリストを上へ移動</translation>
+    </message>
+    <message>
         <source>Move item down</source>
         <translation>項目を下へ移動</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down</source>
+        <translation>選択したワードリストを下へ移動</translation>
+    </message>
+    <message>
+        <source>Add one or more wordlist files. Each checked row is passed to hashcat.</source>
+        <translation>ワードリストのファイルを 1 つ以上追加します。チェックされた各行が hashcat に渡されます。</translation>
+    </message>
+    <message>
+        <source>Remove the selected wordlists.</source>
+        <translation>選択したワードリストを削除します。</translation>
+    </message>
+    <message>
+        <source>Remove wordlists</source>
+        <translation>ワードリストを削除</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -185,6 +225,178 @@
         <translation>エンコード先:</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
+        <translation>攻撃モード 9 用の、スペース区切りの key=value 設定 (例: phases=words,rules や rules.rulefile=…)。ワードリストを使用しない場合のみ有効です。</translation>
+    </message>
+    <message>
+        <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
+        <translation>ルールセットのファイル、Grammar/grammar.txt を含むフォルダー、または同梱の名前。チェックされていない行はスキップされ、1 つもチェックされていない場合は default-passwords が実行されます。</translation>
+    </message>
+    <message>
+        <source>Add one or more PCFG ruleset files.</source>
+        <translation>PCFG ルールセットのファイルを 1 つ以上追加します。</translation>
+    </message>
+    <message>
+        <source>Add PCFG rulesets</source>
+        <translation>PCFG ルールセットを追加</translation>
+    </message>
+    <message>
+        <source>Remove the selected rulesets.</source>
+        <translation>選択したルールセットを削除します。</translation>
+    </message>
+    <message>
+        <source>Remove rulesets</source>
+        <translation>ルールセットを削除</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset up</source>
+        <translation>選択したルールセットを上へ移動</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down</source>
+        <translation>選択したルールセットを下へ移動</translation>
+    </message>
+    <message>
+        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>ルールセットごとに 1 つの数値をコロンで区切って指定します (例: 2:1)。数値の個数はルールセットの数と一致する必要があります。</translation>
+    </message>
+    <message>
+        <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
+        <translation>カーネルが構築する候補の最大長 (4 バイトワード単位): 0 (自動)、16、または 32。</translation>
+    </message>
+    <message>
+        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
+        <translation>1 にすると、順序が許す場合はアンランキングせずに次の基本ワードへ進みます。候補は同一で、高速パスのみ無効になります。</translation>
+    </message>
+    <message>
+        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
+        <translation>このマスクが許容する候補のみを列挙します。omen=1 は除外され、ヒントワードが hintwords または hintfile から取得される場合を除き hintaccount も除外されます。</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
+        <translation>スペース区切りの key=value 設定: omen、cache、lookup、pwmin、pwmax、hintaccount、hintwords、hintfile、hintrank、hintrepeat。ルールセットは先頭に指定します。</translation>
+    </message>
+    <message>
+        <source>Add one or more table files.</source>
+        <translation>テーブルのファイルを 1 つ以上追加します。</translation>
+    </message>
+    <message>
+        <source>Remove the selected tables.</source>
+        <translation>選択したテーブルを削除します。</translation>
+    </message>
+    <message>
+        <source>Remove tables</source>
+        <translation>テーブルを削除</translation>
+    </message>
+    <message>
+        <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
+        <translation>1 (既定) ではトークンを選択肢としてそのまま残し、0 では除外してテーブルがバリエーションのみを生成します。identity=0 は single=1 を除外します。</translation>
+    </message>
+    <message>
+        <source>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</source>
+        <translation>1 にするとワードリストをパターンとして読み込みます。変更されていない単語は返されず、一致しない単語は破棄されます。0 (既定) ではそれらが保持されます。</translation>
+    </message>
+    <message>
+        <source>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</source>
+        <translation>single=1: 直積ではなく候補ごとに 1 回の置換を行います。候補は少なくなりますが、高速なハッシュではホストの処理が増えます。</translation>
+    </message>
+    <message>
+        <source>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</source>
+        <translation>各元単語の最初の N 個の置換のみを保持します。0 は無制限を意味します。single=1 にも適用されます。</translation>
+    </message>
+    <message>
+        <source>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</source>
+        <translation>ホストが断念するまでに列挙する、単語の直積の量。0 は無制限を意味します。</translation>
+    </message>
+    <message>
+        <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
+        <translation>スペース区切りの key=value 設定。最初の 1 つ以降はすべて設定として扱われるため、テーブルを先に指定します。</translation>
+    </message>
+    <message>
+        <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
+        <translation>フィードの名前またはパス。スラッシュはパスを意味します。それ以外の場合、hashcat はフィードディレクトリで feed_&lt;name&gt;、rust_&lt;name&gt;、&lt;name&gt; の順に試します。</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin instead of naming it.</source>
+        <translation>名前を指定する代わりに、フィードプラグインを参照して選択します。</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin</source>
+        <translation>フィードプラグインを参照</translation>
+    </message>
+    <message>
+        <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
+        <translation>フィードに渡す引数。意味と数はフィードによって異なります (wordlist フィードはワードリストのパスを受け取ります)。</translation>
+    </message>
+    <message>
+        <source>Add an argument for the feed, in order.</source>
+        <translation>フィードの引数を順番に追加します。</translation>
+    </message>
+    <message>
+        <source>Remove the selected feed arguments.</source>
+        <translation>選択したフィード引数を削除します。</translation>
+    </message>
+    <message>
+        <source>Remove feed arguments</source>
+        <translation>フィード引数を削除</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument up</source>
+        <translation>選択したフィード引数を上へ移動</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down</source>
+        <translation>選択したフィード引数を下へ移動</translation>
+    </message>
+    <message>
+        <source>Read rules from the files below instead of generating them.</source>
+        <translation>ルールを生成する代わりに、下のファイルから読み込みます。</translation>
+    </message>
+    <message>
+        <source>Rules file 1:</source>
+        <translation>ルールファイル 1:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 1.</source>
+        <translation>スロット 1 のルールファイルを選択します。</translation>
+    </message>
+    <message>
+        <source>Open rules file 1</source>
+        <translation>ルールファイル 1 を開く</translation>
+    </message>
+    <message>
+        <source>Rules file 2:</source>
+        <translation>ルールファイル 2:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 2.</source>
+        <translation>スロット 2 のルールファイルを選択します。</translation>
+    </message>
+    <message>
+        <source>Open rules file 2</source>
+        <translation>ルールファイル 2 を開く</translation>
+    </message>
+    <message>
+        <source>Rules file 3:</source>
+        <translation>ルールファイル 3:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 3.</source>
+        <translation>スロット 3 のルールファイルを選択します。</translation>
+    </message>
+    <message>
+        <source>Open rules file 3</source>
+        <translation>ルールファイル 3 を開く</translation>
+    </message>
+    <message>
+        <source>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</source>
+        <translation>hashcat が生成するランダムルールの数 (-g)。「ルールを生成」の場合のみ使用され、ルールファイルは読み込まれません。</translation>
+    </message>
+    <message>
+        <source>Treat every -r file as one list: rule counts add instead of multiplying.</source>
+        <translation>すべての -r ファイルを 1 つのリストとして扱います。ルール数は乗算ではなく加算されます。</translation>
+    </message>
+    <message>
         <source>Wordlist rules</source>
         <translation>ワードリストのルール</translation>
     </message>
@@ -197,8 +409,16 @@
         <translation>右ルール:</translation>
     </message>
     <message>
+        <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
+        <translation>マスクとカスタム文字セットを 16 進バイトとして解釈します。</translation>
+    </message>
+    <message>
         <source>Charset is hex</source>
         <translation>文字セットは 16 進数</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+I</source>
+        <translation>Ctrl+Shift+I</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -213,6 +433,10 @@
         <translation>最大:</translation>
     </message>
     <message>
+        <source>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</source>
+        <translation>hashcat の最適化カーネルを使用します (-O)。パスワードの最大長が制限されます。</translation>
+    </message>
+    <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
         <translation>hashcat をこれらの CPU デバイスに固定します (カンマ区切り)。空欄の場合は hashcat が決定します。</translation>
     </message>
@@ -225,22 +449,8 @@
         <translation>中止する温度</translation>
     </message>
     <message>
-        <source>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</source>
-        <translation>OpenCL デバイスのホットスポットがこの摂氏温度を超えたときにセッションを中止します。0 を指定すると温度制限を無効にします。</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>出力ファイル</translation>
-    </message>
-    <message>
-        <source>Built-in variables:
-
-&lt;hash&gt; = current hash filename or hash
-&lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>組み込み変数:
-
-&lt;hash&gt; = 現在のハッシュファイル名またはハッシュ
-&lt;unixtime&gt; = 現在の Unix タイムスタンプ</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -275,24 +485,12 @@
         <translation>攻撃</translation>
     </message>
     <message>
-        <source>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</source>
-        <translation>解読するハッシュ、ハッシュを含むファイルのパス、または .hccapx 形式の WPA キャプチャ。ここに単一のハッシュを貼り付けるか、ファイルを指定してください。</translation>
-    </message>
-    <message>
         <source>Open…</source>
         <translation>開く…</translation>
     </message>
     <message>
         <source>Assume the salt is given in hexadecimal.</source>
         <translation>ソルトが 16 進数で指定されているものとして扱います。</translation>
-    </message>
-    <message>
-        <source>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</source>
-        <translation>解読済みのハッシュを potfile から削除し、以降の実行で再び報告されないようにします。攻撃モード 9 では拒否されます。</translation>
-    </message>
-    <message>
-        <source>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</source>
-        <translation>ハッシュの @username 部分を (それを含むハッシュモードで) 無視し、同じワードで複数のアカウントを解読できるようにします。</translation>
     </message>
     <message>
         <source>Attack mode. Each choice reveals its own options below.</source>
@@ -305,12 +503,6 @@
     <message>
         <source>Hash recipe:</source>
         <translation>ハッシュレシピ:</translation>
-    </message>
-    <message>
-        <source>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</source>
-        <translation>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</translation>
     </message>
     <message>
         <source>Add files…</source>
@@ -337,16 +529,8 @@
         <translation>設定 (ワードリストなし):</translation>
     </message>
     <message>
-        <source>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</source>
-        <translation>位置指定の設定をスペース区切りで指定します。ワードリストが選択されていない場合のみ使用されます。ワードリストがある場合、hashcat は 2 つのファイルを行ごとに対応付けます。「phases」は実行するフェーズを負荷の軽い順に選びます。既定の「words,rules,pcfg」は停止したときにのみ終了します。フェーズ接頭辞付きの設定: 「rules.rulefile」、「rules.rulemax」、「words.hints」、「pcfg.hintaccount」、…</translation>
-    </message>
-    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
-    </message>
-    <message>
-        <source>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</source>
-        <translation>1 行は、ルールセットファイル、Grammar/grammar.txt を含むフォルダー、または同梱の名前のいずれかです。チェックされた行のみ使用され、何もチェックされていない場合は hashcat に同梱の default-passwords が実行されます。hints も同梱されています。</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -373,16 +557,12 @@
         <translation>Weights:</translation>
     </message>
     <message>
-        <source>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</source>
-        <translation>ルールセットごとに 1 つの値。コロン区切りの数値で指定します (例: ルールセット 2 つなら 2:1)。値の数はルールセットの数と一致する必要があります。</translation>
-    </message>
-    <message>
         <source>Threads:</source>
         <translation>スレッド:</translation>
     </message>
     <message>
-        <source>Cores that generate base words (0–16); 0 runs on the calling thread</source>
-        <translation>基本ワードを生成するコア数 (0–16)。0 の場合は呼び出し元のスレッドで実行します</translation>
+        <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
+        <translation>基本ワードを生成するコア数 (0–16)。0 の場合は呼び出し元のスレッドで実行します。</translation>
     </message>
     <message>
         <source>auto</source>
@@ -401,48 +581,32 @@
         <translation>Maxword:</translation>
     </message>
     <message>
-        <source>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</source>
-        <translation>カーネルが基本ワード 1 つあたりに生成する候補数: 0、16、または 32 (16 の倍数)</translation>
-    </message>
-    <message>
         <source>Maxgain:</source>
         <translation>Maxgain:</translation>
     </message>
     <message>
-        <source>1.0–64.0; decimal point is a dot, not the locale separator</source>
-        <translation>1.0–64.0。小数点はロケールの区切り文字ではなく、ドットです</translation>
+        <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
+        <translation>1.0–64.0。小数点はロケールの区切り文字ではなく、ドットです。</translation>
     </message>
     <message>
         <source>Walk:</source>
         <translation>Walk:</translation>
     </message>
     <message>
-        <source>1 steps the last token instead of unraking it</source>
-        <translation>1 を指定すると、最後のトークンを「unraking」する代わりに 1 ステップずつ進めます</translation>
-    </message>
-    <message>
         <source>Mask:</source>
         <translation>マスク:</translation>
-    </message>
-    <message>
-        <source>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</source>
-        <translation>文法を、このマスクが許容する候補に絞り込みます。omen=1 とは併用できません。ヒントワードがアカウントから取得される間は hintaccount とも併用できません (代わりに hintwords または hintfile を指定してください)</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
         <translation>追加の設定 (key=value):</translation>
     </message>
     <message>
-        <source>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</source>
-        <translation>スペース区切りの追加の key=value 設定: omen、cache、lookup、pwmin、pwmax、hintaccount、hintwords、hintfile、hintrank、hintrepeat。最初の key=value 以降はすべて設定として扱われるため、ルールセットを先に指定する必要があります。</translation>
-    </message>
-    <message>
         <source>Table</source>
         <translation>テーブル</translation>
     </message>
     <message>
-        <source>Every checked row after the wordlist is a table</source>
-        <translation>ワードリストの後にあるチェックされた行はすべてテーブルです</translation>
+        <source>Every checked row after the wordlist is a table.</source>
+        <translation>ワードリストの後にあるチェックされた行はすべてテーブルです。</translation>
     </message>
     <message>
         <source>Add tables…</source>
@@ -453,44 +617,20 @@
         <translation>Identity:</translation>
     </message>
     <message>
-        <source>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</source>
-        <translation>トークンを変更しないままにすることを選択肢の 1 つとするかどうか。1 (既定) では残し、0 では除外してテーブルがバリエーションのみを生成するようにします。single=1 とは併用できません。</translation>
-    </message>
-    <message>
         <source>Template:</source>
         <translation>Template:</translation>
-    </message>
-    <message>
-        <source>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</source>
-        <translation>1 を指定すると、ワードリストをパターンの集合として読み込みます。変更されないまま返される単語はなく、どのルールにも一致しない単語は破棄されます。0 (既定) では変更されない単語を残します。</translation>
     </message>
     <message>
         <source>Single:</source>
         <translation>Single:</translation>
     </message>
     <message>
-        <source>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</source>
-        <translation>single=1 を指定すると、一致したすべての位置の直積ではなく、各候補がちょうど 1 つの置換だけを持つようになります。多くの場合、これは別の、より負荷の軽い攻撃になります。</translation>
-    </message>
-    <message>
         <source>Cap:</source>
         <translation>Cap:</translation>
     </message>
     <message>
-        <source>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</source>
-        <translation>1 つのソースが単語内で持てる置換の最大数。0 は無制限を意味します。ホスト側の直積のみを制限し、single=1 の実行は制限しません。</translation>
-    </message>
-    <message>
         <source>Maxperm:</source>
         <translation>Maxperm:</translation>
-    </message>
-    <message>
-        <source>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</source>
-        <translation>ホストが 1 つの単語の直積のうち、いくつを列挙してから打ち切るか。0 は無制限を意味します。デバイスのセルが途中で切り捨てられることはありません。</translation>
-    </message>
-    <message>
-        <source>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</source>
-        <translation>スペース区切りの追加の key=value 設定。最初の key=value 以降はすべて設定として扱われるため、テーブルを先に指定する必要があります。</translation>
     </message>
     <message>
         <source>Generic feed</source>
@@ -499,10 +639,6 @@
     <message>
         <source>Feed:</source>
         <translation>Feed:</translation>
-    </message>
-    <message>
-        <source>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</source>
-        <translation>候補ジェネレーター。スラッシュを含むものはフィードのパスとして扱われ、そうでない場合は hashcat がフィードディレクトリ内の feed_&lt;name&gt; を探します。以下の引数はフィード固有です。</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -517,16 +653,12 @@
         <translation>引数:</translation>
     </message>
     <message>
-        <source>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</source>
-        <translation>フィードに渡す引数。意味と個数はフィードによって異なります (wordlist フィードはワードリストのパスを受け取ります)。余分なトークンはそのままフィードに渡されます。</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>追加</translation>
     </message>
     <message>
-        <source>Arguments the feed reads, in order; only checked rows are used</source>
-        <translation>フィードが順に読み込む引数。チェックされた行のみ使用されます</translation>
+        <source>Arguments the feed reads, in order; only checked rows are used.</source>
+        <translation>フィードが順に読み込む引数。チェックされた行のみ使用されます。</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -541,11 +673,7 @@
         <translation>今回の実行でルールファイルのスロット 1 を有効にします。</translation>
     </message>
     <message>
-        <source>Rules file:</source>
-        <translation>ルールファイル:</translation>
-    </message>
-    <message>
-        <source>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>スロット 1 のルールファイル。各単語に適用されます。スロットを使用しない場合は空欄のままにします。</translation>
     </message>
     <message>
@@ -553,7 +681,7 @@
         <translation>今回の実行でルールファイルのスロット 2 を有効にします。</translation>
     </message>
     <message>
-        <source>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>スロット 2 のルールファイル。各単語に適用されます。スロットを使用しない場合は空欄のままにします。</translation>
     </message>
     <message>
@@ -561,7 +689,7 @@
         <translation>今回の実行でルールファイルのスロット 3 を有効にします。</translation>
     </message>
     <message>
-        <source>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>スロット 3 のルールファイル。各単語に適用されます。スロットを使用しない場合は空欄のままにします。</translation>
     </message>
     <message>
@@ -571,14 +699,6 @@
     <message>
         <source>Generate rules:</source>
         <translation>ルールを生成:</translation>
-    </message>
-    <message>
-        <source>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</source>
-        <translation>ルール探索攻撃のために生成するルールの数。ルールファイルは読み込まれず、hashcat 自身がルールを作成します。既存のルールファイルを使用する場合は、代わりに上のスロットを使用してください。</translation>
-    </message>
-    <message>
-        <source>Pass every rules file to hashcat in one run, instead of one run per file.</source>
-        <translation>すべてのルールファイルを、ファイルごとに 1 回ではなく、1 回の実行でまとめて hashcat に渡します。</translation>
     </message>
     <message>
         <source>Join -r files into one list</source>
@@ -621,10 +741,6 @@
         <translation>文字セット 4:</translation>
     </message>
     <message>
-        <source>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</source>
-        <translation>カスタム文字セットを 16 進数のバイトとして解釈します。カスタム文字セット 1 から 4 に適用されます。</translation>
-    </message>
-    <message>
         <source>Session and limits</source>
         <translation>セッションと制限</translation>
     </message>
@@ -661,6 +777,10 @@
         <translation>ステータスを自動的に更新する</translation>
     </message>
     <message>
+        <source>Seconds between status updates; only used when automatic status is enabled.</source>
+        <translation>ステータス更新の間隔 (秒)。自動ステータスが有効な場合のみ使用されます。</translation>
+    </message>
+    <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
         <translation>警告を無視して hashcat を開始します。注意して使用してください。</translation>
     </message>
@@ -673,16 +793,20 @@
         <translation>パフォーマンス</translation>
     </message>
     <message>
-        <source>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</source>
-        <translation>解読は行わず、攻撃の速度のみを表示して終了します。ベンチマークや設定の比較に便利です。</translation>
-    </message>
-    <message>
         <source>Cache path:</source>
         <translation>キャッシュパス:</translation>
     </message>
     <message>
         <source>Directory hashcat keeps its cache in. Must exist.</source>
         <translation>hashcat がキャッシュを保存するディレクトリ。存在している必要があります。</translation>
+    </message>
+    <message>
+        <source>Choose the cache directory.</source>
+        <translation>キャッシュディレクトリを選択します。</translation>
+    </message>
+    <message>
+        <source>Choose cache directory</source>
+        <translation>キャッシュディレクトリを選択</translation>
     </message>
     <message>
         <source>Resources</source>
@@ -701,8 +825,34 @@
         <translation>デバイスタイプ:</translation>
     </message>
     <message>
+        <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
+        <translation>いずれかのバックエンドデバイスがこの温度 (°C) を超えたら中止します。0 で無効になります。</translation>
+    </message>
+    <message>
+        <source>Write recovered hashes to the file below, in the selected formats.</source>
+        <translation>復元したハッシュを、選択した形式で下のファイルに書き込みます。</translation>
+    </message>
+    <message>
         <source>Write recovered hashes to file:</source>
         <translation>復元したハッシュをファイルに書き込む:</translation>
+    </message>
+    <message>
+        <source>The file the recovered hashes are written to. Format variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation>復元したハッシュの書き込み先ファイル。書式変数:
+
+&lt;hash&gt; = 現在のハッシュファイル名またはハッシュ
+&lt;unixtime&gt; = 現在の Unix タイムスタンプ</translation>
+    </message>
+    <message>
+        <source>Choose the outfile path.</source>
+        <translation>出力ファイルのパスを選択します。</translation>
+    </message>
+    <message>
+        <source>Choose outfile</source>
+        <translation>出力ファイルを選択</translation>
     </message>
     <message>
         <source>Format:</source>
@@ -711,6 +861,10 @@
     <message>
         <source>Do not write the potfile</source>
         <translation>potfile に書き込まない</translation>
+    </message>
+    <message>
+        <source>Run hashcat in a terminal with these options.</source>
+        <translation>これらのオプションで hashcat をターミナルで実行します。</translation>
     </message>
     <message>
         <source>Start</source>
@@ -761,56 +915,76 @@
         <translation>スキップした候補の後で、この数の候補だけをテストします。</translation>
     </message>
     <message>
-        <source>Seconds between status updates.</source>
-        <translation>ステータス更新の間隔 (秒)。</translation>
-    </message>
-    <message>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>最適化カーネルを有効にする (パスワード長が制限されます)</translation>
+    </message>
+    <message>
+        <source>Print only the attack’s speed, then quit; no cracking.</source>
+        <translation>攻撃の速度のみを表示して終了します。解読は行いません。</translation>
     </message>
     <message>
         <source>Return expected speed of the attack, then quit</source>
         <translation>攻撃の予想速度を表示して終了する</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature.</source>
-        <translation>デバイスがこの温度に達したら中止します。</translation>
-    </message>
-    <message>
         <source>&#xa0;°C</source>
         <translation>&#xa0;°C</translation>
+    </message>
+    <message>
+        <source>Copy command</source>
+        <translation>コマンドをコピー</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>ヘルプ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>ツール(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>ファイル(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>Settings…</source>
         <translation>設定…</translation>
     </message>
     <message>
+        <source>Ctrl+,</source>
+        <translation>Ctrl+,</translation>
+    </message>
+    <message>
         <source>Import Settings…</source>
         <translation>設定のインポート…</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+O</source>
+        <translation>Ctrl+Shift+O</translation>
     </message>
     <message>
         <source>Export Settings…</source>
         <translation>設定のエクスポート…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
         <source>Export Session…</source>
         <translation>セッションのエクスポート…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+E</source>
+        <translation>Ctrl+Shift+E</translation>
+    </message>
+    <message>
         <source>Import Session…</source>
         <translation>セッションのインポート…</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>ヘルプ</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>ツール</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>ファイル</translation>
     </message>
     <message>
         <source>About</source>
@@ -1007,6 +1181,10 @@ Currently selected: %2.</source>
         <translation>セッションがハッシュタイプ %1 を指定していますが、この hashcat のバージョンはサポートしていません。</translation>
     </message>
     <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>パスワード候補のマスク。?1–?4 はカスタム文字セットを挿入し、?w はワードリストの単語を、?q は「ハイブリッド (マスク + ?w/?q)」モードで 2 つ目のワードリストの単語を挿入します。?? はリテラルの ? です。</translation>
+    </message>
+    <message>
         <source>Load the %1 example? The current session is lost.
 
 The example cracks a test hash; hashcat should recover the password %2.</source>
@@ -1069,6 +1247,14 @@ Error: %1</source>
         <translation>ハッシュタイプを読み込めませんでした。設定で hashcat のパスを確認してください。</translation>
     </message>
     <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+これは Windows Defender などのウイルス対策ソフトが原因の場合があります。対処方法は&lt;a href=&quot;%1&quot;&gt;FAQ の項目&lt;/a&gt;を参照してください。</translation>
+    </message>
+    <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>利用可能なハッシュタイプを読み込むには、%1 → %2 で hashcat のパスを設定してください。</translation>
     </message>
@@ -1089,7 +1275,7 @@ Error: %1</source>
         <translation>このモードにはワードリスト 1 つと、少なくとも 1 つのテーブルが必要です。</translation>
     </message>
     <message>
-        <source>This mode needs a feed. Arguments depend on the feed — random and stdin need none, wordlist needs a path.</source>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
         <translation>このモードにはフィードが必要です。引数はフィードによって異なります。random と stdin には不要で、wordlist にはパスが必要です。</translation>
     </message>
     <message>
@@ -1187,9 +1373,9 @@ Navigate to %2 → %3 to change it.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt; を開いて、起動に使用するターミナルを選択してください。</translation>
     </message>
     <message>
-        <source>This mode takes at most %1 wordlists.
+        <source>Maximum number of wordlists for this mode: %1.
 Currently selected: %2.</source>
-        <translation>このモードで使用できるワードリストは最大 %1 個です。
+        <translation>このモードで使用できるワードリストの最大数は %1 個です。
 現在の選択: %2。</translation>
     </message>
     <message>
@@ -1286,16 +1472,16 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>設定</translation>
     </message>
     <message>
+        <source>hashcat executable</source>
+        <translation>hashcat 実行ファイル</translation>
+    </message>
+    <message>
         <source>Not configured</source>
         <translation>未設定</translation>
     </message>
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;hashcat executable</source>
-        <translation>hashcat 実行ファイル(&amp;H)</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1316,6 +1502,10 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>すべてのカラースキームがすべてのプラットフォームで利用できるわけではありません。</translation>
+    </message>
+    <message>
+        <source>&amp;Parameters</source>
+        <translation>パラメーター(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Use short parameters</source>

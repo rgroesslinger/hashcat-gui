@@ -157,24 +157,12 @@
         <translation>Hash dosyası veya hash:</translation>
     </message>
     <message>
-        <source>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</source>
-        <translation>Kırılacak hash, hash içeren bir dosyanın yolu veya bir .hccapx WPA yakalaması. Buraya tek bir hash yapıştırın ya da bir dosya belirtin.</translation>
-    </message>
-    <message>
         <source>Salt is hex</source>
         <translation>Tuz onaltılık</translation>
     </message>
     <message>
-        <source>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</source>
-        <translation>Sonraki bir çalıştırmanın bunları yeniden bildirmemesi için daha önce kırılmış hash’leri potfile’dan kaldır. Saldırı modu 9’da reddedilir.</translation>
-    </message>
-    <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>Kırıldıktan sonra hash’i hash listesinden kaldır</translation>
-    </message>
-    <message>
-        <source>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</source>
-        <translation>Hash’lerdeki @username kısmını (bunu içeren hash modlarında) yok say; böylece aynı sözcük birden çok hesaba uyabilir.</translation>
     </message>
     <message>
         <source>Ignore username in hash file</source>
@@ -195,12 +183,6 @@
     <message>
         <source>Hash recipe:</source>
         <translation>Hash tarifi:</translation>
-    </message>
-    <message>
-        <source>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</source>
-        <translation>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</translation>
     </message>
     <message>
         <source>Wordlists</source>
@@ -247,16 +229,8 @@
         <translation>Ayarlar (kelime listesi yok):</translation>
     </message>
     <message>
-        <source>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</source>
-        <translation>Boşlukla ayrılmış konuma bağlı ayarlar. Yalnızca kelime listesi seçilmediğinde kullanılır: kelime listesi varsa hashcat iki dosyayı satır satır eşleştirir. “phases”, hangi aşamaların çalışacağını en ucuzdan başlayarak seçer; varsayılan “words,rules,pcfg” yalnızca durdurulunca biter. Aşama önekli ayarlar: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</translation>
-    </message>
-    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
-    </message>
-    <message>
-        <source>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</source>
-        <translation>Bir satır; bir kural kümesi dosyası, Grammar/grammar.txt içeren bir klasör ya da yerleşik bir addır. Yalnızca işaretli satırlar kullanılır; hiçbiri işaretli değilse hashcat’in yerleşik default-passwords kümesi çalışır. hints de yerleşiktir.</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -283,16 +257,12 @@
         <translation>Weights:</translation>
     </message>
     <message>
-        <source>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</source>
-        <translation>Kural kümesi başına bir değer; iki nokta üst üste ile ayrılmış düz sayılar, örn. iki kural kümesi için 2:1. Değer sayısı kural kümesi sayısıyla eşleşmelidir.</translation>
-    </message>
-    <message>
         <source>Threads:</source>
         <translation>İş parçacıkları:</translation>
     </message>
     <message>
-        <source>Cores that generate base words (0–16); 0 runs on the calling thread</source>
-        <translation>Temel sözcükleri üreten çekirdekler (0–16); 0, çağıran iş parçacığında çalışır</translation>
+        <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
+        <translation>Temel sözcükleri üreten çekirdekler (0–16); 0, çağıran iş parçacığında çalışır.</translation>
     </message>
     <message>
         <source>auto</source>
@@ -311,48 +281,32 @@
         <translation>Maxword:</translation>
     </message>
     <message>
-        <source>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</source>
-        <translation>Çekirdeğin temel sözcük başına oluşturduğu adaylar: 0, 16 veya 32 (16’nın katı)</translation>
-    </message>
-    <message>
         <source>Maxgain:</source>
         <translation>Maxgain:</translation>
     </message>
     <message>
-        <source>1.0–64.0; decimal point is a dot, not the locale separator</source>
-        <translation>1.0–64.0; ondalık ayırıcı bölgesel ayırıcı değil, noktadır</translation>
+        <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
+        <translation>1.0–64.0; ondalık ayırıcı bölgesel ayırıcı değil, noktadır.</translation>
     </message>
     <message>
         <source>Walk:</source>
         <translation>Walk:</translation>
     </message>
     <message>
-        <source>1 steps the last token instead of unraking it</source>
-        <translation>1, son token’a “unraking” uygulamak yerine onu adım adım ilerletir</translation>
-    </message>
-    <message>
         <source>Mask:</source>
         <translation>Maske:</translation>
-    </message>
-    <message>
-        <source>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</source>
-        <translation>Dilbilgisini bu maskenin kabul ettiği adaylarla sınırla; omen=1 ile birleştirilemez, ipucu sözcükleri hesaplardan geldiği sürece hintaccount ile de birleştirilemez (bunun yerine hintwords veya hintfile verin)</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
         <translation>Ek ayarlar (key=value):</translation>
     </message>
     <message>
-        <source>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</source>
-        <translation>Boşlukla ayrılmış ek key=value ayarları: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. İlk key=value’dan sonraki her şey bir ayardır; bu yüzden kural kümeleri önce gelmelidir.</translation>
-    </message>
-    <message>
         <source>Table</source>
         <translation>Tablo</translation>
     </message>
     <message>
-        <source>Every checked row after the wordlist is a table</source>
-        <translation>Kelime listesinden sonraki her işaretli satır bir tablodur</translation>
+        <source>Every checked row after the wordlist is a table.</source>
+        <translation>Kelime listesinden sonraki her işaretli satır bir tablodur.</translation>
     </message>
     <message>
         <source>Add tables…</source>
@@ -363,44 +317,20 @@
         <translation>Identity:</translation>
     </message>
     <message>
-        <source>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</source>
-        <translation>Bir token’ın değiştirilmeden bırakılmasının seçeneklerinden biri olup olmadığı: 1 (varsayılan) onu korur, 0 onu eler; böylece tablo yalnızca varyasyonlar üretir. single=1 ile birleştirilemez.</translation>
-    </message>
-    <message>
         <source>Template:</source>
         <translation>Template:</translation>
-    </message>
-    <message>
-        <source>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</source>
-        <translation>1, kelime listesini bir kalıp kümesi olarak okur: hiçbir sözcük değiştirilmeden döndürülmez ve hiçbir kurala uymayan sözcükler elenir. 0 (varsayılan) değiştirilmemiş sözcükleri korur.</translation>
     </message>
     <message>
         <source>Single:</source>
         <translation>Single:</translation>
     </message>
     <message>
-        <source>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</source>
-        <translation>single=1, eşleşen tüm konumların kartezyen çarpımı yerine her adayın tam olarak bir yer değiştirme taşımasını sağlar; genellikle farklı ve daha ucuz bir saldırıdır.</translation>
-    </message>
-    <message>
         <source>Cap:</source>
         <translation>Cap:</translation>
     </message>
     <message>
-        <source>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</source>
-        <translation>Bir kaynağın bir sözcükte taşıyabileceği en fazla yer değiştirme sayısı; 0 sınır yok demektir. Yalnızca ana makine tarafındaki kartezyen çarpımı sınırlar, single=1 çalıştırmasını sınırlamaz.</translation>
-    </message>
-    <message>
         <source>Maxperm:</source>
         <translation>Maxperm:</translation>
-    </message>
-    <message>
-        <source>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</source>
-        <translation>Ana makinenin vazgeçmeden önce bir sözcüğün kartezyen çarpımından kaç öğeyi sıraladığı; 0 sınır yok demektir. Hiçbir aygıt hücresi asla kesilmez.</translation>
-    </message>
-    <message>
-        <source>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</source>
-        <translation>Boşlukla ayrılmış ek key=value ayarları. İlk key=value’dan sonraki her şey bir ayardır; bu yüzden tablolar önce gelmelidir.</translation>
     </message>
     <message>
         <source>Generic feed</source>
@@ -409,10 +339,6 @@
     <message>
         <source>Feed:</source>
         <translation>Feed:</translation>
-    </message>
-    <message>
-        <source>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</source>
-        <translation>Aday üretici. Eğik çizgi içeren her şey bir feed yolu sayılır; aksi hâlde hashcat, feed dizininde feed_&lt;name&gt; arar. Aşağıdaki bağımsız değişkenler feed’e özgüdür.</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -427,16 +353,12 @@
         <translation>Bağımsız değişken:</translation>
     </message>
     <message>
-        <source>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</source>
-        <translation>Feed’e iletilen bağımsız değişken. Anlamı ve sayısı feed’e bağlıdır (wordlist feed’i kelime listesi yollarını alır); fazla token’lar doğrudan feed’e gider.</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Ekle</translation>
     </message>
     <message>
-        <source>Arguments the feed reads, in order; only checked rows are used</source>
-        <translation>Feed’in sırayla okuduğu bağımsız değişkenler; yalnızca işaretli satırlar kullanılır</translation>
+        <source>Arguments the feed reads, in order; only checked rows are used.</source>
+        <translation>Feed’in sırayla okuduğu bağımsız değişkenler; yalnızca işaretli satırlar kullanılır.</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -451,11 +373,7 @@
         <translation>Bu çalıştırma için kural dosyası yuvası 1’i etkinleştir.</translation>
     </message>
     <message>
-        <source>Rules file:</source>
-        <translation>Kural dosyası:</translation>
-    </message>
-    <message>
-        <source>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Yuva 1 için kural dosyası; her sözcüğe uygulanır. Yuvayı kullanmamak için boş bırakın.</translation>
     </message>
     <message>
@@ -463,7 +381,7 @@
         <translation>Bu çalıştırma için kural dosyası yuvası 2’yi etkinleştir.</translation>
     </message>
     <message>
-        <source>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Yuva 2 için kural dosyası; her sözcüğe uygulanır. Yuvayı kullanmamak için boş bırakın.</translation>
     </message>
     <message>
@@ -471,7 +389,7 @@
         <translation>Bu çalıştırma için kural dosyası yuvası 3’ü etkinleştir.</translation>
     </message>
     <message>
-        <source>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Yuva 3 için kural dosyası; her sözcüğe uygulanır. Yuvayı kullanmamak için boş bırakın.</translation>
     </message>
     <message>
@@ -481,14 +399,6 @@
     <message>
         <source>Generate rules:</source>
         <translation>Kural üret:</translation>
-    </message>
-    <message>
-        <source>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</source>
-        <translation>Kural bulma saldırısı için kaç kural üretileceği. Hiçbir kural dosyası okunmaz, hashcat bunları kendisi oluşturur; bunun yerine yukarıdaki yuvalarla mevcut bir kural dosyası kullanın.</translation>
-    </message>
-    <message>
-        <source>Pass every rules file to hashcat in one run, instead of one run per file.</source>
-        <translation>Tüm kural dosyalarını, dosya başına bir çalıştırma yerine tek bir çalıştırmada hashcat’e ilet.</translation>
     </message>
     <message>
         <source>Join -r files into one list</source>
@@ -507,16 +417,224 @@
         <translation>Sağ kural:</translation>
     </message>
     <message>
-        <source>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</source>
-        <translation>Özel karakter kümelerini onaltılık bayt olarak yorumla. 1’den 4’e kadar özel karakter kümelerine uygulanır.</translation>
-    </message>
-    <message>
         <source>Charset is hex</source>
         <translation>Karakter kümesi onaltılık</translation>
     </message>
     <message>
         <source>Mask</source>
         <translation>Maske</translation>
+    </message>
+    <message>
+        <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
+        <translation>Hash, bir hash dosyası veya .hc22000/.hccapx biçiminde bir WPA yakalaması.</translation>
+    </message>
+    <message>
+        <source>Choose a file of hashes.</source>
+        <translation>Bir hash dosyası seç.</translation>
+    </message>
+    <message>
+        <source>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</source>
+        <translation>Hash dosyasını, potfile’da zaten bilinenler dahil kırılmış hash’ler olmadan yeniden yaz; potfile değişmez. Saldırı modu 9’da reddedilir.</translation>
+    </message>
+    <message>
+        <source>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</source>
+        <translation>Modun ayırıcısından (genellikle “:”) önceki kullanıcı adını yok say; böylece aynı hash’i paylaşan hesaplar yalnızca bir kez kırılır.</translation>
+    </message>
+    <message>
+        <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
+        <translation>Hash tarifi, ör. “md5(md5(salt) . pass)”. Tarifi kabuğun dış tırnaklarına, içindeki dizeleri ise diğer tür tırnaklara alın; PowerShell’de $ işaretinden önce bir ters tırnak gerekir.</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist up</source>
+        <translation>Seçili kelime listesini yukarı taşı</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down</source>
+        <translation>Seçili kelime listesini aşağı taşı</translation>
+    </message>
+    <message>
+        <source>Add one or more wordlist files. Each checked row is passed to hashcat.</source>
+        <translation>Bir veya daha fazla kelime listesi dosyası ekle. İşaretli her satır hashcat’e iletilir.</translation>
+    </message>
+    <message>
+        <source>Remove the selected wordlists.</source>
+        <translation>Seçili kelime listelerini kaldır.</translation>
+    </message>
+    <message>
+        <source>Remove wordlists</source>
+        <translation>Kelime listelerini kaldır</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
+        <translation>Saldırı modu 9 için boşlukla ayrılmış key=value ayarları, ör. phases=words,rules veya rules.rulefile=…. Yalnızca kelime listesi olmadan kullanılır.</translation>
+    </message>
+    <message>
+        <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
+        <translation>Bir kural kümesi dosyası, Grammar/grammar.txt içeren bir klasör veya yerleşik bir ad. İşaretsiz satırlar atlanır; hiçbiri işaretli değilse default-passwords çalışır.</translation>
+    </message>
+    <message>
+        <source>Add one or more PCFG ruleset files.</source>
+        <translation>Bir veya daha fazla PCFG kural kümesi dosyası ekle.</translation>
+    </message>
+    <message>
+        <source>Add PCFG rulesets</source>
+        <translation>PCFG kural kümeleri ekle</translation>
+    </message>
+    <message>
+        <source>Remove the selected rulesets.</source>
+        <translation>Seçili kural kümelerini kaldır.</translation>
+    </message>
+    <message>
+        <source>Remove rulesets</source>
+        <translation>Kural kümelerini kaldır</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset up</source>
+        <translation>Seçili kural kümesini yukarı taşı</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down</source>
+        <translation>Seçili kural kümesini aşağı taşı</translation>
+    </message>
+    <message>
+        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>Kural kümesi başına bir düz sayı, iki nokta üst üste ile ayrılmış, ör. 2:1; sayıların adedi kural kümelerinin sayısıyla eşleşmelidir.</translation>
+    </message>
+    <message>
+        <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
+        <translation>Çekirdeğin oluşturduğu en büyük aday uzunluğu, 4 baytlık sözcük cinsinden: 0 (otomatik), 16 veya 32.</translation>
+    </message>
+    <message>
+        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
+        <translation>1, sıranın izin verdiği yerlerde adayı sıralamayı çözmek (unranking) yerine bir sonraki temel sözcüğe geçer; adaylar aynıdır, yalnızca hızlı yol devre dışı kalır.</translation>
+    </message>
+    <message>
+        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
+        <translation>Yalnızca bu maskenin kabul ettiği adayları sırala; omen=1’i ve, ipucu sözcükleri hintwords veya hintfile’dan gelmedikçe hintaccount’u dışlar.</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
+        <translation>Boşlukla ayrılmış key=value ayarları: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Kural kümeleri en başta gelir.</translation>
+    </message>
+    <message>
+        <source>Add one or more table files.</source>
+        <translation>Bir veya daha fazla tablo dosyası ekle.</translation>
+    </message>
+    <message>
+        <source>Remove the selected tables.</source>
+        <translation>Seçili tabloları kaldır.</translation>
+    </message>
+    <message>
+        <source>Remove tables</source>
+        <translation>Tabloları kaldır</translation>
+    </message>
+    <message>
+        <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
+        <translation>1 (varsayılan) bir token’ı seçenek olarak değiştirmeden korur, 0 onu atar; böylece tablo yalnızca varyasyonlar üretir. identity=0, single=1’i dışlar.</translation>
+    </message>
+    <message>
+        <source>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</source>
+        <translation>1, kelime listesini desenler olarak okur: hiçbir sözcük değiştirilmeden döndürülmez ve eşleşmeyen sözcükler atılır. 0 (varsayılan) bunları korur.</translation>
+    </message>
+    <message>
+        <source>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</source>
+        <translation>single=1: Kartezyen çarpım yerine aday başına bir ikame; daha az aday, hızlı hash’lerde host için daha fazla iş.</translation>
+    </message>
+    <message>
+        <source>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</source>
+        <translation>Her kaynak sözcüğün yalnızca ilk N ikamesini koru; 0 sınır yok demektir. single=1 için de geçerlidir.</translation>
+    </message>
+    <message>
+        <source>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</source>
+        <translation>Host’un pes etmeden önce bir sözcüğün Kartezyen çarpımının ne kadarını sıraladığı; 0 sınır yok demektir.</translation>
+    </message>
+    <message>
+        <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
+        <translation>Boşlukla ayrılmış key=value ayarları; ilkinden sonraki her şey bir ayardır, bu yüzden tablolar önce gelir.</translation>
+    </message>
+    <message>
+        <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
+        <translation>Feed adı veya yolu. Eğik çizgi bir yol anlamına gelir; aksi halde hashcat, feed dizininde sırasıyla feed_&lt;name&gt;, rust_&lt;name&gt; ve &lt;name&gt; adlarını dener.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin instead of naming it.</source>
+        <translation>Adını yazmak yerine bir feed eklentisine gözat.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin</source>
+        <translation>Bir feed eklentisine gözat</translation>
+    </message>
+    <message>
+        <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
+        <translation>Feed’e iletilen bağımsız değişken; anlamı ve sayısı feed’e bağlıdır (wordlist feed’i kelime listesi yollarını alır).</translation>
+    </message>
+    <message>
+        <source>Add an argument for the feed, in order.</source>
+        <translation>Feed için sırayla bir bağımsız değişken ekle.</translation>
+    </message>
+    <message>
+        <source>Remove the selected feed arguments.</source>
+        <translation>Seçili feed bağımsız değişkenlerini kaldır.</translation>
+    </message>
+    <message>
+        <source>Remove feed arguments</source>
+        <translation>Feed bağımsız değişkenlerini kaldır</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument up</source>
+        <translation>Seçili feed bağımsız değişkenini yukarı taşı</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down</source>
+        <translation>Seçili feed bağımsız değişkenini aşağı taşı</translation>
+    </message>
+    <message>
+        <source>Read rules from the files below instead of generating them.</source>
+        <translation>Kuralları oluşturmak yerine aşağıdaki dosyalardan oku.</translation>
+    </message>
+    <message>
+        <source>Rules file 1:</source>
+        <translation>Kural dosyası 1:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 1.</source>
+        <translation>Yuva 1 için kural dosyasını seç.</translation>
+    </message>
+    <message>
+        <source>Open rules file 1</source>
+        <translation>Kural dosyası 1’i aç</translation>
+    </message>
+    <message>
+        <source>Rules file 2:</source>
+        <translation>Kural dosyası 2:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 2.</source>
+        <translation>Yuva 2 için kural dosyasını seç.</translation>
+    </message>
+    <message>
+        <source>Open rules file 2</source>
+        <translation>Kural dosyası 2’yi aç</translation>
+    </message>
+    <message>
+        <source>Rules file 3:</source>
+        <translation>Kural dosyası 3:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 3.</source>
+        <translation>Yuva 3 için kural dosyasını seç.</translation>
+    </message>
+    <message>
+        <source>Open rules file 3</source>
+        <translation>Kural dosyası 3’ü aç</translation>
+    </message>
+    <message>
+        <source>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</source>
+        <translation>hashcat’in ürettiği rastgele kural sayısı (-g). Yalnızca “Kural üret” ile kullanılır; hiçbir kural dosyası okunmaz.</translation>
+    </message>
+    <message>
+        <source>Treat every -r file as one list: rule counts add instead of multiplying.</source>
+        <translation>Her -r dosyasını tek bir liste olarak değerlendir: kural sayıları çarpılmak yerine toplanır.</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -549,6 +667,10 @@
     <message>
         <source>Charset 4:</source>
         <translation>Karakter kümesi 4:</translation>
+    </message>
+    <message>
+        <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
+        <translation>Maskeyi ve özel karakter kümelerini onaltılık bayt olarak yorumla.</translation>
     </message>
     <message>
         <source>General</source>
@@ -585,6 +707,10 @@
     <message>
         <source>Update status automatically</source>
         <translation>Durumu otomatik güncelle</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+I</source>
+        <translation>Ctrl+Shift+I</translation>
     </message>
     <message>
         <source>Open…</source>
@@ -643,10 +769,6 @@
         <translation>Tek bir son satır yazdırmak yerine çalıştırma durumunu (hız, ilerleme, tahmini süre) güncellemeyi sürdür.</translation>
     </message>
     <message>
-        <source>Seconds between status updates.</source>
-        <translation>Durum güncellemeleri arasındaki saniye sayısı.</translation>
-    </message>
-    <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
         <translation>Uyarıları yok say ve hashcat’i yine de başlat. Dikkatli kullanın.</translation>
     </message>
@@ -663,12 +785,16 @@
         <translation>Optimize çekirdekleri etkinleştir (parola uzunluğunu sınırlar)</translation>
     </message>
     <message>
-        <source>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</source>
-        <translation>Kırmadan yalnızca saldırının hızını yazdır ve çık. Kıyaslama yapmak ve ayarları karşılaştırmak için kullanışlıdır.</translation>
-    </message>
-    <message>
         <source>Return expected speed of the attack, then quit</source>
         <translation>Saldırının beklenen hızını döndür, ardından çık</translation>
+    </message>
+    <message>
+        <source>Choose the cache directory.</source>
+        <translation>Önbellek dizinini seç.</translation>
+    </message>
+    <message>
+        <source>Choose cache directory</source>
+        <translation>Önbellek dizini seç</translation>
     </message>
     <message>
         <source>Resources</source>
@@ -695,22 +821,12 @@
         <translation>Kullanılacak aygıtlar (virgülle ayırın). Tüm aygıtlar için boş bırakın.</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature.</source>
-        <translation>Bir aygıt bu sıcaklığa ulaştığında durdur.</translation>
+        <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
+        <translation>Herhangi bir backend aygıtı bu sıcaklığı (°C) aştığında durdur; 0 devre dışı bırakır.</translation>
     </message>
     <message>
         <source>&#xa0;°C</source>
         <translation>&#xa0;°C</translation>
-    </message>
-    <message>
-        <source>Built-in variables:
-
-&lt;hash&gt; = current hash filename or hash
-&lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>Yerleşik değişkenler:
-
-&lt;hash&gt; = geçerli hash dosyası adı veya hash
-&lt;unixtime&gt; = geçerli Unix zaman damgası</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -721,20 +837,56 @@
         <translation>Kurtarılan hash’leri potfile’a yazma.</translation>
     </message>
     <message>
+        <source>Copy command</source>
+        <translation>Komutu kopyala</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Yardım</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Araçlar</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Dosya</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
         <source>Settings…</source>
         <translation>Ayarlar…</translation>
+    </message>
+    <message>
+        <source>Ctrl+,</source>
+        <translation>Ctrl+,</translation>
     </message>
     <message>
         <source>Import Settings…</source>
         <translation>Ayarları içe aktar…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+O</source>
+        <translation>Ctrl+Shift+O</translation>
+    </message>
+    <message>
         <source>Export Settings…</source>
         <translation>Ayarları dışa aktar…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
         <source>Export Session…</source>
         <translation>Oturumu dışa aktar…</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+E</source>
+        <translation>Ctrl+Shift+E</translation>
     </message>
     <message>
         <source>Import Session…</source>
@@ -753,16 +905,34 @@
         <translation>hashcat’in önbelleğini tuttuğu dizin. Var olmalıdır.</translation>
     </message>
     <message>
-        <source>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</source>
-        <translation>Bir OpenCL aygıtının sıcak noktası bu kadar santigrat dereceyi aşarsa oturumu durdur. 0, sıcaklık sınırını devre dışı bırakır.</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>Çıktı dosyası</translation>
     </message>
     <message>
+        <source>Write recovered hashes to the file below, in the selected formats.</source>
+        <translation>Kurtarılan hash’leri aşağıdaki dosyaya, seçilen biçimlerde yaz.</translation>
+    </message>
+    <message>
         <source>Write recovered hashes to file:</source>
         <translation>Kurtarılan hash’leri dosyaya yaz:</translation>
+    </message>
+    <message>
+        <source>The file the recovered hashes are written to. Format variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation>Kurtarılan hash’lerin yazıldığı dosya. Biçim değişkenleri:
+
+&lt;hash&gt; = geçerli hash dosyası adı veya hash
+&lt;unixtime&gt; = geçerli Unix zaman damgası</translation>
+    </message>
+    <message>
+        <source>Choose the outfile path.</source>
+        <translation>Çıktı dosyasının yolunu seç.</translation>
+    </message>
+    <message>
+        <source>Choose outfile</source>
+        <translation>Çıktı dosyası seç</translation>
     </message>
     <message>
         <source>Format:</source>
@@ -781,6 +951,10 @@
         <translation>Potfile’ı yazma</translation>
     </message>
     <message>
+        <source>Run hashcat in a terminal with these options.</source>
+        <translation>hashcat’i bu seçeneklerle bir terminalde çalıştır.</translation>
+    </message>
+    <message>
         <source>Start</source>
         <translation>Başlat</translation>
     </message>
@@ -789,24 +963,24 @@
         <translation>Komutu panoya kopyala</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>Yardım</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>Araçlar</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>Dosya</translation>
-    </message>
-    <message>
         <source>About</source>
         <translation>Hakkında</translation>
     </message>
     <message>
         <source>Load Example Session</source>
         <translation>Örnek oturumu yükle</translation>
+    </message>
+    <message>
+        <source>Seconds between status updates; only used when automatic status is enabled.</source>
+        <translation>Durum güncellemeleri arasındaki saniye sayısı; yalnızca otomatik durum etkinken kullanılır.</translation>
+    </message>
+    <message>
+        <source>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</source>
+        <translation>hashcat’in optimize çekirdeklerini kullan (-O); bunlar en çok parola uzunluğunu sınırlar.</translation>
+    </message>
+    <message>
+        <source>Print only the attack’s speed, then quit; no cracking.</source>
+        <translation>Yalnızca saldırının hızını yazdır, sonra çık; kırma yapılmaz.</translation>
     </message>
     <message>
         <source>Reset Session</source>
@@ -1011,7 +1185,7 @@ Varsayılan: 1,2</translation>
         <translation>Bu mod bir kelime listesi ve en az bir tablo gerektirir.</translation>
     </message>
     <message>
-        <source>This mode needs a feed. Arguments depend on the feed — random and stdin need none, wordlist needs a path.</source>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
         <translation>Bu mod bir feed gerektirir. Bağımsız değişkenler feed’e bağlıdır: random ve stdin hiç gerektirmez, wordlist bir yol gerektirir.</translation>
     </message>
     <message>
@@ -1129,6 +1303,10 @@ Hata: %1</translation>
         <translation>Bu mod bir maske gerektirir.</translation>
     </message>
     <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>Parola adayı maskesi. ?1–?4 özel bir karakter kümesi ekler, ?w kelime listesindeki sözcüğü, ?q ise Hibrit (maske + ?w/?q) modunda kelime listesindeki ikinci bir sözcüğü ekler; ?? ise düz bir ? karakteridir.</translation>
+    </message>
+    <message>
         <source>Load the %1 example? The current session is lost.
 
 The example cracks a test hash; hashcat should recover the password %2.</source>
@@ -1147,6 +1325,14 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
     <message>
         <source>Could not write “%1”: %2</source>
         <translation>“%1” yazılamadı: %2</translation>
+    </message>
+    <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklanabilir. Çözüm için &lt;a href=&quot;%1&quot;&gt;SSS girdisine&lt;/a&gt; bakın.</translation>
     </message>
     <message>
         <source>This mode needs at least one wordlist.</source>
@@ -1187,9 +1373,9 @@ Değiştirmek için %2 → %3 bölümüne gidin.</translation>
         <translation>Başlatmada kullanılan terminali seçmek için &lt;b&gt;%1 → %2&lt;/b&gt; bölümüne gidin.</translation>
     </message>
     <message>
-        <source>This mode takes at most %1 wordlists.
+        <source>Maximum number of wordlists for this mode: %1.
 Currently selected: %2.</source>
-        <translation>Bu mod en fazla %1 kelime listesi alır.
+        <translation>Bu mod için izin verilen en fazla kelime listesi sayısı: %1.
 Şu anda seçili: %2.</translation>
     </message>
     <message>
@@ -1286,16 +1472,16 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Ayarlar</translation>
     </message>
     <message>
+        <source>hashcat executable</source>
+        <translation>hashcat çalıştırılabilir dosyası</translation>
+    </message>
+    <message>
         <source>Not configured</source>
         <translation>Yapılandırılmamış</translation>
     </message>
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;hashcat executable</source>
-        <translation>&amp;hashcat çalıştırılabilir dosyası</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1320,6 +1506,10 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>Tüm renk şemaları her platformda kullanılamaz.</translation>
+    </message>
+    <message>
+        <source>&amp;Parameters</source>
+        <translation>&amp;Parametreler</translation>
     </message>
     <message>
         <source>&amp;Use short parameters</source>

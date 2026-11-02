@@ -975,7 +975,7 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
         {AttackMode::HybridWordMask, QStringLiteral("This mode needs a wordlist and a mask.")},
         {AttackMode::HybridMaskWord, QStringLiteral("This mode needs a wordlist and a mask.")},
         {AttackMode::Generic,
-         QStringLiteral("This mode needs a feed. Arguments depend on the feed — "
+         QStringLiteral("This mode needs a feed. Arguments depend on the feed: "
                         "random and stdin need none, wordlist needs a path.")},
         {AttackMode::Association,
          QStringLiteral("This mode needs at most one wordlist. Without one the words come from "

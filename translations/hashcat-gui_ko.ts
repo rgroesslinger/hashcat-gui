@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -153,20 +153,60 @@
         <translation>해시 파일 또는 해시:</translation>
     </message>
     <message>
+        <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
+        <translation>해시, 해시 파일, 또는 .hc22000/.hccapx WPA 캡처입니다.</translation>
+    </message>
+    <message>
+        <source>Choose a file of hashes.</source>
+        <translation>해시 파일을 선택합니다.</translation>
+    </message>
+    <message>
         <source>Salt is hex</source>
         <translation>솔트가 16진수</translation>
+    </message>
+    <message>
+        <source>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</source>
+        <translation>크래킹한 해시(potfile에 이미 있는 것 포함)를 제외하고 해시 파일을 다시 씁니다. potfile은 변경되지 않습니다. 공격 모드 9에서는 거부됩니다.</translation>
     </message>
     <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>크래킹한 해시를 해시 목록에서 제거</translation>
     </message>
     <message>
+        <source>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</source>
+        <translation>모드 구분자(보통 “:”) 앞의 사용자 이름을 무시하여, 같은 해시를 공유하는 계정을 한 번만 크래킹합니다.</translation>
+    </message>
+    <message>
+        <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
+        <translation>해시 레시피(예: “md5(md5(salt) . pass)”). 레시피 전체는 셸의 바깥쪽 따옴표로 감싸고, 안쪽 문자열에는 다른 종류의 따옴표를 사용합니다. PowerShell에서는 $ 앞에 백틱이 필요합니다.</translation>
+    </message>
+    <message>
         <source>Move item up</source>
         <translation>항목 위로 이동</translation>
     </message>
     <message>
+        <source>Move selected wordlist up</source>
+        <translation>선택한 단어 목록 위로 이동</translation>
+    </message>
+    <message>
         <source>Move item down</source>
         <translation>항목 아래로 이동</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down</source>
+        <translation>선택한 단어 목록 아래로 이동</translation>
+    </message>
+    <message>
+        <source>Add one or more wordlist files. Each checked row is passed to hashcat.</source>
+        <translation>단어 목록 파일을 하나 이상 추가합니다. 체크된 각 행이 hashcat에 전달됩니다.</translation>
+    </message>
+    <message>
+        <source>Remove the selected wordlists.</source>
+        <translation>선택한 단어 목록을 제거합니다.</translation>
+    </message>
+    <message>
+        <source>Remove wordlists</source>
+        <translation>단어 목록 제거</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -185,6 +225,178 @@
         <translation>인코딩 대상:</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
+        <translation>공격 모드 9용 공백으로 구분된 key=value 설정입니다(예: phases=words,rules 또는 rules.rulefile=…). 단어 목록이 없을 때만 사용됩니다.</translation>
+    </message>
+    <message>
+        <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
+        <translation>규칙 세트 파일, Grammar/grammar.txt가 있는 폴더, 또는 내장 이름. 체크되지 않은 행은 건너뛰며, 하나도 체크되지 않으면 default-passwords가 실행됩니다.</translation>
+    </message>
+    <message>
+        <source>Add one or more PCFG ruleset files.</source>
+        <translation>PCFG 규칙 세트 파일을 하나 이상 추가합니다.</translation>
+    </message>
+    <message>
+        <source>Add PCFG rulesets</source>
+        <translation>PCFG 규칙 세트 추가</translation>
+    </message>
+    <message>
+        <source>Remove the selected rulesets.</source>
+        <translation>선택한 규칙 세트를 제거합니다.</translation>
+    </message>
+    <message>
+        <source>Remove rulesets</source>
+        <translation>규칙 세트 제거</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset up</source>
+        <translation>선택한 규칙 세트 위로 이동</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down</source>
+        <translation>선택한 규칙 세트 아래로 이동</translation>
+    </message>
+    <message>
+        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>규칙 세트마다 일반 숫자를 하나씩 콜론으로 구분하여 입력합니다(예: 2:1). 숫자의 개수는 규칙 세트의 개수와 일치해야 합니다.</translation>
+    </message>
+    <message>
+        <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
+        <translation>커널이 만드는 후보의 최대 길이(4바이트 단어 단위): 0(자동), 16 또는 32.</translation>
+    </message>
+    <message>
+        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
+        <translation>1이면 순서가 허용하는 경우 언랭킹 대신 다음 기본 단어로 넘어갑니다. 후보는 동일하며 빠른 경로만 꺼집니다.</translation>
+    </message>
+    <message>
+        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
+        <translation>이 마스크가 허용하는 후보만 열거합니다. omen=1은 제외되며, 힌트 단어가 hintwords 또는 hintfile에서 오는 경우를 제외하고 hintaccount도 제외됩니다.</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
+        <translation>공백으로 구분된 key=value 설정: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. 규칙 세트가 먼저 와야 합니다.</translation>
+    </message>
+    <message>
+        <source>Add one or more table files.</source>
+        <translation>테이블 파일을 하나 이상 추가합니다.</translation>
+    </message>
+    <message>
+        <source>Remove the selected tables.</source>
+        <translation>선택한 테이블을 제거합니다.</translation>
+    </message>
+    <message>
+        <source>Remove tables</source>
+        <translation>테이블 제거</translation>
+    </message>
+    <message>
+        <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
+        <translation>1(기본값)이면 토큰을 선택지로서 그대로 유지하고, 0이면 제외하여 테이블이 변형만 생성합니다. identity=0은 single=1을 제외합니다.</translation>
+    </message>
+    <message>
+        <source>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</source>
+        <translation>1이면 단어 목록을 패턴으로 읽습니다. 변경되지 않은 단어는 반환되지 않고 일치하지 않는 단어는 버려집니다. 0(기본값)이면 그대로 유지합니다.</translation>
+    </message>
+    <message>
+        <source>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</source>
+        <translation>single=1: 데카르트 곱 대신 후보당 치환을 한 번만 수행합니다. 후보는 줄어들지만 빠른 해시에서는 호스트 작업이 늘어납니다.</translation>
+    </message>
+    <message>
+        <source>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</source>
+        <translation>각 원본 단어의 처음 N개 치환만 유지합니다. 0은 제한 없음을 뜻합니다. single=1에도 적용됩니다.</translation>
+    </message>
+    <message>
+        <source>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</source>
+        <translation>호스트가 포기하기 전에 단어의 데카르트 곱을 얼마나 열거할지 정합니다. 0은 제한 없음을 뜻합니다.</translation>
+    </message>
+    <message>
+        <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
+        <translation>공백으로 구분된 key=value 설정입니다. 첫 번째 이후는 모두 설정으로 취급되므로 테이블을 먼저 지정해야 합니다.</translation>
+    </message>
+    <message>
+        <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
+        <translation>피드 이름 또는 경로입니다. 슬래시는 경로를 뜻하며, 그렇지 않으면 hashcat이 피드 디렉터리에서 feed_&lt;name&gt;, rust_&lt;name&gt;, &lt;name&gt; 순으로 시도합니다.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin instead of naming it.</source>
+        <translation>이름을 지정하는 대신 피드 플러그인을 찾아봅니다.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin</source>
+        <translation>피드 플러그인 찾아보기</translation>
+    </message>
+    <message>
+        <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
+        <translation>피드에 전달되는 인수입니다. 의미와 개수는 피드에 따라 다릅니다(wordlist 피드는 단어 목록 경로를 받습니다).</translation>
+    </message>
+    <message>
+        <source>Add an argument for the feed, in order.</source>
+        <translation>피드에 전달할 인수를 순서대로 추가합니다.</translation>
+    </message>
+    <message>
+        <source>Remove the selected feed arguments.</source>
+        <translation>선택한 피드 인수를 제거합니다.</translation>
+    </message>
+    <message>
+        <source>Remove feed arguments</source>
+        <translation>피드 인수 제거</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument up</source>
+        <translation>선택한 피드 인수 위로 이동</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down</source>
+        <translation>선택한 피드 인수 아래로 이동</translation>
+    </message>
+    <message>
+        <source>Read rules from the files below instead of generating them.</source>
+        <translation>규칙을 생성하는 대신 아래 파일에서 읽습니다.</translation>
+    </message>
+    <message>
+        <source>Rules file 1:</source>
+        <translation>규칙 파일 1:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 1.</source>
+        <translation>슬롯 1의 규칙 파일을 선택합니다.</translation>
+    </message>
+    <message>
+        <source>Open rules file 1</source>
+        <translation>규칙 파일 1 열기</translation>
+    </message>
+    <message>
+        <source>Rules file 2:</source>
+        <translation>규칙 파일 2:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 2.</source>
+        <translation>슬롯 2의 규칙 파일을 선택합니다.</translation>
+    </message>
+    <message>
+        <source>Open rules file 2</source>
+        <translation>규칙 파일 2 열기</translation>
+    </message>
+    <message>
+        <source>Rules file 3:</source>
+        <translation>규칙 파일 3:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 3.</source>
+        <translation>슬롯 3의 규칙 파일을 선택합니다.</translation>
+    </message>
+    <message>
+        <source>Open rules file 3</source>
+        <translation>규칙 파일 3 열기</translation>
+    </message>
+    <message>
+        <source>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</source>
+        <translation>hashcat이 생성할 무작위 규칙의 수(-g)입니다. “규칙 생성”을 사용할 때만 적용되며 규칙 파일은 읽지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Treat every -r file as one list: rule counts add instead of multiplying.</source>
+        <translation>모든 -r 파일을 하나의 목록으로 취급합니다. 규칙 수가 곱해지지 않고 더해집니다.</translation>
+    </message>
+    <message>
         <source>Wordlist rules</source>
         <translation>단어 목록 규칙</translation>
     </message>
@@ -197,8 +409,16 @@
         <translation>오른쪽 규칙:</translation>
     </message>
     <message>
+        <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
+        <translation>마스크와 사용자 지정 문자 집합을 16진수 바이트로 해석합니다.</translation>
+    </message>
+    <message>
         <source>Charset is hex</source>
         <translation>문자 집합이 16진수</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+I</source>
+        <translation>Ctrl+Shift+I</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -213,6 +433,10 @@
         <translation>최대:</translation>
     </message>
     <message>
+        <source>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</source>
+        <translation>hashcat의 최적화된 커널을 사용합니다(-O). 비밀번호 최대 길이가 제한됩니다.</translation>
+    </message>
+    <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
         <translation>hashcat을 이 CPU 장치에 고정합니다(쉼표로 구분). 비워 두면 hashcat이 결정합니다.</translation>
     </message>
@@ -225,22 +449,8 @@
         <translation>중단 온도</translation>
     </message>
     <message>
-        <source>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</source>
-        <translation>OpenCL 장치의 핫스팟이 이 섭씨 온도를 초과하면 세션을 중단합니다. 0으로 설정하면 온도 제한을 사용하지 않습니다.</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>출력 파일</translation>
-    </message>
-    <message>
-        <source>Built-in variables:
-
-&lt;hash&gt; = current hash filename or hash
-&lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>내장 변수:
-
-&lt;hash&gt; = 현재 해시 파일 이름 또는 해시
-&lt;unixtime&gt; = 현재 Unix 타임스탬프</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -275,24 +485,12 @@
         <translation>공격</translation>
     </message>
     <message>
-        <source>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</source>
-        <translation>크래킹할 해시, 해시가 들어 있는 파일의 경로 또는 .hccapx WPA 캡처입니다. 여기에 해시 하나를 붙여 넣거나 파일을 지정하세요.</translation>
-    </message>
-    <message>
         <source>Open…</source>
         <translation>열기…</translation>
     </message>
     <message>
         <source>Assume the salt is given in hexadecimal.</source>
         <translation>솔트가 16진수로 주어진 것으로 간주합니다.</translation>
-    </message>
-    <message>
-        <source>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</source>
-        <translation>이미 크래킹한 해시를 potfile에서 제거하여 이후 실행에서 다시 보고하지 않도록 합니다. 공격 모드 9에서는 거부됩니다.</translation>
-    </message>
-    <message>
-        <source>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</source>
-        <translation>해시의 @username 부분을 (해당 부분이 있는 해시 모드에서) 무시하여 같은 단어가 여러 계정에 맞을 수 있게 합니다.</translation>
     </message>
     <message>
         <source>Attack mode. Each choice reveals its own options below.</source>
@@ -305,12 +503,6 @@
     <message>
         <source>Hash recipe:</source>
         <translation>해시 레시피:</translation>
-    </message>
-    <message>
-        <source>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</source>
-        <translation>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</translation>
     </message>
     <message>
         <source>Add files…</source>
@@ -337,16 +529,8 @@
         <translation>설정(단어 목록 없음):</translation>
     </message>
     <message>
-        <source>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</source>
-        <translation>공백으로 구분하는 위치 기반 설정입니다. 단어 목록을 선택하지 않았을 때만 사용됩니다. 단어 목록이 있으면 hashcat이 두 파일을 줄 단위로 짝짓습니다. “phases”는 실행할 단계를 비용이 적은 순서대로 선택하며, 기본값 “words,rules,pcfg”는 중지할 때만 끝납니다. 단계 접두사가 붙은 설정: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</translation>
-    </message>
-    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
-    </message>
-    <message>
-        <source>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</source>
-        <translation>한 행은 규칙 세트 파일, Grammar/grammar.txt가 들어 있는 폴더 또는 내장 이름입니다. 체크된 행만 사용되며, 아무것도 체크하지 않으면 hashcat에 내장된 default-passwords가 실행됩니다. hints도 내장되어 있습니다.</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -373,16 +557,12 @@
         <translation>Weights:</translation>
     </message>
     <message>
-        <source>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</source>
-        <translation>규칙 세트마다 값 하나씩, 콜론으로 구분한 일반 숫자입니다. 예: 규칙 세트 두 개면 2:1. 값의 개수는 규칙 세트의 수와 같아야 합니다.</translation>
-    </message>
-    <message>
         <source>Threads:</source>
         <translation>스레드:</translation>
     </message>
     <message>
-        <source>Cores that generate base words (0–16); 0 runs on the calling thread</source>
-        <translation>기본 단어를 생성하는 코어 수(0–16). 0이면 호출한 스레드에서 실행합니다</translation>
+        <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
+        <translation>기본 단어를 생성하는 코어 수(0–16). 0이면 호출한 스레드에서 실행합니다.</translation>
     </message>
     <message>
         <source>auto</source>
@@ -401,48 +581,32 @@
         <translation>Maxword:</translation>
     </message>
     <message>
-        <source>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</source>
-        <translation>커널이 기본 단어당 만드는 후보 수: 0, 16 또는 32(16의 배수)</translation>
-    </message>
-    <message>
         <source>Maxgain:</source>
         <translation>Maxgain:</translation>
     </message>
     <message>
-        <source>1.0–64.0; decimal point is a dot, not the locale separator</source>
-        <translation>1.0–64.0. 소수점은 로캘 구분자가 아니라 점입니다</translation>
+        <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
+        <translation>1.0–64.0. 소수점은 로캘 구분자가 아니라 점입니다.</translation>
     </message>
     <message>
         <source>Walk:</source>
         <translation>Walk:</translation>
     </message>
     <message>
-        <source>1 steps the last token instead of unraking it</source>
-        <translation>1이면 마지막 토큰에 “unraking”을 적용하는 대신 한 단계씩 진행합니다</translation>
-    </message>
-    <message>
         <source>Mask:</source>
         <translation>마스크:</translation>
-    </message>
-    <message>
-        <source>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</source>
-        <translation>문법을 이 마스크가 허용하는 후보로 제한합니다. omen=1과 함께 사용할 수 없으며, 힌트 단어가 계정에서 올 때는 hintaccount와도 함께 사용할 수 없습니다(대신 hintwords 또는 hintfile을 지정하세요)</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
         <translation>추가 설정(key=value):</translation>
     </message>
     <message>
-        <source>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</source>
-        <translation>공백으로 구분하는 추가 key=value 설정: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. 첫 번째 key=value 이후는 모두 설정으로 처리되므로 규칙 세트를 먼저 지정해야 합니다.</translation>
-    </message>
-    <message>
         <source>Table</source>
         <translation>테이블</translation>
     </message>
     <message>
-        <source>Every checked row after the wordlist is a table</source>
-        <translation>단어 목록 뒤에 체크된 모든 행은 테이블입니다</translation>
+        <source>Every checked row after the wordlist is a table.</source>
+        <translation>단어 목록 뒤에 체크된 모든 행은 테이블입니다.</translation>
     </message>
     <message>
         <source>Add tables…</source>
@@ -453,44 +617,20 @@
         <translation>Identity:</translation>
     </message>
     <message>
-        <source>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</source>
-        <translation>토큰을 변경하지 않고 두는 것을 선택지 중 하나로 포함할지 여부입니다. 1(기본값)은 유지하고, 0은 제외하여 테이블이 변형만 생성하도록 합니다. single=1과 함께 사용할 수 없습니다.</translation>
-    </message>
-    <message>
         <source>Template:</source>
         <translation>Template:</translation>
-    </message>
-    <message>
-        <source>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</source>
-        <translation>1이면 단어 목록을 패턴 집합으로 읽습니다. 변경되지 않은 단어는 반환되지 않으며, 어떤 규칙과도 일치하지 않는 단어는 버려집니다. 0(기본값)은 변경되지 않은 단어를 유지합니다.</translation>
     </message>
     <message>
         <source>Single:</source>
         <translation>Single:</translation>
     </message>
     <message>
-        <source>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</source>
-        <translation>single=1은 일치하는 모든 위치의 곱집합 대신 각 후보가 정확히 하나의 치환만 갖도록 합니다. 대개 다르고 비용이 적은 공격이 됩니다.</translation>
-    </message>
-    <message>
         <source>Cap:</source>
         <translation>Cap:</translation>
     </message>
     <message>
-        <source>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</source>
-        <translation>하나의 소스가 단어 안에서 가질 수 있는 최대 치환 수입니다. 0은 제한 없음을 뜻합니다. 호스트 쪽 곱집합만 제한하며 single=1 실행에는 적용되지 않습니다.</translation>
-    </message>
-    <message>
         <source>Maxperm:</source>
         <translation>Maxperm:</translation>
-    </message>
-    <message>
-        <source>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</source>
-        <translation>호스트가 포기하기 전에 한 단어의 곱집합에서 몇 개를 열거할지 정합니다. 0은 제한 없음을 뜻합니다. 장치 셀은 중간에 잘리지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</source>
-        <translation>공백으로 구분하는 추가 key=value 설정입니다. 첫 번째 key=value 이후는 모두 설정으로 처리되므로 테이블을 먼저 지정해야 합니다.</translation>
     </message>
     <message>
         <source>Generic feed</source>
@@ -499,10 +639,6 @@
     <message>
         <source>Feed:</source>
         <translation>Feed:</translation>
-    </message>
-    <message>
-        <source>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</source>
-        <translation>후보 생성기입니다. 슬래시가 들어 있으면 피드 경로로 처리하고, 그렇지 않으면 hashcat이 피드 디렉터리에서 feed_&lt;name&gt;을 찾습니다. 아래의 인수는 피드별로 다릅니다.</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -517,16 +653,12 @@
         <translation>인수:</translation>
     </message>
     <message>
-        <source>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</source>
-        <translation>피드에 전달되는 인수입니다. 의미와 개수는 피드에 따라 다르며(wordlist 피드는 단어 목록 경로를 받습니다), 추가 토큰은 그대로 피드에 전달됩니다.</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>추가</translation>
     </message>
     <message>
-        <source>Arguments the feed reads, in order; only checked rows are used</source>
-        <translation>피드가 순서대로 읽는 인수입니다. 체크된 행만 사용됩니다</translation>
+        <source>Arguments the feed reads, in order; only checked rows are used.</source>
+        <translation>피드가 순서대로 읽는 인수입니다. 체크된 행만 사용됩니다.</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -541,11 +673,7 @@
         <translation>이번 실행에서 규칙 파일 슬롯 1을 사용합니다.</translation>
     </message>
     <message>
-        <source>Rules file:</source>
-        <translation>규칙 파일:</translation>
-    </message>
-    <message>
-        <source>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>슬롯 1의 규칙 파일로, 각 단어에 적용됩니다. 슬롯을 사용하지 않으려면 비워 두세요.</translation>
     </message>
     <message>
@@ -553,7 +681,7 @@
         <translation>이번 실행에서 규칙 파일 슬롯 2를 사용합니다.</translation>
     </message>
     <message>
-        <source>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>슬롯 2의 규칙 파일로, 각 단어에 적용됩니다. 슬롯을 사용하지 않으려면 비워 두세요.</translation>
     </message>
     <message>
@@ -561,7 +689,7 @@
         <translation>이번 실행에서 규칙 파일 슬롯 3을 사용합니다.</translation>
     </message>
     <message>
-        <source>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>슬롯 3의 규칙 파일로, 각 단어에 적용됩니다. 슬롯을 사용하지 않으려면 비워 두세요.</translation>
     </message>
     <message>
@@ -571,14 +699,6 @@
     <message>
         <source>Generate rules:</source>
         <translation>규칙 생성:</translation>
-    </message>
-    <message>
-        <source>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</source>
-        <translation>규칙 찾기 공격을 위해 생성할 규칙의 수입니다. 규칙 파일은 읽지 않으며 hashcat이 직접 규칙을 만듭니다. 기존 규칙 파일을 사용하려면 위의 슬롯을 사용하세요.</translation>
-    </message>
-    <message>
-        <source>Pass every rules file to hashcat in one run, instead of one run per file.</source>
-        <translation>규칙 파일마다 한 번씩 실행하는 대신, 모든 규칙 파일을 한 번의 실행으로 hashcat에 전달합니다.</translation>
     </message>
     <message>
         <source>Join -r files into one list</source>
@@ -621,10 +741,6 @@
         <translation>문자 집합 4:</translation>
     </message>
     <message>
-        <source>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</source>
-        <translation>사용자 지정 문자 집합을 16진수 바이트로 해석합니다. 사용자 지정 문자 집합 1~4에 적용됩니다.</translation>
-    </message>
-    <message>
         <source>Session and limits</source>
         <translation>세션 및 제한</translation>
     </message>
@@ -661,6 +777,10 @@
         <translation>상태 자동 업데이트</translation>
     </message>
     <message>
+        <source>Seconds between status updates; only used when automatic status is enabled.</source>
+        <translation>상태 업데이트 사이의 간격(초)입니다. 자동 상태가 켜져 있을 때만 사용됩니다.</translation>
+    </message>
+    <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
         <translation>경고를 무시하고 hashcat을 시작합니다. 주의해서 사용하세요.</translation>
     </message>
@@ -673,16 +793,20 @@
         <translation>성능</translation>
     </message>
     <message>
-        <source>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</source>
-        <translation>크래킹하지 않고 공격 속도만 출력한 뒤 종료합니다. 벤치마크와 설정 비교에 유용합니다.</translation>
-    </message>
-    <message>
         <source>Cache path:</source>
         <translation>캐시 경로:</translation>
     </message>
     <message>
         <source>Directory hashcat keeps its cache in. Must exist.</source>
         <translation>hashcat이 캐시를 보관하는 디렉터리입니다. 반드시 존재해야 합니다.</translation>
+    </message>
+    <message>
+        <source>Choose the cache directory.</source>
+        <translation>캐시 디렉터리를 선택합니다.</translation>
+    </message>
+    <message>
+        <source>Choose cache directory</source>
+        <translation>캐시 디렉터리 선택</translation>
     </message>
     <message>
         <source>Resources</source>
@@ -701,8 +825,34 @@
         <translation>장치 유형:</translation>
     </message>
     <message>
+        <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
+        <translation>백엔드 장치 중 하나라도 이 온도(°C)를 초과하면 중단합니다. 0이면 비활성화됩니다.</translation>
+    </message>
+    <message>
+        <source>Write recovered hashes to the file below, in the selected formats.</source>
+        <translation>복구한 해시를 선택한 형식으로 아래 파일에 씁니다.</translation>
+    </message>
+    <message>
         <source>Write recovered hashes to file:</source>
         <translation>복구한 해시를 파일에 쓰기:</translation>
+    </message>
+    <message>
+        <source>The file the recovered hashes are written to. Format variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation>복구한 해시를 기록할 파일입니다. 형식 변수:
+
+&lt;hash&gt; = 현재 해시 파일 이름 또는 해시
+&lt;unixtime&gt; = 현재 Unix 타임스탬프</translation>
+    </message>
+    <message>
+        <source>Choose the outfile path.</source>
+        <translation>출력 파일 경로를 선택합니다.</translation>
+    </message>
+    <message>
+        <source>Choose outfile</source>
+        <translation>출력 파일 선택</translation>
     </message>
     <message>
         <source>Format:</source>
@@ -711,6 +861,10 @@
     <message>
         <source>Do not write the potfile</source>
         <translation>potfile에 쓰지 않음</translation>
+    </message>
+    <message>
+        <source>Run hashcat in a terminal with these options.</source>
+        <translation>이 옵션으로 터미널에서 hashcat을 실행합니다.</translation>
     </message>
     <message>
         <source>Start</source>
@@ -761,56 +915,76 @@
         <translation>건너뛴 후보 이후로 이 개수만큼의 후보만 테스트합니다.</translation>
     </message>
     <message>
-        <source>Seconds between status updates.</source>
-        <translation>상태 갱신 사이의 간격(초)입니다.</translation>
+        <source>Enable optimized kernels (limits password length)</source>
+        <translation>최적화된 커널 사용(비밀번호 길이 제한)</translation>
     </message>
     <message>
-        <source>Enable optimized kernels (limits password length)</source>
-        <translation>최적화된 커널 사용 (비밀번호 길이 제한)</translation>
+        <source>Print only the attack’s speed, then quit; no cracking.</source>
+        <translation>공격 속도만 출력하고 종료합니다. 크래킹은 하지 않습니다.</translation>
     </message>
     <message>
         <source>Return expected speed of the attack, then quit</source>
         <translation>공격의 예상 속도를 출력한 뒤 종료</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature.</source>
-        <translation>장치가 이 온도에 도달하면 중단합니다.</translation>
-    </message>
-    <message>
         <source>&#xa0;°C</source>
         <translation>&#xa0;°C</translation>
+    </message>
+    <message>
+        <source>Copy command</source>
+        <translation>명령 복사</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>도움말(&amp;H)</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>도구(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>파일(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>Settings…</source>
         <translation>설정…</translation>
     </message>
     <message>
+        <source>Ctrl+,</source>
+        <translation>Ctrl+,</translation>
+    </message>
+    <message>
         <source>Import Settings…</source>
         <translation>설정 가져오기…</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+O</source>
+        <translation>Ctrl+Shift+O</translation>
     </message>
     <message>
         <source>Export Settings…</source>
         <translation>설정 내보내기…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
         <source>Export Session…</source>
         <translation>세션 내보내기…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+E</source>
+        <translation>Ctrl+Shift+E</translation>
+    </message>
+    <message>
         <source>Import Session…</source>
         <translation>세션 가져오기…</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>도움말</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>도구</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>파일</translation>
     </message>
     <message>
         <source>About</source>
@@ -1007,6 +1181,10 @@ Currently selected: %2.</source>
         <translation>세션에 지정된 해시 유형 %1은(는) 이 hashcat 버전에서 지원되지 않습니다.</translation>
     </message>
     <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>비밀번호 후보 마스크입니다. ?1–?4는 사용자 지정 문자 집합을, ?w는 단어 목록의 단어를, ?q는 “하이브리드(마스크 + ?w/?q)” 모드에서 두 번째 단어 목록의 단어를 삽입하며, ??는 리터럴 ?입니다.</translation>
+    </message>
+    <message>
         <source>Load the %1 example? The current session is lost.
 
 The example cracks a test hash; hashcat should recover the password %2.</source>
@@ -1069,6 +1247,14 @@ Error: %1</source>
         <translation>해시 유형을 불러올 수 없습니다. 설정에서 hashcat 경로를 확인하세요.</translation>
     </message>
     <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니다. 해결 방법은 &lt;a href=&quot;%1&quot;&gt;FAQ 항목&lt;/a&gt;을 참조하세요.</translation>
+    </message>
+    <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>사용 가능한 해시 유형을 불러오려면 %1 → %2에서 hashcat 경로를 설정하세요.</translation>
     </message>
@@ -1089,7 +1275,7 @@ Error: %1</source>
         <translation>이 모드에는 단어 목록 하나와 테이블이 하나 이상 필요합니다.</translation>
     </message>
     <message>
-        <source>This mode needs a feed. Arguments depend on the feed — random and stdin need none, wordlist needs a path.</source>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
         <translation>이 모드에는 피드가 필요합니다. 인수는 피드에 따라 다르며, random과 stdin은 필요하지 않고 wordlist는 경로가 필요합니다.</translation>
     </message>
     <message>
@@ -1187,9 +1373,9 @@ Navigate to %2 → %3 to change it.</source>
         <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 실행에 사용할 터미널을 선택하세요.</translation>
     </message>
     <message>
-        <source>This mode takes at most %1 wordlists.
+        <source>Maximum number of wordlists for this mode: %1.
 Currently selected: %2.</source>
-        <translation>이 모드는 단어 목록을 최대 %1개까지 사용할 수 있습니다.
+        <translation>이 모드의 단어 목록 최대 개수는 %1개입니다.
 현재 선택: %2개.</translation>
     </message>
     <message>
@@ -1286,16 +1472,16 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>설정</translation>
     </message>
     <message>
+        <source>hashcat executable</source>
+        <translation>hashcat 실행 파일</translation>
+    </message>
+    <message>
         <source>Not configured</source>
         <translation>설정되지 않음</translation>
     </message>
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;hashcat executable</source>
-        <translation>hashcat 실행 파일(&amp;H)</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1316,6 +1502,10 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>모든 색상 테마를 모든 플랫폼에서 사용할 수 있는 것은 아닙니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Parameters</source>
+        <translation>매개변수(&amp;P)</translation>
     </message>
     <message>
         <source>&amp;Use short parameters</source>

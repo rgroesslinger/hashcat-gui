@@ -1594,7 +1594,7 @@ void MainWindow::initHashAndAttackModes()
                     // query that runs into its deadline; on other platforms a
                     // timeout has no such explanation to offer.
                     error += tr("\n\nThis can be caused by Windows Defender or other "
-                                "anti-virus software. See the <a href=\"%1\">FAQ entry</a> "
+                                "antivirus software. See the <a href=\"%1\">FAQ entry</a> "
                                 "for a remedy.")
                                  .arg(QString(AppConstants::Urls::FaqHashTypesTimeout));
                 }
@@ -1726,7 +1726,7 @@ QString MainWindow::modeHint(AttackMode mode) const
     case AttackMode::HybridMaskWord:
         return tr("This mode needs a wordlist and a mask.");
     case AttackMode::Generic:
-        return tr("This mode needs a feed. Arguments depend on the feed — "
+        return tr("This mode needs a feed. Arguments depend on the feed: "
                   "random and stdin need none, wordlist needs a path.");
     case AttackMode::Association:
         // The settings grammar (phases, the never-ending default) is the
@@ -2319,7 +2319,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         const CommandBuilder::ModeRequirements requirements =
             CommandBuilder::modeRequirements(currentAttackMode());
         box.setIcon(QMessageBox::Information);
-        QString text = tr("This mode takes at most %1 wordlists.\nCurrently selected: %2.")
+        QString text = tr("Maximum number of wordlists for this mode: %1.\nCurrently selected: %2.")
                            .arg(requirements.maxWordlists)
                            .arg(detail);
         if (currentAttackMode() == AttackMode::Association) {

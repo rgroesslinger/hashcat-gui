@@ -157,24 +157,12 @@
         <translation>Файл гешів або геш:</translation>
     </message>
     <message>
-        <source>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</source>
-        <translation>Геш для злому, шлях до файлу з гешами або дамп WPA у форматі .hccapx. Вставте сюди один геш або вкажіть файл.</translation>
-    </message>
-    <message>
         <source>Salt is hex</source>
         <translation>Сіль у hex</translation>
     </message>
     <message>
-        <source>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</source>
-        <translation>Вилучати вже зламані геші з potfile, щоб наступний запуск не повідомляв про них знову. Відхиляється в режимі атаки 9.</translation>
-    </message>
-    <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>Вилучати геш зі списку гешів після злому</translation>
-    </message>
-    <message>
-        <source>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</source>
-        <translation>Ігнорувати частину @username у гешах (у режимах гешів, що її містять), щоб те саме слово могло підійти до кількох облікових записів.</translation>
     </message>
     <message>
         <source>Ignore username in hash file</source>
@@ -195,12 +183,6 @@
     <message>
         <source>Hash recipe:</source>
         <translation>Рецепт геша:</translation>
-    </message>
-    <message>
-        <source>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</source>
-        <translation>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</translation>
     </message>
     <message>
         <source>Wordlists</source>
@@ -247,16 +229,8 @@
         <translation>Налаштування (без словника):</translation>
     </message>
     <message>
-        <source>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</source>
-        <translation>Позиційні налаштування через пробіл. Використовуються, лише коли словник не вибрано: за вибраного словника hashcat зіставляє два файли порядково. «phases» визначає, які фази виконуються, починаючи з найдешевшої; типове значення «words,rules,pcfg» завершується лише після зупинки. Налаштування з префіксом фази: «rules.rulefile», «rules.rulemax», «words.hints», «pcfg.hintaccount», …</translation>
-    </message>
-    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
-    </message>
-    <message>
-        <source>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</source>
-        <translation>Рядок — це файл набору правил, тека з Grammar/grammar.txt або вбудована назва. Використовуються лише позначені рядки; якщо жодного не позначено, запускається вбудований у hashcat default-passwords. hints також вбудований.</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -283,16 +257,12 @@
         <translation>Weights:</translation>
     </message>
     <message>
-        <source>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</source>
-        <translation>Одне значення на набір правил, прості числа через двокрапку, наприклад 2:1 для двох наборів правил. Кількість значень має збігатися з кількістю наборів правил.</translation>
-    </message>
-    <message>
         <source>Threads:</source>
         <translation>Потоки:</translation>
     </message>
     <message>
-        <source>Cores that generate base words (0–16); 0 runs on the calling thread</source>
-        <translation>Ядра, що генерують базові слова (0–16); 0 виконує роботу у викликаючому потоці</translation>
+        <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
+        <translation>Ядра, що генерують базові слова (0–16); 0 виконує роботу в потоці, що викликає.</translation>
     </message>
     <message>
         <source>auto</source>
@@ -311,48 +281,32 @@
         <translation>Maxword:</translation>
     </message>
     <message>
-        <source>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</source>
-        <translation>Кандидати, які ядро будує на одне базове слово: 0, 16 або 32 (кратно 16)</translation>
-    </message>
-    <message>
         <source>Maxgain:</source>
         <translation>Maxgain:</translation>
     </message>
     <message>
-        <source>1.0–64.0; decimal point is a dot, not the locale separator</source>
-        <translation>1.0–64.0; десятковим роздільником є крапка, а не роздільник із регіональних налаштувань</translation>
+        <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
+        <translation>1.0–64.0; десятковим роздільником є крапка, а не роздільник із регіональних налаштувань.</translation>
     </message>
     <message>
         <source>Walk:</source>
         <translation>Walk:</translation>
     </message>
     <message>
-        <source>1 steps the last token instead of unraking it</source>
-        <translation>1 просуває останній токен покроково, замість того щоб застосовувати до нього «unraking»</translation>
-    </message>
-    <message>
         <source>Mask:</source>
         <translation>Маска:</translation>
-    </message>
-    <message>
-        <source>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</source>
-        <translation>Обмежити граматику кандидатами, які допускає ця маска; не можна поєднувати з omen=1, а також із hintaccount, поки слова-підказки беруться з облікових записів (натомість укажіть hintwords або hintfile)</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
         <translation>Додаткові налаштування (key=value):</translation>
     </message>
     <message>
-        <source>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</source>
-        <translation>Додаткові налаштування key=value через пробіл: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Усе після першого key=value вважається налаштуванням, тому набори правил мають іти першими.</translation>
-    </message>
-    <message>
         <source>Table</source>
         <translation>Таблиця</translation>
     </message>
     <message>
-        <source>Every checked row after the wordlist is a table</source>
-        <translation>Кожен позначений рядок після словника — це таблиця</translation>
+        <source>Every checked row after the wordlist is a table.</source>
+        <translation>Кожен позначений рядок після словника — це таблиця.</translation>
     </message>
     <message>
         <source>Add tables…</source>
@@ -363,44 +317,20 @@
         <translation>Identity:</translation>
     </message>
     <message>
-        <source>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</source>
-        <translation>Чи входить залишення токена без змін до його варіантів: 1 (типово) залишає, 0 виключає, тож таблиця дає лише варіації. Не можна поєднувати з single=1.</translation>
-    </message>
-    <message>
         <source>Template:</source>
         <translation>Template:</translation>
-    </message>
-    <message>
-        <source>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</source>
-        <translation>1 читає словник як набір шаблонів: жодне слово не повертається без змін, а слова, що не підходять до жодного правила, відкидаються. 0 (типово) зберігає слова без змін.</translation>
     </message>
     <message>
         <source>Single:</source>
         <translation>Single:</translation>
     </message>
     <message>
-        <source>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</source>
-        <translation>single=1 робить так, що кожен кандидат містить рівно одну заміну замість декартового добутку всіх відповідних позицій; зазвичай це інша, дешевша атака.</translation>
-    </message>
-    <message>
         <source>Cap:</source>
         <translation>Cap:</translation>
     </message>
     <message>
-        <source>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</source>
-        <translation>Максимальна кількість замін, яку одне джерело може внести в слово; 0 означає без обмежень. Обмежує лише декартів добуток на боці хоста, але не запуск із single=1.</translation>
-    </message>
-    <message>
         <source>Maxperm:</source>
         <translation>Maxperm:</translation>
-    </message>
-    <message>
-        <source>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</source>
-        <translation>Скільки елементів декартового добутку одного слова хост перелічує, перш ніж здатися; 0 означає без обмежень. Клітинка пристрою ніколи не обрізається.</translation>
-    </message>
-    <message>
-        <source>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</source>
-        <translation>Додаткові налаштування key=value через пробіл. Усе після першого key=value вважається налаштуванням, тому таблиці мають іти першими.</translation>
     </message>
     <message>
         <source>Generic feed</source>
@@ -409,10 +339,6 @@
     <message>
         <source>Feed:</source>
         <translation>Feed:</translation>
-    </message>
-    <message>
-        <source>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</source>
-        <translation>Генератор кандидатів. Усе, що містить скісну риску, вважається шляхом до feed; інакше hashcat шукає feed_&lt;name&gt; у своєму каталозі feed. Наведені нижче аргументи залежать від feed.</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -427,16 +353,12 @@
         <translation>Аргумент:</translation>
     </message>
     <message>
-        <source>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</source>
-        <translation>Аргумент, що передається до feed. Його зміст і кількість залежать від feed (feed wordlist приймає шляхи до словників); зайві токени передаються просто до feed.</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Додати</translation>
     </message>
     <message>
-        <source>Arguments the feed reads, in order; only checked rows are used</source>
-        <translation>Аргументи, які читає feed, по порядку; використовуються лише позначені рядки</translation>
+        <source>Arguments the feed reads, in order; only checked rows are used.</source>
+        <translation>Аргументи, які читає feed, по порядку; використовуються лише позначені рядки.</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -451,11 +373,7 @@
         <translation>Увімкнути слот 1 файлу правил для цього запуску.</translation>
     </message>
     <message>
-        <source>Rules file:</source>
-        <translation>Файл правил:</translation>
-    </message>
-    <message>
-        <source>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Файл правил для слота 1; застосовується до кожного слова. Залиште порожнім, щоб не використовувати слот.</translation>
     </message>
     <message>
@@ -463,7 +381,7 @@
         <translation>Увімкнути слот 2 файлу правил для цього запуску.</translation>
     </message>
     <message>
-        <source>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Файл правил для слота 2; застосовується до кожного слова. Залиште порожнім, щоб не використовувати слот.</translation>
     </message>
     <message>
@@ -471,7 +389,7 @@
         <translation>Увімкнути слот 3 файлу правил для цього запуску.</translation>
     </message>
     <message>
-        <source>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Файл правил для слота 3; застосовується до кожного слова. Залиште порожнім, щоб не використовувати слот.</translation>
     </message>
     <message>
@@ -481,14 +399,6 @@
     <message>
         <source>Generate rules:</source>
         <translation>Генерувати правила:</translation>
-    </message>
-    <message>
-        <source>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</source>
-        <translation>Скільки правил згенерувати для атаки з пошуком правил. Файл правил не читається, hashcat створює їх сам; щоб використати наявний файл правил, скористайтеся слотами вище.</translation>
-    </message>
-    <message>
-        <source>Pass every rules file to hashcat in one run, instead of one run per file.</source>
-        <translation>Передати всі файли правил до hashcat за один запуск, а не по одному запуску на файл.</translation>
     </message>
     <message>
         <source>Join -r files into one list</source>
@@ -507,16 +417,224 @@
         <translation>Праве правило:</translation>
     </message>
     <message>
-        <source>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</source>
-        <translation>Інтерпретувати власні набори символів як шістнадцяткові байти. Стосується власних наборів символів з 1 по 4.</translation>
-    </message>
-    <message>
         <source>Charset is hex</source>
         <translation>Набір символів у hex</translation>
     </message>
     <message>
         <source>Mask</source>
         <translation>Маска</translation>
+    </message>
+    <message>
+        <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
+        <translation>Геш, файл гешів або WPA-захоплення .hc22000/.hccapx.</translation>
+    </message>
+    <message>
+        <source>Choose a file of hashes.</source>
+        <translation>Вибрати файл гешів.</translation>
+    </message>
+    <message>
+        <source>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</source>
+        <translation>Перезаписати файл гешів без зламаних гешів, зокрема тих, що вже відомі з potfile; сам potfile не змінюється. Відхиляється в режимі атаки 9.</translation>
+    </message>
+    <message>
+        <source>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</source>
+        <translation>Ігнорувати ім’я користувача перед роздільником режиму (зазвичай «:»), щоб облікові записи зі спільним гешем ламалися один раз.</translation>
+    </message>
+    <message>
+        <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
+        <translation>Рецепт геша, наприклад «md5(md5(salt) . pass)». Візьміть його у зовнішні лапки оболонки, а внутрішні рядки — у лапки іншого виду; PowerShell потребує зворотного апострофа перед $.</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist up</source>
+        <translation>Перемістити вибраний словник угору</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down</source>
+        <translation>Перемістити вибраний словник униз</translation>
+    </message>
+    <message>
+        <source>Add one or more wordlist files. Each checked row is passed to hashcat.</source>
+        <translation>Додати один або кілька файлів словників. Кожен позначений рядок передається до hashcat.</translation>
+    </message>
+    <message>
+        <source>Remove the selected wordlists.</source>
+        <translation>Вилучити вибрані словники.</translation>
+    </message>
+    <message>
+        <source>Remove wordlists</source>
+        <translation>Вилучити словники</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
+        <translation>Налаштування key=value через пробіл для режиму атаки 9, наприклад phases=words,rules або rules.rulefile=…. Використовуються лише без словника.</translation>
+    </message>
+    <message>
+        <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
+        <translation>Файл набору правил, тека з Grammar/grammar.txt або вбудована назва. Непозначені рядки пропускаються; якщо не позначено жодного, запускається default-passwords.</translation>
+    </message>
+    <message>
+        <source>Add one or more PCFG ruleset files.</source>
+        <translation>Додати один або кілька файлів наборів правил PCFG.</translation>
+    </message>
+    <message>
+        <source>Add PCFG rulesets</source>
+        <translation>Додати набори правил PCFG</translation>
+    </message>
+    <message>
+        <source>Remove the selected rulesets.</source>
+        <translation>Вилучити вибрані набори правил.</translation>
+    </message>
+    <message>
+        <source>Remove rulesets</source>
+        <translation>Вилучити набори правил</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset up</source>
+        <translation>Перемістити вибраний набір правил угору</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down</source>
+        <translation>Перемістити вибраний набір правил униз</translation>
+    </message>
+    <message>
+        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>По одному простому числу на набір правил, через двокрапку, наприклад 2:1; кількість чисел має збігатися з кількістю наборів правил.</translation>
+    </message>
+    <message>
+        <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
+        <translation>Максимальна довжина кандидата, яку будує ядро, у 4-байтових словах: 0 (авто), 16 або 32.</translation>
+    </message>
+    <message>
+        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
+        <translation>1 переходить до наступного базового слова там, де це дозволяє порядок, замість його обчислення через unranking; кандидати ті самі, вимикається лише швидкий шлях.</translation>
+    </message>
+    <message>
+        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
+        <translation>Перебирати лише кандидатів, які допускає ця маска; виключає omen=1, а також hintaccount, якщо слова-підказки не беруться з hintwords або hintfile.</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
+        <translation>Налаштування key=value через пробіл: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Набори правил ідуть першими.</translation>
+    </message>
+    <message>
+        <source>Add one or more table files.</source>
+        <translation>Додати один або кілька файлів таблиць.</translation>
+    </message>
+    <message>
+        <source>Remove the selected tables.</source>
+        <translation>Вилучити вибрані таблиці.</translation>
+    </message>
+    <message>
+        <source>Remove tables</source>
+        <translation>Вилучити таблиці</translation>
+    </message>
+    <message>
+        <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
+        <translation>1 (типово) залишає токен без змін як один із варіантів, 0 відкидає його, і таблиця дає лише варіації. identity=0 виключає single=1.</translation>
+    </message>
+    <message>
+        <source>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</source>
+        <translation>1 читає словник як шаблони: жодне слово не повертається без змін, а слова без збігу відкидаються. 0 (типово) залишає їх.</translation>
+    </message>
+    <message>
+        <source>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</source>
+        <translation>single=1: одна підстановка на кандидата замість декартового добутку; менше кандидатів, більше роботи хоста при швидких гешах.</translation>
+    </message>
+    <message>
+        <source>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</source>
+        <translation>Залишати лише перші N підстановок кожного вихідного слова; 0 означає без обмежень. Діє й для single=1.</translation>
+    </message>
+    <message>
+        <source>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</source>
+        <translation>Яку частину декартового добутку слова хост перебирає, перш ніж здатися; 0 означає без обмежень.</translation>
+    </message>
+    <message>
+        <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
+        <translation>Налаштування key=value, розділені пробілами; усе після першого — налаштування, тому таблиці йдуть першими.</translation>
+    </message>
+    <message>
+        <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
+        <translation>Назва або шлях feed. Скісна риска означає шлях; інакше hashcat пробує feed_&lt;name&gt;, rust_&lt;name&gt;, потім &lt;name&gt; у своєму каталозі feed.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin instead of naming it.</source>
+        <translation>Вибрати плагін feed замість указання його назви.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin</source>
+        <translation>Вибрати плагін feed</translation>
+    </message>
+    <message>
+        <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
+        <translation>Аргумент, що передається до feed; його сенс і кількість залежать від feed (feed wordlist приймає шляхи до словників).</translation>
+    </message>
+    <message>
+        <source>Add an argument for the feed, in order.</source>
+        <translation>Додати аргумент для feed за порядком.</translation>
+    </message>
+    <message>
+        <source>Remove the selected feed arguments.</source>
+        <translation>Вилучити вибрані аргументи feed.</translation>
+    </message>
+    <message>
+        <source>Remove feed arguments</source>
+        <translation>Вилучити аргументи feed</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument up</source>
+        <translation>Перемістити вибраний аргумент feed угору</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down</source>
+        <translation>Перемістити вибраний аргумент feed униз</translation>
+    </message>
+    <message>
+        <source>Read rules from the files below instead of generating them.</source>
+        <translation>Читати правила з файлів нижче замість їх генерування.</translation>
+    </message>
+    <message>
+        <source>Rules file 1:</source>
+        <translation>Файл правил 1:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 1.</source>
+        <translation>Вибрати файл правил для слота 1.</translation>
+    </message>
+    <message>
+        <source>Open rules file 1</source>
+        <translation>Відкрити файл правил 1</translation>
+    </message>
+    <message>
+        <source>Rules file 2:</source>
+        <translation>Файл правил 2:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 2.</source>
+        <translation>Вибрати файл правил для слота 2.</translation>
+    </message>
+    <message>
+        <source>Open rules file 2</source>
+        <translation>Відкрити файл правил 2</translation>
+    </message>
+    <message>
+        <source>Rules file 3:</source>
+        <translation>Файл правил 3:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 3.</source>
+        <translation>Вибрати файл правил для слота 3.</translation>
+    </message>
+    <message>
+        <source>Open rules file 3</source>
+        <translation>Відкрити файл правил 3</translation>
+    </message>
+    <message>
+        <source>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</source>
+        <translation>Кількість випадкових правил, які генерує hashcat (-g). Використовується лише з опцією «Генерувати правила»; файл правил не читається.</translation>
+    </message>
+    <message>
+        <source>Treat every -r file as one list: rule counts add instead of multiplying.</source>
+        <translation>Вважати кожен файл -r одним списком: кількості правил додаються, а не перемножуються.</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -549,6 +667,10 @@
     <message>
         <source>Charset 4:</source>
         <translation>Набір символів 4:</translation>
+    </message>
+    <message>
+        <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
+        <translation>Інтерпретувати маску та власні набори символів як шістнадцяткові байти.</translation>
     </message>
     <message>
         <source>General</source>
@@ -585,6 +707,10 @@
     <message>
         <source>Update status automatically</source>
         <translation>Оновлювати стан автоматично</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+I</source>
+        <translation>Ctrl+Shift+I</translation>
     </message>
     <message>
         <source>Open…</source>
@@ -643,10 +769,6 @@
         <translation>Постійно оновлювати стан запуску (швидкість, перебіг, розрахунковий час) замість виведення одного підсумкового рядка.</translation>
     </message>
     <message>
-        <source>Seconds between status updates.</source>
-        <translation>Секунд між оновленнями стану.</translation>
-    </message>
-    <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
         <translation>Ігнорувати попередження й усе одно запустити hashcat. Користуйтеся обережно.</translation>
     </message>
@@ -663,12 +785,16 @@
         <translation>Увімкнути оптимізовані ядра (обмежує довжину пароля)</translation>
     </message>
     <message>
-        <source>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</source>
-        <translation>Вивести лише швидкість атаки й вийти, не ламаючи. Зручно для вимірювання продуктивності та порівняння налаштувань.</translation>
-    </message>
-    <message>
         <source>Return expected speed of the attack, then quit</source>
         <translation>Показати очікувану швидкість атаки й вийти</translation>
+    </message>
+    <message>
+        <source>Choose the cache directory.</source>
+        <translation>Вибрати каталог кешу.</translation>
+    </message>
+    <message>
+        <source>Choose cache directory</source>
+        <translation>Вибрати каталог кешу</translation>
     </message>
     <message>
         <source>Resources</source>
@@ -695,22 +821,12 @@
         <translation>Пристрої, що використовуються, через кому. Залиште порожнім, щоб використовувати всі пристрої.</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature.</source>
-        <translation>Перервати, коли пристрій досягне цієї температури.</translation>
+        <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
+        <translation>Перервати, коли будь-який пристрій бекенда перевищить цю температуру в °C; 0 вимикає перевірку.</translation>
     </message>
     <message>
         <source>&#xa0;°C</source>
         <translation>&#xa0;°C</translation>
-    </message>
-    <message>
-        <source>Built-in variables:
-
-&lt;hash&gt; = current hash filename or hash
-&lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>Вбудовані змінні:
-
-&lt;hash&gt; = ім’я поточного файлу гешів або геш
-&lt;unixtime&gt; = поточна мітка часу Unix</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -721,20 +837,56 @@
         <translation>Не записувати відновлені геші в potfile.</translation>
     </message>
     <message>
+        <source>Copy command</source>
+        <translation>Копіювати команду</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Довідка</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Інструменти</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Файл</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
+    </message>
+    <message>
         <source>Settings…</source>
         <translation>Налаштування…</translation>
+    </message>
+    <message>
+        <source>Ctrl+,</source>
+        <translation>Ctrl+,</translation>
     </message>
     <message>
         <source>Import Settings…</source>
         <translation>Імпорт налаштувань…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+O</source>
+        <translation>Ctrl+Shift+O</translation>
+    </message>
+    <message>
         <source>Export Settings…</source>
         <translation>Експорт налаштувань…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
         <source>Export Session…</source>
         <translation>Експорт сеансу…</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+E</source>
+        <translation>Ctrl+Shift+E</translation>
     </message>
     <message>
         <source>Import Session…</source>
@@ -753,16 +905,34 @@
         <translation>Каталог, у якому hashcat зберігає свій кеш. Має існувати.</translation>
     </message>
     <message>
-        <source>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</source>
-        <translation>Перервати сеанс, коли гаряча точка пристрою OpenCL перевищить указану кількість градусів Цельсія. 0 вимикає обмеження за температурою.</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>Вихідний файл</translation>
     </message>
     <message>
+        <source>Write recovered hashes to the file below, in the selected formats.</source>
+        <translation>Записувати відновлені геші в указаний нижче файл у вибраних форматах.</translation>
+    </message>
+    <message>
         <source>Write recovered hashes to file:</source>
         <translation>Записувати відновлені геші у файл:</translation>
+    </message>
+    <message>
+        <source>The file the recovered hashes are written to. Format variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation>Файл, у який записуються відновлені геші. Змінні формату:
+
+&lt;hash&gt; = ім’я поточного файлу гешів або геш
+&lt;unixtime&gt; = поточна мітка часу Unix</translation>
+    </message>
+    <message>
+        <source>Choose the outfile path.</source>
+        <translation>Вибрати шлях вихідного файлу.</translation>
+    </message>
+    <message>
+        <source>Choose outfile</source>
+        <translation>Вибрати вихідний файл</translation>
     </message>
     <message>
         <source>Format:</source>
@@ -781,6 +951,10 @@
         <translation>Не записувати potfile</translation>
     </message>
     <message>
+        <source>Run hashcat in a terminal with these options.</source>
+        <translation>Запустити hashcat у терміналі з цими параметрами.</translation>
+    </message>
+    <message>
         <source>Start</source>
         <translation>Пуск</translation>
     </message>
@@ -789,24 +963,24 @@
         <translation>Копіювати команду до буфера обміну</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>Довідка</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>Інструменти</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>Файл</translation>
-    </message>
-    <message>
         <source>About</source>
         <translation>Про програму</translation>
     </message>
     <message>
         <source>Load Example Session</source>
         <translation>Завантажити приклад сеансу</translation>
+    </message>
+    <message>
+        <source>Seconds between status updates; only used when automatic status is enabled.</source>
+        <translation>Секунди між оновленнями стану; використовується лише за ввімкненого автоматичного стану.</translation>
+    </message>
+    <message>
+        <source>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</source>
+        <translation>Використовувати оптимізовані ядра hashcat (-O); вони обмежують максимальну довжину пароля.</translation>
+    </message>
+    <message>
+        <source>Print only the attack’s speed, then quit; no cracking.</source>
+        <translation>Вивести лише швидкість атаки й вийти; без злому.</translation>
     </message>
     <message>
         <source>Reset Session</source>
@@ -1011,7 +1185,7 @@ Default: 1,2</source>
         <translation>Цьому режиму потрібні один словник і щонайменше одна таблиця.</translation>
     </message>
     <message>
-        <source>This mode needs a feed. Arguments depend on the feed — random and stdin need none, wordlist needs a path.</source>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
         <translation>Цьому режиму потрібен feed. Аргументи залежать від feed: random і stdin не потребують жодного, wordlist потребує шлях.</translation>
     </message>
     <message>
@@ -1103,7 +1277,7 @@ Navigate to %3 → %4 to change it.</source>
     <message>
         <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
-        <translation>Цьому режиму потрібно рівно %1 словників (лівий, правий).
+        <translation>Цьому режиму потрібні словники в кількості рівно %1 (лівий, правий).
 Наразі вибрано: %2.</translation>
     </message>
     <message>
@@ -1129,6 +1303,10 @@ Error: %1</source>
         <translation>Цьому режиму потрібна маска.</translation>
     </message>
     <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>Маска кандидатів у паролі. ?1–?4 вставляють власний набір символів, ?w вставляє слово зі словника, а ?q — друге слово зі словника в режимі «Гібридна (маска + ?w/?q)», ?? означає літерал ?.</translation>
+    </message>
+    <message>
         <source>Load the %1 example? The current session is lost.
 
 The example cracks a test hash; hashcat should recover the password %2.</source>
@@ -1147,6 +1325,14 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
     <message>
         <source>Could not write “%1”: %2</source>
         <translation>Не вдалося записати «%1»: %2</translation>
+    </message>
+    <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+Це може бути спричинено Windows Defender або іншим антивірусним ПЗ. Спосіб усунення див. у &lt;a href=&quot;%1&quot;&gt;записі ЧаП&lt;/a&gt;.</translation>
     </message>
     <message>
         <source>This mode needs at least one wordlist.</source>
@@ -1187,9 +1373,9 @@ Navigate to %2 → %3 to change it.</source>
         <translation>Перейдіть до &lt;b&gt;%1 → %2&lt;/b&gt;, щоб вибрати термінал, який використовується для запуску.</translation>
     </message>
     <message>
-        <source>This mode takes at most %1 wordlists.
+        <source>Maximum number of wordlists for this mode: %1.
 Currently selected: %2.</source>
-        <translation>Цей режим приймає щонайбільше %1 словників.
+        <translation>Максимальна кількість словників для цього режиму: %1.
 Наразі вибрано: %2.</translation>
     </message>
     <message>
@@ -1286,16 +1472,16 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Налаштування</translation>
     </message>
     <message>
+        <source>hashcat executable</source>
+        <translation>виконуваний файл hashcat</translation>
+    </message>
+    <message>
         <source>Not configured</source>
         <translation>Не налаштовано</translation>
     </message>
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;hashcat executable</source>
-        <translation>&amp;Виконуваний файл hashcat</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1320,6 +1506,10 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>Не всі кольорові схеми доступні на всіх платформах.</translation>
+    </message>
+    <message>
+        <source>&amp;Parameters</source>
+        <translation>&amp;Параметри</translation>
     </message>
     <message>
         <source>&amp;Use short parameters</source>

@@ -261,7 +261,7 @@
                <bool>false</bool>
                 </property>
                 <property name="toolTip">
-               <string>Hash recipe, e.g. 'md5(md5(salt) . pass)'. Wrap it in the shell’s outer quote and inner strings in the other; PowerShell needs a backtick before $.</string>
+               <string>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</string>
                 </property>
                </widget>
               </item>
@@ -769,7 +769,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Cores that generate base words (0–16); 0 runs on the calling thread</string>
+               <string>Cores that generate base words (0–16); 0 runs on the calling thread.</string>
               </property>
               <property name="placeholderText">
                <string>auto</string>
@@ -838,7 +838,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>1.0–64.0; decimal point is a dot, not the locale separator</string>
+               <string>1.0–64.0; decimal point is a dot, not the locale separator.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">1.5</string>
@@ -968,7 +968,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Every checked row after the wordlist is a table</string>
+               <string>Every checked row after the wordlist is a table.</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -1278,7 +1278,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Arguments the feed reads, in order; only checked rows are used</string>
+               <string>Arguments the feed reads, in order; only checked rows are used.</string>
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
@@ -1415,7 +1415,7 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_rulesfile_1">
                         <property name="toolTip">
-                          <string>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</string>
+                          <string>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</string>
                         </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -1440,7 +1440,7 @@
                      <item>
                       <widget class="QPushButton" name="pushButton_open_rulesfile_1">
                        <property name="toolTip">
-                        <string>Choose the rule file for slot 1.</string>
+                        <string>Choose the rules file for slot 1.</string>
                        </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -1473,7 +1473,7 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_rulesfile_2">
                         <property name="toolTip">
-                          <string>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</string>
+                          <string>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</string>
                         </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -1498,7 +1498,7 @@
                      <item>
                       <widget class="QPushButton" name="pushButton_open_rulesfile_2">
                        <property name="toolTip">
-                        <string>Choose the rule file for slot 2.</string>
+                        <string>Choose the rules file for slot 2.</string>
                        </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -1531,7 +1531,7 @@
                      <item>
                       <widget class="QLineEdit" name="lineEdit_rulesfile_3">
                         <property name="toolTip">
-                          <string>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</string>
+                          <string>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</string>
                         </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -1556,7 +1556,7 @@
                      <item>
                       <widget class="QPushButton" name="pushButton_open_rulesfile_3">
                        <property name="toolTip">
-                        <string>Choose the rule file for slot 3.</string>
+                        <string>Choose the rules file for slot 3.</string>
                        </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -1592,7 +1592,7 @@
                      <item>
                       <widget class="QSpinBox" name="spinBox_generate_rules">
                         <property name="toolTip">
-                          <string>Number of random rules hashcat generates (-g). Only used with Generate rules; no rule file is read.</string>
+                          <string>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</string>
                         </property>
                        <property name="enabled">
                         <bool>false</bool>
@@ -2345,7 +2345,7 @@
                    <item>
                     <widget class="QCheckBox" name="checkBox_hwmon_temp_abort">
                      <property name="toolTip">
-                      <string>Abort when a device reaches this temperature.</string>
+                      <string>Abort when any backend device exceeds this temperature in °C; 0 disables it.</string>
                      </property>
                      <property name="text">
                       <string>Abort above</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="sr">
+<TS version="2.1" language="sr" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -153,20 +153,60 @@
         <translation>Datoteka sa hash-ovima ili hash:</translation>
     </message>
     <message>
+        <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
+        <translation>Hash, datoteka sa hash-ovima ili WPA snimak .hc22000/.hccapx.</translation>
+    </message>
+    <message>
+        <source>Choose a file of hashes.</source>
+        <translation>Izaberi datoteku sa hash-ovima.</translation>
+    </message>
+    <message>
         <source>Salt is hex</source>
         <translation>Salt je heksadecimalan</translation>
+    </message>
+    <message>
+        <source>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</source>
+        <translation>Ponovo upiši datoteku sa hash-ovima bez provaljenih hash-ova, uključujući one koje potfile već poznaje; sam potfile ostaje neizmenjen. Odbija se u režimu napada 9.</translation>
     </message>
     <message>
         <source>Remove hash from hash list once it is cracked</source>
         <translation>Ukloni hash sa liste hash-ova kada bude provaljen</translation>
     </message>
     <message>
+        <source>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</source>
+        <translation>Zanemari korisničko ime pre separatora režima (obično „:“), tako da se nalozi sa istim hash-om provaljuju samo jednom.</translation>
+    </message>
+    <message>
+        <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
+        <translation>Recept za hash, npr. „md5(md5(salt) . pass)“. Stavite ga u spoljne navodnike shell-a, a unutrašnje niske u navodnike druge vrste; PowerShell zahteva obrnuti apostrof pre $.</translation>
+    </message>
+    <message>
         <source>Move item up</source>
         <translation>Pomeri stavku gore</translation>
     </message>
     <message>
+        <source>Move selected wordlist up</source>
+        <translation>Pomeri izabranu listu reči gore</translation>
+    </message>
+    <message>
         <source>Move item down</source>
         <translation>Pomeri stavku dole</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down</source>
+        <translation>Pomeri izabranu listu reči dole</translation>
+    </message>
+    <message>
+        <source>Add one or more wordlist files. Each checked row is passed to hashcat.</source>
+        <translation>Dodaj jednu ili više datoteka sa listama reči. Svaki označeni red se prosleđuje programu hashcat.</translation>
+    </message>
+    <message>
+        <source>Remove the selected wordlists.</source>
+        <translation>Ukloni izabrane liste reči.</translation>
+    </message>
+    <message>
+        <source>Remove wordlists</source>
+        <translation>Ukloni liste reči</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -185,6 +225,178 @@
         <translation>Kodiranje u:</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
+        <translation>Podešavanja key=value razdvojena razmacima za režim napada 9, npr. phases=words,rules ili rules.rulefile=…. Koriste se samo bez liste reči.</translation>
+    </message>
+    <message>
+        <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
+        <translation>Datoteka skupa pravila, fascikla sa Grammar/grammar.txt ili ugrađeno ime. Neoznačeni redovi se preskaču; ako nijedan nije označen, pokreće se default-passwords.</translation>
+    </message>
+    <message>
+        <source>Add one or more PCFG ruleset files.</source>
+        <translation>Dodaj jednu ili više datoteka PCFG skupova pravila.</translation>
+    </message>
+    <message>
+        <source>Add PCFG rulesets</source>
+        <translation>Dodaj PCFG skupove pravila</translation>
+    </message>
+    <message>
+        <source>Remove the selected rulesets.</source>
+        <translation>Ukloni izabrane skupove pravila.</translation>
+    </message>
+    <message>
+        <source>Remove rulesets</source>
+        <translation>Ukloni skupove pravila</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset up</source>
+        <translation>Pomeri izabrani skup pravila gore</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down</source>
+        <translation>Pomeri izabrani skup pravila dole</translation>
+    </message>
+    <message>
+        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>Po jedan običan broj za svaki skup pravila, razdvojeni dvotačkom, npr. 2:1; broj vrednosti mora da odgovara broju skupova pravila.</translation>
+    </message>
+    <message>
+        <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
+        <translation>Maksimalna dužina kandidata koju kernel gradi, u 4-bajtnim rečima: 0 (auto), 16 ili 32.</translation>
+    </message>
+    <message>
+        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
+        <translation>1 prelazi na sledeću osnovnu reč gde redosled to dozvoljava, umesto da je izračuna pomoću unranking-a; kandidati su identični, isključuje se samo brza putanja.</translation>
+    </message>
+    <message>
+        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
+        <translation>Nabroj samo kandidate koje ova maska dopušta; isključuje omen=1 i hintaccount osim ako reči nagoveštaja ne potiču iz hintwords ili hintfile.</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
+        <translation>Podešavanja key=value razdvojena razmacima: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Skupovi pravila idu prvi.</translation>
+    </message>
+    <message>
+        <source>Add one or more table files.</source>
+        <translation>Dodaj jednu ili više datoteka tabela.</translation>
+    </message>
+    <message>
+        <source>Remove the selected tables.</source>
+        <translation>Ukloni izabrane tabele.</translation>
+    </message>
+    <message>
+        <source>Remove tables</source>
+        <translation>Ukloni tabele</translation>
+    </message>
+    <message>
+        <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
+        <translation>1 (podrazumevano) zadržava token nepromenjen kao jedan izbor, 0 ga odbacuje pa tabela daje samo varijacije. identity=0 isključuje single=1.</translation>
+    </message>
+    <message>
+        <source>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</source>
+        <translation>1 čita listu reči kao obrasce: nijedna reč se ne vraća nepromenjena, a reči bez podudaranja se odbacuju. 0 (podrazumevano) ih zadržava.</translation>
+    </message>
+    <message>
+        <source>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</source>
+        <translation>single=1: jedna zamena po kandidatu umesto Dekartovog proizvoda; manje kandidata, više posla za host kod brzih hash-ova.</translation>
+    </message>
+    <message>
+        <source>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</source>
+        <translation>Zadrži samo prvih N zamena svake izvorne reči; 0 znači bez ograničenja. Važi i za single=1.</translation>
+    </message>
+    <message>
+        <source>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</source>
+        <translation>Koliki deo Dekartovog proizvoda jedne reči host nabraja pre nego što odustane; 0 znači bez ograničenja.</translation>
+    </message>
+    <message>
+        <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
+        <translation>Podešavanja key=value razdvojena razmacima; sve posle prvog je podešavanje, pa tabele idu prve.</translation>
+    </message>
+    <message>
+        <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
+        <translation>Ime ili putanja feed-a. Kosa crta znači putanju; u suprotnom hashcat pokušava feed_&lt;name&gt;, rust_&lt;name&gt;, pa &lt;name&gt; u svom direktorijumu feed-ova.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin instead of naming it.</source>
+        <translation>Potraži feed plugin umesto navođenja njegovog imena.</translation>
+    </message>
+    <message>
+        <source>Browse for a feed plugin</source>
+        <translation>Potraži feed plugin</translation>
+    </message>
+    <message>
+        <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
+        <translation>Argument koji se prosleđuje feed-u; značenje i broj zavise od feed-a (feed wordlist prima putanje lista reči).</translation>
+    </message>
+    <message>
+        <source>Add an argument for the feed, in order.</source>
+        <translation>Dodaj argument za feed, redom.</translation>
+    </message>
+    <message>
+        <source>Remove the selected feed arguments.</source>
+        <translation>Ukloni izabrane argumente feed-a.</translation>
+    </message>
+    <message>
+        <source>Remove feed arguments</source>
+        <translation>Ukloni argumente feed-a</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument up</source>
+        <translation>Pomeri izabrani argument feed-a gore</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down</source>
+        <translation>Pomeri izabrani argument feed-a dole</translation>
+    </message>
+    <message>
+        <source>Read rules from the files below instead of generating them.</source>
+        <translation>Čitaj pravila iz datoteka ispod umesto da ih generišeš.</translation>
+    </message>
+    <message>
+        <source>Rules file 1:</source>
+        <translation>Datoteka sa pravilima 1:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 1.</source>
+        <translation>Izaberi datoteku sa pravilima za slot 1.</translation>
+    </message>
+    <message>
+        <source>Open rules file 1</source>
+        <translation>Otvori datoteku sa pravilima 1</translation>
+    </message>
+    <message>
+        <source>Rules file 2:</source>
+        <translation>Datoteka sa pravilima 2:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 2.</source>
+        <translation>Izaberi datoteku sa pravilima za slot 2.</translation>
+    </message>
+    <message>
+        <source>Open rules file 2</source>
+        <translation>Otvori datoteku sa pravilima 2</translation>
+    </message>
+    <message>
+        <source>Rules file 3:</source>
+        <translation>Datoteka sa pravilima 3:</translation>
+    </message>
+    <message>
+        <source>Choose the rules file for slot 3.</source>
+        <translation>Izaberi datoteku sa pravilima za slot 3.</translation>
+    </message>
+    <message>
+        <source>Open rules file 3</source>
+        <translation>Otvori datoteku sa pravilima 3</translation>
+    </message>
+    <message>
+        <source>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</source>
+        <translation>Broj nasumičnih pravila koje hashcat generiše (-g). Koristi se samo uz „Generiši pravila“; datoteka sa pravilima se ne čita.</translation>
+    </message>
+    <message>
+        <source>Treat every -r file as one list: rule counts add instead of multiplying.</source>
+        <translation>Tretiraj svaku -r datoteku kao jednu listu: brojevi pravila se sabiraju umesto da se množe.</translation>
+    </message>
+    <message>
         <source>Wordlist rules</source>
         <translation>Pravila liste reči</translation>
     </message>
@@ -197,8 +409,16 @@
         <translation>Desno pravilo:</translation>
     </message>
     <message>
+        <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
+        <translation>Tumači masku i prilagođene skupove znakova kao heksadecimalne bajtove.</translation>
+    </message>
+    <message>
         <source>Charset is hex</source>
         <translation>Skup znakova je heksadecimalan</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+I</source>
+        <translation>Ctrl+Shift+I</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -213,6 +433,10 @@
         <translation>Maks:</translation>
     </message>
     <message>
+        <source>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</source>
+        <translation>Koristi hashcat-ove optimizovane kernele (-O); oni ograničavaju maksimalnu dužinu lozinke.</translation>
+    </message>
+    <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
         <translation>Veži hashcat za ove CPU uređaje, odvojene zarezima. Ostavite prazno da hashcat odluči.</translation>
     </message>
@@ -225,22 +449,8 @@
         <translation>Prekini iznad</translation>
     </message>
     <message>
-        <source>Abort the session when an OpenCL device hotspot exceeds this many degrees Celsius. 0 disables the thermal limit.</source>
-        <translation>Prekini sesiju kada vruća tačka OpenCL uređaja pređe ovoliko stepeni Celzijusa. 0 isključuje temperaturno ograničenje.</translation>
-    </message>
-    <message>
         <source>Outfile</source>
         <translation>Izlazna datoteka</translation>
-    </message>
-    <message>
-        <source>Built-in variables:
-
-&lt;hash&gt; = current hash filename or hash
-&lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>Ugrađene promenljive:
-
-&lt;hash&gt; = ime trenutne datoteke sa hash-ovima ili hash
-&lt;unixtime&gt; = trenutna Unix vremenska oznaka</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -275,24 +485,12 @@
         <translation>Napad</translation>
     </message>
     <message>
-        <source>The hash to crack, a path to a file of hashes, or a .hccapx WPA capture. Paste a single hash here, or point it at a file.</source>
-        <translation>Hash koji treba provaliti, putanja do datoteke sa hash-ovima ili .hccapx WPA snimak. Nalepite ovde jedan hash ili navedite datoteku.</translation>
-    </message>
-    <message>
         <source>Open…</source>
         <translation>Otvori…</translation>
     </message>
     <message>
         <source>Assume the salt is given in hexadecimal.</source>
         <translation>Pretpostavi da je salt zadat heksadecimalno.</translation>
-    </message>
-    <message>
-        <source>Remove already-cracked hashes from the potfile so a later run does not report them again. Refused in attack mode 9.</source>
-        <translation>Ukloni već provaljene hash-ove iz potfile-a kako ih naredno pokretanje ne bi ponovo prijavljivalo. Odbija se u režimu napada 9.</translation>
-    </message>
-    <message>
-        <source>Ignore the @username part of hashes (in hash modes that carry one) so the same word can satisfy several accounts.</source>
-        <translation>Zanemari deo @username u hash-ovima (u režimima hash-a koji ga sadrže) kako bi ista reč mogla da odgovara većem broju naloga.</translation>
     </message>
     <message>
         <source>Attack mode. Each choice reveals its own options below.</source>
@@ -305,12 +503,6 @@
     <message>
         <source>Hash recipe:</source>
         <translation>Recept za hash:</translation>
-    </message>
-    <message>
-        <source>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</source>
-        <translation>Unix: &apos;md5(md5(salt) . pass)&apos;
-               Windows: &quot;md5(&apos;abc&apos; . pass)&quot;</translation>
     </message>
     <message>
         <source>Add files…</source>
@@ -337,16 +529,8 @@
         <translation>Podešavanja (bez liste reči):</translation>
     </message>
     <message>
-        <source>Positional settings, separated by spaces. Only used when no wordlist is selected: with one, hashcat pairs the two files by line. “phases” picks which phases run, cheapest first; the default “words,rules,pcfg” ends only when stopped. Phase-prefixed settings: “rules.rulefile”, “rules.rulemax”, “words.hints”, “pcfg.hintaccount”, …</source>
-        <translation>Pozicione postavke, razdvojene razmacima. Koriste se samo kada nije izabrana lista reči: uz listu reči hashcat uparuje dve datoteke red po red. „phases“ bira koje se faze izvršavaju, od najjeftinije; podrazumevano „words,rules,pcfg“ se završava tek kada se zaustavi. Postavke sa prefiksom faze: „rules.rulefile“, „rules.rulemax“, „words.hints“, „pcfg.hintaccount“, …</translation>
-    </message>
-    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
-    </message>
-    <message>
-        <source>A row is a ruleset file, a folder with a Grammar/grammar.txt, or a bundled name. Only checked rows are used; with none checked, hashcat’s bundled default-passwords runs. hints is also bundled.</source>
-        <translation>Red je datoteka skupa pravila, fascikla sa Grammar/grammar.txt ili ugrađeno ime. Koriste se samo označeni redovi; ako nijedan nije označen, pokreće se ugrađeni default-passwords programa hashcat. hints je takođe ugrađen.</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -373,16 +557,12 @@
         <translation>Weights:</translation>
     </message>
     <message>
-        <source>One value per ruleset, plain numbers separated by colons, e.g. 2:1 for two rulesets. The count must match the number of rulesets.</source>
-        <translation>Jedna vrednost po skupu pravila, obični brojevi razdvojeni dvotačkama, npr. 2:1 za dva skupa pravila. Broj vrednosti mora odgovarati broju skupova pravila.</translation>
-    </message>
-    <message>
         <source>Threads:</source>
         <translation>Niti:</translation>
     </message>
     <message>
-        <source>Cores that generate base words (0–16); 0 runs on the calling thread</source>
-        <translation>Jezgra koja generišu osnovne reči (0–16); 0 radi u niti koja poziva</translation>
+        <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
+        <translation>Jezgra koja generišu osnovne reči (0–16); 0 radi u niti koja poziva.</translation>
     </message>
     <message>
         <source>auto</source>
@@ -401,48 +581,32 @@
         <translation>Maxword:</translation>
     </message>
     <message>
-        <source>Candidates the kernel builds per base word: 0, 16 or 32 (a multiple of 16)</source>
-        <translation>Kandidati koje kernel pravi po osnovnoj reči: 0, 16 ili 32 (umnožak broja 16)</translation>
-    </message>
-    <message>
         <source>Maxgain:</source>
         <translation>Maxgain:</translation>
     </message>
     <message>
-        <source>1.0–64.0; decimal point is a dot, not the locale separator</source>
-        <translation>1.0–64.0; decimalni separator je tačka, a ne separator iz regionalnih podešavanja</translation>
+        <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
+        <translation>1.0–64.0; decimalni separator je tačka, a ne separator iz regionalnih podešavanja.</translation>
     </message>
     <message>
         <source>Walk:</source>
         <translation>Walk:</translation>
     </message>
     <message>
-        <source>1 steps the last token instead of unraking it</source>
-        <translation>1 pomera poslednji token korak po korak umesto da na njega primeni „unraking“</translation>
-    </message>
-    <message>
         <source>Mask:</source>
         <translation>Maska:</translation>
-    </message>
-    <message>
-        <source>Hold the grammar to the candidates this mask admits; cannot be combined with omen=1, or with hintaccount while the hint words come from the accounts (give hintwords or hintfile instead)</source>
-        <translation>Ograniči gramatiku na kandidate koje ova maska dozvoljava; ne može se kombinovati sa omen=1, niti sa hintaccount dok reči nagoveštaja potiču iz naloga (umesto toga navedite hintwords ili hintfile)</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
         <translation>Dodatna podešavanja (key=value):</translation>
     </message>
     <message>
-        <source>Additional key=value settings, separated by spaces: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Everything after the first key=value is a setting, so rulesets must come first.</source>
-        <translation>Dodatne key=value postavke, razdvojene razmacima: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Sve posle prvog key=value je postavka, pa skupovi pravila moraju ići prvi.</translation>
-    </message>
-    <message>
         <source>Table</source>
         <translation>Tabela</translation>
     </message>
     <message>
-        <source>Every checked row after the wordlist is a table</source>
-        <translation>Svaki označeni red posle liste reči je tabela</translation>
+        <source>Every checked row after the wordlist is a table.</source>
+        <translation>Svaki označeni red posle liste reči je tabela.</translation>
     </message>
     <message>
         <source>Add tables…</source>
@@ -453,44 +617,20 @@
         <translation>Identity:</translation>
     </message>
     <message>
-        <source>Whether leaving a token unchanged is one of its choices: 1 (default) keeps it, 0 drops it so the table only produces variations. Cannot be combined with single=1.</source>
-        <translation>Da li je ostavljanje tokena nepromenjenim jedan od njegovih izbora: 1 (podrazumevano) ga zadržava, 0 ga odbacuje pa tabela daje samo varijacije. Ne može se kombinovati sa single=1.</translation>
-    </message>
-    <message>
         <source>Template:</source>
         <translation>Template:</translation>
-    </message>
-    <message>
-        <source>1 reads the wordlist as a set of patterns: no word is ever returned unchanged, and words matching no rule are dropped. 0 (default) keeps unchanged words.</source>
-        <translation>1 čita listu reči kao skup obrazaca: nijedna reč se nikada ne vraća nepromenjena, a reči koje ne odgovaraju nijednom pravilu se odbacuju. 0 (podrazumevano) zadržava nepromenjene reči.</translation>
     </message>
     <message>
         <source>Single:</source>
         <translation>Single:</translation>
     </message>
     <message>
-        <source>single=1 makes each candidate carry exactly one substitution instead of the cross product of every matched position, usually a different, cheaper attack.</source>
-        <translation>single=1 čini da svaki kandidat nosi tačno jednu zamenu umesto Dekartovog proizvoda svih podudarnih pozicija; obično je to drugačiji, jeftiniji napad.</translation>
-    </message>
-    <message>
         <source>Cap:</source>
         <translation>Cap:</translation>
     </message>
     <message>
-        <source>Maximum replacements one source may carry in a word; 0 means no limit. Only limits the host-side cross product, not a single=1 run.</source>
-        <translation>Najveći broj zamena koje jedan izvor može da nosi u reči; 0 znači bez ograničenja. Ograničava samo Dekartov proizvod na strani hosta, a ne pokretanje sa single=1.</translation>
-    </message>
-    <message>
         <source>Maxperm:</source>
         <translation>Maxperm:</translation>
-    </message>
-    <message>
-        <source>How many of one word’s cross product the host enumerates before giving up; 0 means no limit. Each device cell is never cut.</source>
-        <translation>Koliko elemenata Dekartovog proizvoda jedne reči host nabraja pre nego što odustane; 0 znači bez ograničenja. Nijedna ćelija uređaja se nikada ne preseca.</translation>
-    </message>
-    <message>
-        <source>Additional key=value settings, separated by spaces. Everything after the first key=value is a setting, so the tables must come first.</source>
-        <translation>Dodatne key=value postavke, razdvojene razmacima. Sve posle prvog key=value je postavka, pa tabele moraju ići prve.</translation>
     </message>
     <message>
         <source>Generic feed</source>
@@ -499,10 +639,6 @@
     <message>
         <source>Feed:</source>
         <translation>Feed:</translation>
-    </message>
-    <message>
-        <source>Candidate generator. Anything containing a slash is treated as a feed path; otherwise hashcat looks for feed_&lt;name&gt; under its feeds directory. Arguments below are feed-specific.</source>
-        <translation>Generator kandidata. Sve što sadrži kosu crtu tretira se kao putanja feed-a; u suprotnom hashcat traži feed_&lt;name&gt; u svom direktorijumu feed-ova. Argumenti ispod zavise od feed-a.</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -517,16 +653,12 @@
         <translation>Argument:</translation>
     </message>
     <message>
-        <source>Argument passed to the feed. Its meaning and count depend on the feed (the wordlist feed takes wordlist paths); extra tokens go straight to the feed.</source>
-        <translation>Argument koji se prosleđuje feed-u. Njegovo značenje i broj zavise od feed-a (feed wordlist prima putanje lista reči); dodatni tokeni idu direktno feed-u.</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Dodaj</translation>
     </message>
     <message>
-        <source>Arguments the feed reads, in order; only checked rows are used</source>
-        <translation>Argumenti koje feed čita, redom; koriste se samo označeni redovi</translation>
+        <source>Arguments the feed reads, in order; only checked rows are used.</source>
+        <translation>Argumenti koje feed čita, redom; koriste se samo označeni redovi.</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -541,11 +673,7 @@
         <translation>Uključi slot 1 datoteke sa pravilima za ovo pokretanje.</translation>
     </message>
     <message>
-        <source>Rules file:</source>
-        <translation>Datoteka sa pravilima:</translation>
-    </message>
-    <message>
-        <source>Rule file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Datoteka sa pravilima za slot 1; primenjuje se na svaku reč. Ostavite prazno da se slot ne koristi.</translation>
     </message>
     <message>
@@ -553,7 +681,7 @@
         <translation>Uključi slot 2 datoteke sa pravilima za ovo pokretanje.</translation>
     </message>
     <message>
-        <source>Rule file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Datoteka sa pravilima za slot 2; primenjuje se na svaku reč. Ostavite prazno da se slot ne koristi.</translation>
     </message>
     <message>
@@ -561,7 +689,7 @@
         <translation>Uključi slot 3 datoteke sa pravilima za ovo pokretanje.</translation>
     </message>
     <message>
-        <source>Rule file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
+        <source>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
         <translation>Datoteka sa pravilima za slot 3; primenjuje se na svaku reč. Ostavite prazno da se slot ne koristi.</translation>
     </message>
     <message>
@@ -571,14 +699,6 @@
     <message>
         <source>Generate rules:</source>
         <translation>Generiši pravila:</translation>
-    </message>
-    <message>
-        <source>How many rules to generate for the finding-rule attack. No rules file is read, hashcat builds them itself; use an existing rule file with the slots above instead.</source>
-        <translation>Koliko pravila generisati za napad traženja pravila. Nijedna datoteka sa pravilima se ne čita, hashcat ih sam pravi; umesto toga koristite postojeću datoteku sa pravilima u slotovima iznad.</translation>
-    </message>
-    <message>
-        <source>Pass every rules file to hashcat in one run, instead of one run per file.</source>
-        <translation>Prosledi sve datoteke sa pravilima programu hashcat u jednom pokretanju, umesto jednog pokretanja po datoteci.</translation>
     </message>
     <message>
         <source>Join -r files into one list</source>
@@ -621,10 +741,6 @@
         <translation>Skup znakova 4:</translation>
     </message>
     <message>
-        <source>Interpret the custom charsets as hexadecimal bytes. Applies to custom charset 1 through 4.</source>
-        <translation>Tumači prilagođene skupove znakova kao heksadecimalne bajtove. Odnosi se na prilagođene skupove znakova od 1 do 4.</translation>
-    </message>
-    <message>
         <source>Session and limits</source>
         <translation>Sesija i ograničenja</translation>
     </message>
@@ -661,6 +777,10 @@
         <translation>Automatski ažuriraj status</translation>
     </message>
     <message>
+        <source>Seconds between status updates; only used when automatic status is enabled.</source>
+        <translation>Sekunde između ažuriranja statusa; koristi se samo kada je automatski status omogućen.</translation>
+    </message>
+    <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
         <translation>Zanemari upozorenja i ipak pokreni hashcat. Koristite oprezno.</translation>
     </message>
@@ -673,16 +793,20 @@
         <translation>Performanse</translation>
     </message>
     <message>
-        <source>Print only the attack’s speed and quit, without cracking. Useful for benchmarking and comparing settings.</source>
-        <translation>Ispiši samo brzinu napada i izađi, bez provaljivanja. Korisno za merenje performansi i poređenje podešavanja.</translation>
-    </message>
-    <message>
         <source>Cache path:</source>
         <translation>Putanja keša:</translation>
     </message>
     <message>
         <source>Directory hashcat keeps its cache in. Must exist.</source>
         <translation>Direktorijum u kome hashcat čuva svoj keš. Mora da postoji.</translation>
+    </message>
+    <message>
+        <source>Choose the cache directory.</source>
+        <translation>Izaberi direktorijum keša.</translation>
+    </message>
+    <message>
+        <source>Choose cache directory</source>
+        <translation>Izaberi direktorijum keša</translation>
     </message>
     <message>
         <source>Resources</source>
@@ -701,8 +825,34 @@
         <translation>Vrste uređaja:</translation>
     </message>
     <message>
+        <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
+        <translation>Prekini kada bilo koji backend uređaj pređe ovu temperaturu u °C; 0 isključuje ograničenje.</translation>
+    </message>
+    <message>
+        <source>Write recovered hashes to the file below, in the selected formats.</source>
+        <translation>Upiši pronađene hash-ove u datoteku ispod, u izabranim formatima.</translation>
+    </message>
+    <message>
         <source>Write recovered hashes to file:</source>
         <translation>Upiši pronađene hash-ove u datoteku:</translation>
+    </message>
+    <message>
+        <source>The file the recovered hashes are written to. Format variables:
+
+&lt;hash&gt; = current hash filename or hash
+&lt;unixtime&gt; = current Unix timestamp</source>
+        <translation>Datoteka u koju se upisuju pronađeni hash-ovi. Promenljive formata:
+
+&lt;hash&gt; = ime trenutne datoteke sa hash-ovima ili hash
+&lt;unixtime&gt; = trenutna Unix vremenska oznaka</translation>
+    </message>
+    <message>
+        <source>Choose the outfile path.</source>
+        <translation>Izaberi putanju izlazne datoteke.</translation>
+    </message>
+    <message>
+        <source>Choose outfile</source>
+        <translation>Izaberi izlaznu datoteku</translation>
     </message>
     <message>
         <source>Format:</source>
@@ -711,6 +861,10 @@
     <message>
         <source>Do not write the potfile</source>
         <translation>Ne upisuj potfile</translation>
+    </message>
+    <message>
+        <source>Run hashcat in a terminal with these options.</source>
+        <translation>Pokreni hashcat u terminalu sa ovim opcijama.</translation>
     </message>
     <message>
         <source>Start</source>
@@ -761,56 +915,76 @@
         <translation>Testiraj samo ovoliko kandidata posle preskočenih.</translation>
     </message>
     <message>
-        <source>Seconds between status updates.</source>
-        <translation>Sekundi između ažuriranja statusa.</translation>
-    </message>
-    <message>
         <source>Enable optimized kernels (limits password length)</source>
         <translation>Omogući optimizovane kernele (ograničava dužinu lozinke)</translation>
+    </message>
+    <message>
+        <source>Print only the attack’s speed, then quit; no cracking.</source>
+        <translation>Ispiši samo brzinu napada, a zatim izađi; bez provaljivanja.</translation>
     </message>
     <message>
         <source>Return expected speed of the attack, then quit</source>
         <translation>Ispiši očekivanu brzinu napada i izađi</translation>
     </message>
     <message>
-        <source>Abort when a device reaches this temperature.</source>
-        <translation>Prekini kada uređaj dostigne ovu temperaturu.</translation>
-    </message>
-    <message>
         <source>&#xa0;°C</source>
         <translation>&#xa0;°C</translation>
+    </message>
+    <message>
+        <source>Copy command</source>
+        <translation>Kopiraj naredbu</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Pomoć</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Alati</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Datoteka</translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <translation>Ctrl+Q</translation>
     </message>
     <message>
         <source>Settings…</source>
         <translation>Podešavanja…</translation>
     </message>
     <message>
+        <source>Ctrl+,</source>
+        <translation>Ctrl+,</translation>
+    </message>
+    <message>
         <source>Import Settings…</source>
         <translation>Uvezi podešavanja…</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+O</source>
+        <translation>Ctrl+Shift+O</translation>
     </message>
     <message>
         <source>Export Settings…</source>
         <translation>Izvezi podešavanja…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+S</source>
+        <translation>Ctrl+Shift+S</translation>
+    </message>
+    <message>
         <source>Export Session…</source>
         <translation>Izvezi sesiju…</translation>
     </message>
     <message>
+        <source>Ctrl+Shift+E</source>
+        <translation>Ctrl+Shift+E</translation>
+    </message>
+    <message>
         <source>Import Session…</source>
         <translation>Uvezi sesiju…</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>Pomoć</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>Alati</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>Datoteka</translation>
     </message>
     <message>
         <source>About</source>
@@ -999,12 +1173,16 @@ Idite na %3 → %4 da biste ga promenili.</translation>
     <message>
         <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
-        <translation>Ovaj režim zahteva tačno %1 lista reči (leva, desna).
+        <translation>Ovaj režim zahteva liste reči u tačnom broju %1 (leva, desna).
 Trenutno izabrano: %2.</translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>Sesija navodi vrstu hash-a %1, koju ova verzija hashcat-a ne podržava.</translation>
+    </message>
+    <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>Maska kandidata za lozinku. ?1–?4 umeću prilagođeni skup znakova, ?w umeće reč iz liste reči, a ?q drugu reč iz liste reči u režimu Hibrid (maska + ?w/?q), dok ?? označava bukvalno ?.</translation>
     </message>
     <message>
         <source>Load the %1 example? The current session is lost.
@@ -1069,6 +1247,14 @@ Greška: %1</translation>
         <translation>Vrste hash-ova nisu mogle da se učitaju. Proverite putanju do hashcat-a u podešavanjima.</translation>
     </message>
     <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potražite u &lt;a href=&quot;%1&quot;&gt;stavci FAQ-a&lt;/a&gt;.</translation>
+    </message>
+    <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>Podesite putanju do hashcat-a u %1 → %2 da biste učitali dostupne vrste hash-ova.</translation>
     </message>
@@ -1089,7 +1275,7 @@ Greška: %1</translation>
         <translation>Ovaj režim zahteva jednu listu reči i najmanje jednu tabelu.</translation>
     </message>
     <message>
-        <source>This mode needs a feed. Arguments depend on the feed — random and stdin need none, wordlist needs a path.</source>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
         <translation>Ovaj režim zahteva feed. Argumenti zavise od feed-a: random i stdin ne traže nijedan, wordlist traži putanju.</translation>
     </message>
     <message>
@@ -1187,9 +1373,9 @@ Idite na %2 → %3 da to promenite.</translation>
         <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da izaberete terminal koji se koristi za pokretanje.</translation>
     </message>
     <message>
-        <source>This mode takes at most %1 wordlists.
+        <source>Maximum number of wordlists for this mode: %1.
 Currently selected: %2.</source>
-        <translation>Ovaj režim prihvata najviše %1 lista reči.
+        <translation>Najveći broj lista reči za ovaj režim: %1.
 Trenutno izabrano: %2.</translation>
     </message>
     <message>
@@ -1286,16 +1472,16 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Podešavanja</translation>
     </message>
     <message>
+        <source>hashcat executable</source>
+        <translation>hashcat program</translation>
+    </message>
+    <message>
         <source>Not configured</source>
         <translation>Nije konfigurisano</translation>
     </message>
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
-    </message>
-    <message>
-        <source>&amp;hashcat executable</source>
-        <translation>&amp;hashcat program</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1316,6 +1502,10 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>Nisu sve šeme boja dostupne na svim platformama.</translation>
+    </message>
+    <message>
+        <source>&amp;Parameters</source>
+        <translation>&amp;Parametri</translation>
     </message>
     <message>
         <source>&amp;Use short parameters</source>
