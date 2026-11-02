@@ -879,6 +879,7 @@ void TestHelperUtils::terminalArgumentsArePinned()
         {"kitty", {"--hold"}},
         {"foot", {"--hold"}},
         {"wezterm", {"start", "--"}},
+        {"ghostty", {"--wait-after-command=true", "-e"}},
     };
 
     const QMap<QString, QStringList> &table = HelperUtils::terminalArguments();

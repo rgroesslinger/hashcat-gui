@@ -10,11 +10,10 @@ A graphical user interface for [hashcat](https://github.com/hashcat/hashcat/), t
 ## Features
 
 - **All hashcat attack modes** — straight, combination, brute force, PCFG, table, generic feed and association, plus hybrid modes that pair a character mask with wordlists.
-- **Preview the command** — the preview shows the exact `hashcat` command, with optional short parameter names, which can be copied to the clipboard.
+- **Preview and run** — the live preview shows the exact `hashcat` command, with optional short parameter names. Run it directly in a terminal of your choice, or copy it to the clipboard and take it from there.
 - **A runnable example for each mode** — `Tools → Load Example Session` opens a bundled session with its own wordlist, rules or table, so you can check the setup before running your own data.
 - **Session saving** — the last session is restored automatically; sessions and settings can be exported and imported.
 - **Real list management** — several wordlists, rule slots, PCFG rulesets, tables and feed arguments with per-row include checkboxes.
-- **Runs in your own terminal** — hashcat starts detached in GNOME Terminal, Konsole, Xfce, Ptyxis, Alacritty, kitty, foot, WezTerm, PowerShell or pwsh.
 - **Native packaging** — packages for openSUSE, Fedora, Debian, Ubuntu, and a Windows build.
 
 ## Installation

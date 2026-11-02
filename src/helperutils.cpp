@@ -628,8 +628,7 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
 
 // The arguments that belong between the terminal program and the hashcat
 // command line, for every supported terminal. The entries are pure data -
-// nothing here looks at the filesystem. Terminals whose option takes a single
-// shell-quoted string (terminator -e) are deliberately not listed.
+// nothing here looks at the filesystem.
 //
 // PowerShell's -Command must come last: it takes the rest of the command line
 // as the command text, which is what startClicked() builds. The & is the call
@@ -638,9 +637,8 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
 //
 // gnome-terminal, ptyxis and wezterm have no flag to stay open after the
 // command exits; holding them would need the command wrapped in a shell
-// string, which the line above rules out. cmd.exe /k stays open, but breaks as
-// soon as two arguments need quotes: /K then strips the first and last quote
-// of the whole command line.
+// string. cmd.exe /k stays open, but breaks as soon as two arguments need
+// quotes: /K then strips the first and last quote of the whole command line.
 const QMap<QString, QStringList> &HelperUtils::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
@@ -661,6 +659,8 @@ const QMap<QString, QStringList> &HelperUtils::terminalArguments()
         {QStringLiteral("kitty"), {QStringLiteral("--hold")}},
         {QStringLiteral("foot"), {QStringLiteral("--hold")}},
         {QStringLiteral("wezterm"), {QStringLiteral("start"), QStringLiteral("--")}},
+        {QStringLiteral("ghostty"),
+         {QStringLiteral("--wait-after-command=true"), QStringLiteral("-e")}},
     };
     return table;
 }
