@@ -17,7 +17,6 @@
 #include <QGroupBox>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QLabel>
 #include <QPushButton>
 #include <iterator>
 
@@ -674,10 +673,8 @@ void TestSettingsDialog::colorSchemeFollowsTheSetting()
     QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::ColorScheme),
              QStringLiteral("light"));
 
-    // The dialog says that not every platform offers both appearances.
-    QLabel *note = dialog.findChild<QLabel *>(QStringLiteral("label_color_scheme_note"));
-    QVERIFY(note);
-    QVERIFY(!note->text().isEmpty());
+    // The combo explains that not every platform offers both appearances.
+    QVERIFY(!dialog.ui->comboBox_color_scheme->toolTip().isEmpty());
 }
 
 // The dialog opens as large as its content: the size in the .ui would clip

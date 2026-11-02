@@ -171,7 +171,6 @@ worth remembering before touching either:
 **Repo hygiene**
 - `FAQ.md` is generated: edit `FAQ.yaml`, then `mdfaqgen FAQ.yaml FAQ.md` (mdfaqgen asks before
   overwriting).
-- A user-visible change gets a `CHANGELOG.md` entry under "Unreleased".
 - `build/` is gitignored; never commit `ui_*.h`, `.qm` or binaries.
 
 ## Commit messages

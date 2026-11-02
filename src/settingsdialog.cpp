@@ -89,12 +89,15 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
     ui->label_download->setText(tr("Download from %1").arg(downloadLink));
     ui->label_download->setOpenExternalLinks(true);
 
-    ui->label_hc_path->setBuddy(ui->lineEdit_hc_path);
     ui->label_terminal->setBuddy(ui->comboBox_terminal);
     ui->label_language->setBuddy(ui->comboBox_language);
     ui->label_color_scheme->setBuddy(ui->comboBox_color_scheme);
+    ui->label_parameters->setBuddy(ui->checkBox_use_short_parameters);
     ui->label_session_path_text->setBuddy(ui->lineEdit_session_path);
     ui->label_settings_path_text->setBuddy(ui->lineEdit_settings_path);
+
+    ui->comboBox_color_scheme->setToolTip(
+        tr("Not all color schemes are available on all platforms."));
 
     ui->checkBox_use_short_parameters->setToolTip(
         tr("Use the short option names (-m) instead of the long ones (--hash-type) in the "
