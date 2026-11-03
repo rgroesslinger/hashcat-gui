@@ -1,11 +1,12 @@
 # AGENTS.md
 
-Qt 6 / C++20 GUI around the hashcat CLI. `main.cpp` -> `MainWindow` -> widgets in
-`src/mainwindow.ui` -> `HashcatOptions` -> `CommandBuilder::build()` -> hashcat argv.
+Qt 6 / C++20 GUI around the hashcat CLI. `main.cpp` -> `MainWindow` (`src/mainwindow.ui`) ->
+`collectHashcatOptions()` -> `HashcatOptions` -> `CommandBuilder::build()` -> hashcat argv.
+Keep argv order stable: preview, clipboard and tests depend on it.
 
-## Verification
+## Verify
 
-Run from the repo root, in order; the change is not complete until all pass:
+Run from the repo root, in order:
 
 1. `cmake -B build` — only if `build/` is not configured.
 2. `cmake --build build --target clang-format` — rewrites in place, so before building/tests.
@@ -14,177 +15,102 @@ Run from the repo root, in order; the change is not complete until all pass:
 5. `cmake --build build --target clang-tidy -j$(nproc)` — `src/` and `tests/`.
 6. `cmake --build build --target clazy -j$(nproc)` — `src/` and `tests/`.
 
-Both analyzer targets are an aggregate of one target per source file, so `-j` analyzes the
-files in parallel. They are warning-only (`WarningsAsErrors` empty): read the output and fix
-or justify every finding. CI runs none of the `clang-format`, `clang-tidy` or `clazy` targets;
-this list is the only enforcement.
+Analyzer targets run one job per file (hence `-j`) and are warning-only: fix or justify every
+finding. Use `desktop-file-validate hashcat-gui.desktop` when the desktop entry or icons change.
 
-**Prerequisites:** Qt 6.8+ (Core, Gui, Widgets, Concurrent, Network), C++20, `clang-format`,
-`clang-tidy`, `clazy-standalone`. Optional: Qt6 LinguistTools (otherwise no `.qm` files and no
-`update_translations` target) and Qt6 Test (no tests are built, so `--no-tests=error` fails). A
-missing target means a missing tool: install it or tell the user, then re-run `cmake -B build`.
+**Prerequisites:** Qt 6.8+ (Core, Gui, Widgets, Concurrent, Network), C++20, GCC or Clang (no
+MSVC), `clang-format`, `clang-tidy`, `clazy-standalone`, and hashcat 8.0.0+ at runtime. Qt6
+LinguistTools is optional (no `.qm`/`update_translations` without it), as is Qt6 Test (no tests
+built, so `--no-tests=error` fails). A missing target means a missing tool: install it, then
+re-run `cmake -B build`.
 
-**Conditional checks:** release prep refreshes catalogs (see **Translations**); desktop
-entry/icon changes get `desktop-file-validate hashcat-gui.desktop`; structural changes (source
-lists, build system, translations, packaging) also check `build-release.yml`, CI and `obs/`.
+## Test and run
 
-## Build and test
-
-- Defaults to Release for single-config generators.
-  `cmake -B build && cmake --build build -j$(nproc)`.
 - One suite: `ctest --test-dir build -R '^tst_commandbuilder$' --output-on-failure`.
-- One case:
-  `QT_QPA_PLATFORM=offscreen ./build/tst_mainwindow freshWindowMatchesTheDefaultOptions`
-  (CTest sets `QT_QPA_PLATFORM=offscreen` and a 60 s timeout; direct runs need it).
-- Run `./build/hashcat-gui`; `--help` and `--version` exit before the window is created.
-
-### Looking at the UI
-
-- Offscreen + `QWidget::grab()` works, but a real `MainWindow` freezes: an empty
-  `hashcatPath` queues the modal Settings dialog, and non-JSON hashcat output opens a modal
-  warning; `processEvents()` then blocks in the modal loop. Set the application name, redirect
-  XDG dirs and point `hashcatPath` at a stub with valid machine-readable JSON (see
-  `TestEnvironment::redirectBaseDirectories()`, stubs in `tst_helperutils.cpp`).
-- For layout only, skip `MainWindow`: include
-  `build/hashcat-gui-core_autogen/include/ui_mainwindow.h`, instantiate `Ui::MainWindow`, call
-  `setupUi()` on a plain `QMainWindow`, and grab. Screenshot harnesses stay in `/tmp`.
+- One case: `QT_QPA_PLATFORM=offscreen ./build/tst_mainwindow freshWindowMatchesTheDefaultOptions`
+  (CTest sets the env var and a 60 s timeout; direct runs need it).
+- `./build/hashcat-gui`; `--help` and `--version` exit before the window exists.
+- A real `MainWindow` freezes offscreen (an empty `hashcatPath` queues the modal Settings dialog,
+  non-JSON output opens a modal warning), so `processEvents()` blocks. For screenshots redirect
+  XDG dirs and point `hashcatPath` at a stub with valid machine-readable JSON
+  (`TestEnvironment::redirectBaseDirectories()`, `tst_helperutils.cpp`); for layout only,
+  instantiate `Ui::MainWindow`. Harnesses stay in `/tmp`.
 
 ## Structure
 
 - `hashcat-gui-core` is an OBJECT library with every app source except `main.cpp`; executable
-  and tests link it. Keep it OBJECT: static drops qrc objects and static initializers.
-- New production `.cpp`/`.h`/`.ui`/`.qrc` files go in `HASHCAT_GUI_SOURCES` (no globbing);
-  new tests (`tests/tst_*.cpp`, linked against core) go in `HASHCAT_GUI_TESTS`.
-- Flow: `main.cpp` -> `MainWindow` (`mainwindow.ui`) -> `collectHashcatOptions()` ->
-  `HashcatOptions` -> `CommandBuilder::build()` -> argv. `HelperUtils` runs hashcat and the
-  terminal; `WidgetStateSerializer` + `StateFile` persist sessions; settings go through
-  `SettingsManager::instance()`. Keep argv order stable: preview, clipboard and tests depend
-  on it. UI-free logic (CommandBuilder, HashcatInfoParser, HelperUtils, StateFile,
-  WidgetStateSerializer, SettingsManager, UpdateChecker, PathMonitor) stays testable.
-- Attack-mode gating predicates live in `CommandBuilder` and are reused for group-box
-  enablement; `modeRequirements()` derives mode hint and launch validation from them.
-- Bundled example sessions (`Tools → Load Example Session`) live in `src/examples.h` (data,
-  not hashcat option docs): one `Entry` per attack mode in `All`, ordered like the combo. The
-  session JSON and its wordlists/rules/tables are `:/sessions/…` qrc resources whose paths are
-  prefixed with `Examples::DataPrefix` and unpacked into `Examples::DataDirectory` at load.
-- Launch: `HelperUtils::validateOptions()` (mode needs), then `validateLaunch()` (path,
-  binary, terminal). hashcat starts detached (`CREATE_NEW_CONSOLE` on Windows).
-- `UpdateChecker` (About dialog) is async over `QNetworkAccessManager` to GitHub. Tests never
-  contact GitHub: `evaluateResponse()` parses canned JSON, `tst_updatechecker` uses a loopback
-  `QTcpServer`, and `AboutDialog` injects a checker via its private constructor
-  (`friend class TestAboutDialog`).
-- `PathMonitor` decides which rows count as usable: its `Kind` rules - only wordlists and
-  PCFG rulesets may be folders (an empty wordlist folder, and a ruleset without
-  `Grammar/grammar.txt`, are unusable), tables are file-only, and a bare ruleset name such as
-  `default-passwords` is resolved by hashcat and never flagged. A missing or unusable path
-  swaps the row's file/folder icon for a warning icon with a tooltip.
-- Every row of the wordlist, ruleset, table and feed lists carries a check state: an unchecked
-  row keeps its place and its session entry, but is left out of the command and out of the
-  launch validation.
+  and tests link it. Keep it OBJECT: a static library drops qrc objects and static initializers.
+- Register new production sources in `HASHCAT_GUI_SOURCES`, new `tests/tst_*.cpp` in
+  `HASHCAT_GUI_TESTS`. No globbing.
+- UI-free logic (CommandBuilder, HashcatInfoParser, HelperUtils, StateFile,
+  WidgetStateSerializer, SettingsManager, UpdateChecker, PathMonitor) stays testable;
+  `HelperUtils` runs hashcat/terminal.
+- Attack-mode gating predicates live in `CommandBuilder`; `modeRequirements()` derives mode hints
+  and launch validation. Launch is `HelperUtils::validateOptions()` then `validateLaunch()`;
+  hashcat starts detached (`CREATE_NEW_CONSOLE` on Windows).
+- Example sessions in `src/examples.h`: one `Entry` per attack mode in combo order; paths use
+  `Examples::DataPrefix` and unpack into `Examples::DataDirectory`.
+- `PathMonitor`: wordlist and PCFG rulesets may be folders (wordlist needs a file, ruleset needs
+  `Grammar/grammar.txt`), tables are file-only, and a bare name like `default-passwords` is
+  resolved by hashcat; unusable paths get a warning icon.
+- Unchecked wordlist/ruleset/table/feed rows keep their place and session entry but are omitted
+  from the command and launch validation.
+- `UpdateChecker` is async; tests use a loopback `QTcpServer` and a `TestAboutDialog`-injected
+  checker, never GitHub.
+- Hash types load asynchronously from `hashcat --example-hashes --machine-readable`;
+  `m_pendingHashTypeId` applies a session's type later. Never block the GUI thread with a hashcat
+  query; read `QSettings` on the calling thread before `QtConcurrent` (it is only reentrant).
 
-### Adding a hashcat option
+## Adding a hashcat option
 
-The option touches four places; preview and tests follow:
-- a field in `HashcatOptions` (`src/hashcatoptions.h`), defaulting to what the widget in
-  `mainwindow.ui` starts with;
-- a `CommandBuilder::Parameter`, its `parameterName()` entry and its `build()` case
-  (`src/commandbuilder.*`); leave it out at its default so the preview stays quiet;
+Four places, then preview and tests:
+- a field in `HashcatOptions` (`src/hashcatoptions.h`), defaulting to the widget's start value;
+- a `CommandBuilder::Parameter`, `parameterName()` entry and `build()` case; omit it at its
+  default so the preview stays quiet;
 - the widget in `src/mainwindow.ui` and its read in `MainWindow::collectHashcatOptions()`;
 - a case in `tests/tst_commandbuilder.cpp`.
 
-Connect the widget to `commandChanged()` once; the attack-mode combo is the only exception,
-it goes through `attackIndexChanged()`.
+Connect to `commandChanged()` once; the attack-mode combo uses `attackIndexChanged()` instead.
 
-### Threading and async
+## Persistence
 
-- Hash types load asynchronously from `hashcat --example-hashes --machine-readable`; the combo
-  stays empty until then. `m_pendingHashTypeId` selects a session's hash type later.
-- Never block the GUI thread with a hashcat query. `QSettings` is only reentrant: read it on
-  the calling thread before `QtConcurrent`.
-
-### WidgetStateSerializer
-
-- Converts a widget tree to/from JSON; the object names it keys on are the session format.
-  Returns the values nothing claimed and the wrong-typed ones - the caller reports both
-  (mechanics: `widgetstateserializer.h`).
-- Combo values are item data (attack id, hash id, workload level), never display text. Only a
-  combo without item data falls back to position; an unknown identifier leaves it untouched.
-
-### StateFile
-
-The envelope rules are commented at length in `statefile.h` and `appconstants.h`; the traps
-worth remembering before touching either:
-
-- The envelope (the file's shape) is frozen; per-section versions
-  (`AppConstants::Sessions::Version`, `Settings::Version`) are bumped on a widget/setting
-  *rename*, never on an addition.
-- Section names and `session.json` are constants, not class names - the session section was
-  once keyed by class name, so renaming either orphans every saved file (and a version bump
-  cannot protect a name).
-- A removed widget is neither: its object name goes into
-  `AppConstants::Sessions::RetiredWidgetNames` (never reuse a retired one; `tst_mainwindow`
-  enforces it) and the version stays.
-- A newer version is refused; an older one is applied with unknown/wrong-typed values named.
-  Never destroy a file this version cannot understand - leave it and report it.
-- The class owns only the envelope; the caller passes and compares the version, and writes
-  replace the whole file (no merging) - the caller decides every section.
-
-### Settings
-
-- `SettingsManager::instance()` wraps `QSettings::IniFormat` under the application name. Keys
-  and value types are in `AppConstants::SettingsKeys`; `All` is the table export/import read, so
-  a new setting is one entry.
-- `SettingsDialog::savedSettings()` is static and reads `SettingsManager`: the export is a
-  snapshot of stored values and needs no open dialog.
-- Don't set `QCoreApplication`'s organization name: it changes
-  `QStandardPaths::AppDataLocation` and the session path.
+- `WidgetStateSerializer` keys on widget object names, which are the session format. Combo values
+  are item data (attack/hash id), never display text; a combo without item data
+  falls back to position, an unknown identifier is left untouched.
+- `StateFile` owns only the frozen envelope. Section versions bump on a widget/setting *rename*,
+  never on an addition; section names and `session.json` are constants (renaming one orphans saved
+  files). A removed widget goes to `AppConstants::Sessions::RetiredWidgetNames` (never reuse it)
+  without a version bump. Refuse newer versions, apply older ones naming unknown/wrong-typed
+  values, never destroy a file this version cannot understand; writes replace the whole file.
+- `SettingsManager` wraps `QSettings::IniFormat`; keys, types and defaults are
+  `AppConstants::SettingsKeys::All` (the export/import read). Never set `QCoreApplication`'s
+  organization name: it moves `QStandardPaths::AppDataLocation` and the session file.
 
 ## Conventions
 
-**Code**
 - SPDX `GPL-3.0-or-later` header in every source, header and test.
-- Production uses `QT_NO_CAST_FROM_ASCII`/`QT_NO_CAST_TO_ASCII`: `QStringLiteral`,
+- Production defines `QT_NO_CAST_FROM_ASCII`/`QT_NO_CAST_TO_ASCII`: use `QStringLiteral`,
   `QLatin1StringView` or `QString::fromUtf8` (tests exempt).
-- Protocol tokens, settings keys, defaults and file names go in `src/appconstants.h`. Fixed
-  hashcat syntax/help tables stay non-translatable.
-- Non-QObject classes needing `tr()` use `Q_DECLARE_TR_FUNCTIONS(...)`.
-- Style follows `.clang-format` (enforced by the `clang-format` target).
-- Comments carry the *why* (constraint, platform quirk, trade-off), not what the code says.
-
-**Translations**
-- Wrap user-visible text in `tr()`. Catalogs use `lupdate -no-obsolete -locations none`: no
-  file/line refs (moving code leaves them alone) and no obsolete source strings.
-- Don't run `update_translations` during development: it rewrites every `translations/*.ts`;
-  catalogs may lag and CI/tests don't check freshness or translation completeness. Before a
-  release refresh once by hand and commit them; new strings arrive untranslated.
-- Adding a language: update `HASHCAT_GUI_TRANSLATIONS` and
-  `AppConstants::Languages::Available` (English has no catalog); `tst_translations` enforces
-  the match, but skips when the build produced no embedded `.qm` (no LinguistTools).
-
-**Tests**
-- Use `TestEnvironment::run`, not `QTEST_MAIN`: it redirects XDG config/data/cache dirs so
-  tests never touch real settings.
-- Private access goes through a friend class declared in the header under test
-  (`TestMainWindow`, `TestSettingsDialog`); declare a new friend instead of widening the API.
-- Shell-script hashcat stubs cannot run on Windows: `QSKIP` those cases.
-
-**Repo hygiene**
-- `FAQ.md` is generated: edit `FAQ.yaml`, then `mdfaqgen FAQ.yaml FAQ.md` (mdfaqgen asks before
-  overwriting).
-- `build/` is gitignored; never commit `ui_*.h`, `.qm` or binaries.
-
-## Commit messages
-
-- Subject ≤72 chars, capitalized, imperative, no period. Body only if needed: what and why,
-  wrapped at 72; don't restate the diff.
+- Protocol tokens, settings keys, defaults and file names go in `src/appconstants.h`; fixed
+  hashcat syntax/help tables stay non-translatable. Non-QObject classes needing `tr()` use
+  `Q_DECLARE_TR_FUNCTIONS`.
+- Style is `.clang-format`; the target globs `src/` and `tests/`, so new files are formatted
+  automatically but still need registration. Comments carry the *why*, not the what, and stay
+  short.
+- Wrap user-visible text in `tr()`. Catalogs use `lupdate -no-obsolete -locations none`. Don't run
+  `update_translations` during development - it rewrites every `.ts` and CI/tests don't check
+  freshness; refresh once before a release. A new language updates `HASHCAT_GUI_TRANSLATIONS` and
+  `AppConstants::Languages::Available` (English has no catalog); `tst_translations` enforces the
+  match but skips without embedded `.qm`.
+- Tests use `TestEnvironment::run`, not `QTEST_MAIN` (it redirects XDG dirs). Private access goes
+  through a friend class declared in the header under test; add a friend instead of widening the
+  API. Shell-script hashcat stubs cannot run on Windows: `QSKIP` those cases.
+- Commit subject ≤72 chars, capitalized, imperative, no period; body only for what and why.
+- `FAQ.md` is generated: edit `FAQ.yaml`, then `mdfaqgen FAQ.yaml FAQ.md`.
 
 ## CI and packaging
 
-- CI: GCC and Clang on Linux and Windows; both run `ctest --no-tests=error`; the `linux-gcc`
-  job also runs `desktop-file-validate`. CI does not check that catalogs are up to date or
-  fully translated.
-- OBS and the Windows release both build with
-  `-DBUILD_TESTING=OFF -DHASHCAT_GUI_REQUIRE_TRANSLATIONS=ON`; tests are CI's job. The option
-  makes missing LinguistTools a configure error, and a failing `lrelease` fails the build. It
-  does not size-check the resulting `.qm` files.
-- Windows binary: `build-release.yml` on release publish; Linux packages: OBS from `obs/`.
+- CI: GCC and Clang on Linux and Windows, both run `ctest --no-tests=error`.
+- OBS and the Windows release use `-DBUILD_TESTING=OFF -DHASHCAT_GUI_REQUIRE_TRANSLATIONS=ON`:
+  missing LinguistTools is a configure error and a failing `lrelease` fails the build (tests are
+  CI's job). Windows binary: `build-release.yml`; Linux packages: OBS from `obs/`.
