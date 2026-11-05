@@ -71,6 +71,7 @@ public:
         SecondWordlistWithoutQ,          // two wordlists, no ?q for the second
         IncrementInMode12,               // hashcat refuses -i in the hybrid mode 12
         MaskMarkersNotAllowed,           // ?w/?q in a mode that rewrites them
+        PcfgCharsetWithoutMask,          // a mode 4 charset has no mask= to sit in
         InvalidPcfgSetting,              // a mode 4 setting out of range or twice
         InvalidTableSetting,             // a mode 5 setting out of range or twice
         InvalidAssociationSetting,       // a mode 9 token that is not key=value

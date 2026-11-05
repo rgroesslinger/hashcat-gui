@@ -921,7 +921,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</string>
+               <string>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">?u?l?l?l?l?d?d?d</string>

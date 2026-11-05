@@ -298,8 +298,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         new QRegularExpressionValidator(digits, ui->lineEdit_table_maxperm));
 
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
-    const QString charsetTip = tr("Built-in charsets:") + QLatin1String("\n\n")
-                               + QString::fromUtf8(AppConstants::HelpText::BuiltinCharsets);
+    const QString charsetTip =
+        tr("Use ?1–?4 in a mask to insert a custom charset. A mask is used by "
+           "Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no "
+           "mask names is refused.")
+        + QLatin1String("\n\n") + tr("Built-in charsets:") + QLatin1String("\n\n")
+        + QString::fromUtf8(AppConstants::HelpText::BuiltinCharsets);
     ui->lineEdit_mask->setToolTip(tr("Password candidate mask. ?1–?4 insert a custom charset, "
                                      "?w inserts the wordlist word and ?q a second wordlist word "
                                      "in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.")
@@ -2420,6 +2424,13 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         box.setIcon(QMessageBox::Information);
         box.setText(tr("The ?w and ?q markers are only offered in the hybrid mode "
                        "(mask + wordlists)."));
+        break;
+
+    case HelperUtils::LaunchError::PcfgCharsetWithoutMask:
+        box.setIcon(QMessageBox::Information);
+        box.setText(tr("A custom charset is used only inside a mask, and this run named no "
+                       "mask. Add a mask= setting that references ?1–?4, for example "
+                       "mask=?1?1?1?1, or clear the custom charset."));
         break;
 
     // The three settings errors name a value or token the user typed, so

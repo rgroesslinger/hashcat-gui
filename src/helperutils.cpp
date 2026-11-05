@@ -344,10 +344,12 @@ HelperUtils::LaunchError checkPcfgSettings(const HashcatOptions &options, QStrin
 
     // The feed refuses a named charset without a mask rather than ignoring it.
     // The builder emits one only while its checkbox is on and it has a value.
+    // This is not a bad setting value: the mask is missing entirely, which is
+    // what the dedicated launch error says.
     if (mask.isEmpty()) {
         for (const auto &charset : options.customCharsets) {
             if (charset.enabled && !charset.value.isEmpty()) {
-                return fail(named(AppConstants::HashcatSettings::Mask, mask));
+                return HelperUtils::LaunchError::PcfgCharsetWithoutMask;
             }
         }
     }

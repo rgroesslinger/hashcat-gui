@@ -579,15 +579,16 @@ void TestHelperUtils::pcfgSettingsAreValidated()
 
     // A custom charset is accepted only inside a mask, which the feed refuses
     // rather than ignoring. The builder emits one only while its checkbox is
-    // on and it has a value.
+    // on and it has a value. This is not a bad setting value, so it has its own
+    // error and names no value: the mask is missing, not invalid.
     HashcatOptions charsetNoMask = clean;
     charsetNoMask.pcfgMask.clear();
     charsetNoMask.customCharsets[0].enabled = true;
     charsetNoMask.customCharsets[0].value = QStringLiteral("abc");
     QString charsetDetail;
     QCOMPARE(int(HelperUtils::validateOptions(charsetNoMask, &charsetDetail)),
-             int(HelperUtils::LaunchError::InvalidPcfgSetting));
-    QCOMPARE(charsetDetail, QStringLiteral("mask="));
+             int(HelperUtils::LaunchError::PcfgCharsetWithoutMask));
+    QVERIFY(charsetDetail.isEmpty());
 
     HashcatOptions charsetWithMask = clean;
     charsetWithMask.customCharsets[0].enabled = true;

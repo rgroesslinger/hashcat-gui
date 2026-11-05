@@ -254,6 +254,7 @@ private slots:
     void modeHintFollowsTheAttackMode();
     void hashRecipeRowFollowsTheHashType();
     void launchValidationFollowsTheWidgets();
+    void pcfgCharsetNeedsAMask();
     void widgetsFlowIntoTheOptions();
     void statusTimerReachesTheCommandLine();
     void skipAndLimitAcceptOnlyNumbers();
@@ -1129,6 +1130,39 @@ void TestMainWindow::launchValidationFollowsTheWidgets()
     QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
              int(HelperUtils::LaunchError::RemoveInAssociation));
     window.ui->checkBox_remove->setChecked(false);
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+}
+
+// A custom charset is used only inside a mask. PCFG takes its mask from the
+// Mask field or from a mask= setting, so a charset without either is refused
+// under its own error rather than as an invalid setting value.
+void TestMainWindow::pcfgCharsetNeedsAMask()
+{
+    MainWindow window;
+
+    window.ui->comboBox_attack->setCurrentIndex(3); // PCFG
+    QCOMPARE(int(window.ui->comboBox_attack->currentData().toInt()), int(AttackMode::Pcfg));
+
+    window.ui->checkBox_custom_charset1->setChecked(true);
+    window.ui->lineEdit_custom_charset1->setText(QStringLiteral("abc"));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::PcfgCharsetWithoutMask));
+
+    // A mask that references ?1 gives the charset its place.
+    window.ui->lineEdit_pcfg_mask->setText(QStringLiteral("?1?1?1"));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+
+    // mask= on the extra settings line is the same setting.
+    window.ui->lineEdit_pcfg_mask->clear();
+    window.ui->lineEdit_pcfg_extra->setText(QStringLiteral("mask=?1?1?1"));
+    QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
+             int(HelperUtils::LaunchError::None));
+
+    // An unchecked charset is left out of the command, so no mask is needed.
+    window.ui->lineEdit_pcfg_extra->clear();
+    window.ui->checkBox_custom_charset1->setChecked(false);
     QCOMPARE(int(HelperUtils::validateOptions(window.collectHashcatOptions())),
              int(HelperUtils::LaunchError::None));
 }
