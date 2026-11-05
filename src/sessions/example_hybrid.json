@@ -51,6 +51,7 @@
                 "lineEdit_pcfg_mask": "",
                 "lineEdit_pcfg_maxgain": "",
                 "lineEdit_pcfg_maxword": "",
+                "lineEdit_pcfg_ruleset_name": "",
                 "lineEdit_pcfg_scale": "",
                 "lineEdit_pcfg_threads": "",
                 "lineEdit_pcfg_walk": "",

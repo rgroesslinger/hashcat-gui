@@ -559,6 +559,43 @@
                     <number>4</number>
                    </property>
                    <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_pcfg_ruleset_name">
+                     <property name="spacing">
+                      <number>4</number>
+                     </property>
+                     <item>
+             <widget class="QLabel" name="label_pcfg_ruleset_name">
+              <property name="text">
+               <string>Name:</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QLineEdit" name="lineEdit_pcfg_ruleset_name">
+              <property name="toolTip">
+               <string>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</string>
+              </property>
+              <property name="placeholderText">
+               <string>default-passwords, hints, or a ruleset path</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QPushButton" name="pushButton_add_pcfg_ruleset_name">
+              <property name="toolTip">
+               <string>Add a bundled or installed ruleset by name.</string>
+              </property>
+              <property name="accessibleName">
+               <string>Add ruleset name</string>
+              </property>
+              <property name="text">
+               <string>Add</string>
+              </property>
+             </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
              <widget class="QListWidget" name="listWidget_pcfg_rulesets">
               <property name="minimumSize">
                <size>

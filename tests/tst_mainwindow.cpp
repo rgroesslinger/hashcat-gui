@@ -261,6 +261,7 @@ private slots:
     void checkedWordlistsEndUpInTheCommand();
     void missingWordlistsAreMarked();
     void addingPathsKeepsTheListClean();
+    void pcfgRulesetNameIsAddedFromTheField();
     void folderPathsAreMarked();
     void hashTypeComesFromTheItemData();
     void hashTypesAreFilledFromHashcat();
@@ -1504,6 +1505,39 @@ void TestMainWindow::addingPathsKeepsTheListClean()
     QListWidget *tables = window.ui->listWidget_tables;
     MainWindow::addPathsToList(tables, {QStringLiteral("/tmp/table.txt")});
     QCOMPARE(tables->item(0)->checkState(), Qt::Checked);
+}
+
+// A bundled or installed ruleset is a name, not a file the dialog could
+// return: the field adds it verbatim, once, and the command carries it.
+void TestMainWindow::pcfgRulesetNameIsAddedFromTheField()
+{
+    MainWindow window;
+
+    QLineEdit *field = window.ui->lineEdit_pcfg_ruleset_name;
+    QListWidget *rulesets = window.ui->listWidget_pcfg_rulesets;
+
+    // The field trims, but nothing else about the name is changed.
+    field->setText(QStringLiteral("  hints  "));
+    window.addPcfgRulesetNameClicked();
+    QCOMPARE(rulesets->count(), 1);
+    QCOMPARE(rulesets->item(0)->text(), QStringLiteral("hints"));
+    QCOMPARE(rulesets->item(0)->checkState(), Qt::Checked);
+    QVERIFY(field->text().isEmpty());
+
+    // A name that is already a row is not added twice.
+    field->setText(QStringLiteral("hints"));
+    window.addPcfgRulesetNameClicked();
+    QCOMPARE(rulesets->count(), 1);
+
+    // An empty field adds nothing.
+    field->setText(QStringLiteral("   "));
+    window.addPcfgRulesetNameClicked();
+    QCOMPARE(rulesets->count(), 1);
+
+    // PCFG passes the rows on unchanged; a bare name is what makes hashcat
+    // look in its own pcfg folders rather than in the working directory.
+    window.ui->comboBox_attack->setCurrentIndex(3); // PCFG
+    QVERIFY(window.generateArguments().contains(QStringLiteral("hints")));
 }
 
 // A wordlist folder, a ruleset folder and a table are judged by different

@@ -528,6 +528,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             &MainWindow::addPcfgRulesetClicked);
     connect(ui->pushButton_open_pcfg_ruleset_folder, &QPushButton::clicked, this,
             &MainWindow::addPcfgRulesetFolderClicked);
+    connect(ui->pushButton_add_pcfg_ruleset_name, &QPushButton::clicked, this,
+            &MainWindow::addPcfgRulesetNameClicked);
+    // Typing a bundled name and pressing Enter is the natural sequence; without
+    // this connection the button would be the only way to add one.
+    connect(ui->lineEdit_pcfg_ruleset_name, &QLineEdit::returnPressed, this,
+            &MainWindow::addPcfgRulesetNameClicked);
     connect(ui->pushButton_remove_pcfg_ruleset, &QPushButton::clicked, this,
             &MainWindow::removePcfgRulesetClicked);
     connect(ui->toolButton_pcfg_ruleset_up, &QToolButton::clicked, this,
@@ -1180,6 +1186,7 @@ void MainWindow::resetSessionTriggered()
     ui->lineEdit_pcfg_walk->clear();
     ui->lineEdit_pcfg_mask->clear();
     ui->lineEdit_pcfg_extra->clear();
+    ui->lineEdit_pcfg_ruleset_name->clear();
     ui->listWidget_tables->clear();
     ui->lineEdit_table_identity->clear();
     ui->lineEdit_table_template->clear();
@@ -1793,9 +1800,10 @@ void MainWindow::removeWordlistClicked()
 
 void MainWindow::addPathsToList(QListWidget *list, const QStringList &paths)
 {
-    // The dialog hands out '/' separated paths, which are stored in the
-    // platform's own form so the rows look like the paths the user works with
-    // everywhere else. A path that is already a row is not added twice.
+    // The file and folder dialogs and the ruleset name field end here: the
+    // paths that are not rows yet, once each, in the platform's own separator
+    // form. Every row starts checked; unchecking it later keeps the row in the
+    // list but leaves it out of the command.
     for (const QString &path : paths) {
         const QString native = QDir::toNativeSeparators(path);
         if (native.isEmpty() || !list->findItems(native, Qt::MatchExactly).isEmpty()) {
@@ -1870,6 +1878,20 @@ void MainWindow::addPcfgRulesetFolderClicked()
     if (!folder.isEmpty()) {
         addPathsToList(ui->listWidget_pcfg_rulesets, {folder});
     }
+}
+
+void MainWindow::addPcfgRulesetNameClicked()
+{
+    // A bundled or installed ruleset is a name the dialog cannot return, not a
+    // file. hashcat treats a name containing a slash as a path, so a pasted
+    // path works here too and needs no separate branch.
+    const QString name = ui->lineEdit_pcfg_ruleset_name->text().trimmed();
+    if (name.isEmpty()) {
+        return;
+    }
+
+    addPathsToList(ui->listWidget_pcfg_rulesets, {name});
+    ui->lineEdit_pcfg_ruleset_name->clear();
 }
 
 void MainWindow::removePcfgRulesetClicked()

@@ -70,6 +70,7 @@ private slots:
     // the PCFG, table and feed groups
     void addPcfgRulesetClicked();
     void addPcfgRulesetFolderClicked();
+    void addPcfgRulesetNameClicked();
     void removePcfgRulesetClicked();
     void pcfgRulesetMoveUpClicked();
     void pcfgRulesetMoveDownClicked();
