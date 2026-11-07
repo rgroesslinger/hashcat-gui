@@ -9,6 +9,7 @@
 #include <QLatin1StringView>
 #include <QString>
 #include <QtGlobal>
+#include <array>
 #include <type_traits>
 
 // Application wide constants.
@@ -35,13 +36,23 @@ struct Language {
 };
 // Sorted alphabetically by language code (ISO 639-1, with region suffix).
 // Keep this order when adding new languages.
-inline constexpr Language Available[] = {
-    {"de", "Deutsch"},    {"en", "English"},     {"es", "Español"},
-    {"fr", "Français"},   {"it", "Italiano"},    {"ja", "日本語"},
-    {"ko", "한국어"},     {"pl", "Polski"},      {"pt_BR", "Português (Brasil)"},
-    {"ru", "Русский"},    {"sr", "Srpski"},      {"tr", "Türkçe"},
-    {"uk", "Українська"}, {"zh_CN", "简体中文"}, {"zh_TW", "繁體中文"},
-};
+inline constexpr auto Available = std::to_array<Language>({
+    {"de", "Deutsch"},
+    {"en", "English"},
+    {"es", "Español"},
+    {"fr", "Français"},
+    {"it", "Italiano"},
+    {"ja", "日本語"},
+    {"ko", "한국어"},
+    {"pl", "Polski"},
+    {"pt_BR", "Português (Brasil)"},
+    {"ru", "Русский"},
+    {"sr", "Srpski"},
+    {"tr", "Türkçe"},
+    {"uk", "Українська"},
+    {"zh_CN", "简体中文"},
+    {"zh_TW", "繁體中文"},
+});
 // What a fresh install gets before anything was ever saved, and what the
 // dialog falls back to when the key holds a code that is no longer offered:
 // System default - follow the environment's locale, which lands on English
@@ -72,25 +83,25 @@ enum class Type : quint8 {
 
 struct Entry {
     QLatin1StringView key;
-    Type type;
+    Type type = Type::String;
     // What the setting starts with: the text for a string setting, the
     // switch for a boolean one. The text is UTF-8, as everywhere else in the
     // application.
-    const char *textDefault;
-    bool boolDefault;
+    const char *textDefault = "";
+    bool boolDefault = false;
 };
 
 // Every key the settings are made of, with the type of value it takes and the
 // value it starts with. The export and the import both read this table, so a
 // new setting is one entry here; the tests then say what else is missing.
-inline constexpr Entry All[] = {
+inline constexpr auto All = std::to_array<Entry>({
     {HashcatPath, Type::String, "", false},
     {Terminal, Type::String, "", false},
     {UseShortParameters, Type::Boolean, "", false},
     {RestoreSession, Type::Boolean, "", true},
     {ColorScheme, Type::String, "", false},
     {Language, Type::String, Languages::Default, false},
-};
+});
 
 // The default of a setting, in the type the setting takes.
 template <typename T> T defaultOf(QLatin1StringView key)
@@ -170,11 +181,11 @@ inline constexpr int Version = 1;
 // The object names of widgets that were removed. Their values cannot be
 // applied, and reporting them would hit every session written before the
 // removal - not a hand edit or a file of another version.
-inline constexpr QLatin1StringView RetiredWidgetNames[] = {
+inline constexpr auto RetiredWidgetNames = std::to_array<QLatin1StringView>({
     QLatin1StringView{"checkBox_override_workload_profile"},
     QLatin1StringView{"comboBox_workload_profile"},
     QLatin1StringView{"spinBox_segment_size"},
-};
+});
 } // namespace Sessions
 
 // Values the widgets start with. The identical defaults are baked into the
@@ -205,7 +216,7 @@ inline constexpr QLatin1StringView Digits{"^[0-9]*$"};
 // -D takes a number list of the device types 1 (CPU) and 2 (GPU); 3, the
 // accelerators, is gone with hashcat 8.0.0. Spaces around the numbers are
 // fine, as in hashcat's own number list.
-inline constexpr QLatin1StringView DeviceTypes{"^\\s*([12]\\s*(,\\s*[12]\\s*)*)?$"};
+inline constexpr QLatin1StringView DeviceTypes{R"(^\s*([12]\s*(,\s*[12]\s*)*)?$)"};
 // The shapes the feeds of the attack modes 4 and 5 parse themselves and a
 // plain integer validator cannot hold: the colon separated weights list,
 // maxword's multiple of 16, the dot separated decimal and the 0/1 flags.
@@ -322,10 +333,14 @@ namespace Hashcat
 // The installed name is probed first: a setup that has both is a wrapper or a
 // symlink around the same binary.
 #ifdef Q_OS_WIN
-inline constexpr QLatin1StringView ExecutableNames[] = {QLatin1StringView{"hashcat.exe"}};
+inline constexpr auto ExecutableNames = std::to_array<QLatin1StringView>({
+    QLatin1StringView{"hashcat.exe"},
+});
 #else
-inline constexpr QLatin1StringView ExecutableNames[] = {QLatin1StringView{"hashcat"},
-                                                        QLatin1StringView{"hashcat.bin"}};
+inline constexpr auto ExecutableNames = std::to_array<QLatin1StringView>({
+    QLatin1StringView{"hashcat"},
+    QLatin1StringView{"hashcat.bin"},
+});
 #endif
 inline constexpr QLatin1StringView Quiet{"--quiet"};
 inline constexpr QLatin1StringView ExampleHashes{"--example-hashes"};

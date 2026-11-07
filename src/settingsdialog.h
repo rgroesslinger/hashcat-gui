@@ -25,6 +25,11 @@ public:
     explicit SettingsDialog(QWidget *parent = nullptr);
     ~SettingsDialog() override;
 
+    SettingsDialog(const SettingsDialog &) = delete;
+    SettingsDialog &operator=(const SettingsDialog &) = delete;
+    SettingsDialog(SettingsDialog &&) = delete;
+    SettingsDialog &operator=(SettingsDialog &&) = delete;
+
     // The settings as they are stored right now.
     //
     // The export is a backup of the configuration the application runs with,

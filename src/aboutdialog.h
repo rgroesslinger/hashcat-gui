@@ -25,6 +25,11 @@ public:
     explicit AboutDialog(QWidget *parent = nullptr);
     ~AboutDialog() override;
 
+    AboutDialog(const AboutDialog &) = delete;
+    AboutDialog &operator=(const AboutDialog &) = delete;
+    AboutDialog(AboutDialog &&) = delete;
+    AboutDialog &operator=(AboutDialog &&) = delete;
+
 protected:
     // The dialog opens as large as its content. The height of the
     // word-wrapped labels is only known once they have been polished, so the
@@ -75,7 +80,7 @@ private:
     void setVersionLabel(const QString &text);
 
     // What a bug report needs: the versions and the hashcat in use.
-    QString detailsText() const;
+    [[nodiscard]] QString detailsText() const;
 
     // The version of hashcat - empty while the query is in flight and after
     // an error. The label shows the version or the error wrapped; this keeps

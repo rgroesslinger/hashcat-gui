@@ -16,6 +16,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QVersionNumber>
+#include <utility>
 
 namespace
 {
@@ -49,8 +50,8 @@ UpdateChecker::UpdateChecker(QObject *parent)
 {
 }
 
-UpdateChecker::UpdateChecker(QNetworkAccessManager *manager, const QUrl &endpoint, QObject *parent)
-    : QObject(parent), m_manager(manager), m_endpoint(endpoint)
+UpdateChecker::UpdateChecker(QNetworkAccessManager *manager, QUrl endpoint, QObject *parent)
+    : QObject(parent), m_manager(manager), m_endpoint(std::move(endpoint))
 {
     if (!m_manager) {
         m_manager = new QNetworkAccessManager(this);
@@ -75,7 +76,7 @@ void UpdateChecker::check()
     QNetworkReply *reply = m_manager->get(request);
     m_reply = reply;
 
-    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply] {
         if (m_reply == reply) {
             m_reply.clear();
         }

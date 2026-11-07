@@ -13,7 +13,8 @@ class SettingsManager
 public:
     static SettingsManager &instance();
 
-    template <typename T> T getKey(const QString &key, const T &defaultValue = T()) const
+    template <typename T>
+    [[nodiscard]] T getKey(const QString &key, const T &defaultValue = T()) const
     {
         return settings.value(key, QVariant::fromValue(defaultValue)).template value<T>();
     }
@@ -24,11 +25,17 @@ public:
     //
     // A file on every platform: QSettings::IniFormat keeps the settings in
     // an INI file on Windows as well, so there is always a path to open.
-    QString fileName() const;
+    [[nodiscard]] QString fileName() const;
+
+    SettingsManager(const SettingsManager &) = delete;
+    SettingsManager &operator=(const SettingsManager &) = delete;
+    SettingsManager(SettingsManager &&) = delete;
+    SettingsManager &operator=(SettingsManager &&) = delete;
 
 private:
     SettingsManager();
     ~SettingsManager() = default;
+
     QSettings settings;
 };
 

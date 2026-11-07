@@ -46,9 +46,10 @@
 #include <QTextDocument>
 #include <QToolTip>
 
+#include <array>
 #include <utility>
 
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
 #include <process.h>
 #include <windows.h>
 #endif
@@ -110,7 +111,7 @@ QStringList displayArguments(const QStringList &arguments)
 #endif
     const qsizetype recipe = display.indexOf(QString(AppConstants::Hashcat::HashRecipe));
     if (recipe >= 0 && recipe + 1 < display.size()) {
-        display[recipe + 1] = quote + display.at(recipe + 1) + quote;
+        display.replace(recipe + 1, quote + display.at(recipe + 1) + quote);
     }
     return display;
 }
@@ -278,14 +279,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // The shapes that are not a plain integer range: the colon separated
     // weights list, maxword's multiple of 16, the dot separated decimal and
     // the 0/1 flags of the table feed.
-    const std::pair<QLineEdit *, QLatin1StringView> feedShapes[] = {
+    const auto feedShapes = std::to_array<std::pair<QLineEdit *, QLatin1StringView>>({
         {ui->lineEdit_pcfg_weights, AppConstants::Validation::WeightsList},
         {ui->lineEdit_pcfg_maxword, AppConstants::Validation::MaxwordValue},
         {ui->lineEdit_pcfg_maxgain, AppConstants::Validation::DecimalNumber},
         {ui->lineEdit_table_identity, AppConstants::Validation::BinaryFlag},
         {ui->lineEdit_table_template, AppConstants::Validation::BinaryFlag},
         {ui->lineEdit_table_single, AppConstants::Validation::BinaryFlag},
-    };
+    });
     for (const auto &[edit, shape] : feedShapes) {
         edit->setValidator(
             new QRegularExpressionValidator(QRegularExpression(QString(shape)), edit));
@@ -776,7 +777,7 @@ QSize MainWindow::attackModeEnvelope(int wrapWidth)
 {
     QWidget *content = ui->scrollArea_attack->widget();
     if (!content) {
-        return QSize();
+        return {};
     }
     // The combo is filled in the constructor; keep a defensive fallback for a
     // window whose modes are not set up yet.
@@ -1548,7 +1549,7 @@ void MainWindow::initHashAndAttackModes()
         m_hashTypeWatcher = watcher;
 
         // When the future is finished, fill the combo with the parsed types.
-        connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
+        connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher] {
             const HashcatResult &result = watcher->result();
             watcher->deleteLater();
 
@@ -1750,7 +1751,7 @@ QString MainWindow::modeHint(AttackMode mode) const
         return tr("This mode needs a mask with exactly one ?w; a ?q after ?w "
                   "names a second wordlist.");
     }
-    return QString();
+    return {};
 }
 
 // Options that only carry a value while their parent checkbox is on. The
@@ -2249,7 +2250,7 @@ void MainWindow::startClicked()
     QStringList arguments = availableTerminals.value(configuredTerminal);
     arguments << hashcatPath << generateArguments();
 
-#if defined(Q_OS_WIN)
+#ifdef Q_OS_WIN
     /* Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal */
     proc.setCreateProcessArgumentsModifier(
         [](QProcess::CreateProcessArguments *args) { args->flags |= CREATE_NEW_CONSOLE; });
@@ -2543,13 +2544,13 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.potfileDisable = ui->checkBox_potfile_disable->isChecked();
 
     if (ui->radioButton_use_rules_file->isChecked()) {
-        QCheckBox *boxes[3] = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2,
-                               ui->checkBox_rulesfile_3};
-        QLineEdit *edits[3] = {ui->lineEdit_rulesfile_1, ui->lineEdit_rulesfile_2,
-                               ui->lineEdit_rulesfile_3};
-        for (int i = 0; i < 3; ++i) {
-            if (boxes[i]->isChecked() && !edits[i]->text().isEmpty()) {
-                options.rulesFiles << edits[i]->text();
+        const std::array boxes = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2,
+                                  ui->checkBox_rulesfile_3};
+        const std::array edits = {ui->lineEdit_rulesfile_1, ui->lineEdit_rulesfile_2,
+                                  ui->lineEdit_rulesfile_3};
+        for (std::size_t i = 0; i < boxes.size(); ++i) {
+            if (boxes.at(i)->isChecked() && !edits.at(i)->text().isEmpty()) {
+                options.rulesFiles << edits.at(i)->text();
             }
         }
         // Stored as a plain bool: the builder only emits it next to the -r
@@ -2573,21 +2574,21 @@ HashcatOptions MainWindow::collectHashcatOptions()
     options.speedOnly = ui->checkBox_speed_only->isChecked();
     options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
 
-    QCheckBox *charsetBoxes[4] = {
+    const std::array charsetBoxes = {
         ui->checkBox_custom_charset1,
         ui->checkBox_custom_charset2,
         ui->checkBox_custom_charset3,
         ui->checkBox_custom_charset4,
     };
-    QLineEdit *charsetEdits[4] = {
+    const std::array charsetEdits = {
         ui->lineEdit_custom_charset1,
         ui->lineEdit_custom_charset2,
         ui->lineEdit_custom_charset3,
         ui->lineEdit_custom_charset4,
     };
-    for (int i = 0; i < 4; ++i) {
-        options.customCharsets[i].enabled = charsetBoxes[i]->isChecked();
-        options.customCharsets[i].value = charsetEdits[i]->text();
+    for (std::size_t i = 0; i < charsetBoxes.size(); ++i) {
+        options.customCharsets.at(i).enabled = charsetBoxes.at(i)->isChecked();
+        options.customCharsets.at(i).value = charsetEdits.at(i)->text();
     }
 
     options.hexCharset = ui->checkBox_hex_charset->isChecked();

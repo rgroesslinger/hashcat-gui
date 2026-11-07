@@ -75,7 +75,7 @@ void TestHashcatInfoParser::nonNumericKeysAreSkipped()
     QVERIFY(HashcatInfoParser::parseExampleHashes(raw, hashModes));
     QCOMPARE(hashModes.size(), 2);
     QCOMPARE(hashModes.value(0), QStringLiteral("0 | MD5"));
-    QCOMPARE(hashModes.value(4294967295u), QStringLiteral("4294967295 | Top"));
+    QCOMPARE(hashModes.value(4294967295U), QStringLiteral("4294967295 | Top"));
 }
 
 // An id without a usable name is dead weight: empty name, no name at all,

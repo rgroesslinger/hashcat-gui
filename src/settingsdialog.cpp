@@ -346,11 +346,11 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
     const QStringList keys = settings.keys();
     QStringList unknownKeys;
     for (const QString &key : keys) {
-        const bool known = std::any_of(std::begin(AppConstants::SettingsKeys::All),
-                                       std::end(AppConstants::SettingsKeys::All),
-                                       [&key](const AppConstants::SettingsKeys::Entry &entry) {
-                                           return QString(entry.key) == key;
-                                       });
+        const bool known =
+            std::ranges::any_of(AppConstants::SettingsKeys::All,
+                                [&key](const AppConstants::SettingsKeys::Entry &entry) {
+                                    return QString(entry.key) == key;
+                                });
         if (!known) {
             unknownKeys << key;
         }

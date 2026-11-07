@@ -13,6 +13,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTemporaryDir>
+#include <array>
 #include <iterator>
 
 // The conditions that keep Execute from starting anything, the terminal
@@ -50,7 +51,7 @@ private slots:
 
 private:
     // The stubs only make sense where a #! line does
-    bool stubsAvailable() const
+    [[nodiscard]] bool stubsAvailable() const
     {
         return !m_okScript.isEmpty();
     }
@@ -510,7 +511,7 @@ void TestHelperUtils::pcfgSettingsAreValidated()
         QString value;
         QString reported; // the detail: the setting as the feed sees it
     };
-    const Case typedCases[]{
+    const auto typedCases = std::to_array<Case>({
         {&HashcatOptions::pcfgScale, QStringLiteral("0"), QStringLiteral("scale=0")},
         {&HashcatOptions::pcfgScale, QStringLiteral("65"), QStringLiteral("scale=65")},
         {&HashcatOptions::pcfgCostmax, QStringLiteral("0"), QStringLiteral("costmax=0")},
@@ -524,7 +525,7 @@ void TestHelperUtils::pcfgSettingsAreValidated()
         // makes, so this one exists only here.
         {&HashcatOptions::pcfgMaxgain, QStringLiteral("0.5"), QStringLiteral("maxgain=0.5")},
         {&HashcatOptions::pcfgMaxgain, QStringLiteral("65"), QStringLiteral("maxgain=65")},
-    };
+    });
     for (const Case &bad : typedCases) {
         HashcatOptions options = clean;
         options.*bad.field = bad.value;
@@ -583,24 +584,24 @@ void TestHelperUtils::pcfgSettingsAreValidated()
     // error and names no value: the mask is missing, not invalid.
     HashcatOptions charsetNoMask = clean;
     charsetNoMask.pcfgMask.clear();
-    charsetNoMask.customCharsets[0].enabled = true;
-    charsetNoMask.customCharsets[0].value = QStringLiteral("abc");
+    charsetNoMask.customCharsets.at(0).enabled = true;
+    charsetNoMask.customCharsets.at(0).value = QStringLiteral("abc");
     QString charsetDetail;
     QCOMPARE(int(HelperUtils::validateOptions(charsetNoMask, &charsetDetail)),
              int(HelperUtils::LaunchError::PcfgCharsetWithoutMask));
     QVERIFY(charsetDetail.isEmpty());
 
     HashcatOptions charsetWithMask = clean;
-    charsetWithMask.customCharsets[0].enabled = true;
-    charsetWithMask.customCharsets[0].value = QStringLiteral("abc");
+    charsetWithMask.customCharsets.at(0).enabled = true;
+    charsetWithMask.customCharsets.at(0).value = QStringLiteral("abc");
     expect(charsetWithMask, HelperUtils::LaunchError::None);
 
     HashcatOptions charsetDisabled = charsetNoMask;
-    charsetDisabled.customCharsets[0].enabled = false;
+    charsetDisabled.customCharsets.at(0).enabled = false;
     expect(charsetDisabled, HelperUtils::LaunchError::None);
 
     HashcatOptions charsetEmpty = charsetNoMask;
-    charsetEmpty.customCharsets[0].value.clear();
+    charsetEmpty.customCharsets.at(0).value.clear();
     expect(charsetEmpty, HelperUtils::LaunchError::None);
 
     // mask= is a setting like any other, so the extra line may carry it; then
@@ -611,7 +612,7 @@ void TestHelperUtils::pcfgSettingsAreValidated()
     expect(charsetViaExtra, HelperUtils::LaunchError::None);
 
     HashcatOptions omenViaExtra = charsetNoMask;
-    omenViaExtra.customCharsets[0] = HashcatOptions::Charset();
+    omenViaExtra.customCharsets.at(0) = HashcatOptions::Charset();
     omenViaExtra.pcfgExtraSettings =
         QStringList{QStringLiteral("mask=?l?l"), QStringLiteral("omen=1")};
     expect(omenViaExtra, HelperUtils::LaunchError::InvalidPcfgSetting);
@@ -864,10 +865,10 @@ void TestHelperUtils::cachePathNeedsAnExistingDirectory()
 void TestHelperUtils::terminalArgumentsArePinned()
 {
     struct Expected {
-        const char *terminal;
+        const char *terminal = "";
         QStringList arguments;
     };
-    const Expected expected[] = {
+    const auto expected = std::to_array<Expected>({
         {"cmd.exe", {"/k"}},
         {"powershell.exe", {"-NoExit", "-NoProfile", "-Command", "&"}},
         {"pwsh", {"-NoExit", "-NoProfile", "-Command", "&"}},
@@ -881,7 +882,7 @@ void TestHelperUtils::terminalArgumentsArePinned()
         {"foot", {"--hold"}},
         {"wezterm", {"start", "--"}},
         {"ghostty", {"--wait-after-command=true", "-e"}},
-    };
+    });
 
     const QMap<QString, QStringList> &table = HelperUtils::terminalArguments();
     QCOMPARE(int(table.size()), int(std::size(expected)));
@@ -894,7 +895,7 @@ void TestHelperUtils::terminalArgumentsArePinned()
 void TestHelperUtils::findHashcatInPathFindsTheExecutable()
 {
     const QString stub = TestEnvironment::writeSearchableExecutable(
-        QString(AppConstants::Hashcat::ExecutableNames[0]));
+        QString(AppConstants::Hashcat::ExecutableNames.at(0)));
     QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
 
     TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());

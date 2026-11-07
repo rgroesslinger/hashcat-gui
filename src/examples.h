@@ -9,6 +9,7 @@
 #include "hashcatoptions.h"
 
 #include <QLatin1StringView>
+#include <array>
 
 // The bundled example sessions, one per supported attack mode.
 //
@@ -21,14 +22,14 @@
 namespace Examples
 {
 struct Entry {
-    AttackMode attackMode;
-    int hashType;
+    AttackMode attackMode = AttackMode::Straight;
+    int hashType = 0;
     QLatin1StringView resource;
     QLatin1StringView password;
 };
 
 // Ordered like AllAttackModes and the attack mode combo.
-inline constexpr Entry All[] = {
+inline constexpr auto All = std::to_array<Entry>({
     {AttackMode::Straight, 0, QLatin1StringView{":/sessions/example_straight.json"},
      QLatin1StringView{"Sunshine42!"}},
     {AttackMode::Combination, 100, QLatin1StringView{":/sessions/example_combination.json"},
@@ -49,14 +50,14 @@ inline constexpr Entry All[] = {
      QLatin1StringView{"Harper"}},
     {AttackMode::Hybrid, 3200, QLatin1StringView{":/sessions/example_hybrid.json"},
      QLatin1StringView{"Coffee2Go!"}},
-};
+});
 
 // A path in a session file starts with this token; the loader replaces it
 // with the native path of DataDirectory once the files are unpacked.
 inline constexpr QLatin1StringView DataPrefix{"<examples>/"};
 inline constexpr QLatin1StringView DataDirectory{"examples"};
 
-inline constexpr QLatin1StringView DataFiles[] = {
+inline constexpr auto DataFiles = std::to_array<QLatin1StringView>({
     QLatin1StringView{":/sessions/data/straight_words.txt"},
     QLatin1StringView{":/sessions/data/straight.rule"},
     QLatin1StringView{":/sessions/data/combination_left.txt"},
@@ -70,7 +71,7 @@ inline constexpr QLatin1StringView DataFiles[] = {
     QLatin1StringView{":/sessions/data/association.hash"},
     QLatin1StringView{":/sessions/data/hybrid_left.txt"},
     QLatin1StringView{":/sessions/data/hybrid_right.txt"},
-};
+});
 } // namespace Examples
 
 #endif // EXAMPLES_H

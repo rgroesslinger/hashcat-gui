@@ -7,6 +7,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <algorithm>
 #include <utility>
 
 namespace
@@ -32,12 +33,9 @@ bool hasWordlistFiles(const QString &path)
     // feed will read it.
     const QFileInfoList entries =
         folder.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
-    for (const QFileInfo &info : entries) {
-        if (!info.fileName().startsWith(QLatin1Char('.'))) {
-            return true;
-        }
-    }
-    return false;
+    return std::ranges::any_of(entries, [](const QFileInfo &info) {
+        return !info.fileName().startsWith(QLatin1Char('.'));
+    });
 }
 } // namespace
 

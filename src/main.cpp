@@ -13,6 +13,7 @@
 #include <QIcon>
 #include <QLocale>
 #include <QTranslator>
+#include <array>
 
 int main(int argc, char *argv[])
 {
@@ -22,21 +23,21 @@ int main(int argc, char *argv[])
     // application name as its organization, and setting QCoreApplication's
     // organization in addition would change QStandardPaths::AppDataLocation
     // (and with it the location of the session file)
-    a.setApplicationName(QStringLiteral("hashcat-gui"));
-    a.setApplicationVersion(QStringLiteral(HASHCAT_GUI_VERSION));
+    QApplication::setApplicationName(QStringLiteral("hashcat-gui"));
+    QApplication::setApplicationVersion(QStringLiteral(HASHCAT_GUI_VERSION));
 
     // Standard --help / --version handling. parser.process() exits the
     // process on either option, so the main window is never created and no
     // dialog opens - handy for smoke-testing the binary.
     QCommandLineParser parser;
-    parser.setApplicationDescription(a.applicationName());
+    parser.setApplicationDescription(QApplication::applicationName());
     parser.addHelpOption();
     parser.addVersionOption();
     parser.process(a);
 
     // Let the desktop match the window to the XDG desktop entry
     // to resolve the installed hicolor icon by name
-    a.setDesktopFileName(QStringLiteral("hashcat-gui"));
+    QApplication::setDesktopFileName(QStringLiteral("hashcat-gui"));
 
     // The color scheme the user chose. An empty scheme leaves the decision
     // to the desktop, so the application keeps out of it.
@@ -49,18 +50,18 @@ int main(int argc, char *argv[])
     // SVG is unrenderable (no qsvg plugin): it looks valid but yields no
     // pixmap, so the result is probed and the embedded PNGs are used when it
     // comes up empty.
-#if defined(Q_OS_WIN)
-    a.setWindowIcon(QIcon(QStringLiteral(":/icons/hashcat-gui.ico")));
+#ifdef Q_OS_WIN
+    QApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/hashcat-gui.ico")));
 #else
     QIcon windowIcon = QIcon::fromTheme(QStringLiteral("hashcat-gui"));
     if (windowIcon.pixmap(32, 32).isNull()) {
-        static constexpr int iconSizes[] = {16, 22, 24, 32, 48, 64, 128, 256};
+        static constexpr auto iconSizes = std::to_array<int>({16, 22, 24, 32, 48, 64, 128, 256});
         for (int size : iconSizes) {
             windowIcon.addFile(
                 QStringLiteral(":/icons/hicolor/%1x%1/apps/hashcat-gui.png").arg(size));
         }
     }
-    a.setWindowIcon(windowIcon);
+    QApplication::setWindowIcon(windowIcon);
 #endif
 
     // Load the translation before the first widget exists. qt_add_translations()
@@ -76,11 +77,11 @@ int main(int argc, char *argv[])
     if (translator.load(language.isEmpty() ? QLocale() : QLocale(language),
                         QStringLiteral("hashcat-gui"), QStringLiteral("_"),
                         QStringLiteral(":/i18n"), QStringLiteral(".qm"))) {
-        a.installTranslator(&translator);
+        QApplication::installTranslator(&translator);
     }
 
     MainWindow w;
     w.show();
 
-    return a.exec();
+    return QApplication::exec();
 }

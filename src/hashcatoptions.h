@@ -10,6 +10,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <array>
 #include <cstdint>
 
 // Supported attack modes, as numbered by hashcat (-a).
@@ -28,12 +29,18 @@ enum class AttackMode : std::uint8_t {
 };
 
 // The attack modes in the order the combo box and the example menu show them.
-inline constexpr AttackMode AllAttackModes[] = {
-    AttackMode::Straight,       AttackMode::Combination, AttackMode::BruteForce,
-    AttackMode::Pcfg,           AttackMode::Table,       AttackMode::HybridWordMask,
-    AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+inline constexpr auto AllAttackModes = std::to_array<AttackMode>({
+    AttackMode::Straight,
+    AttackMode::Combination,
+    AttackMode::BruteForce,
+    AttackMode::Pcfg,
+    AttackMode::Table,
+    AttackMode::HybridWordMask,
+    AttackMode::HybridMaskWord,
+    AttackMode::Generic,
+    AttackMode::Association,
     AttackMode::Hybrid,
-};
+});
 
 // One UI independent description of a hashcat invocation.
 //
@@ -108,7 +115,7 @@ struct HashcatOptions {
         bool enabled = false;
         QString value;
     };
-    Charset customCharsets[4];
+    std::array<Charset, 4> customCharsets;
 
     bool hexCharset = false;
     bool hexSalt = false;

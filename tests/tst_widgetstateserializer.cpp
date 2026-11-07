@@ -48,35 +48,31 @@ namespace
 // real session would carry.
 struct Form {
     Form()
+        : lineEdit(new QLineEdit(&widget)), checkBox(new QCheckBox(&widget)),
+          comboBox(new QComboBox(&widget)), comboBoxWithData(new QComboBox(&widget)),
+          radioButton(new QRadioButton(&widget)), spinBox(new QSpinBox(&widget)),
+          doubleSpinBox(new QDoubleSpinBox(&widget)), listWidget(new QListWidget(&widget))
     {
-        lineEdit = new QLineEdit(&widget);
         lineEdit->setObjectName(QStringLiteral("lineEdit_command"));
 
-        checkBox = new QCheckBox(&widget);
         checkBox->setObjectName(QStringLiteral("checkBox_rules"));
 
-        comboBox = new QComboBox(&widget);
         comboBox->setObjectName(QStringLiteral("comboBox_language"));
         comboBox->addItems(
             {QStringLiteral("English"), QStringLiteral("Deutsch"), QStringLiteral("Srpski")});
 
         // A combo box whose entries carry an id, the way the attack modes
         // and the hash types do.
-        comboBoxWithData = new QComboBox(&widget);
         comboBoxWithData->setObjectName(QStringLiteral("comboBox_hash_type"));
-        comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
-        comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000u);
+        comboBoxWithData->addItem(QStringLiteral("MD5"), 0U);
+        comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000U);
 
-        radioButton = new QRadioButton(&widget);
         radioButton->setObjectName(QStringLiteral("radioButton_plain"));
 
-        spinBox = new QSpinBox(&widget);
         spinBox->setObjectName(QStringLiteral("spinBox_runtime"));
 
-        doubleSpinBox = new QDoubleSpinBox(&widget);
         doubleSpinBox->setObjectName(QStringLiteral("doubleSpinBox_ratio"));
 
-        listWidget = new QListWidget(&widget);
         listWidget->setObjectName(QStringLiteral("listWidget_wordlist"));
     }
 
@@ -127,7 +123,7 @@ void TestWidgetStateSerializer::roundTrip()
     QCOMPARE(restored.checkBox->isChecked(), true);
     QCOMPARE(restored.comboBox->currentIndex(), 2);
     QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
-    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000U);
     QCOMPARE(restored.radioButton->isChecked(), true);
     QCOMPARE(restored.spinBox->value(), 42);
     QCOMPARE(restored.doubleSpinBox->value(), 2.5);
@@ -153,14 +149,14 @@ void TestWidgetStateSerializer::comboBoxIdentifiersSurviveAShiftedList()
     // entry.
     Form restored;
     restored.comboBoxWithData->clear();
-    restored.comboBoxWithData->addItem(QStringLiteral("SHA-1"), 100u);
-    restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
-    restored.comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000u);
+    restored.comboBoxWithData->addItem(QStringLiteral("SHA-1"), 100U);
+    restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0U);
+    restored.comboBoxWithData->addItem(QStringLiteral("NTLM"), 1000U);
 
     WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
     QCOMPARE(restored.comboBoxWithData->currentIndex(), 2);
-    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000U);
 }
 
 // A combo box whose entries carry no identifier falls back to its position.
@@ -189,8 +185,8 @@ void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
     Form restored;
     restored.comboBoxWithData->clear();
     // The text "1" is not the identifier 1; only the data counts.
-    restored.comboBoxWithData->addItem(QStringLiteral("1"), 5u);
-    restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0u);
+    restored.comboBoxWithData->addItem(QStringLiteral("1"), 5U);
+    restored.comboBoxWithData->addItem(QStringLiteral("MD5"), 0U);
     restored.comboBoxWithData->setCurrentIndex(1); // MD5, id 0
 
     WidgetStateSerializer::applyToWidgets(values, &restored.widget);
@@ -198,7 +194,7 @@ void TestWidgetStateSerializer::comboBoxIdentifierIsNotMatchedByText()
     // The identifier 1 is unknown, so nothing changes - even though an entry
     // displays "1".
     QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
-    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 0u);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 0U);
 }
 
 // An identifier the list does not know leaves the combo box alone. The
@@ -215,7 +211,7 @@ void TestWidgetStateSerializer::anUnknownIdentifierChangesNothing()
     WidgetStateSerializer::applyToWidgets(values, &restored.widget);
 
     QCOMPARE(restored.comboBoxWithData->currentIndex(), 1);
-    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000u);
+    QCOMPARE(restored.comboBoxWithData->currentData().toUInt(), 1000U);
 }
 
 // A field may hold non-ASCII text, and it has to survive the round trip

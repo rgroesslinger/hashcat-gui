@@ -13,6 +13,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QUrl>
+#include <utility>
 
 namespace
 {
@@ -36,12 +37,12 @@ QByteArray httpResponse(const QByteArray &body, int status = 200)
 class HttpServer : public QTcpServer
 {
 public:
-    explicit HttpServer(const QByteArray &response, QObject *parent = nullptr)
-        : QTcpServer(parent), m_response(response)
+    explicit HttpServer(QByteArray response, QObject *parent = nullptr)
+        : QTcpServer(parent), m_response(std::move(response))
     {
-        connect(this, &QTcpServer::newConnection, this, [this]() {
+        connect(this, &QTcpServer::newConnection, this, [this] {
             QTcpSocket *socket = nextPendingConnection();
-            connect(socket, &QTcpSocket::readyRead, socket, [this, socket]() {
+            connect(socket, &QTcpSocket::readyRead, socket, [this, socket] {
                 m_request += socket->readAll();
                 if (m_sent || !m_request.contains(QByteArrayLiteral("\r\n\r\n"))) {
                     return;
@@ -54,14 +55,14 @@ public:
         });
     }
 
-    QByteArray request() const
+    [[nodiscard]] QByteArray request() const
     {
         return m_request;
     }
 
-    QUrl url(const QString &path = QStringLiteral("/latest")) const
+    [[nodiscard]] QUrl url(const QString &path = QStringLiteral("/latest")) const
     {
-        return QUrl(QStringLiteral("http://127.0.0.1:%1%2").arg(serverPort()).arg(path));
+        return {QStringLiteral("http://127.0.0.1:%1%2").arg(serverPort()).arg(path)};
     }
 
 private:

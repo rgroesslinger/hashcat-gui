@@ -34,6 +34,11 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+    MainWindow(const MainWindow &) = delete;
+    MainWindow &operator=(const MainWindow &) = delete;
+    MainWindow(MainWindow &&) = delete;
+    MainWindow &operator=(MainWindow &&) = delete;
+
 protected:
     // The window cannot know its natural size before it is shown: the scroll
     // areas inside the tabs only report the content's final minimum once they
@@ -147,7 +152,7 @@ private:
     void initExampleSessionMenu();
     // The translated name of an attack mode, shared by the combo box and the
     // example submenu so the two cannot drift apart.
-    QString attackModeName(AttackMode mode) const;
+    [[nodiscard]] QString attackModeName(AttackMode mode) const;
     // Unpacks the example data files and returns the native directory with a
     // trailing separator, ready to replace Examples::DataPrefix.
     bool materializeExampleData(QString *directory, QString *error);
@@ -155,22 +160,22 @@ private:
     void updateOptionDependencies();
 
     // The attack mode the user selected.
-    AttackMode currentAttackMode() const;
+    [[nodiscard]] AttackMode currentAttackMode() const;
 
     // What the selected attack mode needs from the user.
-    QString modeHint(AttackMode mode) const;
+    [[nodiscard]] QString modeHint(AttackMode mode) const;
 
     // The notes an import has about the file itself: the version it was made
     // by and the sections it holds besides the one that was imported.
-    QStringList fileNotes(int fileVersion, int currentVersion,
-                          const QStringList &otherSections) const;
+    [[nodiscard]] QStringList fileNotes(int fileVersion, int currentVersion,
+                                        const QStringList &otherSections) const;
 
     // Why a file a newer version wrote is not applied at all.
-    QString newerFileNote(int fileVersion, int currentVersion) const;
+    [[nodiscard]] QString newerFileNote(int fileVersion, int currentVersion) const;
 
     // Why the session of a newer version is not restored - and not stored
     // either.
-    QString newerSessionNote(int fileVersion) const;
+    [[nodiscard]] QString newerSessionNote(int fileVersion) const;
 
     // Applies the values of a session file to the widgets and collects the
     // notes about what could not be applied.
@@ -211,14 +216,14 @@ private:
     // Presents what HelperUtils::validateLaunch() reported
     void showLaunchError(HelperUtils::LaunchError error, const QString &detail);
 
-    QString sessionFile() const;
+    [[nodiscard]] QString sessionFile() const;
 
     // Whether this version understands the session file: one it cannot read
     // at all, or one of a newer format, belongs to another version.
-    bool sessionFileIsUnderstood(const QString &file) const;
+    [[nodiscard]] bool sessionFileIsUnderstood(const QString &file) const;
 
     // Whether the application keeps the session between two runs.
-    bool restoreSessionEnabled() const;
+    [[nodiscard]] bool restoreSessionEnabled() const;
 
     void loadSession();
     void saveSession();
@@ -226,7 +231,7 @@ private:
     // Queues the hash type a session names until the list of hash types
     // exists, and reports one this hashcat does not know - which leaves the
     // combo without a selection.
-    QString restoreHashType(const QJsonObject &state);
+    [[nodiscard]] QString restoreHashType(const QJsonObject &values);
 
     // Applies the hash type a session asked for, now that the list of hash
     // types exists. Returns a message when the session names a hash type

@@ -10,6 +10,8 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QMap>
+#include <array>
+#include <cstddef>
 
 bool CommandBuilder::attackUsesMask(AttackMode mode)
 {
@@ -409,16 +411,16 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     // expressed directly so a stale checkbox cannot leak -1 ... -4 into a
     // command that does not use them.
     if (attackUsesCustomCharset(mode)) {
-        static const Parameter charsetParameters[4] = {
+        static const auto charsetParameters = std::to_array<Parameter>({
             Parameter::CustomCharset1,
             Parameter::CustomCharset2,
             Parameter::CustomCharset3,
             Parameter::CustomCharset4,
-        };
-        for (int i = 0; i < 4; ++i) {
-            const auto &charset = options.customCharsets[i];
+        });
+        for (std::size_t i = 0; i < charsetParameters.size(); ++i) {
+            const auto &charset = options.customCharsets.at(i);
             if (charset.enabled && !charset.value.isEmpty()) {
-                arguments << parameterName(charsetParameters[i], useShort) << charset.value;
+                arguments << parameterName(charsetParameters.at(i), useShort) << charset.value;
             }
         }
     }

@@ -260,7 +260,7 @@ void AboutDialog::updateVersionLabel()
         ui->label_hc_version_text->setText(QFileInfo(path).fileName());
 
         QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
-        connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher]() {
+        connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher] {
             const HashcatResult &result = watcher->result();
 
             if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {

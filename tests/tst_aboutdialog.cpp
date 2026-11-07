@@ -110,7 +110,9 @@ void TestAboutDialog::resizingKeepsTheContentAtTheTop()
     QHash<QString, int> heights;
     for (const QString &name : names) {
         QLabel *label = dialog.findChild<QLabel *>(name);
-        QVERIFY2(label, qPrintable(name));
+        if (label == nullptr) {
+            QFAIL(qPrintable(name));
+        }
         heights.insert(name, label->height());
     }
     QLabel *firstLink = dialog.findChild<QLabel *>(QStringLiteral("label_link_project"));
@@ -124,7 +126,9 @@ void TestAboutDialog::resizingKeepsTheContentAtTheTop()
     QCoreApplication::processEvents();
     for (const QString &name : names) {
         QLabel *label = dialog.findChild<QLabel *>(name);
-        QVERIFY2(label, qPrintable(name));
+        if (label == nullptr) {
+            QFAIL(qPrintable(name));
+        }
         QVERIFY2(label->height() == heights.value(name),
                  qPrintable(QStringLiteral("%1: height %2, expected %3")
                                 .arg(name)

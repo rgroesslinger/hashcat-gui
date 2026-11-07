@@ -173,7 +173,7 @@ void TestSettingsDialog::languageComboStoresLocaleCodes()
     QCOMPARE(dialog.ui->comboBox_language->itemData(0).toString(), QString());
 
     for (int i = 0; i < languages; ++i) {
-        const auto &language = AppConstants::Languages::Available[i];
+        const auto &language = AppConstants::Languages::Available.at(i);
         QCOMPARE(dialog.ui->comboBox_language->itemData(i + 1).toString(),
                  QString::fromUtf8(language.code));
         // shown in the language's own name, not an English word for it
@@ -402,7 +402,7 @@ void TestSettingsDialog::hashcatPathStatusFollowsTheField()
 void TestSettingsDialog::detectsHashcatFromPathWhenNoPathConfigured()
 {
     const QString stub = TestEnvironment::writeSearchableExecutable(
-        QString(AppConstants::Hashcat::ExecutableNames[0]));
+        QString(AppConstants::Hashcat::ExecutableNames.at(0)));
     QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
 
     TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
@@ -427,7 +427,7 @@ void TestSettingsDialog::doesNotReplaceAConfiguredPath()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, configured);
 
     const QString stub = TestEnvironment::writeSearchableExecutable(
-        QString(AppConstants::Hashcat::ExecutableNames[0]));
+        QString(AppConstants::Hashcat::ExecutableNames.at(0)));
     QVERIFY2(!stub.isEmpty(), "the executable stub could not be written");
     TestEnvironment::PathGuard guard(QFileInfo(stub).absolutePath().toUtf8());
 

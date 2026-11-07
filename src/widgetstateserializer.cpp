@@ -18,10 +18,12 @@
 #include <QSpinBox>
 #include <algorithm>
 
+namespace
+{
 // Whether the entries of a combo box carry identifiers (item data) at all.
 // It decides whether a selection is stored by identifier or by position: the
 // two never mix within one combo box, so the stored value is unambiguous.
-static bool comboBoxHasItemData(const QComboBox *comboBox)
+bool comboBoxHasItemData(const QComboBox *comboBox)
 {
     for (int i = 0; i < comboBox->count(); ++i) {
         if (comboBox->itemData(i).isValid()) {
@@ -39,7 +41,7 @@ static bool comboBoxHasItemData(const QComboBox *comboBox)
 // nothing, and a file that names it would change a spin box. A widget
 // without a name at all would share the key "" with every other unnamed
 // widget.
-static bool isApplicationWidget(const QWidget *widget)
+bool isApplicationWidget(const QWidget *widget)
 {
     if (widget->objectName().isEmpty()) {
         return false;
@@ -53,30 +55,31 @@ static bool isApplicationWidget(const QWidget *widget)
     return !parent->metaObject()->inherits(&QAbstractSpinBox::staticMetaObject)
            && !parent->metaObject()->inherits(&QComboBox::staticMetaObject);
 }
+} // namespace
 
 WidgetStateSerializer::WidgetStateSerializer(QObject *parent) : QObject(parent) {}
 
-QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &ignoredWidgets)
+QJsonObject WidgetStateSerializer::toJson(const QWidget *widget, const QStringList &ignoredWidgets)
 {
     QJsonObject obj;
 
-    auto const lineEdits = w->findChildren<const QLineEdit *>();
+    auto const lineEdits = widget->findChildren<const QLineEdit *>();
     for (const QLineEdit *lineEdit : lineEdits) {
         if (!isApplicationWidget(lineEdit)) {
             continue;
         }
-        obj[lineEdit->objectName()] = lineEdit->text();
+        obj.insert(lineEdit->objectName(), lineEdit->text());
     }
 
-    auto const checkBoxes = w->findChildren<const QCheckBox *>();
+    auto const checkBoxes = widget->findChildren<const QCheckBox *>();
     for (const QCheckBox *checkBox : checkBoxes) {
         if (!isApplicationWidget(checkBox)) {
             continue;
         }
-        obj[checkBox->objectName()] = checkBox->isChecked();
+        obj.insert(checkBox->objectName(), checkBox->isChecked());
     }
 
-    auto const comboBoxes = w->findChildren<const QComboBox *>();
+    auto const comboBoxes = widget->findChildren<const QComboBox *>();
     for (const QComboBox *comboBox : comboBoxes) {
         if (!isApplicationWidget(comboBox)) {
             continue;
@@ -84,36 +87,36 @@ QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &i
         // Stored by the identifier of the selected entry - the attack mode or
         // hash type id - not by its position, which a list that grows in the
         // middle shifts. A combo box without identifiers falls back to that.
-        obj[comboBox->objectName()] = comboBoxHasItemData(comboBox)
-                                          ? QJsonValue::fromVariant(comboBox->currentData())
-                                          : QJsonValue(comboBox->currentIndex());
+        obj.insert(comboBox->objectName(), comboBoxHasItemData(comboBox)
+                                               ? QJsonValue::fromVariant(comboBox->currentData())
+                                               : QJsonValue(comboBox->currentIndex()));
     }
 
-    auto const radioButtons = w->findChildren<const QRadioButton *>();
+    auto const radioButtons = widget->findChildren<const QRadioButton *>();
     for (const QRadioButton *radioButton : radioButtons) {
         if (!isApplicationWidget(radioButton)) {
             continue;
         }
-        obj[radioButton->objectName()] = radioButton->isChecked();
+        obj.insert(radioButton->objectName(), radioButton->isChecked());
     }
 
-    auto const spinBoxes = w->findChildren<const QSpinBox *>();
+    auto const spinBoxes = widget->findChildren<const QSpinBox *>();
     for (const QSpinBox *spinBox : spinBoxes) {
         if (!isApplicationWidget(spinBox)) {
             continue;
         }
-        obj[spinBox->objectName()] = spinBox->value();
+        obj.insert(spinBox->objectName(), spinBox->value());
     }
 
-    auto const doubleSpinBoxes = w->findChildren<const QDoubleSpinBox *>();
+    auto const doubleSpinBoxes = widget->findChildren<const QDoubleSpinBox *>();
     for (const QDoubleSpinBox *doubleSpinBox : doubleSpinBoxes) {
         if (!isApplicationWidget(doubleSpinBox)) {
             continue;
         }
-        obj[doubleSpinBox->objectName()] = doubleSpinBox->value();
+        obj.insert(doubleSpinBox->objectName(), doubleSpinBox->value());
     }
 
-    auto const listWidgets = w->findChildren<const QListWidget *>();
+    auto const listWidgets = widget->findChildren<const QListWidget *>();
     for (const QListWidget *listWidget : listWidgets) {
         if (!isApplicationWidget(listWidget)) {
             continue;
@@ -122,11 +125,11 @@ QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &i
         const auto items = listWidget->findItems(QStringLiteral("*"), Qt::MatchWildcard);
         for (const QListWidgetItem *item : items) {
             QJsonObject li;
-            li[QStringLiteral("text")] = item->text();
-            li[QStringLiteral("checked")] = (item->checkState() == Qt::Checked);
+            li.insert(QStringLiteral("text"), item->text());
+            li.insert(QStringLiteral("checked"), (item->checkState() == Qt::Checked));
             list.append(li);
         }
-        obj[listWidget->objectName()] = list;
+        obj.insert(listWidget->objectName(), list);
     }
 
     for (const QString &name : ignoredWidgets) {
@@ -137,12 +140,12 @@ QJsonObject WidgetStateSerializer::toJson(const QWidget *w, const QStringList &i
 }
 
 WidgetStateSerializer::ApplyResult
-WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
+WidgetStateSerializer::applyToWidgets(const QJsonObject &values, QWidget *widget,
                                       const QStringList &ignoredWidgets)
 {
     // The names are removed from a copy, so that the caller can still read the
     // values afterwards - the hash type, for one.
-    QJsonObject mutableObj = obj;
+    QJsonObject mutableObj = values;
 
     for (const QString &name : ignoredWidgets) {
         mutableObj.remove(name);
@@ -152,7 +155,7 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
 
     // Every name that is applied is taken off the copy, so that what is left
     // over names the values no widget claimed.
-    auto const lineEdits = w->findChildren<QLineEdit *>();
+    auto const lineEdits = widget->findChildren<QLineEdit *>();
     for (QLineEdit *lineEdit : lineEdits) {
         if (!isApplicationWidget(lineEdit)) {
             continue;
@@ -172,7 +175,7 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         lineEdit->setText(value.toString());
     }
 
-    auto const checkBoxes = w->findChildren<QCheckBox *>();
+    auto const checkBoxes = widget->findChildren<QCheckBox *>();
     for (QCheckBox *checkBox : checkBoxes) {
         if (!isApplicationWidget(checkBox)) {
             continue;
@@ -192,7 +195,7 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         checkBox->setChecked(value.toBool());
     }
 
-    auto const comboBoxes = w->findChildren<QComboBox *>();
+    auto const comboBoxes = widget->findChildren<QComboBox *>();
     for (QComboBox *comboBox : comboBoxes) {
         if (!isApplicationWidget(comboBox)) {
             continue;
@@ -233,7 +236,7 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         }
     }
 
-    auto const radioButtons = w->findChildren<QRadioButton *>();
+    auto const radioButtons = widget->findChildren<QRadioButton *>();
     for (QRadioButton *radioButton : radioButtons) {
         if (!isApplicationWidget(radioButton)) {
             continue;
@@ -253,7 +256,7 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         radioButton->setChecked(value.toBool());
     }
 
-    auto const spinBoxes = w->findChildren<QSpinBox *>();
+    auto const spinBoxes = widget->findChildren<QSpinBox *>();
     for (QSpinBox *spinBox : spinBoxes) {
         if (!isApplicationWidget(spinBox)) {
             continue;
@@ -276,7 +279,7 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         spinBox->setValue(value.toInt());
     }
 
-    auto const doubleSpinBoxes = w->findChildren<QDoubleSpinBox *>();
+    auto const doubleSpinBoxes = widget->findChildren<QDoubleSpinBox *>();
     for (QDoubleSpinBox *doubleSpinBox : doubleSpinBoxes) {
         if (!isApplicationWidget(doubleSpinBox)) {
             continue;
@@ -296,7 +299,7 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         doubleSpinBox->setValue(value.toDouble());
     }
 
-    auto const listWidgets = w->findChildren<QListWidget *>();
+    auto const listWidgets = widget->findChildren<QListWidget *>();
     for (QListWidget *listWidget : listWidgets) {
         if (!isApplicationWidget(listWidget)) {
             continue;
@@ -330,9 +333,9 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &obj, QWidget *w,
         for (const auto &v : list) {
             QJsonObject li = v.toObject();
             QListWidgetItem *item =
-                new QListWidgetItem(li[QStringLiteral("text")].toString(), listWidget);
-            item->setCheckState(li[QStringLiteral("checked")].toBool() ? Qt::Checked
-                                                                       : Qt::Unchecked);
+                new QListWidgetItem(li.value(QStringLiteral("text")).toString(), listWidget);
+            item->setCheckState(li.value(QStringLiteral("checked")).toBool() ? Qt::Checked
+                                                                             : Qt::Unchecked);
         }
     }
 

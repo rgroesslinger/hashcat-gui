@@ -19,6 +19,7 @@
 #include <QStyleHints>
 #include <QtConcurrent/QtConcurrentRun>
 #include <algorithm>
+#include <array>
 #include <utility>
 
 // Runs hashcat asynchronously; the caller attaches a QFutureWatcher and reads
@@ -149,8 +150,8 @@ QString settingsKey(const QString &token)
 bool hasSetting(const QStringList &tokens, QLatin1StringView key)
 {
     const QString prefix = QString(key) + QLatin1Char('=');
-    return std::any_of(tokens.cbegin(), tokens.cend(),
-                       [&prefix](const QString &token) { return token.startsWith(prefix); });
+    return std::ranges::any_of(
+        tokens, [&prefix](const QString &token) { return token.startsWith(prefix); });
 }
 
 // The value of the first token with the given key, or an empty string. A
@@ -164,7 +165,7 @@ QString settingValue(const QStringList &tokens, QLatin1StringView key)
             return token.mid(prefix.size());
         }
     }
-    return QString();
+    return {};
 }
 
 // The keys of the settings a typed field holds, counted once per field that
@@ -221,15 +222,15 @@ int amplifierWordlistRow(AttackMode mode)
 // would be read as another ruleset or table.
 bool bareExtraToken(const QStringList &tokens, QString *tokenOut)
 {
-    for (const QString &token : tokens) {
-        if (!token.contains(QLatin1Char('='))) {
-            if (tokenOut) {
-                *tokenOut = token;
-            }
-            return true;
-        }
+    const auto bare = std::ranges::find_if(
+        tokens, [](const QString &token) { return !token.contains(QLatin1Char('=')); });
+    if (bare == tokens.cend()) {
+        return false;
     }
-    return false;
+    if (tokenOut) {
+        *tokenOut = *bare;
+    }
+    return true;
 }
 
 // The checks of the mode 4 (PCFG) settings. The feed parses them only after
@@ -257,13 +258,13 @@ HelperUtils::LaunchError checkPcfgSettings(const HashcatOptions &options, QStrin
     // These are the feed's own parameter bounds. The auto default for threads
     // (16 on a fast hash, 8 on a slow one, capped by the machine) only fills
     // an absent setting; it does not widen the range a named one may take.
-    const Bound bounds[] = {
+    const auto bounds = std::to_array<Bound>({
         {options.pcfgScale, AppConstants::HashcatSettings::Scale, 1, 64},
         {options.pcfgCostmax, AppConstants::HashcatSettings::Costmax, 1, 64},
         {options.pcfgThreads, AppConstants::HashcatSettings::Threads, 0, 16},
         {options.pcfgKbits, AppConstants::HashcatSettings::Kbits, 0, 27},
         {options.pcfgWalk, AppConstants::HashcatSettings::Walk, 0, 1},
-    };
+    });
     for (const Bound &bound : bounds) {
         if (!bound.value.trimmed().isEmpty() && !numberInRange(bound.value, bound.min, bound.max)) {
             return fail(named(bound.name, bound.value));
@@ -295,8 +296,8 @@ HelperUtils::LaunchError checkPcfgSettings(const HashcatOptions &options, QStrin
         // A weight per ruleset; an empty list is the one bundled default.
         const qsizetype expected = std::max<qsizetype>(1, options.pcfgRulesets.size());
         if (!shape.match(weights).hasMatch() || values.size() != expected
-            || std::any_of(values.cbegin(), values.cend(),
-                           [](const QString &value) { return value.toLongLong() <= 0; })) {
+            || std::ranges::any_of(values,
+                                   [](const QString &value) { return value.toLongLong() <= 0; })) {
             return fail(named(AppConstants::HashcatSettings::Weights, weights));
         }
     }
@@ -391,11 +392,11 @@ HelperUtils::LaunchError checkTableSettings(const HashcatOptions &options, QStri
     };
 
     // The three flags: empty (the default), 0 or 1.
-    const std::pair<QString, QLatin1StringView> flags[] = {
+    const auto flags = std::to_array<std::pair<QString, QLatin1StringView>>({
         {options.tableIdentity, AppConstants::HashcatSettings::Identity},
         {options.tableTemplate, AppConstants::HashcatSettings::Template},
         {options.tableSingle, AppConstants::HashcatSettings::Single},
-    };
+    });
     for (const auto &[value, name] : flags) {
         const QString trimmed = value.trimmed();
         if (!trimmed.isEmpty() && trimmed != QLatin1String("0") && trimmed != QLatin1String("1")) {

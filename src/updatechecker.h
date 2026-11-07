@@ -46,7 +46,7 @@ class UpdateChecker : public QObject
 
 public:
     explicit UpdateChecker(QObject *parent = nullptr);
-    UpdateChecker(QNetworkAccessManager *manager, const QUrl &endpoint, QObject *parent = nullptr);
+    UpdateChecker(QNetworkAccessManager *manager, QUrl endpoint, QObject *parent = nullptr);
     ~UpdateChecker() override = default;
 
     // Starts one request. A second call while a request is in flight is
@@ -57,6 +57,11 @@ public:
     // rules can be tested without a network.
     static UpdateCheckResult evaluateResponse(const QByteArray &body,
                                               const QString &currentVersion);
+
+    UpdateChecker(const UpdateChecker &) = delete;
+    UpdateChecker &operator=(const UpdateChecker &) = delete;
+    UpdateChecker(UpdateChecker &&) = delete;
+    UpdateChecker &operator=(UpdateChecker &&) = delete;
 
 signals:
     void finished(const UpdateCheckResult &result);

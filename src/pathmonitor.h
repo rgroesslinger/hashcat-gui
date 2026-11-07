@@ -44,14 +44,14 @@ public:
     void setPaths(const QStringList &paths);
 
     // Whether the last check found a path hashcat can use.
-    bool isAvailable(const QString &path) const;
+    [[nodiscard]] bool isAvailable(const QString &path) const;
 
 signals:
     void availabilityChanged(const QString &path, bool available);
 
 private:
-    bool isUsable(const QString &path) const;
-    QStringList watchDirectories(const QString &path) const;
+    [[nodiscard]] bool isUsable(const QString &path) const;
+    [[nodiscard]] QStringList watchDirectories(const QString &path) const;
     void recheck();
     void updateWatches();
 

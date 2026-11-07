@@ -10,6 +10,7 @@
 
 #include <QDateTime>
 #include <QSet>
+#include <array>
 
 // Everything the argument rules promise: what reaches the hashcat command
 // line, in which order, and what is deliberately left out of it.
@@ -262,8 +263,8 @@ void TestCommandBuilder::argumentLayout()
     options.mask = QStringLiteral("?d?d");
     options.rulesFiles << QStringLiteral("r.rule");
     options.generateRules = 4;
-    options.customCharsets[0].enabled = true;
-    options.customCharsets[0].value = QStringLiteral("abc");
+    options.customCharsets.at(0).enabled = true;
+    options.customCharsets.at(0).value = QStringLiteral("abc");
 
     QCOMPARE(CommandBuilder::build(options), expected);
 }
@@ -681,8 +682,8 @@ void TestCommandBuilder::nonAsciiArgumentsSurviveVerbatim()
     options.hashFile = hashFile;
     options.mask = mask;
     options.wordlists << dictionary;
-    options.customCharsets[0].enabled = true;
-    options.customCharsets[0].value = charset;
+    options.customCharsets.at(0).enabled = true;
+    options.customCharsets.at(0).value = charset;
     options.outfileEnabled = true;
     options.outfile = outfile;
 
@@ -953,7 +954,7 @@ void TestCommandBuilder::parameterSpelling()
 
     // every enumerator has to be spelled out, otherwise the option silently
     // vanishes from the command line
-    const Parameter all[] = {
+    const auto all = std::to_array<Parameter>({
         Parameter::AttackMode,
         Parameter::BackendDevices,
         Parameter::CachePath,
@@ -994,7 +995,7 @@ void TestCommandBuilder::parameterSpelling()
         Parameter::Status,
         Parameter::StatusTimer,
         Parameter::Username,
-    };
+    });
     for (const Parameter key : all) {
         QVERIFY2(!CommandBuilder::parameterName(key).isEmpty(), "an enum has no long spelling");
         QVERIFY2(!CommandBuilder::parameterName(key, true).isEmpty(),

@@ -430,7 +430,9 @@ void TestMainWindow::hashTypeComboIsSearchable()
     // The constructor makes the field editable and gives it a completer.
     QVERIFY(window.ui->comboBox_hash_type->isEditable());
     QCompleter *completer = window.ui->comboBox_hash_type->completer();
-    QVERIFY(completer != nullptr);
+    if (completer == nullptr) {
+        QFAIL("the hash type combo has no completer");
+    }
 
     // The list arrives asynchronously and is refilled as hashcat changes, so
     // the completer is bound to the combo's own model, not a snapshot taken
@@ -605,7 +607,9 @@ void TestMainWindow::attackTabGroupBoxesAlignTheirContentToTheTop()
     for (const QString &name :
          {QStringLiteral("gridLayout_pcfg"), QStringLiteral("gridLayout_table")}) {
         auto *grid = window.ui->tab_attack->findChild<QGridLayout *>(name);
-        QVERIFY2(grid, qPrintable(QStringLiteral("missing layout: %1").arg(name)));
+        if (grid == nullptr) {
+            QFAIL(qPrintable(QStringLiteral("missing layout: %1").arg(name)));
+        }
         QVERIFY2(grid->alignment() & Qt::AlignTop,
                  qPrintable(QStringLiteral("layout not top aligned: %1").arg(name)));
     }
@@ -1003,7 +1007,9 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
                 expected = &candidate;
             }
         }
-        QVERIFY2(expected, "no expectation written down for this attack mode");
+        if (expected == nullptr) {
+            QFAIL("no expectation written down for this attack mode");
+        }
 
         QCOMPARE(window.ui->label_mode_hint->text(), expected->hint);
     }
@@ -1493,11 +1499,11 @@ void TestMainWindow::missingWordlistsAreMarked()
     // monitor has to attach to those rows as well.
     QJsonArray restoredWordlists;
     QJsonObject restoredWordlist;
-    restoredWordlist[QStringLiteral("text")] = missingPath;
-    restoredWordlist[QStringLiteral("checked")] = true;
+    restoredWordlist.insert(QStringLiteral("text"), missingPath);
+    restoredWordlist.insert(QStringLiteral("checked"), true);
     restoredWordlists.append(restoredWordlist);
     QJsonObject sessionValues;
-    sessionValues[QStringLiteral("listWidget_wordlist")] = restoredWordlists;
+    sessionValues.insert(QStringLiteral("listWidget_wordlist"), restoredWordlists);
 
     QVERIFY(window.applySessionFile(sessionValues, AppConstants::Sessions::Version, {}).isEmpty());
 
@@ -1722,8 +1728,8 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     QVERIFY(window.ui->comboBox_hash_type->toolTip().isEmpty());
 
     // 0 sorts before 1000, and the ids travel as item data
-    QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 0u);
-    QCOMPARE(window.ui->comboBox_hash_type->itemData(1).toUInt(), 1000u);
+    QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 0U);
+    QCOMPARE(window.ui->comboBox_hash_type->itemData(1).toUInt(), 1000U);
 
     const QStringList arguments = window.generateArguments();
     const qsizetype hashType = arguments.indexOf(QStringLiteral("--hash-type"));
@@ -1829,7 +1835,7 @@ void TestMainWindow::changingTheBinaryReRunsTheQuery()
     QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
     QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() == 1,
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400u);
+    QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400U);
 }
 
 // The reply of a query an earlier init started describes a binary the list no
@@ -1891,7 +1897,7 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
     } else {
         QTRY_COMPARE_WITH_TIMEOUT(window.ui->comboBox_hash_type->count(), 1,
                                   AppConstants::Hashcat::QueryTimeoutMs);
-        QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400u);
+        QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400U);
     }
 
     // Let the first query answer. Its watcher is deleted once its reply is
@@ -1909,7 +1915,7 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
         QVERIFY(window.ui->comboBox_hash_type->toolTip().contains(QStringLiteral("Settings")));
     } else {
         QCOMPARE(window.ui->comboBox_hash_type->count(), 1);
-        QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400u);
+        QCOMPARE(window.ui->comboBox_hash_type->itemData(0).toUInt(), 1400U);
         QVERIFY(window.ui->comboBox_hash_type->isEnabled());
     }
 #endif
@@ -2168,7 +2174,7 @@ void TestMainWindow::sessionHashTypeSurvivesTheAsynchronousQuery()
                              AppConstants::Hashcat::QueryTimeoutMs);
 
     QCOMPARE(window.ui->comboBox_hash_type->currentIndex(), 1);
-    QCOMPARE(window.ui->comboBox_hash_type->currentData().toUInt(), 1000u);
+    QCOMPARE(window.ui->comboBox_hash_type->currentData().toUInt(), 1000U);
     QCOMPARE(window.m_pendingHashTypeId, -1); // applied and consumed
 }
 
@@ -2304,9 +2310,9 @@ void TestMainWindow::windowFitsItsContent()
         const int viewportHeight = natural.boundedTo(cap).height() - chrome.height();
         int requiredWidth = 0;
         for (int i = 0; i < tabAreas.count(); ++i) {
-            int width = minima[i].width();
-            if (minima[i].height() > viewportHeight) {
-                width += tabAreas[i]->verticalScrollBar()->sizeHint().width();
+            int width = minima.at(i).width();
+            if (minima.at(i).height() > viewportHeight) {
+                width += tabAreas.at(i)->verticalScrollBar()->sizeHint().width();
             }
             requiredWidth = qMax(requiredWidth, width);
         }
@@ -2560,14 +2566,12 @@ void TestMainWindow::noShortcutCombinesControlAndAlt()
     const auto actions = window.findChildren<QAction *>();
     QVERIFY(!actions.isEmpty());
     for (const QAction *action : actions) {
-        const QKeySequence shortcut = action->shortcut();
-        for (int i = 0; i < shortcut.count(); ++i) {
-            const Qt::KeyboardModifiers modifiers = shortcut[i].keyboardModifiers();
-            QVERIFY2(
-                !(modifiers.testFlag(Qt::ControlModifier) && modifiers.testFlag(Qt::AltModifier)),
-                qPrintable(
-                    QStringLiteral("%1: %2").arg(action->objectName(), shortcut.toString())));
-        }
+        // QKeySequence has no bounds-safe accessor for its combinations, so
+        // the analyzer rejects operator[]; the portable text names the same
+        // modifiers.
+        const QString shortcut = action->shortcut().toString(QKeySequence::PortableText);
+        QVERIFY2(!shortcut.contains(QStringLiteral("Ctrl+Alt")),
+                 qPrintable(QStringLiteral("%1: %2").arg(action->objectName(), shortcut)));
     }
 }
 

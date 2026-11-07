@@ -141,6 +141,8 @@ public:
 
     PathGuard(const PathGuard &) = delete;
     PathGuard &operator=(const PathGuard &) = delete;
+    PathGuard(PathGuard &&) = delete;
+    PathGuard &operator=(PathGuard &&) = delete;
 
 private:
     QByteArray m_previous;
@@ -268,7 +270,7 @@ inline void checkGroupBoxTitleAlignment(QObject *root)
 // Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behavior, plus the redirect
 // above. needsGui decides between QApplication and QCoreApplication - the
 // command builder and helper utils tests never need a display.
-inline int run(QObject *test, int argc, char *argv[], bool needsGui)
+inline int run(QObject *test, int argc, char **argv, bool needsGui)
 {
     redirectBaseDirectories();
 
@@ -278,11 +280,11 @@ inline int run(QObject *test, int argc, char *argv[], bool needsGui)
         // The application name is the organization QSettings writes under, so
         // this is a second, independent guard on top of the XDG redirect - and
         // on Windows, where XDG plays no part, the only one.
-        app.setApplicationName(QStringLiteral("hashcat-gui-tests"));
+        QCoreApplication::setApplicationName(QStringLiteral("hashcat-gui-tests"));
         result = QTest::qExec(test, argc, argv);
     } else {
         QCoreApplication app(argc, argv);
-        app.setApplicationName(QStringLiteral("hashcat-gui-tests"));
+        QCoreApplication::setApplicationName(QStringLiteral("hashcat-gui-tests"));
         result = QTest::qExec(test, argc, argv);
     }
 
