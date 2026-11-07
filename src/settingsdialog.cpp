@@ -22,7 +22,6 @@
 #include <QShowEvent>
 #include <QUrl>
 #include <algorithm>
-#include <iterator>
 
 namespace
 {
