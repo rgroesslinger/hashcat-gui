@@ -233,6 +233,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>Nazwa:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>Nazwa dołączonego lub zainstalowanego zestawu reguł, np. default-passwords lub hints. Ukośnik oznacza ścieżkę; hashcat przeszukuje najpierw swój folder profilu i współdzielone foldery pcfg.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints lub ścieżka zestawu reguł</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>Dodaj dołączony lub zainstalowany zestaw reguł według nazwy.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>Dodaj nazwę zestawu reguł</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>Folder zestawu reguł wymaga pliku Grammar/grammar.txt.</translation>
     </message>
@@ -295,6 +315,10 @@
     <message>
         <source>Mask:</source>
         <translation>Maska:</translation>
+    </message>
+    <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>Maska wybiera kandydatów, których gramatyka może wygenerować. ?1–?4 wstawiają własny zestaw znaków. Nie można łączyć z omen=1 ani z hintaccount bez hintwords/hintfile.</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
@@ -507,10 +531,6 @@
     <message>
         <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
         <translation>1 przechodzi do następnego słowa bazowego tam, gdzie pozwala na to kolejność, zamiast je wyliczać przez unranking; kandydaci są identyczni, wyłączona jest tylko szybka ścieżka.</translation>
-    </message>
-    <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>Wyliczaj tylko kandydatów dopuszczanych przez tę maskę; wyklucza omen=1 oraz hintaccount, chyba że słowa podpowiedzi pochodzą z hintwords lub hintfile.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -802,7 +822,7 @@
     </message>
     <message>
         <source>CPU affinity:</source>
-        <translation>Powinowactwo CPU:</translation>
+        <translation>Koligacja CPU:</translation>
     </message>
     <message>
         <source>Backend devices:</source>
@@ -1053,8 +1073,8 @@ Domyślnie: 1,2</translation>
         <translation>Plik sesji ma wersję formatu %1, ale ta wersja odczytuje wersję formatu %2, więc sesja nie została przywrócona. Plik pozostawiono bez zmian, więc sesja z tego uruchomienia również nie zostanie zapisana. Zaktualizuj hashcat-gui, aby go odczytać.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>Ustawienia wyeksportowano do %1.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>Ustawienia wyeksportowano do „%1”.</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1303,6 +1323,10 @@ Błąd: %1</translation>
         <translation>Ten tryb wymaga maski.</translation>
     </message>
     <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Użyj ?1–?4 w masce, aby wstawić własny zestaw znaków. Maska jest używana przez Brute-force, tryby hybrydowe i ustawienie mask= w PCFG; zestaw znaków, którego nie wymienia żadna maska, jest odrzucany.</translation>
+    </message>
+    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Maska kandydatów na hasło. ?1–?4 wstawiają własny zestaw znaków, ?w wstawia słowo z listy słów, a ?q drugie słowo z listy słów w trybie Hybrydowy (maska + ?w/?q), natomiast ?? oznacza dosłowny znak ?.</translation>
     </message>
@@ -1427,6 +1451,10 @@ Aktualnie wybrano: %2.</translation>
     <message>
         <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
         <translation>Znaczniki ?w i ?q są dostępne tylko w trybie hybrydowym (maska + listy słów).</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Własny zestaw znaków jest używany tylko wewnątrz maski, a to uruchomienie nie podało żadnej maski. Dodaj ustawienie mask= odwołujące się do ?1–?4, na przykład mask=?1?1?1?1, albo wyczyść własny zestaw znaków.</translation>
     </message>
     <message>
         <source>The setting “%1” is not valid for this mode.</source>

@@ -269,10 +269,6 @@
         <translation>1 pasa a la siguiente palabra base cuando el orden lo permite, en lugar de calcularla por unranking; los candidatos son idénticos, solo se desactiva la vía rápida.</translation>
     </message>
     <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>Enumerar solo los candidatos que admite esta máscara; excluye omen=1 y hintaccount, salvo que las palabras de pista procedan de hintwords o hintfile.</translation>
-    </message>
-    <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>Ajustes key=value separados por espacios: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Los conjuntos de reglas van primero.</translation>
     </message>
@@ -533,6 +529,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>Nombre:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>Nombre de un conjunto de reglas incluido o instalado, como default-passwords o hints. Una barra indica una ruta; hashcat busca primero en su carpeta de perfil y en las carpetas pcfg compartidas.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints o la ruta de un conjunto de reglas</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>Añadir por nombre un conjunto de reglas incluido o instalado.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>Añadir nombre de conjunto de reglas</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>Una carpeta de conjunto de reglas necesita un Grammar/grammar.txt.</translation>
     </message>
@@ -595,6 +611,10 @@
     <message>
         <source>Mask:</source>
         <translation>Máscara:</translation>
+    </message>
+    <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>Una máscara selecciona los candidatos que la gramática puede generar. ?1–?4 insertan un juego de caracteres personalizado. No se puede combinar con omen=1, ni con hintaccount sin hintwords/hintfile.</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
@@ -1065,8 +1085,8 @@ Predeterminado: 1,2</translation>
         <translation>El archivo de sesión tiene la versión de formato %1, pero esta versión lee la versión de formato %2, por lo que la sesión no se restauró. El archivo se dejó tal como estaba, así que tampoco se guarda la sesión de esta ejecución. Actualice hashcat-gui para leerlo.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>Ajustes exportados a %1.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>Ajustes exportados a “%1”.</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1179,6 +1199,10 @@ Seleccionadas actualmente: %2.</translation>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>La sesión indica el tipo de hash %1, que esta versión de hashcat no admite.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Use ?1–?4 en una máscara para insertar un juego de caracteres personalizado. Una máscara la usan Fuerza bruta, los modos híbridos y el ajuste mask= de PCFG; un juego de caracteres que ninguna máscara menciona se rechaza.</translation>
     </message>
     <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
@@ -1427,6 +1451,10 @@ Seleccionadas actualmente: %2.</translation>
     <message>
         <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
         <translation>Los marcadores ?w y ?q solo se ofrecen en el modo híbrido (máscara + listas de palabras).</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Un juego de caracteres personalizado solo se usa dentro de una máscara, y esta ejecución no indicó ninguna máscara. Añada un ajuste mask= que haga referencia a ?1–?4, por ejemplo mask=?1?1?1?1, o borre el juego de caracteres personalizado.</translation>
     </message>
     <message>
         <source>The setting “%1” is not valid for this mode.</source>

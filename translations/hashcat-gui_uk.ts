@@ -233,6 +233,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>Назва:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>Назва вбудованого або встановленого набору правил, наприклад default-passwords або hints. Скісна риска означає шлях; hashcat спочатку шукає у своїй теці профілю та в спільних теках pcfg.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints або шлях до набору правил</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>Додати вбудований або встановлений набір правил за назвою.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>Додати назву набору правил</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>Теці набору правил потрібен файл Grammar/grammar.txt.</translation>
     </message>
@@ -295,6 +315,10 @@
     <message>
         <source>Mask:</source>
         <translation>Маска:</translation>
+    </message>
+    <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>Маска вибирає кандидатів, які може породити граматика. ?1–?4 вставляють власний набір символів. Не можна поєднувати з omen=1, а також з hintaccount без hintwords/hintfile.</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
@@ -507,10 +531,6 @@
     <message>
         <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
         <translation>1 переходить до наступного базового слова там, де це дозволяє порядок, замість його обчислення через unranking; кандидати ті самі, вимикається лише швидкий шлях.</translation>
-    </message>
-    <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>Перебирати лише кандидатів, які допускає ця маска; виключає omen=1, а також hintaccount, якщо слова-підказки не беруться з hintwords або hintfile.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -1053,8 +1073,8 @@ Default: 1,2</source>
         <translation>Файл сеансу має версію формату %1, але ця версія читає формат версії %2, тому сеанс не було відновлено. Файл залишено без змін, тому сеанс цього запуску теж не зберігається. Оновіть hashcat-gui, щоб прочитати його.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>Налаштування експортовано до %1.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>Налаштування експортовано до «%1».</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1303,6 +1323,10 @@ Error: %1</source>
         <translation>Цьому режиму потрібна маска.</translation>
     </message>
     <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Використовуйте ?1–?4 у масці, щоб вставити власний набір символів. Маска використовується режимом «Повний перебір», гібридними режимами та налаштуванням mask= у PCFG; набір символів, який не названо в жодній масці, відхиляється.</translation>
+    </message>
+    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Маска кандидатів у паролі. ?1–?4 вставляють власний набір символів, ?w вставляє слово зі словника, а ?q — друге слово зі словника в режимі «Гібридна (маска + ?w/?q)», ?? означає літерал ?.</translation>
     </message>
@@ -1427,6 +1451,10 @@ Currently selected: %2.</source>
     <message>
         <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
         <translation>Маркери ?w і ?q доступні лише в гібридному режимі (маска + словники).</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Власний набір символів використовується лише всередині маски, а в цьому запуску маску не вказано. Додайте налаштування mask=, що посилається на ?1–?4, наприклад mask=?1?1?1?1, або очистьте власний набір символів.</translation>
     </message>
     <message>
         <source>The setting “%1” is not valid for this mode.</source>

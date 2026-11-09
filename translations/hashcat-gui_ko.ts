@@ -269,10 +269,6 @@
         <translation>1이면 순서가 허용하는 경우 언랭킹 대신 다음 기본 단어로 넘어갑니다. 후보는 동일하며 빠른 경로만 꺼집니다.</translation>
     </message>
     <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>이 마스크가 허용하는 후보만 열거합니다. omen=1은 제외되며, 힌트 단어가 hintwords 또는 hintfile에서 오는 경우를 제외하고 hintaccount도 제외됩니다.</translation>
-    </message>
-    <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>공백으로 구분된 key=value 설정: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. 규칙 세트가 먼저 와야 합니다.</translation>
     </message>
@@ -533,6 +529,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>이름:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>내장되었거나 설치된 규칙 세트의 이름입니다(예: default-passwords, hints). 슬래시는 경로를 뜻하며, hashcat은 프로필 폴더와 공유 pcfg 폴더를 먼저 검색합니다.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints 또는 규칙 세트 경로</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>내장되었거나 설치된 규칙 세트를 이름으로 추가합니다.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>규칙 세트 이름 추가</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>규칙 세트 폴더에는 Grammar/grammar.txt가 필요합니다.</translation>
     </message>
@@ -597,6 +613,10 @@
         <translation>마스크:</translation>
     </message>
     <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>마스크는 문법이 생성할 수 있는 후보를 선택합니다. ?1–?4는 사용자 지정 문자 집합을 삽입합니다. omen=1과는 함께 사용할 수 없으며, hintwords/hintfile 없는 hintaccount와도 함께 사용할 수 없습니다.</translation>
+    </message>
+    <message>
         <source>Extra settings (key=value):</source>
         <translation>추가 설정(key=value):</translation>
     </message>
@@ -638,7 +658,7 @@
     </message>
     <message>
         <source>Feed:</source>
-        <translation>Feed:</translation>
+        <translation>피드:</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -1065,8 +1085,8 @@ Default: 1,2</source>
         <translation>세션 파일은 형식 버전 %1이지만 이 버전은 형식 버전 %2을(를) 읽으므로 세션이 복원되지 않았습니다. 파일은 그대로 두었으므로 이번 실행의 세션도 저장되지 않습니다. 읽으려면 hashcat-gui를 업데이트하세요.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>설정을 %1(으)로 내보냈습니다.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>설정을 “%1”(으)로 내보냈습니다.</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1179,6 +1199,10 @@ Currently selected: %2.</source>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>세션에 지정된 해시 유형 %1은(는) 이 hashcat 버전에서 지원되지 않습니다.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>마스크에서 ?1–?4를 사용하면 사용자 지정 문자 집합을 삽입할 수 있습니다. 마스크는 무차별 대입, 하이브리드 모드, PCFG의 mask= 설정에서 사용되며, 어떤 마스크에도 지정되지 않은 문자 집합은 거부됩니다.</translation>
     </message>
     <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
@@ -1427,6 +1451,10 @@ Currently selected: %2.</source>
     <message>
         <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
         <translation>?w와 ?q 표시는 하이브리드 모드(마스크 + 단어 목록)에서만 사용할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>사용자 지정 문자 집합은 마스크 안에서만 사용되는데, 이번 실행에는 마스크가 지정되지 않았습니다. ?1–?4를 참조하는 mask= 설정을 추가하거나(예: mask=?1?1?1?1) 사용자 지정 문자 집합을 비우세요.</translation>
     </message>
     <message>
         <source>The setting “%1” is not valid for this mode.</source>

@@ -269,10 +269,6 @@
         <translation>1 passa alla parola di base successiva, dove l’ordine lo consente, invece di calcolarla con l’unranking; i candidati sono identici, viene disattivato solo il percorso rapido.</translation>
     </message>
     <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>Enumera solo i candidati che questa maschera ammette; esclude omen=1 e hintaccount, a meno che le parole di suggerimento non provengano da hintwords o hintfile.</translation>
-    </message>
-    <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>Impostazioni key=value separate da spazi: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. I set di regole vanno per primi.</translation>
     </message>
@@ -490,7 +486,7 @@
     </message>
     <message>
         <source>Assume the salt is given in hexadecimal.</source>
-        <translation>Presuppone che il salt sia fornito in esadecimale.</translation>
+        <translation>Presupponi che il salt sia fornito in esadecimale.</translation>
     </message>
     <message>
         <source>Attack mode. Each choice reveals its own options below.</source>
@@ -522,7 +518,7 @@
     </message>
     <message>
         <source>Assume words in the wordlist are given in hexadecimal.</source>
-        <translation>Presuppone che le parole della wordlist siano fornite in esadecimale.</translation>
+        <translation>Presupponi che le parole della wordlist siano fornite in esadecimale.</translation>
     </message>
     <message>
         <source>Settings (no wordlist):</source>
@@ -531,6 +527,26 @@
     <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nome:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>Il nome di un set di regole incluso o installato, come default-passwords o hints. Una barra indica un percorso; hashcat cerca prima nella propria cartella del profilo e nelle cartelle pcfg condivise.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints oppure il percorso di un set di regole</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>Aggiungi per nome un set di regole incluso o installato.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>Aggiungi nome di set di regole</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -595,6 +611,10 @@
     <message>
         <source>Mask:</source>
         <translation>Maschera:</translation>
+    </message>
+    <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>Una maschera seleziona i candidati che la grammatica può produrre. ?1–?4 inseriscono un set di caratteri personalizzato. Non può essere combinata con omen=1, né con hintaccount senza hintwords/hintfile.</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
@@ -782,7 +802,7 @@
     </message>
     <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
-        <translation>Ignora gli avvisi e avvia comunque hashcat. Usare con cautela.</translation>
+        <translation>Ignora gli avvisi e avvia comunque hashcat. Usa con cautela.</translation>
     </message>
     <message>
         <source>Force (ignore warnings)</source>
@@ -1065,8 +1085,8 @@ Predefinito: 1,2</translation>
         <translation>Il file di sessione è nella versione del formato %1, ma questa versione legge la versione del formato %2, quindi la sessione non è stata ripristinata. Il file è stato lasciato così com’è, quindi nemmeno la sessione di questa esecuzione viene salvata. Aggiorna hashcat-gui per leggerlo.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>Impostazioni esportate in %1.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>Impostazioni esportate in “%1”.</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1179,6 +1199,10 @@ Attualmente selezionate: %2.</translation>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>La sessione indica il tipo di hash %1, che questa versione di hashcat non supporta.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Usa ?1–?4 in una maschera per inserire un set di caratteri personalizzato. Una maschera è usata da Forza bruta, dalle modalità ibride e dall’impostazione mask= di PCFG; un set di caratteri che nessuna maschera nomina viene rifiutato.</translation>
     </message>
     <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
@@ -1429,6 +1453,10 @@ Attualmente selezionate: %2.</translation>
         <translation>I marcatori ?w e ?q sono disponibili solo nella modalità ibrida (maschera + wordlist).</translation>
     </message>
     <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Un set di caratteri personalizzato viene usato solo all’interno di una maschera, e questa esecuzione non ha indicato alcuna maschera. Aggiungi un’impostazione mask= che faccia riferimento a ?1–?4, ad esempio mask=?1?1?1?1, oppure svuota il set di caratteri personalizzato.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>L’impostazione “%1” non è valida per questa modalità.</translation>
     </message>
@@ -1533,7 +1561,7 @@ md5(md5(salt) . pass). Inseriscila nel campo della ricetta dell’hash.</transla
     </message>
     <message>
         <source>Open the folder the session is stored in</source>
-        <translation>Apre la cartella in cui è salvata la sessione</translation>
+        <translation>Apri la cartella in cui è salvata la sessione</translation>
     </message>
     <message>
         <source>Settings &amp;file</source>
@@ -1545,7 +1573,7 @@ md5(md5(salt) . pass). Inseriscila nel campo della ricetta dell’hash.</transla
     </message>
     <message>
         <source>Open the folder the settings are stored in</source>
-        <translation>Apre la cartella in cui sono salvate le impostazioni</translation>
+        <translation>Apri la cartella in cui sono salvate le impostazioni</translation>
     </message>
     <message>
         <source>General</source>

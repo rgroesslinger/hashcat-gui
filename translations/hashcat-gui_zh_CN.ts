@@ -269,10 +269,6 @@
         <translation>设为 1 时，在顺序允许的情况下直接步进到下一个基础单词，而不是通过 unranking 计算；候选内容相同，只是关闭了快速路径。</translation>
     </message>
     <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>仅枚举此掩码允许的候选；会排除 omen=1，也会排除 hintaccount，除非提示单词来自 hintwords 或 hintfile。</translation>
-    </message>
-    <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>以空格分隔的 key=value 设置：omen、cache、lookup、pwmin、pwmax、hintaccount、hintwords、hintfile、hintrank、hintrepeat。规则集放在最前面。</translation>
     </message>
@@ -533,6 +529,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>名称：</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>内置或已安装的规则集名称，例如 default-passwords 或 hints。包含斜杠表示路径；hashcat 会先在其配置文件夹和共享的 pcfg 文件夹中搜索。</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords、hints，或规则集路径</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>按名称添加内置或已安装的规则集。</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>添加规则集名称</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>规则集文件夹需要包含 Grammar/grammar.txt。</translation>
     </message>
@@ -597,6 +613,10 @@
         <translation>掩码：</translation>
     </message>
     <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>掩码用于选择语法可以生成的候选。?1–?4 插入自定义字符集。不能与 omen=1 组合使用，也不能在没有 hintwords/hintfile 的情况下与 hintaccount 组合使用。</translation>
+    </message>
+    <message>
         <source>Extra settings (key=value):</source>
         <translation>额外设置（key=value）：</translation>
     </message>
@@ -638,7 +658,7 @@
     </message>
     <message>
         <source>Feed:</source>
-        <translation>Feed:</translation>
+        <translation>Feed：</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -1065,8 +1085,8 @@ Default: 1,2</source>
         <translation>会话文件的格式版本为 %1，但此版本读取的是格式版本 %2，因此未恢复会话。文件已保持原样，因此本次运行的会话也不会被保存。请更新 hashcat-gui 以读取该文件。</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>设置已导出到 %1。</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>设置已导出到“%1”。</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1179,6 +1199,10 @@ Currently selected: %2.</source>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>会话指定了哈希类型 %1，此版本的 hashcat 不支持该类型。</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>在掩码中使用 ?1–?4 可插入自定义字符集。暴力破解、混合模式以及 PCFG 的 mask= 设置会使用掩码；未被任何掩码引用的字符集会被拒绝。</translation>
     </message>
     <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
@@ -1427,6 +1451,10 @@ Currently selected: %2.</source>
     <message>
         <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
         <translation>?w 和 ?q 标记仅在混合模式（掩码 + 字典）中提供。</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>自定义字符集只能在掩码中使用，而本次运行未指定掩码。请添加引用 ?1–?4 的 mask= 设置（例如 mask=?1?1?1?1），或清除自定义字符集。</translation>
     </message>
     <message>
         <source>The setting “%1” is not valid for this mode.</source>

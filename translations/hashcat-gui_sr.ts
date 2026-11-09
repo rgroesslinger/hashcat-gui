@@ -269,10 +269,6 @@
         <translation>1 prelazi na sledeću osnovnu reč gde redosled to dozvoljava, umesto da je izračuna pomoću unranking-a; kandidati su identični, isključuje se samo brza putanja.</translation>
     </message>
     <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>Nabroj samo kandidate koje ova maska dopušta; isključuje omen=1 i hintaccount osim ako reči nagoveštaja ne potiču iz hintwords ili hintfile.</translation>
-    </message>
-    <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>Podešavanja key=value razdvojena razmacima: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Skupovi pravila idu prvi.</translation>
     </message>
@@ -533,6 +529,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>Naziv:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>Naziv ugrađenog ili instaliranog skupa pravila, na primer default-passwords ili hints. Kosa crta znači putanju; hashcat prvo pretražuje svoju fasciklu profila i deljene pcfg fascikle.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints ili putanja skupa pravila</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>Dodaj ugrađeni ili instalirani skup pravila po nazivu.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>Dodaj naziv skupa pravila</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>Fascikla skupa pravila zahteva Grammar/grammar.txt.</translation>
     </message>
@@ -595,6 +611,10 @@
     <message>
         <source>Mask:</source>
         <translation>Maska:</translation>
+    </message>
+    <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>Maska bira kandidate koje gramatika sme da generiše. ?1–?4 umeću prilagođeni skup znakova. Ne može se kombinovati sa omen=1, niti sa hintaccount bez hintwords/hintfile.</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
@@ -1065,8 +1085,8 @@ Podrazumevano: 1,2</translation>
         <translation>Datoteka sesije je u verziji formata %1, ali ova verzija čita verziju formata %2, pa sesija nije vraćena. Datoteka je ostavljena kakva jeste, pa se ni sesija ovog pokretanja ne čuva. Ažurirajte hashcat-gui da biste je pročitali.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>Podešavanja su izvezena u %1.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>Podešavanja su izvezena u „%1“.</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1179,6 +1199,10 @@ Trenutno izabrano: %2.</translation>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>Sesija navodi vrstu hash-a %1, koju ova verzija hashcat-a ne podržava.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Koristite ?1–?4 u maski da biste umetnuli prilagođeni skup znakova. Masku koriste Brute-force, hibridni režimi i podešavanje mask= u PCFG-u; skup znakova koji nijedna maska ne navodi se odbija.</translation>
     </message>
     <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
@@ -1429,12 +1453,16 @@ Trenutno izabrano: %2.</translation>
         <translation>Oznake ?w i ?q nude se samo u hibridnom režimu (maska + liste reči).</translation>
     </message>
     <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Prilagođeni skup znakova koristi se samo unutar maske, a ovo pokretanje nije navelo nijednu masku. Dodajte podešavanje mask= koje upućuje na ?1–?4, na primer mask=?1?1?1?1, ili obrišite prilagođeni skup znakova.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
-        <translation>Postavka „%1“ nije ispravna za ovaj režim.</translation>
+        <translation>Podešavanje „%1“ nije ispravno za ovaj režim.</translation>
     </message>
     <message>
         <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>Token „%1“ nije postavka; postavke se pišu kao key=value.</translation>
+        <translation>Token „%1“ nije podešavanje; podešavanja se pišu kao key=value.</translation>
     </message>
     <message>
         <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>

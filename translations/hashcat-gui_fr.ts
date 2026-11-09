@@ -226,7 +226,7 @@
     </message>
     <message>
         <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>Paramètres key=value séparés par des espaces pour le mode d’attaque 9, p. ex. phases=words,rules ou rules.rulefile=…. Utilisés uniquement sans liste de mots.</translation>
+        <translation>Réglages key=value séparés par des espaces pour le mode d’attaque 9, p. ex. phases=words,rules ou rules.rulefile=…. Utilisés uniquement sans liste de mots.</translation>
     </message>
     <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
@@ -269,12 +269,8 @@
         <translation>1 passe au mot de base suivant lorsque l’ordre le permet, au lieu de le calculer par unranking&#xa0;; les candidats sont identiques, seul le chemin rapide est désactivé.</translation>
     </message>
     <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>Énumérer uniquement les candidats que ce masque admet&#xa0;; exclut omen=1, ainsi que hintaccount sauf si les mots d’indice proviennent de hintwords ou hintfile.</translation>
-    </message>
-    <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
-        <translation>Paramètres key=value séparés par des espaces&#xa0;: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Les jeux de règles viennent en premier.</translation>
+        <translation>Réglages key=value séparés par des espaces&#xa0;: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Les jeux de règles viennent en premier.</translation>
     </message>
     <message>
         <source>Add one or more table files.</source>
@@ -310,7 +306,7 @@
     </message>
     <message>
         <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
-        <translation>Paramètres key=value séparés par des espaces&#xa0;; tout ce qui suit le premier est un paramètre, les tables viennent donc en premier.</translation>
+        <translation>Réglages key=value séparés par des espaces&#xa0;; tout ce qui suit le premier est un réglage, les tables viennent donc en premier.</translation>
     </message>
     <message>
         <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
@@ -326,7 +322,7 @@
     </message>
     <message>
         <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
-        <translation>Argument transmis au feed&#xa0;; son sens et leur nombre dépendent du feed (le feed wordlist prend des chemins de listes de mots).</translation>
+        <translation>Argument transmis au feed&#xa0;; la signification et le nombre des arguments dépendent du feed (le feed wordlist prend des chemins de listes de mots).</translation>
     </message>
     <message>
         <source>Add an argument for the feed, in order.</source>
@@ -526,11 +522,31 @@
     </message>
     <message>
         <source>Settings (no wordlist):</source>
-        <translation>Paramètres (sans liste de mots)&#xa0;:</translation>
+        <translation>Réglages (sans liste de mots)&#xa0;:</translation>
     </message>
     <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Name:</source>
+        <translation>Nom&#xa0;:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>Nom d’un jeu de règles fourni ou installé, comme default-passwords ou hints. Une barre oblique indique un chemin&#xa0;; hashcat cherche d’abord dans son dossier de profil et dans les dossiers pcfg partagés.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints ou un chemin de jeu de règles</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>Ajouter un jeu de règles fourni ou installé par son nom.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>Ajouter un nom de jeu de règles</translation>
     </message>
     <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
@@ -597,8 +613,12 @@
         <translation>Masque&#xa0;:</translation>
     </message>
     <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>Un masque sélectionne les candidats que la grammaire peut produire. ?1–?4 insèrent un jeu de caractères personnalisé. Impossible à combiner avec omen=1, ni avec hintaccount sans hintwords/hintfile.</translation>
+    </message>
+    <message>
         <source>Extra settings (key=value):</source>
-        <translation>Paramètres supplémentaires (key=value)&#xa0;:</translation>
+        <translation>Réglages supplémentaires (key=value)&#xa0;:</translation>
     </message>
     <message>
         <source>Table</source>
@@ -952,7 +972,7 @@
     </message>
     <message>
         <source>Settings…</source>
-        <translation>Paramètres…</translation>
+        <translation>Réglages…</translation>
     </message>
     <message>
         <source>Ctrl+,</source>
@@ -960,7 +980,7 @@
     </message>
     <message>
         <source>Import Settings…</source>
-        <translation>Importer les paramètres…</translation>
+        <translation>Importer les réglages…</translation>
     </message>
     <message>
         <source>Ctrl+Shift+O</source>
@@ -968,7 +988,7 @@
     </message>
     <message>
         <source>Export Settings…</source>
-        <translation>Exporter les paramètres…</translation>
+        <translation>Exporter les réglages…</translation>
     </message>
     <message>
         <source>Ctrl+Shift+S</source>
@@ -1065,8 +1085,8 @@ Par défaut&#xa0;: 1,2</translation>
         <translation>Le fichier de session est en version de format %1, mais cette version lit la version de format %2, la session n’a donc pas été restaurée. Le fichier a été laissé tel quel, la session de cette exécution n’est donc pas enregistrée non plus. Mettez hashcat-gui à jour pour le lire.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>Paramètres exportés vers %1.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>Réglages exportés vers «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1098,15 +1118,15 @@ Par défaut&#xa0;: 1,2</translation>
     </message>
     <message>
         <source>Export settings</source>
-        <translation>Exporter les paramètres</translation>
+        <translation>Exporter les réglages</translation>
     </message>
     <message>
         <source>Import settings</source>
-        <translation>Importer les paramètres</translation>
+        <translation>Importer les réglages</translation>
     </message>
     <message>
         <source>Settings loaded from “%1”.</source>
-        <translation>Paramètres chargés depuis «&#xa0;%1&#xa0;».</translation>
+        <translation>Réglages chargés depuis «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>Review them and save to apply them.</source>
@@ -1181,6 +1201,10 @@ Actuellement sélectionnées&#xa0;: %2.</translation>
         <translation>La session désigne le type de hash %1, que cette version de hashcat ne prend pas en charge.</translation>
     </message>
     <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Utilisez ?1–?4 dans un masque pour insérer un jeu de caractères personnalisé. Un masque est utilisé par Force brute, les modes hybrides et le réglage mask= de PCFG&#xa0;; un jeu de caractères qu’aucun masque ne nomme est refusé.</translation>
+    </message>
+    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Masque des candidats de mot de passe. ?1–?4 insèrent un jeu de caractères personnalisé, ?w insère le mot de la liste de mots et ?q un second mot de liste de mots dans le mode Hybride (masque + ?w/?q), et ?? est un ? littéral.</translation>
     </message>
@@ -1244,7 +1268,7 @@ Erreur&#xa0;: %1</translation>
     </message>
     <message>
         <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
-        <translation>Les types de hash n’ont pas pu être chargés. Vérifiez le chemin de hashcat dans les paramètres.</translation>
+        <translation>Les types de hash n’ont pas pu être chargés. Vérifiez le chemin de hashcat dans les réglages.</translation>
     </message>
     <message>
         <source>
@@ -1280,7 +1304,7 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     </message>
     <message>
         <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>Ce mode nécessite au plus une liste de mots. Sans liste, les mots proviennent du fichier de hashes et la ligne de paramètres peut borner l’exécution&#xa0;; avec une liste, les deux fichiers sont associés ligne par ligne.</translation>
+        <translation>Ce mode nécessite au plus une liste de mots. Sans liste, les mots proviennent du fichier de hashes et la ligne de réglages peut borner l’exécution&#xa0;; avec une liste, les deux fichiers sont associés ligne par ligne.</translation>
     </message>
     <message>
         <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
@@ -1429,16 +1453,20 @@ Actuellement sélectionnées&#xa0;: %2.</translation>
         <translation>Les marqueurs ?w et ?q ne sont proposés que dans le mode hybride (masque + listes de mots).</translation>
     </message>
     <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Un jeu de caractères personnalisé n’est utilisé qu’à l’intérieur d’un masque, et cette exécution n’a indiqué aucun masque. Ajoutez un réglage mask= qui référence ?1–?4, par exemple mask=?1?1?1?1, ou videz le jeu de caractères personnalisé.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
-        <translation>Le paramètre «&#xa0;%1&#xa0;» n’est pas valide pour ce mode.</translation>
+        <translation>Le réglage «&#xa0;%1&#xa0;» n’est pas valide pour ce mode.</translation>
     </message>
     <message>
         <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>Le token «&#xa0;%1&#xa0;» n’est pas un paramètre&#xa0;; les paramètres s’écrivent sous la forme key=value.</translation>
+        <translation>Le token «&#xa0;%1&#xa0;» n’est pas un réglage&#xa0;; les réglages s’écrivent sous la forme key=value.</translation>
     </message>
     <message>
         <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
-        <translation>La ligne de paramètres ne s’applique que tant que les mots proviennent du fichier de hashes. Videz soit la ligne de paramètres, soit la liste de listes de mots.</translation>
+        <translation>La ligne de réglages ne s’applique que tant que les mots proviennent du fichier de hashes. Videz soit la ligne de réglages, soit la liste de listes de mots.</translation>
     </message>
     <message>
         <source>The hash type 4000 describes its hashes as a recipe, for example
@@ -1469,7 +1497,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     <name>SettingsDialog</name>
     <message>
         <source>Settings</source>
-        <translation>Paramètres</translation>
+        <translation>Réglages</translation>
     </message>
     <message>
         <source>hashcat executable</source>
@@ -1505,7 +1533,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>&amp;Parameters</source>
-        <translation>P&amp;aramètres</translation>
+        <translation>&amp;Paramètres</translation>
     </message>
     <message>
         <source>&amp;Use short parameters</source>
@@ -1537,15 +1565,15 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Settings &amp;file</source>
-        <translation>Fichier des &amp;paramètres</translation>
+        <translation>Fichier des ré&amp;glages</translation>
     </message>
     <message>
         <source>The file the settings are stored in</source>
-        <translation>Le fichier dans lequel les paramètres sont enregistrés</translation>
+        <translation>Le fichier dans lequel les réglages sont enregistrés</translation>
     </message>
     <message>
         <source>Open the folder the settings are stored in</source>
-        <translation>Ouvrir le dossier dans lequel les paramètres sont enregistrés</translation>
+        <translation>Ouvrir le dossier dans lequel les réglages sont enregistrés</translation>
     </message>
     <message>
         <source>General</source>

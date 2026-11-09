@@ -982,7 +982,7 @@ void MainWindow::exportSettingsTriggered()
     if (StateFile::write(file, AppConstants::FileSections::Settings,
                          AppConstants::Settings::Version, SettingsDialog::savedSettings(),
                          &error)) {
-        QMessageBox::information(this, tr("Exported"), tr("Settings exported to %1.").arg(file));
+        QMessageBox::information(this, tr("Exported"), tr("Settings exported to “%1”.").arg(file));
     } else {
         QMessageBox::warning(this, tr("Export failed"), error);
     }

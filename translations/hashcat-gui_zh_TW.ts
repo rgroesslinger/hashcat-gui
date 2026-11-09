@@ -233,6 +233,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>名稱：</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>內建或已安裝的規則集名稱，例如 default-passwords 或 hints。包含斜線表示路徑；hashcat 會先在其設定檔資料夾和共用的 pcfg 資料夾中搜尋。</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords、hints，或規則集路徑</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>依名稱新增內建或已安裝的規則集。</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>新增規則集名稱</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>規則集資料夾需要包含 Grammar/grammar.txt。</translation>
     </message>
@@ -262,7 +282,7 @@
     </message>
     <message>
         <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
-        <translation>產生基礎單字的核心數（0–16）；0 表示在呼叫端執行緒中執行。</translation>
+        <translation>產生基礎單字的 CPU 核心數（0–16）；0 表示在呼叫端執行緒中執行。</translation>
     </message>
     <message>
         <source>auto</source>
@@ -295,6 +315,10 @@
     <message>
         <source>Mask:</source>
         <translation>遮罩：</translation>
+    </message>
+    <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>遮罩用於選擇語法可以產生的候選。?1–?4 插入自訂字元集。不能與 omen=1 組合使用，也不能在沒有 hintwords/hintfile 的情況下與 hintaccount 組合使用。</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
@@ -338,7 +362,7 @@
     </message>
     <message>
         <source>Feed:</source>
-        <translation>Feed:</translation>
+        <translation>Feed：</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -507,10 +531,6 @@
     <message>
         <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
         <translation>設為 1 時，在順序允許的情況下直接步進到下一個基礎單字，而不是透過 unranking 計算；候選內容相同，只是關閉了快速路徑。</translation>
-    </message>
-    <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>僅列舉此遮罩允許的候選；會排除 omen=1，也會排除 hintaccount，除非提示單字來自 hintwords 或 hintfile。</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -1053,8 +1073,8 @@ Default: 1,2</source>
         <translation>工作階段檔案的格式版本為 %1，但此版本讀取的是格式版本 %2，因此未還原工作階段。檔案已保持原樣，因此本次執行的工作階段也不會被儲存。請更新 hashcat-gui 以讀取該檔案。</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>設定已匯出到 %1。</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>設定已匯出到「%1」。</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1303,6 +1323,10 @@ Error: %1</source>
         <translation>此模式需要一個遮罩。</translation>
     </message>
     <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>在遮罩中使用 ?1–?4 可插入自訂字元集。暴力破解、混合模式以及 PCFG 的 mask= 設定會使用遮罩；未被任何遮罩引用的字元集會被拒絕。</translation>
+    </message>
+    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>密碼候選遮罩。?1–?4 插入自訂字元集，?w 插入字典中的單字，?q 在「混合（遮罩 + ?w/?q）」模式下插入第二個字典中的單字，?? 表示字面的 ?。</translation>
     </message>
@@ -1427,6 +1451,10 @@ Currently selected: %2.</source>
     <message>
         <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
         <translation>?w 和 ?q 標記僅在混合模式（遮罩 + 字典）中提供。</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>自訂字元集只能在遮罩中使用，而本次執行未指定遮罩。請新增引用 ?1–?4 的 mask= 設定（例如 mask=?1?1?1?1），或清除自訂字元集。</translation>
     </message>
     <message>
         <source>The setting “%1” is not valid for this mode.</source>

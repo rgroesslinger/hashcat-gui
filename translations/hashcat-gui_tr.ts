@@ -233,6 +233,26 @@
         <translation>PCFG</translation>
     </message>
     <message>
+        <source>Name:</source>
+        <translation>Ad:</translation>
+    </message>
+    <message>
+        <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
+        <translation>Yerleşik veya kurulu bir kural kümesinin adı, ör. default-passwords veya hints. Eğik çizgi bir yol anlamına gelir; hashcat önce profil klasörüne ve paylaşılan pcfg klasörlerine bakar.</translation>
+    </message>
+    <message>
+        <source>default-passwords, hints, or a ruleset path</source>
+        <translation>default-passwords, hints veya bir kural kümesi yolu</translation>
+    </message>
+    <message>
+        <source>Add a bundled or installed ruleset by name.</source>
+        <translation>Yerleşik veya kurulu bir kural kümesini adıyla ekle.</translation>
+    </message>
+    <message>
+        <source>Add ruleset name</source>
+        <translation>Kural kümesi adı ekle</translation>
+    </message>
+    <message>
         <source>A ruleset folder needs a Grammar/grammar.txt.</source>
         <translation>Bir kural kümesi klasörü için Grammar/grammar.txt gerekir.</translation>
     </message>
@@ -295,6 +315,10 @@
     <message>
         <source>Mask:</source>
         <translation>Maske:</translation>
+    </message>
+    <message>
+        <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
+        <translation>Bir maske, gramerin üretebileceği adayları seçer. ?1–?4 özel bir karakter kümesi ekler. omen=1 ile veya hintwords/hintfile olmadan hintaccount ile birleştirilemez.</translation>
     </message>
     <message>
         <source>Extra settings (key=value):</source>
@@ -509,10 +533,6 @@
         <translation>1, sıranın izin verdiği yerlerde adayı sıralamayı çözmek (unranking) yerine bir sonraki temel sözcüğe geçer; adaylar aynıdır, yalnızca hızlı yol devre dışı kalır.</translation>
     </message>
     <message>
-        <source>Only enumerate candidates this mask admits; excludes omen=1, and hintaccount unless hint words come from hintwords or hintfile.</source>
-        <translation>Yalnızca bu maskenin kabul ettiği adayları sırala; omen=1’i ve, ipucu sözcükleri hintwords veya hintfile’dan gelmedikçe hintaccount’u dışlar.</translation>
-    </message>
-    <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>Boşlukla ayrılmış key=value ayarları: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Kural kümeleri en başta gelir.</translation>
     </message>
@@ -718,7 +738,7 @@
     </message>
     <message>
         <source>Assume the salt is given in hexadecimal.</source>
-        <translation>Salt’ın onaltılık olarak verildiğini varsay.</translation>
+        <translation>Tuzun onaltılık olarak verildiğini varsay.</translation>
     </message>
     <message>
         <source>Add files…</source>
@@ -802,7 +822,7 @@
     </message>
     <message>
         <source>CPU affinity:</source>
-        <translation>CPU ilişkisi:</translation>
+        <translation>CPU benzeşimi:</translation>
     </message>
     <message>
         <source>Backend devices:</source>
@@ -822,7 +842,7 @@
     </message>
     <message>
         <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
-        <translation>Herhangi bir backend aygıtı bu sıcaklığı (°C) aştığında durdur; 0 devre dışı bırakır.</translation>
+        <translation>Herhangi bir arka uç aygıtı bu sıcaklığı (°C) aştığında durdur; 0 devre dışı bırakır.</translation>
     </message>
     <message>
         <source>&#xa0;°C</source>
@@ -1053,8 +1073,8 @@ Varsayılan: 1,2</translation>
         <translation>Oturum dosyasının biçim sürümü %1, ancak bu sürüm %2 biçim sürümünü okuduğundan oturum geri yüklenmedi. Dosya olduğu gibi bırakıldı, bu nedenle bu çalıştırmanın oturumu da saklanmaz. Okumak için hashcat-gui’yi güncelleyin.</translation>
     </message>
     <message>
-        <source>Settings exported to %1.</source>
-        <translation>Ayarlar %1 konumuna dışa aktarıldı.</translation>
+        <source>Settings exported to “%1”.</source>
+        <translation>Ayarlar “%1” konumuna dışa aktarıldı.</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
@@ -1303,6 +1323,10 @@ Hata: %1</translation>
         <translation>Bu mod bir maske gerektirir.</translation>
     </message>
     <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Bir maskeye özel karakter kümesi eklemek için ?1–?4 kullanın. Maske; Kaba kuvvet, hibrit modlar ve PCFG’nin mask= ayarı tarafından kullanılır; hiçbir maskenin adını vermediği karakter kümesi reddedilir.</translation>
+    </message>
+    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Parola adayı maskesi. ?1–?4 özel bir karakter kümesi ekler, ?w kelime listesindeki sözcüğü, ?q ise Hibrit (maske + ?w/?q) modunda kelime listesindeki ikinci bir sözcüğü ekler; ?? ise düz bir ? karakteridir.</translation>
     </message>
@@ -1427,6 +1451,10 @@ Currently selected: %2.</source>
     <message>
         <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
         <translation>?w ve ?q işaretleri yalnızca hibrit modda (maske + kelime listeleri) sunulur.</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Özel karakter kümesi yalnızca bir maskenin içinde kullanılır ve bu çalıştırmada hiçbir maske belirtilmedi. ?1–?4 değerlerine başvuran bir mask= ayarı ekleyin, örneğin mask=?1?1?1?1, ya da özel karakter kümesini temizleyin.</translation>
     </message>
     <message>
         <source>The setting “%1” is not valid for this mode.</source>
