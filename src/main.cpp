@@ -4,7 +4,7 @@
  */
 
 #include "appconstants.h"
-#include "helperutils.h"
+#include "appearance.h"
 #include "mainwindow.h"
 #include "settingsmanager.h"
 
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     // The color scheme the user chose. An empty scheme leaves the decision
     // to the desktop, so the application keeps out of it.
-    HelperUtils::applyColorScheme(SettingsManager::instance().getKey<QString>(
+    Appearance::applyColorScheme(SettingsManager::instance().getKey<QString>(
         AppConstants::SettingsKeys::ColorScheme,
         AppConstants::SettingsKeys::defaultOf<QString>(AppConstants::SettingsKeys::ColorScheme)));
 

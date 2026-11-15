@@ -39,12 +39,6 @@ public:
     // the runner directly.
     static QFuture<HashcatResult>
     executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
-
-    // Applies the color scheme the user chose.
-    //
-    // An empty scheme follows the system again - the desktop decides - while
-    // the other two force a light or a dark appearance.
-    static void applyColorScheme(const QString &scheme);
 };
 
 #endif // HELPERUTILS_H

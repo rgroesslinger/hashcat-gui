@@ -11,9 +11,7 @@
 #include "settingsmanager.h"
 
 #include <QFuture>
-#include <QGuiApplication>
 #include <QString>
-#include <QStyleHints>
 
 // Reads the configured path on the calling thread and forwards to the runner:
 // QSettings is only reentrant, and the runner's worker runs on the thread pool.
@@ -44,21 +42,4 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
                                                       QString *detail)
 {
     return LaunchValidator::validateOptions(options, detail);
-}
-
-void HelperUtils::applyColorScheme(const QString &scheme)
-{
-    QStyleHints *hints = QGuiApplication::styleHints();
-    if (!hints) {
-        return;
-    }
-
-    if (scheme == AppConstants::Appearance::ColorSchemeDark) {
-        hints->setColorScheme(Qt::ColorScheme::Dark);
-    } else if (scheme == AppConstants::Appearance::ColorSchemeLight) {
-        hints->setColorScheme(Qt::ColorScheme::Light);
-    } else {
-        // The system default: the desktop decides again.
-        hints->unsetColorScheme();
-    }
 }

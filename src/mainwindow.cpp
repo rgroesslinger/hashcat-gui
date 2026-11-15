@@ -11,7 +11,7 @@
 #include "examples.h"
 #include "hashcatinfoparser.h"
 #include "hashcatrunner.h"
-#include "helperutils.h"
+#include "launchmessage.h"
 #include "launchvalidator.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
@@ -2245,7 +2245,7 @@ void MainWindow::startClicked()
     // Nothing is started unless the configuration is known to be complete.
     const LaunchValidator::LaunchProblem problem = LaunchValidator::validate(context);
     if (problem) {
-        showLaunchError(problem.code, problem.detail);
+        showLaunchError(problem, context);
         return;
     }
 
@@ -2270,228 +2270,22 @@ void MainWindow::startClicked()
     }
 }
 
-void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &detail)
+void MainWindow::showLaunchError(const LaunchValidator::LaunchProblem &problem,
+                                 const LaunchValidator::LaunchContext &context)
 {
+    // The menu labels are computed here: menuPath also serves the hash-type
+    // tooltip, and the presenter must not know the menu widgets.
     const QString menu = menuPath(ui->menuFile->menuAction()->text());
     const QString settingsEntry = menuPath(ui->actionSettings->text());
-    const QString configuredTerminal =
-        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal);
-
-    QMessageBox box(this);
-    box.setIcon(QMessageBox::Warning);
-
-    switch (error) {
-    case HelperUtils::LaunchError::NoHashFile:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("Please choose a hash file."));
-        break;
-
-    case HelperUtils::LaunchError::NoHashcatPath:
-        box.setIcon(QMessageBox::Information);
-        box.setTextFormat(Qt::RichText);
-        box.setText(
-            tr("Navigate to <b>%1 → %2</b> to configure the path to the hashcat executable.")
-                .arg(menu, settingsEntry));
-        break;
-
-    // The two messages below interpolate user supplied strings, so they are
-    // set to plain text explicitly: the default is AutoText, which would take
-    // a path or a terminal name containing a '<' for markup and display it
-    // mangled.
-    case HelperUtils::LaunchError::HashcatPathMissing:
-        box.setTextFormat(Qt::PlainText);
-        box.setText(tr("The configured hashcat executable does not exist:\n%1\n"
-                       "Navigate to %2 → %3 to change it.")
-                        .arg(detail, menu, settingsEntry));
-        break;
-
-    case HelperUtils::LaunchError::NoTerminal:
-        box.setIcon(QMessageBox::Information);
-        box.setTextFormat(Qt::RichText);
-        box.setText(tr("Navigate to <b>%1 → %2</b> to select the terminal used for launching.")
-                        .arg(menu, settingsEntry));
-        break;
-
-    case HelperUtils::LaunchError::NoTerminals:
-        box.setText(TerminalCatalog::noSupportedTerminalMessage());
-        break;
-
-    case HelperUtils::LaunchError::UnknownTerminal:
-        box.setTextFormat(Qt::PlainText);
-        box.setText(tr("The configured terminal “%1” is not available. Available terminals: %2\n"
-                       "Navigate to %3 → %4 to change it.")
-                        .arg(configuredTerminal, detail, menu, settingsEntry));
-        break;
-
-    // The mode specific requirements. They are not misconfigurations of the
-    // installation but of the attack itself, so the message says what the
-    // mode needs instead of pointing at the settings.
-    case HelperUtils::LaunchError::NoWordlist:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("This mode needs at least one wordlist."));
-        break;
-
-    case HelperUtils::LaunchError::WrongWordlistCount: {
-        // The wording below uses minWordlists as the exact count. That is only
-        // correct while Combination is the sole mode with maxWordlists >= 0,
-        // and there min == max; a mode with a range reports TooManyWordlists.
-        const CommandBuilder::ModeRequirements requirements =
-            CommandBuilder::modeRequirements(currentAttackMode());
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("This mode needs exactly %1 wordlists (left, right).\n"
-                       "Currently selected: %2.")
-                        .arg(requirements.minWordlists)
-                        .arg(detail));
-        break;
-    }
-
-    case HelperUtils::LaunchError::TooManyWordlists: {
-        const CommandBuilder::ModeRequirements requirements =
-            CommandBuilder::modeRequirements(currentAttackMode());
-        box.setIcon(QMessageBox::Information);
-        QString text = tr("Maximum number of wordlists for this mode: %1.\nCurrently selected: %2.")
-                           .arg(requirements.maxWordlists)
-                           .arg(detail);
-        if (currentAttackMode() == AttackMode::Association) {
-            text += QLatin1Char('\n')
-                    + tr("hashcat pairs the two files by line here; this GUI offers "
-                         "only one wordlist for that role.");
-        }
-        box.setText(text);
-        break;
-    }
-
-    // The row is user supplied, so plain text: a '<' in the path would be
-    // taken for markup by the default AutoText.
-    case HelperUtils::LaunchError::WordlistMustBeFile:
-        box.setTextFormat(Qt::PlainText);
-        box.setText(tr("This wordlist has to be a file: hashcat reads it as the multiplied "
-                       "wordlist (the ?q side), and a folder cannot be used there:\n%1")
-                        .arg(detail));
-        break;
-
-    case HelperUtils::LaunchError::NoMask:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("This mode needs a mask."));
-        break;
-
-    case HelperUtils::LaunchError::NoTable:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("This mode needs at least one table."));
-        break;
-
-    case HelperUtils::LaunchError::NoFeed:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("This mode needs a feed: a bundled name (wordlist, stdin, random, …) "
-                       "or the path of a feed file."));
-        break;
-
-    case HelperUtils::LaunchError::MaskNeedsWordMarker:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("This mode pairs the wordlists with the mask; the mask needs a ?w "
-                       "for the word."));
-        break;
-
-    case HelperUtils::LaunchError::MaskMultipleWordMarkers:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The mask contains more than one ?w."));
-        break;
-
-    case HelperUtils::LaunchError::MaskQBeforeWord:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The mask contains a ?q before the first ?w."));
-        break;
-
-    case HelperUtils::LaunchError::MaskMultipleQMarks:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The mask contains more than one ?q."));
-        break;
-
-    case HelperUtils::LaunchError::MaskQWithoutWordlist:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The mask names a second word with ?q, but only one wordlist "
-                       "is selected."));
-        break;
-
-    case HelperUtils::LaunchError::SecondWordlistWithoutQ:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("Two wordlists are selected, but the mask has no ?q for the "
-                       "second one."));
-        break;
-
-    case HelperUtils::LaunchError::IncrementInMode12:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The increment is not offered in this hybrid mode."));
-        break;
-
-    case HelperUtils::LaunchError::MaskMarkersNotAllowed:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The ?w and ?q markers are only offered in the hybrid mode "
-                       "(mask + wordlists)."));
-        break;
-
-    case HelperUtils::LaunchError::PcfgCharsetWithoutMask:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("A custom charset is used only inside a mask, and this run named no "
-                       "mask. Add a mask= setting that references ?1–?4, for example "
-                       "mask=?1?1?1?1, or clear the custom charset."));
-        break;
-
-    // The three settings errors name a value or token the user typed, so
-    // they are set to plain text explicitly: a value containing '<' would
-    // be taken for markup by the default AutoText.
-    case HelperUtils::LaunchError::InvalidPcfgSetting:
-    case HelperUtils::LaunchError::InvalidTableSetting:
-        box.setIcon(QMessageBox::Information);
-        box.setTextFormat(Qt::PlainText);
-        box.setText(tr("The setting “%1” is not valid for this mode.").arg(detail));
-        break;
-
-    case HelperUtils::LaunchError::InvalidAssociationSetting:
-        box.setIcon(QMessageBox::Information);
-        box.setTextFormat(Qt::PlainText);
-        box.setText(
-            tr("The token “%1” is not a setting; settings are written as key=value.").arg(detail));
-        break;
-
-    case HelperUtils::LaunchError::AssociationSettingsWithWordlist:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The settings line applies only while the words come from the hash "
-                       "file. Clear either the settings line or the wordlist list."));
-        break;
-
-    case HelperUtils::LaunchError::NoHashRecipe:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The hash type 4000 describes its hashes as a recipe, for example\n"
-                       "md5(md5(salt) . pass). Enter it in the hash recipe field."));
-        break;
-
-    case HelperUtils::LaunchError::InvalidIncrement:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The minimum increment length is larger than the maximum."));
-        break;
-
-    // The path below is user supplied, so plain text: a '<' in it would be
-    // taken for markup by the default AutoText.
-    case HelperUtils::LaunchError::InvalidCachePath:
-        box.setTextFormat(Qt::PlainText);
-        box.setText(tr("The cache path must be an existing directory:\n%1").arg(detail));
-        break;
-
-    case HelperUtils::LaunchError::IncrementWithSpeedOnly:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("The increment cannot be combined with the speed-only option."));
-        break;
-
-    case HelperUtils::LaunchError::RemoveInAssociation:
-        box.setIcon(QMessageBox::Information);
-        box.setText(tr("Removing cracked hashes is not possible in the association attack mode."));
-        break;
-
-    case HelperUtils::LaunchError::None:
+    const LaunchMessage message = messageFor(problem, context, menu, settingsEntry);
+    if (message.text.isEmpty()) {
         return;
     }
 
+    QMessageBox box(this);
+    box.setIcon(message.icon);
+    box.setTextFormat(message.format);
+    box.setText(message.text);
     box.exec();
 }
 

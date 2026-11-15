@@ -6,7 +6,7 @@
 #include "settingsdialog.h"
 
 #include "appconstants.h"
-#include "helperutils.h"
+#include "appearance.h"
 #include "settingsmanager.h"
 #include "statefile.h"
 #include "terminalcatalog.h"
@@ -541,7 +541,7 @@ void SettingsDialog::saveClicked()
 
     // The color scheme takes effect right away, no restart needed.
     const QString colorScheme = ui->comboBox_color_scheme->currentData().toString();
-    HelperUtils::applyColorScheme(colorScheme);
+    Appearance::applyColorScheme(colorScheme);
 
     // The catalog is loaded once, in main(), before the first widget exists.
     // Rather than rebuilding every open widget to swap it, tell the user the

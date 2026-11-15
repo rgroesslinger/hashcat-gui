@@ -4,7 +4,7 @@
  */
 
 #include "appconstants.h"
-#include "helperutils.h"
+#include "appearance.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "statefile.h"
@@ -158,7 +158,7 @@ void TestSettingsDialog::cleanup()
     settings.setKey(AppConstants::SettingsKeys::ColorScheme, m_savedColorScheme);
     // The scheme is a property of the whole application, so it returns to
     // what the user had as well.
-    HelperUtils::applyColorScheme(m_savedColorScheme);
+    Appearance::applyColorScheme(m_savedColorScheme);
 }
 
 // System default plus one row per catalog, each shown in its own language

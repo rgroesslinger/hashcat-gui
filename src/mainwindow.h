@@ -8,7 +8,7 @@
 
 #include "hashcatoptions.h"
 #include "hashcatrunner.h"
-#include "helperutils.h"
+#include "launchvalidator.h"
 #include "pathmonitor.h"
 
 #include <QComboBox>
@@ -213,8 +213,9 @@ private:
                             bool available);
     static QString unavailableTooltip(PathMonitor::Kind kind, const QString &path);
 
-    // Presents what HelperUtils::validateLaunch() reported
-    void showLaunchError(HelperUtils::LaunchError error, const QString &detail);
+    // Presents what LaunchValidator::validate() reported
+    void showLaunchError(const LaunchValidator::LaunchProblem &problem,
+                         const LaunchValidator::LaunchContext &context);
 
     [[nodiscard]] QString sessionFile() const;
 

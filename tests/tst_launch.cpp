@@ -5,6 +5,7 @@
 
 #include "appconstants.h"
 #include "hashcatoptions.h"
+#include "helperutils.h"
 #include "mainwindow.h"
 #include "mainwindowtestaccess.h"
 #include "mainwindowtesthelpers.h"

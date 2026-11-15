@@ -47,6 +47,8 @@ set(HASHCAT_GUI_SOURCES
     src/aboutdialog.h
     src/aboutdialog.cpp
     src/appconstants.h
+    src/appearance.h
+    src/appearance.cpp
     src/commandbuilder.h
     src/commandbuilder.cpp
     src/examples.h
@@ -59,6 +61,8 @@ set(HASHCAT_GUI_SOURCES
     src/helperutils.cpp
     src/launchvalidator.h
     src/launchvalidator.cpp
+    src/launchmessage.h
+    src/launchmessage.cpp
     src/mainwindow.h
     src/mainwindow.cpp
     src/settingsdialog.h
@@ -165,6 +169,7 @@ set(HASHCAT_GUI_TESTS
     tst_hashcatrunner
     tst_helperutils
     tst_launch
+    tst_launchmessage
     tst_layout
     tst_mainwindow
     tst_pathmonitor
