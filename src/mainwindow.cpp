@@ -12,6 +12,7 @@
 #include "hashcatinfoparser.h"
 #include "hashcatrunner.h"
 #include "helperutils.h"
+#include "launchvalidator.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "statefile.h"
@@ -2229,30 +2230,22 @@ void MainWindow::copyCommandToClipboard()
 
 void MainWindow::startClicked()
 {
-    // What the selected attack mode needs comes first: it is what the user
-    // has just configured, and hashcat would only answer it with a usage
-    // error after the run has started.
-    QString detail;
-    const HelperUtils::LaunchError optionError =
-        HelperUtils::validateOptions(collectHashcatOptions(), &detail);
-    if (optionError != HelperUtils::LaunchError::None) {
-        showLaunchError(optionError, detail);
-        return;
-    }
+    // Everything the validation reads is collected here, on the GUI thread;
+    // the validator itself looks at no settings. The option checks run first:
+    // they are what the user has just configured, and hashcat would only
+    // answer them with a usage error after the run has started.
+    LaunchValidator::LaunchContext context;
+    context.options = collectHashcatOptions();
 
     auto &settings = SettingsManager::instance();
-
-    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-    const QString configuredTerminal =
-        settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
-    const QMap<QString, QStringList> availableTerminals = TerminalCatalog::availableTerminals();
+    context.hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    context.configuredTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
+    context.availableTerminals = TerminalCatalog::availableTerminals().keys();
 
     // Nothing is started unless the configuration is known to be complete.
-    const HelperUtils::LaunchError error =
-        HelperUtils::validateLaunch(ui->lineEdit_hashfile->text(), hashcatPath, configuredTerminal,
-                                    availableTerminals.keys(), &detail);
-    if (error != HelperUtils::LaunchError::None) {
-        showLaunchError(error, detail);
+    const LaunchValidator::LaunchProblem problem = LaunchValidator::validate(context);
+    if (problem) {
+        showLaunchError(problem.code, problem.detail);
         return;
     }
 
@@ -2260,7 +2253,8 @@ void MainWindow::startClicked()
     // encoded script, so no hash, mask, path or session value is parsed as
     // shell code. The terminal stays open after hashcat exits, as before.
     const LaunchCommand command =
-        TerminalCatalog::launchCommand(configuredTerminal, hashcatPath, generateArguments(), true);
+        TerminalCatalog::launchCommand(context.configuredTerminal, context.hashcatPath,
+                                       CommandBuilder::build(context.options), true);
     if (command.program.isEmpty()) {
         QMessageBox::warning(this, tr("Launch failed"),
                              tr("The command line is too long for the terminal. Shorten the "
@@ -2269,9 +2263,10 @@ void MainWindow::startClicked()
     }
 
     QString launchError;
-    if (!TerminalCatalog::launchDetached(command, hashcatPath, &launchError)) {
-        QMessageBox::warning(this, tr("Launch failed"),
-                             tr("Could not start “%1”: %2").arg(configuredTerminal, launchError));
+    if (!TerminalCatalog::launchDetached(command, context.hashcatPath, &launchError)) {
+        QMessageBox::warning(
+            this, tr("Launch failed"),
+            tr("Could not start “%1”: %2").arg(context.configuredTerminal, launchError));
     }
 }
 

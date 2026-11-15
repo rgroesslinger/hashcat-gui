@@ -57,6 +57,8 @@ set(HASHCAT_GUI_SOURCES
     src/hashcatrunner.cpp
     src/helperutils.h
     src/helperutils.cpp
+    src/launchvalidator.h
+    src/launchvalidator.cpp
     src/mainwindow.h
     src/mainwindow.cpp
     src/settingsdialog.h

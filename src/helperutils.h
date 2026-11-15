@@ -9,6 +9,7 @@
 #include "appconstants.h"
 #include "hashcatoptions.h"
 #include "hashcatrunner.h"
+#include "launchvalidator.h"
 
 #include <QCoreApplication>
 #include <QFuture>
@@ -22,65 +23,15 @@ class HelperUtils
     Q_DECLARE_TR_FUNCTIONS(HelperUtils)
 
 public:
-    // What can keep the Execute button from starting anything
-    enum class LaunchError : std::uint8_t {
-        None,
-        NoHashFile,         // no hash file selected
-        NoHashcatPath,      // the hashcat path was never configured
-        HashcatPathMissing, // configured, but the file is not there (anymore)
-        NoTerminal,         // no terminal selected
-        NoTerminals,        // this system has no supported terminal at all
-        UnknownTerminal,    // the configured terminal is not installed
-        NoWordlist,         // the mode reads word lists, none is selected
-        WrongWordlistCount, // the mode wants an exact number of word lists
-        TooManyWordlists,   // more word lists than the mode accepts
-        // The wordlist hashcat multiplies (?q) is read by one feed instance
-        // from start to end, so unlike the base it cannot be a folder.
-        WordlistMustBeFile,
-        NoMask,           // the mode brute-forces a mask, none is given
-        InvalidIncrement, // the increment bounds contradict each other
-        // hashcat 8.0.0 silently ignores -i under --speed-only (it allows the
-        // flag for ACT_CRACK | ACT_STDOUT | ACT_KEYSPACE), so refusing the
-        // combination is a GUI policy: incrementing would make a fixed speed
-        // measurement meaningless.
-        IncrementWithSpeedOnly,
-        RemoveInAssociation,             // hashcat refuses --remove in attack mode 9
-        NoTable,                         // the table feed got no table
-        NoFeed,                          // the generic feed got no feed name
-        MaskNeedsWordMarker,             // the mode 12 mask names no ?w word
-        MaskMultipleWordMarkers,         // more than one ?w in the mask
-        MaskQBeforeWord,                 // a ?q before the first ?w in the mask
-        MaskMultipleQMarks,              // more than one ?q in the mask
-        MaskQWithoutWordlist,            // ?q names a second word, no second wordlist
-        SecondWordlistWithoutQ,          // two wordlists, no ?q for the second
-        IncrementInMode12,               // hashcat refuses -i in the hybrid mode 12
-        MaskMarkersNotAllowed,           // ?w/?q in a mode that rewrites them
-        PcfgCharsetWithoutMask,          // a mode 4 charset has no mask= to sit in
-        InvalidPcfgSetting,              // a mode 4 setting out of range or twice
-        InvalidTableSetting,             // a mode 5 setting out of range or twice
-        InvalidAssociationSetting,       // a mode 9 token that is not key=value
-        AssociationSettingsWithWordlist, // settings only with no wordlist
-        NoHashRecipe,                    // hash mode 4000 without its recipe
-        InvalidCachePath,                // --cache-path is not an existing directory
-    };
+    // Transitional alias while the tests move to LaunchValidator.
+    using LaunchError = LaunchValidator::LaunchError;
 
-    // Checks everything that has to hold before hashcat can be started.
-    //
-    // detail receives the offending value - the missing path, or the terminals
-    // that would work - when it is not nullptr.
+    // Transitional facade: the old signatures forward to LaunchValidator.
+    // Deleted together with HelperUtils.
     static LaunchError validateLaunch(const QString &hashFile, const QString &hashcatPath,
                                       const QString &configuredTerminal,
                                       const QStringList &availableTerminals,
                                       QString *detail = nullptr);
-
-    // Checks what the selected attack mode needs: the word lists it reads,
-    // the mask it brute-forces, the settings of the feed modes, the bounds
-    // of the increment and the option combinations hashcat refuses. detail
-    // receives the offending value - a count, or the field and value (or the
-    // repeated key) of a setting - when it is not nullptr.
-    //
-    // What the mode needs comes from CommandBuilder::modeRequirements(), so
-    // the group boxes, the mode hint and this check cannot disagree.
     static LaunchError validateOptions(const HashcatOptions &options, QString *detail = nullptr);
 
     // Reads the configured path on the calling thread and forwards to
