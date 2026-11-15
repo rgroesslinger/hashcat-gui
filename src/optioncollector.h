@@ -7,7 +7,11 @@
 #define OPTIONCOLLECTOR_H
 
 #include "hashcatoptions.h"
-#include "ui_mainwindow.h"
+
+namespace Ui
+{
+class MainWindow;
+}
 
 // Reads the current widget state into the UI-independent description of a
 // hashcat invocation. Everything the command line is built from goes through

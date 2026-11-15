@@ -7,6 +7,7 @@
 
 #include "aboutdialog.h"
 #include "appconstants.h"
+#include "attackmodeview.h"
 #include "checkeditemlist.h"
 #include "commandbuilder.h"
 #include "commandpreview.h"
@@ -109,7 +110,8 @@ QString suggestedExportPath(QLatin1StringView fileName)
 
 } // namespace
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), m_attackModeView(*ui)
 {
     ui->setupUi(this);
 
@@ -667,7 +669,7 @@ QSize MainWindow::attackModeEnvelope(int wrapWidth)
     QSize envelope(0, 0);
     for (int i = 0; i < ui->comboBox_attack->count(); ++i) {
         const auto mode = static_cast<AttackMode>(ui->comboBox_attack->itemData(i).toInt());
-        applyAttackModeView(mode);
+        m_attackModeView.apply(mode);
         activateLayouts(content);
         QSize minimum = content->minimumSizeHint();
         if (wrapWidth > 0) {
@@ -680,7 +682,7 @@ QSize MainWindow::attackModeEnvelope(int wrapWidth)
     }
 
     // Leave the tab showing the mode the user (or a restored session) chose.
-    applyAttackModeView(current);
+    m_attackModeView.apply(current);
     activateLayouts(content);
     content->setUpdatesEnabled(updates);
     return envelope;
@@ -865,7 +867,7 @@ void MainWindow::loadExampleSession(AttackMode mode)
         this, tr("Load example session"),
         tr("Load the %1 example? The current session is lost.\n\n"
            "The example cracks a test hash; hashcat should recover the password %2.")
-            .arg(attackModeName(mode), QString(entry->password)),
+            .arg(AttackModeView::name(mode), QString(entry->password)),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
     if (answer != QMessageBox::Yes) {
         return;
@@ -1230,37 +1232,11 @@ bool MainWindow::sessionFileIsUnderstood(const QString &file) const
            && document.status != StateFile::Status::Newer;
 }
 
-QString MainWindow::attackModeName(AttackMode mode) const
-{
-    switch (mode) {
-    case AttackMode::Straight:
-        return tr("Straight");
-    case AttackMode::Combination:
-        return tr("Combination");
-    case AttackMode::BruteForce:
-        return tr("Brute-force");
-    case AttackMode::Pcfg:
-        return tr("PCFG");
-    case AttackMode::Table:
-        return tr("Table");
-    case AttackMode::HybridWordMask:
-        return tr("Hybrid Wordlist + Mask");
-    case AttackMode::HybridMaskWord:
-        return tr("Hybrid Mask + Wordlist");
-    case AttackMode::Generic:
-        return tr("Generic (feed)");
-    case AttackMode::Association:
-        return tr("Association");
-    case AttackMode::Hybrid:
-        return tr("Hybrid (mask + ?w/?q)");
-    }
-    return {};
-}
-
 void MainWindow::initExampleSessionMenu()
 {
     for (const Examples::Entry &entry : Examples::All) {
-        QAction *action = ui->menuLoadExampleSession->addAction(attackModeName(entry.attackMode));
+        QAction *action =
+            ui->menuLoadExampleSession->addAction(AttackModeView::name(entry.attackMode));
         action->setData(static_cast<int>(entry.attackMode));
         connect(action, &QAction::triggered, this,
                 [this, mode = entry.attackMode] { loadExampleSession(mode); });
@@ -1286,7 +1262,7 @@ void MainWindow::initHashAndAttackModes()
     // is what a translation changes, the id is what has to end up on the
     // command line.
     for (const AttackMode mode : AllAttackModes) {
-        ui->comboBox_attack->addItem(attackModeName(mode), static_cast<int>(mode));
+        ui->comboBox_attack->addItem(AttackModeView::name(mode), static_cast<int>(mode));
     }
 
     // Hash types
@@ -1400,118 +1376,15 @@ void MainWindow::attackIndexChanged([[maybe_unused]] int index)
 
 void MainWindow::updateViewAttackMode()
 {
-    applyAttackModeView(currentAttackMode());
+    m_attackModeView.apply(currentAttackMode());
     updateOptionDependencies();
     commandChanged();
-}
-
-// Shows the mode hint and the groups the mode uses, and hides the rest. The
-// very predicates CommandBuilder applies are used, so the widgets show
-// exactly the options that end up in the command line and the two can never
-// drift apart. Groups are hidden rather than disabled so the form only shows
-// the options the mode uses; the window keeps room for the busiest mode
-// anyway, see attackModeEnvelope(). Fitting the window measures this once per
-// mode, so the hint text has to be here as well - it sets the width the
-// window has to hold.
-void MainWindow::applyAttackModeView(AttackMode mode)
-{
-    const bool usesMask = CommandBuilder::attackUsesMask(mode);
-    const bool usesRuleLeft = CommandBuilder::attackUsesRuleLeft(mode);
-    const bool usesRuleRight = CommandBuilder::attackUsesRuleRight(mode);
-    const bool usesIncrement = CommandBuilder::attackUsesIncrement(mode);
-    ui->groupBox_wordlists->setVisible(CommandBuilder::attackUsesWordlists(mode));
-    ui->groupBox_rules->setVisible(CommandBuilder::attackUsesRules(mode));
-    // The group starts out disabled in the .ui file, so it keeps the
-    // enabled gate next to the visibility one: it is visible only while one
-    // of the two sides applies, and enabled exactly then.
-    ui->groupBox_wordlist_rules->setVisible(usesRuleLeft || usesRuleRight);
-    ui->groupBox_wordlist_rules->setEnabled(usesRuleLeft || usesRuleRight);
-    ui->label_rule_left->setEnabled(usesRuleLeft);
-    ui->lineEdit_rule_left->setEnabled(usesRuleLeft);
-    ui->label_rule_right->setEnabled(usesRuleRight);
-    ui->lineEdit_rule_right->setEnabled(usesRuleRight);
-    ui->groupBox_custom_charset->setVisible(CommandBuilder::attackUsesCustomCharset(mode));
-    ui->groupBox_mask->setVisible(usesMask);
-
-    // The feed modes get a group each, and mode 9 one extra row: the
-    // settings line that bounds a run whose words come from the hash file.
-    ui->groupBox_pcfg->setVisible(mode == AttackMode::Pcfg);
-    ui->groupBox_table->setVisible(mode == AttackMode::Table);
-    ui->groupBox_feed->setVisible(mode == AttackMode::Generic);
-    ui->label_association_settings->setVisible(mode == AttackMode::Association);
-    ui->lineEdit_association_settings->setVisible(mode == AttackMode::Association);
-
-    // Inside the wordlist group: only the modes that read a wordlist take
-    // the wordlist options, and only the ones hashcat lets name an
-    // encoding.
-    ui->checkBox_hex_wordlist->setVisible(CommandBuilder::attackUsesHexWordlist(mode));
-    const bool usesEncoding = CommandBuilder::attackUsesWordlistEncoding(mode);
-    ui->label_encoding_from->setVisible(usesEncoding);
-    ui->lineEdit_encoding_from->setVisible(usesEncoding);
-    ui->label_encoding_to->setVisible(usesEncoding);
-    ui->lineEdit_encoding_to->setVisible(usesEncoding);
-
-    // Inside the mask group: hashcat 8.0.0 refuses -i in mode 12, so the
-    // increment row only exists where the flag is offered.
-    ui->checkBox_increment->setVisible(usesIncrement);
-    ui->label_increment_min->setVisible(usesIncrement);
-    ui->spinBox_increment_min->setVisible(usesIncrement);
-    ui->label_increment_max->setVisible(usesIncrement);
-    ui->spinBox_increment_max->setVisible(usesIncrement);
-
-    // Tell the user what the mode expects, so the launch validation does not
-    // have to be the first thing that explains it.
-    ui->label_mode_hint->setText(modeHint(mode));
 }
 
 // The attack mode the user selected.
 AttackMode MainWindow::currentAttackMode() const
 {
     return static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
-}
-
-// What the user has to provide for the selected attack mode.
-//
-// The wording follows the requirements in CommandBuilder::modeRequirements(), so
-// the hint and the launch validation cannot tell the user different things.
-QString MainWindow::modeHint(AttackMode mode) const
-{
-    // A sentence per mode. The label wraps at the tab width (wordWrap in the
-    // .ui file), so the texts stay free of line breaks and translations can
-    // rewrap as they like. The height a wrapped hint needs is not part of a
-    // minimum size hint - a wrapping label reports one line - so the fit
-    // reserves it through heightForWidth() at the final width,
-    // see attackModeEnvelope() and fitToContent().
-    switch (mode) {
-    case AttackMode::Straight:
-        return tr("This mode needs at least one wordlist.");
-    case AttackMode::Combination:
-        return tr("This mode needs exactly 2 wordlists (left, right).");
-    case AttackMode::BruteForce:
-        return tr("This mode needs a mask.");
-    case AttackMode::Pcfg:
-        return tr("This mode runs hashcat’s bundled default-passwords ruleset; "
-                  "name one or more to use your own.");
-    case AttackMode::Table:
-        return tr("This mode needs one wordlist and at least one table.");
-    case AttackMode::HybridWordMask:
-    case AttackMode::HybridMaskWord:
-        return tr("This mode needs a wordlist and a mask.");
-    case AttackMode::Generic:
-        return tr("This mode needs a feed. Arguments depend on the feed: "
-                  "random and stdin need none, wordlist needs a path.");
-    case AttackMode::Association:
-        // The settings grammar (phases, the never-ending default) is the
-        // settings line's own tooltip; the hint keeps only what the mode
-        // needs, in the wording of modeRequirements().
-        return tr("This mode needs at most one wordlist. Without one the words come from the "
-                  "hash file and the settings line can bound the run; with one the two files "
-                  "are paired by line.");
-    case AttackMode::Hybrid:
-        return tr("This mode needs a mask with exactly one ?w; a ?q after ?w "
-                  "names a second wordlist.");
-    }
-    return {};
 }
 
 // Options that only carry a value while their parent checkbox is on. The

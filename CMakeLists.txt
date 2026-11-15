@@ -49,6 +49,8 @@ set(HASHCAT_GUI_SOURCES
     src/appconstants.h
     src/appearance.h
     src/appearance.cpp
+    src/attackmodeview.h
+    src/attackmodeview.cpp
     src/checkeditemlist.h
     src/checkeditemlist.cpp
     src/commandbuilder.h
@@ -173,6 +175,7 @@ endif()
 # Drives the executables, their registration and the analysis inputs.
 set(HASHCAT_GUI_TESTS
     tst_aboutdialog
+    tst_attackmodeview
     tst_commandbuilder
     tst_commandpreview
     tst_examplesession

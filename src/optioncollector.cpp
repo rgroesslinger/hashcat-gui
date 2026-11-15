@@ -8,6 +8,7 @@
 #include "appconstants.h"
 #include "checkeditemlist.h"
 #include "commandbuilder.h"
+#include "ui_mainwindow.h"
 
 #include <QComboBox>
 #include <QLineEdit>

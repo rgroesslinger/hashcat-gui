@@ -6,6 +6,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "attackmodeview.h"
 #include "hashcatoptions.h"
 #include "hashcatrunner.h"
 #include "launchvalidator.h"
@@ -129,6 +130,10 @@ private:
 
     Ui::MainWindow *ui;
 
+    // The attack mode's face on the form; constructed with the ui, applied
+    // on every mode change and once per mode by the envelope measurement.
+    AttackModeView m_attackModeView;
+
     // Tell the rows of each list which of their paths hashcat can use.
     PathMonitor m_wordlistMonitor{PathMonitor::Kind::Wordlist};
     PathMonitor m_pcfgMonitor{PathMonitor::Kind::Pcfg};
@@ -151,17 +156,11 @@ private:
     // The example submenu is built once: initHashAndAttackModes() runs again
     // on settings changes, and adding the actions there would duplicate them.
     void initExampleSessionMenu();
-    // The translated name of an attack mode, shared by the combo box and the
-    // example submenu so the two cannot drift apart.
-    [[nodiscard]] QString attackModeName(AttackMode mode) const;
     void updateViewAttackMode();
     void updateOptionDependencies();
 
     // The attack mode the user selected.
     [[nodiscard]] AttackMode currentAttackMode() const;
-
-    // What the selected attack mode needs from the user.
-    [[nodiscard]] QString modeHint(AttackMode mode) const;
 
     // Applies the values of a session file to the widgets and collects the
     // notes about what could not be applied.
@@ -207,11 +206,6 @@ private:
     // types exists. Returns a message when the session names a hash type
     // this hashcat does not know.
     QString applyPendingHashType();
-
-    // Shows the mode hint and the groups the mode uses, and hides the rest.
-    // Shared by the normal refresh and the envelope measurement, which walks
-    // every mode before the window is sized.
-    void applyAttackModeView(AttackMode mode);
 
     // The largest minimum the attack tab can need: every mode's groups and
     // hint in one size. Measured before the visible mode is restored. A
