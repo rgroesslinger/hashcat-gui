@@ -83,12 +83,6 @@ struct LaunchProblem {
 // started - and the launch checks second. Within each group the order is
 // part of the contract: the first problem found is the one reported.
 LaunchProblem validate(const LaunchContext &context);
-
-// The two groups on their own. Transitional: they exist while HelperUtils
-// forwards its old signatures, and go back into the implementation when the
-// facade is deleted.
-LaunchError validateOptions(const HashcatOptions &options, QString *detail = nullptr);
-LaunchError validateLaunch(const LaunchContext &context, QString *detail = nullptr);
 } // namespace LaunchValidator
 
 #endif // LAUNCHVALIDATOR_H

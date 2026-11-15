@@ -33,7 +33,7 @@ re-run `cmake -B build`.
 - A real `MainWindow` freezes offscreen (an empty `hashcatPath` queues the modal Settings dialog,
   non-JSON output opens a modal warning), so `processEvents()` blocks. For screenshots redirect
   XDG dirs and point `hashcatPath` at a stub with valid machine-readable JSON
-  (`TestEnvironment::redirectBaseDirectories()`, `tst_helperutils.cpp`); for layout only,
+  (`TestEnvironment::redirectBaseDirectories()`, `tst_launchvalidator.cpp`); for layout only,
   instantiate `Ui::MainWindow`. Harnesses stay in `/tmp`.
 
 ## Structure
@@ -42,12 +42,14 @@ re-run `cmake -B build`.
   and tests link it. Keep it OBJECT: a static library drops qrc objects and static initializers.
 - Register new production sources in `HASHCAT_GUI_SOURCES`, new `tests/tst_*.cpp` in
   `HASHCAT_GUI_TESTS`. No globbing.
-- UI-free logic (CommandBuilder, HashcatInfoParser, HelperUtils, StateFile,
-  WidgetStateSerializer, SettingsManager, UpdateChecker, PathMonitor) stays testable;
-  `HelperUtils` runs hashcat/terminal.
+- UI-free logic (CommandBuilder, HashcatInfoParser, HashcatRunner, TerminalCatalog,
+  LaunchValidator, LaunchMessage, Appearance, StateFile, WidgetStateSerializer, SettingsManager,
+  UpdateChecker, PathMonitor) stays testable; `HashcatRunner` runs hashcat, `TerminalCatalog`
+  starts the terminal.
 - Attack-mode gating predicates live in `CommandBuilder`; `modeRequirements()` derives mode hints
-  and launch validation. Launch is `HelperUtils::validateOptions()` then `validateLaunch()`;
-  hashcat starts detached (`CREATE_NEW_CONSOLE` on Windows).
+  and launch validation. Launch is `LaunchValidator::validate()` (option checks first, launch
+  checks second); `TerminalCatalog::launchDetached()` starts hashcat detached
+  (`CREATE_NEW_CONSOLE` on Windows).
 - Example sessions in `src/examples.h`: one `Entry` per attack mode in combo order; paths use
   `Examples::DataPrefix` and unpack into `Examples::DataDirectory`.
 - `PathMonitor`: wordlist and PCFG rulesets may be folders (wordlist needs a file, ruleset needs

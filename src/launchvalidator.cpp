@@ -16,6 +16,8 @@
 
 namespace LaunchValidator
 {
+namespace
+{
 LaunchError validateLaunch(const LaunchContext &context, QString *detail)
 {
     const QString &hashFile = context.options.hashFile;
@@ -64,8 +66,6 @@ LaunchError validateLaunch(const LaunchContext &context, QString *detail)
     return LaunchError::None;
 }
 
-namespace
-{
 // The value of a numeric setting when its text is a number in the given
 // range. A session file sets widget text directly and bypasses the input
 // validators, so every non-empty field is checked here again.
@@ -379,7 +379,6 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
 
     return LaunchError::None;
 }
-} // namespace
 
 LaunchError validateOptions(const HashcatOptions &options, QString *detail)
 {
@@ -563,6 +562,8 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
 
     return LaunchError::None;
 }
+
+} // namespace
 
 LaunchProblem validate(const LaunchContext &context)
 {

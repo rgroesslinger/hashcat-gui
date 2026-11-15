@@ -116,7 +116,7 @@ void TestHashcatInfoParser::hashcat8ModesParseInOrder()
     QVERIFY(!hashModes.contains(12000));
 }
 
-// HelperUtils::executeHashcat() appends --quiet for a reason: fromJson skips
+// HashcatRunner::execute() appends --quiet for a reason: fromJson skips
 // leading whitespace only, so an unquiet banner would fail the parse at char
 // zero. This pins the contract that makes the flag load-bearing.
 void TestHashcatInfoParser::bannerPrefixedReplyIsRejected()

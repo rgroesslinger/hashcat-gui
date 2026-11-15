@@ -57,8 +57,6 @@ set(HASHCAT_GUI_SOURCES
     src/hashcatoptions.h
     src/hashcatrunner.h
     src/hashcatrunner.cpp
-    src/helperutils.h
-    src/helperutils.cpp
     src/launchvalidator.h
     src/launchvalidator.cpp
     src/launchmessage.h
@@ -167,9 +165,9 @@ set(HASHCAT_GUI_TESTS
     tst_commandbuilder
     tst_hashcatinfoparser
     tst_hashcatrunner
-    tst_helperutils
     tst_launch
     tst_launchmessage
+    tst_launchvalidator
     tst_layout
     tst_mainwindow
     tst_pathmonitor

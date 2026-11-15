@@ -5,7 +5,7 @@
 
 #include "appconstants.h"
 #include "hashcatoptions.h"
-#include "helperutils.h"
+#include "launchvalidator.h"
 #include "mainwindow.h"
 #include "mainwindowtestaccess.h"
 #include "mainwindowtesthelpers.h"
@@ -42,6 +42,24 @@
 #include <QToolTip>
 #include <QWidget>
 #include <utility>
+
+namespace
+{
+// The option checks on their own: the launch fields hold values that pass,
+// so only the options can fail. validate() runs the option checks first,
+// which is the precedence these tests pin.
+LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &options)
+{
+    LaunchValidator::LaunchContext context;
+    context.options = options;
+    context.options.hashFile = QStringLiteral("hash.txt");
+    context.hashcatPath = QStringLiteral("hashcat");
+    context.configuredTerminal = QStringLiteral("konsole");
+    context.availableTerminals = QStringList{QStringLiteral("konsole")};
+    return LaunchValidator::validate(context);
+}
+
+} // namespace
 
 // The launch half of the main window: validation through the widgets, error
 // presentation, preview and clipboard.
@@ -134,53 +152,53 @@ void TestLaunch::launchValidationFollowsTheWidgets()
     };
 
     // Straight mode without a word list is what the hint warns about.
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::NoWordlist));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::NoWordlist));
 
     addWordlist(QStringLiteral("/tmp/a.txt"));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 
     // Combination mode wants exactly two word lists.
     MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(1); // combination
     QCOMPARE(int(MainWindowTestAccess::ui(window)->comboBox_attack->currentData().toInt()),
              int(AttackMode::Combination));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::WrongWordlistCount));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::WrongWordlistCount));
 
     addWordlist(QStringLiteral("/tmp/b.txt"));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 
     addWordlist(QStringLiteral("/tmp/c.txt"));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::WrongWordlistCount));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::WrongWordlistCount));
 
     // A mask mode needs a mask, and the bounds of the increment have to fit.
     MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(2); // brute-force
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::NoMask));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::NoMask));
 
     MainWindowTestAccess::ui(window)->lineEdit_mask->setText(QStringLiteral("?d?d?d?d"));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 
     MainWindowTestAccess::ui(window)->checkBox_increment->setChecked(true);
     MainWindowTestAccess::ui(window)->spinBox_increment_min->setValue(8);
     MainWindowTestAccess::ui(window)->spinBox_increment_max->setValue(4);
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::InvalidIncrement));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::InvalidIncrement));
 
     // A valid pair of bounds, but incrementing and speed-only are mutually
     // exclusive in hashcat. Both controls are reachable in a mask mode.
     MainWindowTestAccess::ui(window)->spinBox_increment_min->setValue(4);
     MainWindowTestAccess::ui(window)->spinBox_increment_max->setValue(8);
     MainWindowTestAccess::ui(window)->checkBox_speed_only->setChecked(true);
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::IncrementWithSpeedOnly));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::IncrementWithSpeedOnly));
     MainWindowTestAccess::ui(window)->checkBox_speed_only->setChecked(false);
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 
     // Association keeps the checked increment from the brute-force step (its
     // group box is disabled), but the command line carries no -i, so the
@@ -194,15 +212,15 @@ void TestLaunch::launchValidationFollowsTheWidgets()
     // pairing; the cap takes the first one.
     MainWindowTestAccess::ui(window)->listWidget_wordlist->item(2)->setCheckState(Qt::Unchecked);
     MainWindowTestAccess::ui(window)->listWidget_wordlist->item(1)->setCheckState(Qt::Unchecked);
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 
     MainWindowTestAccess::ui(window)->checkBox_remove->setChecked(true);
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::RemoveInAssociation));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::RemoveInAssociation));
     MainWindowTestAccess::ui(window)->checkBox_remove->setChecked(false);
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 }
 
 // A custom charset is used only inside a mask. PCFG takes its mask from the
@@ -218,25 +236,25 @@ void TestLaunch::pcfgCharsetNeedsAMask()
 
     MainWindowTestAccess::ui(window)->checkBox_custom_charset1->setChecked(true);
     MainWindowTestAccess::ui(window)->lineEdit_custom_charset1->setText(QStringLiteral("abc"));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::PcfgCharsetWithoutMask));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::PcfgCharsetWithoutMask));
 
     // A mask that references ?1 gives the charset its place.
     MainWindowTestAccess::ui(window)->lineEdit_pcfg_mask->setText(QStringLiteral("?1?1?1"));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 
     // mask= on the extra settings line is the same setting.
     MainWindowTestAccess::ui(window)->lineEdit_pcfg_mask->clear();
     MainWindowTestAccess::ui(window)->lineEdit_pcfg_extra->setText(QStringLiteral("mask=?1?1?1"));
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 
     // An unchecked charset is left out of the command, so no mask is needed.
     MainWindowTestAccess::ui(window)->lineEdit_pcfg_extra->clear();
     MainWindowTestAccess::ui(window)->checkBox_custom_charset1->setChecked(false);
-    QCOMPARE(int(HelperUtils::validateOptions(MainWindowTestAccess::collectHashcatOptions(window))),
-             int(HelperUtils::LaunchError::None));
+    QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
+             int(LaunchValidator::LaunchError::None));
 }
 
 // With a hashcat binary configured the preview is [binary][separator][args]:
