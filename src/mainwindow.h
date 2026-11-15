@@ -153,9 +153,6 @@ private:
     // The translated name of an attack mode, shared by the combo box and the
     // example submenu so the two cannot drift apart.
     [[nodiscard]] QString attackModeName(AttackMode mode) const;
-    // Unpacks the example data files and returns the native directory with a
-    // trailing separator, ready to replace Examples::DataPrefix.
-    bool materializeExampleData(QString *directory, QString *error);
     void updateViewAttackMode();
     void updateOptionDependencies();
 

@@ -51,7 +51,11 @@ set(HASHCAT_GUI_SOURCES
     src/appearance.cpp
     src/commandbuilder.h
     src/commandbuilder.cpp
+    src/commandpreview.h
+    src/commandpreview.cpp
     src/examples.h
+    src/examplesession.h
+    src/examplesession.cpp
     src/hashcatinfoparser.h
     src/hashcatinfoparser.cpp
     src/hashcatoptions.h
@@ -71,6 +75,7 @@ set(HASHCAT_GUI_SOURCES
     src/statefile.cpp
     src/terminalcatalog.h
     src/terminalcatalog.cpp
+    src/textutils.h
     src/updatechecker.h
     src/updatechecker.cpp
     src/widgetstateserializer.h
@@ -163,6 +168,8 @@ endif()
 set(HASHCAT_GUI_TESTS
     tst_aboutdialog
     tst_commandbuilder
+    tst_commandpreview
+    tst_examplesession
     tst_hashcatinfoparser
     tst_hashcatrunner
     tst_launch

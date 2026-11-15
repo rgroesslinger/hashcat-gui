@@ -8,7 +8,9 @@
 #include "aboutdialog.h"
 #include "appconstants.h"
 #include "commandbuilder.h"
+#include "commandpreview.h"
 #include "examples.h"
+#include "examplesession.h"
 #include "hashcatinfoparser.h"
 #include "hashcatrunner.h"
 #include "launchmessage.h"
@@ -17,6 +19,7 @@
 #include "settingsmanager.h"
 #include "statefile.h"
 #include "terminalcatalog.h"
+#include "textutils.h"
 #include "ui_mainwindow.h"
 #include "widgetstateserializer.h"
 
@@ -71,18 +74,6 @@ void activateLayouts(QWidget *widget)
     }
 }
 
-// A tooltip that contains something like "<b>" would be read as markup and
-// mangle the display. Escape such text once, and turn its breaks into <br> for
-// the rich text renderer. Plain text is left alone: escaping it would show
-// entities such as &amp; literally.
-QString escapeRichText(QString text)
-{
-    if (!Qt::mightBeRichText(text)) {
-        return text;
-    }
-    return text.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
-}
-
 // A menu path names the entry, not the action: the ellipsis of an entry that
 // opens a dialog is not part of "File → Settings", and neither is the
 // mnemonic marker (the titles read "&File" so Alt+F can reach them).
@@ -93,65 +84,6 @@ QString menuPath(const QString &text)
         path.chop(1);
     }
     return path.remove(QLatin1Char('&')).trimmed();
-}
-
-// The argument list as the preview and the clipboard show it: one token per
-// argument, joined with spaces. The hash recipe is a single argument that
-// contains spaces, so it is quoted for display - a copied command must not
-// split it. The argv handed to hashcat keeps the token unquoted.
-QStringList displayArguments(const QStringList &arguments)
-{
-    QStringList display = arguments;
-#ifdef Q_OS_WIN
-    const QChar quote = QLatin1Char('"');
-#else
-    const QChar quote = QLatin1Char('\'');
-#endif
-    const qsizetype recipe = display.indexOf(QString(AppConstants::Hashcat::HashRecipe));
-    if (recipe >= 0 && recipe + 1 < display.size()) {
-        display.replace(recipe + 1, quote + display.at(recipe + 1) + quote);
-    }
-    return display;
-}
-
-// The tooltip of the command preview: the whole command, because the line
-// edit shows only its beginning.
-//
-// Plain text, not rich text: a rich text tooltip is squeezed into whatever
-// width its text control happens to have and grows tall instead, while a
-// plain text one keeps the line breaks it is given.
-//
-// A path that contains something like "<b>" would be read as a tag and
-// mangle the display, so a command that looks like markup is escaped and its
-// breaks become <br>: the rare case loses the plain-text width, but keeps the
-// text.
-QString commandTooltip(const QString &command)
-{
-    if (command.isEmpty()) {
-        return {};
-    }
-
-    // The breaks go between the arguments, so a flag stays with the value
-    // that follows it.
-    const QStringList parts = command.split(QLatin1Char(' '));
-    QStringList lines;
-    QString line;
-    for (const QString &part : std::as_const(parts)) {
-        const bool endsWithFlag = line.section(QLatin1Char(' '), -1).startsWith(QLatin1Char('-'));
-        // The space between the parts counts too: the line is one character
-        // longer than the two of them together.
-        if (!line.isEmpty() && line.size() + part.size() + 1 > 120 && !endsWithFlag) {
-            lines << line;
-            line = part;
-        } else {
-            line += (line.isEmpty() ? QString() : QStringLiteral(" ")) + part;
-        }
-    }
-    if (!line.isEmpty()) {
-        lines << line;
-    }
-
-    return escapeRichText(lines.join(QLatin1Char('\n')));
 }
 
 // Where a file dialog starts: a folder the user knows. A bare file name
@@ -173,59 +105,6 @@ QString suggestedExportPath(QLatin1StringView fileName)
     return QDir(suggestedFolder()).filePath(QString(fileName));
 }
 
-// Whether a session asks for one of the bundled example data files. Only such
-// a session pays the unpacking cost; the brute-force example has no data.
-bool containsExamplePrefix(const QJsonValue &value)
-{
-    if (value.isString()) {
-        return value.toString().contains(QString(Examples::DataPrefix));
-    }
-    if (value.isObject()) {
-        const QJsonObject object = value.toObject();
-        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-            if (containsExamplePrefix(it.value())) {
-                return true;
-            }
-        }
-    }
-    if (value.isArray()) {
-        const QJsonArray array = value.toArray();
-        for (const auto &entry : array) {
-            if (containsExamplePrefix(entry)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-// Replaces the <examples>/ token in every string of the session, including the
-// text of list rows, with the directory the resources were unpacked to.
-QJsonValue withExamplePaths(const QJsonValue &value, const QString &directory)
-{
-    if (value.isString()) {
-        QString text = value.toString();
-        text.replace(QString(Examples::DataPrefix), directory);
-        return text;
-    }
-    if (value.isObject()) {
-        const QJsonObject object = value.toObject();
-        QJsonObject result;
-        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-            result.insert(it.key(), withExamplePaths(it.value(), directory));
-        }
-        return result;
-    }
-    if (value.isArray()) {
-        const QJsonArray array = value.toArray();
-        QJsonArray result;
-        for (const auto &entry : array) {
-            result.append(withExamplePaths(entry, directory));
-        }
-        return result;
-    }
-    return value;
-}
 } // namespace
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -1048,13 +927,7 @@ void MainWindow::importSettingsTriggered()
 // Tools → Load Example Session → <attack mode>
 void MainWindow::loadExampleSession(AttackMode mode)
 {
-    const Examples::Entry *entry = nullptr;
-    for (const Examples::Entry &candidate : Examples::All) {
-        if (candidate.attackMode == mode) {
-            entry = &candidate;
-            break;
-        }
-    }
+    const Examples::Entry *entry = ExampleSession::find(mode);
     if (!entry) {
         return;
     }
@@ -1086,63 +959,19 @@ void MainWindow::loadExampleSession(AttackMode mode)
     // The wordlists, rules and tables of an example are resources too, and
     // hashcat can only read real files: unpack them first, then point the
     // session at that directory.
-    if (containsExamplePrefix(values)) {
+    if (ExampleSession::containsExamplePrefix(values)) {
         QString directory;
-        if (!materializeExampleData(&directory, &error)) {
+        if (!ExampleSession::materialize(&directory, &error)) {
             QMessageBox::warning(this, tr("Load example session"), error);
             return;
         }
-        values = withExamplePaths(values, directory).toObject();
+        values = ExampleSession::withExamplePaths(values, directory).toObject();
     }
 
     const QStringList notes = applySessionFile(values, version, otherSections);
     if (!notes.isEmpty()) {
         QMessageBox::warning(this, tr("Load example session"), notes.join(QLatin1Char('\n')));
     }
-}
-
-// Writes every bundled data file to the example directory, replacing the
-// copy a previous load left there. The whole set is written, not only the
-// files the selected session names: the files are tiny, and an example must
-// never depend on what another one unpacked before it.
-bool MainWindow::materializeExampleData(QString *directory, QString *error)
-{
-    const QString target = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                               .filePath(QString(Examples::DataDirectory));
-    if (!QDir().mkpath(target)) {
-        *error = tr("Could not create the example directory “%1”.").arg(target);
-        return false;
-    }
-
-    for (const QLatin1StringView &resource : Examples::DataFiles) {
-        QFile source{QString(resource)};
-        if (!source.open(QIODevice::ReadOnly)) {
-            *error = tr("Could not read the bundled file “%1”: %2")
-                         .arg(QString(resource), source.errorString());
-            return false;
-        }
-
-        QSaveFile destination{QDir(target).filePath(QFileInfo(QString(resource)).fileName())};
-        if (!destination.open(QIODevice::WriteOnly)) {
-            *error = tr("Could not write “%1”: %2")
-                         .arg(destination.fileName(), destination.errorString());
-            return false;
-        }
-
-        const QByteArray data = source.readAll();
-        if (destination.write(data) != data.size() || !destination.commit()) {
-            *error = tr("Could not write “%1”: %2")
-                         .arg(destination.fileName(), destination.errorString());
-            return false;
-        }
-    }
-
-    QString prefix = QDir::toNativeSeparators(target);
-    if (!prefix.endsWith(QDir::separator())) {
-        prefix += QDir::separator();
-    }
-    *directory = std::move(prefix);
-    return true;
 }
 
 // Tools → Reset Session
@@ -2301,20 +2130,15 @@ void MainWindow::commandChanged()
 
     auto &settings = SettingsManager::instance();
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-
-    // The binary name comes first when one is configured; without it the
-    // preview is the bare argument list, which must not start with a blank.
     const QString binary = hashcatPath.isEmpty() ? QString() : QFileInfo(hashcatPath).fileName();
-    const QStringList arguments = generateArguments();
 
-    const QString command = (binary.isEmpty() ? QString() : binary + QLatin1Char(' '))
-                            + displayArguments(arguments).join(QLatin1Char(' '));
+    const QString command = CommandPreview::format(binary, generateArguments());
     ui->lineEdit_command->setText(command);
     ui->lineEdit_command->setCursorPosition(0);
 
     // The line edit shows the beginning of the command only - it is as wide as
     // the window and the command is not. The tooltip carries all of it.
-    ui->lineEdit_command->setToolTip(commandTooltip(command));
+    ui->lineEdit_command->setToolTip(CommandPreview::tooltip(command));
 }
 
 HashcatOptions MainWindow::collectHashcatOptions()
