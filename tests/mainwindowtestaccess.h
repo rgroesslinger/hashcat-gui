@@ -7,6 +7,7 @@
 #define MAINWINDOWTESTACCESS_H
 
 #include "hashcatoptions.h"
+#include "hashtypeloader.h"
 #include "mainwindow.h"
 #include "statefile.h"
 
@@ -59,9 +60,14 @@ struct MainWindowTestAccess {
         window.addPcfgRulesetNameClicked();
     }
 
-    static void initHashAndAttackModes(MainWindow &window)
+    static void reloadHashTypes(MainWindow &window)
     {
-        window.initHashAndAttackModes();
+        window.reloadHashTypes();
+    }
+
+    static HashTypeLoader &hashTypeLoader(MainWindow &window)
+    {
+        return window.m_hashTypeLoader;
     }
 
     static void fitToContent(MainWindow &window)
@@ -72,11 +78,6 @@ struct MainWindowTestAccess {
     static QSize attackModeEnvelope(MainWindow &window, int wrapWidth)
     {
         return window.attackModeEnvelope(wrapWidth);
-    }
-
-    static QFutureWatcher<HashcatResult> *&hashTypeWatcher(MainWindow &window)
-    {
-        return window.m_hashTypeWatcher;
     }
 
     static int &pendingHashTypeId(MainWindow &window)

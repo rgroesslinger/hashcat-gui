@@ -34,7 +34,6 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMenu>
-#include <QPointer>
 #include <QRadioButton>
 #include <QScreen>
 #include <QScrollArea>
@@ -96,6 +95,8 @@ private slots:
     void theDefaultsMatchTheUiFiles();
     void switchingTheAttackModeRebuildsThePreviewOnce();
     void destroyingTheWindowWithListRowsIsSafe();
+    void changingTheBinaryKeepsTheAttackMode();
+    void importingSettingsReRunsTheQueryWhenTheBinaryChanged();
 
 private:
     MainWindowFixture m_fixture;
@@ -1219,7 +1220,7 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     MainWindow window;
 
     // The query runs off-thread; until the event loop delivers its result the
-    // combo stays parked in the state initHashAndAttackModes() put it in.
+    // combo stays parked in the state the first reload put it in.
     QVERIFY(!MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip(),
              QStringLiteral("Updating…"));
@@ -1367,12 +1368,16 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
     QTemporaryDir release;
     QVERIFY(release.isValid());
     const QString releaseFile = release.filePath(QStringLiteral("release"));
+    const QString markerFile = release.filePath(QStringLiteral("answered"));
 
     QByteArray slowScript = "#!/bin/sh\n"
                             "while [ ! -e '";
     slowScript += releaseFile.toUtf8();
     slowScript += "' ]; do sleep 0.05; done\n"
                   "printf '{\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+                  "printf done > '";
+    slowScript += markerFile.toUtf8();
+    slowScript += "'\n"
                   "exit 0\n";
 
     const QString slowStub =
@@ -1387,16 +1392,15 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
 
     MainWindow window;
 
-    // The first query is still on its way; it is the one that will answer last.
-    QPointer<QFutureWatcher<HashcatResult>> staleQuery =
-        MainWindowTestAccess::hashTypeWatcher(window);
-    QVERIFY2(!staleQuery.isNull(), "the first query was not started");
+    // The first query is still on its way; it is the one that will answer
+    // last. The stub writes a marker once it has printed its reply, so the
+    // test can wait for the stale answer without a watcher to observe.
     QVERIFY(!MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
 
-    // A second init supersedes it before the stub has answered.
+    // A second reload supersedes it before the stub has answered.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        clearPath ? QString() : fastStub);
-    MainWindowTestAccess::initHashAndAttackModes(window);
+    MainWindowTestAccess::reloadHashTypes(window);
 
     if (clearPath) {
         QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
@@ -1409,12 +1413,14 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
         QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
     }
 
-    // Let the first query answer. Its watcher is deleted once its reply is
-    // handled, so the pointer turning null proves the stale reply has arrived.
+    // Let the first query answer; the marker proves the stale reply was
+    // produced. The loader dropped that watcher when the second reload
+    // replaced it, so the reply cannot reach the combo.
     QFile releaseFlag(releaseFile);
     QVERIFY(releaseFlag.open(QIODevice::WriteOnly));
     releaseFlag.close();
-    QTRY_VERIFY_WITH_TIMEOUT(staleQuery.isNull(), AppConstants::Hashcat::QueryTimeoutMs);
+    QTRY_VERIFY_WITH_TIMEOUT(QFile::exists(markerFile), AppConstants::Hashcat::QueryTimeoutMs);
+    QTest::qWait(100);
 
     // The stale reply changed nothing: the current list is still the newer
     // one - or still empty after the path was cleared.
@@ -1545,6 +1551,94 @@ void TestMainWindow::destroyingTheWindowWithListRowsIsSafe()
 
     window.reset();
     QVERIFY(true);
+}
+
+// A settings change that reloads the hash types must not touch the attack
+// combo: refilling it would silently reset the mode to Straight.
+void TestMainWindow::changingTheBinaryKeepsTheAttackMode()
+{
+    const QString stubA = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-mode-a"),
+                                                          "#!/bin/sh\n"
+                                                          "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
+                                                          "exit 0\n");
+    const QString stubB = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-mode-b"), "#!/bin/sh\n"
+                                               "printf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"
+                                               "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stubA.isEmpty() && !stubB.isEmpty(), "the shell stubs could not be written");
+#endif
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(2); // brute-force
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_attack->currentData().toInt(),
+             static_cast<int>(AttackMode::BruteForce));
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.saveSettingsDialog = true;
+    recorder.start();
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubB);
+    QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
+
+    // The hash-type list is replaced - the selection resets, expected because
+    // the new binary may not offer the selected id - but the mode stays. Wait
+    // for the new id, not the count: both lists hold one entry.
+    QTRY_VERIFY_WITH_TIMEOUT(
+        MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt() == 1400U,
+        AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_attack->currentData().toInt(),
+             static_cast<int>(AttackMode::BruteForce));
+}
+
+// An import that changes the binary re-runs the hash-type query, exactly as
+// a save from the settings dialog does; the old list must not stay on screen.
+void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
+{
+    const QString stubA = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-import-a"),
+        "#!/bin/sh\n"
+        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+        "exit 0\n");
+    const QString stubB = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-import-b"), "#!/bin/sh\n"
+                                                 "printf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"
+                                                 "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stubA.isEmpty() && !stubB.isEmpty(), "the shell stubs could not be written");
+#endif
+
+    const QString file =
+        TestEnvironment::configHome().filePath(QStringLiteral("import-binary.json"));
+    QJsonObject values;
+    values.insert(QStringLiteral("hashcatPath"), stubB);
+    QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,
+                             AppConstants::Settings::Version, values, nullptr));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.saveSettingsDialog = true;
+    recorder.start();
+
+    QVERIFY(QMetaObject::invokeMethod(&window, "importSettingsTriggered"));
+
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
 }
 
 int main(int argc, char *argv[])

@@ -9,12 +9,12 @@
 #include "attackmodeview.h"
 #include "hashcatoptions.h"
 #include "hashcatrunner.h"
+#include "hashtypeloader.h"
 #include "launchvalidator.h"
 #include "pathlistcontroller.h"
 #include "statefile.h"
 
 #include <QComboBox>
-#include <QFutureWatcher>
 #include <QJsonObject>
 #include <QListWidgetItem>
 #include <QMainWindow>
@@ -141,7 +141,14 @@ private:
     // this suggestion.
     QString m_suggestedOutfile;
 
-    void initHashAndAttackModes();
+    // Fills the attack combo once, in the constructor; a settings change
+    // must not refill it and reset the selected mode.
+    void initAttackModes();
+    // Starts the hash-type query for the configured binary; never touches
+    // the attack combo.
+    void reloadHashTypes();
+    // The shared refresh after the settings were saved or imported.
+    void refreshAfterSettingsChange();
     // The example submenu is built once: initHashAndAttackModes() runs again
     // on settings changes, and adding the actions there would duplicate them.
     void initExampleSessionMenu();
@@ -238,16 +245,9 @@ private:
     // here and is applied once the items exist, see initHashAndAttackModes().
     int m_pendingHashTypeId = -1;
 
-    // The binary the current hash-type list came from. Settings re-runs the
-    // query when the configured path no longer matches, so a changed binary
-    // replaces the list instead of leaving the old one on screen.
-    QString m_queriedHashcatPath;
-
-    // The query of the latest initHashAndAttackModes() call. An earlier one
-    // can still be in flight, and its reply describes a binary this list no
-    // longer comes from: only the watcher held here may fill the combo. Null
-    // means no query is on its way.
-    QFutureWatcher<HashcatResult> *m_hashTypeWatcher = nullptr;
+    // The asynchronous hash-type query: the watcher, the stale-query guard
+    // and the parsed list. The window maps its signals onto the combo.
+    HashTypeLoader m_hashTypeLoader;
 };
 
 #endif // MAINWINDOW_H

@@ -13,8 +13,7 @@
 #include "commandpreview.h"
 #include "examples.h"
 #include "examplesession.h"
-#include "hashcatinfoparser.h"
-#include "hashcatrunner.h"
+#include "hashtypeloader.h"
 #include "launchmessage.h"
 #include "launchvalidator.h"
 #include "optioncollector.h"
@@ -112,7 +111,7 @@ QString suggestedExportPath(QLatin1StringView fileName)
 } // namespace
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), m_attackModeView(*ui)
+    : QMainWindow(parent), ui(new Ui::MainWindow), m_attackModeView(*ui), m_hashTypeLoader(this)
 {
     ui->setupUi(this);
 
@@ -236,13 +235,65 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto &settings = SettingsManager::instance();
 
-    initHashAndAttackModes();
+    // The loader's replies fill the hash combo. The connections come before
+    // the first reload, so the loading state is not missed.
+    connect(&m_hashTypeLoader, &HashTypeLoader::loadingChanged, this, [this](bool loading) {
+        ui->comboBox_hash_type->setEnabled(!loading);
+        if (loading) {
+            ui->comboBox_hash_type->setToolTip(tr("Updating…"));
+        }
+    });
+    connect(&m_hashTypeLoader, &HashTypeLoader::loaded, this,
+            [this](const QMap<quint32, QString> &hashTypes) {
+                ui->comboBox_hash_type->clear();
+                // fill the combobox, hash type id as item data
+                for (auto it = hashTypes.constBegin(); it != hashTypes.constEnd(); ++it) {
+                    ui->comboBox_hash_type->addItem(it.value(), it.key());
+                }
+                ui->comboBox_hash_type->setToolTip(QString());
+
+                // A session loaded while the combo was still empty could not
+                // select its hash type; apply the stored id now that the
+                // items exist, and consume it.
+                const QString problem = applyPendingHashType();
+                if (!problem.isEmpty()) {
+                    QMessageBox::warning(this, tr("Session warning"), problem);
+                }
+            });
+    connect(&m_hashTypeLoader, &HashTypeLoader::failed, this,
+            [this](const HashTypeFailure &failure) {
+                // The combo was disabled while the query ran. Restore its
+                // tooltip on every failure path so it does not stay stuck on
+                // "Updating…" forever.
+                ui->comboBox_hash_type->setToolTip(
+                    tr("The hash types could not be loaded. Check the hashcat path in Settings."));
+                // Exit codes changed in hashcat 8.0.0, but this only wants
+                // "did it work"; the GUI has no per-cause message, and a
+                // reader must not turn this into per-code handling.
+                QString error =
+                    tr("Failed to obtain supported hash types.\nError: %1").arg(failure.detail);
+#ifdef Q_OS_WIN
+                if (failure.kind == HashTypeFailure::Kind::Timeout) {
+                    // The FAQ names Windows Defender as the usual cause of a
+                    // query that runs into its deadline; on other platforms a
+                    // timeout has no such explanation to offer.
+                    error += tr("\n\nThis can be caused by Windows Defender or other "
+                                "antivirus software. See the <a href=\"%1\">FAQ entry</a> "
+                                "for a remedy.")
+                                 .arg(QString(AppConstants::Urls::FaqHashTypesTimeout));
+                }
+#endif
+                QMessageBox::warning(this, tr("Failed to load hash types"), error);
+            });
+
+    initAttackModes();
     initExampleSessionMenu();
     updateViewAttackMode();
     // The hash type list arrives asynchronously, but the recipe row can only
     // be hidden for the empty combo; every later change comes through the
     // connection set up below.
     updateHashTypeDependencies();
+    reloadHashTypes();
 
     /* ---------- save the session on quit ---------- */
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::saveSession);
@@ -819,12 +870,8 @@ void MainWindow::importSettingsTriggered()
 
     if (settingsDialog.exec() == QDialog::Accepted) {
         // An import can change the binary name and the short/long parameter
-        // choice too, so the preview and the hash types need the same refresh
-        // as after the settings were saved from the menu.
-        if (ui->comboBox_hash_type->count() == 0 && !m_hashTypeWatcher) {
-            initHashAndAttackModes();
-        }
-        commandChanged();
+        // choice too, so it gets the same refresh as a save from the menu.
+        refreshAfterSettingsChange();
     }
 }
 
@@ -995,19 +1042,7 @@ void MainWindow::settingsTriggered()
 {
     SettingsDialog settingsDialog(this);
     if (settingsDialog.exec() == QDialog::Accepted) {
-        // Re-run the query when the binary changed: its list replaces the one
-        // on screen - which resets the hash type selection, expected because
-        // the new binary may not offer the selected id - or when nothing was
-        // ever loaded, no query is on its way, and the path may be usable now.
-        const QString hashcatPath =
-            SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-        if (hashcatPath != m_queriedHashcatPath
-            || (ui->comboBox_hash_type->count() == 0 && !m_hashTypeWatcher)) {
-            initHashAndAttackModes();
-        }
-        // The settings can change the binary name and the short/long parameter
-        // choice, both of which are part of the preview.
-        commandChanged();
+        refreshAfterSettingsChange();
     }
 }
 
@@ -1218,130 +1253,47 @@ void MainWindow::initExampleSessionMenu()
     }
 }
 
-void MainWindow::initHashAndAttackModes()
+// Fills the attack combo once, in the constructor. The numeric id travels
+// as item data: the displayed text is what a translation changes, the id is
+// what has to end up on the command line. A settings change must not refill
+// it: that would silently reset the selected mode to Straight.
+void MainWindow::initAttackModes()
 {
-    // Refilling both combos is a bulk write: the preview rebuilds once after
-    // the refresh, not per item. The query's reply arrives later, outside the
-    // guard, and fills the hash combo through the normal signal path.
-    const CommandSilence silence(*this);
-
-    ui->comboBox_attack->clear();
-    ui->comboBox_hash_type->clear();
-
-    // A query of an earlier call may still be running: its reply describes a
-    // binary this list no longer comes from. Clearing the member invalidates
-    // it; the watcher below replaces it when this call starts a new query.
-    m_hashTypeWatcher = nullptr;
-
-    // Attack modes. The numeric id travels as item data: the displayed text
-    // is what a translation changes, the id is what has to end up on the
-    // command line.
     for (const AttackMode mode : AllAttackModes) {
         ui->comboBox_attack->addItem(AttackModeView::name(mode), static_cast<int>(mode));
     }
+}
 
-    // Hash types
-    auto &settings = SettingsManager::instance();
-    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-
-    // Remember which binary this list comes from. An empty path records
-    // "nothing queried" just as well, so the first configured path counts as
-    // a change too - see settingsTriggered().
-    m_queriedHashcatPath = hashcatPath;
-
-    if (!hashcatPath.isEmpty()) {
-        ui->comboBox_hash_type->setToolTip(tr("Updating…"));
-        ui->comboBox_hash_type->setEnabled(false);
-
-        // The watcher is destroyed once its reply is handled. It is the
-        // current query from here on, so the reply below is allowed to fill
-        // the combo.
-        auto *watcher = new QFutureWatcher<HashcatResult>(this);
-        m_hashTypeWatcher = watcher;
-
-        // When the future is finished, fill the combo with the parsed types.
-        connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher] {
-            const HashcatResult &result = watcher->result();
-            watcher->deleteLater();
-
-            // A later initHashAndAttackModes() call has superseded this query:
-            // its reply belongs to a binary the combo no longer shows, so it
-            // must not touch the list - and must not consume the hash type a
-            // session is still waiting for.
-            if (watcher != m_hashTypeWatcher) {
-                return;
-            }
-            m_hashTypeWatcher = nullptr;
-
-            QString error;
-            QString hashTypeProblem;
-
-            // Check if the command failed. Exit codes changed in hashcat
-            // 8.0.0 (-2 is now a wrong attack command, -12 an unusable file,
-            // -13 a bridge failure, all of them -1 before), but this only
-            // wants "did it work", and the GUI has no per-cause message: a
-            // reader must not turn this into per-code handling.
-            if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                error = tr("Failed to obtain supported hash types.\nError: %1")
-                            .arg(result.standardError);
-            } else {
-                QMap<quint32, QString> parsed;
-                if (HashcatInfoParser::parseExampleHashes(result.standardOutput, parsed, &error)) {
-                    ui->comboBox_hash_type->clear();
-
-                    // fill the combobox, hash type id as item data
-                    for (auto it = parsed.constBegin(); it != parsed.constEnd(); ++it) {
-                        ui->comboBox_hash_type->addItem(it.value(), it.key());
-                    }
-
-                    // A session loaded while the combo was still empty could
-                    // not select its hash type; apply the stored id now that
-                    // the items exist, and consume it.
-                    hashTypeProblem = applyPendingHashType();
-                }
-            }
-
-            // The combo was disabled while the query ran. Restore it on every
-            // path so a failed or malformed reply does not leave it stuck on
-            // the "Updating…" tooltip forever.
-            ui->comboBox_hash_type->setEnabled(true);
-            ui->comboBox_hash_type->setToolTip(error.isEmpty()
-                                                   ? QString()
-                                                   : tr("The hash types could not be loaded. Check "
-                                                        "the hashcat path in Settings."));
-
-            if (!error.isEmpty()) {
-#ifdef Q_OS_WIN
-                if (result.timedOut) {
-                    // The FAQ names Windows Defender as the usual cause of a
-                    // query that runs into its deadline; on other platforms a
-                    // timeout has no such explanation to offer.
-                    error += tr("\n\nThis can be caused by Windows Defender or other "
-                                "antivirus software. See the <a href=\"%1\">FAQ entry</a> "
-                                "for a remedy.")
-                                 .arg(QString(AppConstants::Urls::FaqHashTypesTimeout));
-                }
-#endif
-                QMessageBox::warning(this, tr("Failed to load hash types"), error);
-            } else if (!hashTypeProblem.isEmpty()) {
-                QMessageBox::warning(this, tr("Session warning"), hashTypeProblem);
-            }
-        });
-
-        // Assigned above, before the future is set: a query that finishes at
-        // once must not look stale to its own handler.
-        watcher->setFuture(HashcatRunner::execute(
-            hashcatPath, QStringList() << AppConstants::Hashcat::ExampleHashes
-                                       << AppConstants::Hashcat::MachineReadable));
-    } else {
+// Starts the hash-type query for the configured binary. Never touches the
+// attack combo - the mode the user selected survives a settings change.
+void MainWindow::reloadHashTypes()
+{
+    const QString hashcatPath =
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    if (hashcatPath.isEmpty()) {
         // A query an earlier call started disabled the combo. Without a new
         // one there is nothing to wait for, so it goes back to the user.
-        ui->comboBox_hash_type->setEnabled(true);
         ui->comboBox_hash_type->setToolTip(
             tr("Set the hashcat path under %1 → %2 to load the available hash types.")
                 .arg(menuPath(ui->menuFile->menuAction()->text()),
                      menuPath(ui->actionSettings->text())));
     }
+    m_hashTypeLoader.reload(hashcatPath);
+}
+
+// The refresh after the settings were saved or imported: re-run the query
+// when the binary changed - or when nothing was ever loaded and the path may
+// be usable now - and rebuild the preview, which carries the binary name and
+// the short/long parameter choice.
+void MainWindow::refreshAfterSettingsChange()
+{
+    const QString hashcatPath =
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    if (hashcatPath != m_hashTypeLoader.queriedPath()
+        || (ui->comboBox_hash_type->count() == 0 && !m_hashTypeLoader.isLoading())) {
+        reloadHashTypes();
+    }
+    commandChanged();
 }
 
 void MainWindow::attackIndexChanged([[maybe_unused]] int index)
