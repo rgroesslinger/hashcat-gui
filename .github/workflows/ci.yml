@@ -84,3 +84,32 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: ctest --test-dir build --output-on-failure --no-tests=error
+
+  # The teardown order of the list widgets and the watcher lifetimes are
+  # invariant territory: a sanitizer build runs the same suite on every push.
+  # Leak detection stays off - Qt and the platform plugins keep allocations
+  # alive past main(), which is not this code's leak to report.
+  sanitizers:
+    runs-on: ubuntu-26.04
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      CTEST_PARALLEL_LEVEL: 4
+      ASAN_OPTIONS: detect_leaks=0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential g++ cmake \
+            qt6-base-dev qt6-tools-dev qt6-l10n-tools desktop-file-utils
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-sanitize-recover=undefined -fno-omit-frame-pointer"
+          cmake --build build
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure --no-tests=error
