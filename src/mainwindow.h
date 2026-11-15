@@ -10,16 +10,16 @@
 #include "hashcatoptions.h"
 #include "hashcatrunner.h"
 #include "launchvalidator.h"
-#include "pathmonitor.h"
+#include "pathlistcontroller.h"
 #include "statefile.h"
 
 #include <QComboBox>
 #include <QFutureWatcher>
-#include <QIcon>
 #include <QJsonObject>
 #include <QListWidgetItem>
 #include <QMainWindow>
 #include <QShowEvent>
+#include <memory>
 
 namespace Ui
 {
@@ -71,8 +71,6 @@ private slots:
     void wordlistMoveUpClicked();
     void wordlistMoveDownClicked();
     void wordlistItemClicked(QListWidgetItem *item);
-    void refreshWordlistMonitor();
-    void wordlistAvailabilityChanged(const QString &path, bool available);
 
     // the PCFG, table and feed groups
     void addPcfgRulesetClicked();
@@ -81,12 +79,8 @@ private slots:
     void removePcfgRulesetClicked();
     void pcfgRulesetMoveUpClicked();
     void pcfgRulesetMoveDownClicked();
-    void refreshPcfgMonitor();
-    void pcfgAvailabilityChanged(const QString &path, bool available);
     void addTableClicked();
     void removeTableClicked();
-    void refreshTableMonitor();
-    void tableAvailabilityChanged(const QString &path, bool available);
     void addFeedClicked();
     void addFeedArgumentClicked();
     void removeFeedArgumentClicked();
@@ -134,17 +128,12 @@ private:
     // on every mode change and once per mode by the envelope measurement.
     AttackModeView m_attackModeView;
 
-    // Tell the rows of each list which of their paths hashcat can use.
-    PathMonitor m_wordlistMonitor{PathMonitor::Kind::Wordlist};
-    PathMonitor m_pcfgMonitor{PathMonitor::Kind::Pcfg};
-    PathMonitor m_tableMonitor{PathMonitor::Kind::Table};
-
-    // What a path row is decorated with: the type of the path while it is
-    // usable, the warning otherwise. Built once, because a refresh compares
-    // against them and does not want to rebuild the style's icons.
-    QIcon m_fileIcon;
-    QIcon m_folderIcon;
-    QIcon m_warningIcon;
+    // One controller per argument list: the rows, their checked state and
+    // the monitor decoration. Destroyed before delete ui, see the destructor.
+    std::unique_ptr<PathListController> m_wordlistList;
+    std::unique_ptr<PathListController> m_pcfgRulesetList;
+    std::unique_ptr<PathListController> m_tableList;
+    std::unique_ptr<PathListController> m_feedArgumentList;
 
     // The last outfile name generated from the hash file name, see
     // hashFileTextChanged(). It is not cleared when the user types a name of
@@ -171,15 +160,6 @@ private:
     // widgets.
     HashcatOptions collectHashcatOptions();
     QStringList generateArguments();
-
-    // Rebuilds a monitor's watched set from the rows of its list, and marks or
-    // clears one row. The row write blocks the list's signals: an icon is not
-    // a change to the command, so it must not rebuild the preview through
-    // itemChanged().
-    static void refreshMonitor(QListWidget *list, PathMonitor &monitor);
-    void setRowAvailability(QListWidget *list, PathMonitor::Kind kind, const QString &path,
-                            bool available);
-    static QString unavailableTooltip(PathMonitor::Kind kind, const QString &path);
 
     // Presents what LaunchValidator::validate() reported
     void showLaunchError(const LaunchValidator::LaunchProblem &problem,

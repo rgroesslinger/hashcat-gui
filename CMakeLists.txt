@@ -73,6 +73,8 @@ set(HASHCAT_GUI_SOURCES
     src/mainwindow.cpp
     src/optioncollector.h
     src/optioncollector.cpp
+    src/pathlistcontroller.h
+    src/pathlistcontroller.cpp
     src/settingsdialog.h
     src/settingsdialog.cpp
     src/sessiontransfer.h
@@ -187,6 +189,7 @@ set(HASHCAT_GUI_TESTS
     tst_layout
     tst_mainwindow
     tst_optioncollector
+    tst_pathlistcontroller
     tst_pathmonitor
     tst_session
     tst_sessiontransfer

@@ -18,12 +18,13 @@
 #include "launchmessage.h"
 #include "launchvalidator.h"
 #include "optioncollector.h"
+#include "pathlistcontroller.h"
+#include "pathmonitor.h"
 #include "sessiontransfer.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "statefile.h"
 #include "terminalcatalog.h"
-#include "textutils.h"
 #include "ui_mainwindow.h"
 
 #include <QAbstractButton>
@@ -129,9 +130,28 @@ MainWindow::MainWindow(QWidget *parent)
     // The path rows say what they are at a glance: a file, a folder, or the
     // warning of a path hashcat cannot use. The style owns the pixmaps, and
     // the rows are compared by icon key, so these are asked for once.
-    m_fileIcon = style()->standardIcon(QStyle::SP_FileIcon);
-    m_folderIcon = style()->standardIcon(QStyle::SP_DirIcon);
-    m_warningIcon = style()->standardIcon(QStyle::SP_MessageBoxWarning);
+    const QIcon fileIcon = style()->standardIcon(QStyle::SP_FileIcon);
+    const QIcon folderIcon = style()->standardIcon(QStyle::SP_DirIcon);
+    const QIcon warningIcon = style()->standardIcon(QStyle::SP_MessageBoxWarning);
+
+    // One controller per argument list: the rows, their checked state and
+    // the monitor decoration. They are destroyed before delete ui, see the
+    // destructor.
+    m_wordlistList =
+        std::make_unique<PathListController>(ui->listWidget_wordlist, PathMonitor::Kind::Wordlist,
+                                             fileIcon, folderIcon, warningIcon, nullptr);
+    m_pcfgRulesetList =
+        std::make_unique<PathListController>(ui->listWidget_pcfg_rulesets, PathMonitor::Kind::Pcfg,
+                                             fileIcon, folderIcon, warningIcon, nullptr);
+    m_tableList =
+        std::make_unique<PathListController>(ui->listWidget_tables, PathMonitor::Kind::Table,
+                                             fileIcon, folderIcon, warningIcon, nullptr);
+    m_feedArgumentList =
+        std::make_unique<PathListController>(ui->listWidget_feed_arguments, nullptr);
+    for (PathListController *controller : {m_wordlistList.get(), m_pcfgRulesetList.get(),
+                                           m_tableList.get(), m_feedArgumentList.get()}) {
+        connect(controller, &PathListController::changed, this, &MainWindow::commandChanged);
+    }
 
     // -s and -l take a plain number; a digit-only validator keeps a value
     // hashcat would refuse to start from ever reaching the command line.
@@ -347,13 +367,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionAboutQt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
 
     /* ---------- wordlist ---------- */
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this,
-            [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this,
-            [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsMoved, this,
-            [this] { commandChanged(); });
-    connect(ui->listWidget_wordlist, &QListWidget::itemChanged, this, [this] { commandChanged(); });
     connect(ui->listWidget_wordlist, &QListWidget::itemClicked, this,
             &MainWindow::wordlistItemClicked);
     connect(ui->pushButton_remove_wordlist, &QPushButton::clicked, this,
@@ -366,46 +379,7 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::wordlistMoveUpClicked);
     connect(ui->toolButton_wordlist_move_down, &QToolButton::clicked, this,
             &MainWindow::wordlistMoveDownClicked);
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsInserted, this,
-            &MainWindow::refreshWordlistMonitor);
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::rowsRemoved, this,
-            &MainWindow::refreshWordlistMonitor);
-    // clear() - and with it a session restore or a reset - resets the model
-    // instead of removing the rows one by one.
-    connect(ui->listWidget_wordlist->model(), &QAbstractItemModel::modelReset, this,
-            &MainWindow::refreshWordlistMonitor);
-    connect(&m_wordlistMonitor, &PathMonitor::availabilityChanged, this,
-            &MainWindow::wordlistAvailabilityChanged);
-
     /* ---------- PCFG, table and feed ---------- */
-    // The three editable lists announce every change through their model,
-    // which covers the in-place editing as well as the buttons.
-    for (QListWidget *list :
-         {ui->listWidget_pcfg_rulesets, ui->listWidget_tables, ui->listWidget_feed_arguments}) {
-        CheckedItemList::connectModelChanges(list, this, [this] { commandChanged(); });
-    }
-
-    // The two path lists own a monitor each. A session restore re-inserts
-    // their rows instead of editing them, so insertion and the model reset are
-    // the events that bring a path under watch.
-    connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::rowsInserted, this,
-            &MainWindow::refreshPcfgMonitor);
-    connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::rowsRemoved, this,
-            &MainWindow::refreshPcfgMonitor);
-    connect(ui->listWidget_pcfg_rulesets->model(), &QAbstractItemModel::modelReset, this,
-            &MainWindow::refreshPcfgMonitor);
-    connect(&m_pcfgMonitor, &PathMonitor::availabilityChanged, this,
-            &MainWindow::pcfgAvailabilityChanged);
-
-    connect(ui->listWidget_tables->model(), &QAbstractItemModel::rowsInserted, this,
-            &MainWindow::refreshTableMonitor);
-    connect(ui->listWidget_tables->model(), &QAbstractItemModel::rowsRemoved, this,
-            &MainWindow::refreshTableMonitor);
-    connect(ui->listWidget_tables->model(), &QAbstractItemModel::modelReset, this,
-            &MainWindow::refreshTableMonitor);
-    connect(&m_tableMonitor, &PathMonitor::availabilityChanged, this,
-            &MainWindow::tableAvailabilityChanged);
-
     connect(ui->pushButton_open_pcfg_ruleset, &QPushButton::clicked, this,
             &MainWindow::addPcfgRulesetClicked);
     connect(ui->pushButton_open_pcfg_ruleset_folder, &QPushButton::clicked, this,
@@ -503,13 +477,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    // QMainWindow destroys its child widgets only after the members are gone.
-    // Clearing a list then resets its model, and the handlers read ui and the
-    // monitor members, which have to be out of the picture by that point.
-    disconnect(ui->listWidget_wordlist->model(), nullptr, this, nullptr);
-    disconnect(ui->listWidget_pcfg_rulesets->model(), nullptr, this, nullptr);
-    disconnect(ui->listWidget_tables->model(), nullptr, this, nullptr);
-    disconnect(ui->listWidget_feed_arguments->model(), nullptr, this, nullptr);
+    // The controllers own connections into the list models. ~QListWidget
+    // resets its model while the connections still run, so they have to be
+    // gone before delete ui - being a child of the list would not help,
+    // rowsRemoved fires before ~QObject disconnects.
+    m_wordlistList.reset();
+    m_pcfgRulesetList.reset();
+    m_tableList.reset();
+    m_feedArgumentList.reset();
     delete ui;
 }
 
@@ -1430,7 +1405,7 @@ void MainWindow::openCachePathClicked()
 
 void MainWindow::removeWordlistClicked()
 {
-    CheckedItemList::removeSelected(ui->listWidget_wordlist);
+    m_wordlistList->removeSelected();
     ui->pushButton_remove_wordlist->setEnabled(false);
     ui->toolButton_wordlist_move_up->setEnabled(false);
     ui->toolButton_wordlist_move_down->setEnabled(false);
@@ -1438,29 +1413,27 @@ void MainWindow::removeWordlistClicked()
 
 void MainWindow::addWordlistClicked()
 {
-    CheckedItemList::addPaths(ui->listWidget_wordlist,
-                              QFileDialog::getOpenFileNames(this, tr("Add wordlists")));
+    m_wordlistList->addPaths(QFileDialog::getOpenFileNames(this, tr("Add wordlists")));
 }
 
 void MainWindow::addWordlistFolderClicked()
 {
     const QString folder = QFileDialog::getExistingDirectory(this, tr("Add wordlist folder"));
     if (!folder.isEmpty()) {
-        CheckedItemList::addPaths(ui->listWidget_wordlist, {folder});
+        m_wordlistList->addPaths({folder});
     }
 }
 
 void MainWindow::addPcfgRulesetClicked()
 {
-    CheckedItemList::addPaths(ui->listWidget_pcfg_rulesets,
-                              QFileDialog::getOpenFileNames(this, tr("Add rulesets")));
+    m_pcfgRulesetList->addPaths(QFileDialog::getOpenFileNames(this, tr("Add rulesets")));
 }
 
 void MainWindow::addPcfgRulesetFolderClicked()
 {
     const QString folder = QFileDialog::getExistingDirectory(this, tr("Add ruleset folder"));
     if (!folder.isEmpty()) {
-        CheckedItemList::addPaths(ui->listWidget_pcfg_rulesets, {folder});
+        m_pcfgRulesetList->addPaths({folder});
     }
 }
 
@@ -1472,28 +1445,27 @@ void MainWindow::addPcfgRulesetNameClicked()
 
 void MainWindow::removePcfgRulesetClicked()
 {
-    CheckedItemList::removeSelected(ui->listWidget_pcfg_rulesets);
+    m_pcfgRulesetList->removeSelected();
 }
 
 void MainWindow::pcfgRulesetMoveUpClicked()
 {
-    CheckedItemList::moveSelected(ui->listWidget_pcfg_rulesets, -1);
+    m_pcfgRulesetList->moveSelected(-1);
 }
 
 void MainWindow::pcfgRulesetMoveDownClicked()
 {
-    CheckedItemList::moveSelected(ui->listWidget_pcfg_rulesets, 1);
+    m_pcfgRulesetList->moveSelected(1);
 }
 
 void MainWindow::addTableClicked()
 {
-    CheckedItemList::addPaths(ui->listWidget_tables,
-                              QFileDialog::getOpenFileNames(this, tr("Add tables")));
+    m_tableList->addPaths(QFileDialog::getOpenFileNames(this, tr("Add tables")));
 }
 
 void MainWindow::removeTableClicked()
 {
-    CheckedItemList::removeSelected(ui->listWidget_tables);
+    m_tableList->removeSelected();
 }
 
 void MainWindow::addFeedClicked()
@@ -1521,27 +1493,27 @@ void MainWindow::addFeedArgumentClicked()
 
 void MainWindow::removeFeedArgumentClicked()
 {
-    CheckedItemList::removeSelected(ui->listWidget_feed_arguments);
+    m_feedArgumentList->removeSelected();
 }
 
 void MainWindow::feedArgumentMoveUpClicked()
 {
-    CheckedItemList::moveSelected(ui->listWidget_feed_arguments, -1);
+    m_feedArgumentList->moveSelected(-1);
 }
 
 void MainWindow::feedArgumentMoveDownClicked()
 {
-    CheckedItemList::moveSelected(ui->listWidget_feed_arguments, 1);
+    m_feedArgumentList->moveSelected(1);
 }
 
 void MainWindow::wordlistMoveUpClicked()
 {
-    CheckedItemList::moveSelected(ui->listWidget_wordlist, -1);
+    m_wordlistList->moveSelected(-1);
 }
 
 void MainWindow::wordlistMoveDownClicked()
 {
-    CheckedItemList::moveSelected(ui->listWidget_wordlist, 1);
+    m_wordlistList->moveSelected(1);
 }
 
 void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
@@ -1549,117 +1521,6 @@ void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
     ui->pushButton_remove_wordlist->setEnabled(true);
     ui->toolButton_wordlist_move_up->setEnabled(true);
     ui->toolButton_wordlist_move_down->setEnabled(true);
-}
-
-// The rows are the source of the watched paths: a path arrives through the file
-// dialog, a drop, a session or a reset, and all of them change the model.
-void MainWindow::refreshMonitor(QListWidget *list, PathMonitor &monitor)
-{
-    QStringList paths;
-    paths.reserve(list->count());
-    for (int i = 0; i < list->count(); ++i) {
-        paths << list->item(i)->text();
-    }
-    monitor.setPaths(paths);
-}
-
-// Why a row hashcat cannot use is unusable, in the terms of its list. The path
-// may contain markup-like text, so the result is escaped for the rich text
-// tooltip.
-QString MainWindow::unavailableTooltip(PathMonitor::Kind kind, const QString &path)
-{
-    const bool folder = QFileInfo(path).isDir();
-
-    switch (kind) {
-    case PathMonitor::Kind::Wordlist:
-        if (folder) {
-            return escapeRichText(tr("This folder has no wordlists. hashcat reads the regular "
-                                     "files directly inside it, not subfolders."));
-        }
-        return escapeRichText(tr("This wordlist does not exist:\n%1").arg(path));
-    case PathMonitor::Kind::Pcfg:
-        if (folder) {
-            return escapeRichText(
-                tr("This ruleset folder has no Grammar/grammar.txt:\n%1").arg(path));
-        }
-        return escapeRichText(tr("This ruleset does not exist:\n%1").arg(path));
-    case PathMonitor::Kind::Table:
-        if (folder) {
-            return escapeRichText(
-                tr("A table must be a file; hashcat does not read a folder:\n%1").arg(path));
-        }
-        return escapeRichText(tr("This table does not exist:\n%1").arg(path));
-    }
-
-    return {};
-}
-
-void MainWindow::setRowAvailability(QListWidget *list, PathMonitor::Kind kind, const QString &path,
-                                    bool available)
-{
-    // Writing an icon or a tooltip is an item change, which for every list
-    // rebuilds the preview. The blocker keeps that out: the decoration is not
-    // part of the command.
-    const QSignalBlocker blocker(list);
-
-    // A usable path shows what it is; an unusable one cannot be trusted with
-    // a type, so the warning takes the icon's place. A bundled ruleset name has
-    // neither a file nor a folder behind it and stays without one.
-    const QFileInfo info(path);
-    QIcon icon;
-    if (!available) {
-        icon = m_warningIcon;
-    } else if (info.isDir()) {
-        icon = m_folderIcon;
-    } else if (info.isFile()) {
-        icon = m_fileIcon;
-    }
-
-    const QString tooltip = available ? QString() : unavailableTooltip(kind, path);
-
-    for (int i = 0; i < list->count(); ++i) {
-        QListWidgetItem *item = list->item(i);
-        if (item->text() != path) {
-            continue;
-        }
-
-        if (item->icon().cacheKey() != icon.cacheKey()) {
-            item->setIcon(icon);
-        }
-        if (item->toolTip() != tooltip) {
-            item->setToolTip(tooltip);
-        }
-    }
-}
-
-void MainWindow::refreshWordlistMonitor()
-{
-    refreshMonitor(ui->listWidget_wordlist, m_wordlistMonitor);
-}
-
-void MainWindow::refreshPcfgMonitor()
-{
-    refreshMonitor(ui->listWidget_pcfg_rulesets, m_pcfgMonitor);
-}
-
-void MainWindow::refreshTableMonitor()
-{
-    refreshMonitor(ui->listWidget_tables, m_tableMonitor);
-}
-
-void MainWindow::wordlistAvailabilityChanged(const QString &path, bool available)
-{
-    setRowAvailability(ui->listWidget_wordlist, PathMonitor::Kind::Wordlist, path, available);
-}
-
-void MainWindow::pcfgAvailabilityChanged(const QString &path, bool available)
-{
-    setRowAvailability(ui->listWidget_pcfg_rulesets, PathMonitor::Kind::Pcfg, path, available);
-}
-
-void MainWindow::tableAvailabilityChanged(const QString &path, bool available)
-{
-    setRowAvailability(ui->listWidget_tables, PathMonitor::Kind::Table, path, available);
 }
 
 void MainWindow::rulesFile1Toggled(bool checked)

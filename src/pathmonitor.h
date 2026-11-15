@@ -39,6 +39,12 @@ public:
 
     explicit PathMonitor(Kind kind, QObject *parent = nullptr);
 
+    // What this monitor judges the paths by.
+    [[nodiscard]] Kind kind() const
+    {
+        return m_kind;
+    }
+
     // Replaces the watched set. Every path is reported, so a row that was just
     // inserted receives its state even when the path was watched before.
     void setPaths(const QStringList &paths);

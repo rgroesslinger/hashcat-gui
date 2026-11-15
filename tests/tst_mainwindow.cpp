@@ -95,6 +95,7 @@ private slots:
     void wordlistMoveSurvivesAMissingSelection();
     void theDefaultsMatchTheUiFiles();
     void switchingTheAttackModeRebuildsThePreviewOnce();
+    void destroyingTheWindowWithListRowsIsSafe();
 
 private:
     MainWindowFixture m_fixture;
@@ -1527,6 +1528,23 @@ void TestMainWindow::switchingTheAttackModeRebuildsThePreviewOnce()
     const int before = MainWindowTestAccess::previewRebuilds(window);
     MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(1);
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
+}
+
+// The list owners must be gone before delete ui: ~QListWidget resets its
+// model while the handlers still run, and a handler reading a dead member is
+// a crash. Rows in every list make the reset fire; the run under ASan is the
+// real proof.
+void TestMainWindow::destroyingTheWindowWithListRowsIsSafe()
+{
+    auto window = std::make_unique<MainWindow>();
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(*window);
+    CheckedItemList::addPaths(ui->listWidget_wordlist, {QStringLiteral("/tmp/a.txt")});
+    CheckedItemList::addPaths(ui->listWidget_pcfg_rulesets, {QStringLiteral("default-passwords")});
+    CheckedItemList::addPaths(ui->listWidget_tables, {QStringLiteral("/tmp/t.table")});
+    CheckedItemList::addPaths(ui->listWidget_feed_arguments, {QStringLiteral("arg")});
+
+    window.reset();
+    QVERIFY(true);
 }
 
 int main(int argc, char *argv[])
