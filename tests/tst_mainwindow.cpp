@@ -98,6 +98,7 @@ private slots:
     void switchingTheAttackModeRebuildsThePreviewOnce();
     void destroyingTheWindowWithListRowsIsSafe();
     void everyCommandWidgetReachesThePreview();
+    void listRowEventsRebuildThePreviewOnce();
     void changingTheBinaryKeepsTheAttackMode();
     void importingSettingsReRunsTheQueryWhenTheBinaryChanged();
 
@@ -1715,6 +1716,30 @@ void TestMainWindow::everyCommandWidgetReachesThePreview()
 
     // 41 line edits, 22 checkboxes, 2 radios, 6 spin boxes, 2 combos.
     QCOMPARE(touched, 73);
+}
+
+// One owner per connection: a single list row event rebuilds the preview
+// exactly once. The controller's changed() signal must not reach
+// commandChanged() through two connections.
+void TestMainWindow::listRowEventsRebuildThePreviewOnce()
+{
+    MainWindow window;
+    QListWidget *list = MainWindowTestAccess::ui(window)->listWidget_wordlist;
+
+    // A bare insert: one rowsInserted event.
+    const int beforeInsert = MainWindowTestAccess::previewRebuilds(window);
+    list->addItem(QStringLiteral("/tmp/a.txt"));
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - beforeInsert, 1);
+
+    // A check-state change: one itemChanged event.
+    const int beforeCheck = MainWindowTestAccess::previewRebuilds(window);
+    list->item(0)->setCheckState(Qt::Checked);
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - beforeCheck, 1);
+
+    // A removal: one rowsRemoved event.
+    const int beforeRemove = MainWindowTestAccess::previewRebuilds(window);
+    delete list->takeItem(0);
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - beforeRemove, 1);
 }
 
 int main(int argc, char *argv[])
