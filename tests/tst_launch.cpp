@@ -4,6 +4,7 @@
  */
 
 #include "appconstants.h"
+#include "checkeditemlist.h"
 #include "hashcatoptions.h"
 #include "launchvalidator.h"
 #include "mainwindow.h"
@@ -379,8 +380,8 @@ void TestLaunch::thePreviewFormattingIsPinned()
         MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(0));
     const QString pathA = QString(80, QLatin1Char('a'));
     const QString pathB = QString(80, QLatin1Char('b'));
-    MainWindowTestAccess::addPathsToList(MainWindowTestAccess::ui(window)->listWidget_wordlist,
-                                         {pathA, pathB});
+    CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_wordlist,
+                              {pathA, pathB});
     const QString wrappedCommand = QStringLiteral("stub-hashcat-preview --hash-type 0 "
                                                   "--attack-mode 0 ")
                                    + pathA + QLatin1Char(' ') + pathB;

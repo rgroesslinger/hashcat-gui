@@ -69,7 +69,7 @@ Four places, then preview and tests:
 - a field in `HashcatOptions` (`src/hashcatoptions.h`), defaulting to the widget's start value;
 - a `CommandBuilder::Parameter`, `parameterName()` entry and `build()` case; omit it at its
   default so the preview stays quiet;
-- the widget in `src/mainwindow.ui` and its read in `MainWindow::collectHashcatOptions()`;
+- the widget in `src/mainwindow.ui` and its read in `OptionCollector::collect()`;
 - a case in `tests/tst_commandbuilder.cpp`.
 
 Connect to `commandChanged()` once; the attack-mode combo uses `attackIndexChanged()` instead.

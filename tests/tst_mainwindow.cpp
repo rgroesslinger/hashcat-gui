@@ -4,6 +4,7 @@
  */
 
 #include "appconstants.h"
+#include "checkeditemlist.h"
 #include "commandbuilder.h"
 #include "examples.h"
 #include "hashcatoptions.h"
@@ -1023,27 +1024,27 @@ void TestMainWindow::addingPathsKeepsTheListClean()
     MainWindow window;
 
     QListWidget *wordlists = MainWindowTestAccess::ui(window)->listWidget_wordlist;
-    MainWindowTestAccess::addPathsToList(wordlists, {QStringLiteral("/tmp/a.txt"), QString(),
-                                                     QStringLiteral("/tmp/a.txt"),
-                                                     QStringLiteral("/tmp/b.txt")});
+    CheckedItemList::addPaths(wordlists,
+                              {QStringLiteral("/tmp/a.txt"), QString(),
+                               QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")});
     QCOMPARE(wordlists->count(), 2);
     QCOMPARE(wordlists->item(0)->text(), QDir::toNativeSeparators(QStringLiteral("/tmp/a.txt")));
     QCOMPARE(wordlists->item(0)->checkState(), Qt::Checked);
     QCOMPARE(wordlists->item(1)->checkState(), Qt::Checked);
 
     // A path that is already a row is not added twice.
-    MainWindowTestAccess::addPathsToList(wordlists, {QStringLiteral("/tmp/a.txt")});
+    CheckedItemList::addPaths(wordlists, {QStringLiteral("/tmp/a.txt")});
     QCOMPARE(wordlists->count(), 2);
 
     // Every list takes part in the command the same way: a new row starts
     // checked, and unchecking it keeps the row without passing it on.
     QListWidget *rulesets = MainWindowTestAccess::ui(window)->listWidget_pcfg_rulesets;
-    MainWindowTestAccess::addPathsToList(rulesets, {QStringLiteral("/tmp/one.pcfg")});
+    CheckedItemList::addPaths(rulesets, {QStringLiteral("/tmp/one.pcfg")});
     QCOMPARE(rulesets->count(), 1);
     QCOMPARE(rulesets->item(0)->checkState(), Qt::Checked);
 
     QListWidget *tables = MainWindowTestAccess::ui(window)->listWidget_tables;
-    MainWindowTestAccess::addPathsToList(tables, {QStringLiteral("/tmp/table.txt")});
+    CheckedItemList::addPaths(tables, {QStringLiteral("/tmp/table.txt")});
     QCOMPARE(tables->item(0)->checkState(), Qt::Checked);
 }
 

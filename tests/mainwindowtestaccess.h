@@ -74,11 +74,6 @@ struct MainWindowTestAccess {
         return window.attackModeEnvelope(wrapWidth);
     }
 
-    static void addPathsToList(QListWidget *list, const QStringList &paths)
-    {
-        MainWindow::addPathsToList(list, paths);
-    }
-
     static QFutureWatcher<HashcatResult> *&hashTypeWatcher(MainWindow &window)
     {
         return window.m_hashTypeWatcher;

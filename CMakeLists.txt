@@ -49,6 +49,8 @@ set(HASHCAT_GUI_SOURCES
     src/appconstants.h
     src/appearance.h
     src/appearance.cpp
+    src/checkeditemlist.h
+    src/checkeditemlist.cpp
     src/commandbuilder.h
     src/commandbuilder.cpp
     src/commandpreview.h
@@ -67,6 +69,8 @@ set(HASHCAT_GUI_SOURCES
     src/launchmessage.cpp
     src/mainwindow.h
     src/mainwindow.cpp
+    src/optioncollector.h
+    src/optioncollector.cpp
     src/settingsdialog.h
     src/settingsdialog.cpp
     src/sessiontransfer.h
@@ -179,6 +183,7 @@ set(HASHCAT_GUI_TESTS
     tst_launchvalidator
     tst_layout
     tst_mainwindow
+    tst_optioncollector
     tst_pathmonitor
     tst_session
     tst_sessiontransfer

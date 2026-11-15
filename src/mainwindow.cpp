@@ -7,6 +7,7 @@
 
 #include "aboutdialog.h"
 #include "appconstants.h"
+#include "checkeditemlist.h"
 #include "commandbuilder.h"
 #include "commandpreview.h"
 #include "examples.h"
@@ -15,6 +16,7 @@
 #include "hashcatrunner.h"
 #include "launchmessage.h"
 #include "launchvalidator.h"
+#include "optioncollector.h"
 #include "sessiontransfer.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
@@ -378,11 +380,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // which covers the in-place editing as well as the buttons.
     for (QListWidget *list :
          {ui->listWidget_pcfg_rulesets, ui->listWidget_tables, ui->listWidget_feed_arguments}) {
-        connect(list->model(), &QAbstractItemModel::rowsInserted, this,
-                [this] { commandChanged(); });
-        connect(list->model(), &QAbstractItemModel::rowsRemoved, this,
-                [this] { commandChanged(); });
-        connect(list, &QListWidget::itemChanged, this, [this] { commandChanged(); });
+        CheckedItemList::connectModelChanges(list, this, [this] { commandChanged(); });
     }
 
     // The two path lists own a monitor each. A session restore re-inserts
@@ -1559,131 +1557,70 @@ void MainWindow::openCachePathClicked()
 
 void MainWindow::removeWordlistClicked()
 {
-    removeSelectedRows(ui->listWidget_wordlist);
+    CheckedItemList::removeSelected(ui->listWidget_wordlist);
     ui->pushButton_remove_wordlist->setEnabled(false);
     ui->toolButton_wordlist_move_up->setEnabled(false);
     ui->toolButton_wordlist_move_down->setEnabled(false);
 }
 
-void MainWindow::addPathsToList(QListWidget *list, const QStringList &paths)
-{
-    // The file and folder dialogs and the ruleset name field end here: the
-    // paths that are not rows yet, once each, in the platform's own separator
-    // form. Every row starts checked; unchecking it later keeps the row in the
-    // list but leaves it out of the command.
-    for (const QString &path : paths) {
-        const QString native = QDir::toNativeSeparators(path);
-        if (native.isEmpty() || !list->findItems(native, Qt::MatchExactly).isEmpty()) {
-            continue;
-        }
-
-        auto *item = new QListWidgetItem(native, list);
-        item->setCheckState(Qt::Checked);
-    }
-}
-
 void MainWindow::addWordlistClicked()
 {
-    addPathsToList(ui->listWidget_wordlist,
-                   QFileDialog::getOpenFileNames(this, tr("Add wordlists")));
+    CheckedItemList::addPaths(ui->listWidget_wordlist,
+                              QFileDialog::getOpenFileNames(this, tr("Add wordlists")));
 }
 
 void MainWindow::addWordlistFolderClicked()
 {
     const QString folder = QFileDialog::getExistingDirectory(this, tr("Add wordlist folder"));
     if (!folder.isEmpty()) {
-        addPathsToList(ui->listWidget_wordlist, {folder});
+        CheckedItemList::addPaths(ui->listWidget_wordlist, {folder});
     }
-}
-
-QStringList MainWindow::checkedItems(const QListWidget *list)
-{
-    QStringList items;
-    items.reserve(list->count());
-    for (int i = 0; i < list->count(); ++i) {
-        const QListWidgetItem *item = list->item(i);
-        if (item->checkState() == Qt::Checked) {
-            items << item->text();
-        }
-    }
-    return items;
-}
-
-void MainWindow::removeSelectedRows(QListWidget *list)
-{
-    // The rows know their list and take themselves out of it when deleted.
-    const QList<QListWidgetItem *> selected = list->selectedItems();
-    for (QListWidgetItem *item : selected) {
-        delete item;
-    }
-    list->clearSelection();
-}
-
-void MainWindow::moveSelectedRow(QListWidget *list, int delta)
-{
-    // currentRow() is -1 when nothing is selected: without the guards below
-    // takeItem(-1) returns nullptr and the list ends up with a null entry.
-    const int currentRow = list->currentRow();
-    const int targetRow = currentRow + delta;
-    if (currentRow < 0 || targetRow < 0 || targetRow >= list->count()) {
-        return;
-    }
-    QListWidgetItem *item = list->takeItem(currentRow);
-    list->insertItem(targetRow, item);
-    list->setCurrentRow(targetRow);
 }
 
 void MainWindow::addPcfgRulesetClicked()
 {
-    addPathsToList(ui->listWidget_pcfg_rulesets,
-                   QFileDialog::getOpenFileNames(this, tr("Add rulesets")));
+    CheckedItemList::addPaths(ui->listWidget_pcfg_rulesets,
+                              QFileDialog::getOpenFileNames(this, tr("Add rulesets")));
 }
 
 void MainWindow::addPcfgRulesetFolderClicked()
 {
     const QString folder = QFileDialog::getExistingDirectory(this, tr("Add ruleset folder"));
     if (!folder.isEmpty()) {
-        addPathsToList(ui->listWidget_pcfg_rulesets, {folder});
+        CheckedItemList::addPaths(ui->listWidget_pcfg_rulesets, {folder});
     }
 }
 
 void MainWindow::addPcfgRulesetNameClicked()
 {
-    // A bundled or installed ruleset is a name the dialog cannot return, not a
-    // file. hashcat treats a name containing a slash as a path, so a pasted
-    // path works here too and needs no separate branch.
-    const QString name = ui->lineEdit_pcfg_ruleset_name->text().trimmed();
-    if (name.isEmpty()) {
-        return;
-    }
-
-    addPathsToList(ui->listWidget_pcfg_rulesets, {name});
+    CheckedItemList::addName(ui->listWidget_pcfg_rulesets, ui->lineEdit_pcfg_ruleset_name->text());
     ui->lineEdit_pcfg_ruleset_name->clear();
 }
 
 void MainWindow::removePcfgRulesetClicked()
 {
-    removeSelectedRows(ui->listWidget_pcfg_rulesets);
+    CheckedItemList::removeSelected(ui->listWidget_pcfg_rulesets);
 }
 
 void MainWindow::pcfgRulesetMoveUpClicked()
 {
-    moveSelectedRow(ui->listWidget_pcfg_rulesets, -1);
+    CheckedItemList::moveSelected(ui->listWidget_pcfg_rulesets, -1);
 }
 
 void MainWindow::pcfgRulesetMoveDownClicked()
 {
-    moveSelectedRow(ui->listWidget_pcfg_rulesets, 1);
+    CheckedItemList::moveSelected(ui->listWidget_pcfg_rulesets, 1);
 }
 
 void MainWindow::addTableClicked()
 {
-    addPathsToList(ui->listWidget_tables, QFileDialog::getOpenFileNames(this, tr("Add tables")));
+    CheckedItemList::addPaths(ui->listWidget_tables,
+                              QFileDialog::getOpenFileNames(this, tr("Add tables")));
 }
 
 void MainWindow::removeTableClicked()
 {
-    removeSelectedRows(ui->listWidget_tables);
+    CheckedItemList::removeSelected(ui->listWidget_tables);
 }
 
 void MainWindow::addFeedClicked()
@@ -1711,27 +1648,27 @@ void MainWindow::addFeedArgumentClicked()
 
 void MainWindow::removeFeedArgumentClicked()
 {
-    removeSelectedRows(ui->listWidget_feed_arguments);
+    CheckedItemList::removeSelected(ui->listWidget_feed_arguments);
 }
 
 void MainWindow::feedArgumentMoveUpClicked()
 {
-    moveSelectedRow(ui->listWidget_feed_arguments, -1);
+    CheckedItemList::moveSelected(ui->listWidget_feed_arguments, -1);
 }
 
 void MainWindow::feedArgumentMoveDownClicked()
 {
-    moveSelectedRow(ui->listWidget_feed_arguments, 1);
+    CheckedItemList::moveSelected(ui->listWidget_feed_arguments, 1);
 }
 
 void MainWindow::wordlistMoveUpClicked()
 {
-    moveSelectedRow(ui->listWidget_wordlist, -1);
+    CheckedItemList::moveSelected(ui->listWidget_wordlist, -1);
 }
 
 void MainWindow::wordlistMoveDownClicked()
 {
-    moveSelectedRow(ui->listWidget_wordlist, 1);
+    CheckedItemList::moveSelected(ui->listWidget_wordlist, 1);
 }
 
 void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
@@ -2062,141 +1999,8 @@ void MainWindow::commandChanged()
 
 HashcatOptions MainWindow::collectHashcatOptions()
 {
-    auto &settings = SettingsManager::instance();
-
-    HashcatOptions options;
-    options.useShortParameters =
-        settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
-
-    // currentData() is invalid while the hash type list has not been filled -
-    // no hashcat configured, or the query failed. CommandBuilder then leaves
-    // -m out entirely instead of asking for hash type 0.
-    const QVariant hashType = ui->comboBox_hash_type->currentData();
-    options.hashType = hashType.isValid() ? hashType.toInt() : -1;
-    options.hashRecipe = ui->lineEdit_hash_recipe->text();
-
-    options.attackMode = static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
-
-    options.remove = ui->checkBox_remove->isChecked();
-    options.ignoreUsername = ui->checkBox_ignoreusername->isChecked();
-
-    options.force = ui->checkBox_force->isChecked();
-    options.session = ui->lineEdit_session->text();
-    options.runtime = ui->spinBox_runtime->value();
-    options.skip = ui->lineEdit_skip->text();
-    options.limit = ui->lineEdit_limit->text();
-    options.status = ui->checkBox_status->isChecked();
-    options.statusTimer = ui->spinBox_status_timer->value();
-    options.potfileDisable = ui->checkBox_potfile_disable->isChecked();
-
-    if (ui->radioButton_use_rules_file->isChecked()) {
-        const std::array boxes = {ui->checkBox_rulesfile_1, ui->checkBox_rulesfile_2,
-                                  ui->checkBox_rulesfile_3};
-        const std::array edits = {ui->lineEdit_rulesfile_1, ui->lineEdit_rulesfile_2,
-                                  ui->lineEdit_rulesfile_3};
-        for (std::size_t i = 0; i < boxes.size(); ++i) {
-            if (boxes.at(i)->isChecked() && !edits.at(i)->text().isEmpty()) {
-                options.rulesFiles << edits.at(i)->text();
-            }
-        }
-        // Stored as a plain bool: the builder only emits it next to the -r
-        // files, so a ticked box with generated rules selected stays silent.
-        options.rulesConcat = ui->checkBox_rules_concat->isChecked();
-    } else if (ui->radioButton_generate_rules->isChecked()) {
-        options.generateRules = ui->spinBox_generate_rules->value();
-    }
-
-    options.ruleLeft = ui->lineEdit_rule_left->text();
-    options.ruleRight = ui->lineEdit_rule_right->text();
-
-    options.mask = ui->lineEdit_mask->text();
-    // The increment widgets are hidden in the modes that refuse the flag
-    // (mode 12), so a session that stored a checked box there must not put
-    // -i on the command line.
-    options.increment = CommandBuilder::attackUsesIncrement(options.attackMode)
-                        && ui->checkBox_increment->isChecked();
-    options.incrementMin = ui->spinBox_increment_min->value();
-    options.incrementMax = ui->spinBox_increment_max->value();
-    options.speedOnly = ui->checkBox_speed_only->isChecked();
-    options.optimizedKernel = ui->checkBox_optimized_kernel->isChecked();
-
-    const std::array charsetBoxes = {
-        ui->checkBox_custom_charset1,
-        ui->checkBox_custom_charset2,
-        ui->checkBox_custom_charset3,
-        ui->checkBox_custom_charset4,
-    };
-    const std::array charsetEdits = {
-        ui->lineEdit_custom_charset1,
-        ui->lineEdit_custom_charset2,
-        ui->lineEdit_custom_charset3,
-        ui->lineEdit_custom_charset4,
-    };
-    for (std::size_t i = 0; i < charsetBoxes.size(); ++i) {
-        options.customCharsets.at(i).enabled = charsetBoxes.at(i)->isChecked();
-        options.customCharsets.at(i).value = charsetEdits.at(i)->text();
-    }
-
-    options.hexCharset = ui->checkBox_hex_charset->isChecked();
-    options.hexSalt = ui->checkBox_hex_salt->isChecked();
-    options.hexWordlist = ui->checkBox_hex_wordlist->isChecked();
-    options.encodingFrom = ui->lineEdit_encoding_from->text();
-    options.encodingTo = ui->lineEdit_encoding_to->text();
-
-    options.outfileEnabled = ui->checkBox_outfile->isChecked();
-    options.outfile = ui->lineEdit_outfile->text();
-    options.outfileFormat = ui->lineEdit_outfile_format->text();
-    options.outfileJson = ui->checkBox_outfile_json->isChecked();
-    options.cachePath = ui->lineEdit_cache_path->text();
-    options.cpuAffinity = ui->lineEdit_cpu_affinity->text();
-    options.backendDevices = ui->lineEdit_backend_devices->text();
-    options.openclDeviceTypes = ui->lineEdit_opencl_device_types->text();
-    options.hwmonTempAbort = ui->checkBox_hwmon_temp_abort->isChecked();
-    options.hwmonTempAbortCelsius = ui->spinBox_hwmon_temp_abort->value();
-    options.hashFile = ui->lineEdit_hashfile->text();
-
-    // Every argument list - the wordlists included - passes only its checked
-    // rows: an unchecked row stays in the list and in the session, but not in
-    // the command.
-    options.wordlists = checkedItems(ui->listWidget_wordlist);
-
-    // The feed modes. Every value is read unconditionally: a disabled or
-    // hidden field can still hold a value a session stored, and the launch
-    // validation is where a combination that cannot work is refused.
-    const auto splitSettings = [](const QString &text) {
-        static const QRegularExpression separator{QStringLiteral("\\s+")};
-        return text.split(separator, Qt::SkipEmptyParts);
-    };
-
-    options.pcfgRulesets = checkedItems(ui->listWidget_pcfg_rulesets);
-    options.pcfgScale = ui->lineEdit_pcfg_scale->text().trimmed();
-    options.pcfgCostmax = ui->lineEdit_pcfg_costmax->text().trimmed();
-    options.pcfgWeights = ui->lineEdit_pcfg_weights->text().trimmed();
-    options.pcfgThreads = ui->lineEdit_pcfg_threads->text().trimmed();
-    options.pcfgKbits = ui->lineEdit_pcfg_kbits->text().trimmed();
-    options.pcfgMaxword = ui->lineEdit_pcfg_maxword->text().trimmed();
-    options.pcfgMaxgain = ui->lineEdit_pcfg_maxgain->text().trimmed();
-    options.pcfgWalk = ui->lineEdit_pcfg_walk->text().trimmed();
-    options.pcfgMask = ui->lineEdit_pcfg_mask->text().trimmed();
-    options.pcfgExtraSettings = splitSettings(ui->lineEdit_pcfg_extra->text());
-
-    options.tableFiles = checkedItems(ui->listWidget_tables);
-    options.tableIdentity = ui->lineEdit_table_identity->text().trimmed();
-    options.tableTemplate = ui->lineEdit_table_template->text().trimmed();
-    options.tableSingle = ui->lineEdit_table_single->text().trimmed();
-    options.tableCap = ui->lineEdit_table_cap->text().trimmed();
-    options.tableMaxperm = ui->lineEdit_table_maxperm->text().trimmed();
-    options.tableExtraSettings = splitSettings(ui->lineEdit_table_extra->text());
-
-    options.feedName = ui->lineEdit_feed->text().trimmed();
-    options.feedArguments = checkedItems(ui->listWidget_feed_arguments);
-
-    // The settings line of mode 9 stays as typed even next to a wordlist:
-    // the launch validation names both controls instead of silently dropping
-    // what the user typed, and the preview keeps showing it.
-    options.associationSettings = splitSettings(ui->lineEdit_association_settings->text());
-
-    return options;
+    return OptionCollector::collect(*ui, SettingsManager::instance().getKey<bool>(
+                                             AppConstants::SettingsKeys::UseShortParameters));
 }
 
 QStringList MainWindow::generateArguments()

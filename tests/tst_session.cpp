@@ -4,6 +4,7 @@
  */
 
 #include "appconstants.h"
+#include "checkeditemlist.h"
 #include "mainwindow.h"
 #include "mainwindowtestaccess.h"
 #include "mainwindowtesthelpers.h"
@@ -1058,11 +1059,10 @@ void TestSession::aNoOpApplyWithRowsRebuildsThePreviewOnce()
     MainWindow window;
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
                              5000);
-    MainWindowTestAccess::addPathsToList(MainWindowTestAccess::ui(window)->listWidget_wordlist,
-                                         {QStringLiteral("/tmp/one.txt")});
-    MainWindowTestAccess::addPathsToList(
-        MainWindowTestAccess::ui(window)->listWidget_feed_arguments,
-        {QStringLiteral("arg one"), QStringLiteral("arg two")});
+    CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_wordlist,
+                              {QStringLiteral("/tmp/one.txt")});
+    CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_feed_arguments,
+                              {QStringLiteral("arg one"), QStringLiteral("arg two")});
 
     StateFile::Document document;
     document.status = StateFile::Status::Read;
