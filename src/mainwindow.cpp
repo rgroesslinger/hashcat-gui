@@ -454,14 +454,14 @@ void MainWindow::connectListSignals()
 
 void MainWindow::connectDependencySignals()
 {
-    // The rule-file fields follow their own boxes; the radio pair decides
-    // which side applies at all, see updateRulesDependencies().
-    bindEnabled(ui->checkBox_rulesfile_1,
-                {ui->lineEdit_rulesfile_1, ui->pushButton_open_rulesfile_1});
-    bindEnabled(ui->checkBox_rulesfile_2,
-                {ui->lineEdit_rulesfile_2, ui->pushButton_open_rulesfile_2});
-    bindEnabled(ui->checkBox_rulesfile_3,
-                {ui->lineEdit_rulesfile_3, ui->pushButton_open_rulesfile_3});
+    // The radios and the file boxes all feed the same predicate, so one slot
+    // owns the whole rules choice - see updateRulesDependencies().
+    connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this,
+            &MainWindow::updateRulesDependencies);
+    connect(ui->checkBox_rulesfile_2, &QCheckBox::toggled, this,
+            &MainWindow::updateRulesDependencies);
+    connect(ui->checkBox_rulesfile_3, &QCheckBox::toggled, this,
+            &MainWindow::updateRulesDependencies);
     bindEnabled(ui->radioButton_generate_rules, {ui->spinBox_generate_rules});
     connect(ui->radioButton_use_rules_file, &QRadioButton::toggled, this,
             &MainWindow::updateRulesDependencies);
@@ -1409,10 +1409,10 @@ void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
     ui->toolButton_wordlist_move_down->setEnabled(true);
 }
 
-// The cross-state half of the rules choice: which side applies at all. The
-// fields' own boxes are bound separately (bindEnabled); this slot runs on
-// the radio pair only, so a session that ticks a file box under the
-// generated side keeps the field state that box's own connection set.
+// The one owner of the rules choice's enable state: the radio pair decides
+// which side applies at all, each file box whether its field is live. Every
+// widget feeding the predicate is connected here, so a session that ticks a
+// file box under the generated side cannot enable its field.
 void MainWindow::updateRulesDependencies()
 {
     const bool useFiles = ui->radioButton_use_rules_file->isChecked();

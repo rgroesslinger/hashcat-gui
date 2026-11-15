@@ -74,6 +74,7 @@ private slots:
     void loadExampleSessionUnpacksItsDataFiles();
     void optionDependenciesFollowTheirCheckboxes();
     void outfileJsonTakesOverFromTheFormatField();
+    void rulesFileFieldsObeyTheGeneratedSide();
     void modeHintFollowsTheAttackMode();
     void hashRecipeRowFollowsTheHashType();
     void widgetsFlowIntoTheOptions();
@@ -558,6 +559,40 @@ void TestMainWindow::outfileJsonTakesOverFromTheFormatField()
     QVERIFY(!MainWindowTestAccess::ui(window)->checkBox_rules_concat->isEnabled());
     MainWindowTestAccess::ui(window)->radioButton_use_rules_file->setChecked(true);
     QVERIFY(MainWindowTestAccess::ui(window)->checkBox_rules_concat->isEnabled());
+}
+
+// An import applies the file boxes without touching the radio pair, so a
+// session that ticks one under the generated side must not enable its field:
+// the whole rules choice belongs to updateRulesDependencies().
+void TestMainWindow::rulesFileFieldsObeyTheGeneratedSide()
+{
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    ui->radioButton_generate_rules->setChecked(true);
+    QVERIFY(!ui->lineEdit_rulesfile_1->isEnabled());
+    QVERIFY(!ui->pushButton_open_rulesfile_1->isEnabled());
+
+    QJsonObject values;
+    values.insert(QStringLiteral("checkBox_rulesfile_1"), true);
+    values.insert(QStringLiteral("radioButton_generate_rules"), true);
+    values.insert(QStringLiteral("radioButton_use_rules_file"), false);
+    StateFile::Document document;
+    document.status = StateFile::Status::Read;
+    document.version = AppConstants::Sessions::Version;
+    document.values = values;
+    QVERIFY(MainWindowTestAccess::applySessionFile(window, document).isEmpty());
+
+    QVERIFY(!ui->lineEdit_rulesfile_1->isEnabled());
+    QVERIFY(!ui->pushButton_open_rulesfile_1->isEnabled());
+
+    // The files side takes the ticked box over; unticking it switches the
+    // field off again without touching the side.
+    ui->radioButton_use_rules_file->setChecked(true);
+    QVERIFY(ui->lineEdit_rulesfile_1->isEnabled());
+    QVERIFY(ui->pushButton_open_rulesfile_1->isEnabled());
+    ui->checkBox_rulesfile_1->setChecked(false);
+    QVERIFY(!ui->lineEdit_rulesfile_1->isEnabled());
+    QVERIFY(!ui->pushButton_open_rulesfile_1->isEnabled());
 }
 
 // The hint under the mode selector has to tell the user what the mode needs,
