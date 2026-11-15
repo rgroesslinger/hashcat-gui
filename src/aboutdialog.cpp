@@ -6,7 +6,7 @@
 #include "aboutdialog.h"
 
 #include "appconstants.h"
-#include "helperutils.h"
+#include "hashcatrunner.h"
 #include "settingsmanager.h"
 #include "ui_aboutdialog.h"
 #include "updatechecker.h"
@@ -273,7 +273,7 @@ void AboutDialog::updateVersionLabel()
         });
 
         watcher->setFuture(
-            HelperUtils::executeHashcat(QStringList() << AppConstants::Hashcat::Version));
+            HashcatRunner::execute(path, QStringList() << AppConstants::Hashcat::Version));
     }
 
     ui->label_hc_gui_version->setText(QApplication::applicationVersion());

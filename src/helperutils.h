@@ -8,37 +8,13 @@
 
 #include "appconstants.h"
 #include "hashcatoptions.h"
+#include "hashcatrunner.h"
 
 #include <QCoreApplication>
 #include <QFuture>
-#include <QMap>
-#include <QProcess>
 #include <QString>
 #include <QStringList>
 #include <cstdint>
-
-// Result of a single hashcat invocation.
-//
-// The status members default to "no process ran", so an early return (missing
-// configuration, process never started, timeout) cannot look like a successful
-// run to the consumers that check exitStatus/exitCode first.
-struct HashcatResult {
-    QProcess::ExitStatus exitStatus = QProcess::CrashExit;
-    int exitCode = -1;
-    // The query hit its deadline. The status members alone cannot tell that
-    // from a crash: the process was killed to end the wait.
-    bool timedOut = false;
-    QString standardOutput;
-    QString standardError;
-};
-
-// The program and the arguments that start hashcat in a terminal. An empty
-// program means the launch is refused: the terminal is unknown, or the
-// command line would exceed the length a Windows process can take.
-struct LaunchCommand {
-    QString program;
-    QStringList arguments;
-};
 
 class HelperUtils
 {
@@ -107,35 +83,11 @@ public:
     // the group boxes, the mode hint and this check cannot disagree.
     static LaunchError validateOptions(const HashcatOptions &options, QString *detail = nullptr);
 
+    // Reads the configured path on the calling thread and forwards to
+    // HashcatRunner::execute(). The callers that already hold the path use
+    // the runner directly.
     static QFuture<HashcatResult>
     executeHashcat(const QStringList &args, int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
-
-    // Every supported terminal and the arguments that belong between the
-    // terminal program and the hashcat command line. Pure data - nothing
-    // here looks at the filesystem - so the tests can pin every entry.
-    // PowerShell and pwsh are discovered through this table but launched
-    // through launchCommand(); their entries hold no arguments.
-    static const QMap<QString, QStringList> &terminalArguments();
-
-    // The command line that starts hashcat in the given terminal, built
-    // without starting anything. PowerShell and pwsh get an -EncodedCommand
-    // script that quotes every token, so no hash, mask, path or session value
-    // is ever parsed as shell code; every other terminal execs hashcat
-    // directly. keepOpen asks the terminal to stay open after hashcat exits.
-    static LaunchCommand launchCommand(const QString &terminal, const QString &hashcatPath,
-                                       const QStringList &arguments, bool keepOpen);
-
-    static QMap<QString, QStringList> availableTerminals();
-
-    // The hashcat executable on the PATH, empty when this system has none.
-    //
-    // The settings dialog only offers it: a configured path is never replaced
-    // by the one this lookup finds.
-    static QString findHashcatInPath();
-
-    // The note the settings dialog and a failed launch both show when this
-    // system has no terminal hashcat-gui can start hashcat in.
-    static QString noSupportedTerminalMessage();
 
     // Applies the color scheme the user chose.
     //

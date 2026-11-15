@@ -10,10 +10,12 @@
 #include "commandbuilder.h"
 #include "examples.h"
 #include "hashcatinfoparser.h"
+#include "hashcatrunner.h"
 #include "helperutils.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "statefile.h"
+#include "terminalcatalog.h"
 #include "ui_mainwindow.h"
 #include "widgetstateserializer.h"
 
@@ -48,11 +50,6 @@
 
 #include <array>
 #include <utility>
-
-#ifdef Q_OS_WIN
-#include <process.h>
-#include <windows.h>
-#endif
 
 namespace
 {
@@ -1635,9 +1632,9 @@ void MainWindow::initHashAndAttackModes()
 
         // Assigned above, before the future is set: a query that finishes at
         // once must not look stale to its own handler.
-        watcher->setFuture(HelperUtils::executeHashcat(QStringList()
-                                                       << AppConstants::Hashcat::ExampleHashes
-                                                       << AppConstants::Hashcat::MachineReadable));
+        watcher->setFuture(HashcatRunner::execute(
+            hashcatPath, QStringList() << AppConstants::Hashcat::ExampleHashes
+                                       << AppConstants::Hashcat::MachineReadable));
     } else {
         // A query an earlier call started disabled the combo. Without a new
         // one there is nothing to wait for, so it goes back to the user.
@@ -2248,7 +2245,7 @@ void MainWindow::startClicked()
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     const QString configuredTerminal =
         settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
-    const QMap<QString, QStringList> availableTerminals = HelperUtils::availableTerminals();
+    const QMap<QString, QStringList> availableTerminals = TerminalCatalog::availableTerminals();
 
     // Nothing is started unless the configuration is known to be complete.
     const HelperUtils::LaunchError error =
@@ -2263,7 +2260,7 @@ void MainWindow::startClicked()
     // encoded script, so no hash, mask, path or session value is parsed as
     // shell code. The terminal stays open after hashcat exits, as before.
     const LaunchCommand command =
-        HelperUtils::launchCommand(configuredTerminal, hashcatPath, generateArguments(), true);
+        TerminalCatalog::launchCommand(configuredTerminal, hashcatPath, generateArguments(), true);
     if (command.program.isEmpty()) {
         QMessageBox::warning(this, tr("Launch failed"),
                              tr("The command line is too long for the terminal. Shorten the "
@@ -2271,22 +2268,10 @@ void MainWindow::startClicked()
         return;
     }
 
-    QProcess proc;
-
-#ifdef Q_OS_WIN
-    /* Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal */
-    proc.setCreateProcessArgumentsModifier(
-        [](QProcess::CreateProcessArguments *args) { args->flags |= CREATE_NEW_CONSOLE; });
-#endif
-
-    proc.setProgram(command.program);
-    proc.setArguments(command.arguments);
-    proc.setWorkingDirectory(QFileInfo(hashcatPath).absolutePath());
-
-    if (!proc.startDetached()) {
-        QMessageBox::warning(
-            this, tr("Launch failed"),
-            tr("Could not start “%1”: %2").arg(configuredTerminal, proc.errorString()));
+    QString launchError;
+    if (!TerminalCatalog::launchDetached(command, hashcatPath, &launchError)) {
+        QMessageBox::warning(this, tr("Launch failed"),
+                             tr("Could not start “%1”: %2").arg(configuredTerminal, launchError));
     }
 }
 
@@ -2333,7 +2318,7 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
         break;
 
     case HelperUtils::LaunchError::NoTerminals:
-        box.setText(HelperUtils::noSupportedTerminalMessage());
+        box.setText(TerminalCatalog::noSupportedTerminalMessage());
         break;
 
     case HelperUtils::LaunchError::UnknownTerminal:

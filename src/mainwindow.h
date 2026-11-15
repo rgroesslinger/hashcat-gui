@@ -7,6 +7,7 @@
 #define MAINWINDOW_H
 
 #include "hashcatoptions.h"
+#include "hashcatrunner.h"
 #include "helperutils.h"
 #include "pathmonitor.h"
 

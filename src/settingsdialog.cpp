@@ -9,6 +9,7 @@
 #include "helperutils.h"
 #include "settingsmanager.h"
 #include "statefile.h"
+#include "terminalcatalog.h"
 #include "ui_settingsdialog.h"
 
 #include <QDesktopServices>
@@ -154,7 +155,7 @@ void SettingsDialog::readSettings()
 
     // The combos are filled first: a stored value can only find its entry
     // once the entries exist.
-    QMap<QString, QStringList> availableTerminals = HelperUtils::availableTerminals();
+    QMap<QString, QStringList> availableTerminals = TerminalCatalog::availableTerminals();
     ui->comboBox_terminal->addItems(availableTerminals.keys());
     ui->comboBox_terminal->setPlaceholderText(tr("Select a terminal"));
 
@@ -192,7 +193,7 @@ void SettingsDialog::readSettings()
     // an empty field is filled - a path the user chose is never replaced - and
     // nothing is stored until Save.
     if (ui->lineEdit_hc_path->text().isEmpty()) {
-        const QString onPath = HelperUtils::findHashcatInPath();
+        const QString onPath = TerminalCatalog::findHashcatInPath();
         if (!onPath.isEmpty()) {
             ui->lineEdit_hc_path->setText(QDir::toNativeSeparators(onPath));
         }
@@ -485,7 +486,7 @@ void SettingsDialog::updateHashcatStatus()
 void SettingsDialog::updateTerminalStatus()
 {
     if (ui->comboBox_terminal->count() == 0) {
-        ui->label_terminal_status->setText(HelperUtils::noSupportedTerminalMessage());
+        ui->label_terminal_status->setText(TerminalCatalog::noSupportedTerminalMessage());
         ui->label_terminal_status->setVisible(true);
         return;
     }
