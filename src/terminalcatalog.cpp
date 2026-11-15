@@ -6,6 +6,7 @@
 #include "terminalcatalog.h"
 
 #include "appconstants.h"
+#include "argumentquoting.h"
 
 #include <QFileInfo>
 #include <QProcess>
@@ -123,11 +124,27 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal, const QStr
     // hashes, masks, outfiles and session values would run as expressions.
     // -EncodedCommand takes the script as UTF-16LE base64 instead, and the
     // script quotes every token, so nothing a session carries can execute.
+    //
+    // The script starts hashcat through ProcessStartInfo, not through
+    // PowerShell's own native invocation: Windows PowerShell 5.1 (and pwsh
+    // before 7.3) does not escape embedded quotes on the way to a native
+    // command line and drops empty arguments. ProcessStartInfo.Arguments is
+    // used verbatim by CreateProcess, so the MSVCRT quoting here is the only
+    // transformation between the collected argv and hashcat's argv, on every
+    // PowerShell version.
+    //
+    // WaitForExit holds the session while hashcat runs; the script must not
+    // call exit afterwards - an explicit exit ends the session even under
+    // -NoExit and would close the terminal the moment hashcat is done.
     if (terminal == QStringLiteral("powershell.exe") || terminal == QStringLiteral("pwsh")) {
-        QString script = QStringLiteral("& ") + powerShellToken(hashcatPath);
-        for (const QString &argument : arguments) {
-            script += QStringLiteral(" ") + powerShellToken(argument);
-        }
+        QString script =
+            QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo\n$si.FileName = ")
+            + powerShellToken(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
+            + powerShellToken(msvcrtJoinArguments(arguments))
+            + QStringLiteral("\n$si.UseShellExecute = $false\n$si.WorkingDirectory = ")
+            + powerShellToken(QFileInfo(hashcatPath).absolutePath())
+            + QStringLiteral("\n$p = [System.Diagnostics.Process]::Start($si)\n"
+                             "$p.WaitForExit()");
 
         QStringEncoder encoder(QStringEncoder::Utf16LE);
         const QByteArray encodedBytes = encoder.encode(script);

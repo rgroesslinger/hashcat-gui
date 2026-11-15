@@ -48,9 +48,11 @@ public:
 
     // The command line that starts hashcat in the given terminal, built
     // without starting anything. PowerShell and pwsh get an -EncodedCommand
-    // script that quotes every token, so no hash, mask, path or session value
-    // is ever parsed as shell code; every other terminal execs hashcat
-    // directly. keepOpen asks the terminal to stay open after hashcat exits.
+    // script that quotes every token and starts hashcat through
+    // ProcessStartInfo, so no hash, mask, path or session value is ever
+    // parsed as shell code or rewritten by PowerShell's own native argument
+    // passing; every other terminal execs hashcat directly. keepOpen asks
+    // the terminal to stay open after hashcat exits.
     static LaunchCommand launchCommand(const QString &terminal, const QString &hashcatPath,
                                        const QStringList &arguments, bool keepOpen);
 

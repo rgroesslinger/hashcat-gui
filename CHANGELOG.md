@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- The PowerShell launch now starts hashcat through `ProcessStartInfo` with a pre-quoted command line, on every PowerShell version. Windows PowerShell 5.1 (and pwsh before 7.3) mangled embedded double quotes and dropped empty arguments when handing the command line to hashcat, so a recipe like `md5($p."salt")` arrived corrupted
 - The attack mode survives a settings change that reloads the hash types; previously the mode selector was refilled and silently jumped back to Straight
 - Importing settings re-runs the hash-type query when the hashcat binary changed, as the settings dialog already did; previously the old list stayed on screen
 - Fixed the PowerShell launch quoting. `powershell.exe` and `pwsh` received the hashcat command line after `-Command &`, which re-parsed hashes, masks, paths and session values as PowerShell code - a crafted session file could run arbitrary commands on Execute. The launch now uses `-EncodedCommand` with every token quoted, so no user value is parsed as code, and an overlong command line is refused instead of truncated

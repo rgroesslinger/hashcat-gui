@@ -4,11 +4,13 @@
  */
 
 #include "appconstants.h"
+#include "argumentquoting.h"
 #include "terminalcatalog.h"
 #include "testenvironment.h"
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -29,6 +31,48 @@ QString decodeScript(const QString &encoded)
     const QByteArray bytes = QByteArray::fromBase64(encoded.toLatin1());
     return decoder.decode(bytes);
 }
+
+// The shell and the helper for the launches that need a real PowerShell;
+// empty when absent, so the caller can skip. Windows PowerShell 5.1 is the
+// stricter tokenizer, so it is preferred where both shells exist.
+QString findPowerShell()
+{
+    for (const QString &name : {QStringLiteral("powershell.exe"), QStringLiteral("pwsh")}) {
+        if (!QStandardPaths::findExecutable(name).isEmpty()) {
+            return name;
+        }
+    }
+    return {};
+}
+
+QString findArgEcho()
+{
+#ifdef Q_OS_WIN
+    const QString helper =
+        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho.exe"));
+#else
+    const QString helper =
+        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho"));
+#endif
+    return QFile::exists(helper) ? helper : QString();
+}
+
+// A failed check must not leave the shell behind: -NoExit holds it forever.
+struct ShellGuard {
+    QProcess *proc;
+    explicit ShellGuard(QProcess *p) : proc(p) {}
+    ~ShellGuard()
+    {
+        if (proc->state() != QProcess::NotRunning) {
+            proc->kill();
+            proc->waitForFinished(5000);
+        }
+    }
+    ShellGuard(const ShellGuard &) = delete;
+    ShellGuard &operator=(const ShellGuard &) = delete;
+    ShellGuard(ShellGuard &&) = delete;
+    ShellGuard &operator=(ShellGuard &&) = delete;
+};
 } // namespace
 
 // The terminal table, the launch command line and the detached start.
@@ -49,6 +93,8 @@ private slots:
     void launchCommandRefusesAnUnknownTerminal();
     void launchCommandRoundTripsThroughPowerShell_data();
     void launchCommandRoundTripsThroughPowerShell();
+    void launchCommandKeepOpenHoldsTheSession_data();
+    void launchCommandKeepOpenHoldsTheSession();
     void findHashcatInPathFindsTheExecutable();
     void findHashcatInPathProbesBothUnixNames_data();
     void findHashcatInPathProbesBothUnixNames();
@@ -109,7 +155,9 @@ void TestTerminalCatalog::launchCommandExecsUnixTerminalsDirectly()
 }
 
 // The PowerShell launch carries its script as UTF-16LE base64; the flags are
-// fixed, and -NoExit appears only while the terminal should stay open.
+// fixed, and -NoExit appears only while the terminal should stay open. The
+// script starts hashcat through ProcessStartInfo with a verbatim Arguments
+// string - PowerShell's own native argument passing never sees the tokens.
 void TestTerminalCatalog::launchCommandEncodesTheScript_data()
 {
     QTest::addColumn<QString>("terminal");
@@ -142,36 +190,46 @@ void TestTerminalCatalog::launchCommandEncodesTheScript()
     QCOMPARE(command.arguments.size(), expectedFlags.size() + 1);
 
     const QString expectedScript =
-        QStringLiteral("& 'C:\\Program Files\\hashcat\\hashcat.exe' '--attack-mode' '0' "
-                       "'--mask' '?d?d?d?d'");
+        QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo\n"
+                       "$si.FileName = 'C:\\Program Files\\hashcat\\hashcat.exe'\n"
+                       "$si.Arguments = '--attack-mode 0 --mask ?d?d?d?d'\n"
+                       "$si.UseShellExecute = $false\n"
+                       "$si.WorkingDirectory = '")
+        + QFileInfo(hashcatPath).absolutePath()
+        + QStringLiteral("'\n"
+                         "$p = [System.Diagnostics.Process]::Start($si)\n"
+                         "$p.WaitForExit()");
     QCOMPARE(decodeScript(command.arguments.last()), expectedScript);
 }
 
 // The tokens a hashcat command line really carries: bcrypt hashes, masks with
 // shell metacharacters, spaces, quotes and backticks. Each has to reach the
-// script as a literal, never as code.
+// Arguments string as a literal the MSVCRT parser reads back unchanged -
+// never as code, and never rewritten by PowerShell's native binder.
 void TestTerminalCatalog::launchCommandQuotesEveryToken_data()
 {
     QTest::addColumn<QString>("token");
     QTest::addColumn<QString>("quoted");
 
     QTest::newRow("bcrypt hash") << QStringLiteral("$2a$10$abcdefghijklmnopqrstuu")
-                                 << QStringLiteral("'$2a$10$abcdefghijklmnopqrstuu'");
+                                 << QStringLiteral("$2a$10$abcdefghijklmnopqrstuu");
     QTest::newRow("mask with subexpression")
-        << QStringLiteral("?d?d$(Get-Date)") << QStringLiteral("'?d?d$(Get-Date)'");
-    QTest::newRow("mask with semicolon")
-        << QStringLiteral("?d;calc") << QStringLiteral("'?d;calc'");
-    QTest::newRow("spaces") << QStringLiteral("two words") << QStringLiteral("'two words'");
+        << QStringLiteral("?d?d$(Get-Date)") << QStringLiteral("?d?d$(Get-Date)");
+    QTest::newRow("mask with semicolon") << QStringLiteral("?d;calc") << QStringLiteral("?d;calc");
+    QTest::newRow("spaces") << QStringLiteral("two words") << QStringLiteral("\"two words\"");
     QTest::newRow("single quotes")
-        << QStringLiteral("it's a 'test'") << QStringLiteral("'it''s a ''test'''");
+        << QStringLiteral("it's a 'test'") << QStringLiteral("\"it's a 'test'\"");
     QTest::newRow("double quotes")
-        << QStringLiteral("say \"hi\"") << QStringLiteral("'say \"hi\"'");
-    QTest::newRow("backticks") << QStringLiteral("`backtick`") << QStringLiteral("'`backtick`'");
+        << QStringLiteral("say \"hi\"") << QStringLiteral("\"say \\\"hi\\\"\"");
+    QTest::newRow("quote without spaces") << QStringLiteral("a\"b") << QStringLiteral("a\\\"b");
+    QTest::newRow("backticks") << QStringLiteral("`backtick`") << QStringLiteral("`backtick`");
     QTest::newRow("pipe and ampersand")
-        << QStringLiteral("pipe|and&semi") << QStringLiteral("'pipe|and&semi'");
-    QTest::newRow("empty") << QString() << QStringLiteral("''");
-    QTest::newRow("newline") << QStringLiteral("line\nbreak") << QStringLiteral("'line\nbreak'");
-    QTest::newRow("smart double quotes") << QStringLiteral("“”„") << QStringLiteral("'“”„'");
+        << QStringLiteral("pipe|and&semi") << QStringLiteral("pipe|and&semi");
+    QTest::newRow("empty") << QString() << QStringLiteral("\"\"");
+    QTest::newRow("newline") << QStringLiteral("line\nbreak") << QStringLiteral("\"line\nbreak\"");
+    QTest::newRow("smart double quotes") << QStringLiteral("“”„") << QStringLiteral("“”„");
+    QTest::newRow("trailing backslash and spaces")
+        << QStringLiteral("C:\\path with space\\") << QStringLiteral("\"C:\\path with space\\\\\"");
 }
 
 void TestTerminalCatalog::launchCommandQuotesEveryToken()
@@ -181,12 +239,18 @@ void TestTerminalCatalog::launchCommandQuotesEveryToken()
 
     const LaunchCommand command = TerminalCatalog::launchCommand(
         QStringLiteral("pwsh"), QStringLiteral("hashcat"), {token}, false);
-    QCOMPARE(decodeScript(command.arguments.last()), QStringLiteral("& 'hashcat' ") + quoted);
+    // None of these tokens holds a smart single quote, so the Arguments
+    // literal is single-quoted with its own quotes doubled.
+    QString literal = quoted;
+    literal.replace(QLatin1Char('\''), QStringLiteral("''"));
+    const QString script = decodeScript(command.arguments.last());
+    QVERIFY2(script.contains(QStringLiteral("$si.Arguments = '") + literal + QStringLiteral("'\n")),
+             qPrintable(script));
 }
 
 // PowerShell reads U+2018-U+201B as single-quote delimiters, so a token that
-// holds one cannot be quoted literally; it travels as its own base64 value,
-// decoded inside the script.
+// holds one cannot be quoted literally; the whole Arguments string travels
+// as its own base64 value, decoded inside the script.
 void TestTerminalCatalog::launchCommandCarriesSmartQuotesAsBase64_data()
 {
     QTest::addColumn<QString>("token");
@@ -204,11 +268,15 @@ void TestTerminalCatalog::launchCommandCarriesSmartQuotesAsBase64()
 
     const LaunchCommand command = TerminalCatalog::launchCommand(
         QStringLiteral("powershell.exe"), QStringLiteral("hashcat"), {token}, false);
+    // The base64 carries the token as the MSVCRT quoting left it (pinned in
+    // tst_argumentquoting); this case is about the transport.
     const QString expected =
-        QStringLiteral("& 'hashcat' "
+        QStringLiteral("$si.Arguments = "
                        "([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('")
-        + QString::fromLatin1(token.toUtf8().toBase64()) + QStringLiteral("')))");
-    QCOMPARE(decodeScript(command.arguments.last()), expected);
+        + QString::fromLatin1(msvcrtQuoteArgument(token).toUtf8().toBase64())
+        + QStringLiteral("')))\n");
+    QVERIFY2(decodeScript(command.arguments.last()).contains(expected),
+             qPrintable(decodeScript(command.arguments.last())));
 }
 
 // A command line beyond the Windows limit is refused, never truncated.
@@ -263,28 +331,26 @@ void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell_data()
         QStringLiteral("?d‛?d"), QStringLiteral("“double”"), QStringLiteral("it's ’mixed’")};
     QTest::newRow("line breaks") << QStringList{QStringLiteral("line\nbreak"),
                                                 QStringLiteral("tab\there")};
+    // The cases PowerShell's own native argument passing used to break on
+    // Windows (5.1 and pwsh before 7.3): embedded quotes with and without
+    // spaces, an empty token, and a trailing backslash behind spaces.
+    QTest::newRow("native passing hazards") << QStringList{QStringLiteral("say \"hi\""),
+                                                           QStringLiteral("a\"b"),
+                                                           QString(),
+                                                           QStringLiteral("C:\\path with space\\"),
+                                                           QStringLiteral("trail\\"),
+                                                           QStringLiteral("a'b\"c\\d e"),
+                                                           QStringLiteral("$2a$10$abc")};
 }
 
 void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell()
 {
-    QString shell;
-    for (const QString &name : {QStringLiteral("powershell.exe"), QStringLiteral("pwsh")}) {
-        if (!QStandardPaths::findExecutable(name).isEmpty()) {
-            shell = name;
-            break;
-        }
-    }
+    const QString shell = findPowerShell();
     if (shell.isEmpty()) {
         QSKIP("no PowerShell on PATH");
     }
-#ifdef Q_OS_WIN
-    const QString helper =
-        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho.exe"));
-#else
-    const QString helper =
-        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho"));
-#endif
-    if (!QFile::exists(helper)) {
+    const QString helper = findArgEcho();
+    if (helper.isEmpty()) {
         QSKIP("the argecho helper is not built");
     }
 
@@ -308,6 +374,61 @@ void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell()
         received << value.toString();
     }
     QCOMPARE(received, tokens);
+}
+
+// keepOpen has to hold the session after hashcat exits: -NoExit only keeps
+// it open while the script itself does not call exit. The helper exits at
+// once, so what the shell does afterwards is the whole keepOpen contract.
+void TestTerminalCatalog::launchCommandKeepOpenHoldsTheSession_data()
+{
+    QTest::addColumn<bool>("keepOpen");
+    QTest::newRow("keep open") << true;
+    QTest::newRow("close") << false;
+}
+
+void TestTerminalCatalog::launchCommandKeepOpenHoldsTheSession()
+{
+    const QString shell = findPowerShell();
+    if (shell.isEmpty()) {
+        QSKIP("no PowerShell on PATH");
+    }
+    const QString helper = findArgEcho();
+    if (helper.isEmpty()) {
+        QSKIP("the argecho helper is not built");
+    }
+
+    QFETCH(bool, keepOpen);
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        shell, helper, {QStringLiteral("--attack-mode"), QStringLiteral("0")}, keepOpen);
+    QVERIFY(!command.program.isEmpty());
+
+    QProcess proc;
+    proc.setProgram(command.program);
+    proc.setArguments(command.arguments);
+    proc.start();
+    QVERIFY2(proc.waitForStarted(10000), qPrintable(proc.errorString()));
+    const ShellGuard guard{&proc};
+
+    // The helper's JSON arrives when it exits - the moment the script's
+    // WaitForExit returns and the keepOpen decision takes effect.
+    QByteArray received;
+    QElapsedTimer timer;
+    timer.start();
+    while (!QJsonDocument::fromJson(received).isArray()) {
+        QVERIFY2(timer.elapsed() < 30000, "the helper did not run in time");
+        proc.waitForReadyRead(100);
+        received += proc.readAllStandardOutput();
+    }
+
+    if (keepOpen) {
+        // Leave the script time to end - and an exit statement in it time to
+        // take the session down with it.
+        QTest::qWait(1500);
+        QVERIFY2(proc.state() == QProcess::Running,
+                 "the session ended although -NoExit was asked to hold it");
+    } else {
+        QVERIFY2(proc.waitForFinished(30000), "the shell did not exit on its own");
+    }
 }
 
 // The lookup follows PATH and only reports a file this system can execute.
