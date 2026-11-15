@@ -8,10 +8,14 @@
 #include "settingsmanager.h"
 #include "testenvironment.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QStandardPaths>
 #include <QStringDecoder>
 #include <QTemporaryDir>
 #include <array>
@@ -49,6 +53,8 @@ private slots:
     void launchCommandCarriesSmartQuotesAsBase64();
     void launchCommandRefusesAnOverlongCommandLine();
     void launchCommandRefusesAnUnknownTerminal();
+    void launchCommandRoundTripsThroughPowerShell_data();
+    void launchCommandRoundTripsThroughPowerShell();
     void findHashcatInPathFindsTheExecutable();
     void findHashcatInPathProbesBothUnixNames_data();
     void findHashcatInPathProbesBothUnixNames();
@@ -1057,6 +1063,81 @@ void TestHelperUtils::launchCommandRefusesAnUnknownTerminal()
                                    {QStringLiteral("--help")}, true);
     QVERIFY(command.program.isEmpty());
     QVERIFY(command.arguments.isEmpty());
+}
+
+// The encoding is only proven once a real PowerShell has parsed it: start the
+// argecho helper through the shell and compare its argv with the tokens that
+// went in. Windows PowerShell 5.1 is the stricter tokenizer, so it is preferred
+// where both shells exist; the Unix runners carry pwsh.
+void TestHelperUtils::launchCommandRoundTripsThroughPowerShell_data()
+{
+    QTest::addColumn<QStringList>("tokens");
+
+    QTest::newRow("hashcat argv") << QStringList{QStringLiteral("--attack-mode"),
+                                                 QStringLiteral("0"),
+                                                 QStringLiteral("-m"),
+                                                 QStringLiteral("22000"),
+                                                 QStringLiteral("$2a$10$abcdefghijklmnopqrstuu"),
+                                                 QStringLiteral("?d?d?d?d")};
+    QTest::newRow("shell metacharacters") << QStringList{QStringLiteral("?d?d$(Get-Date)"),
+                                                         QStringLiteral("?d;calc"),
+                                                         QStringLiteral("a&b"),
+                                                         QStringLiteral("a|b"),
+                                                         QStringLiteral("`tick`"),
+                                                         QStringLiteral("$env:PATH")};
+    QTest::newRow("spaces and quotes")
+        << QStringList{QStringLiteral("two words"), QStringLiteral("it's"),
+                       QStringLiteral("say \"hi\""), QString()};
+    QTest::newRow("smart quotes") << QStringList{
+        QStringLiteral("?d‘?d"), QStringLiteral("?d’?d"),    QStringLiteral("?d‚?d"),
+        QStringLiteral("?d‛?d"), QStringLiteral("“double”"), QStringLiteral("it's ’mixed’")};
+    QTest::newRow("line breaks") << QStringList{QStringLiteral("line\nbreak"),
+                                                QStringLiteral("tab\there")};
+}
+
+void TestHelperUtils::launchCommandRoundTripsThroughPowerShell()
+{
+    QString shell;
+    for (const QString &name : {QStringLiteral("powershell.exe"), QStringLiteral("pwsh")}) {
+        if (!QStandardPaths::findExecutable(name).isEmpty()) {
+            shell = name;
+            break;
+        }
+    }
+    if (shell.isEmpty()) {
+        QSKIP("no PowerShell on PATH");
+    }
+#ifdef Q_OS_WIN
+    const QString helper =
+        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho.exe"));
+#else
+    const QString helper =
+        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho"));
+#endif
+    if (!QFile::exists(helper)) {
+        QSKIP("the argecho helper is not built");
+    }
+
+    QFETCH(QStringList, tokens);
+    const LaunchCommand command = HelperUtils::launchCommand(shell, helper, tokens, false);
+    QVERIFY(!command.program.isEmpty());
+
+    QProcess proc;
+    proc.setProgram(command.program);
+    proc.setArguments(command.arguments);
+    proc.start();
+    QVERIFY2(proc.waitForStarted(10000), qPrintable(proc.errorString()));
+    QVERIFY2(proc.waitForFinished(30000), "the shell did not finish in time");
+    QCOMPARE(proc.exitCode(), 0);
+
+    const QJsonDocument document = QJsonDocument::fromJson(proc.readAllStandardOutput());
+    QVERIFY2(document.isArray(), qPrintable(QString::fromUtf8(proc.readAllStandardError())));
+    QStringList received;
+    const QJsonArray array = document.array();
+    for (const auto &value : array) {
+        received << value.toString();
+    }
+    QCOMPARE(received, tokens);
 }
 
 // The lookup follows PATH and only reports a file this system can execute.

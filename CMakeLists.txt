@@ -169,6 +169,11 @@ set(HASHCAT_GUI_TESTS
 if(NOT BUILD_TESTING)
     message(STATUS "BUILD_TESTING is off - building without tests")
 elseif(Qt6Test_FOUND)
+    # The launch round-trip test starts this helper through a real shell and
+    # reads its argv back as JSON. It has no Qt Test cases of its own.
+    add_executable(argecho tests/argecho.cpp)
+    target_link_libraries(argecho PRIVATE Qt6::Core)
+
     foreach(test IN LISTS HASHCAT_GUI_TESTS)
         add_executable(${test} tests/${test}.cpp)
         target_link_libraries(${test} PRIVATE hashcat-gui-core Qt6::Test)
