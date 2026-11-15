@@ -204,6 +204,9 @@ inline constexpr int StatusTimer = 10;    // seconds, hashcat's own default
 inline constexpr int HwmonTempAbort = 90; // degrees Celsius
 inline constexpr int IncrementMin = 0;    // 0 = hashcat default
 inline constexpr int IncrementMax = 0;    // 0 = hashcat default
+// spinBox_generate_rules has no value property in the .ui file: its effective
+// default is its minimum, and the reset writes the same number.
+inline constexpr int GenerateRules = 1;
 } // namespace Defaults
 
 // The pattern the keyspace bounds -s and -l have to match. Hashcat takes them

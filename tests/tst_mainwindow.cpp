@@ -303,6 +303,7 @@ private slots:
     void theStartupShowsNoBox();
     void theSerializedKeySetIsFrozen();
     void theGoldenSessionRoundTrips();
+    void theDefaultsMatchTheUiFiles();
     void thePreviewFormattingIsPinned();
 
 private:
@@ -3190,6 +3191,24 @@ void TestMainWindow::theGoldenSessionRoundTrips()
         QStringLiteral("/tmp/golden-right.txt"),
     };
     QCOMPARE(window.generateArguments(), expectedArguments);
+}
+
+// The defaults the code documents and the defaults the .ui files bake in are
+// two sources of the same truth; a widget that drifts from its constant makes
+// the reset and the fresh window disagree.
+void TestMainWindow::theDefaultsMatchTheUiFiles()
+{
+    MainWindow window;
+    QCOMPARE(window.ui->lineEdit_outfile_format->text(),
+             QString(AppConstants::Defaults::OutfileFormat));
+    QCOMPARE(window.ui->lineEdit_backend_devices->text(),
+             QString(AppConstants::Defaults::BackendDevices));
+    QCOMPARE(window.ui->spinBox_runtime->value(), AppConstants::Defaults::Runtime);
+    QCOMPARE(window.ui->spinBox_status_timer->value(), AppConstants::Defaults::StatusTimer);
+    QCOMPARE(window.ui->spinBox_hwmon_temp_abort->value(), AppConstants::Defaults::HwmonTempAbort);
+    QCOMPARE(window.ui->spinBox_increment_min->value(), AppConstants::Defaults::IncrementMin);
+    QCOMPARE(window.ui->spinBox_increment_max->value(), AppConstants::Defaults::IncrementMax);
+    QCOMPARE(window.ui->spinBox_generate_rules->value(), AppConstants::Defaults::GenerateRules);
 }
 
 // The preview's display formatting, pinned before it moves to its own unit:
