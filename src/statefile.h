@@ -11,6 +11,7 @@
 #include <QLatin1StringView>
 #include <QString>
 #include <QStringList>
+#include <cstdint>
 
 // A file the application writes and reads again: the session it keeps between
 // two runs and the settings the user exports share one shape.
@@ -42,6 +43,32 @@ public:
     // application name alone decides - the organization name is deliberately
     // left unset, see main.cpp.
     static QString sessionFilePath();
+
+    // What one read of a section means for the caller.
+    enum class Status : std::uint8_t {
+        Read,       // the values may be applied
+        Unreadable, // no JSON, no section, no values - error says why
+        Newer,      // a format version this build does not know
+        Older,      // an earlier format version, applied with a note
+    };
+
+    // One section read with its version policy applied: the caller acts on
+    // the status instead of repeating the comparison. A file that names no
+    // version reads as -1 and is applied like an older file's values, but
+    // without the older-version note - it is hand-edited, not historical.
+    struct Document {
+        Status status = Status::Unreadable;
+        QJsonObject values;
+        int version = -1;
+        QStringList otherSections;
+        QString error;
+    };
+
+    // Reads the section and compares its version with maxVersion, the
+    // version this build writes. The session and the settings share this
+    // one policy.
+    static Document readDocument(const QString &filename, QLatin1StringView section,
+                                 int maxVersion);
 
     // Writes the values into the file as the section of the given name.
     //

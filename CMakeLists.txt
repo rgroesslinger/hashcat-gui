@@ -69,6 +69,8 @@ set(HASHCAT_GUI_SOURCES
     src/mainwindow.cpp
     src/settingsdialog.h
     src/settingsdialog.cpp
+    src/sessiontransfer.h
+    src/sessiontransfer.cpp
     src/settingsmanager.h
     src/settingsmanager.cpp
     src/statefile.h
@@ -179,6 +181,7 @@ set(HASHCAT_GUI_TESTS
     tst_mainwindow
     tst_pathmonitor
     tst_session
+    tst_sessiontransfer
     tst_settingsdialog
     tst_statefile
     tst_terminalcatalog

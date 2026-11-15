@@ -10,6 +10,7 @@
 #include "hashcatrunner.h"
 #include "launchvalidator.h"
 #include "pathmonitor.h"
+#include "statefile.h"
 
 #include <QComboBox>
 #include <QFutureWatcher>
@@ -162,22 +163,9 @@ private:
     // What the selected attack mode needs from the user.
     [[nodiscard]] QString modeHint(AttackMode mode) const;
 
-    // The notes an import has about the file itself: the version it was made
-    // by and the sections it holds besides the one that was imported.
-    [[nodiscard]] QStringList fileNotes(int fileVersion, int currentVersion,
-                                        const QStringList &otherSections) const;
-
-    // Why a file a newer version wrote is not applied at all.
-    [[nodiscard]] QString newerFileNote(int fileVersion, int currentVersion) const;
-
-    // Why the session of a newer version is not restored - and not stored
-    // either.
-    [[nodiscard]] QString newerSessionNote(int fileVersion) const;
-
     // Applies the values of a session file to the widgets and collects the
     // notes about what could not be applied.
-    QStringList applySessionFile(const QJsonObject &values, int version,
-                                 const QStringList &otherSections);
+    QStringList applySessionFile(const StateFile::Document &document);
 
     // Reads the current widget state. Everything the command line is built
     // from goes through here, so CommandBuilder never has to know about

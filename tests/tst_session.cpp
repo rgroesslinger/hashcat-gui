@@ -7,6 +7,7 @@
 #include "mainwindow.h"
 #include "mainwindowtestaccess.h"
 #include "mainwindowtesthelpers.h"
+#include "sessiontransfer.h"
 #include "settingsmanager.h"
 #include "statefile.h"
 #include "testenvironment.h"
@@ -716,10 +717,7 @@ void TestSession::aNewerSessionSurvivesTheExit()
 // restored, and the session of this run is not stored either.
 void TestSession::theNewerSessionWarningSaysWhatIsLost()
 {
-    MainWindow window;
-
-    const QString note =
-        MainWindowTestAccess::newerSessionNote(window, AppConstants::Sessions::Version + 1);
+    const QString note = SessionTransfer::newerSessionNote(AppConstants::Sessions::Version + 1);
     QVERIFY(note.contains(QStringLiteral("not restored")));
     QVERIFY(note.contains(QStringLiteral("not stored")));
 }
@@ -940,14 +938,10 @@ void TestSession::theGoldenSessionRoundTrips()
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
                              5000);
 
-    QString error;
-    QJsonObject values;
-    int version = 0;
-    QStringList otherSections;
-    QVERIFY(StateFile::read(goldenPath, AppConstants::FileSections::Session, &values, &version,
-                            &otherSections, &error));
-    const QStringList notes =
-        MainWindowTestAccess::applySessionFile(window, values, version, otherSections);
+    const StateFile::Document document = StateFile::readDocument(
+        goldenPath, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    QVERIFY(document.status != StateFile::Status::Unreadable);
+    const QStringList notes = MainWindowTestAccess::applySessionFile(window, document);
     QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QStringLiteral("\n"))));
 
     MainWindowTestAccess::saveSession(window);
@@ -1034,16 +1028,12 @@ void TestSession::applyingASessionRebuildsThePreviewOnce()
 
     const QString goldenPath =
         QStringLiteral(QT_TESTCASE_SOURCEDIR "/tests/data/golden_session.json");
-    QString error;
-    QJsonObject values;
-    int version = 0;
-    QStringList otherSections;
-    QVERIFY(StateFile::read(goldenPath, AppConstants::FileSections::Session, &values, &version,
-                            &otherSections, &error));
+    const StateFile::Document document = StateFile::readDocument(
+        goldenPath, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    QVERIFY(document.status != StateFile::Status::Unreadable);
 
     const int before = MainWindowTestAccess::previewRebuilds(window);
-    const QStringList notes =
-        MainWindowTestAccess::applySessionFile(window, values, version, otherSections);
+    const QStringList notes = MainWindowTestAccess::applySessionFile(window, document);
     QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QStringLiteral("\n"))));
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
 
@@ -1074,11 +1064,12 @@ void TestSession::aNoOpApplyWithRowsRebuildsThePreviewOnce()
         MainWindowTestAccess::ui(window)->listWidget_feed_arguments,
         {QStringLiteral("arg one"), QStringLiteral("arg two")});
 
-    const QJsonObject current =
-        WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
+    StateFile::Document document;
+    document.status = StateFile::Status::Read;
+    document.version = AppConstants::Sessions::Version;
+    document.values = WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
     const int before = MainWindowTestAccess::previewRebuilds(window);
-    const QStringList notes = MainWindowTestAccess::applySessionFile(
-        window, current, AppConstants::Sessions::Version, {});
+    const QStringList notes = MainWindowTestAccess::applySessionFile(window, document);
     QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QStringLiteral("\n"))));
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
 }

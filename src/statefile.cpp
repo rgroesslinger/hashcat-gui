@@ -31,6 +31,27 @@ QString StateFile::sessionFilePath()
     return QDir(dirPath).filePath(AppConstants::Files::SessionFile);
 }
 
+StateFile::Document StateFile::readDocument(const QString &filename, QLatin1StringView section,
+                                            int maxVersion)
+{
+    Document document;
+    if (!read(filename, section, &document.values, &document.version, &document.otherSections,
+              &document.error)) {
+        document.status = Status::Unreadable;
+        return document;
+    }
+    if (document.version > maxVersion) {
+        document.status = Status::Newer;
+    } else if (document.version >= 0 && document.version < maxVersion) {
+        document.status = Status::Older;
+    } else {
+        // The current version - or no version at all, which is applied like
+        // an older file's values but without the note.
+        document.status = Status::Read;
+    }
+    return document;
+}
+
 bool StateFile::write(const QString &filename, QLatin1StringView section, int version,
                       const QJsonObject &values, QString *errorMessage)
 {

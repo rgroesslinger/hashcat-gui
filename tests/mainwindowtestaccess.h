@@ -8,6 +8,7 @@
 
 #include "hashcatoptions.h"
 #include "mainwindow.h"
+#include "statefile.h"
 
 #include <QJsonObject>
 #include <QSize>
@@ -48,20 +49,14 @@ struct MainWindowTestAccess {
         return window.sessionFile();
     }
 
-    static QStringList applySessionFile(MainWindow &window, const QJsonObject &values, int version,
-                                        const QStringList &otherSections)
+    static QStringList applySessionFile(MainWindow &window, const StateFile::Document &document)
     {
-        return window.applySessionFile(values, version, otherSections);
+        return window.applySessionFile(document);
     }
 
     static void addPcfgRulesetNameClicked(MainWindow &window)
     {
         window.addPcfgRulesetNameClicked();
-    }
-
-    static QString newerSessionNote(MainWindow &window, int fileVersion)
-    {
-        return window.newerSessionNote(fileVersion);
     }
 
     static void initHashAndAttackModes(MainWindow &window)

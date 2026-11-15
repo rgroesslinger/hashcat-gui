@@ -15,13 +15,13 @@
 #include "hashcatrunner.h"
 #include "launchmessage.h"
 #include "launchvalidator.h"
+#include "sessiontransfer.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "statefile.h"
 #include "terminalcatalog.h"
 #include "textutils.h"
 #include "ui_mainwindow.h"
-#include "widgetstateserializer.h"
 
 #include <QAbstractButton>
 #include <QAbstractItemModel>
@@ -702,8 +702,7 @@ void MainWindow::exportTriggered()
     }
 
     QString error;
-    const QJsonObject values =
-        WidgetStateSerializer::toJson(this, {AppConstants::Files::PreviewWidget});
+    const QJsonObject values = SessionTransfer::toDocument(this);
     if (StateFile::write(file, AppConstants::FileSections::Session, AppConstants::Sessions::Version,
                          values, &error)) {
         QMessageBox::information(this, tr("Exported"), tr("Session exported to “%1”.").arg(file));
@@ -722,25 +721,23 @@ void MainWindow::importTriggered()
         return;
     }
 
-    QString error;
-    QJsonObject values;
-    int version = 0;
-    QStringList otherSections;
-    if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
-                         &otherSections, &error)) {
-        QMessageBox::warning(this, tr("Import failed"), error);
+    const StateFile::Document document = StateFile::readDocument(
+        file, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    if (document.status == StateFile::Status::Unreadable) {
+        QMessageBox::warning(this, tr("Import failed"), document.error);
         return;
     }
 
-    if (version > AppConstants::Sessions::Version) {
-        QMessageBox::warning(this, tr("Import failed"),
-                             newerFileNote(version, AppConstants::Sessions::Version));
+    if (document.status == StateFile::Status::Newer) {
+        QMessageBox::warning(
+            this, tr("Import failed"),
+            SessionTransfer::newerFileNote(document.version, AppConstants::Sessions::Version));
         return;
     }
 
     // The mapping applies the values; the hash type is the one it cannot
     // take yet, see restoreHashType().
-    const QStringList notes = applySessionFile(values, version, otherSections);
+    const QStringList notes = applySessionFile(document);
 
     if (notes.isEmpty()) {
         QMessageBox::information(this, tr("Imported"), tr("Session imported from “%1”.").arg(file));
@@ -756,8 +753,7 @@ void MainWindow::importTriggered()
 //
 // The caller decides what to do with the notes: an import has a headline, the
 // auto-load stays quiet when there is nothing to say.
-QStringList MainWindow::applySessionFile(const QJsonObject &values, int version,
-                                         const QStringList &otherSections)
+QStringList MainWindow::applySessionFile(const StateFile::Document &document)
 {
     // A retired widget's value cannot be applied, but it is not news: every
     // session written before the removal names it. Dropping the name keeps the
@@ -767,86 +763,20 @@ QStringList MainWindow::applySessionFile(const QJsonObject &values, int version,
         ignoredWidgets.append(QString(retired));
     }
 
-    // The hash combo has no items yet - the query that fills it runs
-    // asynchronously. Remember the stored hash type; the reply applies it
-    // once the items exist. The bulk write is silenced: one preview rebuild
-    // below, not one per widget.
-    WidgetStateSerializer::ApplyResult notApplied;
-    QString problem;
+    // The bulk write is silenced: one preview rebuild below, not one per
+    // widget. The hash-type note comes last, after the transfer's notes.
+    QStringList notes;
     {
         const CommandSilence silence(*this);
-        notApplied = WidgetStateSerializer::applyToWidgets(values, this, ignoredWidgets);
-        problem = restoreHashType(values);
+        notes = SessionTransfer::applyToWidgets(document, this, ignoredWidgets);
+        const QString problem = restoreHashType(document.values);
+        if (!problem.isEmpty()) {
+            notes << problem;
+        }
     }
     commandChanged();
 
-    QStringList notes = fileNotes(version, AppConstants::Sessions::Version, otherSections);
-
-    // The notes are only there when there is something to say.
-    const QString unknownNote = StateFile::unknownValuesNote(notApplied.unknownKeys);
-    if (!unknownNote.isEmpty()) {
-        notes << unknownNote;
-    }
-
-    const QString wrongTypeNote = StateFile::wrongTypeValuesNote(notApplied.wrongTypes);
-    if (!wrongTypeNote.isEmpty()) {
-        notes << wrongTypeNote;
-    }
-    if (!problem.isEmpty()) {
-        notes << problem;
-    }
-
     return notes;
-}
-
-// The notes an import has about the file itself: the version it was made by
-// and the sections it holds besides the one that was imported.
-QStringList MainWindow::fileNotes(int fileVersion, int currentVersion,
-                                  const QStringList &otherSections) const
-{
-    QStringList notes;
-
-    // A newer format version is refused before it gets here: a name that
-    // survived may mean something else there. A file that names no version is
-    // hand-edited; its values are applied like an older file's.
-    if (fileVersion >= 0 && fileVersion < currentVersion) {
-        notes << tr("The file was made by an older version of hashcat-gui (format version %1; "
-                    "this version reads format version %2).")
-                     .arg(fileVersion)
-                     .arg(currentVersion);
-    }
-
-    if (!otherSections.isEmpty()) {
-        notes << tr("The file holds sections this import does not use: %1.")
-                     .arg(StateFile::nameList(otherSections));
-    }
-
-    return notes;
-}
-
-// Why a file with a newer format version is not applied at all: this version
-// does not know what the values it cannot name mean, and a name that survived
-// may mean something else there.
-QString MainWindow::newerFileNote(int fileVersion, int currentVersion) const
-{
-    return tr("The file is in format version %1, but this version reads format version %2, so it "
-              "was not applied. Update hashcat-gui to read it.")
-        .arg(fileVersion)
-        .arg(currentVersion);
-}
-
-// Why the session of a newer version is not restored.
-//
-// The file is left as it is as well, so the session of this run is not
-// stored either: the session of the newer version wins over the one of this
-// run.
-QString MainWindow::newerSessionNote(int fileVersion) const
-{
-    return tr("The session file is in format version %1, but this version reads format version %2, "
-              "so the session was not restored. The file was left as it is, so the session of "
-              "this run is not stored either. Update hashcat-gui to read it.")
-        .arg(fileVersion)
-        .arg(AppConstants::Sessions::Version);
 }
 
 // File → Export Settings
@@ -880,27 +810,26 @@ void MainWindow::importSettingsTriggered()
         return;
     }
 
-    QString error;
-    QJsonObject values;
-    int version = 0;
-    QStringList otherSections;
-    if (!StateFile::read(file, AppConstants::FileSections::Settings, &values, &version,
-                         &otherSections, &error)) {
-        QMessageBox::warning(this, tr("Import failed"), error);
+    const StateFile::Document document = StateFile::readDocument(
+        file, AppConstants::FileSections::Settings, AppConstants::Settings::Version);
+    if (document.status == StateFile::Status::Unreadable) {
+        QMessageBox::warning(this, tr("Import failed"), document.error);
         return;
     }
 
-    if (version > AppConstants::Settings::Version) {
-        QMessageBox::warning(this, tr("Import failed"),
-                             newerFileNote(version, AppConstants::Settings::Version));
+    if (document.status == StateFile::Status::Newer) {
+        QMessageBox::warning(
+            this, tr("Import failed"),
+            SessionTransfer::newerFileNote(document.version, AppConstants::Settings::Version));
         return;
     }
 
     // The dialog opens with the values of the file in it, so the user reviews
     // them before Save applies them.
     SettingsDialog settingsDialog(this);
-    QStringList notes = settingsDialog.applyImportedSettings(values);
-    notes << fileNotes(version, AppConstants::Settings::Version, otherSections);
+    QStringList notes = settingsDialog.applyImportedSettings(document.values);
+    notes << SessionTransfer::fileNotes(document.version, AppConstants::Settings::Version,
+                                        document.otherSections);
 
     QStringList message;
     message << tr("Settings loaded from “%1”.").arg(file);
@@ -946,29 +875,28 @@ void MainWindow::loadExampleSession(AttackMode mode)
 
     // The examples are compiled into this build, so their format version
     // cannot be newer than this one; the test keeps the resources current.
-    QString error;
-    QJsonObject values;
-    int version = 0;
-    QStringList otherSections;
-    if (!StateFile::read(QString(entry->resource), AppConstants::FileSections::Session, &values,
-                         &version, &otherSections, &error)) {
-        QMessageBox::warning(this, tr("Load example session"), error);
+    StateFile::Document document =
+        StateFile::readDocument(QString(entry->resource), AppConstants::FileSections::Session,
+                                AppConstants::Sessions::Version);
+    if (document.status == StateFile::Status::Unreadable) {
+        QMessageBox::warning(this, tr("Load example session"), document.error);
         return;
     }
 
     // The wordlists, rules and tables of an example are resources too, and
     // hashcat can only read real files: unpack them first, then point the
     // session at that directory.
-    if (ExampleSession::containsExamplePrefix(values)) {
+    QString error;
+    if (ExampleSession::containsExamplePrefix(document.values)) {
         QString directory;
         if (!ExampleSession::materialize(&directory, &error)) {
             QMessageBox::warning(this, tr("Load example session"), error);
             return;
         }
-        values = ExampleSession::withExamplePaths(values, directory).toObject();
+        document.values = ExampleSession::withExamplePaths(document.values, directory).toObject();
     }
 
-    const QStringList notes = applySessionFile(values, version, otherSections);
+    const QStringList notes = applySessionFile(document);
     if (!notes.isEmpty()) {
         QMessageBox::warning(this, tr("Load example session"), notes.join(QLatin1Char('\n')));
     }
@@ -1156,12 +1084,9 @@ void MainWindow::loadSession()
         return;
     }
 
-    QString error;
-    QJsonObject values;
-    int version = 0;
-    QStringList otherSections;
-    if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
-                         &otherSections, &error)) {
+    const StateFile::Document document = StateFile::readDocument(
+        file, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    if (document.status == StateFile::Status::Unreadable) {
         // A file this version cannot read is not thrown away: it may belong
         // to a version that can read it, or the user may want to look at it.
         // The start goes on without the session.
@@ -1169,20 +1094,21 @@ void MainWindow::loadSession()
             this, tr("Session warning"),
             tr("The session file could not be read, so the session was not restored. The file "
                "was left in place.\n\n%1")
-                .arg(error));
+                .arg(document.error));
         return;
     }
 
     // A session with a newer format version is left in place: it is what that
     // version saved, and the user may go back to it.
-    if (version > AppConstants::Sessions::Version) {
-        QMessageBox::warning(this, tr("Session warning"), newerSessionNote(version));
+    if (document.status == StateFile::Status::Newer) {
+        QMessageBox::warning(this, tr("Session warning"),
+                             SessionTransfer::newerSessionNote(document.version));
         return;
     }
 
     // The auto-load is not an import: there is no headline, and nothing is
     // shown when the load went well.
-    const QStringList notes = applySessionFile(values, version, otherSections);
+    const QStringList notes = applySessionFile(document);
 
     if (!notes.isEmpty()) {
         QMessageBox::warning(this, tr("Session warning"), notes.join(QLatin1Char('\n')));
@@ -1285,8 +1211,7 @@ void MainWindow::saveSession()
     QDir().mkpath(QFileInfo(file).absolutePath());
 
     QString error;
-    const QJsonObject values =
-        WidgetStateSerializer::toJson(this, {AppConstants::Files::PreviewWidget});
+    const QJsonObject values = SessionTransfer::toDocument(this);
     if (!StateFile::write(file, AppConstants::FileSections::Session,
                           AppConstants::Sessions::Version, values, &error)) {
         QMessageBox::warning(this, tr("Save failed"), error);
@@ -1301,16 +1226,10 @@ void MainWindow::saveSession()
 // written by another version and is left alone.
 bool MainWindow::sessionFileIsUnderstood(const QString &file) const
 {
-    QString error;
-    QJsonObject values;
-    int version = 0;
-    QStringList otherSections;
-    if (!StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
-                         &otherSections, &error)) {
-        return false;
-    }
-
-    return version <= AppConstants::Sessions::Version;
+    const StateFile::Document document = StateFile::readDocument(
+        file, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    return document.status != StateFile::Status::Unreadable
+           && document.status != StateFile::Status::Newer;
 }
 
 QString MainWindow::attackModeName(AttackMode mode) const

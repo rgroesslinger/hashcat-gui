@@ -334,15 +334,11 @@ void TestMainWindow::exampleSessionFilesAreValid()
         const QString file = QString(entry.resource);
         QVERIFY2(QFile::exists(file), qPrintable(file));
 
-        QString error;
-        QJsonObject values;
-        int version = -1;
-        QStringList otherSections;
-        QVERIFY2(StateFile::read(file, AppConstants::FileSections::Session, &values, &version,
-                                 &otherSections, &error),
-                 qPrintable(error));
-        QCOMPARE(version, AppConstants::Sessions::Version);
-        QVERIFY(otherSections.isEmpty());
+        const StateFile::Document document = StateFile::readDocument(
+            file, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+        QVERIFY2(document.status != StateFile::Status::Unreadable, qPrintable(document.error));
+        QCOMPARE(document.version, AppConstants::Sessions::Version);
+        QVERIFY(document.otherSections.isEmpty());
 
         // The hash type list normally arrives from hashcat in the background;
         // the tests only need the entry the example names.
@@ -350,8 +346,7 @@ void TestMainWindow::exampleSessionFilesAreValid()
         MainWindowTestAccess::ui(window)->comboBox_hash_type->addItem(
             QString::number(entry.hashType), entry.hashType);
 
-        const QStringList notes =
-            MainWindowTestAccess::applySessionFile(window, values, version, otherSections);
+        const QStringList notes = MainWindowTestAccess::applySessionFile(window, document);
         QVERIFY2(notes.isEmpty(),
                  qPrintable(QStringLiteral("%1: %2").arg(file, notes.join(QLatin1Char('\n')))));
 
@@ -367,7 +362,7 @@ void TestMainWindow::exampleSessionFilesAreValid()
             WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
         QStringList missing;
         for (auto it = state.constBegin(); it != state.constEnd(); ++it) {
-            if (!values.contains(it.key())) {
+            if (!document.values.contains(it.key())) {
                 missing << it.key();
             }
         }
@@ -377,7 +372,7 @@ void TestMainWindow::exampleSessionFilesAreValid()
         // A data path that no resource is bundled under would fail only when
         // the example is loaded, with a missing wordlist or rules file.
         QStringList paths;
-        collectExamplePaths(values, &paths);
+        collectExamplePaths(document.values, &paths);
         for (const QString &path : std::as_const(paths)) {
             const QString name = QFileInfo(path).fileName();
             bool found = false;
@@ -1006,9 +1001,11 @@ void TestMainWindow::missingWordlistsAreMarked()
     QJsonObject sessionValues;
     sessionValues.insert(QStringLiteral("listWidget_wordlist"), restoredWordlists);
 
-    QVERIFY(MainWindowTestAccess::applySessionFile(window, sessionValues,
-                                                   AppConstants::Sessions::Version, {})
-                .isEmpty());
+    StateFile::Document document;
+    document.status = StateFile::Status::Read;
+    document.version = AppConstants::Sessions::Version;
+    document.values = sessionValues;
+    QVERIFY(MainWindowTestAccess::applySessionFile(window, document).isEmpty());
 
     QListWidget *list = MainWindowTestAccess::ui(window)->listWidget_wordlist;
     QCOMPARE(list->count(), 1);
