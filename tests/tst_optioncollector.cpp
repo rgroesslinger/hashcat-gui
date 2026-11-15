@@ -11,6 +11,7 @@
 #include "ui_mainwindow.h"
 
 #include <QComboBox>
+#include <QDir>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QMainWindow>
@@ -234,7 +235,9 @@ void TestOptionCollector::onlyCheckedRowsReachTheOptions()
     CheckedItemList::addPaths(form.ui.listWidget_feed_arguments, {QStringLiteral("arg")});
 
     const HashcatOptions options = OptionCollector::collect(form.ui, false);
-    QCOMPARE(options.wordlists, QStringList{QStringLiteral("/tmp/a.txt")});
+    // The rows hold the platform's own separator form, like the dialogs return.
+    QCOMPARE(options.wordlists,
+             QStringList{QDir::toNativeSeparators(QStringLiteral("/tmp/a.txt"))});
     QCOMPARE(options.feedArguments, QStringList{QStringLiteral("arg")});
 }
 

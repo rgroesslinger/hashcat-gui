@@ -7,6 +7,7 @@
 #include "testenvironment.h"
 
 #include <QApplication>
+#include <QDir>
 #include <QListWidget>
 #include <QSignalSpy>
 #include <QStyle>
@@ -42,13 +43,16 @@ void TestPathListController::pathsAreAddedOnceAndChecked()
     controller.addPaths({QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/a.txt"),
                          QStringLiteral("/tmp/b.txt"), QString()});
     QCOMPARE(list.count(), 2);
-    const QStringList both{QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")};
+    // The rows hold the platform's own separator form, like the dialogs return.
+    const QStringList both{QDir::toNativeSeparators(QStringLiteral("/tmp/a.txt")),
+                           QDir::toNativeSeparators(QStringLiteral("/tmp/b.txt"))};
     QCOMPARE(controller.checkedItems(), both);
 
     // An unchecked row keeps its place but stays out of the command.
     list.item(0)->setCheckState(Qt::Unchecked);
     QCOMPARE(list.count(), 2);
-    QCOMPARE(controller.checkedItems(), QStringList{QStringLiteral("/tmp/b.txt")});
+    QCOMPARE(controller.checkedItems(),
+             QStringList{QDir::toNativeSeparators(QStringLiteral("/tmp/b.txt"))});
 }
 
 void TestPathListController::removeAndMoveFollowTheSelection()
@@ -62,19 +66,20 @@ void TestPathListController::removeAndMoveFollowTheSelection()
     controller.moveSelected(-1);
     QCOMPARE(list.count(), 3);
 
+    const QString b = QDir::toNativeSeparators(QStringLiteral("/tmp/b.txt"));
     list.setCurrentRow(1);
     controller.moveSelected(-1);
-    QCOMPARE(list.item(0)->text(), QStringLiteral("/tmp/b.txt"));
+    QCOMPARE(list.item(0)->text(), b);
     // Two moves down carry b to the end; a move past the end does nothing.
     controller.moveSelected(1);
     controller.moveSelected(1);
     controller.moveSelected(1);
-    QCOMPARE(list.item(2)->text(), QStringLiteral("/tmp/b.txt"));
+    QCOMPARE(list.item(2)->text(), b);
 
     list.setCurrentRow(0);
     controller.removeSelected();
     QCOMPARE(list.count(), 2);
-    QCOMPARE(list.item(0)->text(), QStringLiteral("/tmp/c.txt"));
+    QCOMPARE(list.item(0)->text(), QDir::toNativeSeparators(QStringLiteral("/tmp/c.txt")));
 }
 
 void TestPathListController::decorationMarksUnusablePaths()
