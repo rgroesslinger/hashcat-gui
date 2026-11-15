@@ -157,8 +157,11 @@ set(HASHCAT_GUI_TESTS
     tst_commandbuilder
     tst_hashcatinfoparser
     tst_helperutils
+    tst_launch
+    tst_layout
     tst_mainwindow
     tst_pathmonitor
+    tst_session
     tst_settingsdialog
     tst_statefile
     tst_translations

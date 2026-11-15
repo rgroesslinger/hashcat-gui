@@ -103,8 +103,10 @@ Connect to `commandChanged()` once; the attack-mode combo uses `attackIndexChang
   `AppConstants::Languages::Available` (English has no catalog); `tst_translations` enforces the
   match but skips without embedded `.qm`.
 - Tests use `TestEnvironment::run`, not `QTEST_MAIN` (it redirects XDG dirs). Private access goes
-  through a friend class declared in the header under test; add a friend instead of widening the
-  API. Shell-script hashcat stubs cannot run on Windows: `QSKIP` those cases.
+  through a friend declared in the header under test (`MainWindow`'s is the
+  `MainWindowTestAccess` struct in `tests/mainwindowtestaccess.h`; delete an entry in the commit
+  that turns it into a public unit API). Add a friend instead of widening the API. Shell-script
+  hashcat stubs cannot run on Windows: `QSKIP` those cases.
 - Commit subject ≤72 chars, capitalized, imperative, no period; body only for what and why.
 - `FAQ.md` is generated: edit `FAQ.yaml`, then `mdfaqgen FAQ.yaml FAQ.md`.
 

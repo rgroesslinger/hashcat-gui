@@ -120,10 +120,10 @@ private slots:
     void copyCommandToClipboard();
 
 private:
-    // The tests read the widget state through collectHashcatOptions() and
-    // generateArguments(); making them a friend keeps those two private
-    // instead of widening the window's public surface for the sake of tests.
-    friend class TestMainWindow;
+    // The tests read the widget state through MainWindowTestAccess, the one
+    // test seam; it keeps the private surface private instead of widening the
+    // window's public API for the sake of tests.
+    friend struct MainWindowTestAccess;
 
     Ui::MainWindow *ui;
 
