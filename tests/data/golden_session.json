@@ -1,0 +1,116 @@
+{
+    "sections": {
+        "session": {
+            "values": {
+                "checkBox_custom_charset1": true,
+                "checkBox_custom_charset2": true,
+                "checkBox_custom_charset3": true,
+                "checkBox_custom_charset4": true,
+                "checkBox_force": true,
+                "checkBox_hex_charset": true,
+                "checkBox_hex_salt": true,
+                "checkBox_hex_wordlist": true,
+                "checkBox_hwmon_temp_abort": true,
+                "checkBox_ignoreusername": true,
+                "checkBox_increment": true,
+                "checkBox_optimized_kernel": true,
+                "checkBox_outfile": true,
+                "checkBox_outfile_json": true,
+                "checkBox_potfile_disable": true,
+                "checkBox_remove": true,
+                "checkBox_rules_concat": true,
+                "checkBox_rulesfile_1": true,
+                "checkBox_rulesfile_2": true,
+                "checkBox_rulesfile_3": true,
+                "checkBox_speed_only": true,
+                "checkBox_status": true,
+                "comboBox_attack": 1,
+                "comboBox_hash_type": 4000,
+                "lineEdit_association_settings": "phases=words",
+                "lineEdit_backend_devices": "1",
+                "lineEdit_cache_path": "/tmp/golden-cache",
+                "lineEdit_cpu_affinity": "0,1",
+                "lineEdit_custom_charset1": "?l",
+                "lineEdit_custom_charset2": "?u",
+                "lineEdit_custom_charset3": "?d",
+                "lineEdit_custom_charset4": "?s",
+                "lineEdit_encoding_from": "utf-8",
+                "lineEdit_encoding_to": "iso-8859-1",
+                "lineEdit_feed": "wordlist",
+                "lineEdit_feed_argument": "staging-arg",
+                "lineEdit_hash_recipe": "md5(md5($p).$s)",
+                "lineEdit_hashfile": "/tmp/golden-hashes.txt",
+                "lineEdit_limit": "100",
+                "lineEdit_mask": "?d?d?d?d",
+                "lineEdit_opencl_device_types": "1,2",
+                "lineEdit_outfile": "/tmp/golden-out.txt",
+                "lineEdit_outfile_format": "2,3",
+                "lineEdit_pcfg_costmax": "16",
+                "lineEdit_pcfg_extra": "omen=1",
+                "lineEdit_pcfg_kbits": "10",
+                "lineEdit_pcfg_mask": "?d?d",
+                "lineEdit_pcfg_maxgain": "2.5",
+                "lineEdit_pcfg_maxword": "16",
+                "lineEdit_pcfg_ruleset_name": "staging",
+                "lineEdit_pcfg_scale": "8",
+                "lineEdit_pcfg_threads": "4",
+                "lineEdit_pcfg_walk": "1",
+                "lineEdit_pcfg_weights": "1:2",
+                "lineEdit_rule_left": "^a",
+                "lineEdit_rule_right": "$b",
+                "lineEdit_rulesfile_1": "/tmp/golden-r1.rule",
+                "lineEdit_rulesfile_2": "/tmp/golden-r2.rule",
+                "lineEdit_rulesfile_3": "/tmp/golden-r3.rule",
+                "lineEdit_session": "golden",
+                "lineEdit_skip": "10",
+                "lineEdit_table_cap": "1000",
+                "lineEdit_table_extra": "substitutions=1",
+                "lineEdit_table_identity": "1",
+                "lineEdit_table_maxperm": "5000",
+                "lineEdit_table_single": "0",
+                "lineEdit_table_template": "0",
+                "listWidget_feed_arguments": [
+                    {
+                        "checked": true,
+                        "text": "arg one"
+                    },
+                    {
+                        "checked": false,
+                        "text": "arg two"
+                    }
+                ],
+                "listWidget_pcfg_rulesets": [
+                    {
+                        "checked": true,
+                        "text": "/tmp/golden-rules.pcfg"
+                    }
+                ],
+                "listWidget_tables": [
+                    {
+                        "checked": true,
+                        "text": "/tmp/golden.table"
+                    }
+                ],
+                "listWidget_wordlist": [
+                    {
+                        "checked": true,
+                        "text": "/tmp/golden-left.txt"
+                    },
+                    {
+                        "checked": true,
+                        "text": "/tmp/golden-right.txt"
+                    }
+                ],
+                "radioButton_generate_rules": true,
+                "radioButton_use_rules_file": false,
+                "spinBox_generate_rules": 500,
+                "spinBox_hwmon_temp_abort": 85,
+                "spinBox_increment_max": 6,
+                "spinBox_increment_min": 2,
+                "spinBox_runtime": 60,
+                "spinBox_status_timer": 30
+            },
+            "version": 1
+        }
+    }
+}

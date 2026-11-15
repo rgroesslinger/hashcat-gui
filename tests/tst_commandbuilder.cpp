@@ -43,6 +43,7 @@ private slots:
     void positionalInputsFollowTheMode();
     void modeRequirements_data();
     void modeRequirements();
+    void parameterSpelling_data();
     void parameterSpelling();
     void unknownParameterIsEmpty();
     void predicates();
@@ -926,81 +927,83 @@ void TestCommandBuilder::modeRequirements()
     QCOMPARE(requirements.needsMask, needsMask);
 }
 
-void TestCommandBuilder::parameterSpelling()
+// One row per enumerator: the long form, and the short form where one exists
+// (empty otherwise). A parameter without a short form has to fall back to the
+// long one rather than produce an empty argument, and a new enumerator has to
+// be written down here - Count pins the row count against the enum.
+void TestCommandBuilder::parameterSpelling_data()
 {
     using Parameter = CommandBuilder::Parameter;
 
-    QCOMPARE(CommandBuilder::parameterName(Parameter::AttackMode), QStringLiteral("--attack-mode"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::AttackMode, true), QStringLiteral("-a"));
+    QTest::addColumn<int>("parameter");
+    QTest::addColumn<QString>("longForm");
+    QTest::addColumn<QString>("shortForm");
 
-    // --cpu-affinity has no short form; asking for one must fall back to the
-    // long one rather than produce an empty argument
-    QCOMPARE(CommandBuilder::parameterName(Parameter::CpuAffinity, true),
-             QStringLiteral("--cpu-affinity"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::CpuAffinity, false),
-             QStringLiteral("--cpu-affinity"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::HexCharset, true),
-             QStringLiteral("--hex-charset"));
-
-    // The short forms that differ from the parameter name are easy to get
-    // wrong, so pin them here as well.
-    QCOMPARE(CommandBuilder::parameterName(Parameter::Increment, true), QStringLiteral("-i"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::Skip, true), QStringLiteral("-s"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::Limit, true), QStringLiteral("-l"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::OpenclDeviceTypes, true),
-             QStringLiteral("-D"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::RuleLeft, true), QStringLiteral("-j"));
-    QCOMPARE(CommandBuilder::parameterName(Parameter::RuleRight, true), QStringLiteral("-k"));
-
-    // every enumerator has to be spelled out, otherwise the option silently
-    // vanishes from the command line
-    const auto all = std::to_array<Parameter>({
-        Parameter::AttackMode,
-        Parameter::BackendDevices,
-        Parameter::CachePath,
-        Parameter::CpuAffinity,
-        Parameter::CustomCharset1,
-        Parameter::CustomCharset2,
-        Parameter::CustomCharset3,
-        Parameter::CustomCharset4,
-        Parameter::EncodingFrom,
-        Parameter::EncodingTo,
-        Parameter::Force,
-        Parameter::GenerateRules,
-        Parameter::HashType,
-        Parameter::HashRecipe,
-        Parameter::HexCharset,
-        Parameter::HexSalt,
-        Parameter::HexWordlist,
-        Parameter::HwmonTempAbort,
-        Parameter::Increment,
-        Parameter::IncrementMax,
-        Parameter::IncrementMin,
-        Parameter::Limit,
-        Parameter::OpenclDeviceTypes,
-        Parameter::OptimizedKernel,
-        Parameter::Outfile,
-        Parameter::OutfileFormat,
-        Parameter::OutfileJson,
-        Parameter::PotfileDisable,
-        Parameter::Remove,
-        Parameter::RuleLeft,
-        Parameter::RuleRight,
-        Parameter::RulesConcat,
-        Parameter::RulesFile,
-        Parameter::Runtime,
-        Parameter::Session,
-        Parameter::Skip,
-        Parameter::SpeedOnly,
-        Parameter::Status,
-        Parameter::StatusTimer,
-        Parameter::Username,
+    struct Row {
+        Parameter parameter;
+        const char *longForm;
+        const char *shortForm;
+    };
+    const auto rows = std::to_array<Row>({
+        {Parameter::AttackMode, "--attack-mode", "-a"},
+        {Parameter::BackendDevices, "--backend-devices", "-d"},
+        {Parameter::CachePath, "--cache-path", ""},
+        {Parameter::CpuAffinity, "--cpu-affinity", ""},
+        {Parameter::CustomCharset1, "--custom-charset1", "-1"},
+        {Parameter::CustomCharset2, "--custom-charset2", "-2"},
+        {Parameter::CustomCharset3, "--custom-charset3", "-3"},
+        {Parameter::CustomCharset4, "--custom-charset4", "-4"},
+        {Parameter::EncodingFrom, "--encoding-from", ""},
+        {Parameter::EncodingTo, "--encoding-to", ""},
+        {Parameter::Force, "--force", ""},
+        {Parameter::GenerateRules, "--generate-rules", "-g"},
+        {Parameter::HashType, "--hash-type", "-m"},
+        {Parameter::HashRecipe, "--hash-recipe", ""},
+        {Parameter::HexCharset, "--hex-charset", ""},
+        {Parameter::HexSalt, "--hex-salt", ""},
+        {Parameter::HexWordlist, "--hex-wordlist", ""},
+        {Parameter::HwmonTempAbort, "--hwmon-temp-abort", ""},
+        {Parameter::Increment, "--increment", "-i"},
+        {Parameter::IncrementMax, "--increment-max", ""},
+        {Parameter::IncrementMin, "--increment-min", ""},
+        {Parameter::Limit, "--limit", "-l"},
+        {Parameter::OpenclDeviceTypes, "--opencl-device-types", "-D"},
+        {Parameter::OptimizedKernel, "--optimized-kernel-enable", "-O"},
+        {Parameter::Outfile, "--outfile", "-o"},
+        {Parameter::OutfileFormat, "--outfile-format", ""},
+        {Parameter::OutfileJson, "--outfile-json", ""},
+        {Parameter::PotfileDisable, "--potfile-disable", ""},
+        {Parameter::Remove, "--remove", ""},
+        {Parameter::RuleLeft, "--rule-left", "-j"},
+        {Parameter::RuleRight, "--rule-right", "-k"},
+        {Parameter::RulesConcat, "--rules-concat", ""},
+        {Parameter::RulesFile, "--rules-file", "-r"},
+        {Parameter::Runtime, "--runtime", ""},
+        {Parameter::Session, "--session", ""},
+        {Parameter::Skip, "--skip", "-s"},
+        {Parameter::SpeedOnly, "--speed-only", ""},
+        {Parameter::Status, "--status", ""},
+        {Parameter::StatusTimer, "--status-timer", ""},
+        {Parameter::Username, "--username", ""},
     });
-    for (const Parameter key : all) {
-        QVERIFY2(!CommandBuilder::parameterName(key).isEmpty(), "an enum has no long spelling");
-        QVERIFY2(!CommandBuilder::parameterName(key, true).isEmpty(),
-                 "an enum has no spelling at all");
+    QCOMPARE(int(Parameter::Count), int(rows.size()));
+
+    for (const Row &row : rows) {
+        QTest::newRow(row.longForm)
+            << static_cast<int>(row.parameter) << QString::fromLatin1(row.longForm)
+            << QString::fromLatin1(row.shortForm);
     }
+}
+
+void TestCommandBuilder::parameterSpelling()
+{
+    QFETCH(int, parameter);
+    QFETCH(QString, longForm);
+    QFETCH(QString, shortForm);
+
+    const auto key = static_cast<CommandBuilder::Parameter>(parameter);
+    QCOMPARE(CommandBuilder::parameterName(key, false), longForm);
+    QCOMPARE(CommandBuilder::parameterName(key, true), shortForm.isEmpty() ? longForm : shortForm);
 }
 
 void TestCommandBuilder::unknownParameterIsEmpty()

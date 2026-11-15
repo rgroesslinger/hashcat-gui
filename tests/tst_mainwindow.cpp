@@ -42,6 +42,7 @@
 #include <QTimer>
 #include <QToolTip>
 #include <QWidget>
+#include <array>
 #include <utility>
 
 namespace
@@ -300,6 +301,9 @@ private slots:
     void aSessionFileThatCannotBeReadIsLeftAlone();
     void aSessionFileOfAnotherShapeIsLeftAlone();
     void theStartupShowsNoBox();
+    void theSerializedKeySetIsFrozen();
+    void theGoldenSessionRoundTrips();
+    void thePreviewFormattingIsPinned();
 
 private:
     static QAction *exampleAction(MainWindow &window, AttackMode mode);
@@ -2989,6 +2993,258 @@ void TestMainWindow::theStartupShowsNoBox()
     QCOMPARE(m_closedModals, 0);
     // ... and the session was restored.
     QCOMPARE(reloaded.ui->spinBox_runtime->value(), 64);
+}
+
+// The session format is the set of widget names: a new named widget - even a
+// Designer auto-name - enters the frozen format and can never be renamed.
+// The key set of a fresh window is pinned against the checked-in list.
+void TestMainWindow::theSerializedKeySetIsFrozen()
+{
+    MainWindow window;
+    const QJsonObject values =
+        WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
+
+    const auto expected = std::to_array<QLatin1StringView>({
+        QLatin1StringView{"checkBox_custom_charset1"},
+        QLatin1StringView{"checkBox_custom_charset2"},
+        QLatin1StringView{"checkBox_custom_charset3"},
+        QLatin1StringView{"checkBox_custom_charset4"},
+        QLatin1StringView{"checkBox_force"},
+        QLatin1StringView{"checkBox_hex_charset"},
+        QLatin1StringView{"checkBox_hex_salt"},
+        QLatin1StringView{"checkBox_hex_wordlist"},
+        QLatin1StringView{"checkBox_hwmon_temp_abort"},
+        QLatin1StringView{"checkBox_ignoreusername"},
+        QLatin1StringView{"checkBox_increment"},
+        QLatin1StringView{"checkBox_optimized_kernel"},
+        QLatin1StringView{"checkBox_outfile"},
+        QLatin1StringView{"checkBox_outfile_json"},
+        QLatin1StringView{"checkBox_potfile_disable"},
+        QLatin1StringView{"checkBox_remove"},
+        QLatin1StringView{"checkBox_rules_concat"},
+        QLatin1StringView{"checkBox_rulesfile_1"},
+        QLatin1StringView{"checkBox_rulesfile_2"},
+        QLatin1StringView{"checkBox_rulesfile_3"},
+        QLatin1StringView{"checkBox_speed_only"},
+        QLatin1StringView{"checkBox_status"},
+        QLatin1StringView{"comboBox_attack"},
+        QLatin1StringView{"comboBox_hash_type"},
+        QLatin1StringView{"lineEdit_association_settings"},
+        QLatin1StringView{"lineEdit_backend_devices"},
+        QLatin1StringView{"lineEdit_cache_path"},
+        QLatin1StringView{"lineEdit_cpu_affinity"},
+        QLatin1StringView{"lineEdit_custom_charset1"},
+        QLatin1StringView{"lineEdit_custom_charset2"},
+        QLatin1StringView{"lineEdit_custom_charset3"},
+        QLatin1StringView{"lineEdit_custom_charset4"},
+        QLatin1StringView{"lineEdit_encoding_from"},
+        QLatin1StringView{"lineEdit_encoding_to"},
+        QLatin1StringView{"lineEdit_feed"},
+        QLatin1StringView{"lineEdit_feed_argument"},
+        QLatin1StringView{"lineEdit_hash_recipe"},
+        QLatin1StringView{"lineEdit_hashfile"},
+        QLatin1StringView{"lineEdit_limit"},
+        QLatin1StringView{"lineEdit_mask"},
+        QLatin1StringView{"lineEdit_opencl_device_types"},
+        QLatin1StringView{"lineEdit_outfile"},
+        QLatin1StringView{"lineEdit_outfile_format"},
+        QLatin1StringView{"lineEdit_pcfg_costmax"},
+        QLatin1StringView{"lineEdit_pcfg_extra"},
+        QLatin1StringView{"lineEdit_pcfg_kbits"},
+        QLatin1StringView{"lineEdit_pcfg_mask"},
+        QLatin1StringView{"lineEdit_pcfg_maxgain"},
+        QLatin1StringView{"lineEdit_pcfg_maxword"},
+        QLatin1StringView{"lineEdit_pcfg_ruleset_name"},
+        QLatin1StringView{"lineEdit_pcfg_scale"},
+        QLatin1StringView{"lineEdit_pcfg_threads"},
+        QLatin1StringView{"lineEdit_pcfg_walk"},
+        QLatin1StringView{"lineEdit_pcfg_weights"},
+        QLatin1StringView{"lineEdit_rule_left"},
+        QLatin1StringView{"lineEdit_rule_right"},
+        QLatin1StringView{"lineEdit_rulesfile_1"},
+        QLatin1StringView{"lineEdit_rulesfile_2"},
+        QLatin1StringView{"lineEdit_rulesfile_3"},
+        QLatin1StringView{"lineEdit_session"},
+        QLatin1StringView{"lineEdit_skip"},
+        QLatin1StringView{"lineEdit_table_cap"},
+        QLatin1StringView{"lineEdit_table_extra"},
+        QLatin1StringView{"lineEdit_table_identity"},
+        QLatin1StringView{"lineEdit_table_maxperm"},
+        QLatin1StringView{"lineEdit_table_single"},
+        QLatin1StringView{"lineEdit_table_template"},
+        QLatin1StringView{"listWidget_feed_arguments"},
+        QLatin1StringView{"listWidget_pcfg_rulesets"},
+        QLatin1StringView{"listWidget_tables"},
+        QLatin1StringView{"listWidget_wordlist"},
+        QLatin1StringView{"radioButton_generate_rules"},
+        QLatin1StringView{"radioButton_use_rules_file"},
+        QLatin1StringView{"spinBox_generate_rules"},
+        QLatin1StringView{"spinBox_hwmon_temp_abort"},
+        QLatin1StringView{"spinBox_increment_max"},
+        QLatin1StringView{"spinBox_increment_min"},
+        QLatin1StringView{"spinBox_runtime"},
+        QLatin1StringView{"spinBox_status_timer"},
+    });
+
+    QStringList expectedNames;
+    for (const QLatin1StringView &name : expected) {
+        expectedNames << QString(name);
+    }
+    QCOMPARE(values.keys(), expectedNames);
+}
+
+// One canonical session with every serialized widget non-default: applying it
+// and saving again has to be byte-identical, and the argv it produces is
+// pinned. Together with the key-set test this guards the frozen session
+// format and the argv order through every extraction step.
+void TestMainWindow::theGoldenSessionRoundTrips()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-golden"),
+                                                         "#!/bin/sh\n"
+                                                         "printf '{\"0\":{\"name\":\"MD5\"},"
+                                                         "\"1000\":{\"name\":\"NTLM\"},"
+                                                         "\"4000\":{\"name\":\"recipe\"}}\\n'\n"
+                                                         "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    const QString goldenPath =
+        QStringLiteral(QT_TESTCASE_SOURCEDIR "/tests/data/golden_session.json");
+    QFile goldenFile(goldenPath);
+    QVERIFY2(goldenFile.open(QIODevice::ReadOnly), qPrintable(goldenPath));
+    const QByteArray goldenBytes = goldenFile.readAll();
+    goldenFile.close();
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() == 3, 5000);
+
+    QString error;
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    QVERIFY(StateFile::read(goldenPath, AppConstants::FileSections::Session, &values, &version,
+                            &otherSections, &error));
+    const QStringList notes = window.applySessionFile(values, version, otherSections);
+    QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QStringLiteral("\n"))));
+
+    window.saveSession();
+    QFile saved(StateFile::sessionFilePath());
+    QVERIFY(saved.open(QIODevice::ReadOnly));
+    QCOMPARE(saved.readAll(), goldenBytes);
+
+    const QStringList expectedArguments{
+        QStringLiteral("--hash-type"),
+        QStringLiteral("4000"),
+        QStringLiteral("--hash-recipe"),
+        QStringLiteral("md5(md5($p).$s)"),
+        QStringLiteral("--attack-mode"),
+        QStringLiteral("1"),
+        QStringLiteral("--force"),
+        QStringLiteral("--remove"),
+        QStringLiteral("--username"),
+        QStringLiteral("--session"),
+        QStringLiteral("golden"),
+        QStringLiteral("--runtime"),
+        QStringLiteral("60"),
+        QStringLiteral("--status"),
+        QStringLiteral("--status-timer"),
+        QStringLiteral("30"),
+        QStringLiteral("--potfile-disable"),
+        QStringLiteral("--generate-rules"),
+        QStringLiteral("500"),
+        QStringLiteral("--rule-left"),
+        QStringLiteral("^a"),
+        QStringLiteral("--rule-right"),
+        QStringLiteral("$b"),
+        QStringLiteral("--speed-only"),
+        QStringLiteral("--optimized-kernel-enable"),
+        QStringLiteral("--skip"),
+        QStringLiteral("10"),
+        QStringLiteral("--limit"),
+        QStringLiteral("100"),
+        QStringLiteral("--hex-salt"),
+        QStringLiteral("--hex-wordlist"),
+        QStringLiteral("--encoding-from"),
+        QStringLiteral("utf-8"),
+        QStringLiteral("--encoding-to"),
+        QStringLiteral("iso-8859-1"),
+        QStringLiteral("--outfile"),
+        QStringLiteral("/tmp/golden-out.txt"),
+        QStringLiteral("--outfile-json"),
+        QStringLiteral("--cache-path"),
+        QStringLiteral("/tmp/golden-cache"),
+        QStringLiteral("--cpu-affinity"),
+        QStringLiteral("0,1"),
+        QStringLiteral("--backend-devices"),
+        QStringLiteral("1"),
+        QStringLiteral("--opencl-device-types"),
+        QStringLiteral("1,2"),
+        QStringLiteral("--hwmon-temp-abort"),
+        QStringLiteral("85"),
+        QStringLiteral("/tmp/golden-hashes.txt"),
+        QStringLiteral("/tmp/golden-left.txt"),
+        QStringLiteral("/tmp/golden-right.txt"),
+    };
+    QCOMPARE(window.generateArguments(), expectedArguments);
+}
+
+// The preview's display formatting, pinned before it moves to its own unit:
+// the recipe is quoted for display, markup-like text is escaped in the
+// tooltip, and the tooltip wraps at 120 columns.
+void TestMainWindow::thePreviewFormattingIsPinned()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-preview"),
+                                                         "#!/bin/sh\n"
+                                                         "printf '{\"0\":{\"name\":\"MD5\"},"
+                                                         "\"4000\":{\"name\":\"recipe\"}}\\n'\n"
+                                                         "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(window.ui->comboBox_hash_type->count() == 2, 5000);
+
+#ifdef Q_OS_WIN
+    const QChar quote = QLatin1Char('"');
+#else
+    const QChar quote = QLatin1Char('\'');
+#endif
+
+    // A recipe with spaces, quotes and markup: the command line quotes it for
+    // display, the tooltip escapes the markup.
+    window.ui->comboBox_hash_type->setCurrentIndex(window.ui->comboBox_hash_type->findData(4000));
+    window.ui->lineEdit_hash_recipe->setText(QStringLiteral("md5($p.\"<b>\")"));
+    const QString recipeCommand = QStringLiteral("stub-hashcat-preview --hash-type 4000 "
+                                                 "--hash-recipe ")
+                                  + quote + QStringLiteral("md5($p.\"<b>\")") + quote
+                                  + QStringLiteral(" --attack-mode 0");
+    QCOMPARE(window.ui->lineEdit_command->text(), recipeCommand);
+    QCOMPARE(window.ui->lineEdit_command->toolTip(),
+             QStringLiteral("stub-hashcat-preview --hash-type 4000 --hash-recipe ") + quote
+                 + QStringLiteral("md5($p.&quot;&lt;b&gt;&quot;)") + quote
+                 + QStringLiteral(" --attack-mode 0"));
+
+    // Two long positional wordlists: the tooltip breaks between arguments at
+    // 120 columns, a flag keeps its value on the same line.
+    window.ui->comboBox_hash_type->setCurrentIndex(window.ui->comboBox_hash_type->findData(0));
+    const QString pathA = QString(80, QLatin1Char('a'));
+    const QString pathB = QString(80, QLatin1Char('b'));
+    MainWindow::addPathsToList(window.ui->listWidget_wordlist, {pathA, pathB});
+    const QString wrappedCommand = QStringLiteral("stub-hashcat-preview --hash-type 0 "
+                                                  "--attack-mode 0 ")
+                                   + pathA + QLatin1Char(' ') + pathB;
+    QCOMPARE(window.ui->lineEdit_command->text(), wrappedCommand);
+    QCOMPARE(window.ui->lineEdit_command->toolTip(),
+             QStringLiteral("stub-hashcat-preview --hash-type 0 --attack-mode 0\n") + pathA
+                 + QLatin1Char('\n') + pathB);
 }
 
 int main(int argc, char *argv[])

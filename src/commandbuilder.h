@@ -63,6 +63,10 @@ public:
         Status,
         StatusTimer,
         Username,
+        // Not a parameter: the number of enumerators, for the table tests.
+        // It has no name-table entry and is never accepted from a session
+        // or a command line.
+        Count,
     };
 
     // What an attack mode needs from the user before hashcat can run.
