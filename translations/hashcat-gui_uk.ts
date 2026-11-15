@@ -113,6 +113,100 @@
     </message>
 </context>
 <context>
+    <name>AttackModeView</name>
+    <message>
+        <source>Straight</source>
+        <translation>Словникова</translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation>Комбінаторна</translation>
+    </message>
+    <message>
+        <source>Brute-force</source>
+        <translation>Повний перебір</translation>
+    </message>
+    <message>
+        <source>PCFG</source>
+        <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Таблиця</translation>
+    </message>
+    <message>
+        <source>Hybrid Wordlist + Mask</source>
+        <translation>Гібридна: словник + маска</translation>
+    </message>
+    <message>
+        <source>Hybrid Mask + Wordlist</source>
+        <translation>Гібридна: маска + словник</translation>
+    </message>
+    <message>
+        <source>Generic (feed)</source>
+        <translation>Універсальна (feed)</translation>
+    </message>
+    <message>
+        <source>Association</source>
+        <translation>Асоціативна</translation>
+    </message>
+    <message>
+        <source>Hybrid (mask + ?w/?q)</source>
+        <translation>Гібридна (маска + ?w/?q)</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Цьому режиму потрібен принаймні один словник.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly 2 wordlists (left, right).</source>
+        <translation>Цьому режиму потрібно рівно 2 словники (лівий, правий).</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Цьому режиму потрібна маска.</translation>
+    </message>
+    <message>
+        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
+        <translation>Цей режим запускає вбудований у hashcat набір правил default-passwords; укажіть один або кілька, щоб використати власні.</translation>
+    </message>
+    <message>
+        <source>This mode needs one wordlist and at least one table.</source>
+        <translation>Цьому режиму потрібні один словник і щонайменше одна таблиця.</translation>
+    </message>
+    <message>
+        <source>This mode needs a wordlist and a mask.</source>
+        <translation>Цьому режиму потрібні словник і маска.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
+        <translation>Цьому режиму потрібен feed. Аргументи залежать від feed: random і stdin не потребують жодного, wordlist потребує шлях.</translation>
+    </message>
+    <message>
+        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
+        <translation>Цьому режиму потрібно щонайбільше один словник. Без словника слова беруться з файлу гешів, а рядок налаштувань може обмежити запуск; зі словником два файли зіставляються порядково.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
+        <translation>Цьому режиму потрібна маска рівно з одним ?w; ?q після ?w указує другий словник.</translation>
+    </message>
+</context>
+<context>
+    <name>ExampleSession</name>
+    <message>
+        <source>Could not create the example directory “%1”.</source>
+        <translation>Не вдалося створити каталог прикладу «%1».</translation>
+    </message>
+    <message>
+        <source>Could not read the bundled file “%1”: %2</source>
+        <translation>Не вдалося прочитати вбудований файл «%1»: %2</translation>
+    </message>
+    <message>
+        <source>Could not write “%1”: %2</source>
+        <translation>Не вдалося записати «%1»: %2</translation>
+    </message>
+</context>
+<context>
     <name>HashcatInfoParser</name>
     <message>
         <source>Invalid JSON returned from hashcat.</source>
@@ -124,7 +218,7 @@
     </message>
 </context>
 <context>
-    <name>HelperUtils</name>
+    <name>HashcatRunner</name>
     <message>
         <source>The hashcat path is not configured.</source>
         <translation>Шлях до hashcat не налаштовано.</translation>
@@ -141,9 +235,144 @@
         <translation>Вичерпано час очікування hashcat
 %1</translation>
     </message>
+</context>
+<context>
+    <name>LaunchMessage</name>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>У цій системі не знайдено підтримуваного термінала. hashcat-gui потрібен термінал, щоб показувати вивід hashcat.</translation>
+        <source>Please choose a hash file.</source>
+        <translation>Виберіть файл гешів.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
+        <translation>Перейдіть до &lt;b&gt;%1 → %2&lt;/b&gt;, щоб налаштувати шлях до виконуваного файлу hashcat.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable does not exist:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>Налаштованого виконуваного файлу hashcat не існує:
+%1
+Перейдіть до %2 → %3, щоб змінити його.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
+        <translation>Перейдіть до &lt;b&gt;%1 → %2&lt;/b&gt;, щоб вибрати термінал, який використовується для запуску.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation>Налаштований термінал «%1» недоступний. Доступні термінали: %2
+Перейдіть до %3 → %4, щоб змінити його.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Цьому режиму потрібен принаймні один словник.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
+Currently selected: %2.</source>
+        <translation>Цьому режиму потрібні словники в кількості рівно %1 (лівий, правий).
+Наразі вибрано: %2.</translation>
+    </message>
+    <message>
+        <source>Maximum number of wordlists for this mode: %1.
+Currently selected: %2.</source>
+        <translation>Максимальна кількість словників для цього режиму: %1.
+Наразі вибрано: %2.</translation>
+    </message>
+    <message>
+        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
+        <translation>Тут hashcat зіставляє два файли порядково; цей інтерфейс пропонує для такої ролі лише один словник.</translation>
+    </message>
+    <message>
+        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
+%1</source>
+        <translation>Цей словник має бути файлом: hashcat читає його як множений словник (сторона ?q), і теку там використати не можна:
+%1</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Цьому режиму потрібна маска.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one table.</source>
+        <translation>Цьому режиму потрібна щонайменше одна таблиця.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
+        <translation>Цьому режиму потрібен feed: вбудована назва (wordlist, stdin, random, …) або шлях до файлу feed.</translation>
+    </message>
+    <message>
+        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
+        <translation>Цей режим зіставляє словники з маскою; масці потрібен ?w для слова.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?w.</source>
+        <translation>Маска містить більше ніж один ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains a ?q before the first ?w.</source>
+        <translation>Маска містить ?q перед першим ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?q.</source>
+        <translation>Маска містить більше ніж один ?q.</translation>
+    </message>
+    <message>
+        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
+        <translation>Маска вказує друге слово через ?q, але вибрано лише один словник.</translation>
+    </message>
+    <message>
+        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
+        <translation>Вибрано два словники, але в масці немає ?q для другого.</translation>
+    </message>
+    <message>
+        <source>The increment is not offered in this hybrid mode.</source>
+        <translation>Приріст недоступний у цьому гібридному режимі.</translation>
+    </message>
+    <message>
+        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
+        <translation>Маркери ?w і ?q доступні лише в гібридному режимі (маска + словники).</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Власний набір символів використовується лише всередині маски, а в цьому запуску маску не вказано. Додайте налаштування mask=, що посилається на ?1–?4, наприклад mask=?1?1?1?1, або очистьте власний набір символів.</translation>
+    </message>
+    <message>
+        <source>The setting “%1” is not valid for this mode.</source>
+        <translation>Налаштування «%1» недійсне для цього режиму.</translation>
+    </message>
+    <message>
+        <source>The token “%1” is not a setting; settings are written as key=value.</source>
+        <translation>Токен «%1» не є налаштуванням; налаштування записуються у вигляді key=value.</translation>
+    </message>
+    <message>
+        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
+        <translation>Рядок налаштувань діє, лише поки слова беруться з файлу гешів. Очистьте або рядок налаштувань, або список словників.</translation>
+    </message>
+    <message>
+        <source>The hash type 4000 describes its hashes as a recipe, for example
+md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
+        <translation>Тип геша 4000 описує свої геші у вигляді рецепта, наприклад
+md5(md5(salt) . pass). Введіть його в поле рецепта геша.</translation>
+    </message>
+    <message>
+        <source>The minimum increment length is larger than the maximum.</source>
+        <translation>Мінімальна довжина приросту більша за максимальну.</translation>
+    </message>
+    <message>
+        <source>The cache path must be an existing directory:
+%1</source>
+        <translation>Шлях до кешу має вказувати на наявний каталог:
+%1</translation>
+    </message>
+    <message>
+        <source>The increment cannot be combined with the speed-only option.</source>
+        <translation>Приріст не можна поєднувати з параметром «лише швидкість».</translation>
+    </message>
+    <message>
+        <source>Removing cracked hashes is not possible in the association attack mode.</source>
+        <translation>Вилучення зламаних гешів неможливе в асоціативному режимі атаки.</translation>
     </message>
 </context>
 <context>
@@ -773,8 +1002,8 @@
         <translation>Перервати сеанс через указану кількість секунд; 0 — працювати, доки hashcat не завершить роботу.</translation>
     </message>
     <message>
-        <source>&#xa0;s</source>
-        <translation>&#xa0;с</translation>
+        <source> s</source>
+        <translation> с</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -845,8 +1074,8 @@
         <translation>Перервати, коли будь-який пристрій бекенда перевищить цю температуру в °C; 0 вимикає перевірку.</translation>
     </message>
     <message>
-        <source>&#xa0;°C</source>
-        <translation>&#xa0;°C</translation>
+        <source> °C</source>
+        <translation> °C</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -1057,22 +1286,6 @@ Default: 1,2</source>
         <translation>Імпортовано</translation>
     </message>
     <message>
-        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
-        <translation>Файл створено старішою версією hashcat-gui (версія формату %1; ця версія читає формат версії %2).</translation>
-    </message>
-    <message>
-        <source>The file holds sections this import does not use: %1.</source>
-        <translation>Файл містить розділи, які цей імпорт не використовує: %1.</translation>
-    </message>
-    <message>
-        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
-        <translation>Файл має версію формату %1, але ця версія читає формат версії %2, тому його не було застосовано. Оновіть hashcat-gui, щоб прочитати його.</translation>
-    </message>
-    <message>
-        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
-        <translation>Файл сеансу має версію формату %1, але ця версія читає формат версії %2, тому сеанс не було відновлено. Файл залишено без змін, тому сеанс цього запуску теж не зберігається. Оновіть hashcat-gui, щоб прочитати його.</translation>
-    </message>
-    <message>
         <source>Settings exported to “%1”.</source>
         <translation>Налаштування експортовано до «%1».</translation>
     </message>
@@ -1153,68 +1366,12 @@ Default: 1,2</source>
         <translation>Не вдалося зберегти</translation>
     </message>
     <message>
-        <source>Straight</source>
-        <translation>Словникова</translation>
-    </message>
-    <message>
-        <source>Combination</source>
-        <translation>Комбінаторна</translation>
-    </message>
-    <message>
-        <source>Brute-force</source>
-        <translation>Повний перебір</translation>
-    </message>
-    <message>
-        <source>Hybrid Wordlist + Mask</source>
-        <translation>Гібридна: словник + маска</translation>
-    </message>
-    <message>
-        <source>Hybrid Mask + Wordlist</source>
-        <translation>Гібридна: маска + словник</translation>
-    </message>
-    <message>
-        <source>Generic (feed)</source>
-        <translation>Універсальна (feed)</translation>
-    </message>
-    <message>
-        <source>Association</source>
-        <translation>Асоціативна</translation>
-    </message>
-    <message>
-        <source>Hybrid (mask + ?w/?q)</source>
-        <translation>Гібридна (маска + ?w/?q)</translation>
-    </message>
-    <message>
         <source>Updating…</source>
         <translation>Оновлення…</translation>
     </message>
     <message>
         <source>Failed to load hash types</source>
         <translation>Не вдалося завантажити типи гешів</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly 2 wordlists (left, right).</source>
-        <translation>Цьому режиму потрібно рівно 2 словники (лівий, правий).</translation>
-    </message>
-    <message>
-        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
-        <translation>Цей режим запускає вбудований у hashcat набір правил default-passwords; укажіть один або кілька, щоб використати власні.</translation>
-    </message>
-    <message>
-        <source>This mode needs one wordlist and at least one table.</source>
-        <translation>Цьому режиму потрібні один словник і щонайменше одна таблиця.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
-        <translation>Цьому режиму потрібен feed. Аргументи залежать від feed: random і stdin не потребують жодного, wordlist потребує шлях.</translation>
-    </message>
-    <message>
-        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>Цьому режиму потрібно щонайбільше один словник. Без словника слова беруться з файлу гешів, а рядок налаштувань може обмежити запуск; зі словником два файли зіставляються порядково.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
-        <translation>Цьому режиму потрібна маска рівно з одним ?w; ?q після ?w указує другий словник.</translation>
     </message>
     <message>
         <source>Open hash file</source>
@@ -1253,8 +1410,75 @@ Default: 1,2</source>
         <translation>Відкрити файл feed</translation>
     </message>
     <message>
+        <source>Open rules file</source>
+        <translation>Відкрити файл правил</translation>
+    </message>
+    <message>
+        <source>Could not start “%1”: %2</source>
+        <translation>Не вдалося запустити «%1»: %2</translation>
+    </message>
+    <message>
+        <source>Failed to obtain supported hash types.
+Error: %1</source>
+        <translation>Не вдалося отримати підтримувані типи гешів.
+Помилка: %1</translation>
+    </message>
+    <message>
+        <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
+        <translation>Не вдалося завантажити типи гешів. Перевірте шлях до hashcat у налаштуваннях.</translation>
+    </message>
+    <message>
+        <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
+        <translation>Укажіть шлях до hashcat у %1 → %2, щоб завантажити доступні типи гешів.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Використовуйте ?1–?4 у масці, щоб вставити власний набір символів. Маска використовується режимом «Повний перебір», гібридними режимами та налаштуванням mask= у PCFG; набір символів, який не названо в жодній масці, відхиляється.</translation>
+    </message>
+    <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>Маска кандидатів у паролі. ?1–?4 вставляють власний набір символів, ?w вставляє слово зі словника, а ?q — друге слово зі словника в режимі «Гібридна (маска + ?w/?q)», ?? означає літерал ?.</translation>
+    </message>
+    <message>
+        <source>Load the %1 example? The current session is lost.
+
+The example cracks a test hash; hashcat should recover the password %2.</source>
+        <translation>Завантажити приклад %1? Поточний сеанс буде втрачено.
+
+Приклад ламає тестовий геш; hashcat має відновити пароль %2.</translation>
+    </message>
+    <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+Це може бути спричинено Windows Defender або іншим антивірусним ПЗ. Спосіб усунення див. у &lt;a href="%1"&gt;записі ЧаП&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>Скопійовано до буфера обміну</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Не вдалося запустити</translation>
+    </message>
+    <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>Командний рядок задовгий для термінала. Скоротіть списки аргументів або їхні значення та повторіть спробу.</translation>
+    </message>
+</context>
+<context>
+    <name>PathListController</name>
+    <message>
         <source>This folder has no wordlists. hashcat reads the regular files directly inside it, not subfolders.</source>
         <translation>У цій теці немає словників. hashcat читає звичайні файли, що лежать безпосередньо в ній, але не підтеки.</translation>
+    </message>
+    <message>
+        <source>This wordlist does not exist:
+%1</source>
+        <translation>Цього словника не існує:
+%1</translation>
     </message>
     <message>
         <source>This ruleset folder has no Grammar/grammar.txt:
@@ -1280,221 +1504,24 @@ Default: 1,2</source>
         <translation>Ця таблиця не існує:
 %1</translation>
     </message>
+</context>
+<context>
+    <name>SessionTransfer</name>
     <message>
-        <source>Open rules file</source>
-        <translation>Відкрити файл правил</translation>
+        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
+        <translation>Файл створено старішою версією hashcat-gui (версія формату %1; ця версія читає формат версії %2).</translation>
     </message>
     <message>
-        <source>Could not start “%1”: %2</source>
-        <translation>Не вдалося запустити «%1»: %2</translation>
+        <source>The file holds sections this import does not use: %1.</source>
+        <translation>Файл містить розділи, які цей імпорт не використовує: %1.</translation>
     </message>
     <message>
-        <source>The configured terminal “%1” is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>Налаштований термінал «%1» недоступний. Доступні термінали: %2
-Перейдіть до %3 → %4, щоб змінити його.</translation>
+        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
+        <translation>Файл має версію формату %1, але ця версія читає формат версії %2, тому його не було застосовано. Оновіть hashcat-gui, щоб прочитати його.</translation>
     </message>
     <message>
-        <source>This mode needs exactly %1 wordlists (left, right).
-Currently selected: %2.</source>
-        <translation>Цьому режиму потрібні словники в кількості рівно %1 (лівий, правий).
-Наразі вибрано: %2.</translation>
-    </message>
-    <message>
-        <source>Failed to obtain supported hash types.
-Error: %1</source>
-        <translation>Не вдалося отримати підтримувані типи гешів.
-Помилка: %1</translation>
-    </message>
-    <message>
-        <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
-        <translation>Не вдалося завантажити типи гешів. Перевірте шлях до hashcat у налаштуваннях.</translation>
-    </message>
-    <message>
-        <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
-        <translation>Укажіть шлях до hashcat у %1 → %2, щоб завантажити доступні типи гешів.</translation>
-    </message>
-    <message>
-        <source>This mode needs a wordlist and a mask.</source>
-        <translation>Цьому режиму потрібні словник і маска.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask.</source>
-        <translation>Цьому режиму потрібна маска.</translation>
-    </message>
-    <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>Використовуйте ?1–?4 у масці, щоб вставити власний набір символів. Маска використовується режимом «Повний перебір», гібридними режимами та налаштуванням mask= у PCFG; набір символів, який не названо в жодній масці, відхиляється.</translation>
-    </message>
-    <message>
-        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
-        <translation>Маска кандидатів у паролі. ?1–?4 вставляють власний набір символів, ?w вставляє слово зі словника, а ?q — друге слово зі словника в режимі «Гібридна (маска + ?w/?q)», ?? означає літерал ?.</translation>
-    </message>
-    <message>
-        <source>Load the %1 example? The current session is lost.
-
-The example cracks a test hash; hashcat should recover the password %2.</source>
-        <translation>Завантажити приклад %1? Поточний сеанс буде втрачено.
-
-Приклад ламає тестовий геш; hashcat має відновити пароль %2.</translation>
-    </message>
-    <message>
-        <source>Could not create the example directory “%1”.</source>
-        <translation>Не вдалося створити каталог прикладу «%1».</translation>
-    </message>
-    <message>
-        <source>Could not read the bundled file “%1”: %2</source>
-        <translation>Не вдалося прочитати вбудований файл «%1»: %2</translation>
-    </message>
-    <message>
-        <source>Could not write “%1”: %2</source>
-        <translation>Не вдалося записати «%1»: %2</translation>
-    </message>
-    <message>
-        <source>
-
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
-        <translation>
-
-Це може бути спричинено Windows Defender або іншим антивірусним ПЗ. Спосіб усунення див. у &lt;a href=&quot;%1&quot;&gt;записі ЧаП&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one wordlist.</source>
-        <translation>Цьому режиму потрібен принаймні один словник.</translation>
-    </message>
-    <message>
-        <source>This wordlist does not exist:
-%1</source>
-        <translation>Цього словника не існує:
-%1</translation>
-    </message>
-    <message>
-        <source>Copied to the clipboard</source>
-        <translation>Скопійовано до буфера обміну</translation>
-    </message>
-    <message>
-        <source>Launch failed</source>
-        <translation>Не вдалося запустити</translation>
-    </message>
-    <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>Командний рядок задовгий для термінала. Скоротіть списки аргументів або їхні значення та повторіть спробу.</translation>
-    </message>
-    <message>
-        <source>Please choose a hash file.</source>
-        <translation>Виберіть файл гешів.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
-        <translation>Перейдіть до &lt;b&gt;%1 → %2&lt;/b&gt;, щоб налаштувати шлях до виконуваного файлу hashcat.</translation>
-    </message>
-    <message>
-        <source>The configured hashcat executable does not exist:
-%1
-Navigate to %2 → %3 to change it.</source>
-        <translation>Налаштованого виконуваного файлу hashcat не існує:
-%1
-Перейдіть до %2 → %3, щоб змінити його.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
-        <translation>Перейдіть до &lt;b&gt;%1 → %2&lt;/b&gt;, щоб вибрати термінал, який використовується для запуску.</translation>
-    </message>
-    <message>
-        <source>Maximum number of wordlists for this mode: %1.
-Currently selected: %2.</source>
-        <translation>Максимальна кількість словників для цього режиму: %1.
-Наразі вибрано: %2.</translation>
-    </message>
-    <message>
-        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
-        <translation>Тут hashcat зіставляє два файли порядково; цей інтерфейс пропонує для такої ролі лише один словник.</translation>
-    </message>
-    <message>
-        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
-%1</source>
-        <translation>Цей словник має бути файлом: hashcat читає його як множений словник (сторона ?q), і теку там використати не можна:
-%1</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one table.</source>
-        <translation>Цьому режиму потрібна щонайменше одна таблиця.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
-        <translation>Цьому режиму потрібен feed: вбудована назва (wordlist, stdin, random, …) або шлях до файлу feed.</translation>
-    </message>
-    <message>
-        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
-        <translation>Цей режим зіставляє словники з маскою; масці потрібен ?w для слова.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?w.</source>
-        <translation>Маска містить більше ніж один ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains a ?q before the first ?w.</source>
-        <translation>Маска містить ?q перед першим ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?q.</source>
-        <translation>Маска містить більше ніж один ?q.</translation>
-    </message>
-    <message>
-        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
-        <translation>Маска вказує друге слово через ?q, але вибрано лише один словник.</translation>
-    </message>
-    <message>
-        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
-        <translation>Вибрано два словники, але в масці немає ?q для другого.</translation>
-    </message>
-    <message>
-        <source>The increment is not offered in this hybrid mode.</source>
-        <translation>Приріст недоступний у цьому гібридному режимі.</translation>
-    </message>
-    <message>
-        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
-        <translation>Маркери ?w і ?q доступні лише в гібридному режимі (маска + словники).</translation>
-    </message>
-    <message>
-        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
-        <translation>Власний набір символів використовується лише всередині маски, а в цьому запуску маску не вказано. Додайте налаштування mask=, що посилається на ?1–?4, наприклад mask=?1?1?1?1, або очистьте власний набір символів.</translation>
-    </message>
-    <message>
-        <source>The setting “%1” is not valid for this mode.</source>
-        <translation>Налаштування «%1» недійсне для цього режиму.</translation>
-    </message>
-    <message>
-        <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>Токен «%1» не є налаштуванням; налаштування записуються у вигляді key=value.</translation>
-    </message>
-    <message>
-        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
-        <translation>Рядок налаштувань діє, лише поки слова беруться з файлу гешів. Очистьте або рядок налаштувань, або список словників.</translation>
-    </message>
-    <message>
-        <source>The hash type 4000 describes its hashes as a recipe, for example
-md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
-        <translation>Тип геша 4000 описує свої геші у вигляді рецепта, наприклад
-md5(md5(salt) . pass). Введіть його в поле рецепта геша.</translation>
-    </message>
-    <message>
-        <source>The minimum increment length is larger than the maximum.</source>
-        <translation>Мінімальна довжина приросту більша за максимальну.</translation>
-    </message>
-    <message>
-        <source>The cache path must be an existing directory:
-%1</source>
-        <translation>Шлях до кешу має вказувати на наявний каталог:
-%1</translation>
-    </message>
-    <message>
-        <source>The increment cannot be combined with the speed-only option.</source>
-        <translation>Приріст не можна поєднувати з параметром «лише швидкість».</translation>
-    </message>
-    <message>
-        <source>Removing cracked hashes is not possible in the association attack mode.</source>
-        <translation>Вилучення зламаних гешів неможливе в асоціативному режимі атаки.</translation>
+        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
+        <translation>Файл сеансу має версію формату %1, але ця версія читає формат версії %2, тому сеанс не було відновлено. Файл залишено без змін, тому сеанс цього запуску теж не зберігається. Оновіть hashcat-gui, щоб прочитати його.</translation>
     </message>
 </context>
 <context>
@@ -1725,6 +1752,13 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>Файл містить значення неправильного типу, тому їх не було застосовано: %1.</translation>
+    </message>
+</context>
+<context>
+    <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation>У цій системі не знайдено підтримуваного термінала. hashcat-gui потрібен термінал, щоб показувати вивід hashcat.</translation>
     </message>
 </context>
 <context>

@@ -107,6 +107,9 @@ Connect to `commandChanged()` once; the attack-mode combo uses `attackIndexChang
   freshness; refresh once before a release. A new language updates `HASHCAT_GUI_TRANSLATIONS` and
   `AppConstants::Languages::Available` (English has no catalog); `tst_translations` enforces the
   match but skips without embedded `.qm`.
+- New units take the narrowest input they need: extract the narrow fields or a small value instead
+  of passing the whole form or a singleton. `OptionCollector` and `AttackModeView` taking
+  `Ui::MainWindow` is the documented exception - the session format is keyed on widget names.
 - Tests use `TestEnvironment::run`, not `QTEST_MAIN` (it redirects XDG dirs). Private access goes
   through a friend declared in the header under test (`MainWindow`'s is the
   `MainWindowTestAccess` struct in `tests/mainwindowtestaccess.h`; delete an entry in the commit

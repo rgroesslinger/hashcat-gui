@@ -113,6 +113,100 @@
     </message>
 </context>
 <context>
+    <name>AttackModeView</name>
+    <message>
+        <source>Straight</source>
+        <translation>Dizionario</translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation>Combinazione</translation>
+    </message>
+    <message>
+        <source>Brute-force</source>
+        <translation>Forza bruta</translation>
+    </message>
+    <message>
+        <source>PCFG</source>
+        <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Tabella</translation>
+    </message>
+    <message>
+        <source>Hybrid Wordlist + Mask</source>
+        <translation>Ibrido: wordlist + maschera</translation>
+    </message>
+    <message>
+        <source>Hybrid Mask + Wordlist</source>
+        <translation>Ibrido: maschera + wordlist</translation>
+    </message>
+    <message>
+        <source>Generic (feed)</source>
+        <translation>Generico (feed)</translation>
+    </message>
+    <message>
+        <source>Association</source>
+        <translation>Associazione</translation>
+    </message>
+    <message>
+        <source>Hybrid (mask + ?w/?q)</source>
+        <translation>Ibrido (maschera + ?w/?q)</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Questa modalità richiede almeno una wordlist.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly 2 wordlists (left, right).</source>
+        <translation>Questa modalità richiede esattamente 2 wordlist (sinistra, destra).</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Questa modalità richiede una maschera.</translation>
+    </message>
+    <message>
+        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
+        <translation>Questa modalità esegue il set di regole default-passwords incluso in hashcat; indicane uno o più per usare i tuoi.</translation>
+    </message>
+    <message>
+        <source>This mode needs one wordlist and at least one table.</source>
+        <translation>Questa modalità richiede una wordlist e almeno una tabella.</translation>
+    </message>
+    <message>
+        <source>This mode needs a wordlist and a mask.</source>
+        <translation>Questa modalità richiede una wordlist e una maschera.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
+        <translation>Questa modalità richiede un feed. Gli argomenti dipendono dal feed: random e stdin non ne richiedono, wordlist richiede un percorso.</translation>
+    </message>
+    <message>
+        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
+        <translation>Questa modalità richiede al massimo una wordlist. Senza wordlist, le parole provengono dal file di hash e la riga delle impostazioni può delimitare l’esecuzione; con una wordlist, i due file vengono abbinati riga per riga.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
+        <translation>Questa modalità richiede una maschera con esattamente un ?w; un ?q dopo ?w indica una seconda wordlist.</translation>
+    </message>
+</context>
+<context>
+    <name>ExampleSession</name>
+    <message>
+        <source>Could not create the example directory “%1”.</source>
+        <translation>Impossibile creare la directory di esempio “%1”.</translation>
+    </message>
+    <message>
+        <source>Could not read the bundled file “%1”: %2</source>
+        <translation>Impossibile leggere il file incluso “%1”: %2</translation>
+    </message>
+    <message>
+        <source>Could not write “%1”: %2</source>
+        <translation>Impossibile scrivere “%1”: %2</translation>
+    </message>
+</context>
+<context>
     <name>HashcatInfoParser</name>
     <message>
         <source>Invalid JSON returned from hashcat.</source>
@@ -124,7 +218,7 @@
     </message>
 </context>
 <context>
-    <name>HelperUtils</name>
+    <name>HashcatRunner</name>
     <message>
         <source>The hashcat path is not configured.</source>
         <translation>Il percorso di hashcat non è configurato.</translation>
@@ -141,9 +235,144 @@
         <translation>Timeout di hashcat
 %1</translation>
     </message>
+</context>
+<context>
+    <name>LaunchMessage</name>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>Non è stato trovato alcun terminale supportato su questo sistema. hashcat-gui ne ha bisogno per mostrare l’output di hashcat.</translation>
+        <source>Please choose a hash file.</source>
+        <translation>Scegli un file di hash.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
+        <translation>Vai su &lt;b&gt;%1 → %2&lt;/b&gt; per configurare il percorso dell’eseguibile di hashcat.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable does not exist:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>L’eseguibile di hashcat configurato non esiste:
+%1
+Vai su %2 → %3 per modificarlo.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
+        <translation>Vai su &lt;b&gt;%1 → %2&lt;/b&gt; per selezionare il terminale usato per l’avvio.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation>Il terminale configurato “%1” non è disponibile. Terminali disponibili: %2
+Vai su %3 → %4 per cambiarlo.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Questa modalità richiede almeno una wordlist.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
+Currently selected: %2.</source>
+        <translation>Questa modalità richiede esattamente %1 wordlist (sinistra, destra).
+Attualmente selezionate: %2.</translation>
+    </message>
+    <message>
+        <source>Maximum number of wordlists for this mode: %1.
+Currently selected: %2.</source>
+        <translation>Numero massimo di wordlist per questa modalità: %1.
+Attualmente selezionate: %2.</translation>
+    </message>
+    <message>
+        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
+        <translation>Qui hashcat abbina i due file riga per riga; questa interfaccia offre una sola wordlist per quel ruolo.</translation>
+    </message>
+    <message>
+        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
+%1</source>
+        <translation>Questa wordlist deve essere un file: hashcat la legge come wordlist moltiplicata (il lato ?q) e lì non si può usare una cartella:
+%1</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Questa modalità richiede una maschera.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one table.</source>
+        <translation>Questa modalità richiede almeno una tabella.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
+        <translation>Questa modalità richiede un feed: un nome incluso (wordlist, stdin, random, …) oppure il percorso di un file di feed.</translation>
+    </message>
+    <message>
+        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
+        <translation>Questa modalità abbina le wordlist alla maschera; la maschera richiede un ?w per la parola.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?w.</source>
+        <translation>La maschera contiene più di un ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains a ?q before the first ?w.</source>
+        <translation>La maschera contiene un ?q prima del primo ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?q.</source>
+        <translation>La maschera contiene più di un ?q.</translation>
+    </message>
+    <message>
+        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
+        <translation>La maschera indica una seconda parola con ?q, ma è selezionata una sola wordlist.</translation>
+    </message>
+    <message>
+        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
+        <translation>Sono selezionate due wordlist, ma la maschera non ha un ?q per la seconda.</translation>
+    </message>
+    <message>
+        <source>The increment is not offered in this hybrid mode.</source>
+        <translation>L’incremento non è disponibile in questa modalità ibrida.</translation>
+    </message>
+    <message>
+        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
+        <translation>I marcatori ?w e ?q sono disponibili solo nella modalità ibrida (maschera + wordlist).</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Un set di caratteri personalizzato viene usato solo all’interno di una maschera, e questa esecuzione non ha indicato alcuna maschera. Aggiungi un’impostazione mask= che faccia riferimento a ?1–?4, ad esempio mask=?1?1?1?1, oppure svuota il set di caratteri personalizzato.</translation>
+    </message>
+    <message>
+        <source>The setting “%1” is not valid for this mode.</source>
+        <translation>L’impostazione “%1” non è valida per questa modalità.</translation>
+    </message>
+    <message>
+        <source>The token “%1” is not a setting; settings are written as key=value.</source>
+        <translation>Il token “%1” non è un’impostazione; le impostazioni si scrivono come key=value.</translation>
+    </message>
+    <message>
+        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
+        <translation>La riga delle impostazioni si applica solo finché le parole provengono dal file di hash. Svuota la riga delle impostazioni oppure l’elenco delle wordlist.</translation>
+    </message>
+    <message>
+        <source>The hash type 4000 describes its hashes as a recipe, for example
+md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
+        <translation>Il tipo di hash 4000 descrive i propri hash come una ricetta, ad esempio
+md5(md5(salt) . pass). Inseriscila nel campo della ricetta dell’hash.</translation>
+    </message>
+    <message>
+        <source>The minimum increment length is larger than the maximum.</source>
+        <translation>La lunghezza minima dell’incremento è maggiore di quella massima.</translation>
+    </message>
+    <message>
+        <source>The cache path must be an existing directory:
+%1</source>
+        <translation>Il percorso della cache deve essere una directory esistente:
+%1</translation>
+    </message>
+    <message>
+        <source>The increment cannot be combined with the speed-only option.</source>
+        <translation>L’incremento non può essere combinato con l’opzione di sola velocità.</translation>
+    </message>
+    <message>
+        <source>Removing cracked hashes is not possible in the association attack mode.</source>
+        <translation>La rimozione degli hash decifrati non è possibile nella modalità di attacco Associazione.</translation>
     </message>
 </context>
 <context>
@@ -923,8 +1152,8 @@
         <translation>Interrompi la sessione dopo questo numero di secondi; 0 la esegue finché hashcat non termina.</translation>
     </message>
     <message>
-        <source>&#xa0;s</source>
-        <translation>&#xa0;s</translation>
+        <source> s</source>
+        <translation> s</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -947,8 +1176,8 @@
         <translation>Mostra la velocità prevista dell’attacco, poi esci</translation>
     </message>
     <message>
-        <source>&#xa0;°C</source>
-        <translation>&#xa0;°C</translation>
+        <source> °C</source>
+        <translation> °C</translation>
     </message>
     <message>
         <source>Copy command</source>
@@ -1069,22 +1298,6 @@ Predefinito: 1,2</translation>
         <translation>Importato</translation>
     </message>
     <message>
-        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
-        <translation>Il file è stato creato da una versione precedente di hashcat-gui (versione del formato %1; questa versione legge la versione del formato %2).</translation>
-    </message>
-    <message>
-        <source>The file holds sections this import does not use: %1.</source>
-        <translation>Il file contiene sezioni che questa importazione non usa: %1.</translation>
-    </message>
-    <message>
-        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
-        <translation>Il file è nella versione del formato %1, ma questa versione legge la versione del formato %2, quindi non è stato applicato. Aggiorna hashcat-gui per leggerlo.</translation>
-    </message>
-    <message>
-        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
-        <translation>Il file di sessione è nella versione del formato %1, ma questa versione legge la versione del formato %2, quindi la sessione non è stata ripristinata. Il file è stato lasciato così com’è, quindi nemmeno la sessione di questa esecuzione viene salvata. Aggiorna hashcat-gui per leggerlo.</translation>
-    </message>
-    <message>
         <source>Settings exported to “%1”.</source>
         <translation>Impostazioni esportate in “%1”.</translation>
     </message>
@@ -1157,14 +1370,6 @@ Predefinito: 1,2</translation>
         <translation>Caricamento dei tipi di hash non riuscito</translation>
     </message>
     <message>
-        <source>This mode needs a wordlist and a mask.</source>
-        <translation>Questa modalità richiede una wordlist e una maschera.</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one wordlist.</source>
-        <translation>Questa modalità richiede almeno una wordlist.</translation>
-    </message>
-    <message>
         <source>Open hash file</source>
         <translation>Apri file di hash</translation>
     </message>
@@ -1183,18 +1388,6 @@ Predefinito: 1,2</translation>
     <message>
         <source>Could not start “%1”: %2</source>
         <translation>Impossibile avviare “%1”: %2</translation>
-    </message>
-    <message>
-        <source>The configured terminal “%1” is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>Il terminale configurato “%1” non è disponibile. Terminali disponibili: %2
-Vai su %3 → %4 per cambiarlo.</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly %1 wordlists (left, right).
-Currently selected: %2.</source>
-        <translation>Questa modalità richiede esattamente %1 wordlist (sinistra, destra).
-Attualmente selezionate: %2.</translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
@@ -1217,50 +1410,6 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
 L’esempio decifra un hash di prova; hashcat dovrebbe recuperare la password %2.</translation>
     </message>
     <message>
-        <source>Could not create the example directory “%1”.</source>
-        <translation>Impossibile creare la directory di esempio “%1”.</translation>
-    </message>
-    <message>
-        <source>Could not read the bundled file “%1”: %2</source>
-        <translation>Impossibile leggere il file incluso “%1”: %2</translation>
-    </message>
-    <message>
-        <source>Could not write “%1”: %2</source>
-        <translation>Impossibile scrivere “%1”: %2</translation>
-    </message>
-    <message>
-        <source>Straight</source>
-        <translation>Dizionario</translation>
-    </message>
-    <message>
-        <source>Combination</source>
-        <translation>Combinazione</translation>
-    </message>
-    <message>
-        <source>Brute-force</source>
-        <translation>Forza bruta</translation>
-    </message>
-    <message>
-        <source>Hybrid Wordlist + Mask</source>
-        <translation>Ibrido: wordlist + maschera</translation>
-    </message>
-    <message>
-        <source>Hybrid Mask + Wordlist</source>
-        <translation>Ibrido: maschera + wordlist</translation>
-    </message>
-    <message>
-        <source>Generic (feed)</source>
-        <translation>Generico (feed)</translation>
-    </message>
-    <message>
-        <source>Association</source>
-        <translation>Associazione</translation>
-    </message>
-    <message>
-        <source>Hybrid (mask + ?w/?q)</source>
-        <translation>Ibrido (maschera + ?w/?q)</translation>
-    </message>
-    <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Impossibile ottenere i tipi di hash supportati.
@@ -1273,42 +1422,14 @@ Errore: %1</translation>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Può essere causato da Windows Defender o da altro software antivirus. Consulta la &lt;a href=&quot;%1&quot;&gt;voce delle FAQ&lt;/a&gt; per trovare un rimedio.</translation>
+Può essere causato da Windows Defender o da altro software antivirus. Consulta la &lt;a href="%1"&gt;voce delle FAQ&lt;/a&gt; per trovare un rimedio.</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>Imposta il percorso di hashcat in %1 → %2 per caricare i tipi di hash disponibili.</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly 2 wordlists (left, right).</source>
-        <translation>Questa modalità richiede esattamente 2 wordlist (sinistra, destra).</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask.</source>
-        <translation>Questa modalità richiede una maschera.</translation>
-    </message>
-    <message>
-        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
-        <translation>Questa modalità esegue il set di regole default-passwords incluso in hashcat; indicane uno o più per usare i tuoi.</translation>
-    </message>
-    <message>
-        <source>This mode needs one wordlist and at least one table.</source>
-        <translation>Questa modalità richiede una wordlist e almeno una tabella.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
-        <translation>Questa modalità richiede un feed. Gli argomenti dipendono dal feed: random e stdin non ne richiedono, wordlist richiede un percorso.</translation>
-    </message>
-    <message>
-        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>Questa modalità richiede al massimo una wordlist. Senza wordlist, le parole provengono dal file di hash e la riga delle impostazioni può delimitare l’esecuzione; con una wordlist, i due file vengono abbinati riga per riga.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
-        <translation>Questa modalità richiede una maschera con esattamente un ?w; un ?q dopo ?w indica una seconda wordlist.</translation>
     </message>
     <message>
         <source>Open cache directory</source>
@@ -1334,6 +1455,21 @@ Può essere causato da Windows Defender o da altro software antivirus. Consulta 
         <source>Open feed file</source>
         <translation>Apri file di feed</translation>
     </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>Copiato negli appunti</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Avvio non riuscito</translation>
+    </message>
+    <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>La riga di comando è troppo lunga per il terminale. Accorcia gli elenchi di argomenti o i loro valori e riprova.</translation>
+    </message>
+</context>
+<context>
+    <name>PathListController</name>
     <message>
         <source>This folder has no wordlists. hashcat reads the regular files directly inside it, not subfolders.</source>
         <translation>Questa cartella non contiene wordlist. hashcat legge i file normali presenti direttamente al suo interno, non le sottocartelle.</translation>
@@ -1368,133 +1504,24 @@ Può essere causato da Windows Defender o da altro software antivirus. Consulta 
         <translation>Questa tabella non esiste:
 %1</translation>
     </message>
+</context>
+<context>
+    <name>SessionTransfer</name>
     <message>
-        <source>Copied to the clipboard</source>
-        <translation>Copiato negli appunti</translation>
+        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
+        <translation>Il file è stato creato da una versione precedente di hashcat-gui (versione del formato %1; questa versione legge la versione del formato %2).</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>Avvio non riuscito</translation>
+        <source>The file holds sections this import does not use: %1.</source>
+        <translation>Il file contiene sezioni che questa importazione non usa: %1.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>La riga di comando è troppo lunga per il terminale. Accorcia gli elenchi di argomenti o i loro valori e riprova.</translation>
+        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
+        <translation>Il file è nella versione del formato %1, ma questa versione legge la versione del formato %2, quindi non è stato applicato. Aggiorna hashcat-gui per leggerlo.</translation>
     </message>
     <message>
-        <source>Please choose a hash file.</source>
-        <translation>Scegli un file di hash.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
-        <translation>Vai su &lt;b&gt;%1 → %2&lt;/b&gt; per configurare il percorso dell’eseguibile di hashcat.</translation>
-    </message>
-    <message>
-        <source>The configured hashcat executable does not exist:
-%1
-Navigate to %2 → %3 to change it.</source>
-        <translation>L’eseguibile di hashcat configurato non esiste:
-%1
-Vai su %2 → %3 per modificarlo.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
-        <translation>Vai su &lt;b&gt;%1 → %2&lt;/b&gt; per selezionare il terminale usato per l’avvio.</translation>
-    </message>
-    <message>
-        <source>Maximum number of wordlists for this mode: %1.
-Currently selected: %2.</source>
-        <translation>Numero massimo di wordlist per questa modalità: %1.
-Attualmente selezionate: %2.</translation>
-    </message>
-    <message>
-        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
-        <translation>Qui hashcat abbina i due file riga per riga; questa interfaccia offre una sola wordlist per quel ruolo.</translation>
-    </message>
-    <message>
-        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
-%1</source>
-        <translation>Questa wordlist deve essere un file: hashcat la legge come wordlist moltiplicata (il lato ?q) e lì non si può usare una cartella:
-%1</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one table.</source>
-        <translation>Questa modalità richiede almeno una tabella.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
-        <translation>Questa modalità richiede un feed: un nome incluso (wordlist, stdin, random, …) oppure il percorso di un file di feed.</translation>
-    </message>
-    <message>
-        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
-        <translation>Questa modalità abbina le wordlist alla maschera; la maschera richiede un ?w per la parola.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?w.</source>
-        <translation>La maschera contiene più di un ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains a ?q before the first ?w.</source>
-        <translation>La maschera contiene un ?q prima del primo ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?q.</source>
-        <translation>La maschera contiene più di un ?q.</translation>
-    </message>
-    <message>
-        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
-        <translation>La maschera indica una seconda parola con ?q, ma è selezionata una sola wordlist.</translation>
-    </message>
-    <message>
-        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
-        <translation>Sono selezionate due wordlist, ma la maschera non ha un ?q per la seconda.</translation>
-    </message>
-    <message>
-        <source>The increment is not offered in this hybrid mode.</source>
-        <translation>L’incremento non è disponibile in questa modalità ibrida.</translation>
-    </message>
-    <message>
-        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
-        <translation>I marcatori ?w e ?q sono disponibili solo nella modalità ibrida (maschera + wordlist).</translation>
-    </message>
-    <message>
-        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
-        <translation>Un set di caratteri personalizzato viene usato solo all’interno di una maschera, e questa esecuzione non ha indicato alcuna maschera. Aggiungi un’impostazione mask= che faccia riferimento a ?1–?4, ad esempio mask=?1?1?1?1, oppure svuota il set di caratteri personalizzato.</translation>
-    </message>
-    <message>
-        <source>The setting “%1” is not valid for this mode.</source>
-        <translation>L’impostazione “%1” non è valida per questa modalità.</translation>
-    </message>
-    <message>
-        <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>Il token “%1” non è un’impostazione; le impostazioni si scrivono come key=value.</translation>
-    </message>
-    <message>
-        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
-        <translation>La riga delle impostazioni si applica solo finché le parole provengono dal file di hash. Svuota la riga delle impostazioni oppure l’elenco delle wordlist.</translation>
-    </message>
-    <message>
-        <source>The hash type 4000 describes its hashes as a recipe, for example
-md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
-        <translation>Il tipo di hash 4000 descrive i propri hash come una ricetta, ad esempio
-md5(md5(salt) . pass). Inseriscila nel campo della ricetta dell’hash.</translation>
-    </message>
-    <message>
-        <source>The minimum increment length is larger than the maximum.</source>
-        <translation>La lunghezza minima dell’incremento è maggiore di quella massima.</translation>
-    </message>
-    <message>
-        <source>The cache path must be an existing directory:
-%1</source>
-        <translation>Il percorso della cache deve essere una directory esistente:
-%1</translation>
-    </message>
-    <message>
-        <source>The increment cannot be combined with the speed-only option.</source>
-        <translation>L’incremento non può essere combinato con l’opzione di sola velocità.</translation>
-    </message>
-    <message>
-        <source>Removing cracked hashes is not possible in the association attack mode.</source>
-        <translation>La rimozione degli hash decifrati non è possibile nella modalità di attacco Associazione.</translation>
+        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
+        <translation>Il file di sessione è nella versione del formato %1, ma questa versione legge la versione del formato %2, quindi la sessione non è stata ripristinata. Il file è stato lasciato così com’è, quindi nemmeno la sessione di questa esecuzione viene salvata. Aggiorna hashcat-gui per leggerlo.</translation>
     </message>
 </context>
 <context>
@@ -1725,6 +1752,13 @@ md5(md5(salt) . pass). Inseriscila nel campo della ricetta dell’hash.</transla
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>Il file contiene valori di tipo errato, quindi non sono stati applicati: %1.</translation>
+    </message>
+</context>
+<context>
+    <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation>Non è stato trovato alcun terminale supportato su questo sistema. hashcat-gui ne ha bisogno per mostrare l’output di hashcat.</translation>
     </message>
 </context>
 <context>

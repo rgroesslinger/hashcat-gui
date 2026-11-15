@@ -44,7 +44,6 @@
 #include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QSaveFile>

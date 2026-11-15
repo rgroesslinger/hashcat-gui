@@ -113,6 +113,100 @@
     </message>
 </context>
 <context>
+    <name>AttackModeView</name>
+    <message>
+        <source>Straight</source>
+        <translation>사전</translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation>조합</translation>
+    </message>
+    <message>
+        <source>Brute-force</source>
+        <translation>무차별 대입</translation>
+    </message>
+    <message>
+        <source>PCFG</source>
+        <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>테이블</translation>
+    </message>
+    <message>
+        <source>Hybrid Wordlist + Mask</source>
+        <translation>하이브리드: 단어 목록 + 마스크</translation>
+    </message>
+    <message>
+        <source>Hybrid Mask + Wordlist</source>
+        <translation>하이브리드: 마스크 + 단어 목록</translation>
+    </message>
+    <message>
+        <source>Generic (feed)</source>
+        <translation>일반(피드)</translation>
+    </message>
+    <message>
+        <source>Association</source>
+        <translation>연관</translation>
+    </message>
+    <message>
+        <source>Hybrid (mask + ?w/?q)</source>
+        <translation>하이브리드(마스크 + ?w/?q)</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>이 모드에는 단어 목록이 하나 이상 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly 2 wordlists (left, right).</source>
+        <translation>이 모드에는 정확히 2개의 단어 목록(왼쪽, 오른쪽)이 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>이 모드에는 마스크가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
+        <translation>이 모드는 hashcat에 내장된 default-passwords 규칙 세트를 실행합니다. 직접 만든 것을 사용하려면 하나 이상 지정하세요.</translation>
+    </message>
+    <message>
+        <source>This mode needs one wordlist and at least one table.</source>
+        <translation>이 모드에는 단어 목록 하나와 테이블이 하나 이상 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs a wordlist and a mask.</source>
+        <translation>이 모드에는 단어 목록과 마스크가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
+        <translation>이 모드에는 피드가 필요합니다. 인수는 피드에 따라 다르며, random과 stdin은 필요하지 않고 wordlist는 경로가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
+        <translation>이 모드는 단어 목록을 최대 하나까지 사용할 수 있습니다. 단어 목록이 없으면 단어는 해시 파일에서 가져오며 설정 줄로 실행 범위를 제한할 수 있고, 단어 목록이 있으면 두 파일을 줄 단위로 짝짓습니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
+        <translation>이 모드에는 ?w가 정확히 하나 들어 있는 마스크가 필요합니다. ?w 뒤의 ?q는 두 번째 단어 목록을 지정합니다.</translation>
+    </message>
+</context>
+<context>
+    <name>ExampleSession</name>
+    <message>
+        <source>Could not create the example directory “%1”.</source>
+        <translation>예제 디렉터리 “%1”을(를) 만들 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Could not read the bundled file “%1”: %2</source>
+        <translation>내장 파일 “%1”을(를) 읽을 수 없습니다: %2</translation>
+    </message>
+    <message>
+        <source>Could not write “%1”: %2</source>
+        <translation>“%1”을(를) 쓸 수 없습니다: %2</translation>
+    </message>
+</context>
+<context>
     <name>HashcatInfoParser</name>
     <message>
         <source>Invalid JSON returned from hashcat.</source>
@@ -124,7 +218,7 @@
     </message>
 </context>
 <context>
-    <name>HelperUtils</name>
+    <name>HashcatRunner</name>
     <message>
         <source>The hashcat path is not configured.</source>
         <translation>hashcat 경로가 설정되지 않았습니다.</translation>
@@ -141,9 +235,144 @@
         <translation>hashcat 시간이 초과되었습니다
 %1</translation>
     </message>
+</context>
+<context>
+    <name>LaunchMessage</name>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>이 시스템에서 지원되는 터미널을 찾을 수 없습니다. hashcat 출력을 표시하려면 hashcat-gui에 터미널이 필요합니다.</translation>
+        <source>Please choose a hash file.</source>
+        <translation>해시 파일을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
+        <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 hashcat 실행 파일 경로를 설정하세요.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable does not exist:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>설정된 hashcat 실행 파일이 없습니다:
+%1
+변경하려면 %2 → %3(으)로 이동하세요.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
+        <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 실행에 사용할 터미널을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation>설정된 터미널 “%1”을(를) 사용할 수 없습니다. 사용 가능한 터미널: %2
+변경하려면 %3 → %4(으)로 이동하세요.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>이 모드에는 단어 목록이 하나 이상 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
+Currently selected: %2.</source>
+        <translation>이 모드에는 정확히 %1개의 단어 목록(왼쪽, 오른쪽)이 필요합니다.
+현재 선택: %2개.</translation>
+    </message>
+    <message>
+        <source>Maximum number of wordlists for this mode: %1.
+Currently selected: %2.</source>
+        <translation>이 모드의 단어 목록 최대 개수는 %1개입니다.
+현재 선택: %2개.</translation>
+    </message>
+    <message>
+        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
+        <translation>여기서는 hashcat이 두 파일을 줄 단위로 짝짓습니다. 이 GUI는 그 역할에 단어 목록을 하나만 제공합니다.</translation>
+    </message>
+    <message>
+        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
+%1</source>
+        <translation>이 단어 목록은 파일이어야 합니다. hashcat은 이를 곱해지는 단어 목록(?q 쪽)으로 읽으며 그 자리에는 폴더를 사용할 수 없습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>이 모드에는 마스크가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one table.</source>
+        <translation>이 모드에는 테이블이 하나 이상 필요합니다.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
+        <translation>이 모드에는 피드가 필요합니다. 내장 이름(wordlist, stdin, random, …) 또는 피드 파일 경로를 지정하세요.</translation>
+    </message>
+    <message>
+        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
+        <translation>이 모드는 단어 목록을 마스크와 짝짓습니다. 마스크에는 단어를 위한 ?w가 필요합니다.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?w.</source>
+        <translation>마스크에 ?w가 둘 이상 들어 있습니다.</translation>
+    </message>
+    <message>
+        <source>The mask contains a ?q before the first ?w.</source>
+        <translation>마스크에서 첫 번째 ?w 앞에 ?q가 있습니다.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?q.</source>
+        <translation>마스크에 ?q가 둘 이상 들어 있습니다.</translation>
+    </message>
+    <message>
+        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
+        <translation>마스크가 ?q로 두 번째 단어를 지정하지만 선택된 단어 목록은 하나뿐입니다.</translation>
+    </message>
+    <message>
+        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
+        <translation>단어 목록이 두 개 선택되었지만 마스크에는 두 번째 목록을 위한 ?q가 없습니다.</translation>
+    </message>
+    <message>
+        <source>The increment is not offered in this hybrid mode.</source>
+        <translation>이 하이브리드 모드에서는 증가를 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
+        <translation>?w와 ?q 표시는 하이브리드 모드(마스크 + 단어 목록)에서만 사용할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>사용자 지정 문자 집합은 마스크 안에서만 사용되는데, 이번 실행에는 마스크가 지정되지 않았습니다. ?1–?4를 참조하는 mask= 설정을 추가하거나(예: mask=?1?1?1?1) 사용자 지정 문자 집합을 비우세요.</translation>
+    </message>
+    <message>
+        <source>The setting “%1” is not valid for this mode.</source>
+        <translation>설정 “%1”은(는) 이 모드에서 유효하지 않습니다.</translation>
+    </message>
+    <message>
+        <source>The token “%1” is not a setting; settings are written as key=value.</source>
+        <translation>토큰 “%1”은(는) 설정이 아닙니다. 설정은 key=value 형식으로 작성합니다.</translation>
+    </message>
+    <message>
+        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
+        <translation>설정 줄은 단어를 해시 파일에서 가져올 때만 적용됩니다. 설정 줄이나 단어 목록 중 하나를 비우세요.</translation>
+    </message>
+    <message>
+        <source>The hash type 4000 describes its hashes as a recipe, for example
+md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
+        <translation>해시 유형 4000은 해시를 레시피로 설명합니다. 예:
+md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</translation>
+    </message>
+    <message>
+        <source>The minimum increment length is larger than the maximum.</source>
+        <translation>증가 최소 길이가 최대 길이보다 큽니다.</translation>
+    </message>
+    <message>
+        <source>The cache path must be an existing directory:
+%1</source>
+        <translation>캐시 경로는 존재하는 디렉터리여야 합니다:
+%1</translation>
+    </message>
+    <message>
+        <source>The increment cannot be combined with the speed-only option.</source>
+        <translation>증가는 속도 전용 옵션과 함께 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Removing cracked hashes is not possible in the association attack mode.</source>
+        <translation>연관 공격 모드에서는 크래킹한 해시를 제거할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -923,8 +1152,8 @@
         <translation>이 시간(초)이 지나면 세션을 중단합니다. 0이면 hashcat이 끝날 때까지 실행합니다.</translation>
     </message>
     <message>
-        <source>&#xa0;s</source>
-        <translation>&#xa0;초</translation>
+        <source> s</source>
+        <translation> 초</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -947,8 +1176,8 @@
         <translation>공격의 예상 속도를 출력한 뒤 종료</translation>
     </message>
     <message>
-        <source>&#xa0;°C</source>
-        <translation>&#xa0;°C</translation>
+        <source> °C</source>
+        <translation> °C</translation>
     </message>
     <message>
         <source>Copy command</source>
@@ -1069,22 +1298,6 @@ Default: 1,2</source>
         <translation>가져오기 완료</translation>
     </message>
     <message>
-        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
-        <translation>이 파일은 이전 버전의 hashcat-gui에서 만들어졌습니다(형식 버전 %1; 이 버전은 형식 버전 %2을(를) 읽습니다).</translation>
-    </message>
-    <message>
-        <source>The file holds sections this import does not use: %1.</source>
-        <translation>이 파일에는 이 가져오기에서 사용하지 않는 섹션이 있습니다: %1.</translation>
-    </message>
-    <message>
-        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
-        <translation>이 파일은 형식 버전 %1이지만 이 버전은 형식 버전 %2을(를) 읽으므로 적용되지 않았습니다. 읽으려면 hashcat-gui를 업데이트하세요.</translation>
-    </message>
-    <message>
-        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
-        <translation>세션 파일은 형식 버전 %1이지만 이 버전은 형식 버전 %2을(를) 읽으므로 세션이 복원되지 않았습니다. 파일은 그대로 두었으므로 이번 실행의 세션도 저장되지 않습니다. 읽으려면 hashcat-gui를 업데이트하세요.</translation>
-    </message>
-    <message>
         <source>Settings exported to “%1”.</source>
         <translation>설정을 “%1”(으)로 내보냈습니다.</translation>
     </message>
@@ -1157,14 +1370,6 @@ Default: 1,2</source>
         <translation>해시 유형을 불러오지 못했습니다</translation>
     </message>
     <message>
-        <source>This mode needs a wordlist and a mask.</source>
-        <translation>이 모드에는 단어 목록과 마스크가 필요합니다.</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one wordlist.</source>
-        <translation>이 모드에는 단어 목록이 하나 이상 필요합니다.</translation>
-    </message>
-    <message>
         <source>Open hash file</source>
         <translation>해시 파일 열기</translation>
     </message>
@@ -1183,18 +1388,6 @@ Default: 1,2</source>
     <message>
         <source>Could not start “%1”: %2</source>
         <translation>“%1”을(를) 시작할 수 없습니다: %2</translation>
-    </message>
-    <message>
-        <source>The configured terminal “%1” is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>설정된 터미널 “%1”을(를) 사용할 수 없습니다. 사용 가능한 터미널: %2
-변경하려면 %3 → %4(으)로 이동하세요.</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly %1 wordlists (left, right).
-Currently selected: %2.</source>
-        <translation>이 모드에는 정확히 %1개의 단어 목록(왼쪽, 오른쪽)이 필요합니다.
-현재 선택: %2개.</translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
@@ -1217,50 +1410,6 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
 이 예제는 테스트 해시를 크래킹하며, hashcat이 비밀번호 %2을(를) 복구해야 합니다.</translation>
     </message>
     <message>
-        <source>Could not create the example directory “%1”.</source>
-        <translation>예제 디렉터리 “%1”을(를) 만들 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Could not read the bundled file “%1”: %2</source>
-        <translation>내장 파일 “%1”을(를) 읽을 수 없습니다: %2</translation>
-    </message>
-    <message>
-        <source>Could not write “%1”: %2</source>
-        <translation>“%1”을(를) 쓸 수 없습니다: %2</translation>
-    </message>
-    <message>
-        <source>Straight</source>
-        <translation>사전</translation>
-    </message>
-    <message>
-        <source>Combination</source>
-        <translation>조합</translation>
-    </message>
-    <message>
-        <source>Brute-force</source>
-        <translation>무차별 대입</translation>
-    </message>
-    <message>
-        <source>Hybrid Wordlist + Mask</source>
-        <translation>하이브리드: 단어 목록 + 마스크</translation>
-    </message>
-    <message>
-        <source>Hybrid Mask + Wordlist</source>
-        <translation>하이브리드: 마스크 + 단어 목록</translation>
-    </message>
-    <message>
-        <source>Generic (feed)</source>
-        <translation>일반(피드)</translation>
-    </message>
-    <message>
-        <source>Association</source>
-        <translation>연관</translation>
-    </message>
-    <message>
-        <source>Hybrid (mask + ?w/?q)</source>
-        <translation>하이브리드(마스크 + ?w/?q)</translation>
-    </message>
-    <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>지원되는 해시 유형을 가져오지 못했습니다.
@@ -1273,42 +1422,14 @@ Error: %1</source>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니다. 해결 방법은 &lt;a href=&quot;%1&quot;&gt;FAQ 항목&lt;/a&gt;을 참조하세요.</translation>
+Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니다. 해결 방법은 &lt;a href="%1"&gt;FAQ 항목&lt;/a&gt;을 참조하세요.</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>사용 가능한 해시 유형을 불러오려면 %1 → %2에서 hashcat 경로를 설정하세요.</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly 2 wordlists (left, right).</source>
-        <translation>이 모드에는 정확히 2개의 단어 목록(왼쪽, 오른쪽)이 필요합니다.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask.</source>
-        <translation>이 모드에는 마스크가 필요합니다.</translation>
-    </message>
-    <message>
-        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
-        <translation>이 모드는 hashcat에 내장된 default-passwords 규칙 세트를 실행합니다. 직접 만든 것을 사용하려면 하나 이상 지정하세요.</translation>
-    </message>
-    <message>
-        <source>This mode needs one wordlist and at least one table.</source>
-        <translation>이 모드에는 단어 목록 하나와 테이블이 하나 이상 필요합니다.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
-        <translation>이 모드에는 피드가 필요합니다. 인수는 피드에 따라 다르며, random과 stdin은 필요하지 않고 wordlist는 경로가 필요합니다.</translation>
-    </message>
-    <message>
-        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>이 모드는 단어 목록을 최대 하나까지 사용할 수 있습니다. 단어 목록이 없으면 단어는 해시 파일에서 가져오며 설정 줄로 실행 범위를 제한할 수 있고, 단어 목록이 있으면 두 파일을 줄 단위로 짝짓습니다.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
-        <translation>이 모드에는 ?w가 정확히 하나 들어 있는 마스크가 필요합니다. ?w 뒤의 ?q는 두 번째 단어 목록을 지정합니다.</translation>
     </message>
     <message>
         <source>Open cache directory</source>
@@ -1334,6 +1455,21 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <source>Open feed file</source>
         <translation>피드 파일 열기</translation>
     </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>클립보드에 복사됨</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>실행 실패</translation>
+    </message>
+    <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>명령줄이 터미널에 대해 너무 깁니다. 인수 목록이나 해당 값을 줄인 후 다시 시도하세요.</translation>
+    </message>
+</context>
+<context>
+    <name>PathListController</name>
     <message>
         <source>This folder has no wordlists. hashcat reads the regular files directly inside it, not subfolders.</source>
         <translation>이 폴더에는 단어 목록이 없습니다. hashcat은 폴더 바로 안의 일반 파일을 읽으며 하위 폴더는 읽지 않습니다.</translation>
@@ -1368,133 +1504,24 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>이 테이블이 존재하지 않습니다:
 %1</translation>
     </message>
+</context>
+<context>
+    <name>SessionTransfer</name>
     <message>
-        <source>Copied to the clipboard</source>
-        <translation>클립보드에 복사됨</translation>
+        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
+        <translation>이 파일은 이전 버전의 hashcat-gui에서 만들어졌습니다(형식 버전 %1; 이 버전은 형식 버전 %2을(를) 읽습니다).</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>실행 실패</translation>
+        <source>The file holds sections this import does not use: %1.</source>
+        <translation>이 파일에는 이 가져오기에서 사용하지 않는 섹션이 있습니다: %1.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>명령줄이 터미널에 대해 너무 깁니다. 인수 목록이나 해당 값을 줄인 후 다시 시도하세요.</translation>
+        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
+        <translation>이 파일은 형식 버전 %1이지만 이 버전은 형식 버전 %2을(를) 읽으므로 적용되지 않았습니다. 읽으려면 hashcat-gui를 업데이트하세요.</translation>
     </message>
     <message>
-        <source>Please choose a hash file.</source>
-        <translation>해시 파일을 선택하세요.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
-        <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 hashcat 실행 파일 경로를 설정하세요.</translation>
-    </message>
-    <message>
-        <source>The configured hashcat executable does not exist:
-%1
-Navigate to %2 → %3 to change it.</source>
-        <translation>설정된 hashcat 실행 파일이 없습니다:
-%1
-변경하려면 %2 → %3(으)로 이동하세요.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
-        <translation>&lt;b&gt;%1 → %2&lt;/b&gt;에서 실행에 사용할 터미널을 선택하세요.</translation>
-    </message>
-    <message>
-        <source>Maximum number of wordlists for this mode: %1.
-Currently selected: %2.</source>
-        <translation>이 모드의 단어 목록 최대 개수는 %1개입니다.
-현재 선택: %2개.</translation>
-    </message>
-    <message>
-        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
-        <translation>여기서는 hashcat이 두 파일을 줄 단위로 짝짓습니다. 이 GUI는 그 역할에 단어 목록을 하나만 제공합니다.</translation>
-    </message>
-    <message>
-        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
-%1</source>
-        <translation>이 단어 목록은 파일이어야 합니다. hashcat은 이를 곱해지는 단어 목록(?q 쪽)으로 읽으며 그 자리에는 폴더를 사용할 수 없습니다:
-%1</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one table.</source>
-        <translation>이 모드에는 테이블이 하나 이상 필요합니다.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
-        <translation>이 모드에는 피드가 필요합니다. 내장 이름(wordlist, stdin, random, …) 또는 피드 파일 경로를 지정하세요.</translation>
-    </message>
-    <message>
-        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
-        <translation>이 모드는 단어 목록을 마스크와 짝짓습니다. 마스크에는 단어를 위한 ?w가 필요합니다.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?w.</source>
-        <translation>마스크에 ?w가 둘 이상 들어 있습니다.</translation>
-    </message>
-    <message>
-        <source>The mask contains a ?q before the first ?w.</source>
-        <translation>마스크에서 첫 번째 ?w 앞에 ?q가 있습니다.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?q.</source>
-        <translation>마스크에 ?q가 둘 이상 들어 있습니다.</translation>
-    </message>
-    <message>
-        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
-        <translation>마스크가 ?q로 두 번째 단어를 지정하지만 선택된 단어 목록은 하나뿐입니다.</translation>
-    </message>
-    <message>
-        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
-        <translation>단어 목록이 두 개 선택되었지만 마스크에는 두 번째 목록을 위한 ?q가 없습니다.</translation>
-    </message>
-    <message>
-        <source>The increment is not offered in this hybrid mode.</source>
-        <translation>이 하이브리드 모드에서는 증가를 사용할 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
-        <translation>?w와 ?q 표시는 하이브리드 모드(마스크 + 단어 목록)에서만 사용할 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
-        <translation>사용자 지정 문자 집합은 마스크 안에서만 사용되는데, 이번 실행에는 마스크가 지정되지 않았습니다. ?1–?4를 참조하는 mask= 설정을 추가하거나(예: mask=?1?1?1?1) 사용자 지정 문자 집합을 비우세요.</translation>
-    </message>
-    <message>
-        <source>The setting “%1” is not valid for this mode.</source>
-        <translation>설정 “%1”은(는) 이 모드에서 유효하지 않습니다.</translation>
-    </message>
-    <message>
-        <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>토큰 “%1”은(는) 설정이 아닙니다. 설정은 key=value 형식으로 작성합니다.</translation>
-    </message>
-    <message>
-        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
-        <translation>설정 줄은 단어를 해시 파일에서 가져올 때만 적용됩니다. 설정 줄이나 단어 목록 중 하나를 비우세요.</translation>
-    </message>
-    <message>
-        <source>The hash type 4000 describes its hashes as a recipe, for example
-md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
-        <translation>해시 유형 4000은 해시를 레시피로 설명합니다. 예:
-md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</translation>
-    </message>
-    <message>
-        <source>The minimum increment length is larger than the maximum.</source>
-        <translation>증가 최소 길이가 최대 길이보다 큽니다.</translation>
-    </message>
-    <message>
-        <source>The cache path must be an existing directory:
-%1</source>
-        <translation>캐시 경로는 존재하는 디렉터리여야 합니다:
-%1</translation>
-    </message>
-    <message>
-        <source>The increment cannot be combined with the speed-only option.</source>
-        <translation>증가는 속도 전용 옵션과 함께 사용할 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Removing cracked hashes is not possible in the association attack mode.</source>
-        <translation>연관 공격 모드에서는 크래킹한 해시를 제거할 수 없습니다.</translation>
+        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
+        <translation>세션 파일은 형식 버전 %1이지만 이 버전은 형식 버전 %2을(를) 읽으므로 세션이 복원되지 않았습니다. 파일은 그대로 두었으므로 이번 실행의 세션도 저장되지 않습니다. 읽으려면 hashcat-gui를 업데이트하세요.</translation>
     </message>
 </context>
 <context>
@@ -1725,6 +1752,13 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>파일에 잘못된 형식의 값이 있어 적용되지 않았습니다: %1.</translation>
+    </message>
+</context>
+<context>
+    <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation>이 시스템에서 지원되는 터미널을 찾을 수 없습니다. hashcat 출력을 표시하려면 hashcat-gui에 터미널이 필요합니다.</translation>
     </message>
 </context>
 <context>

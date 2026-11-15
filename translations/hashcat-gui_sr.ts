@@ -113,6 +113,100 @@
     </message>
 </context>
 <context>
+    <name>AttackModeView</name>
+    <message>
+        <source>Straight</source>
+        <translation>Rečnik</translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation>Kombinacija</translation>
+    </message>
+    <message>
+        <source>Brute-force</source>
+        <translation>Brute-force</translation>
+    </message>
+    <message>
+        <source>PCFG</source>
+        <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Tabela</translation>
+    </message>
+    <message>
+        <source>Hybrid Wordlist + Mask</source>
+        <translation>Hibrid: lista reči + maska</translation>
+    </message>
+    <message>
+        <source>Hybrid Mask + Wordlist</source>
+        <translation>Hibrid: maska + lista reči</translation>
+    </message>
+    <message>
+        <source>Generic (feed)</source>
+        <translation>Generički (feed)</translation>
+    </message>
+    <message>
+        <source>Association</source>
+        <translation>Asocijacija</translation>
+    </message>
+    <message>
+        <source>Hybrid (mask + ?w/?q)</source>
+        <translation>Hibrid (maska + ?w/?q)</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Ovaj režim zahteva najmanje jednu listu reči.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly 2 wordlists (left, right).</source>
+        <translation>Ovaj režim zahteva tačno 2 liste reči (leva, desna).</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Ovaj režim zahteva masku.</translation>
+    </message>
+    <message>
+        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
+        <translation>Ovaj režim pokreće ugrađeni skup pravila default-passwords programa hashcat; navedite jedan ili više da biste koristili sopstvene.</translation>
+    </message>
+    <message>
+        <source>This mode needs one wordlist and at least one table.</source>
+        <translation>Ovaj režim zahteva jednu listu reči i najmanje jednu tabelu.</translation>
+    </message>
+    <message>
+        <source>This mode needs a wordlist and a mask.</source>
+        <translation>Ovaj režim zahteva listu reči i masku.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
+        <translation>Ovaj režim zahteva feed. Argumenti zavise od feed-a: random i stdin ne traže nijedan, wordlist traži putanju.</translation>
+    </message>
+    <message>
+        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
+        <translation>Ovaj režim zahteva najviše jednu listu reči. Bez nje reči potiču iz datoteke sa hash-ovima, a red podešavanja može da ograniči pokretanje; sa listom reči dve datoteke se uparuju red po red.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
+        <translation>Ovaj režim zahteva masku sa tačno jednim ?w; ?q posle ?w navodi drugu listu reči.</translation>
+    </message>
+</context>
+<context>
+    <name>ExampleSession</name>
+    <message>
+        <source>Could not create the example directory “%1”.</source>
+        <translation>Direktorijum primera „%1“ nije mogao da se napravi.</translation>
+    </message>
+    <message>
+        <source>Could not read the bundled file “%1”: %2</source>
+        <translation>Ugrađena datoteka „%1“ nije mogla da se pročita: %2</translation>
+    </message>
+    <message>
+        <source>Could not write “%1”: %2</source>
+        <translation>„%1“ nije moglo da se upiše: %2</translation>
+    </message>
+</context>
+<context>
     <name>HashcatInfoParser</name>
     <message>
         <source>Invalid JSON returned from hashcat.</source>
@@ -124,7 +218,7 @@
     </message>
 </context>
 <context>
-    <name>HelperUtils</name>
+    <name>HashcatRunner</name>
     <message>
         <source>The hashcat path is not configured.</source>
         <translation>Putanja do hashcat-a nije konfigurisana.</translation>
@@ -141,9 +235,144 @@
         <translation>hashcat je dostigao vremenski limit
 %1</translation>
     </message>
+</context>
+<context>
+    <name>LaunchMessage</name>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>Na ovom sistemu nije pronađen podržani terminal. hashcat-gui ga zahteva da bi prikazao izlaz programa hashcat.</translation>
+        <source>Please choose a hash file.</source>
+        <translation>Izaberite datoteku sa hash-ovima.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
+        <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da podesite putanju do hashcat programa.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable does not exist:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>Konfigurisani hashcat program ne postoji:
+%1
+Idite na %2 → %3 da to promenite.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
+        <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da izaberete terminal koji se koristi za pokretanje.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation>Konfigurisani terminal „%1“ nije dostupan. Dostupni terminali: %2
+Idite na %3 → %4 da biste ga promenili.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Ovaj režim zahteva najmanje jednu listu reči.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
+Currently selected: %2.</source>
+        <translation>Ovaj režim zahteva liste reči u tačnom broju %1 (leva, desna).
+Trenutno izabrano: %2.</translation>
+    </message>
+    <message>
+        <source>Maximum number of wordlists for this mode: %1.
+Currently selected: %2.</source>
+        <translation>Najveći broj lista reči za ovaj režim: %1.
+Trenutno izabrano: %2.</translation>
+    </message>
+    <message>
+        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
+        <translation>Ovde hashcat uparuje dve datoteke red po red; ovaj interfejs nudi samo jednu listu reči za tu ulogu.</translation>
+    </message>
+    <message>
+        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
+%1</source>
+        <translation>Ova lista reči mora biti datoteka: hashcat je čita kao umnoženu listu reči (strana ?q), a fascikla se tamo ne može koristiti:
+%1</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Ovaj režim zahteva masku.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one table.</source>
+        <translation>Ovaj režim zahteva najmanje jednu tabelu.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
+        <translation>Ovaj režim zahteva feed: ugrađeno ime (wordlist, stdin, random, …) ili putanju datoteke feed-a.</translation>
+    </message>
+    <message>
+        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
+        <translation>Ovaj režim uparuje liste reči sa maskom; maska zahteva ?w za reč.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?w.</source>
+        <translation>Maska sadrži više od jednog ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains a ?q before the first ?w.</source>
+        <translation>Maska sadrži ?q pre prvog ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?q.</source>
+        <translation>Maska sadrži više od jednog ?q.</translation>
+    </message>
+    <message>
+        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
+        <translation>Maska navodi drugu reč pomoću ?q, ali je izabrana samo jedna lista reči.</translation>
+    </message>
+    <message>
+        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
+        <translation>Izabrane su dve liste reči, ali maska nema ?q za drugu.</translation>
+    </message>
+    <message>
+        <source>The increment is not offered in this hybrid mode.</source>
+        <translation>Povećavanje se ne nudi u ovom hibridnom režimu.</translation>
+    </message>
+    <message>
+        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
+        <translation>Oznake ?w i ?q nude se samo u hibridnom režimu (maska + liste reči).</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Prilagođeni skup znakova koristi se samo unutar maske, a ovo pokretanje nije navelo nijednu masku. Dodajte podešavanje mask= koje upućuje na ?1–?4, na primer mask=?1?1?1?1, ili obrišite prilagođeni skup znakova.</translation>
+    </message>
+    <message>
+        <source>The setting “%1” is not valid for this mode.</source>
+        <translation>Podešavanje „%1“ nije ispravno za ovaj režim.</translation>
+    </message>
+    <message>
+        <source>The token “%1” is not a setting; settings are written as key=value.</source>
+        <translation>Token „%1“ nije podešavanje; podešavanja se pišu kao key=value.</translation>
+    </message>
+    <message>
+        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
+        <translation>Red podešavanja važi samo dok reči potiču iz datoteke sa hash-ovima. Obrišite ili red podešavanja ili listu lista reči.</translation>
+    </message>
+    <message>
+        <source>The hash type 4000 describes its hashes as a recipe, for example
+md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
+        <translation>Vrsta hash-a 4000 opisuje svoje hash-ove kao recept, na primer
+md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
+    </message>
+    <message>
+        <source>The minimum increment length is larger than the maximum.</source>
+        <translation>Minimalna dužina povećavanja veća je od maksimalne.</translation>
+    </message>
+    <message>
+        <source>The cache path must be an existing directory:
+%1</source>
+        <translation>Putanja keša mora biti postojeći direktorijum:
+%1</translation>
+    </message>
+    <message>
+        <source>The increment cannot be combined with the speed-only option.</source>
+        <translation>Povećavanje se ne može kombinovati sa opcijom samo za brzinu.</translation>
+    </message>
+    <message>
+        <source>Removing cracked hashes is not possible in the association attack mode.</source>
+        <translation>Uklanjanje provaljenih hash-ova nije moguće u režimu napada asocijacije.</translation>
     </message>
 </context>
 <context>
@@ -923,8 +1152,8 @@
         <translation>Prekini sesiju posle ovoliko sekundi; 0 radi dok hashcat ne završi.</translation>
     </message>
     <message>
-        <source>&#xa0;s</source>
-        <translation>&#xa0;s</translation>
+        <source> s</source>
+        <translation> s</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -947,8 +1176,8 @@
         <translation>Ispiši očekivanu brzinu napada i izađi</translation>
     </message>
     <message>
-        <source>&#xa0;°C</source>
-        <translation>&#xa0;°C</translation>
+        <source> °C</source>
+        <translation> °C</translation>
     </message>
     <message>
         <source>Copy command</source>
@@ -1069,22 +1298,6 @@ Podrazumevano: 1,2</translation>
         <translation>Uvezeno</translation>
     </message>
     <message>
-        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
-        <translation>Datoteku je napravila starija verzija programa hashcat-gui (verzija formata %1; ova verzija čita verziju formata %2).</translation>
-    </message>
-    <message>
-        <source>The file holds sections this import does not use: %1.</source>
-        <translation>Datoteka sadrži odeljke koje ovaj uvoz ne koristi: %1.</translation>
-    </message>
-    <message>
-        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
-        <translation>Datoteka je u verziji formata %1, ali ova verzija čita verziju formata %2, pa nije primenjena. Ažurirajte hashcat-gui da biste je pročitali.</translation>
-    </message>
-    <message>
-        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
-        <translation>Datoteka sesije je u verziji formata %1, ali ova verzija čita verziju formata %2, pa sesija nije vraćena. Datoteka je ostavljena kakva jeste, pa se ni sesija ovog pokretanja ne čuva. Ažurirajte hashcat-gui da biste je pročitali.</translation>
-    </message>
-    <message>
         <source>Settings exported to “%1”.</source>
         <translation>Podešavanja su izvezena u „%1“.</translation>
     </message>
@@ -1157,14 +1370,6 @@ Podrazumevano: 1,2</translation>
         <translation>Vrste hash-ova nisu mogle da se učitaju</translation>
     </message>
     <message>
-        <source>This mode needs a wordlist and a mask.</source>
-        <translation>Ovaj režim zahteva listu reči i masku.</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one wordlist.</source>
-        <translation>Ovaj režim zahteva najmanje jednu listu reči.</translation>
-    </message>
-    <message>
         <source>Open hash file</source>
         <translation>Otvori datoteku sa hash-ovima</translation>
     </message>
@@ -1183,18 +1388,6 @@ Podrazumevano: 1,2</translation>
     <message>
         <source>Could not start “%1”: %2</source>
         <translation>„%1“ nije moglo da se pokrene: %2</translation>
-    </message>
-    <message>
-        <source>The configured terminal “%1” is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>Konfigurisani terminal „%1“ nije dostupan. Dostupni terminali: %2
-Idite na %3 → %4 da biste ga promenili.</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly %1 wordlists (left, right).
-Currently selected: %2.</source>
-        <translation>Ovaj režim zahteva liste reči u tačnom broju %1 (leva, desna).
-Trenutno izabrano: %2.</translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
@@ -1217,50 +1410,6 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
 Primer provaljuje probni hash; hashcat bi trebalo da pronađe lozinku %2.</translation>
     </message>
     <message>
-        <source>Could not create the example directory “%1”.</source>
-        <translation>Direktorijum primera „%1“ nije mogao da se napravi.</translation>
-    </message>
-    <message>
-        <source>Could not read the bundled file “%1”: %2</source>
-        <translation>Ugrađena datoteka „%1“ nije mogla da se pročita: %2</translation>
-    </message>
-    <message>
-        <source>Could not write “%1”: %2</source>
-        <translation>„%1“ nije moglo da se upiše: %2</translation>
-    </message>
-    <message>
-        <source>Straight</source>
-        <translation>Rečnik</translation>
-    </message>
-    <message>
-        <source>Combination</source>
-        <translation>Kombinacija</translation>
-    </message>
-    <message>
-        <source>Brute-force</source>
-        <translation>Brute-force</translation>
-    </message>
-    <message>
-        <source>Hybrid Wordlist + Mask</source>
-        <translation>Hibrid: lista reči + maska</translation>
-    </message>
-    <message>
-        <source>Hybrid Mask + Wordlist</source>
-        <translation>Hibrid: maska + lista reči</translation>
-    </message>
-    <message>
-        <source>Generic (feed)</source>
-        <translation>Generički (feed)</translation>
-    </message>
-    <message>
-        <source>Association</source>
-        <translation>Asocijacija</translation>
-    </message>
-    <message>
-        <source>Hybrid (mask + ?w/?q)</source>
-        <translation>Hibrid (maska + ?w/?q)</translation>
-    </message>
-    <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Preuzimanje podržanih vrsta hash-ova nije uspelo.
@@ -1273,42 +1422,14 @@ Greška: %1</translation>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potražite u &lt;a href=&quot;%1&quot;&gt;stavci FAQ-a&lt;/a&gt;.</translation>
+Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potražite u &lt;a href="%1"&gt;stavci FAQ-a&lt;/a&gt;.</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>Podesite putanju do hashcat-a u %1 → %2 da biste učitali dostupne vrste hash-ova.</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly 2 wordlists (left, right).</source>
-        <translation>Ovaj režim zahteva tačno 2 liste reči (leva, desna).</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask.</source>
-        <translation>Ovaj režim zahteva masku.</translation>
-    </message>
-    <message>
-        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
-        <translation>Ovaj režim pokreće ugrađeni skup pravila default-passwords programa hashcat; navedite jedan ili više da biste koristili sopstvene.</translation>
-    </message>
-    <message>
-        <source>This mode needs one wordlist and at least one table.</source>
-        <translation>Ovaj režim zahteva jednu listu reči i najmanje jednu tabelu.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
-        <translation>Ovaj režim zahteva feed. Argumenti zavise od feed-a: random i stdin ne traže nijedan, wordlist traži putanju.</translation>
-    </message>
-    <message>
-        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>Ovaj režim zahteva najviše jednu listu reči. Bez nje reči potiču iz datoteke sa hash-ovima, a red podešavanja može da ograniči pokretanje; sa listom reči dve datoteke se uparuju red po red.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
-        <translation>Ovaj režim zahteva masku sa tačno jednim ?w; ?q posle ?w navodi drugu listu reči.</translation>
     </message>
     <message>
         <source>Open cache directory</source>
@@ -1334,6 +1455,21 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
         <source>Open feed file</source>
         <translation>Otvori datoteku feed-a</translation>
     </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>Kopirano u privremenu memoriju</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Pokretanje nije uspelo</translation>
+    </message>
+    <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>Komandna linija je preduga za terminal. Skratite liste argumenata ili njihove vrednosti i pokušajte ponovo.</translation>
+    </message>
+</context>
+<context>
+    <name>PathListController</name>
     <message>
         <source>This folder has no wordlists. hashcat reads the regular files directly inside it, not subfolders.</source>
         <translation>Ova fascikla nema liste reči. hashcat čita obične datoteke koje se nalaze direktno u njoj, ne i potfascikle.</translation>
@@ -1368,133 +1504,24 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
         <translation>Ova tabela ne postoji:
 %1</translation>
     </message>
+</context>
+<context>
+    <name>SessionTransfer</name>
     <message>
-        <source>Copied to the clipboard</source>
-        <translation>Kopirano u privremenu memoriju</translation>
+        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
+        <translation>Datoteku je napravila starija verzija programa hashcat-gui (verzija formata %1; ova verzija čita verziju formata %2).</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>Pokretanje nije uspelo</translation>
+        <source>The file holds sections this import does not use: %1.</source>
+        <translation>Datoteka sadrži odeljke koje ovaj uvoz ne koristi: %1.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>Komandna linija je preduga za terminal. Skratite liste argumenata ili njihove vrednosti i pokušajte ponovo.</translation>
+        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
+        <translation>Datoteka je u verziji formata %1, ali ova verzija čita verziju formata %2, pa nije primenjena. Ažurirajte hashcat-gui da biste je pročitali.</translation>
     </message>
     <message>
-        <source>Please choose a hash file.</source>
-        <translation>Izaberite datoteku sa hash-ovima.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
-        <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da podesite putanju do hashcat programa.</translation>
-    </message>
-    <message>
-        <source>The configured hashcat executable does not exist:
-%1
-Navigate to %2 → %3 to change it.</source>
-        <translation>Konfigurisani hashcat program ne postoji:
-%1
-Idite na %2 → %3 da to promenite.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
-        <translation>Idite na &lt;b&gt;%1 → %2&lt;/b&gt; da izaberete terminal koji se koristi za pokretanje.</translation>
-    </message>
-    <message>
-        <source>Maximum number of wordlists for this mode: %1.
-Currently selected: %2.</source>
-        <translation>Najveći broj lista reči za ovaj režim: %1.
-Trenutno izabrano: %2.</translation>
-    </message>
-    <message>
-        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
-        <translation>Ovde hashcat uparuje dve datoteke red po red; ovaj interfejs nudi samo jednu listu reči za tu ulogu.</translation>
-    </message>
-    <message>
-        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
-%1</source>
-        <translation>Ova lista reči mora biti datoteka: hashcat je čita kao umnoženu listu reči (strana ?q), a fascikla se tamo ne može koristiti:
-%1</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one table.</source>
-        <translation>Ovaj režim zahteva najmanje jednu tabelu.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
-        <translation>Ovaj režim zahteva feed: ugrađeno ime (wordlist, stdin, random, …) ili putanju datoteke feed-a.</translation>
-    </message>
-    <message>
-        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
-        <translation>Ovaj režim uparuje liste reči sa maskom; maska zahteva ?w za reč.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?w.</source>
-        <translation>Maska sadrži više od jednog ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains a ?q before the first ?w.</source>
-        <translation>Maska sadrži ?q pre prvog ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?q.</source>
-        <translation>Maska sadrži više od jednog ?q.</translation>
-    </message>
-    <message>
-        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
-        <translation>Maska navodi drugu reč pomoću ?q, ali je izabrana samo jedna lista reči.</translation>
-    </message>
-    <message>
-        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
-        <translation>Izabrane su dve liste reči, ali maska nema ?q za drugu.</translation>
-    </message>
-    <message>
-        <source>The increment is not offered in this hybrid mode.</source>
-        <translation>Povećavanje se ne nudi u ovom hibridnom režimu.</translation>
-    </message>
-    <message>
-        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
-        <translation>Oznake ?w i ?q nude se samo u hibridnom režimu (maska + liste reči).</translation>
-    </message>
-    <message>
-        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
-        <translation>Prilagođeni skup znakova koristi se samo unutar maske, a ovo pokretanje nije navelo nijednu masku. Dodajte podešavanje mask= koje upućuje na ?1–?4, na primer mask=?1?1?1?1, ili obrišite prilagođeni skup znakova.</translation>
-    </message>
-    <message>
-        <source>The setting “%1” is not valid for this mode.</source>
-        <translation>Podešavanje „%1“ nije ispravno za ovaj režim.</translation>
-    </message>
-    <message>
-        <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>Token „%1“ nije podešavanje; podešavanja se pišu kao key=value.</translation>
-    </message>
-    <message>
-        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
-        <translation>Red podešavanja važi samo dok reči potiču iz datoteke sa hash-ovima. Obrišite ili red podešavanja ili listu lista reči.</translation>
-    </message>
-    <message>
-        <source>The hash type 4000 describes its hashes as a recipe, for example
-md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
-        <translation>Vrsta hash-a 4000 opisuje svoje hash-ove kao recept, na primer
-md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
-    </message>
-    <message>
-        <source>The minimum increment length is larger than the maximum.</source>
-        <translation>Minimalna dužina povećavanja veća je od maksimalne.</translation>
-    </message>
-    <message>
-        <source>The cache path must be an existing directory:
-%1</source>
-        <translation>Putanja keša mora biti postojeći direktorijum:
-%1</translation>
-    </message>
-    <message>
-        <source>The increment cannot be combined with the speed-only option.</source>
-        <translation>Povećavanje se ne može kombinovati sa opcijom samo za brzinu.</translation>
-    </message>
-    <message>
-        <source>Removing cracked hashes is not possible in the association attack mode.</source>
-        <translation>Uklanjanje provaljenih hash-ova nije moguće u režimu napada asocijacije.</translation>
+        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
+        <translation>Datoteka sesije je u verziji formata %1, ali ova verzija čita verziju formata %2, pa sesija nije vraćena. Datoteka je ostavljena kakva jeste, pa se ni sesija ovog pokretanja ne čuva. Ažurirajte hashcat-gui da biste je pročitali.</translation>
     </message>
 </context>
 <context>
@@ -1725,6 +1752,13 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>Datoteka sadrži vrednosti pogrešnog tipa, pa nisu primenjene: %1.</translation>
+    </message>
+</context>
+<context>
+    <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation>Na ovom sistemu nije pronađen podržani terminal. hashcat-gui ga zahteva da bi prikazao izlaz programa hashcat.</translation>
     </message>
 </context>
 <context>

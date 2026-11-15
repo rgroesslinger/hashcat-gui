@@ -113,6 +113,100 @@
     </message>
 </context>
 <context>
+    <name>AttackModeView</name>
+    <message>
+        <source>Straight</source>
+        <translation>Словарная</translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation>Комбинаторная</translation>
+    </message>
+    <message>
+        <source>Brute-force</source>
+        <translation>Полный перебор</translation>
+    </message>
+    <message>
+        <source>PCFG</source>
+        <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Таблица</translation>
+    </message>
+    <message>
+        <source>Hybrid Wordlist + Mask</source>
+        <translation>Гибридная: словарь + маска</translation>
+    </message>
+    <message>
+        <source>Hybrid Mask + Wordlist</source>
+        <translation>Гибридная: маска + словарь</translation>
+    </message>
+    <message>
+        <source>Generic (feed)</source>
+        <translation>Универсальная (feed)</translation>
+    </message>
+    <message>
+        <source>Association</source>
+        <translation>Ассоциативная</translation>
+    </message>
+    <message>
+        <source>Hybrid (mask + ?w/?q)</source>
+        <translation>Гибридная (маска + ?w/?q)</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Этому режиму нужен хотя бы один словарь.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly 2 wordlists (left, right).</source>
+        <translation>Этому режиму нужно ровно 2 словаря (левый, правый).</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Этому режиму нужна маска.</translation>
+    </message>
+    <message>
+        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
+        <translation>Этот режим запускает встроенный в hashcat набор правил default-passwords; укажите один или несколько, чтобы использовать свои.</translation>
+    </message>
+    <message>
+        <source>This mode needs one wordlist and at least one table.</source>
+        <translation>Этому режиму нужны один словарь и хотя бы одна таблица.</translation>
+    </message>
+    <message>
+        <source>This mode needs a wordlist and a mask.</source>
+        <translation>Этому режиму нужны словарь и маска.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
+        <translation>Этому режиму нужен feed. Аргументы зависят от feed: random и stdin не требуют их, wordlist требует путь.</translation>
+    </message>
+    <message>
+        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
+        <translation>Этому режиму нужно не более одного словаря. Без словаря слова берутся из файла хешей, а строка настроек может ограничить запуск; со словарём два файла сопоставляются построчно.</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
+        <translation>Этому режиму нужна маска ровно с одним ?w; ?q после ?w задаёт второй словарь.</translation>
+    </message>
+</context>
+<context>
+    <name>ExampleSession</name>
+    <message>
+        <source>Could not create the example directory “%1”.</source>
+        <translation>Не удалось создать каталог примера «%1».</translation>
+    </message>
+    <message>
+        <source>Could not read the bundled file “%1”: %2</source>
+        <translation>Не удалось прочитать встроенный файл «%1»: %2</translation>
+    </message>
+    <message>
+        <source>Could not write “%1”: %2</source>
+        <translation>Не удалось записать «%1»: %2</translation>
+    </message>
+</context>
+<context>
     <name>HashcatInfoParser</name>
     <message>
         <source>Invalid JSON returned from hashcat.</source>
@@ -124,7 +218,7 @@
     </message>
 </context>
 <context>
-    <name>HelperUtils</name>
+    <name>HashcatRunner</name>
     <message>
         <source>The hashcat path is not configured.</source>
         <translation>Путь к hashcat не настроен.</translation>
@@ -141,9 +235,144 @@
         <translation>Истекло время ожидания hashcat
 %1</translation>
     </message>
+</context>
+<context>
+    <name>LaunchMessage</name>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>В этой системе не найден поддерживаемый терминал. hashcat-gui нужен терминал, чтобы показывать вывод hashcat.</translation>
+        <source>Please choose a hash file.</source>
+        <translation>Выберите файл хешей.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
+        <translation>Перейдите в &lt;b&gt;%1 → %2&lt;/b&gt;, чтобы настроить путь к исполняемому файлу hashcat.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable does not exist:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>Настроенный исполняемый файл hashcat не существует:
+%1
+Перейдите в %2 → %3, чтобы изменить его.</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
+        <translation>Перейдите в &lt;b&gt;%1 → %2&lt;/b&gt;, чтобы выбрать терминал, используемый для запуска.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation>Настроенный терминал «%1» недоступен. Доступные терминалы: %2
+Перейдите в %3 → %4, чтобы изменить его.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>Этому режиму нужен хотя бы один словарь.</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
+Currently selected: %2.</source>
+        <translation>Этому режиму нужны словари в количестве ровно %1 (левый, правый).
+Сейчас выбрано: %2.</translation>
+    </message>
+    <message>
+        <source>Maximum number of wordlists for this mode: %1.
+Currently selected: %2.</source>
+        <translation>Максимальное число словарей для этого режима: %1.
+Сейчас выбрано: %2.</translation>
+    </message>
+    <message>
+        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
+        <translation>Здесь hashcat сопоставляет два файла построчно; этот интерфейс предлагает для такой роли только один словарь.</translation>
+    </message>
+    <message>
+        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
+%1</source>
+        <translation>Этот словарь должен быть файлом: hashcat читает его как умножаемый словарь (сторона ?q), и папку там использовать нельзя:
+%1</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>Этому режиму нужна маска.</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one table.</source>
+        <translation>Этому режиму нужна хотя бы одна таблица.</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
+        <translation>Этому режиму нужен feed: встроенное имя (wordlist, stdin, random, …) или путь к файлу feed.</translation>
+    </message>
+    <message>
+        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
+        <translation>Этот режим сопоставляет словари с маской; маске нужен ?w для слова.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?w.</source>
+        <translation>Маска содержит более одного ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains a ?q before the first ?w.</source>
+        <translation>Маска содержит ?q перед первым ?w.</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?q.</source>
+        <translation>Маска содержит более одного ?q.</translation>
+    </message>
+    <message>
+        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
+        <translation>Маска задаёт второе слово через ?q, но выбран только один словарь.</translation>
+    </message>
+    <message>
+        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
+        <translation>Выбрано два словаря, но в маске нет ?q для второго.</translation>
+    </message>
+    <message>
+        <source>The increment is not offered in this hybrid mode.</source>
+        <translation>Инкремент недоступен в этом гибридном режиме.</translation>
+    </message>
+    <message>
+        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
+        <translation>Маркеры ?w и ?q доступны только в гибридном режиме (маска + словари).</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>Пользовательский набор символов используется только внутри маски, а в этом запуске маска не указана. Добавьте настройку mask=, ссылающуюся на ?1–?4, например mask=?1?1?1?1, или очистите пользовательский набор символов.</translation>
+    </message>
+    <message>
+        <source>The setting “%1” is not valid for this mode.</source>
+        <translation>Настройка «%1» недопустима для этого режима.</translation>
+    </message>
+    <message>
+        <source>The token “%1” is not a setting; settings are written as key=value.</source>
+        <translation>Токен «%1» не является настройкой; настройки записываются в виде key=value.</translation>
+    </message>
+    <message>
+        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
+        <translation>Строка настроек действует, только пока слова берутся из файла хешей. Очистите либо строку настроек, либо список словарей.</translation>
+    </message>
+    <message>
+        <source>The hash type 4000 describes its hashes as a recipe, for example
+md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
+        <translation>Тип хеша 4000 описывает свои хеши в виде рецепта, например
+md5(md5(salt) . pass). Введите его в поле рецепта хеша.</translation>
+    </message>
+    <message>
+        <source>The minimum increment length is larger than the maximum.</source>
+        <translation>Минимальная длина инкремента больше максимальной.</translation>
+    </message>
+    <message>
+        <source>The cache path must be an existing directory:
+%1</source>
+        <translation>Путь к кешу должен указывать на существующий каталог:
+%1</translation>
+    </message>
+    <message>
+        <source>The increment cannot be combined with the speed-only option.</source>
+        <translation>Инкремент нельзя сочетать с параметром «только скорость».</translation>
+    </message>
+    <message>
+        <source>Removing cracked hashes is not possible in the association attack mode.</source>
+        <translation>Удаление взломанных хешей невозможно в ассоциативном режиме атаки.</translation>
     </message>
 </context>
 <context>
@@ -773,8 +1002,8 @@
         <translation>Прервать сессию через указанное число секунд; 0 — работать, пока hashcat не завершится.</translation>
     </message>
     <message>
-        <source>&#xa0;s</source>
-        <translation>&#xa0;с</translation>
+        <source> s</source>
+        <translation> с</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -845,8 +1074,8 @@
         <translation>Прервать, когда любое устройство бэкенда превысит эту температуру в °C; 0 отключает проверку.</translation>
     </message>
     <message>
-        <source>&#xa0;°C</source>
-        <translation>&#xa0;°C</translation>
+        <source> °C</source>
+        <translation> °C</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -1057,22 +1286,6 @@ Default: 1,2</source>
         <translation>Импортировано</translation>
     </message>
     <message>
-        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
-        <translation>Файл создан более старой версией hashcat-gui (версия формата %1; эта версия читает формат версии %2).</translation>
-    </message>
-    <message>
-        <source>The file holds sections this import does not use: %1.</source>
-        <translation>Файл содержит разделы, которые этот импорт не использует: %1.</translation>
-    </message>
-    <message>
-        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
-        <translation>Файл имеет версию формата %1, но эта версия читает формат версии %2, поэтому он не был применён. Обновите hashcat-gui, чтобы прочитать его.</translation>
-    </message>
-    <message>
-        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
-        <translation>Файл сессии имеет версию формата %1, но эта версия читает формат версии %2, поэтому сессия не была восстановлена. Файл оставлен без изменений, поэтому сессия этого запуска тоже не сохраняется. Обновите hashcat-gui, чтобы прочитать его.</translation>
-    </message>
-    <message>
         <source>Settings exported to “%1”.</source>
         <translation>Настройки экспортированы в «%1».</translation>
     </message>
@@ -1153,68 +1366,12 @@ Default: 1,2</source>
         <translation>Не удалось сохранить</translation>
     </message>
     <message>
-        <source>Straight</source>
-        <translation>Словарная</translation>
-    </message>
-    <message>
-        <source>Combination</source>
-        <translation>Комбинаторная</translation>
-    </message>
-    <message>
-        <source>Brute-force</source>
-        <translation>Полный перебор</translation>
-    </message>
-    <message>
-        <source>Hybrid Wordlist + Mask</source>
-        <translation>Гибридная: словарь + маска</translation>
-    </message>
-    <message>
-        <source>Hybrid Mask + Wordlist</source>
-        <translation>Гибридная: маска + словарь</translation>
-    </message>
-    <message>
-        <source>Generic (feed)</source>
-        <translation>Универсальная (feed)</translation>
-    </message>
-    <message>
-        <source>Association</source>
-        <translation>Ассоциативная</translation>
-    </message>
-    <message>
-        <source>Hybrid (mask + ?w/?q)</source>
-        <translation>Гибридная (маска + ?w/?q)</translation>
-    </message>
-    <message>
         <source>Updating…</source>
         <translation>Обновление…</translation>
     </message>
     <message>
         <source>Failed to load hash types</source>
         <translation>Не удалось загрузить типы хешей</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly 2 wordlists (left, right).</source>
-        <translation>Этому режиму нужно ровно 2 словаря (левый, правый).</translation>
-    </message>
-    <message>
-        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
-        <translation>Этот режим запускает встроенный в hashcat набор правил default-passwords; укажите один или несколько, чтобы использовать свои.</translation>
-    </message>
-    <message>
-        <source>This mode needs one wordlist and at least one table.</source>
-        <translation>Этому режиму нужны один словарь и хотя бы одна таблица.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
-        <translation>Этому режиму нужен feed. Аргументы зависят от feed: random и stdin не требуют их, wordlist требует путь.</translation>
-    </message>
-    <message>
-        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>Этому режиму нужно не более одного словаря. Без словаря слова берутся из файла хешей, а строка настроек может ограничить запуск; со словарём два файла сопоставляются построчно.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
-        <translation>Этому режиму нужна маска ровно с одним ?w; ?q после ?w задаёт второй словарь.</translation>
     </message>
     <message>
         <source>Open hash file</source>
@@ -1253,8 +1410,75 @@ Default: 1,2</source>
         <translation>Открыть файл feed</translation>
     </message>
     <message>
+        <source>Open rules file</source>
+        <translation>Открыть файл правил</translation>
+    </message>
+    <message>
+        <source>Could not start “%1”: %2</source>
+        <translation>Не удалось запустить «%1»: %2</translation>
+    </message>
+    <message>
+        <source>Failed to obtain supported hash types.
+Error: %1</source>
+        <translation>Не удалось получить поддерживаемые типы хешей.
+Ошибка: %1</translation>
+    </message>
+    <message>
+        <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
+        <translation>Не удалось загрузить типы хешей. Проверьте путь к hashcat в настройках.</translation>
+    </message>
+    <message>
+        <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
+        <translation>Укажите путь к hashcat в %1 → %2, чтобы загрузить доступные типы хешей.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>Используйте ?1–?4 в маске, чтобы вставить пользовательский набор символов. Маска используется режимом «Полный перебор», гибридными режимами и настройкой mask= в PCFG; набор символов, который не назван ни в одной маске, отклоняется.</translation>
+    </message>
+    <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>Маска кандидатов в пароли. ?1–?4 вставляют пользовательский набор символов, ?w вставляет слово из словаря, а ?q — второе слово из словаря в режиме «Гибридная (маска + ?w/?q)», ?? означает литерал ?.</translation>
+    </message>
+    <message>
+        <source>Load the %1 example? The current session is lost.
+
+The example cracks a test hash; hashcat should recover the password %2.</source>
+        <translation>Загрузить пример %1? Текущая сессия будет потеряна.
+
+Пример взламывает тестовый хеш; hashcat должен восстановить пароль %2.</translation>
+    </message>
+    <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+Это может быть вызвано Windows Defender или другим антивирусным ПО. Способ решения см. в &lt;a href="%1"&gt;записи FAQ&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>Скопировано в буфер обмена</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Не удалось запустить</translation>
+    </message>
+    <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>Командная строка слишком длинная для терминала. Сократите списки аргументов или их значения и повторите попытку.</translation>
+    </message>
+</context>
+<context>
+    <name>PathListController</name>
+    <message>
         <source>This folder has no wordlists. hashcat reads the regular files directly inside it, not subfolders.</source>
         <translation>В этой папке нет словарей. hashcat читает обычные файлы, лежащие непосредственно в ней, но не подпапки.</translation>
+    </message>
+    <message>
+        <source>This wordlist does not exist:
+%1</source>
+        <translation>Этот словарь не существует:
+%1</translation>
     </message>
     <message>
         <source>This ruleset folder has no Grammar/grammar.txt:
@@ -1280,221 +1504,24 @@ Default: 1,2</source>
         <translation>Эта таблица не существует:
 %1</translation>
     </message>
+</context>
+<context>
+    <name>SessionTransfer</name>
     <message>
-        <source>Open rules file</source>
-        <translation>Открыть файл правил</translation>
+        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
+        <translation>Файл создан более старой версией hashcat-gui (версия формата %1; эта версия читает формат версии %2).</translation>
     </message>
     <message>
-        <source>Could not start “%1”: %2</source>
-        <translation>Не удалось запустить «%1»: %2</translation>
+        <source>The file holds sections this import does not use: %1.</source>
+        <translation>Файл содержит разделы, которые этот импорт не использует: %1.</translation>
     </message>
     <message>
-        <source>The configured terminal “%1” is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>Настроенный терминал «%1» недоступен. Доступные терминалы: %2
-Перейдите в %3 → %4, чтобы изменить его.</translation>
+        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
+        <translation>Файл имеет версию формата %1, но эта версия читает формат версии %2, поэтому он не был применён. Обновите hashcat-gui, чтобы прочитать его.</translation>
     </message>
     <message>
-        <source>This mode needs exactly %1 wordlists (left, right).
-Currently selected: %2.</source>
-        <translation>Этому режиму нужны словари в количестве ровно %1 (левый, правый).
-Сейчас выбрано: %2.</translation>
-    </message>
-    <message>
-        <source>Failed to obtain supported hash types.
-Error: %1</source>
-        <translation>Не удалось получить поддерживаемые типы хешей.
-Ошибка: %1</translation>
-    </message>
-    <message>
-        <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
-        <translation>Не удалось загрузить типы хешей. Проверьте путь к hashcat в настройках.</translation>
-    </message>
-    <message>
-        <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
-        <translation>Укажите путь к hashcat в %1 → %2, чтобы загрузить доступные типы хешей.</translation>
-    </message>
-    <message>
-        <source>This mode needs a wordlist and a mask.</source>
-        <translation>Этому режиму нужны словарь и маска.</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask.</source>
-        <translation>Этому режиму нужна маска.</translation>
-    </message>
-    <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>Используйте ?1–?4 в маске, чтобы вставить пользовательский набор символов. Маска используется режимом «Полный перебор», гибридными режимами и настройкой mask= в PCFG; набор символов, который не назван ни в одной маске, отклоняется.</translation>
-    </message>
-    <message>
-        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
-        <translation>Маска кандидатов в пароли. ?1–?4 вставляют пользовательский набор символов, ?w вставляет слово из словаря, а ?q — второе слово из словаря в режиме «Гибридная (маска + ?w/?q)», ?? означает литерал ?.</translation>
-    </message>
-    <message>
-        <source>Load the %1 example? The current session is lost.
-
-The example cracks a test hash; hashcat should recover the password %2.</source>
-        <translation>Загрузить пример %1? Текущая сессия будет потеряна.
-
-Пример взламывает тестовый хеш; hashcat должен восстановить пароль %2.</translation>
-    </message>
-    <message>
-        <source>Could not create the example directory “%1”.</source>
-        <translation>Не удалось создать каталог примера «%1».</translation>
-    </message>
-    <message>
-        <source>Could not read the bundled file “%1”: %2</source>
-        <translation>Не удалось прочитать встроенный файл «%1»: %2</translation>
-    </message>
-    <message>
-        <source>Could not write “%1”: %2</source>
-        <translation>Не удалось записать «%1»: %2</translation>
-    </message>
-    <message>
-        <source>
-
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
-        <translation>
-
-Это может быть вызвано Windows Defender или другим антивирусным ПО. Способ решения см. в &lt;a href=&quot;%1&quot;&gt;записи FAQ&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one wordlist.</source>
-        <translation>Этому режиму нужен хотя бы один словарь.</translation>
-    </message>
-    <message>
-        <source>This wordlist does not exist:
-%1</source>
-        <translation>Этот словарь не существует:
-%1</translation>
-    </message>
-    <message>
-        <source>Copied to the clipboard</source>
-        <translation>Скопировано в буфер обмена</translation>
-    </message>
-    <message>
-        <source>Launch failed</source>
-        <translation>Не удалось запустить</translation>
-    </message>
-    <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>Командная строка слишком длинная для терминала. Сократите списки аргументов или их значения и повторите попытку.</translation>
-    </message>
-    <message>
-        <source>Please choose a hash file.</source>
-        <translation>Выберите файл хешей.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
-        <translation>Перейдите в &lt;b&gt;%1 → %2&lt;/b&gt;, чтобы настроить путь к исполняемому файлу hashcat.</translation>
-    </message>
-    <message>
-        <source>The configured hashcat executable does not exist:
-%1
-Navigate to %2 → %3 to change it.</source>
-        <translation>Настроенный исполняемый файл hashcat не существует:
-%1
-Перейдите в %2 → %3, чтобы изменить его.</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
-        <translation>Перейдите в &lt;b&gt;%1 → %2&lt;/b&gt;, чтобы выбрать терминал, используемый для запуска.</translation>
-    </message>
-    <message>
-        <source>Maximum number of wordlists for this mode: %1.
-Currently selected: %2.</source>
-        <translation>Максимальное число словарей для этого режима: %1.
-Сейчас выбрано: %2.</translation>
-    </message>
-    <message>
-        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
-        <translation>Здесь hashcat сопоставляет два файла построчно; этот интерфейс предлагает для такой роли только один словарь.</translation>
-    </message>
-    <message>
-        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
-%1</source>
-        <translation>Этот словарь должен быть файлом: hashcat читает его как умножаемый словарь (сторона ?q), и папку там использовать нельзя:
-%1</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one table.</source>
-        <translation>Этому режиму нужна хотя бы одна таблица.</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
-        <translation>Этому режиму нужен feed: встроенное имя (wordlist, stdin, random, …) или путь к файлу feed.</translation>
-    </message>
-    <message>
-        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
-        <translation>Этот режим сопоставляет словари с маской; маске нужен ?w для слова.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?w.</source>
-        <translation>Маска содержит более одного ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains a ?q before the first ?w.</source>
-        <translation>Маска содержит ?q перед первым ?w.</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?q.</source>
-        <translation>Маска содержит более одного ?q.</translation>
-    </message>
-    <message>
-        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
-        <translation>Маска задаёт второе слово через ?q, но выбран только один словарь.</translation>
-    </message>
-    <message>
-        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
-        <translation>Выбрано два словаря, но в маске нет ?q для второго.</translation>
-    </message>
-    <message>
-        <source>The increment is not offered in this hybrid mode.</source>
-        <translation>Инкремент недоступен в этом гибридном режиме.</translation>
-    </message>
-    <message>
-        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
-        <translation>Маркеры ?w и ?q доступны только в гибридном режиме (маска + словари).</translation>
-    </message>
-    <message>
-        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
-        <translation>Пользовательский набор символов используется только внутри маски, а в этом запуске маска не указана. Добавьте настройку mask=, ссылающуюся на ?1–?4, например mask=?1?1?1?1, или очистите пользовательский набор символов.</translation>
-    </message>
-    <message>
-        <source>The setting “%1” is not valid for this mode.</source>
-        <translation>Настройка «%1» недопустима для этого режима.</translation>
-    </message>
-    <message>
-        <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>Токен «%1» не является настройкой; настройки записываются в виде key=value.</translation>
-    </message>
-    <message>
-        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
-        <translation>Строка настроек действует, только пока слова берутся из файла хешей. Очистите либо строку настроек, либо список словарей.</translation>
-    </message>
-    <message>
-        <source>The hash type 4000 describes its hashes as a recipe, for example
-md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
-        <translation>Тип хеша 4000 описывает свои хеши в виде рецепта, например
-md5(md5(salt) . pass). Введите его в поле рецепта хеша.</translation>
-    </message>
-    <message>
-        <source>The minimum increment length is larger than the maximum.</source>
-        <translation>Минимальная длина инкремента больше максимальной.</translation>
-    </message>
-    <message>
-        <source>The cache path must be an existing directory:
-%1</source>
-        <translation>Путь к кешу должен указывать на существующий каталог:
-%1</translation>
-    </message>
-    <message>
-        <source>The increment cannot be combined with the speed-only option.</source>
-        <translation>Инкремент нельзя сочетать с параметром «только скорость».</translation>
-    </message>
-    <message>
-        <source>Removing cracked hashes is not possible in the association attack mode.</source>
-        <translation>Удаление взломанных хешей невозможно в ассоциативном режиме атаки.</translation>
+        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
+        <translation>Файл сессии имеет версию формата %1, но эта версия читает формат версии %2, поэтому сессия не была восстановлена. Файл оставлен без изменений, поэтому сессия этого запуска тоже не сохраняется. Обновите hashcat-gui, чтобы прочитать его.</translation>
     </message>
 </context>
 <context>
@@ -1725,6 +1752,13 @@ md5(md5(salt) . pass). Введите его в поле рецепта хеша
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>Файл содержит значения неверного типа, поэтому они не были применены: %1.</translation>
+    </message>
+</context>
+<context>
+    <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation>В этой системе не найден поддерживаемый терминал. hashcat-gui нужен терминал, чтобы показывать вывод hashcat.</translation>
     </message>
 </context>
 <context>

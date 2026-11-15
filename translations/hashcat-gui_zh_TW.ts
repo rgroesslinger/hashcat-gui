@@ -113,6 +113,100 @@
     </message>
 </context>
 <context>
+    <name>AttackModeView</name>
+    <message>
+        <source>Straight</source>
+        <translation>字典</translation>
+    </message>
+    <message>
+        <source>Combination</source>
+        <translation>組合</translation>
+    </message>
+    <message>
+        <source>Brute-force</source>
+        <translation>暴力破解</translation>
+    </message>
+    <message>
+        <source>PCFG</source>
+        <translation>PCFG</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>表格</translation>
+    </message>
+    <message>
+        <source>Hybrid Wordlist + Mask</source>
+        <translation>混合：字典 + 遮罩</translation>
+    </message>
+    <message>
+        <source>Hybrid Mask + Wordlist</source>
+        <translation>混合：遮罩 + 字典</translation>
+    </message>
+    <message>
+        <source>Generic (feed)</source>
+        <translation>通用（feed）</translation>
+    </message>
+    <message>
+        <source>Association</source>
+        <translation>關聯</translation>
+    </message>
+    <message>
+        <source>Hybrid (mask + ?w/?q)</source>
+        <translation>混合（遮罩 + ?w/?q）</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>此模式需要至少一個字典。</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly 2 wordlists (left, right).</source>
+        <translation>此模式需要恰好 2 個字典（左、右）。</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>此模式需要一個遮罩。</translation>
+    </message>
+    <message>
+        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
+        <translation>此模式會執行 hashcat 內建的 default-passwords 規則集；請指定一個或多個規則集以使用您自己的。</translation>
+    </message>
+    <message>
+        <source>This mode needs one wordlist and at least one table.</source>
+        <translation>此模式需要一個字典和至少一個表格。</translation>
+    </message>
+    <message>
+        <source>This mode needs a wordlist and a mask.</source>
+        <translation>此模式需要一個字典和一個遮罩。</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
+        <translation>此模式需要一個 feed。參數取決於 feed：random 和 stdin 不需要參數，wordlist 需要一個路徑。</translation>
+    </message>
+    <message>
+        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
+        <translation>此模式最多需要一個字典。沒有字典時，單字來自雜湊檔案，設定列可以限定執行範圍；有字典時，兩個檔案將逐行配對。</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
+        <translation>此模式需要恰好包含一個 ?w 的遮罩；?w 之後的 ?q 表示第二個字典。</translation>
+    </message>
+</context>
+<context>
+    <name>ExampleSession</name>
+    <message>
+        <source>Could not create the example directory “%1”.</source>
+        <translation>無法建立範例目錄「%1」。</translation>
+    </message>
+    <message>
+        <source>Could not read the bundled file “%1”: %2</source>
+        <translation>無法讀取內建檔案「%1」：%2</translation>
+    </message>
+    <message>
+        <source>Could not write “%1”: %2</source>
+        <translation>無法寫入「%1」：%2</translation>
+    </message>
+</context>
+<context>
     <name>HashcatInfoParser</name>
     <message>
         <source>Invalid JSON returned from hashcat.</source>
@@ -124,7 +218,7 @@
     </message>
 </context>
 <context>
-    <name>HelperUtils</name>
+    <name>HashcatRunner</name>
     <message>
         <source>The hashcat path is not configured.</source>
         <translation>尚未設定 hashcat 的路徑。</translation>
@@ -141,9 +235,144 @@
         <translation>hashcat 逾時
 %1</translation>
     </message>
+</context>
+<context>
+    <name>LaunchMessage</name>
     <message>
-        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
-        <translation>此系統上找不到支援的終端機。hashcat-gui 需要終端機來顯示 hashcat 的輸出。</translation>
+        <source>Please choose a hash file.</source>
+        <translation>請選擇一個雜湊檔案。</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
+        <translation>請前往 &lt;b&gt;%1 → %2&lt;/b&gt; 設定 hashcat 可執行檔的路徑。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable does not exist:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>設定的 hashcat 可執行檔不存在：
+%1
+請前往 %2 → %3 進行修改。</translation>
+    </message>
+    <message>
+        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
+        <translation>請前往 &lt;b&gt;%1 → %2&lt;/b&gt; 選擇用於啟動的終端機。</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available. Available terminals: %2
+Navigate to %3 → %4 to change it.</source>
+        <translation>已設定的終端機「%1」無法使用。可用的終端機：%2
+請前往 %3 → %4 進行修改。</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one wordlist.</source>
+        <translation>此模式需要至少一個字典。</translation>
+    </message>
+    <message>
+        <source>This mode needs exactly %1 wordlists (left, right).
+Currently selected: %2.</source>
+        <translation>此模式需要恰好 %1 個字典（左、右）。
+目前已選擇：%2 個。</translation>
+    </message>
+    <message>
+        <source>Maximum number of wordlists for this mode: %1.
+Currently selected: %2.</source>
+        <translation>此模式的字典數量上限為 %1。
+目前已選擇：%2 個。</translation>
+    </message>
+    <message>
+        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
+        <translation>在此處 hashcat 會逐行配對兩個檔案；此介面只為該角色提供一個字典。</translation>
+    </message>
+    <message>
+        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
+%1</source>
+        <translation>此字典必須是檔案：hashcat 將其作為被乘的字典（?q 一側）讀取，此處不能使用資料夾：
+%1</translation>
+    </message>
+    <message>
+        <source>This mode needs a mask.</source>
+        <translation>此模式需要一個遮罩。</translation>
+    </message>
+    <message>
+        <source>This mode needs at least one table.</source>
+        <translation>此模式需要至少一個表格。</translation>
+    </message>
+    <message>
+        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
+        <translation>此模式需要一個 feed：內建名稱（wordlist、stdin、random、…）或 feed 檔案的路徑。</translation>
+    </message>
+    <message>
+        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
+        <translation>此模式將字典與遮罩配對；遮罩需要一個 ?w 來代表單字。</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?w.</source>
+        <translation>遮罩包含多個 ?w。</translation>
+    </message>
+    <message>
+        <source>The mask contains a ?q before the first ?w.</source>
+        <translation>遮罩在第一個 ?w 之前包含 ?q。</translation>
+    </message>
+    <message>
+        <source>The mask contains more than one ?q.</source>
+        <translation>遮罩包含多個 ?q。</translation>
+    </message>
+    <message>
+        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
+        <translation>遮罩用 ?q 指定了第二個單字，但只選擇了一個字典。</translation>
+    </message>
+    <message>
+        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
+        <translation>已選擇兩個字典，但遮罩中沒有用於第二個字典的 ?q。</translation>
+    </message>
+    <message>
+        <source>The increment is not offered in this hybrid mode.</source>
+        <translation>此混合模式不提供遞增功能。</translation>
+    </message>
+    <message>
+        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
+        <translation>?w 和 ?q 標記僅在混合模式（遮罩 + 字典）中提供。</translation>
+    </message>
+    <message>
+        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
+        <translation>自訂字元集只能在遮罩中使用，而本次執行未指定遮罩。請新增引用 ?1–?4 的 mask= 設定（例如 mask=?1?1?1?1），或清除自訂字元集。</translation>
+    </message>
+    <message>
+        <source>The setting “%1” is not valid for this mode.</source>
+        <translation>設定「%1」對此模式無效。</translation>
+    </message>
+    <message>
+        <source>The token “%1” is not a setting; settings are written as key=value.</source>
+        <translation>token「%1」不是設定；設定應寫成 key=value 的形式。</translation>
+    </message>
+    <message>
+        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
+        <translation>設定列僅在單字來自雜湊檔案時才適用。請清除設定列或字典清單之一。</translation>
+    </message>
+    <message>
+        <source>The hash type 4000 describes its hashes as a recipe, for example
+md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
+        <translation>雜湊類型 4000 以配方的形式描述其雜湊，例如
+md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
+    </message>
+    <message>
+        <source>The minimum increment length is larger than the maximum.</source>
+        <translation>遞增的最小長度大於最大長度。</translation>
+    </message>
+    <message>
+        <source>The cache path must be an existing directory:
+%1</source>
+        <translation>快取路徑必須是已存在的目錄：
+%1</translation>
+    </message>
+    <message>
+        <source>The increment cannot be combined with the speed-only option.</source>
+        <translation>遞增不能與僅測速選項同時使用。</translation>
+    </message>
+    <message>
+        <source>Removing cracked hashes is not possible in the association attack mode.</source>
+        <translation>在「關聯」攻擊模式下無法移除已破解的雜湊。</translation>
     </message>
 </context>
 <context>
@@ -773,8 +1002,8 @@
         <translation>在此秒數後中止工作階段；0 表示一直執行到 hashcat 結束。</translation>
     </message>
     <message>
-        <source>&#xa0;s</source>
-        <translation>&#xa0;秒</translation>
+        <source> s</source>
+        <translation> 秒</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -845,8 +1074,8 @@
         <translation>當任一後端裝置超過此溫度（°C）時中止；0 表示停用。</translation>
     </message>
     <message>
-        <source>&#xa0;°C</source>
-        <translation>&#xa0;°C</translation>
+        <source> °C</source>
+        <translation> °C</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -1057,22 +1286,6 @@ Default: 1,2</source>
         <translation>已匯入</translation>
     </message>
     <message>
-        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
-        <translation>該檔案由舊版 hashcat-gui 建立（格式版本 %1；此版本讀取格式版本 %2）。</translation>
-    </message>
-    <message>
-        <source>The file holds sections this import does not use: %1.</source>
-        <translation>該檔案包含此匯入未使用的區段：%1。</translation>
-    </message>
-    <message>
-        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
-        <translation>該檔案的格式版本為 %1，但此版本讀取的是格式版本 %2，因此未套用。請更新 hashcat-gui 以讀取該檔案。</translation>
-    </message>
-    <message>
-        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
-        <translation>工作階段檔案的格式版本為 %1，但此版本讀取的是格式版本 %2，因此未還原工作階段。檔案已保持原樣，因此本次執行的工作階段也不會被儲存。請更新 hashcat-gui 以讀取該檔案。</translation>
-    </message>
-    <message>
         <source>Settings exported to “%1”.</source>
         <translation>設定已匯出到「%1」。</translation>
     </message>
@@ -1153,68 +1366,12 @@ Default: 1,2</source>
         <translation>儲存失敗</translation>
     </message>
     <message>
-        <source>Straight</source>
-        <translation>字典</translation>
-    </message>
-    <message>
-        <source>Combination</source>
-        <translation>組合</translation>
-    </message>
-    <message>
-        <source>Brute-force</source>
-        <translation>暴力破解</translation>
-    </message>
-    <message>
-        <source>Hybrid Wordlist + Mask</source>
-        <translation>混合：字典 + 遮罩</translation>
-    </message>
-    <message>
-        <source>Hybrid Mask + Wordlist</source>
-        <translation>混合：遮罩 + 字典</translation>
-    </message>
-    <message>
-        <source>Generic (feed)</source>
-        <translation>通用（feed）</translation>
-    </message>
-    <message>
-        <source>Association</source>
-        <translation>關聯</translation>
-    </message>
-    <message>
-        <source>Hybrid (mask + ?w/?q)</source>
-        <translation>混合（遮罩 + ?w/?q）</translation>
-    </message>
-    <message>
         <source>Updating…</source>
         <translation>正在更新…</translation>
     </message>
     <message>
         <source>Failed to load hash types</source>
         <translation>無法載入雜湊類型</translation>
-    </message>
-    <message>
-        <source>This mode needs exactly 2 wordlists (left, right).</source>
-        <translation>此模式需要恰好 2 個字典（左、右）。</translation>
-    </message>
-    <message>
-        <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
-        <translation>此模式會執行 hashcat 內建的 default-passwords 規則集；請指定一個或多個規則集以使用您自己的。</translation>
-    </message>
-    <message>
-        <source>This mode needs one wordlist and at least one table.</source>
-        <translation>此模式需要一個字典和至少一個表格。</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
-        <translation>此模式需要一個 feed。參數取決於 feed：random 和 stdin 不需要參數，wordlist 需要一個路徑。</translation>
-    </message>
-    <message>
-        <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>此模式最多需要一個字典。沒有字典時，單字來自雜湊檔案，設定列可以限定執行範圍；有字典時，兩個檔案將逐行配對。</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
-        <translation>此模式需要恰好包含一個 ?w 的遮罩；?w 之後的 ?q 表示第二個字典。</translation>
     </message>
     <message>
         <source>Open hash file</source>
@@ -1253,8 +1410,75 @@ Default: 1,2</source>
         <translation>開啟 feed 檔案</translation>
     </message>
     <message>
+        <source>Open rules file</source>
+        <translation>開啟規則檔案</translation>
+    </message>
+    <message>
+        <source>Could not start “%1”: %2</source>
+        <translation>無法啟動「%1」：%2</translation>
+    </message>
+    <message>
+        <source>Failed to obtain supported hash types.
+Error: %1</source>
+        <translation>無法取得支援的雜湊類型。
+錯誤：%1</translation>
+    </message>
+    <message>
+        <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
+        <translation>無法載入雜湊類型。請在設定中檢查 hashcat 路徑。</translation>
+    </message>
+    <message>
+        <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
+        <translation>請在 %1 → %2 中設定 hashcat 路徑，以載入可用的雜湊類型。</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
+        <translation>在遮罩中使用 ?1–?4 可插入自訂字元集。暴力破解、混合模式以及 PCFG 的 mask= 設定會使用遮罩；未被任何遮罩引用的字元集會被拒絕。</translation>
+    </message>
+    <message>
+        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
+        <translation>密碼候選遮罩。?1–?4 插入自訂字元集，?w 插入字典中的單字，?q 在「混合（遮罩 + ?w/?q）」模式下插入第二個字典中的單字，?? 表示字面的 ?。</translation>
+    </message>
+    <message>
+        <source>Load the %1 example? The current session is lost.
+
+The example cracks a test hash; hashcat should recover the password %2.</source>
+        <translation>要載入 %1 範例嗎？目前的工作階段將會遺失。
+
+該範例會破解一個測試雜湊；hashcat 應能復原出密碼 %2。</translation>
+    </message>
+    <message>
+        <source>
+
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+        <translation>
+
+這可能是由 Windows Defender 或其他防毒軟體引起的。解決方法請參閱&lt;a href="%1"&gt;常見問題項目&lt;/a&gt;。</translation>
+    </message>
+    <message>
+        <source>Copied to the clipboard</source>
+        <translation>已複製到剪貼簿</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>啟動失敗</translation>
+    </message>
+    <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>命令列對終端機來說過長。請縮短引數清單或其值，然後重試。</translation>
+    </message>
+</context>
+<context>
+    <name>PathListController</name>
+    <message>
         <source>This folder has no wordlists. hashcat reads the regular files directly inside it, not subfolders.</source>
         <translation>此資料夾中沒有字典。hashcat 讀取其中直接包含的一般檔案，不讀取子資料夾。</translation>
+    </message>
+    <message>
+        <source>This wordlist does not exist:
+%1</source>
+        <translation>此字典不存在：
+%1</translation>
     </message>
     <message>
         <source>This ruleset folder has no Grammar/grammar.txt:
@@ -1280,221 +1504,24 @@ Default: 1,2</source>
         <translation>此表格不存在：
 %1</translation>
     </message>
+</context>
+<context>
+    <name>SessionTransfer</name>
     <message>
-        <source>Open rules file</source>
-        <translation>開啟規則檔案</translation>
+        <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
+        <translation>該檔案由舊版 hashcat-gui 建立（格式版本 %1；此版本讀取格式版本 %2）。</translation>
     </message>
     <message>
-        <source>Could not start “%1”: %2</source>
-        <translation>無法啟動「%1」：%2</translation>
+        <source>The file holds sections this import does not use: %1.</source>
+        <translation>該檔案包含此匯入未使用的區段：%1。</translation>
     </message>
     <message>
-        <source>The configured terminal “%1” is not available. Available terminals: %2
-Navigate to %3 → %4 to change it.</source>
-        <translation>已設定的終端機「%1」無法使用。可用的終端機：%2
-請前往 %3 → %4 進行修改。</translation>
+        <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
+        <translation>該檔案的格式版本為 %1，但此版本讀取的是格式版本 %2，因此未套用。請更新 hashcat-gui 以讀取該檔案。</translation>
     </message>
     <message>
-        <source>This mode needs exactly %1 wordlists (left, right).
-Currently selected: %2.</source>
-        <translation>此模式需要恰好 %1 個字典（左、右）。
-目前已選擇：%2 個。</translation>
-    </message>
-    <message>
-        <source>Failed to obtain supported hash types.
-Error: %1</source>
-        <translation>無法取得支援的雜湊類型。
-錯誤：%1</translation>
-    </message>
-    <message>
-        <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
-        <translation>無法載入雜湊類型。請在設定中檢查 hashcat 路徑。</translation>
-    </message>
-    <message>
-        <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
-        <translation>請在 %1 → %2 中設定 hashcat 路徑，以載入可用的雜湊類型。</translation>
-    </message>
-    <message>
-        <source>This mode needs a wordlist and a mask.</source>
-        <translation>此模式需要一個字典和一個遮罩。</translation>
-    </message>
-    <message>
-        <source>This mode needs a mask.</source>
-        <translation>此模式需要一個遮罩。</translation>
-    </message>
-    <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>在遮罩中使用 ?1–?4 可插入自訂字元集。暴力破解、混合模式以及 PCFG 的 mask= 設定會使用遮罩；未被任何遮罩引用的字元集會被拒絕。</translation>
-    </message>
-    <message>
-        <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
-        <translation>密碼候選遮罩。?1–?4 插入自訂字元集，?w 插入字典中的單字，?q 在「混合（遮罩 + ?w/?q）」模式下插入第二個字典中的單字，?? 表示字面的 ?。</translation>
-    </message>
-    <message>
-        <source>Load the %1 example? The current session is lost.
-
-The example cracks a test hash; hashcat should recover the password %2.</source>
-        <translation>要載入 %1 範例嗎？目前的工作階段將會遺失。
-
-該範例會破解一個測試雜湊；hashcat 應能復原出密碼 %2。</translation>
-    </message>
-    <message>
-        <source>Could not create the example directory “%1”.</source>
-        <translation>無法建立範例目錄「%1」。</translation>
-    </message>
-    <message>
-        <source>Could not read the bundled file “%1”: %2</source>
-        <translation>無法讀取內建檔案「%1」：%2</translation>
-    </message>
-    <message>
-        <source>Could not write “%1”: %2</source>
-        <translation>無法寫入「%1」：%2</translation>
-    </message>
-    <message>
-        <source>
-
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
-        <translation>
-
-這可能是由 Windows Defender 或其他防毒軟體引起的。解決方法請參閱&lt;a href=&quot;%1&quot;&gt;常見問題項目&lt;/a&gt;。</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one wordlist.</source>
-        <translation>此模式需要至少一個字典。</translation>
-    </message>
-    <message>
-        <source>This wordlist does not exist:
-%1</source>
-        <translation>此字典不存在：
-%1</translation>
-    </message>
-    <message>
-        <source>Copied to the clipboard</source>
-        <translation>已複製到剪貼簿</translation>
-    </message>
-    <message>
-        <source>Launch failed</source>
-        <translation>啟動失敗</translation>
-    </message>
-    <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>命令列對終端機來說過長。請縮短引數清單或其值，然後重試。</translation>
-    </message>
-    <message>
-        <source>Please choose a hash file.</source>
-        <translation>請選擇一個雜湊檔案。</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to configure the path to the hashcat executable.</source>
-        <translation>請前往 &lt;b&gt;%1 → %2&lt;/b&gt; 設定 hashcat 可執行檔的路徑。</translation>
-    </message>
-    <message>
-        <source>The configured hashcat executable does not exist:
-%1
-Navigate to %2 → %3 to change it.</source>
-        <translation>設定的 hashcat 可執行檔不存在：
-%1
-請前往 %2 → %3 進行修改。</translation>
-    </message>
-    <message>
-        <source>Navigate to &lt;b&gt;%1 → %2&lt;/b&gt; to select the terminal used for launching.</source>
-        <translation>請前往 &lt;b&gt;%1 → %2&lt;/b&gt; 選擇用於啟動的終端機。</translation>
-    </message>
-    <message>
-        <source>Maximum number of wordlists for this mode: %1.
-Currently selected: %2.</source>
-        <translation>此模式的字典數量上限為 %1。
-目前已選擇：%2 個。</translation>
-    </message>
-    <message>
-        <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
-        <translation>在此處 hashcat 會逐行配對兩個檔案；此介面只為該角色提供一個字典。</translation>
-    </message>
-    <message>
-        <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
-%1</source>
-        <translation>此字典必須是檔案：hashcat 將其作為被乘的字典（?q 一側）讀取，此處不能使用資料夾：
-%1</translation>
-    </message>
-    <message>
-        <source>This mode needs at least one table.</source>
-        <translation>此模式需要至少一個表格。</translation>
-    </message>
-    <message>
-        <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
-        <translation>此模式需要一個 feed：內建名稱（wordlist、stdin、random、…）或 feed 檔案的路徑。</translation>
-    </message>
-    <message>
-        <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
-        <translation>此模式將字典與遮罩配對；遮罩需要一個 ?w 來代表單字。</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?w.</source>
-        <translation>遮罩包含多個 ?w。</translation>
-    </message>
-    <message>
-        <source>The mask contains a ?q before the first ?w.</source>
-        <translation>遮罩在第一個 ?w 之前包含 ?q。</translation>
-    </message>
-    <message>
-        <source>The mask contains more than one ?q.</source>
-        <translation>遮罩包含多個 ?q。</translation>
-    </message>
-    <message>
-        <source>The mask names a second word with ?q, but only one wordlist is selected.</source>
-        <translation>遮罩用 ?q 指定了第二個單字，但只選擇了一個字典。</translation>
-    </message>
-    <message>
-        <source>Two wordlists are selected, but the mask has no ?q for the second one.</source>
-        <translation>已選擇兩個字典，但遮罩中沒有用於第二個字典的 ?q。</translation>
-    </message>
-    <message>
-        <source>The increment is not offered in this hybrid mode.</source>
-        <translation>此混合模式不提供遞增功能。</translation>
-    </message>
-    <message>
-        <source>The ?w and ?q markers are only offered in the hybrid mode (mask + wordlists).</source>
-        <translation>?w 和 ?q 標記僅在混合模式（遮罩 + 字典）中提供。</translation>
-    </message>
-    <message>
-        <source>A custom charset is used only inside a mask, and this run named no mask. Add a mask= setting that references ?1–?4, for example mask=?1?1?1?1, or clear the custom charset.</source>
-        <translation>自訂字元集只能在遮罩中使用，而本次執行未指定遮罩。請新增引用 ?1–?4 的 mask= 設定（例如 mask=?1?1?1?1），或清除自訂字元集。</translation>
-    </message>
-    <message>
-        <source>The setting “%1” is not valid for this mode.</source>
-        <translation>設定「%1」對此模式無效。</translation>
-    </message>
-    <message>
-        <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>token「%1」不是設定；設定應寫成 key=value 的形式。</translation>
-    </message>
-    <message>
-        <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
-        <translation>設定列僅在單字來自雜湊檔案時才適用。請清除設定列或字典清單之一。</translation>
-    </message>
-    <message>
-        <source>The hash type 4000 describes its hashes as a recipe, for example
-md5(md5(salt) . pass). Enter it in the hash recipe field.</source>
-        <translation>雜湊類型 4000 以配方的形式描述其雜湊，例如
-md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
-    </message>
-    <message>
-        <source>The minimum increment length is larger than the maximum.</source>
-        <translation>遞增的最小長度大於最大長度。</translation>
-    </message>
-    <message>
-        <source>The cache path must be an existing directory:
-%1</source>
-        <translation>快取路徑必須是已存在的目錄：
-%1</translation>
-    </message>
-    <message>
-        <source>The increment cannot be combined with the speed-only option.</source>
-        <translation>遞增不能與僅測速選項同時使用。</translation>
-    </message>
-    <message>
-        <source>Removing cracked hashes is not possible in the association attack mode.</source>
-        <translation>在「關聯」攻擊模式下無法移除已破解的雜湊。</translation>
+        <source>The session file is in format version %1, but this version reads format version %2, so the session was not restored. The file was left as it is, so the session of this run is not stored either. Update hashcat-gui to read it.</source>
+        <translation>工作階段檔案的格式版本為 %1，但此版本讀取的是格式版本 %2，因此未還原工作階段。檔案已保持原樣，因此本次執行的工作階段也不會被儲存。請更新 hashcat-gui 以讀取該檔案。</translation>
     </message>
 </context>
 <context>
@@ -1725,6 +1752,13 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
         <translation>該檔案包含類型錯誤的值，因此未套用：%1。</translation>
+    </message>
+</context>
+<context>
+    <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
+        <translation>此系統上找不到支援的終端機。hashcat-gui 需要終端機來顯示 hashcat 的輸出。</translation>
     </message>
 </context>
 <context>
