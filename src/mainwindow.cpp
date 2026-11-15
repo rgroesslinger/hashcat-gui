@@ -23,6 +23,7 @@
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "statefile.h"
+#include "statewidgets.h"
 #include "terminalcatalog.h"
 #include "ui_mainwindow.h"
 
@@ -298,112 +299,185 @@ MainWindow::MainWindow(QWidget *parent)
     /* ---------- save the session on quit ---------- */
     connect(qApp, &QCoreApplication::aboutToQuit, this, &MainWindow::saveSession);
 
-    /* ---------- command preview ---------- */
-    // Every widget whose value reaches the command line is connected here
-    // exactly once. Controls that also need to enable fields, open dialogs or
-    // change the attack-mode gating are connected to their own slot below;
-    // that second connection is the side effect, not a second preview update.
-    // The attack mode combo is the one exception: it refreshes the preview
-    // through attackIndexChanged(), see below.
-    const auto notifyOnText = [this](QLineEdit *edit) {
-        connect(edit, &QLineEdit::textChanged, this, &MainWindow::commandChanged);
-    };
-    const auto notifyOnToggle = [this](QAbstractButton *button) {
-        connect(button, &QAbstractButton::toggled, this, &MainWindow::commandChanged);
-    };
-    const auto notifyOnValue = [this](QSpinBox *spinBox) {
-        connect(spinBox, &QSpinBox::valueChanged, this, &MainWindow::commandChanged);
-    };
-    const auto notifyOnIndex = [this](QComboBox *comboBox) {
-        connect(comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::commandChanged);
-    };
+    connectCommandSignals();
+    connectActionSignals();
+    connectListSignals();
+    connectDependencySignals();
 
-    // Attack tab
-    notifyOnIndex(ui->comboBox_hash_type);
+    loadSession();
+
+    /* ---------- show Settings if hashcatPath not set ---------- */
+    if (settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
+        QMetaObject::invokeMethod(this, &MainWindow::settingsTriggered, Qt::QueuedConnection);
+    }
+}
+
+// The widgets' own setup: the completer, the list controllers, the input
+// validators and the help tooltips. No command wiring here.
+void MainWindow::configureWidgets()
+{
+    // The hash type list is searchable through a completer. It must be editable
+    // before the completer is set - a completer on a non-editable combo is
+    // refused - and NoInsert keeps a name the completer does not match from
+    // becoming the selection, so the current id is always a real one.
+    ui->comboBox_hash_type->setEditable(true);
+    ui->comboBox_hash_type->setInsertPolicy(QComboBox::NoInsert);
+    QCompleter *hashTypeCompleter = ui->comboBox_hash_type->completer();
+    hashTypeCompleter->setCompletionMode(QCompleter::PopupCompletion);
+    hashTypeCompleter->setFilterMode(Qt::MatchContains);
+    hashTypeCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+
+    // The path rows say what they are at a glance: a file, a folder, or the
+    // warning of a path hashcat cannot use. The style owns the pixmaps, and
+    // the rows are compared by icon key, so these are asked for once.
+    const QIcon fileIcon = style()->standardIcon(QStyle::SP_FileIcon);
+    const QIcon folderIcon = style()->standardIcon(QStyle::SP_DirIcon);
+    const QIcon warningIcon = style()->standardIcon(QStyle::SP_MessageBoxWarning);
+
+    // One controller per argument list: the rows, their checked state and
+    // the monitor decoration. They are destroyed before delete ui, see the
+    // destructor.
+    m_wordlistList =
+        std::make_unique<PathListController>(ui->listWidget_wordlist, PathMonitor::Kind::Wordlist,
+                                             fileIcon, folderIcon, warningIcon, nullptr);
+    m_pcfgRulesetList =
+        std::make_unique<PathListController>(ui->listWidget_pcfg_rulesets, PathMonitor::Kind::Pcfg,
+                                             fileIcon, folderIcon, warningIcon, nullptr);
+    m_tableList =
+        std::make_unique<PathListController>(ui->listWidget_tables, PathMonitor::Kind::Table,
+                                             fileIcon, folderIcon, warningIcon, nullptr);
+    m_feedArgumentList =
+        std::make_unique<PathListController>(ui->listWidget_feed_arguments, nullptr);
+
+    // -s and -l take a plain number; a digit-only validator keeps a value
+    // hashcat would refuse to start from ever reaching the command line.
+    const QRegularExpression digits{QString(AppConstants::Validation::Digits)};
+    ui->lineEdit_skip->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_skip));
+    ui->lineEdit_limit->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_limit));
+
+    // -D 3 (the accelerators) is gone with hashcat 8.0.0. The field was free
+    // text, so a 3 typed here only failed after the launch, in the terminal;
+    // the validator keeps the accepted device types where the user sees it.
+    const QRegularExpression deviceTypes{QString(AppConstants::Validation::DeviceTypes)};
+    ui->lineEdit_opencl_device_types->setValidator(
+        new QRegularExpressionValidator(deviceTypes, ui->lineEdit_opencl_device_types));
+
+    // The settings of the PCFG and table feeds, which hashcat parses itself
+    // - and only after it has set up the backend devices, long after the
+    // preview is gone. The ranges a spin box would hold stay line edits
+    // (the feed also takes its defaults, which no spin box can show), so
+    // they get validators of their own.
+    ui->lineEdit_pcfg_scale->setValidator(new QIntValidator(1, 64, ui->lineEdit_pcfg_scale));
+    ui->lineEdit_pcfg_costmax->setValidator(new QIntValidator(1, 64, ui->lineEdit_pcfg_costmax));
+    ui->lineEdit_pcfg_threads->setValidator(new QIntValidator(0, 16, ui->lineEdit_pcfg_threads));
+    ui->lineEdit_pcfg_kbits->setValidator(new QIntValidator(0, 27, ui->lineEdit_pcfg_kbits));
+    ui->lineEdit_pcfg_walk->setValidator(new QIntValidator(0, 1, ui->lineEdit_pcfg_walk));
+
+    // The shapes that are not a plain integer range: the colon separated
+    // weights list, maxword's multiple of 16, the dot separated decimal and
+    // the 0/1 flags of the table feed.
+    const auto feedShapes = std::to_array<std::pair<QLineEdit *, QLatin1StringView>>({
+        {ui->lineEdit_pcfg_weights, AppConstants::Validation::WeightsList},
+        {ui->lineEdit_pcfg_maxword, AppConstants::Validation::MaxwordValue},
+        {ui->lineEdit_pcfg_maxgain, AppConstants::Validation::DecimalNumber},
+        {ui->lineEdit_table_identity, AppConstants::Validation::BinaryFlag},
+        {ui->lineEdit_table_template, AppConstants::Validation::BinaryFlag},
+        {ui->lineEdit_table_single, AppConstants::Validation::BinaryFlag},
+    });
+    for (const auto &[edit, shape] : feedShapes) {
+        edit->setValidator(
+            new QRegularExpressionValidator(QRegularExpression(QString(shape)), edit));
+    }
+    // cap and maxperm reach beyond every Qt integer type (0…0xffffffff and a
+    // full u64); the digits are filtered here, the bounds in validateOptions.
+    ui->lineEdit_table_cap->setValidator(
+        new QRegularExpressionValidator(digits, ui->lineEdit_table_cap));
+    ui->lineEdit_table_maxperm->setValidator(
+        new QRegularExpressionValidator(digits, ui->lineEdit_table_maxperm));
+
+    /* ---------- help tooltips: translatable label + fixed reference tables -- */
+    const QString charsetTip =
+        tr("Use ?1–?4 in a mask to insert a custom charset. A mask is used by "
+           "Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no "
+           "mask names is refused.")
+        + QLatin1String("\n\n") + tr("Built-in charsets:") + QLatin1String("\n\n")
+        + QString::fromUtf8(AppConstants::HelpText::BuiltinCharsets);
+    ui->lineEdit_mask->setToolTip(tr("Password candidate mask. ?1–?4 insert a custom charset, "
+                                     "?w inserts the wordlist word and ?q a second wordlist word "
+                                     "in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.")
+                                  + QLatin1String("\n\n") + charsetTip);
+    ui->lineEdit_custom_charset1->setToolTip(charsetTip);
+    ui->lineEdit_custom_charset2->setToolTip(charsetTip);
+    ui->lineEdit_custom_charset3->setToolTip(charsetTip);
+    ui->lineEdit_custom_charset4->setToolTip(charsetTip);
+
+    const QString outfileFormatTip = tr("Outfile format to use, separated by commas.\nDefault: 1,2")
+                                     + QLatin1String("\n\n")
+                                     + QString::fromUtf8(AppConstants::HelpText::OutfileFormats);
+    ui->lineEdit_outfile_format->setToolTip(outfileFormatTip);
+
+    const QString encodingTip = tr("Common encodings:") + QLatin1String("\n\n")
+                                + QString::fromUtf8(AppConstants::HelpText::CommonEncodings);
+    ui->lineEdit_encoding_from->setToolTip(tr("Force the internal wordlist encoding from this "
+                                              "code. Leave empty to let hashcat decide.")
+                                           + QLatin1String("\n\n") + encodingTip);
+    ui->lineEdit_encoding_to->setToolTip(
+        tr("Force the internal wordlist encoding to this code. Leave empty to let hashcat decide.")
+        + QLatin1String("\n\n") + encodingTip);
+
+    const QString deviceTypeTip = tr("OpenCL device types to use, separated by commas.")
+                                  + QLatin1String("\n\n")
+                                  + QString::fromUtf8(AppConstants::HelpText::OpenClDeviceTypes);
+    ui->lineEdit_opencl_device_types->setToolTip(deviceTypeTip);
+}
+
+// Every widget whose value reaches the command line is connected here
+// exactly once, from the same walk the serializer uses. Controls that also
+// enable fields, open dialogs or change the gating get their own connection
+// elsewhere; that second connection is the side effect, not a second preview
+// update. The attack mode combo is the one exception: it refreshes the
+// preview through attackIndexChanged().
+void MainWindow::connectCommandSignals()
+{
+    const StateWidgetLists widgets = collectStateWidgets(this);
+
+    for (QLineEdit *edit : widgets.lineEdits) {
+        // The preview is generated, not entered; the two staging fields
+        // reach the command only through their Add buttons.
+        if (edit == ui->lineEdit_command || edit == ui->lineEdit_feed_argument
+            || edit == ui->lineEdit_pcfg_ruleset_name) {
+            continue;
+        }
+        connect(edit, &QLineEdit::textChanged, this, &MainWindow::commandChanged);
+    }
+    for (QCheckBox *checkBox : widgets.checkBoxes) {
+        connect(checkBox, &QAbstractButton::toggled, this, &MainWindow::commandChanged);
+    }
+    for (QRadioButton *radioButton : widgets.radioButtons) {
+        connect(radioButton, &QAbstractButton::toggled, this, &MainWindow::commandChanged);
+    }
+    for (QSpinBox *spinBox : widgets.spinBoxes) {
+        connect(spinBox, &QSpinBox::valueChanged, this, &MainWindow::commandChanged);
+    }
+    for (QDoubleSpinBox *spinBox : widgets.doubleSpinBoxes) {
+        connect(spinBox, &QDoubleSpinBox::valueChanged, this, &MainWindow::commandChanged);
+    }
+    for (QComboBox *comboBox : widgets.comboBoxes) {
+        if (comboBox == ui->comboBox_attack) {
+            continue;
+        }
+        connect(comboBox, &QComboBox::currentIndexChanged, this, &MainWindow::commandChanged);
+    }
+
+    // The hash file also drives the outfile suggestion.
+    connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
     // The recipe row belongs to hash mode 4000 alone; the combo decides.
     connect(ui->comboBox_hash_type, &QComboBox::currentIndexChanged, this,
             &MainWindow::updateHashTypeDependencies);
-    notifyOnText(ui->lineEdit_hashfile);
-    notifyOnText(ui->lineEdit_hash_recipe);
-    notifyOnToggle(ui->checkBox_hex_charset);
-    notifyOnToggle(ui->checkBox_hex_salt);
-    // Word lists
-    notifyOnText(ui->lineEdit_encoding_from);
-    notifyOnText(ui->lineEdit_encoding_to);
-    notifyOnToggle(ui->checkBox_hex_wordlist);
-    // Rules
-    notifyOnToggle(ui->checkBox_rulesfile_1);
-    notifyOnToggle(ui->checkBox_rulesfile_2);
-    notifyOnToggle(ui->checkBox_rulesfile_3);
-    notifyOnToggle(ui->checkBox_rules_concat);
-    notifyOnText(ui->lineEdit_rulesfile_1);
-    notifyOnText(ui->lineEdit_rulesfile_2);
-    notifyOnText(ui->lineEdit_rulesfile_3);
-    notifyOnToggle(ui->radioButton_use_rules_file);
-    notifyOnToggle(ui->radioButton_generate_rules);
-    notifyOnValue(ui->spinBox_generate_rules);
-    notifyOnText(ui->lineEdit_rule_left);
-    notifyOnText(ui->lineEdit_rule_right);
-    // Mask and charsets
-    notifyOnText(ui->lineEdit_mask);
-    notifyOnToggle(ui->checkBox_increment);
-    notifyOnValue(ui->spinBox_increment_min);
-    notifyOnValue(ui->spinBox_increment_max);
-    notifyOnToggle(ui->checkBox_custom_charset1);
-    notifyOnToggle(ui->checkBox_custom_charset2);
-    notifyOnToggle(ui->checkBox_custom_charset3);
-    notifyOnToggle(ui->checkBox_custom_charset4);
-    notifyOnText(ui->lineEdit_custom_charset1);
-    notifyOnText(ui->lineEdit_custom_charset2);
-    notifyOnText(ui->lineEdit_custom_charset3);
-    notifyOnText(ui->lineEdit_custom_charset4);
-    // The feed modes (PCFG, table, generic) and the association settings
-    // line. The feed argument field is left out on purpose: it only reaches
-    // the command through its list, via the Add button.
-    notifyOnText(ui->lineEdit_association_settings);
-    notifyOnText(ui->lineEdit_pcfg_scale);
-    notifyOnText(ui->lineEdit_pcfg_costmax);
-    notifyOnText(ui->lineEdit_pcfg_weights);
-    notifyOnText(ui->lineEdit_pcfg_threads);
-    notifyOnText(ui->lineEdit_pcfg_kbits);
-    notifyOnText(ui->lineEdit_pcfg_maxword);
-    notifyOnText(ui->lineEdit_pcfg_maxgain);
-    notifyOnText(ui->lineEdit_pcfg_walk);
-    notifyOnText(ui->lineEdit_pcfg_mask);
-    notifyOnText(ui->lineEdit_pcfg_extra);
-    notifyOnText(ui->lineEdit_table_identity);
-    notifyOnText(ui->lineEdit_table_template);
-    notifyOnText(ui->lineEdit_table_single);
-    notifyOnText(ui->lineEdit_table_cap);
-    notifyOnText(ui->lineEdit_table_maxperm);
-    notifyOnText(ui->lineEdit_table_extra);
-    notifyOnText(ui->lineEdit_feed);
-    // The two hash file options stay on the Attack tab; everything from the
-    // outfile on belongs to the General tab.
-    notifyOnToggle(ui->checkBox_remove);
-    notifyOnToggle(ui->checkBox_ignoreusername);
-    // General tab
-    notifyOnToggle(ui->checkBox_outfile);
-    notifyOnText(ui->lineEdit_outfile);
-    notifyOnText(ui->lineEdit_outfile_format);
-    notifyOnToggle(ui->checkBox_outfile_json);
-    notifyOnText(ui->lineEdit_cache_path);
-    notifyOnText(ui->lineEdit_cpu_affinity);
-    notifyOnText(ui->lineEdit_backend_devices);
-    notifyOnText(ui->lineEdit_session);
-    notifyOnValue(ui->spinBox_runtime);
-    notifyOnText(ui->lineEdit_skip);
-    notifyOnText(ui->lineEdit_limit);
-    notifyOnToggle(ui->checkBox_status);
-    notifyOnValue(ui->spinBox_status_timer);
-    notifyOnToggle(ui->checkBox_force);
-    notifyOnToggle(ui->checkBox_potfile_disable);
-    notifyOnToggle(ui->checkBox_optimized_kernel);
-    notifyOnToggle(ui->checkBox_speed_only);
-    notifyOnText(ui->lineEdit_opencl_device_types);
-    notifyOnToggle(ui->checkBox_hwmon_temp_abort);
-    notifyOnValue(ui->spinBox_hwmon_temp_abort);
+}
 
+void MainWindow::connectActionSignals()
+{
     /* ---------- menu actions ---------- */
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::aboutTriggered);
     connect(ui->actionResetSession, &QAction::triggered, this, &MainWindow::resetSessionTriggered);
@@ -416,6 +490,26 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::exportSettingsTriggered);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::settingsTriggered);
     connect(ui->actionAboutQt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
+
+    /* ---------- stand-alone widgets ---------- */
+    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
+            &MainWindow::openHashFileClicked);
+    connect(ui->pushButton_open_outfile, &QPushButton::clicked, this,
+            &MainWindow::openOutfileClicked);
+    connect(ui->pushButton_open_cache_path, &QPushButton::clicked, this,
+            &MainWindow::openCachePathClicked);
+    connect(ui->pushButton_start, &QPushButton::clicked, this, &MainWindow::startClicked);
+    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this,
+            &MainWindow::copyCommandToClipboard);
+}
+
+void MainWindow::connectListSignals()
+{
+    // The controllers announce every command-relevant row change.
+    for (PathListController *controller : {m_wordlistList.get(), m_pcfgRulesetList.get(),
+                                           m_tableList.get(), m_feedArgumentList.get()}) {
+        connect(controller, &PathListController::changed, this, &MainWindow::commandChanged);
+    }
 
     /* ---------- wordlist ---------- */
     connect(ui->listWidget_wordlist, &QListWidget::itemClicked, this,
@@ -463,66 +557,80 @@ MainWindow::MainWindow(QWidget *parent)
             &MainWindow::feedArgumentMoveUpClicked);
     connect(ui->toolButton_feed_argument_down, &QToolButton::clicked, this,
             &MainWindow::feedArgumentMoveDownClicked);
+}
 
-    /* ---------- rules ---------- */
-    connect(ui->checkBox_rulesfile_1, &QCheckBox::toggled, this, &MainWindow::rulesFile1Toggled);
-    connect(ui->checkBox_rulesfile_2, &QCheckBox::toggled, this, &MainWindow::rulesFile2Toggled);
-    connect(ui->checkBox_rulesfile_3, &QCheckBox::toggled, this, &MainWindow::rulesFile3Toggled);
+void MainWindow::connectDependencySignals()
+{
+    // The rule-file fields follow their own boxes; the radio pair decides
+    // which side applies at all, see updateRulesDependencies().
+    bindEnabled(ui->checkBox_rulesfile_1,
+                {ui->lineEdit_rulesfile_1, ui->pushButton_open_rulesfile_1});
+    bindEnabled(ui->checkBox_rulesfile_2,
+                {ui->lineEdit_rulesfile_2, ui->pushButton_open_rulesfile_2});
+    bindEnabled(ui->checkBox_rulesfile_3,
+                {ui->lineEdit_rulesfile_3, ui->pushButton_open_rulesfile_3});
+    bindEnabled(ui->radioButton_generate_rules, {ui->spinBox_generate_rules});
+    connect(ui->radioButton_use_rules_file, &QRadioButton::toggled, this,
+            &MainWindow::updateRulesDependencies);
+    connect(ui->radioButton_generate_rules, &QRadioButton::toggled, this,
+            &MainWindow::updateRulesDependencies);
+    updateRulesDependencies();
+
     connect(ui->pushButton_open_rulesfile_1, &QPushButton::clicked, this,
             &MainWindow::openRulesFile1Clicked);
     connect(ui->pushButton_open_rulesfile_2, &QPushButton::clicked, this,
             &MainWindow::openRulesFile2Clicked);
     connect(ui->pushButton_open_rulesfile_3, &QPushButton::clicked, this,
             &MainWindow::openRulesFile3Clicked);
-    connect(ui->radioButton_generate_rules, &QRadioButton::toggled, this,
-            &MainWindow::generateRulesToggled);
-    connect(ui->radioButton_use_rules_file, &QRadioButton::toggled, this,
-            &MainWindow::useRulesFileToggled);
 
-    /* ---------- custom charset ---------- */
-    connect(ui->checkBox_custom_charset1, &QCheckBox::toggled, this,
-            &MainWindow::customCharset1Toggled);
-    connect(ui->checkBox_custom_charset2, &QCheckBox::toggled, this,
-            &MainWindow::customCharset2Toggled);
-    connect(ui->checkBox_custom_charset3, &QCheckBox::toggled, this,
-            &MainWindow::customCharset3Toggled);
-    connect(ui->checkBox_custom_charset4, &QCheckBox::toggled, this,
-            &MainWindow::customCharset4Toggled);
+    // A custom charset field is only editable while its box is ticked.
+    bindEnabled(ui->checkBox_custom_charset1, {ui->lineEdit_custom_charset1});
+    bindEnabled(ui->checkBox_custom_charset2, {ui->lineEdit_custom_charset2});
+    bindEnabled(ui->checkBox_custom_charset3, {ui->lineEdit_custom_charset3});
+    bindEnabled(ui->checkBox_custom_charset4, {ui->lineEdit_custom_charset4});
 
-    /* ---------- stand-alone widgets ---------- */
-    connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
-    connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
-            &MainWindow::openHashFileClicked);
-    connect(ui->pushButton_open_outfile, &QPushButton::clicked, this,
-            &MainWindow::openOutfileClicked);
-    connect(ui->pushButton_open_cache_path, &QPushButton::clicked, this,
-            &MainWindow::openCachePathClicked);
-    connect(ui->pushButton_start, &QPushButton::clicked, this, &MainWindow::startClicked);
-    connect(ui->pushButton_copy_clipboard, &QPushButton::clicked, this,
-            &MainWindow::copyCommandToClipboard);
+    // The outfile is opt-in; JSON and the format field are exclusive, and the
+    // value stays in the field so switching back restores what was typed.
+    bindEnabled(ui->checkBox_outfile, {ui->lineEdit_outfile, ui->pushButton_open_outfile});
+    bindDisabled(ui->checkBox_outfile_json, {ui->lineEdit_outfile_format});
+
+    // The option dependencies that follow a checkbox, not the attack mode.
+    bindEnabled(ui->checkBox_increment, {ui->label_increment_min, ui->spinBox_increment_min,
+                                         ui->label_increment_max, ui->spinBox_increment_max});
+    bindEnabled(ui->checkBox_status, {ui->spinBox_status_timer});
+    bindEnabled(ui->checkBox_hwmon_temp_abort, {ui->spinBox_hwmon_temp_abort});
+
     // attackIndexChanged() refreshes the preview through
     // updateViewAttackMode(); connecting it to commandChanged() as well would
     // rebuild the preview twice for every mode change.
     connect(ui->comboBox_attack, &QComboBox::currentIndexChanged, this,
             &MainWindow::attackIndexChanged);
-    connect(ui->checkBox_outfile, &QCheckBox::toggled, this, &MainWindow::outfileToggled);
-    // JSON and the format field are exclusive; the value stays in the field
-    // so switching back restores what was typed.
-    connect(ui->checkBox_outfile_json, &QCheckBox::toggled, this,
-            [this](bool checked) { ui->lineEdit_outfile_format->setEnabled(!checked); });
+}
 
-    /* ---------- dependent widgets ---------- */
-    connect(ui->checkBox_increment, &QCheckBox::toggled, this,
-            &MainWindow::updateOptionDependencies);
-    connect(ui->checkBox_status, &QCheckBox::toggled, this, &MainWindow::updateOptionDependencies);
-    connect(ui->checkBox_hwmon_temp_abort, &QCheckBox::toggled, this,
-            &MainWindow::updateOptionDependencies);
+// One checkbox enables its targets while it is checked; the state is applied
+// at bind time, so the .ui defaults and the connections cannot drift apart.
+void MainWindow::bindEnabled(QAbstractButton *toggle, const QList<QWidget *> &targets)
+{
+    connect(toggle, &QAbstractButton::toggled, this, [targets](bool checked) {
+        for (QWidget *target : targets) {
+            target->setEnabled(checked);
+        }
+    });
+    for (QWidget *target : targets) {
+        target->setEnabled(toggle->isChecked());
+    }
+}
 
-    loadSession();
-
-    /* ---------- show Settings if hashcatPath not set ---------- */
-    if (settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
-        QMetaObject::invokeMethod(this, &MainWindow::settingsTriggered, Qt::QueuedConnection);
+// The inverted pair: the target is enabled while the checkbox is NOT checked.
+void MainWindow::bindDisabled(QAbstractButton *toggle, const QList<QWidget *> &targets)
+{
+    connect(toggle, &QAbstractButton::toggled, this, [targets](bool checked) {
+        for (QWidget *target : targets) {
+            target->setEnabled(!checked);
+        }
+    });
+    for (QWidget *target : targets) {
+        target->setEnabled(!toggle->isChecked());
     }
 }
 
@@ -1304,7 +1412,6 @@ void MainWindow::attackIndexChanged([[maybe_unused]] int index)
 void MainWindow::updateViewAttackMode()
 {
     m_attackModeView.apply(currentAttackMode());
-    updateOptionDependencies();
     commandChanged();
 }
 
@@ -1312,21 +1419,6 @@ void MainWindow::updateViewAttackMode()
 AttackMode MainWindow::currentAttackMode() const
 {
     return static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
-}
-
-// Options that only carry a value while their parent checkbox is on. The
-// group box gating already covers the attack-mode side; this covers the
-// intra-group dependencies that do not follow from the mode.
-void MainWindow::updateOptionDependencies()
-{
-    const bool increment = ui->checkBox_increment->isChecked();
-    ui->label_increment_min->setEnabled(increment);
-    ui->spinBox_increment_min->setEnabled(increment);
-    ui->label_increment_max->setEnabled(increment);
-    ui->spinBox_increment_max->setEnabled(increment);
-
-    ui->spinBox_status_timer->setEnabled(ui->checkBox_status->isChecked());
-    ui->spinBox_hwmon_temp_abort->setEnabled(ui->checkBox_hwmon_temp_abort->isChecked());
 }
 
 void MainWindow::openHashFileClicked()
@@ -1475,48 +1567,28 @@ void MainWindow::wordlistItemClicked([[maybe_unused]] QListWidgetItem *item)
     ui->toolButton_wordlist_move_down->setEnabled(true);
 }
 
-void MainWindow::rulesFile1Toggled(bool checked)
+// The cross-state half of the rules choice: which side applies at all. The
+// fields' own boxes are bound separately (bindEnabled); this slot runs on
+// the radio pair only, so a session that ticks a file box under the
+// generated side keeps the field state that box's own connection set.
+void MainWindow::updateRulesDependencies()
 {
-    ui->lineEdit_rulesfile_1->setEnabled(checked);
-    ui->pushButton_open_rulesfile_1->setEnabled(checked);
-}
-
-void MainWindow::rulesFile2Toggled(bool checked)
-{
-    ui->lineEdit_rulesfile_2->setEnabled(checked);
-    ui->pushButton_open_rulesfile_2->setEnabled(checked);
-}
-
-void MainWindow::rulesFile3Toggled(bool checked)
-{
-    ui->lineEdit_rulesfile_3->setEnabled(checked);
-    ui->pushButton_open_rulesfile_3->setEnabled(checked);
-}
-
-void MainWindow::useRulesFileToggled(bool checked)
-{
-    ui->checkBox_rulesfile_1->setEnabled(checked);
-    ui->checkBox_rulesfile_2->setEnabled(checked);
-    ui->checkBox_rulesfile_3->setEnabled(checked);
+    const bool useFiles = ui->radioButton_use_rules_file->isChecked();
+    ui->checkBox_rulesfile_1->setEnabled(useFiles);
+    ui->checkBox_rulesfile_2->setEnabled(useFiles);
+    ui->checkBox_rulesfile_3->setEnabled(useFiles);
     // The join flag is only meaningful next to the files it joins; the
     // generated-rules radio is the other half of the same choice.
-    ui->checkBox_rules_concat->setEnabled(checked);
-    if (checked) {
-        rulesFile1Toggled(ui->checkBox_rulesfile_1->isChecked());
-        rulesFile2Toggled(ui->checkBox_rulesfile_2->isChecked());
-        rulesFile3Toggled(ui->checkBox_rulesfile_3->isChecked());
-    }
-}
+    ui->checkBox_rules_concat->setEnabled(useFiles);
 
-void MainWindow::generateRulesToggled(bool checked)
-{
-    ui->spinBox_generate_rules->setEnabled(checked);
-    if (checked) {
-        useRulesFileToggled(false);
-        rulesFile1Toggled(false);
-        rulesFile2Toggled(false);
-        rulesFile3Toggled(false);
-    }
+    const auto applySide = [useFiles](QCheckBox *box, QLineEdit *field, QPushButton *button) {
+        const bool enabled = useFiles && box->isChecked();
+        field->setEnabled(enabled);
+        button->setEnabled(enabled);
+    };
+    applySide(ui->checkBox_rulesfile_1, ui->lineEdit_rulesfile_1, ui->pushButton_open_rulesfile_1);
+    applySide(ui->checkBox_rulesfile_2, ui->lineEdit_rulesfile_2, ui->pushButton_open_rulesfile_2);
+    applySide(ui->checkBox_rulesfile_3, ui->lineEdit_rulesfile_3, ui->pushButton_open_rulesfile_3);
 }
 
 void MainWindow::openRulesFile1Clicked()
@@ -1541,32 +1613,6 @@ void MainWindow::openRulesFile3Clicked()
     if (!rulesfile.isEmpty()) {
         ui->lineEdit_rulesfile_3->setText(QDir::toNativeSeparators(rulesfile));
     }
-}
-
-void MainWindow::customCharset1Toggled(bool checked)
-{
-    ui->lineEdit_custom_charset1->setEnabled(checked);
-}
-
-void MainWindow::customCharset2Toggled(bool checked)
-{
-    ui->lineEdit_custom_charset2->setEnabled(checked);
-}
-
-void MainWindow::customCharset3Toggled(bool checked)
-{
-    ui->lineEdit_custom_charset3->setEnabled(checked);
-}
-
-void MainWindow::customCharset4Toggled(bool checked)
-{
-    ui->lineEdit_custom_charset4->setEnabled(checked);
-}
-
-void MainWindow::outfileToggled(bool checked)
-{
-    ui->lineEdit_outfile->setEnabled(checked);
-    ui->pushButton_open_outfile->setEnabled(checked);
 }
 
 void MainWindow::hashFileTextChanged(const QString &text)

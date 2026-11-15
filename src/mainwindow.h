@@ -14,6 +14,7 @@
 #include "pathlistcontroller.h"
 #include "statefile.h"
 
+#include <QAbstractButton>
 #include <QComboBox>
 #include <QJsonObject>
 #include <QListWidgetItem>
@@ -88,16 +89,8 @@ private slots:
     void feedArgumentMoveDownClicked();
 
     // checkboxes / radio buttons
-    void outfileToggled(bool checked);
-    void rulesFile1Toggled(bool checked);
-    void rulesFile2Toggled(bool checked);
-    void rulesFile3Toggled(bool checked);
-    void generateRulesToggled(bool checked);
-    void useRulesFileToggled(bool checked);
-    void customCharset1Toggled(bool checked);
-    void customCharset2Toggled(bool checked);
-    void customCharset3Toggled(bool checked);
-    void customCharset4Toggled(bool checked);
+    // The cross-state half of the rules choice, on the radio pair.
+    void updateRulesDependencies();
 
     // line edits
     void hashFileTextChanged(const QString &text);
@@ -143,6 +136,17 @@ private:
 
     // Fills the attack combo once, in the constructor; a settings change
     // must not refill it and reset the selected mode.
+    // The constructor's halves: widget setup and the four connection groups.
+    void configureWidgets();
+    void connectCommandSignals();
+    void connectActionSignals();
+    void connectListSignals();
+    void connectDependencySignals();
+
+    // One checkbox enables (or disables) its targets, applied at bind time.
+    void bindEnabled(QAbstractButton *toggle, const QList<QWidget *> &targets);
+    void bindDisabled(QAbstractButton *toggle, const QList<QWidget *> &targets);
+
     void initAttackModes();
     // Starts the hash-type query for the configured binary; never touches
     // the attack combo.
@@ -153,7 +157,6 @@ private:
     // on settings changes, and adding the actions there would duplicate them.
     void initExampleSessionMenu();
     void updateViewAttackMode();
-    void updateOptionDependencies();
 
     // The attack mode the user selected.
     [[nodiscard]] AttackMode currentAttackMode() const;

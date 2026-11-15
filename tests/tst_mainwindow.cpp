@@ -13,11 +13,13 @@
 #include "mainwindowtesthelpers.h"
 #include "settingsmanager.h"
 #include "statefile.h"
+#include "statewidgets.h"
 #include "testenvironment.h"
 #include "ui_mainwindow.h"
 #include "widgetstateserializer.h"
 
 #include <QAction>
+#include <QButtonGroup>
 #include <QClipboard>
 #include <QComboBox>
 #include <QCompleter>
@@ -95,6 +97,7 @@ private slots:
     void theDefaultsMatchTheUiFiles();
     void switchingTheAttackModeRebuildsThePreviewOnce();
     void destroyingTheWindowWithListRowsIsSafe();
+    void everyCommandWidgetReachesThePreview();
     void changingTheBinaryKeepsTheAttackMode();
     void importingSettingsReRunsTheQueryWhenTheBinaryChanged();
 
@@ -1639,6 +1642,79 @@ void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
                              AppConstants::Hashcat::QueryTimeoutMs);
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
+}
+
+// The wiring loop and the serializer share one walk: every command widget
+// it connects has to reach the preview, and the excluded ones are the
+// preview itself, the two staging fields and the attack combo's own slot.
+void TestMainWindow::everyCommandWidgetReachesThePreview()
+{
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    // The hash combo is filled asynchronously in the application; fill it by
+    // hand so its index connection is testable without a query.
+    ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
+    ui->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"), 1000);
+
+    const StateWidgetLists widgets = collectStateWidgets(&window);
+    const auto rebuilds = [&window] { return MainWindowTestAccess::previewRebuilds(window); };
+    int touched = 0;
+
+    for (QLineEdit *edit : widgets.lineEdits) {
+        if (edit == ui->lineEdit_command || edit == ui->lineEdit_feed_argument
+            || edit == ui->lineEdit_pcfg_ruleset_name) {
+            continue;
+        }
+        const int before = rebuilds();
+        edit->setText(edit->text() + QStringLiteral("x"));
+        QVERIFY2(rebuilds() > before, qPrintable(edit->objectName()));
+        ++touched;
+    }
+    for (QCheckBox *checkBox : widgets.checkBoxes) {
+        const int before = rebuilds();
+        checkBox->setChecked(!checkBox->isChecked());
+        QVERIFY2(rebuilds() > before, qPrintable(checkBox->objectName()));
+        ++touched;
+    }
+    for (QRadioButton *radioButton : widgets.radioButtons) {
+        const int before = rebuilds();
+        if (radioButton->isChecked()) {
+            // An auto-exclusive radio cannot be unchecked programmatically:
+            // check the other side of its group instead.
+            const auto buttons = radioButton->group()->buttons();
+            for (QAbstractButton *other : buttons) {
+                if (other != radioButton) {
+                    other->setChecked(true);
+                    break;
+                }
+            }
+        } else {
+            radioButton->setChecked(true);
+        }
+        QVERIFY2(rebuilds() > before, qPrintable(radioButton->objectName()));
+        ++touched;
+    }
+    for (QSpinBox *spinBox : widgets.spinBoxes) {
+        const int before = rebuilds();
+        spinBox->setValue(spinBox->value() == spinBox->maximum() ? spinBox->value() - 1
+                                                                 : spinBox->value() + 1);
+        QVERIFY2(rebuilds() > before, qPrintable(spinBox->objectName()));
+        ++touched;
+    }
+    for (QComboBox *comboBox : widgets.comboBoxes) {
+        const int before = rebuilds();
+        comboBox->setCurrentIndex(comboBox->currentIndex() == 0 ? 1 : 0);
+        if (comboBox == ui->comboBox_attack) {
+            // Its own slot refreshes the preview exactly once.
+            QCOMPARE(rebuilds() - before, 1);
+        } else {
+            QVERIFY2(rebuilds() > before, qPrintable(comboBox->objectName()));
+        }
+        ++touched;
+    }
+
+    // 41 line edits, 22 checkboxes, 2 radios, 6 spin boxes, 2 combos.
+    QCOMPARE(touched, 73);
 }
 
 int main(int argc, char *argv[])
