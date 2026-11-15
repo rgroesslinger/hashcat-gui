@@ -37,7 +37,6 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QFutureWatcher>
 #include <QIcon>
 #include <QIntValidator>
 #include <QJsonArray>
@@ -50,10 +49,8 @@
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QSignalBlocker>
 #include <QStandardPaths>
 #include <QStyle>
-#include <QTextDocument>
 #include <QToolTip>
 
 #include <array>

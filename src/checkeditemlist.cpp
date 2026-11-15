@@ -5,7 +5,6 @@
 
 #include "checkeditemlist.h"
 
-#include <QAbstractItemModel>
 #include <QDir>
 #include <QListWidget>
 #include <QListWidgetItem>
@@ -74,12 +73,4 @@ void CheckedItemList::moveSelected(QListWidget *list, int delta)
     QListWidgetItem *item = list->takeItem(currentRow);
     list->insertItem(targetRow, item);
     list->setCurrentRow(targetRow);
-}
-
-void CheckedItemList::connectModelChanges(QListWidget *list, QObject *receiver,
-                                          const std::function<void()> &changed)
-{
-    QObject::connect(list->model(), &QAbstractItemModel::rowsInserted, receiver, changed);
-    QObject::connect(list->model(), &QAbstractItemModel::rowsRemoved, receiver, changed);
-    QObject::connect(list, &QListWidget::itemChanged, receiver, changed);
 }

@@ -138,8 +138,6 @@ private:
     // this suggestion.
     QString m_suggestedOutfile;
 
-    // Fills the attack combo once, in the constructor; a settings change
-    // must not refill it and reset the selected mode.
     // The constructor's halves: widget setup and the four connection groups.
     void configureWidgets();
     void connectCommandSignals();
@@ -151,14 +149,16 @@ private:
     void bindEnabled(QAbstractButton *toggle, const QList<QWidget *> &targets);
     void bindDisabled(QAbstractButton *toggle, const QList<QWidget *> &targets);
 
+    // Fills the attack combo once, in the constructor; a settings change
+    // must not refill it and reset the selected mode.
     void initAttackModes();
     // Starts the hash-type query for the configured binary; never touches
     // the attack combo.
     void reloadHashTypes();
     // The shared refresh after the settings were saved or imported.
     void refreshAfterSettingsChange();
-    // The example submenu is built once: initHashAndAttackModes() runs again
-    // on settings changes, and adding the actions there would duplicate them.
+    // The example submenu is built once, in the constructor; adding the
+    // actions on every settings refresh would duplicate them.
     void initExampleSessionMenu();
     void updateViewAttackMode();
 
@@ -257,7 +257,7 @@ private:
     // A session can name a hash type while comboBox_hash_type still has no
     // items - the list arrives with the asynchronous hashcat query, after the
     // constructor has already loaded the session. The stored id waits
-    // here and is applied once the items exist, see initHashAndAttackModes().
+    // here and is applied once the items exist, see applyPendingHashType().
     int m_pendingHashTypeId = -1;
 
     // The asynchronous hash-type query: the watcher, the stale-query guard

@@ -8,7 +8,6 @@
 
 #include <QString>
 #include <QStringList>
-#include <functional>
 
 class QListWidget;
 class QObject;
@@ -34,12 +33,6 @@ public:
     // Moves the current row by delta; a missing selection or a move past
     // either end does nothing.
     static void moveSelected(QListWidget *list, int delta);
-
-    // The model events that change the command: rows arriving and leaving,
-    // and in-place edits (the check state included). The receiver owns the
-    // connection's lifetime.
-    static void connectModelChanges(QListWidget *list, QObject *receiver,
-                                    const std::function<void()> &changed);
 };
 
 #endif // CHECKEDITEMLIST_H

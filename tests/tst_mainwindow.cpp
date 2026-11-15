@@ -1532,9 +1532,9 @@ void TestMainWindow::theDefaultsMatchTheUiFiles()
              AppConstants::Defaults::GenerateRules);
 }
 
-// A mode switch is not a bulk write: applyAttackModeView only shows, hides
-// and enables, so the explicit refresh in updateViewAttackMode is the one
-// rebuild.
+// A mode switch is not a bulk write: the mode view's apply() only shows,
+// hides and enables, so the explicit refresh in updateViewAttackMode is the
+// one rebuild.
 void TestMainWindow::switchingTheAttackModeRebuildsThePreviewOnce()
 {
     MainWindow window;

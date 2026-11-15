@@ -85,6 +85,7 @@ set(HASHCAT_GUI_SOURCES
     src/settingsmanager.cpp
     src/statefile.h
     src/statefile.cpp
+    src/statewidgets.h
     src/terminalcatalog.h
     src/terminalcatalog.cpp
     src/textutils.h

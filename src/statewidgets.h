@@ -41,8 +41,9 @@ inline bool isApplicationWidget(const QWidget *widget)
 }
 
 // The seven widget types the session format knows, walked recursively below
-// root and filtered to the application's own widgets. The serializer reads
-// and writes them; the preview wiring connects the same set.
+// root and filtered to the application's own widgets. The preview wiring
+// connects this set; the serializer shares the isApplicationWidget predicate
+// above, so persistence and wiring cannot drift apart.
 struct StateWidgetLists {
     QList<QLineEdit *> lineEdits;
     QList<QCheckBox *> checkBoxes;
