@@ -1377,6 +1377,10 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
         <translation>Pokretanje nije uspelo</translation>
     </message>
     <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>Komandna linija je preduga za terminal. Skratite liste argumenata ili njihove vrednosti i pokušajte ponovo.</translation>
+    </message>
+    <message>
         <source>Please choose a hash file.</source>
         <translation>Izaberite datoteku sa hash-ovima.</translation>
     </message>

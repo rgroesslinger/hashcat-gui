@@ -32,6 +32,14 @@ struct HashcatResult {
     QString standardError;
 };
 
+// The program and the arguments that start hashcat in a terminal. An empty
+// program means the launch is refused: the terminal is unknown, or the
+// command line would exceed the length a Windows process can take.
+struct LaunchCommand {
+    QString program;
+    QStringList arguments;
+};
+
 class HelperUtils
 {
     // The messages below end up in dialogs opened by the caller
@@ -105,7 +113,17 @@ public:
     // Every supported terminal and the arguments that belong between the
     // terminal program and the hashcat command line. Pure data - nothing
     // here looks at the filesystem - so the tests can pin every entry.
+    // PowerShell and pwsh are discovered through this table but launched
+    // through launchCommand(); their entries hold no arguments.
     static const QMap<QString, QStringList> &terminalArguments();
+
+    // The command line that starts hashcat in the given terminal, built
+    // without starting anything. PowerShell and pwsh get an -EncodedCommand
+    // script that quotes every token, so no hash, mask, path or session value
+    // is ever parsed as shell code; every other terminal execs hashcat
+    // directly. keepOpen asks the terminal to stay open after hashcat exits.
+    static LaunchCommand launchCommand(const QString &terminal, const QString &hashcatPath,
+                                       const QStringList &arguments, bool keepOpen);
 
     static QMap<QString, QStringList> availableTerminals();
 

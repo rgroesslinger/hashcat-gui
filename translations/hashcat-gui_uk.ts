@@ -1377,6 +1377,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>Не вдалося запустити</translation>
     </message>
     <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>Командний рядок задовгий для термінала. Скоротіть списки аргументів або їхні значення та повторіть спробу.</translation>
+    </message>
+    <message>
         <source>Please choose a hash file.</source>
         <translation>Виберіть файл гешів.</translation>
     </message>

@@ -1377,6 +1377,10 @@ Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklana
         <translation>Başlatma başarısız</translation>
     </message>
     <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>Komut satırı terminal için çok uzun. Argüman listalarını veya değerlerini kısaltıp yeniden deneyin.</translation>
+    </message>
+    <message>
         <source>Please choose a hash file.</source>
         <translation>Lütfen bir hash dosyası seçin.</translation>
     </message>

@@ -16,6 +16,7 @@
 #include <QRegularExpression>
 #include <QStandardPaths>
 #include <QString>
+#include <QStringEncoder>
 #include <QStyleHints>
 #include <QtConcurrent/QtConcurrentRun>
 #include <algorithm>
@@ -633,26 +634,19 @@ HelperUtils::LaunchError HelperUtils::validateOptions(const HashcatOptions &opti
 // command line, for every supported terminal. The entries are pure data -
 // nothing here looks at the filesystem.
 //
-// PowerShell's -Command must come last: it takes the rest of the command line
-// as the command text, which is what startClicked() builds. The & is the call
-// operator and needs an entry of its own, because a hashcat path with spaces
-// arrives quoted - and a bare quoted string is only a string in PowerShell.
+// PowerShell and pwsh are discovered through this table but launched through
+// launchCommand(), which builds an -EncodedCommand script; their entries hold
+// no arguments, so no -Command text can be assembled from the table.
 //
 // gnome-terminal, ptyxis and wezterm have no flag to stay open after the
 // command exits; holding them would need the command wrapped in a shell
-// string. cmd.exe /k stays open, but breaks as soon as two arguments need
-// quotes: /K then strips the first and last quote of the whole command line.
+// string.
 const QMap<QString, QStringList> &HelperUtils::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
-        {QStringLiteral("cmd.exe"), {QStringLiteral("/k")}},
         // No .exe on pwsh so the lookup also resolves on Linux and macOS.
-        {QStringLiteral("powershell.exe"),
-         {QStringLiteral("-NoExit"), QStringLiteral("-NoProfile"), QStringLiteral("-Command"),
-          QStringLiteral("&")}},
-        {QStringLiteral("pwsh"),
-         {QStringLiteral("-NoExit"), QStringLiteral("-NoProfile"), QStringLiteral("-Command"),
-          QStringLiteral("&")}},
+        {QStringLiteral("powershell.exe"), {}},
+        {QStringLiteral("pwsh"), {}},
         {QStringLiteral("xterm"), {QStringLiteral("-hold"), QStringLiteral("-e")}},
         {QStringLiteral("gnome-terminal"), {QStringLiteral("--wait"), QStringLiteral("--")}},
         {QStringLiteral("ptyxis"), {QStringLiteral("--")}},
@@ -666,6 +660,82 @@ const QMap<QString, QStringList> &HelperUtils::terminalArguments()
          {QStringLiteral("--wait-after-command=true"), QStringLiteral("-e")}},
     };
     return table;
+}
+
+namespace
+{
+// PowerShell reads the smart single quotes U+2018-U+201B as string delimiters
+// too, so a token holding one cannot be single-quoted safely.
+bool needsBase64Token(const QString &token)
+{
+    return std::ranges::any_of(token,
+                               [](QChar c) { return c >= QChar(0x2018) && c <= QChar(0x201b); });
+}
+
+// One argv token as a PowerShell expression: a single-quoted literal with an
+// embedded quote doubled, or - for the smart quotes PowerShell would read as
+// delimiters - the token's UTF-8 bytes as base64, decoded inside the script.
+// Everything else ($, backticks, ;) is literal inside single quotes.
+QString powerShellToken(const QString &token)
+{
+    if (needsBase64Token(token)) {
+        return QStringLiteral("([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('")
+               + QString::fromLatin1(token.toUtf8().toBase64()) + QStringLiteral("')))");
+    }
+    QString quoted = token;
+    quoted.replace(QLatin1Char('\''), QStringLiteral("''"));
+    return QStringLiteral("'") + quoted + QStringLiteral("'");
+}
+} // namespace
+
+LaunchCommand HelperUtils::launchCommand(const QString &terminal, const QString &hashcatPath,
+                                         const QStringList &arguments, bool keepOpen)
+{
+    const QMap<QString, QStringList> &table = terminalArguments();
+    const auto it = table.constFind(terminal);
+    if (it == table.constEnd()) {
+        return {};
+    }
+
+    // -Command would re-parse the hashcat command line as PowerShell code:
+    // hashes, masks, outfiles and session values would run as expressions.
+    // -EncodedCommand takes the script as UTF-16LE base64 instead, and the
+    // script quotes every token, so nothing a session carries can execute.
+    if (terminal == QStringLiteral("powershell.exe") || terminal == QStringLiteral("pwsh")) {
+        QString script = QStringLiteral("& ") + powerShellToken(hashcatPath);
+        for (const QString &argument : arguments) {
+            script += QStringLiteral(" ") + powerShellToken(argument);
+        }
+
+        QStringEncoder encoder(QStringEncoder::Utf16LE);
+        const QByteArray encodedBytes = encoder.encode(script);
+        const QString encoded = QString::fromLatin1(encodedBytes.toBase64());
+
+        // CreateProcessW refuses a command line longer than 32,767 characters.
+        // The encoded script is the only large token; the margin covers the
+        // program name, its quotes and the fixed flags. The same limit applies
+        // on every platform, so a refusal does not depend on the OS.
+        constexpr int maxCommandLine = 32767;
+        constexpr int commandLineMargin = 64;
+        if (terminal.size() + encoded.size() + commandLineMargin > maxCommandLine) {
+            return {};
+        }
+
+        LaunchCommand command;
+        command.program = terminal;
+        command.arguments << QStringLiteral("-NoProfile");
+        if (keepOpen) {
+            command.arguments << QStringLiteral("-NoExit");
+        }
+        command.arguments << QStringLiteral("-EncodedCommand") << encoded;
+        return command;
+    }
+
+    LaunchCommand command;
+    command.program = terminal;
+    command.arguments = it.value();
+    command.arguments << hashcatPath << arguments;
+    return command;
 }
 
 QMap<QString, QStringList> HelperUtils::availableTerminals()

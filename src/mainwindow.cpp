@@ -2243,12 +2243,19 @@ void MainWindow::startClicked()
         return;
     }
 
-    QProcess proc;
+    // The terminal command line is built in one place: PowerShell gets an
+    // encoded script, so no hash, mask, path or session value is parsed as
+    // shell code. The terminal stays open after hashcat exits, as before.
+    const LaunchCommand command =
+        HelperUtils::launchCommand(configuredTerminal, hashcatPath, generateArguments(), true);
+    if (command.program.isEmpty()) {
+        QMessageBox::warning(this, tr("Launch failed"),
+                             tr("The command line is too long for the terminal. Shorten the "
+                                "argument lists or their values and try again."));
+        return;
+    }
 
-    /* 1. arguments needed for the selected terminal, 2. the hashcat binary,
-     * 3. the arguments collected from the gui elements */
-    QStringList arguments = availableTerminals.value(configuredTerminal);
-    arguments << hashcatPath << generateArguments();
+    QProcess proc;
 
 #ifdef Q_OS_WIN
     /* Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal */
@@ -2256,8 +2263,8 @@ void MainWindow::startClicked()
         [](QProcess::CreateProcessArguments *args) { args->flags |= CREATE_NEW_CONSOLE; });
 #endif
 
-    proc.setProgram(configuredTerminal);
-    proc.setArguments(arguments);
+    proc.setProgram(command.program);
+    proc.setArguments(command.arguments);
     proc.setWorkingDirectory(QFileInfo(hashcatPath).absolutePath());
 
     if (!proc.startDetached()) {

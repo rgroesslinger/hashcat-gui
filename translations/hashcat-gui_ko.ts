@@ -1377,6 +1377,10 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>실행 실패</translation>
     </message>
     <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>명령줄이 터미널에 대해 너무 깁니다. 인수 목록이나 해당 값을 줄인 후 다시 시도하세요.</translation>
+    </message>
+    <message>
         <source>Please choose a hash file.</source>
         <translation>해시 파일을 선택하세요.</translation>
     </message>

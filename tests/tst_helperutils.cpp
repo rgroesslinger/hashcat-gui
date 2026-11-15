@@ -12,6 +12,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QStringDecoder>
 #include <QTemporaryDir>
 #include <array>
 #include <iterator>
@@ -39,6 +40,15 @@ private slots:
     void hashRecipeIsRequiredFor4000();
     void cachePathNeedsAnExistingDirectory();
     void terminalArgumentsArePinned();
+    void launchCommandExecsUnixTerminalsDirectly();
+    void launchCommandEncodesTheScript_data();
+    void launchCommandEncodesTheScript();
+    void launchCommandQuotesEveryToken_data();
+    void launchCommandQuotesEveryToken();
+    void launchCommandCarriesSmartQuotesAsBase64_data();
+    void launchCommandCarriesSmartQuotesAsBase64();
+    void launchCommandRefusesAnOverlongCommandLine();
+    void launchCommandRefusesAnUnknownTerminal();
     void findHashcatInPathFindsTheExecutable();
     void findHashcatInPathProbesBothUnixNames_data();
     void findHashcatInPathProbesBothUnixNames();
@@ -869,9 +879,10 @@ void TestHelperUtils::terminalArgumentsArePinned()
         QStringList arguments;
     };
     const auto expected = std::to_array<Expected>({
-        {"cmd.exe", {"/k"}},
-        {"powershell.exe", {"-NoExit", "-NoProfile", "-Command", "&"}},
-        {"pwsh", {"-NoExit", "-NoProfile", "-Command", "&"}},
+        // PowerShell and pwsh are discovered here but launched through
+        // launchCommand(); the table holds no arguments for them.
+        {"powershell.exe", {}},
+        {"pwsh", {}},
         {"xterm", {"-hold", "-e"}},
         {"gnome-terminal", {"--wait", "--"}},
         {"ptyxis", {"--"}},
@@ -889,6 +900,163 @@ void TestHelperUtils::terminalArgumentsArePinned()
     for (const Expected &entry : expected) {
         QCOMPARE(table.value(QString::fromLatin1(entry.terminal)), entry.arguments);
     }
+}
+
+namespace
+{
+// The script the -EncodedCommand argument carries, back as text.
+QString decodeScript(const QString &encoded)
+{
+    QStringDecoder decoder(QStringDecoder::Utf16LE);
+    const QByteArray bytes = QByteArray::fromBase64(encoded.toLatin1());
+    return decoder.decode(bytes);
+}
+} // namespace
+
+// Every terminal except PowerShell execs hashcat directly: the table's own
+// arguments, then the binary, then the collected argv - unchanged by keepOpen.
+void TestHelperUtils::launchCommandExecsUnixTerminalsDirectly()
+{
+    const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0")};
+    const QMap<QString, QStringList> &table = HelperUtils::terminalArguments();
+    for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
+        if (it.key() == QStringLiteral("powershell.exe") || it.key() == QStringLiteral("pwsh")) {
+            continue;
+        }
+        const LaunchCommand command =
+            HelperUtils::launchCommand(it.key(), QStringLiteral("hashcat"), arguments, true);
+        QCOMPARE(command.program, it.key());
+        QStringList expected = it.value();
+        expected << QStringLiteral("hashcat") << arguments;
+        QCOMPARE(command.arguments, expected);
+    }
+}
+
+// The PowerShell launch carries its script as UTF-16LE base64; the flags are
+// fixed, and -NoExit appears only while the terminal should stay open.
+void TestHelperUtils::launchCommandEncodesTheScript_data()
+{
+    QTest::addColumn<QString>("terminal");
+    QTest::addColumn<bool>("keepOpen");
+
+    QTest::newRow("powershell.exe, keep open") << QStringLiteral("powershell.exe") << true;
+    QTest::newRow("powershell.exe, close") << QStringLiteral("powershell.exe") << false;
+    QTest::newRow("pwsh, keep open") << QStringLiteral("pwsh") << true;
+    QTest::newRow("pwsh, close") << QStringLiteral("pwsh") << false;
+}
+
+void TestHelperUtils::launchCommandEncodesTheScript()
+{
+    QFETCH(QString, terminal);
+    QFETCH(bool, keepOpen);
+
+    const QString hashcatPath = QStringLiteral("C:\\Program Files\\hashcat\\hashcat.exe");
+    const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0"),
+                                QStringLiteral("--mask"), QStringLiteral("?d?d?d?d")};
+    const LaunchCommand command =
+        HelperUtils::launchCommand(terminal, hashcatPath, arguments, keepOpen);
+
+    QCOMPARE(command.program, terminal);
+    QStringList expectedFlags{QStringLiteral("-NoProfile")};
+    if (keepOpen) {
+        expectedFlags << QStringLiteral("-NoExit");
+    }
+    expectedFlags << QStringLiteral("-EncodedCommand");
+    QCOMPARE(command.arguments.mid(0, expectedFlags.size()), expectedFlags);
+    QCOMPARE(command.arguments.size(), expectedFlags.size() + 1);
+
+    const QString expectedScript =
+        QStringLiteral("& 'C:\\Program Files\\hashcat\\hashcat.exe' '--attack-mode' '0' "
+                       "'--mask' '?d?d?d?d'");
+    QCOMPARE(decodeScript(command.arguments.last()), expectedScript);
+}
+
+// The tokens a hashcat command line really carries: bcrypt hashes, masks with
+// shell metacharacters, spaces, quotes and backticks. Each has to reach the
+// script as a literal, never as code.
+void TestHelperUtils::launchCommandQuotesEveryToken_data()
+{
+    QTest::addColumn<QString>("token");
+    QTest::addColumn<QString>("quoted");
+
+    QTest::newRow("bcrypt hash") << QStringLiteral("$2a$10$abcdefghijklmnopqrstuu")
+                                 << QStringLiteral("'$2a$10$abcdefghijklmnopqrstuu'");
+    QTest::newRow("mask with subexpression")
+        << QStringLiteral("?d?d$(Get-Date)") << QStringLiteral("'?d?d$(Get-Date)'");
+    QTest::newRow("mask with semicolon")
+        << QStringLiteral("?d;calc") << QStringLiteral("'?d;calc'");
+    QTest::newRow("spaces") << QStringLiteral("two words") << QStringLiteral("'two words'");
+    QTest::newRow("single quotes")
+        << QStringLiteral("it's a 'test'") << QStringLiteral("'it''s a ''test'''");
+    QTest::newRow("double quotes")
+        << QStringLiteral("say \"hi\"") << QStringLiteral("'say \"hi\"'");
+    QTest::newRow("backticks") << QStringLiteral("`backtick`") << QStringLiteral("'`backtick`'");
+    QTest::newRow("pipe and ampersand")
+        << QStringLiteral("pipe|and&semi") << QStringLiteral("'pipe|and&semi'");
+    QTest::newRow("empty") << QString() << QStringLiteral("''");
+    QTest::newRow("newline") << QStringLiteral("line\nbreak") << QStringLiteral("'line\nbreak'");
+    QTest::newRow("smart double quotes") << QStringLiteral("“”„") << QStringLiteral("'“”„'");
+}
+
+void TestHelperUtils::launchCommandQuotesEveryToken()
+{
+    QFETCH(QString, token);
+    QFETCH(QString, quoted);
+
+    const LaunchCommand command = HelperUtils::launchCommand(
+        QStringLiteral("pwsh"), QStringLiteral("hashcat"), {token}, false);
+    QCOMPARE(decodeScript(command.arguments.last()), QStringLiteral("& 'hashcat' ") + quoted);
+}
+
+// PowerShell reads U+2018-U+201B as single-quote delimiters, so a token that
+// holds one cannot be quoted literally; it travels as its own base64 value,
+// decoded inside the script.
+void TestHelperUtils::launchCommandCarriesSmartQuotesAsBase64_data()
+{
+    QTest::addColumn<QString>("token");
+
+    QTest::newRow("left single") << QStringLiteral("?d‘?d");
+    QTest::newRow("right single") << QStringLiteral("?d’?d");
+    QTest::newRow("low single") << QStringLiteral("?d‚?d");
+    QTest::newRow("high reversed single") << QStringLiteral("?d‛?d");
+    QTest::newRow("mixed with an ASCII quote") << QStringLiteral("it's ’?d’");
+}
+
+void TestHelperUtils::launchCommandCarriesSmartQuotesAsBase64()
+{
+    QFETCH(QString, token);
+
+    const LaunchCommand command = HelperUtils::launchCommand(
+        QStringLiteral("powershell.exe"), QStringLiteral("hashcat"), {token}, false);
+    const QString expected =
+        QStringLiteral("& 'hashcat' "
+                       "([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('")
+        + QString::fromLatin1(token.toUtf8().toBase64()) + QStringLiteral("')))");
+    QCOMPARE(decodeScript(command.arguments.last()), expected);
+}
+
+// A command line beyond the Windows limit is refused, never truncated.
+void TestHelperUtils::launchCommandRefusesAnOverlongCommandLine()
+{
+    const QStringList arguments{QString(40000, QLatin1Char('a'))};
+    const LaunchCommand command = HelperUtils::launchCommand(
+        QStringLiteral("pwsh"), QStringLiteral("hashcat"), arguments, true);
+    QVERIFY(command.program.isEmpty());
+    QVERIFY(command.arguments.isEmpty());
+
+    // The same launch well under the limit goes through.
+    const LaunchCommand small = HelperUtils::launchCommand(
+        QStringLiteral("pwsh"), QStringLiteral("hashcat"), {QStringLiteral("?d?d")}, true);
+    QVERIFY(!small.program.isEmpty());
+}
+
+void TestHelperUtils::launchCommandRefusesAnUnknownTerminal()
+{
+    const LaunchCommand command =
+        HelperUtils::launchCommand(QStringLiteral("no-such-terminal"), QStringLiteral("hashcat"),
+                                   {QStringLiteral("--help")}, true);
+    QVERIFY(command.program.isEmpty());
+    QVERIFY(command.arguments.isEmpty());
 }
 
 // The lookup follows PATH and only reports a file this system can execute.

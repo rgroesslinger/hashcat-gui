@@ -1377,6 +1377,10 @@ Może to być spowodowane przez Windows Defender lub inne oprogramowanie antywir
         <translation>Uruchomienie nie powiodło się</translation>
     </message>
     <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>Wiersz poleceń jest za długi dla terminala. Skróć listy argumentów lub ich wartości i spróbuj ponownie.</translation>
+    </message>
+    <message>
         <source>Please choose a hash file.</source>
         <translation>Wybierz plik z hashami.</translation>
     </message>

@@ -1377,6 +1377,10 @@ Può essere causato da Windows Defender o da altro software antivirus. Consulta 
         <translation>Avvio non riuscito</translation>
     </message>
     <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>La riga di comando è troppo lunga per il terminale. Accorcia gli elenchi di argomenti o i loro valori e riprova.</translation>
+    </message>
+    <message>
         <source>Please choose a hash file.</source>
         <translation>Scegli un file di hash.</translation>
     </message>

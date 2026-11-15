@@ -1377,6 +1377,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>启动失败</translation>
     </message>
     <message>
+        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
+        <translation>命令行对于终端来说过长。请缩短参数列表或其值，然后重试。</translation>
+    </message>
+    <message>
         <source>Please choose a hash file.</source>
         <translation>请选择一个哈希文件。</translation>
     </message>

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- **Security**: fixed the PowerShell launch quoting. `powershell.exe` and `pwsh` received the hashcat command line after `-Command &`, which re-parsed hashes, masks, paths and session values as PowerShell code - a crafted session file could run arbitrary commands on Execute. The launch now uses `-EncodedCommand` with every token quoted, so no user value is parsed as code, and an overlong command line is refused instead of truncated
+- `cmd.exe` was dropped from the supported terminals: its `/k` quoting broke command lines with more than one quoted argument. Windows uses PowerShell, which is present on every supported release
 - **Support for hashcat 8.0.0**: the attack mode selector offers all ten of its modes - the PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) modes join the existing ones, each with its own options that only appear where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
 - hashcat 8.0.0 or newer is required; the segment size (`-c`) and workload profile (`-w`) options were removed along with it
 - Example sessions for every attack mode are available under Tools → Load Example Session; each uses a different hash type and test password
