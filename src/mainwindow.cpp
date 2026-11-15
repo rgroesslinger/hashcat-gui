@@ -29,7 +29,6 @@
 #include "widgetstateserializer.h"
 
 #include <QAbstractButton>
-#include <QAbstractItemModel>
 #include <QAction>
 #include <QClipboard>
 #include <QCompleter>
@@ -39,13 +38,11 @@
 #include <QFileInfo>
 #include <QIcon>
 #include <QIntValidator>
-#include <QJsonArray>
 #include <QLayout>
 #include <QMenu>
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
-#include <QSaveFile>
 #include <QScreen>
 #include <QScrollArea>
 #include <QScrollBar>
