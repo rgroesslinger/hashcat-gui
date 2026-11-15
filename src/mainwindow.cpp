@@ -130,23 +130,35 @@ MainWindow::MainWindow(QWidget *parent)
     });
     connect(&m_hashTypeLoader, &HashTypeLoader::loaded, this,
             [this](const QMap<quint32, QString> &hashTypes) {
-                ui->comboBox_hash_type->clear();
-                // fill the combobox, hash type id as item data
-                for (auto it = hashTypes.constBegin(); it != hashTypes.constEnd(); ++it) {
-                    ui->comboBox_hash_type->addItem(it.value(), it.key());
-                }
-                ui->comboBox_hash_type->setToolTip(QString());
+                // The refill is a bulk write: one preview rebuild at the end,
+                // not one per combo event.
+                QString problem;
+                {
+                    const CommandSilence silence(*this);
+                    ui->comboBox_hash_type->clear();
+                    // fill the combobox, hash type id as item data
+                    for (auto it = hashTypes.constBegin(); it != hashTypes.constEnd(); ++it) {
+                        ui->comboBox_hash_type->addItem(it.value(), it.key());
+                    }
+                    ui->comboBox_hash_type->setToolTip(QString());
 
-                // A session loaded while the combo was still empty could not
-                // select its hash type; apply the stored id now that the
-                // items exist, and consume it.
-                const QString problem = applyPendingHashType();
+                    // A session loaded while the combo was still empty could
+                    // not select its hash type; apply the stored id now that
+                    // the items exist, and consume it.
+                    problem = applyPendingHashType();
+                }
+                commandChanged();
                 if (!problem.isEmpty()) {
                     QMessageBox::warning(this, tr("Session warning"), problem);
                 }
             });
     connect(&m_hashTypeLoader, &HashTypeLoader::failed, this,
             [this](const HashTypeFailure &failure) {
+                // The previous binary's list must not survive a failed reload:
+                // a stale id would reach the preview and the launch validation,
+                // and the empty combo is what lets a same-path retry re-query
+                // once the binary is repaired.
+                ui->comboBox_hash_type->clear();
                 // The combo was disabled while the query ran. Restore its
                 // tooltip on every failure path so it does not stay stuck on
                 // "Updating…" forever.

@@ -101,6 +101,9 @@ private slots:
     void listRowEventsRebuildThePreviewOnce();
     void changingTheBinaryKeepsTheAttackMode();
     void importingSettingsReRunsTheQueryWhenTheBinaryChanged();
+    void aFailedReloadClearsTheHashTypes();
+    void retryingTheSamePathAfterAFailureReQueries();
+    void aReloadRebuildsThePreviewOnce();
 
 private:
     MainWindowFixture m_fixture;
@@ -1740,6 +1743,113 @@ void TestMainWindow::listRowEventsRebuildThePreviewOnce()
     const int beforeRemove = MainWindowTestAccess::previewRebuilds(window);
     delete list->takeItem(0);
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - beforeRemove, 1);
+}
+
+// A failed reload must not keep the previous binary's list: a stale id in
+// the preview would reach the launch validation, and the empty combo is what
+// lets the same-path retry re-query.
+void TestMainWindow::aFailedReloadClearsTheHashTypes()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-fail-clear"),
+                                                         "#!/bin/sh\n"
+                                                         "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
+                                                         "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    m_fixture.startWatchdog();
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat-broken"));
+    MainWindowTestAccess::reloadHashTypes(window);
+    QTRY_VERIFY_WITH_TIMEOUT(!MainWindowTestAccess::hashTypeLoader(window).isLoading(),
+                             AppConstants::Hashcat::QueryTimeoutMs);
+
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+    QVERIFY(!MainWindowTestAccess::ui(window)->lineEdit_command->text().contains(
+        QStringLiteral("--hash-type")));
+}
+
+// The recovery path: the binary at the same path is repaired, and accepting
+// Settings again re-queries because the failed reload left the combo empty.
+void TestMainWindow::retryingTheSamePathAfterAFailureReQueries()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString binary = directory.filePath(QStringLiteral("hashcat-repaired"));
+    QFile script(binary);
+    QVERIFY(script.open(QIODevice::WriteOnly));
+    script.write("#!/bin/sh\nexit 1\n");
+    script.close();
+    QVERIFY(script.setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, binary);
+
+    m_fixture.startWatchdog();
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(!MainWindowTestAccess::hashTypeLoader(window).isLoading(),
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+
+    // Repair the binary at the same path, then accept Settings again. The
+    // watchdog has done its job (the failure box); stop it so it cannot race
+    // the recorder for the settings dialog.
+    m_fixture.stopWatchdog();
+    QVERIFY(script.open(QIODevice::WriteOnly | QIODevice::Truncate));
+    script.write("#!/bin/sh\nprintf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\nexit 0\n");
+    script.close();
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.saveSettingsDialog = true;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
+
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
+#endif
+}
+
+// The refill is a bulk write: a reload that replaces the list costs exactly
+// one preview rebuild, not one per combo event.
+void TestMainWindow::aReloadRebuildsThePreviewOnce()
+{
+    const QString stubA = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-reload-a"),
+                                                          "#!/bin/sh\n"
+                                                          "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
+                                                          "exit 0\n");
+    const QString stubB = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-reload-b"), "#!/bin/sh\n"
+                                                 "printf '{\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+                                                 "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stubA.isEmpty() && !stubB.isEmpty(), "the shell stubs could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubB);
+    const int before = MainWindowTestAccess::previewRebuilds(window);
+    MainWindowTestAccess::reloadHashTypes(window);
+    QTRY_VERIFY_WITH_TIMEOUT(
+        MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt() == 1000U,
+        AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
 }
 
 int main(int argc, char *argv[])

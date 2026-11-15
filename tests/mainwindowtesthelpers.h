@@ -275,6 +275,10 @@ public:
     {
         m_watchdog.start();
     }
+    void stopWatchdog()
+    {
+        m_watchdog.stop();
+    }
     [[nodiscard]] int closedModals() const
     {
         return m_closedModals;
