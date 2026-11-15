@@ -16,9 +16,10 @@ class CommandPreview
 {
 public:
     // The binary name (empty when none is configured) and one token per
-    // argument, joined with spaces. The hash recipe is a single argument
-    // that contains spaces, so it is quoted for display - a copied command
-    // must not split it. The argv handed to hashcat keeps the token unquoted.
+    // argument, joined with spaces. Every token the platform's shell would
+    // split or expand - spaces, quotes, masks, recipes - is quoted for
+    // display, so a copied command can be pasted into a shell. The argv
+    // handed to hashcat keeps the tokens unquoted.
     static QString format(const QString &binary, const QStringList &arguments);
 
     // The tooltip of the command preview: the whole command, because the

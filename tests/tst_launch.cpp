@@ -332,8 +332,8 @@ void TestLaunch::copyingTheCommandPutsItOnTheClipboard()
 }
 
 // The preview's display formatting, pinned before it moves to its own unit:
-// the recipe is quoted for display, markup-like text is escaped in the
-// tooltip, and the tooltip wraps at 120 columns.
+// every token the shell would split is quoted for display, markup-like text
+// is escaped in the tooltip, and the tooltip wraps at 120 columns.
 void TestLaunch::thePreviewFormattingIsPinned()
 {
     const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-preview"),
@@ -352,27 +352,29 @@ void TestLaunch::thePreviewFormattingIsPinned()
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              5000);
 
-#ifdef Q_OS_WIN
-    const QChar quote = QLatin1Char('"');
-#else
-    const QChar quote = QLatin1Char('\'');
-#endif
-
     // A recipe with spaces, quotes and markup: the command line quotes it for
-    // display, the tooltip escapes the markup.
+    // display - escaping the recipe's own quotes - and the tooltip escapes
+    // the markup.
     MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(
         MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(4000));
     MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->setText(
         QStringLiteral("md5($p.\"<b>\")"));
+#ifdef Q_OS_WIN
+    // The recipe holds no whitespace, so the MSVCRT quoting escapes its
+    // double quotes but does not wrap it.
+    const QString quotedRecipe = QStringLiteral("md5($p.\\\"<b>\\\")");
+    const QString quotedRecipeTooltip = QStringLiteral("md5($p.\\&quot;&lt;b&gt;\\&quot;)");
+#else
+    const QString quotedRecipe = QStringLiteral("'md5($p.\"<b>\")'");
+    const QString quotedRecipeTooltip = QStringLiteral("'md5($p.&quot;&lt;b&gt;&quot;)'");
+#endif
     const QString recipeCommand = QStringLiteral("stub-hashcat-preview --hash-type 4000 "
                                                  "--hash-recipe ")
-                                  + quote + QStringLiteral("md5($p.\"<b>\")") + quote
-                                  + QStringLiteral(" --attack-mode 0");
+                                  + quotedRecipe + QStringLiteral(" --attack-mode 0");
     QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->text(), recipeCommand);
     QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->toolTip(),
-             QStringLiteral("stub-hashcat-preview --hash-type 4000 --hash-recipe ") + quote
-                 + QStringLiteral("md5($p.&quot;&lt;b&gt;&quot;)") + quote
-                 + QStringLiteral(" --attack-mode 0"));
+             QStringLiteral("stub-hashcat-preview --hash-type 4000 --hash-recipe ")
+                 + quotedRecipeTooltip + QStringLiteral(" --attack-mode 0"));
 
     // Two long positional wordlists: the tooltip breaks between arguments at
     // 120 columns, a flag keeps its value on the same line.

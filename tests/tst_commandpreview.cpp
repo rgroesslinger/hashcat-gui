@@ -6,17 +6,21 @@
 #include "commandpreview.h"
 #include "testenvironment.h"
 
-// The display formatting of the command line: spacing, the recipe's display
-// quotes, the tooltip's 120-column wrap and its markup escaping.
+// The display formatting of the command line: spacing, the shell quoting of
+// every token the shell would split or expand, the tooltip's 120-column wrap
+// and its markup escaping.
 class TestCommandPreview : public QObject
 {
     Q_OBJECT
 
 private slots:
     void formatJoinsTheBinaryAndTheArguments();
-    void formatQuotesTheRecipeForDisplay();
+    void formatQuotesEveryTokenForTheShell_data();
+    void formatQuotesEveryTokenForTheShell();
+    void formatQuotesTheBinaryName();
     void tooltipHoldsTheWholeCommand();
     void tooltipWrapsAt120Columns();
+    void tooltipKeepsQuotedTokensWhole();
     void tooltipEscapesMarkup();
 };
 
@@ -34,23 +38,68 @@ void TestCommandPreview::formatJoinsTheBinaryAndTheArguments()
     QCOMPARE(CommandPreview::format(QString(), {}), QString());
 }
 
-void TestCommandPreview::formatQuotesTheRecipeForDisplay()
+// One token per row, quoted the way the platform's shell reads it: POSIX
+// single quotes on Linux for everything outside the literal character set,
+// MSVCRT double quotes on Windows only where the token is empty or holds
+// whitespace (embedded quotes are escaped either way). The recipe is no
+// special case - it is quoted by the same rules as every other token.
+void TestCommandPreview::formatQuotesEveryTokenForTheShell_data()
 {
+    QTest::addColumn<QString>("token");
+    QTest::addColumn<QString>("posix");
+    QTest::addColumn<QString>("windows");
+
+    QTest::newRow("recipe") << QStringLiteral("md5($p.$s)") << QStringLiteral("'md5($p.$s)'")
+                            << QStringLiteral("md5($p.$s)");
+    QTest::newRow("recipe with double quotes")
+        << QStringLiteral("md5($p.\"<b>\")") << QStringLiteral("'md5($p.\"<b>\")'")
+        << QStringLiteral("md5($p.\\\"<b>\\\")");
+    QTest::newRow("recipe with single quotes")
+        << QStringLiteral("md5($p.'x')") << QStringLiteral("'md5($p.'\\''x'\\'')'")
+        << QStringLiteral("md5($p.'x')");
+    QTest::newRow("path with spaces")
+        << QStringLiteral("/tmp/my hashes.txt") << QStringLiteral("'/tmp/my hashes.txt'")
+        << QStringLiteral("\"/tmp/my hashes.txt\"");
+    QTest::newRow("mask") << QStringLiteral("?d?d") << QStringLiteral("'?d?d'")
+                          << QStringLiteral("?d?d");
+    QTest::newRow("session with spaces")
+        << QStringLiteral("my job") << QStringLiteral("'my job'") << QStringLiteral("\"my job\"");
+    QTest::newRow("empty") << QString() << QStringLiteral("''") << QStringLiteral("\"\"");
+    QTest::newRow("safe punctuation")
+        << QStringLiteral("1,2") << QStringLiteral("1,2") << QStringLiteral("1,2");
+    QTest::newRow("bcrypt hash") << QStringLiteral("$2a$10$abc") << QStringLiteral("'$2a$10$abc'")
+                                 << QStringLiteral("$2a$10$abc");
+    QTest::newRow("trailing backslash and spaces")
+        << QStringLiteral("C:\\dir \\") << QStringLiteral("'C:\\dir \\'")
+        << QStringLiteral("\"C:\\dir \\\\\"");
+}
+
+void TestCommandPreview::formatQuotesEveryTokenForTheShell()
+{
+    QFETCH(QString, token);
 #ifdef Q_OS_WIN
-    const QChar quote = QLatin1Char('"');
+    QFETCH(QString, windows);
+    const QString &quoted = windows;
 #else
-    const QChar quote = QLatin1Char('\'');
+    QFETCH(QString, posix);
+    const QString &quoted = posix;
 #endif
-    const QStringList arguments{QStringLiteral("--hash-type"),   QStringLiteral("4000"),
-                                QStringLiteral("--hash-recipe"), QStringLiteral("md5($p.$s)"),
-                                QStringLiteral("--attack-mode"), QStringLiteral("0")};
-    QCOMPARE(CommandPreview::format(QStringLiteral("hashcat"), arguments),
-             QStringLiteral("hashcat --hash-type 4000 --hash-recipe ") + quote
-                 + QStringLiteral("md5($p.$s)") + quote + QStringLiteral(" --attack-mode 0"));
+    QCOMPARE(CommandPreview::format(QString(), {token}), quoted);
 
     // A trailing flag with no value has nothing to quote.
-    const QStringList trailing{QStringLiteral("--hash-recipe")};
-    QCOMPARE(CommandPreview::format(QString(), trailing), QStringLiteral("--hash-recipe"));
+    QCOMPARE(CommandPreview::format(QString(), {QStringLiteral("--hash-recipe")}),
+             QStringLiteral("--hash-recipe"));
+}
+
+void TestCommandPreview::formatQuotesTheBinaryName()
+{
+    const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0")};
+#ifdef Q_OS_WIN
+    const QString expected = QStringLiteral("\"my hashcat\" --attack-mode 0");
+#else
+    const QString expected = QStringLiteral("'my hashcat' --attack-mode 0");
+#endif
+    QCOMPARE(CommandPreview::format(QStringLiteral("my hashcat"), arguments), expected);
 }
 
 void TestCommandPreview::tooltipHoldsTheWholeCommand()
@@ -77,6 +126,29 @@ void TestCommandPreview::tooltipWrapsAt120Columns()
     const QString longSession = QString(150, QLatin1Char('x'));
     const QString flagged = QStringLiteral("hashcat --session ") + longSession;
     QCOMPARE(CommandPreview::tooltip(flagged), flagged);
+}
+
+// A quoted token that holds spaces is one argument: the wrap goes before or
+// after it, never into it, and the tooltip never rewrites the text - the
+// doubled trailing backslashes before a Windows closing quote included.
+void TestCommandPreview::tooltipKeepsQuotedTokensWhole()
+{
+    const QString filler = QString(110, QLatin1Char('a'));
+    const QString longDir =
+        QStringLiteral("C:\\") + QString(130, QLatin1Char('a')) + QStringLiteral(" with space\\");
+    const QString command = CommandPreview::format(
+        QStringLiteral("hashcat"), {QStringLiteral("--session"), filler, longDir,
+                                    QStringLiteral("two words"), QStringLiteral("tail")});
+    const QString tooltip = CommandPreview::tooltip(command);
+    QVERIFY(tooltip.contains(QStringLiteral("two words")));
+    QVERIFY(!tooltip.contains(QStringLiteral("two\nwords")));
+    QVERIFY(tooltip.contains(longDir));
+
+    // The tooltip only swaps the spaces between tokens for breaks: putting
+    // the spaces back gives the command, character for character.
+    QString rejoined = tooltip;
+    rejoined.replace(QLatin1Char('\n'), QLatin1Char(' '));
+    QCOMPARE(rejoined, command);
 }
 
 void TestCommandPreview::tooltipEscapesMarkup()
