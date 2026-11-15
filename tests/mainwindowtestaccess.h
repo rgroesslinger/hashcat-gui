@@ -89,6 +89,11 @@ struct MainWindowTestAccess {
     {
         return window.m_previewRebuilds;
     }
+
+    static QJsonObject defaultSnapshot(MainWindow &window)
+    {
+        return window.m_defaultSnapshot.value_or(QJsonObject{});
+    }
 };
 
 #endif // MAINWINDOWTESTACCESS_H

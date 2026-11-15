@@ -21,6 +21,7 @@
 #include <QMainWindow>
 #include <QShowEvent>
 #include <memory>
+#include <optional>
 
 namespace Ui
 {
@@ -236,6 +237,11 @@ private:
     private:
         MainWindow &m_window;
     };
+
+    // The widget defaults, captured once in the constructor after
+    // initAttackModes() and before the startup restore; the reset applies
+    // them. Constructor only - a later capture would adopt the user's form.
+    std::optional<QJsonObject> m_defaultSnapshot;
 
     int m_commandSilenceDepth = 0;
     // The rebuilds commandChanged() actually performed; the tests pin the

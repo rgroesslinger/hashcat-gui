@@ -5,6 +5,7 @@
 
 #include "appconstants.h"
 #include "checkeditemlist.h"
+#include "hashtypeloader.h"
 #include "mainwindow.h"
 #include "mainwindowtestaccess.h"
 #include "mainwindowtesthelpers.h"
@@ -19,6 +20,7 @@
 #include <QClipboard>
 #include <QComboBox>
 #include <QCompleter>
+#include <QDateTime>
 #include <QDir>
 #include <QDoubleSpinBox>
 #include <QFile>
@@ -38,6 +40,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSet>
+#include <QSignalSpy>
 #include <QSpinBox>
 #include <QStandardPaths>
 #include <QTimer>
@@ -87,6 +90,8 @@ private slots:
     void applyingASessionRebuildsThePreviewOnce();
     void aNoOpApplyWithRowsRebuildsThePreviewOnce();
     void resettingTheSessionRebuildsThePreviewOnce();
+    void changingTheSettingsDoesNotChangeTheSnapshot();
+    void resetDoesNotTriggerQueryOrSave();
 
 private:
     MainWindowFixture m_fixture;
@@ -1089,6 +1094,77 @@ void TestSession::resettingTheSessionRebuildsThePreviewOnce()
     QVERIFY(QMetaObject::invokeMethod(&window, "resetSessionTriggered"));
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
+}
+
+// The snapshot is the constructor's: a settings change - even one that
+// reloads the hash types - must not adopt the user's current form as the
+// defaults the reset restores.
+void TestSession::changingTheSettingsDoesNotChangeTheSnapshot()
+{
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-snapshot"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             5000);
+    const QJsonObject before = MainWindowTestAccess::defaultSnapshot(window);
+    QVERIFY(!before.isEmpty());
+
+    // The user's form, far from the defaults.
+    changeEveryValue(&window);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.saveSettingsDialog = true;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
+
+    QCOMPARE(MainWindowTestAccess::defaultSnapshot(window), before);
+}
+
+// The reset is a form operation: it starts no hash-type query and writes no
+// session - the stored session survives it until the application quits.
+void TestSession::resetDoesNotTriggerQueryOrSave()
+{
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-reset"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             5000);
+
+    // A stored session, with its content and timestamp.
+    MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("stored"));
+    MainWindowTestAccess::saveSession(window);
+    const QString file = StateFile::sessionFilePath();
+    QFile stored(file);
+    QVERIFY(stored.open(QIODevice::ReadOnly));
+    const QByteArray content = stored.readAll();
+    stored.close();
+    const QDateTime modified = QFileInfo(file).lastModified();
+
+    QSignalSpy loading(&MainWindowTestAccess::hashTypeLoader(window),
+                       &HashTypeLoader::loadingChanged);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.acceptConfirmation = true;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&window, "resetSessionTriggered"));
+
+    QCOMPARE(loading.count(), 0);
+    QFile after(file);
+    QVERIFY(after.open(QIODevice::ReadOnly));
+    QCOMPARE(after.readAll(), content);
+    QCOMPARE(QFileInfo(file).lastModified(), modified);
 }
 
 int main(int argc, char *argv[])
