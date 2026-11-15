@@ -16,7 +16,6 @@
 #include <QJsonObject>
 #include <QListWidgetItem>
 #include <QMainWindow>
-#include <QProcess>
 #include <QShowEvent>
 
 namespace Ui
