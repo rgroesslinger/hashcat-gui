@@ -38,6 +38,9 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+    // Restores the session once; call between construction and show().
+    void restoreSession();
+
     MainWindow(const MainWindow &) = delete;
     MainWindow &operator=(const MainWindow &) = delete;
     MainWindow(MainWindow &&) = delete;
@@ -242,6 +245,9 @@ private:
     // initAttackModes() and before the startup restore; the reset applies
     // them. Constructor only - a later capture would adopt the user's form.
     std::optional<QJsonObject> m_defaultSnapshot;
+
+    // Whether the restore pass ran - not whether a file was applied.
+    bool m_sessionRestored = false;
 
     int m_commandSilenceDepth = 0;
     // The rebuilds commandChanged() actually performed; the tests pin the

@@ -92,6 +92,10 @@ private slots:
     void resettingTheSessionRebuildsThePreviewOnce();
     void changingTheSettingsDoesNotChangeTheSnapshot();
     void resetDoesNotTriggerQueryOrSave();
+    void constructorDoesNotRestoreTheSession();
+    void restoringTheSessionTwiceIsHarmless();
+    void savingBeforeRestoringDoesNotOverwriteTheSession();
+    void anEarlyReturningRestoreStillSaves();
 
 private:
     MainWindowFixture m_fixture;
@@ -109,6 +113,7 @@ void TestSession::resetSessionRestoresEveryWidget()
 {
     MainWindow fresh;
     MainWindow window;
+    window.restoreSession();
 
     changeEveryValue(&window);
 
@@ -150,6 +155,7 @@ void TestSession::resetSessionRestoresEveryWidget()
 void TestSession::resettingTheSessionNeedsAConfirmation()
 {
     MainWindow window;
+    window.restoreSession();
     MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("keepMe"));
 
     TestEnvironment::ModalRecorder recorder;
@@ -179,6 +185,8 @@ void TestSession::theSessionRoundTrips()
                                        QStringLiteral("/opt/hashcat/hashcat"));
 
     MainWindow writer;
+
+    writer.restoreSession();
     MainWindowTestAccess::ui(writer)->comboBox_attack->setCurrentIndex(
         2); // brute-force, not the default straight
     MainWindowTestAccess::ui(writer)->spinBox_runtime->setValue(64); // not the default 0
@@ -216,6 +224,7 @@ void TestSession::theSessionRoundTrips()
 
     // A new window runs loadSession() in its constructor...
     MainWindow reloaded;
+    reloaded.restoreSession();
     QCOMPARE(MainWindowTestAccess::ui(reloaded)->comboBox_attack->currentIndex(), 2);
     QCOMPARE(MainWindowTestAccess::ui(reloaded)->spinBox_runtime->value(), 64);
 
@@ -233,6 +242,8 @@ void TestSession::turningTheSessionOffRemovesTheStoredSession()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, true);
 
     MainWindow writer;
+
+    writer.restoreSession();
     MainWindowTestAccess::saveSession(writer);
     const QString session = MainWindowTestAccess::sessionFile(writer);
     QVERIFY(QFile::exists(session));
@@ -277,6 +288,8 @@ void TestSession::sessionHashTypeSurvivesTheAsynchronousQuery()
 
     MainWindow window;
 
+    window.restoreSession();
+
     // The query runs off-thread; wait at least as long as its own deadline
     // so the test never gives up while hashcat could still have answered.
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() > 0,
@@ -317,6 +330,8 @@ void TestSession::sessionWithAnUnknownHashTypeSelectsNothing()
 
     MainWindow window;
 
+    window.restoreSession();
+
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
@@ -336,6 +351,8 @@ void TestSession::theSettingsAreExportedThroughTheFileMenu()
     const QString file = TestEnvironment::configHome().filePath(QStringLiteral("settings.json"));
 
     MainWindow window;
+
+    window.restoreSession();
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
     recorder.start();
@@ -378,6 +395,8 @@ void TestSession::theSettingsAreImportedThroughTheFileMenu()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
     recorder.saveSettingsDialog = true;
@@ -424,6 +443,8 @@ void TestSession::theImportNamesTheValuesTheSessionDoesNotKnow()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
     recorder.start();
@@ -462,6 +483,8 @@ void TestSession::theImportIgnoresRetiredWidgetNames()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
     recorder.start();
@@ -504,6 +527,7 @@ void TestSession::aStartupSessionWithRetiredNamesStaysQuiet()
 
     m_fixture.startWatchdog();
     MainWindow window;
+    window.restoreSession();
 
     QCOMPARE(m_fixture.closedModals(), 0);
     QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 64);
@@ -515,6 +539,7 @@ void TestSession::aStartupSessionWithRetiredNamesStaysQuiet()
 void TestSession::retiredWidgetNamesAreNotReused()
 {
     MainWindow window;
+    window.restoreSession();
     const QJsonObject state =
         WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
 
@@ -545,6 +570,8 @@ void TestSession::aNewerSessionIsRefused()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
     recorder.start();
@@ -578,6 +605,8 @@ void TestSession::anOlderSessionIsAppliedWithANote()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
     recorder.start();
@@ -611,6 +640,8 @@ void TestSession::aNewerSettingsFileIsRefused()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     TestEnvironment::ModalRecorder recorder;
     recorder.pickFile = file;
     recorder.start();
@@ -651,6 +682,7 @@ void TestSession::anOlderStartupSessionIsAppliedWithANote()
     TestEnvironment::ModalRecorder recorder;
     recorder.start();
     MainWindow window;
+    window.restoreSession();
 
     // The value that named a widget was applied...
     QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 64);
@@ -682,8 +714,17 @@ void TestSession::aNewerStartupSessionIsLeftAlone()
     QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version + 1, values, nullptr));
 
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-newer-startup"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
     m_fixture.startWatchdog();
     MainWindow window;
+    window.restoreSession();
 
     QCOMPARE(m_fixture.closedModals(), 1);
     QVERIFY(MainWindowTestAccess::ui(window)->spinBox_runtime->value() != 64);
@@ -704,8 +745,17 @@ void TestSession::aNewerSessionSurvivesTheExit()
                              AppConstants::Sessions::Version + 1, values, nullptr));
     const QJsonObject before = readJsonObject(session);
 
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-newer-exit"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
     m_fixture.startWatchdog();
     MainWindow window;
+    window.restoreSession();
     QCOMPARE(m_fixture.closedModals(), 1);
 
     // The session is on: the file of the newer version is not written over.
@@ -743,8 +793,17 @@ void TestSession::aSessionFileThatCannotBeReadIsLeftAlone()
     file.close();
     const QJsonObject before = readJsonObject(session);
 
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-unreadable"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
     m_fixture.startWatchdog();
     MainWindow window;
+    window.restoreSession();
 
     // The startup says why the session did not come back...
     QCOMPARE(m_fixture.closedModals(), 1);
@@ -775,8 +834,17 @@ void TestSession::aSessionFileOfAnotherShapeIsLeftAlone()
     file.close();
     const QJsonObject before = readJsonObject(session);
 
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-other-shape"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
     m_fixture.startWatchdog();
     MainWindow window;
+    window.restoreSession();
 
     QCOMPARE(m_fixture.closedModals(), 1);
     QVERIFY(QFile::exists(session));
@@ -804,11 +872,13 @@ void TestSession::theStartupShowsNoBox()
 
     // A session the application wrote itself.
     MainWindow writer;
+    writer.restoreSession();
     MainWindowTestAccess::ui(writer)->spinBox_runtime->setValue(64);
     MainWindowTestAccess::saveSession(writer);
 
     m_fixture.startWatchdog();
     MainWindow reloaded;
+    reloaded.restoreSession();
 
     // The window opened without a box...
     QCOMPARE(m_fixture.closedModals(), 0);
@@ -822,6 +892,7 @@ void TestSession::theStartupShowsNoBox()
 void TestSession::theSerializedKeySetIsFrozen()
 {
     MainWindow window;
+    window.restoreSession();
     const QJsonObject values =
         WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
 
@@ -941,6 +1012,8 @@ void TestSession::theGoldenSessionRoundTrips()
     goldenFile.close();
 
     MainWindow window;
+
+    window.restoreSession();
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
                              5000);
 
@@ -1029,6 +1102,8 @@ void TestSession::applyingASessionRebuildsThePreviewOnce()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
                              5000);
 
@@ -1062,6 +1137,8 @@ void TestSession::aNoOpApplyWithRowsRebuildsThePreviewOnce()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
                              5000);
     CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_wordlist,
@@ -1084,6 +1161,7 @@ void TestSession::aNoOpApplyWithRowsRebuildsThePreviewOnce()
 void TestSession::resettingTheSessionRebuildsThePreviewOnce()
 {
     MainWindow window;
+    window.restoreSession();
     changeEveryValue(&window);
 
     TestEnvironment::ModalRecorder recorder;
@@ -1110,6 +1188,8 @@ void TestSession::changingTheSettingsDoesNotChangeTheSnapshot()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
                              5000);
     const QJsonObject before = MainWindowTestAccess::defaultSnapshot(window);
@@ -1139,6 +1219,8 @@ void TestSession::resetDoesNotTriggerQueryOrSave()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
+
+    window.restoreSession();
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
                              5000);
 
@@ -1165,6 +1247,101 @@ void TestSession::resetDoesNotTriggerQueryOrSave()
     QVERIFY(after.open(QIODevice::ReadOnly));
     QCOMPARE(after.readAll(), content);
     QCOMPARE(QFileInfo(file).lastModified(), modified);
+}
+
+// The constructor builds the default form only: the restore is a separate
+// pass, called between construction and show().
+void TestSession::constructorDoesNotRestoreTheSession()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    MainWindow window;
+    QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 0);
+}
+
+// A second restore pass is a no-op: applying twice would consume the pending
+// hash type again and overwrite what the user changed since.
+void TestSession::restoringTheSessionTwiceIsHarmless()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    MainWindow window;
+    window.restoreSession();
+    QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 64);
+
+    MainWindowTestAccess::ui(window)->spinBox_runtime->setValue(32);
+    window.restoreSession();
+    QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 32);
+}
+
+// A path that forgets restoreSession() must not overwrite the user's stored
+// session with a blank form on quit.
+void TestSession::savingBeforeRestoringDoesNotOverwriteTheSession()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+    const QJsonObject before = readJsonObject(session);
+
+    MainWindow window; // no restoreSession()
+    MainWindowTestAccess::ui(window)->spinBox_runtime->setValue(32);
+    MainWindowTestAccess::saveSession(window);
+
+    QCOMPARE(readJsonObject(session), before);
+}
+
+// The flag means "the restore pass ran", not "a file was applied": every
+// early return still lets the quit save store the "no file yet" case - and
+// with the setting off, the removal still applies.
+void TestSession::anEarlyReturningRestoreStillSaves()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+
+    // No session file: the restore returns early, the save still writes.
+    {
+        MainWindow window;
+        window.restoreSession();
+        MainWindowTestAccess::ui(window)->spinBox_runtime->setValue(64);
+        MainWindowTestAccess::saveSession(window);
+        QVERIFY(QFile::exists(session));
+        QCOMPARE(readJsonObject(session)
+                     .value(QStringLiteral("sections"))
+                     .toObject()
+                     .value(QString(AppConstants::FileSections::Session))
+                     .toObject()
+                     .value(QStringLiteral("values"))
+                     .toObject()
+                     .value(QStringLiteral("spinBox_runtime"))
+                     .toInt(),
+                 64);
+    }
+
+    // Restore disabled: the early return still lets the save remove the
+    // session of an earlier run.
+    QFile::remove(session);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, {}, nullptr));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::RestoreSession, false);
+    {
+        MainWindow window;
+        window.restoreSession();
+        MainWindowTestAccess::saveSession(window);
+        QVERIFY(!QFile::exists(session));
+    }
 }
 
 int main(int argc, char *argv[])

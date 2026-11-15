@@ -84,6 +84,9 @@ Connect to `commandChanged()` once; the attack-mode combo uses `attackIndexChang
   files). A removed widget goes to `AppConstants::Sessions::RetiredWidgetNames` (never reuse it)
   without a version bump. Refuse newer versions, apply older ones naming unknown/wrong-typed
   values, never destroy a file this version cannot understand; writes replace the whole file.
+- The restore is a separate pass: `main()` calls `restoreSession()` between construction and
+  `show()`, once. `saveSession()` refuses to write while restoring is enabled and the pass has
+  not run, so a path that forgets it cannot overwrite the stored session with a blank form.
 - `SettingsManager` wraps `QSettings::IniFormat`; keys, types and defaults are
   `AppConstants::SettingsKeys::All` (the export/import read). Never set `QCoreApplication`'s
   organization name: it moves `QStandardPaths::AppDataLocation` and the session file.

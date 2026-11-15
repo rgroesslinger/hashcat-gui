@@ -81,6 +81,9 @@ int main(int argc, char *argv[])
     }
 
     MainWindow w;
+    // Between construction and show: the window must not paint the default
+    // state first, and the first fit to the content measures the restored one.
+    w.restoreSession();
     w.show();
 
     return QApplication::exec();

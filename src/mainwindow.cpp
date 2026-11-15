@@ -310,8 +310,6 @@ MainWindow::MainWindow(QWidget *parent)
     connectListSignals();
     connectDependencySignals();
 
-    loadSession();
-
     /* ---------- show Settings if hashcatPath not set ---------- */
     if (settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath).isEmpty()) {
         QMetaObject::invokeMethod(this, &MainWindow::settingsTriggered, Qt::QueuedConnection);
@@ -1122,7 +1120,22 @@ bool MainWindow::restoreSessionEnabled() const
         AppConstants::SettingsKeys::defaultOf<bool>(AppConstants::SettingsKeys::RestoreSession));
 }
 
-// Load the session – called from the constructor
+// Restores the session once, between construction and show(): the window
+// must not paint the default state first, and the first fitToContent() has
+// to measure the restored content. The flag means "the restore pass ran",
+// not "a file was applied" - it is set before every early return, so the
+// aboutToQuit save still stores the "no file yet" case. A second call is a
+// no-op: applying twice would consume the pending hash type again.
+void MainWindow::restoreSession()
+{
+    if (m_sessionRestored) {
+        return;
+    }
+    m_sessionRestored = true;
+    loadSession();
+}
+
+// Load the session - called from restoreSession()
 void MainWindow::loadSession()
 {
     if (!restoreSessionEnabled()) {
@@ -1241,6 +1254,14 @@ QString MainWindow::applyPendingHashType()
 // Save the session – called by aboutToQuit signal
 void MainWindow::saveSession()
 {
+    // A session that was never restored must not be overwritten by a blank
+    // form: a path that forgets restoreSession() would destroy the user's
+    // stored session on quit. With the setting off there is nothing to
+    // restore, and the removal below still applies.
+    if (restoreSessionEnabled() && !m_sessionRestored) {
+        return;
+    }
+
     const QString file = sessionFile();
 
     // A file this version does not understand is neither written over nor
