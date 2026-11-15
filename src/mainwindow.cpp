@@ -892,10 +892,15 @@ QStringList MainWindow::applySessionFile(const QJsonObject &values, int version,
 
     // The hash combo has no items yet - the query that fills it runs
     // asynchronously. Remember the stored hash type; the reply applies it
-    // once the items exist.
-    const WidgetStateSerializer::ApplyResult notApplied =
-        WidgetStateSerializer::applyToWidgets(values, this, ignoredWidgets);
-    const QString problem = restoreHashType(values);
+    // once the items exist. The bulk write is silenced: one preview rebuild
+    // below, not one per widget.
+    WidgetStateSerializer::ApplyResult notApplied;
+    QString problem;
+    {
+        const CommandSilence silence(*this);
+        notApplied = WidgetStateSerializer::applyToWidgets(values, this, ignoredWidgets);
+        problem = restoreHashType(values);
+    }
     commandChanged();
 
     QStringList notes = fileNotes(version, AppConstants::Sessions::Version, otherSections);
@@ -1155,98 +1160,104 @@ void MainWindow::resetSessionTriggered()
         return;
     }
 
-    // Attack tab
-    ui->lineEdit_hashfile->clear();
-    ui->lineEdit_hash_recipe->clear();
-    ui->checkBox_ignoreusername->setChecked(false);
-    ui->checkBox_remove->setChecked(false);
-    ui->listWidget_wordlist->clear();
-    ui->checkBox_hex_wordlist->setChecked(false);
-    ui->lineEdit_encoding_from->clear();
-    ui->lineEdit_encoding_to->clear();
-    ui->comboBox_attack->setCurrentIndex(0);
-    ui->comboBox_hash_type->setCurrentIndex(0);
-    // A fresh form must not re-apply a hash type a session is still waiting
-    // to deliver.
-    m_pendingHashTypeId = -1;
-    ui->radioButton_use_rules_file->setChecked(true);
-    ui->checkBox_rulesfile_1->setChecked(false);
-    ui->checkBox_rulesfile_2->setChecked(false);
-    ui->checkBox_rulesfile_3->setChecked(false);
-    ui->checkBox_rules_concat->setChecked(false);
-    ui->lineEdit_rulesfile_1->clear();
-    ui->lineEdit_rulesfile_2->clear();
-    ui->lineEdit_rulesfile_3->clear();
-    ui->lineEdit_rule_left->clear();
-    ui->lineEdit_rule_right->clear();
-    ui->lineEdit_association_settings->clear();
-    ui->listWidget_pcfg_rulesets->clear();
-    ui->lineEdit_pcfg_scale->clear();
-    ui->lineEdit_pcfg_costmax->clear();
-    ui->lineEdit_pcfg_weights->clear();
-    ui->lineEdit_pcfg_threads->clear();
-    ui->lineEdit_pcfg_kbits->clear();
-    ui->lineEdit_pcfg_maxword->clear();
-    ui->lineEdit_pcfg_maxgain->clear();
-    ui->lineEdit_pcfg_walk->clear();
-    ui->lineEdit_pcfg_mask->clear();
-    ui->lineEdit_pcfg_extra->clear();
-    ui->lineEdit_pcfg_ruleset_name->clear();
-    ui->listWidget_tables->clear();
-    ui->lineEdit_table_identity->clear();
-    ui->lineEdit_table_template->clear();
-    ui->lineEdit_table_single->clear();
-    ui->lineEdit_table_cap->clear();
-    ui->lineEdit_table_maxperm->clear();
-    ui->lineEdit_table_extra->clear();
-    ui->lineEdit_feed->clear();
-    ui->lineEdit_feed_argument->clear();
-    ui->listWidget_feed_arguments->clear();
-    ui->spinBox_generate_rules->setValue(1);
-    ui->lineEdit_mask->clear();
-    ui->checkBox_increment->setChecked(false);
-    ui->spinBox_increment_min->setValue(AppConstants::Defaults::IncrementMin);
-    ui->spinBox_increment_max->setValue(AppConstants::Defaults::IncrementMax);
-    ui->checkBox_custom_charset1->setChecked(false);
-    ui->lineEdit_custom_charset1->clear();
-    ui->checkBox_custom_charset2->setChecked(false);
-    ui->lineEdit_custom_charset2->clear();
-    ui->checkBox_custom_charset3->setChecked(false);
-    ui->lineEdit_custom_charset3->clear();
-    ui->checkBox_custom_charset4->setChecked(false);
-    ui->lineEdit_custom_charset4->clear();
-    ui->checkBox_hex_charset->setChecked(false);
-    ui->checkBox_hex_salt->setChecked(false);
+    // One preview rebuild at the end, not one per setter.
+    {
+        const CommandSilence silence(*this);
 
-    // General tab
-    ui->checkBox_outfile->setChecked(false);
-    ui->lineEdit_outfile->clear();
-    ui->lineEdit_outfile_format->setText(AppConstants::Defaults::OutfileFormat);
-    ui->checkBox_outfile_json->setChecked(false);
-    ui->lineEdit_cache_path->clear();
-    ui->lineEdit_cpu_affinity->clear();
-    ui->lineEdit_backend_devices->setText(AppConstants::Defaults::BackendDevices);
+        // Attack tab
+        ui->lineEdit_hashfile->clear();
+        ui->lineEdit_hash_recipe->clear();
+        ui->checkBox_ignoreusername->setChecked(false);
+        ui->checkBox_remove->setChecked(false);
+        ui->listWidget_wordlist->clear();
+        ui->checkBox_hex_wordlist->setChecked(false);
+        ui->lineEdit_encoding_from->clear();
+        ui->lineEdit_encoding_to->clear();
+        ui->comboBox_attack->setCurrentIndex(0);
+        ui->comboBox_hash_type->setCurrentIndex(0);
+        // A fresh form must not re-apply a hash type a session is still waiting
+        // to deliver.
+        m_pendingHashTypeId = -1;
+        ui->radioButton_use_rules_file->setChecked(true);
+        ui->checkBox_rulesfile_1->setChecked(false);
+        ui->checkBox_rulesfile_2->setChecked(false);
+        ui->checkBox_rulesfile_3->setChecked(false);
+        ui->checkBox_rules_concat->setChecked(false);
+        ui->lineEdit_rulesfile_1->clear();
+        ui->lineEdit_rulesfile_2->clear();
+        ui->lineEdit_rulesfile_3->clear();
+        ui->lineEdit_rule_left->clear();
+        ui->lineEdit_rule_right->clear();
+        ui->lineEdit_association_settings->clear();
+        ui->listWidget_pcfg_rulesets->clear();
+        ui->lineEdit_pcfg_scale->clear();
+        ui->lineEdit_pcfg_costmax->clear();
+        ui->lineEdit_pcfg_weights->clear();
+        ui->lineEdit_pcfg_threads->clear();
+        ui->lineEdit_pcfg_kbits->clear();
+        ui->lineEdit_pcfg_maxword->clear();
+        ui->lineEdit_pcfg_maxgain->clear();
+        ui->lineEdit_pcfg_walk->clear();
+        ui->lineEdit_pcfg_mask->clear();
+        ui->lineEdit_pcfg_extra->clear();
+        ui->lineEdit_pcfg_ruleset_name->clear();
+        ui->listWidget_tables->clear();
+        ui->lineEdit_table_identity->clear();
+        ui->lineEdit_table_template->clear();
+        ui->lineEdit_table_single->clear();
+        ui->lineEdit_table_cap->clear();
+        ui->lineEdit_table_maxperm->clear();
+        ui->lineEdit_table_extra->clear();
+        ui->lineEdit_feed->clear();
+        ui->lineEdit_feed_argument->clear();
+        ui->listWidget_feed_arguments->clear();
+        ui->spinBox_generate_rules->setValue(1);
+        ui->lineEdit_mask->clear();
+        ui->checkBox_increment->setChecked(false);
+        ui->spinBox_increment_min->setValue(AppConstants::Defaults::IncrementMin);
+        ui->spinBox_increment_max->setValue(AppConstants::Defaults::IncrementMax);
+        ui->checkBox_custom_charset1->setChecked(false);
+        ui->lineEdit_custom_charset1->clear();
+        ui->checkBox_custom_charset2->setChecked(false);
+        ui->lineEdit_custom_charset2->clear();
+        ui->checkBox_custom_charset3->setChecked(false);
+        ui->lineEdit_custom_charset3->clear();
+        ui->checkBox_custom_charset4->setChecked(false);
+        ui->lineEdit_custom_charset4->clear();
+        ui->checkBox_hex_charset->setChecked(false);
+        ui->checkBox_hex_salt->setChecked(false);
 
-    ui->lineEdit_session->clear();
-    ui->spinBox_runtime->setValue(AppConstants::Defaults::Runtime);
-    ui->lineEdit_skip->clear();
-    ui->lineEdit_limit->clear();
-    ui->checkBox_status->setChecked(false);
-    ui->spinBox_status_timer->setValue(AppConstants::Defaults::StatusTimer);
-    ui->checkBox_force->setChecked(false);
-    ui->checkBox_potfile_disable->setChecked(false);
-    ui->checkBox_optimized_kernel->setChecked(false);
-    ui->checkBox_speed_only->setChecked(false);
-    ui->lineEdit_opencl_device_types->clear();
-    ui->checkBox_hwmon_temp_abort->setChecked(false);
-    ui->spinBox_hwmon_temp_abort->setValue(AppConstants::Defaults::HwmonTempAbort);
+        // General tab
+        ui->checkBox_outfile->setChecked(false);
+        ui->lineEdit_outfile->clear();
+        ui->lineEdit_outfile_format->setText(AppConstants::Defaults::OutfileFormat);
+        ui->checkBox_outfile_json->setChecked(false);
+        ui->lineEdit_cache_path->clear();
+        ui->lineEdit_cpu_affinity->clear();
+        ui->lineEdit_backend_devices->setText(AppConstants::Defaults::BackendDevices);
 
-    // The attack combo points at index 0 again, so the mode-specific groups
-    // hide; the pass also refreshes the hint and the dependencies. The recipe
-    // row is refreshed separately: the combo may already have been at index 0,
-    // in which case setCurrentIndex() emits no signal.
-    updateHashTypeDependencies();
-    updateViewAttackMode();
+        ui->lineEdit_session->clear();
+        ui->spinBox_runtime->setValue(AppConstants::Defaults::Runtime);
+        ui->lineEdit_skip->clear();
+        ui->lineEdit_limit->clear();
+        ui->checkBox_status->setChecked(false);
+        ui->spinBox_status_timer->setValue(AppConstants::Defaults::StatusTimer);
+        ui->checkBox_force->setChecked(false);
+        ui->checkBox_potfile_disable->setChecked(false);
+        ui->checkBox_optimized_kernel->setChecked(false);
+        ui->checkBox_speed_only->setChecked(false);
+        ui->lineEdit_opencl_device_types->clear();
+        ui->checkBox_hwmon_temp_abort->setChecked(false);
+        ui->spinBox_hwmon_temp_abort->setValue(AppConstants::Defaults::HwmonTempAbort);
+
+        // The attack combo points at index 0 again, so the mode-specific groups
+        // hide; the pass also refreshes the hint and the dependencies. The recipe
+        // row is refreshed separately: the combo may already have been at index 0,
+        // in which case setCurrentIndex() emits no signal.
+        updateHashTypeDependencies();
+        updateViewAttackMode();
+    }
+    commandChanged();
 }
 
 // File → Settings
@@ -1514,6 +1525,11 @@ void MainWindow::initExampleSessionMenu()
 
 void MainWindow::initHashAndAttackModes()
 {
+    // Refilling both combos is a bulk write: the preview rebuilds once after
+    // the refresh, not per item. The query's reply arrives later, outside the
+    // guard, and fills the hash combo through the normal signal path.
+    const CommandSilence silence(*this);
+
     ui->comboBox_attack->clear();
     ui->comboBox_hash_type->clear();
 
@@ -2503,6 +2519,12 @@ void MainWindow::showLaunchError(HelperUtils::LaunchError error, const QString &
 
 void MainWindow::commandChanged()
 {
+    // A bulk write is in progress: it rebuilds the preview once, at its end.
+    if (m_commandSilenceDepth > 0) {
+        return;
+    }
+    ++m_previewRebuilds;
+
     auto &settings = SettingsManager::instance();
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
 

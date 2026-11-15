@@ -82,6 +82,9 @@ private slots:
     void theStartupShowsNoBox();
     void theSerializedKeySetIsFrozen();
     void theGoldenSessionRoundTrips();
+    void applyingASessionRebuildsThePreviewOnce();
+    void aNoOpApplyWithRowsRebuildsThePreviewOnce();
+    void resettingTheSessionRebuildsThePreviewOnce();
 
 private:
     MainWindowFixture m_fixture;
@@ -1006,6 +1009,95 @@ void TestSession::theGoldenSessionRoundTrips()
         QStringLiteral("/tmp/golden-right.txt"),
     };
     QCOMPARE(MainWindowTestAccess::generateArguments(window), expectedArguments);
+}
+
+// A bulk apply rebuilds the preview exactly once, not once per widget: the
+// golden session changes every serialized widget and still costs one rebuild.
+void TestSession::applyingASessionRebuildsThePreviewOnce()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-once"),
+                                                         "#!/bin/sh\n"
+                                                         "printf '{\"0\":{\"name\":\"MD5\"},"
+                                                         "\"1000\":{\"name\":\"NTLM\"},"
+                                                         "\"4000\":{\"name\":\"recipe\"}}\\n'\n"
+                                                         "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
+                             5000);
+
+    const QString goldenPath =
+        QStringLiteral(QT_TESTCASE_SOURCEDIR "/tests/data/golden_session.json");
+    QString error;
+    QJsonObject values;
+    int version = 0;
+    QStringList otherSections;
+    QVERIFY(StateFile::read(goldenPath, AppConstants::FileSections::Session, &values, &version,
+                            &otherSections, &error));
+
+    const int before = MainWindowTestAccess::previewRebuilds(window);
+    const QStringList notes =
+        MainWindowTestAccess::applySessionFile(window, values, version, otherSections);
+    QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QStringLiteral("\n"))));
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
+
+    // The one rebuild really produced the session's command, not the default.
+    QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_command->text()
+            != QStringLiteral("--attack-mode 0"));
+}
+
+// A no-op apply is a bulk write too: the serializer clears and re-inserts
+// every list even when the values are identical, and the guard has to cover
+// that churn as well.
+void TestSession::aNoOpApplyWithRowsRebuildsThePreviewOnce()
+{
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-noop"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             5000);
+    MainWindowTestAccess::addPathsToList(MainWindowTestAccess::ui(window)->listWidget_wordlist,
+                                         {QStringLiteral("/tmp/one.txt")});
+    MainWindowTestAccess::addPathsToList(
+        MainWindowTestAccess::ui(window)->listWidget_feed_arguments,
+        {QStringLiteral("arg one"), QStringLiteral("arg two")});
+
+    const QJsonObject current =
+        WidgetStateSerializer::toJson(&window, {AppConstants::Files::PreviewWidget});
+    const int before = MainWindowTestAccess::previewRebuilds(window);
+    const QStringList notes = MainWindowTestAccess::applySessionFile(
+        window, current, AppConstants::Sessions::Version, {});
+    QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QStringLiteral("\n"))));
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
+}
+
+// The reset writes every widget back to its default; that is one bulk write
+// and one preview rebuild.
+void TestSession::resettingTheSessionRebuildsThePreviewOnce()
+{
+    MainWindow window;
+    changeEveryValue(&window);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.acceptConfirmation = true;
+    recorder.start();
+
+    const int before = MainWindowTestAccess::previewRebuilds(window);
+    QVERIFY(QMetaObject::invokeMethod(&window, "resetSessionTriggered"));
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
 }
 
 int main(int argc, char *argv[])

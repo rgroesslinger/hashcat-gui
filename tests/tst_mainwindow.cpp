@@ -93,6 +93,7 @@ private slots:
     void outfileSuggestionFollowsUntilTheUserTakesOver();
     void wordlistMoveSurvivesAMissingSelection();
     void theDefaultsMatchTheUiFiles();
+    void switchingTheAttackModeRebuildsThePreviewOnce();
 
 private:
     MainWindowFixture m_fixture;
@@ -1517,6 +1518,17 @@ void TestMainWindow::theDefaultsMatchTheUiFiles()
              AppConstants::Defaults::IncrementMax);
     QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_generate_rules->value(),
              AppConstants::Defaults::GenerateRules);
+}
+
+// A mode switch is not a bulk write: applyAttackModeView only shows, hides
+// and enables, so the explicit refresh in updateViewAttackMode is the one
+// rebuild.
+void TestMainWindow::switchingTheAttackModeRebuildsThePreviewOnce()
+{
+    MainWindow window;
+    const int before = MainWindowTestAccess::previewRebuilds(window);
+    MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(1);
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
 }
 
 int main(int argc, char *argv[])

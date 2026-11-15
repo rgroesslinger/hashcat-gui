@@ -258,6 +258,35 @@ private:
     // must not move or resize a window the user has placed themselves.
     bool m_sizedToContent = false;
 
+    // Bulk writes (session apply, reset, combo refill) silence the preview
+    // while they run: one rebuild at the end instead of one per widget. A
+    // depth counter, not a bool, keeps nested guards reentrant; the RAII guard
+    // clears the depth on every early return.
+    class CommandSilence
+    {
+    public:
+        explicit CommandSilence(MainWindow &window) : m_window(window)
+        {
+            ++m_window.m_commandSilenceDepth;
+        }
+        ~CommandSilence()
+        {
+            --m_window.m_commandSilenceDepth;
+        }
+        CommandSilence(const CommandSilence &) = delete;
+        CommandSilence &operator=(const CommandSilence &) = delete;
+        CommandSilence(CommandSilence &&) = delete;
+        CommandSilence &operator=(CommandSilence &&) = delete;
+
+    private:
+        MainWindow &m_window;
+    };
+
+    int m_commandSilenceDepth = 0;
+    // The rebuilds commandChanged() actually performed; the tests pin the
+    // bulk writes to exactly one.
+    int m_previewRebuilds = 0;
+
     // A session can name a hash type while comboBox_hash_type still has no
     // items - the list arrives with the asynchronous hashcat query, after the
     // constructor has already loaded the session. The stored id waits

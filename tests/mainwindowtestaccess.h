@@ -93,6 +93,11 @@ struct MainWindowTestAccess {
     {
         return window.m_pendingHashTypeId;
     }
+
+    static int previewRebuilds(MainWindow &window)
+    {
+        return window.m_previewRebuilds;
+    }
 };
 
 #endif // MAINWINDOWTESTACCESS_H
