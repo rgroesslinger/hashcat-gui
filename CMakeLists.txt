@@ -212,6 +212,9 @@ elseif(Qt6Test_FOUND)
     # reads its argv back as JSON. It has no Qt Test cases of its own.
     add_executable(argecho tests/argecho.cpp)
     target_link_libraries(argecho PRIVATE Qt6::Core)
+    # Outside the test loop, but the analyzers cover all of tests/. It needs
+    # no autogen dependency: like main.cpp, it includes nothing generated.
+    list(APPEND ANALYSIS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/argecho.cpp)
 
     foreach(test IN LISTS HASHCAT_GUI_TESTS)
         add_executable(${test} tests/${test}.cpp)

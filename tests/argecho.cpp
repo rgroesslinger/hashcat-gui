@@ -12,20 +12,19 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QStringList>
-
-#include <cstdio>
+#include <QTextStream>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
     QJsonArray arguments;
-    const QStringList args = app.arguments();
+    const QStringList args = QCoreApplication::arguments();
     for (int i = 1; i < args.size(); ++i) {
         arguments.append(args.at(i));
     }
 
-    const QByteArray json = QJsonDocument(arguments).toJson(QJsonDocument::Compact);
-    std::fwrite(json.constData(), 1, static_cast<std::size_t>(json.size()), stdout);
+    QTextStream out(stdout);
+    out << QJsonDocument(arguments).toJson(QJsonDocument::Compact);
     return 0;
 }
