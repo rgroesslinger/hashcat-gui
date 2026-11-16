@@ -87,6 +87,9 @@ jobs:
           # powershell.exe is part of Windows; a skipped shell round trip
           # there means the test stopped proving anything.
           HASHCAT_GUI_REQUIRE_SHELL_TESTS: 1
+          # Needed to show Qt ctest failure output.
+          # https://github.com/actions/runner/issues/1206
+          QT_FORCE_STDERR_LOGGING: 1
         run: ctest --test-dir build --output-on-failure --no-tests=error
 
   # The teardown order of the list widgets and the watcher lifetimes are
