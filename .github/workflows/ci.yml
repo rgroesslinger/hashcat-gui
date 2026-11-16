@@ -83,6 +83,10 @@ jobs:
       - name: Test (Windows)
         if: runner.os == 'Windows'
         shell: msys2 {0}
+        env:
+          # powershell.exe is part of Windows; a skipped shell round trip
+          # there means the test stopped proving anything.
+          HASHCAT_GUI_REQUIRE_SHELL_TESTS: 1
         run: ctest --test-dir build --output-on-failure --no-tests=error
 
   # The teardown order of the list widgets and the watcher lifetimes are

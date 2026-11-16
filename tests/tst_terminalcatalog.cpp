@@ -32,29 +32,84 @@ QString decodeScript(const QString &encoded)
     return decoder.decode(bytes);
 }
 
-// The shell and the helper for the launches that need a real PowerShell;
-// empty when absent, so the caller can skip. Windows PowerShell 5.1 is the
-// stricter tokenizer, so it is preferred where both shells exist.
-QString findPowerShell()
+// Every PowerShell on PATH: Windows PowerShell 5.1 and pwsh take different
+// paths through native argument passing, so the round trip runs both where
+// both exist.
+QStringList findPowerShells()
 {
+    QStringList shells;
     for (const QString &name : {QStringLiteral("powershell.exe"), QStringLiteral("pwsh")}) {
         if (!QStandardPaths::findExecutable(name).isEmpty()) {
-            return name;
+            shells << name;
         }
     }
-    return {};
+    return shells;
 }
 
-QString findArgEcho()
+// The shell the keep-open test uses: the stricter tokenizer first.
+QString findPowerShell()
+{
+    const QStringList shells = findPowerShells();
+    return shells.isEmpty() ? QString() : shells.first();
+}
+
+// A helper next to the test binary; empty when it was not built.
+QString findArgumentEcho(const QString &name)
 {
 #ifdef Q_OS_WIN
     const QString helper =
-        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho.exe"));
+        QDir(QCoreApplication::applicationDirPath()).filePath(name + QStringLiteral(".exe"));
 #else
-    const QString helper =
-        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("argecho"));
+    const QString helper = QDir(QCoreApplication::applicationDirPath()).filePath(name);
 #endif
     return QFile::exists(helper) ? helper : QString();
+}
+
+// CI can require the shell tests: a skip then means the runner changed under
+// the job, not that the test does not apply. Callers return after this.
+bool shellTestsRequired()
+{
+    const QByteArray value = qgetenv("HASHCAT_GUI_REQUIRE_SHELL_TESTS");
+    return !value.isEmpty() && value != QByteArrayLiteral("0");
+}
+
+void skipOrFail(const char *why)
+{
+    if (shellTestsRequired()) {
+        QFAIL(why);
+    }
+    QSKIP(why);
+}
+
+// The arguments in an argecho_crt dump: one "A <hex>" line each, an empty
+// argument being "A " with no hex.
+QList<QByteArray> parseArgumentDump(const QByteArray &output)
+{
+    QList<QByteArray> arguments;
+    const QList<QByteArray> lines = output.split('\n');
+    for (const QByteArray &line : lines) {
+        if (line.isEmpty()) {
+            continue;
+        }
+        if (!line.startsWith("A ")) {
+            return {};
+        }
+        arguments << QByteArray::fromHex(line.mid(2));
+    }
+    return arguments;
+}
+
+// The bytes a process receives for a token: QProcess encodes on Unix with the
+// local 8-bit codec, and the Windows C runtime converts the UTF-16 command
+// line to its own code page for main(). toLocal8Bit() is the same conversion.
+QList<QByteArray> localBytes(const QStringList &tokens)
+{
+    QList<QByteArray> bytes;
+    bytes.reserve(tokens.size());
+    for (const QString &token : tokens) {
+        bytes << token.toLocal8Bit();
+    }
+    return bytes;
 }
 
 // A failed check must not leave the shell behind: -NoExit holds it forever.
@@ -97,6 +152,8 @@ private slots:
     void launchCommandRoundTripsThroughPowerShell();
     void launchCommandKeepOpenHoldsTheSession_data();
     void launchCommandKeepOpenHoldsTheSession();
+    void posixQuotingRoundTripsThroughTheShell_data();
+    void posixQuotingRoundTripsThroughTheShell();
     void findHashcatInPathFindsTheExecutable();
     void findHashcatInPathProbesBothUnixNames_data();
     void findHashcatInPathProbesBothUnixNames();
@@ -372,9 +429,10 @@ void TestTerminalCatalog::commandLengthLimitIsDocumented()
 }
 
 // The encoding is only proven once a real PowerShell has parsed it: start the
-// argecho helper through the shell and compare its argv with the tokens that
-// went in. Windows PowerShell 5.1 is the stricter tokenizer, so it is preferred
-// where both shells exist; the Unix runners carry pwsh.
+// argecho helpers through the shell and compare their argv with the tokens
+// that went in. Every PowerShell on PATH runs the round trip - 5.1 and pwsh
+// take different paths through native argument passing - and both helpers
+// are used: Qt's argv and the C runtime's argv that hashcat's main() gets.
 void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell_data()
 {
     QTest::addColumn<QStringList>("tokens");
@@ -413,36 +471,52 @@ void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell_data()
 
 void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell()
 {
-    const QString shell = findPowerShell();
-    if (shell.isEmpty()) {
-        QSKIP("no PowerShell on PATH");
+    const QStringList shells = findPowerShells();
+    const QString qtHelper = findArgumentEcho(QStringLiteral("argecho"));
+    const QString crtHelper = findArgumentEcho(QStringLiteral("argecho_crt"));
+    if (shells.isEmpty()) {
+        skipOrFail("no PowerShell on PATH");
+        return;
     }
-    const QString helper = findArgEcho();
-    if (helper.isEmpty()) {
-        QSKIP("the argecho helper is not built");
+    if (qtHelper.isEmpty() || crtHelper.isEmpty()) {
+        skipOrFail("an argecho helper is not built");
+        return;
     }
 
     QFETCH(QStringList, tokens);
-    const LaunchCommand command =
-        TerminalCatalog::launchCommand(shell, shell, helper, tokens, false);
-    QVERIFY(!command.program.isEmpty());
+    // Every shell on the runner, and both parsers: Qt's and the C runtime's
+    // that hashcat's main() gets.
+    for (const QString &shell : shells) {
+        for (const QString &helper : {qtHelper, crtHelper}) {
+            const LaunchCommand command =
+                TerminalCatalog::launchCommand(shell, shell, helper, tokens, false);
+            QVERIFY2(!command.program.isEmpty(), qPrintable(shell));
 
-    QProcess proc;
-    proc.setProgram(command.program);
-    proc.setArguments(command.arguments);
-    proc.start();
-    QVERIFY2(proc.waitForStarted(10000), qPrintable(proc.errorString()));
-    QVERIFY2(proc.waitForFinished(30000), "the shell did not finish in time");
-    QCOMPARE(proc.exitCode(), 0);
+            QProcess proc;
+            proc.setProgram(command.program);
+            proc.setArguments(command.arguments);
+            proc.start();
+            QVERIFY2(proc.waitForStarted(10000), qPrintable(proc.errorString()));
+            QVERIFY2(proc.waitForFinished(30000), "the shell did not finish in time");
+            QCOMPARE(proc.exitCode(), 0);
 
-    const QJsonDocument document = QJsonDocument::fromJson(proc.readAllStandardOutput());
-    QVERIFY2(document.isArray(), qPrintable(QString::fromUtf8(proc.readAllStandardError())));
-    QStringList received;
-    const QJsonArray array = document.array();
-    for (const auto &value : array) {
-        received << value.toString();
+            const QByteArray output = proc.readAllStandardOutput();
+            if (helper == crtHelper) {
+                QCOMPARE(parseArgumentDump(output), localBytes(tokens));
+                continue;
+            }
+
+            const QJsonDocument document = QJsonDocument::fromJson(output);
+            QVERIFY2(document.isArray(),
+                     qPrintable(QString::fromUtf8(proc.readAllStandardError())));
+            QStringList received;
+            const QJsonArray array = document.array();
+            for (const auto &value : array) {
+                received << value.toString();
+            }
+            QCOMPARE(received, tokens);
+        }
     }
-    QCOMPARE(received, tokens);
 }
 
 // keepOpen has to hold the session after hashcat exits: -NoExit only keeps
@@ -459,11 +533,13 @@ void TestTerminalCatalog::launchCommandKeepOpenHoldsTheSession()
 {
     const QString shell = findPowerShell();
     if (shell.isEmpty()) {
-        QSKIP("no PowerShell on PATH");
+        skipOrFail("no PowerShell on PATH");
+        return;
     }
-    const QString helper = findArgEcho();
+    const QString helper = findArgumentEcho(QStringLiteral("argecho"));
     if (helper.isEmpty()) {
-        QSKIP("the argecho helper is not built");
+        skipOrFail("the argecho helper is not built");
+        return;
     }
 
     QFETCH(bool, keepOpen);
@@ -498,6 +574,64 @@ void TestTerminalCatalog::launchCommandKeepOpenHoldsTheSession()
     } else {
         QVERIFY2(proc.waitForFinished(30000), "the shell did not exit on its own");
     }
+}
+
+// The POSIX clipboard promise: the tokens posixQuoteArgument() produces are
+// read back by a real /bin/sh -c as the same argv, metacharacters and all.
+// The C-runtime helper is used, so the check is on the bytes a process gets.
+void TestTerminalCatalog::posixQuotingRoundTripsThroughTheShell_data()
+{
+    QTest::addColumn<QStringList>("tokens");
+
+    QTest::newRow("hashcat argv") << QStringList{QStringLiteral("--attack-mode"),
+                                                 QStringLiteral("0"),
+                                                 QStringLiteral("-m"),
+                                                 QStringLiteral("22000"),
+                                                 QStringLiteral("$2a$10$abcdefghijklmnopqrstuu"),
+                                                 QStringLiteral("?d?d?d?d")};
+    QTest::newRow("shell metacharacters") << QStringList{QStringLiteral("?d$(touch /tmp/x)"),
+                                                         QStringLiteral("?d;calc"),
+                                                         QStringLiteral("a&b"),
+                                                         QStringLiteral("a|b"),
+                                                         QStringLiteral("`tick`"),
+                                                         QStringLiteral("$HOME")};
+    QTest::newRow("spaces and quotes")
+        << QStringList{QStringLiteral("two words"), QStringLiteral("it's"),
+                       QStringLiteral("say \"hi\""), QString()};
+    QTest::newRow("backslashes") << QStringList{QStringLiteral("back\\slash"),
+                                                QStringLiteral("C:\\dir with space\\"),
+                                                QStringLiteral("trail\\")};
+    QTest::newRow("line breaks") << QStringList{QStringLiteral("line\nbreak"),
+                                                QStringLiteral("tab\there")};
+}
+
+void TestTerminalCatalog::posixQuotingRoundTripsThroughTheShell()
+{
+#ifdef Q_OS_WIN
+    QSKIP("the POSIX shell round trip does not apply on Windows");
+#else
+    const QString shell = QStandardPaths::findExecutable(QStringLiteral("sh"));
+    const QString helper = findArgumentEcho(QStringLiteral("argecho_crt"));
+    if (shell.isEmpty() || helper.isEmpty()) {
+        skipOrFail("no sh or argecho_crt to round-trip through");
+        return;
+    }
+
+    QFETCH(QStringList, tokens);
+    QString command = posixQuoteArgument(helper);
+    for (const QString &token : tokens) {
+        command += QLatin1Char(' ') + posixQuoteArgument(token);
+    }
+
+    QProcess proc;
+    proc.setProgram(shell);
+    proc.setArguments({QStringLiteral("-c"), command});
+    proc.start();
+    QVERIFY2(proc.waitForStarted(10000), qPrintable(proc.errorString()));
+    QVERIFY2(proc.waitForFinished(30000), "the shell did not finish in time");
+    QCOMPARE(proc.exitCode(), 0);
+    QCOMPARE(parseArgumentDump(proc.readAllStandardOutput()), localBytes(tokens));
+#endif
 }
 
 // The lookup follows PATH and only reports a file this system can execute.
