@@ -21,6 +21,7 @@
 #include <QTemporaryDir>
 #include <array>
 #include <iterator>
+#include <utility>
 
 #ifndef Q_OS_WIN
 #include <csignal>
@@ -965,7 +966,7 @@ void TestTerminalCatalog::unixWrapperSurvivesInterrupt()
         }
     }
 
-    for (const QString &shell : shells) {
+    for (const QString &shell : std::as_const(shells)) {
         // The wrapper calls `sh`; the shim comes first so that name picks
         // this shell, while the original PATH keeps the stub's own tools
         // (sleep) available.
