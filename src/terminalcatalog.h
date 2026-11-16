@@ -65,6 +65,11 @@ public:
                                        const QString &hashcatPath, const QStringList &arguments,
                                        bool keepOpen);
 
+    // The readable PowerShell script that starts hashcat through
+    // ProcessStartInfo. launchCommand() encodes exactly this script, and the
+    // Tools action copies it unencoded, so the two cannot drift apart.
+    static QString powerShellScript(const QString &hashcatPath, const QStringList &arguments);
+
     // Starts the terminal detached, in the hashcat binary's own directory.
     // Returns false and fills errorMessage when the start fails. The caller
     // owns the refusal of an empty command and every message box.

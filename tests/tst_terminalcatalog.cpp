@@ -85,6 +85,7 @@ private slots:
     void launchCommandExecsUnixTerminalsDirectly();
     void launchCommandEncodesTheScript_data();
     void launchCommandEncodesTheScript();
+    void powerShellScriptIsTheOneThatIsEncoded();
     void launchCommandQuotesEveryToken_data();
     void launchCommandQuotesEveryToken();
     void launchCommandCarriesSmartQuotesAsBase64_data();
@@ -200,6 +201,21 @@ void TestTerminalCatalog::launchCommandEncodesTheScript()
                          "$p = [System.Diagnostics.Process]::Start($si)\n"
                          "$p.WaitForExit()");
     QCOMPARE(decodeScript(command.arguments.last()), expectedScript);
+}
+
+// The Tools action copies the readable script; the launch encodes it. Both
+// come from the same builder, so one cannot drift from the other.
+void TestTerminalCatalog::powerShellScriptIsTheOneThatIsEncoded()
+{
+    const QString hashcatPath = QStringLiteral("C:\\Program Files\\hashcat\\hashcat.exe");
+    const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0"),
+                                QStringLiteral("$2a$10$abc"), QStringLiteral("?d;calc")};
+
+    const QString script = TerminalCatalog::powerShellScript(hashcatPath, arguments);
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        QStringLiteral("pwsh"), QStringLiteral("pwsh"), hashcatPath, arguments, false);
+
+    QCOMPARE(decodeScript(command.arguments.last()), script);
 }
 
 // The tokens a hashcat command line really carries: bcrypt hashes, masks with

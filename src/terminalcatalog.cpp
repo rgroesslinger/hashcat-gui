@@ -91,6 +91,17 @@ QString TerminalCatalog::noSupportedTerminalMessage()
               "hashcat-gui needs one to show the hashcat output.");
 }
 
+QString TerminalCatalog::powerShellScript(const QString &hashcatPath, const QStringList &arguments)
+{
+    return QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo\n$si.FileName = ")
+           + powerShellQuoteArgument(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
+           + powerShellQuoteArgument(msvcrtJoinArguments(arguments))
+           + QStringLiteral("\n$si.UseShellExecute = $false\n$si.WorkingDirectory = ")
+           + powerShellQuoteArgument(QFileInfo(hashcatPath).absolutePath())
+           + QStringLiteral("\n$p = [System.Diagnostics.Process]::Start($si)\n"
+                            "$p.WaitForExit()");
+}
+
 LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
                                              const QString &terminalProgram,
                                              const QString &hashcatPath,
@@ -119,14 +130,7 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     // call exit afterwards - an explicit exit ends the session even under
     // -NoExit and would close the terminal the moment hashcat is done.
     if (isPowerShell(terminal)) {
-        QString script =
-            QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo\n$si.FileName = ")
-            + powerShellQuoteArgument(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
-            + powerShellQuoteArgument(msvcrtJoinArguments(arguments))
-            + QStringLiteral("\n$si.UseShellExecute = $false\n$si.WorkingDirectory = ")
-            + powerShellQuoteArgument(QFileInfo(hashcatPath).absolutePath())
-            + QStringLiteral("\n$p = [System.Diagnostics.Process]::Start($si)\n"
-                             "$p.WaitForExit()");
+        const QString script = powerShellScript(hashcatPath, arguments);
 
         QStringEncoder encoder(QStringEncoder::Utf16LE);
         const QByteArray encodedBytes = encoder.encode(script);

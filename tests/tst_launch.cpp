@@ -5,12 +5,14 @@
 
 #include "appconstants.h"
 #include "checkeditemlist.h"
+#include "commandbuilder.h"
 #include "hashcatoptions.h"
 #include "launchvalidator.h"
 #include "mainwindow.h"
 #include "mainwindowtestaccess.h"
 #include "mainwindowtesthelpers.h"
 #include "settingsmanager.h"
+#include "terminalcatalog.h"
 #include "testenvironment.h"
 #include "ui_mainwindow.h"
 
@@ -85,6 +87,7 @@ private slots:
     void previewUsesTheConfiguredTerminalsDialect();
     void thePreviewTooltipHoldsTheWholeCommand();
     void copyingTheCommandPutsItOnTheClipboard();
+    void copyingThePowerShellScriptPutsItOnTheClipboard();
     void thePreviewFormattingIsPinned();
 
 private:
@@ -356,6 +359,35 @@ void TestLaunch::copyingTheCommandPutsItOnTheClipboard()
     // The confirmation is a one-shot tooltip at the pointer.
     QVERIFY(QToolTip::text().contains(QStringLiteral("Copied")));
     QToolTip::hideText();
+}
+
+// The Tools action copies the readable script the PowerShell launch encodes,
+// and it is reachable from the Tools menu.
+void TestLaunch::copyingThePowerShellScriptPutsItOnTheClipboard()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-script-copy"),
+                                                         "#!/bin/sh\nexit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QVERIFY2(ui->menuTools->actions().contains(ui->actionCopyPowerShellScript),
+             "the action is not in the Tools menu");
+
+    QApplication::clipboard()->clear();
+    ui->actionCopyPowerShellScript->trigger();
+
+    const QString expected = TerminalCatalog::powerShellScript(
+        stub, CommandBuilder::build(MainWindowTestAccess::collectHashcatOptions(window)));
+    QCOMPARE(QApplication::clipboard()->text(), expected);
+    QVERIFY(
+        expected.contains(QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo")));
+    QVERIFY(expected.contains(stub));
 }
 
 // The preview's display formatting, pinned before it moves to its own unit:

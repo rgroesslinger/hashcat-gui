@@ -112,6 +112,9 @@ private slots:
     // decides whether it exists.
     void updateHashTypeDependencies();
     void copyCommandToClipboard();
+    // Copies the unencoded PowerShell script the launch would encode: the
+    // same ProcessStartInfo text, for inspection or reuse outside the GUI.
+    void copyPowerShellScript();
 
 private:
     // The tests read the widget state through MainWindowTestAccess, the one

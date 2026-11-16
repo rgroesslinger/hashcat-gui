@@ -393,6 +393,8 @@ void MainWindow::connectActionSignals()
             &MainWindow::exportSettingsTriggered);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::settingsTriggered);
     connect(ui->actionAboutQt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
+    connect(ui->actionCopyPowerShellScript, &QAction::triggered, this,
+            &MainWindow::copyPowerShellScript);
 
     /* ---------- stand-alone widgets ---------- */
     connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
@@ -1502,6 +1504,39 @@ void MainWindow::copyCommandToClipboard()
         // A one-shot tooltip confirms the copy. The button's own tooltip
         // would not re-render while the pointer stays on the button.
         QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"), nullptr, {}, 2000);
+    }
+}
+
+// The copy and the launch share one script builder, so what this puts on the
+// clipboard is exactly what a PowerShell terminal would run, only readable.
+void MainWindow::copyPowerShellScript()
+{
+    auto &settings = SettingsManager::instance();
+    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    const QString resolved = Executable::resolve(hashcatPath);
+
+    if (resolved.isEmpty()) {
+        // The path is user supplied, so the message is plain text: a '<' in
+        // it would be read as markup by the default AutoText.
+        QMessageBox box(
+            QMessageBox::Information, tr("Copy as PowerShell Script"),
+            hashcatPath.isEmpty()
+                ? tr("Select the hashcat executable under %1 → %2 first.")
+                      .arg(menuPath(ui->menuFile->menuAction()->text()),
+                           menuPath(ui->actionSettings->text()))
+                : tr("The configured hashcat executable is not found:\n%1").arg(hashcatPath),
+            QMessageBox::Ok, this);
+        box.setTextFormat(Qt::PlainText);
+        box.exec();
+        return;
+    }
+
+    const QString script =
+        TerminalCatalog::powerShellScript(resolved, CommandBuilder::build(collectHashcatOptions()));
+    if (QClipboard *clipboard = QApplication::clipboard()) {
+        clipboard->setText(script);
+        QToolTip::showText(QCursor::pos(), tr("PowerShell script copied to the clipboard"), nullptr,
+                           {}, 2000);
     }
 }
 

@@ -2653,6 +2653,8 @@
     <addaction name="menuLoadExampleSession"/>
     <addaction name="separator"/>
     <addaction name="actionResetSession"/>
+    <addaction name="separator"/>
+    <addaction name="actionCopyPowerShellScript"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -2733,6 +2735,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+I</string>
+   </property>
+  </action>
+  <action name="actionCopyPowerShellScript">
+   <property name="text">
+    <string>Copy as PowerShell Script</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy the unencoded PowerShell script that starts hashcat</string>
    </property>
   </action>
  </widget>
