@@ -119,7 +119,6 @@ void TestTerminalCatalog::terminalArgumentsArePinned()
         {"pwsh", {}},
         {"xterm", {"-hold", "-e"}},
         {"gnome-terminal", {"--wait", "--"}},
-        {"ptyxis", {"--"}},
         {"konsole", {"--hold", "-e"}},
         {"xfce4-terminal", {"--hold", "-x"}},
         {"alacritty", {"--hold", "-e"}},

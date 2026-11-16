@@ -1,8 +1,28 @@
 # Frequently Asked Questions
 
+- [Why are ptyxis and cmd.exe not supported?](#why-are-ptyxis-and-cmdexe-not-supported)
 - [Where are application settings stored?](#where-are-application-settings-stored)
 - [Where is the session saved?](#where-is-the-session-saved)
 - [Why does loading the hash types take so long on Windows?](#why-does-loading-the-hash-types-take-so-long-on-windows)
+
+<a name="why-are-ptyxis-and-cmdexe-not-supported"></a>
+## Why are ptyxis and cmd.exe not supported?
+
+Both would alter a hash, mask or path before hashcat sees it.
+
+**cmd.exe** re-parses `%`, `&`, `^`, `<` and `>` in every command line it
+is given. Those characters occur in hashes, masks and file names, and
+there is no quoting that preserves every possible value. On Windows
+hashcat-gui starts hashcat through a PowerShell script that passes the
+arguments unchanged instead, so cmd.exe is not offered as a terminal.
+
+**ptyxis** hands the command to `systemd-run`, which expands `$`-words a
+second time. A bcrypt hash (`$2a$10$...`), a `$HOME` or a PowerShell
+variable therefore arrived at hashcat truncated or expanded, and ptyxis
+has no option to pass the command verbatim. The terminal is no longer
+offered; every other supported terminal receives the command line
+unchanged.
+
 
 <a name="where-are-application-settings-stored"></a>
 ## Where are application settings stored?

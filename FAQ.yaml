@@ -1,4 +1,20 @@
 items:
+  - q: "Why are ptyxis and cmd.exe not supported?"
+    a: |
+      Both would alter a hash, mask or path before hashcat sees it.
+
+      **cmd.exe** re-parses `%`, `&`, `^`, `<` and `>` in every command line it
+      is given. Those characters occur in hashes, masks and file names, and
+      there is no quoting that preserves every possible value. On Windows
+      hashcat-gui starts hashcat through a PowerShell script that passes the
+      arguments unchanged instead, so cmd.exe is not offered as a terminal.
+
+      **ptyxis** hands the command to `systemd-run`, which expands `$`-words a
+      second time. A bcrypt hash (`$2a$10$...`), a `$HOME` or a PowerShell
+      variable therefore arrived at hashcat truncated or expanded, and ptyxis
+      has no option to pass the command verbatim. The terminal is no longer
+      offered; every other supported terminal receives the command line
+      unchanged.
   - q: "Where are application settings stored?"
     a: |
       Application settings are stored using [QSettings::IniFormat](https://doc.qt.io/qt-6/qsettings.html#Format-enum).

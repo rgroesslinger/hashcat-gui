@@ -26,9 +26,12 @@
 // launchCommand(), which builds an -EncodedCommand script; their entries hold
 // no arguments, so no -Command text can be assembled from the table.
 //
-// gnome-terminal, ptyxis and wezterm have no flag to stay open after the
-// command exits; holding them would need the command wrapped in a shell
-// string.
+// gnome-terminal and wezterm have no flag to stay open after the command
+// exits; holding them would need the command wrapped in a shell string.
+//
+// ptyxis is not offered: it starts the command through systemd-run, which
+// expands "$" words a second time, so a bcrypt hash or a mask arrived at
+// hashcat changed. See the FAQ.
 const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
@@ -37,7 +40,6 @@ const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
         {QStringLiteral("pwsh"), {}},
         {QStringLiteral("xterm"), {QStringLiteral("-hold"), QStringLiteral("-e")}},
         {QStringLiteral("gnome-terminal"), {QStringLiteral("--wait"), QStringLiteral("--")}},
-        {QStringLiteral("ptyxis"), {QStringLiteral("--")}},
         {QStringLiteral("konsole"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
         {QStringLiteral("xfce4-terminal"), {QStringLiteral("--hold"), QStringLiteral("-x")}},
         {QStringLiteral("alacritty"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
