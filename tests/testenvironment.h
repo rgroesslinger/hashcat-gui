@@ -14,8 +14,10 @@
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QStandardPaths>
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QTimer>
@@ -267,9 +269,38 @@ inline void checkGroupBoxTitleAlignment(QObject *root)
                             .arg(offenders.join(QStringLiteral(", ")))));
 }
 
+// XDG redirects are per process, but on Windows QSettings and QStandardPaths
+// derive their writable locations from the application name alone (XDG plays
+// no part there): the settings file and AppDataLocation both end up below
+// %APPDATA%\<name>. The CI job runs ctest with CTEST_PARALLEL_LEVEL, so a fixed
+// name made concurrent suites share that directory, and one suite's cleanup
+// deleted the session and example files another was reading. Naming each suite
+// after its own executable keeps them apart with one directory per suite.
+//
+// Has to run after the Q(Core)Application exists and before the first
+// QSettings or QStandardPaths use. Removing the directories on startup, rather
+// than at exit, also clears up after a run that crashed or was killed, and
+// keeps the number of directories bounded across runs.
+inline void useScratchApplicationData()
+{
+    const QString name = QStringLiteral("hashcat-gui-tests-%1")
+                             .arg(QFileInfo(QCoreApplication::applicationFilePath()).baseName());
+    QCoreApplication::setApplicationName(name);
+
+    for (auto type : {QStandardPaths::AppDataLocation, QStandardPaths::AppConfigLocation}) {
+        const QString location = QStandardPaths::writableLocation(type);
+        // Only ever remove this suite's own directory - never a path that lost
+        // the name suffix and points at somebody's real profile.
+        if (QFileInfo(location).fileName() == name) {
+            QDir(location).removeRecursively();
+        }
+    }
+}
+
 // Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behavior, plus the redirect
-// above. needsGui decides between QApplication and QCoreApplication - the
-// command builder and helper utils tests never need a display.
+// and the scratch application data above. needsGui decides between
+// QApplication and QCoreApplication - the command builder and helper utils
+// tests never need a display.
 inline int run(QObject *test, int argc, char **argv, bool needsGui)
 {
     redirectBaseDirectories();
@@ -277,14 +308,11 @@ inline int run(QObject *test, int argc, char **argv, bool needsGui)
     int result = 0;
     if (needsGui) {
         QApplication app(argc, argv);
-        // The application name is the organization QSettings writes under, so
-        // this is a second, independent guard on top of the XDG redirect - and
-        // on Windows, where XDG plays no part, the only one.
-        QCoreApplication::setApplicationName(QStringLiteral("hashcat-gui-tests"));
+        useScratchApplicationData();
         result = QTest::qExec(test, argc, argv);
     } else {
         QCoreApplication app(argc, argv);
-        QCoreApplication::setApplicationName(QStringLiteral("hashcat-gui-tests"));
+        useScratchApplicationData();
         result = QTest::qExec(test, argc, argv);
     }
 
