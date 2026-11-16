@@ -82,7 +82,7 @@ class TestTerminalCatalog : public QObject
 
 private slots:
     void terminalArgumentsArePinned();
-    void launchCommandExecsUnixTerminalsDirectly();
+    void launchCommandWrapsUnixTerminals();
     void launchCommandEncodesTheScript_data();
     void launchCommandEncodesTheScript();
     void powerShellScriptIsTheOneThatIsEncoded();
@@ -104,6 +104,7 @@ private slots:
     void availableTerminalsReturnsResolvedPrograms();
     void availableTerminalsOfferPowerShellOnlyOnWindows();
     void launchDetachedStartsTheProgram();
+    void unixWrapperRunsHashcatInItsDirectoryWithTheArguments();
     void launchDetachedReportsAFailure();
 };
 
@@ -120,15 +121,15 @@ void TestTerminalCatalog::terminalArgumentsArePinned()
         // launchCommand(); the table holds no arguments for them.
         {"powershell.exe", {}},
         {"pwsh", {}},
-        {"xterm", {"-hold", "-e"}},
-        {"gnome-terminal", {"--wait", "--"}},
-        {"konsole", {"--hold", "-e"}},
-        {"xfce4-terminal", {"--hold", "-x"}},
-        {"alacritty", {"--hold", "-e"}},
-        {"kitty", {"--hold"}},
-        {"foot", {"--hold"}},
+        {"xterm", {"-e"}},
+        {"gnome-terminal", {"--"}},
+        {"konsole", {"-e"}},
+        {"xfce4-terminal", {"-x"}},
+        {"alacritty", {"-e"}},
+        {"kitty", {}},
+        {"foot", {}},
         {"wezterm", {"start", "--"}},
-        {"ghostty", {"--wait-after-command=true", "-e"}},
+        {"ghostty", {"-e"}},
     });
 
     const QMap<QString, QStringList> &table = TerminalCatalog::terminalArguments();
@@ -138,21 +139,35 @@ void TestTerminalCatalog::terminalArgumentsArePinned()
     }
 }
 
-// Every terminal except PowerShell execs hashcat directly: the table's own
-// arguments, then the binary, then the collected argv - unchanged by keepOpen.
-void TestTerminalCatalog::launchCommandExecsUnixTerminalsDirectly()
+// Every terminal except PowerShell runs the same sh wrapper: the terminal's
+// own mode argument, then sh -c with the script, then the hashcat command as
+// positional parameters. Pinning the exact script keeps the working
+// directory, the exit code and the hold-open guarantee from drifting.
+void TestTerminalCatalog::launchCommandWrapsUnixTerminals()
 {
+    const QString wrapper = QStringLiteral(R"(cd "$1" || exit
+shift
+"$@"
+rc=$?
+printf '\n[hashcat exited with %s - press Enter to close]\n' "$rc"
+read -r _)");
+
     const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0")};
     const QMap<QString, QStringList> &table = TerminalCatalog::terminalArguments();
     for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
         if (it.key() == QStringLiteral("powershell.exe") || it.key() == QStringLiteral("pwsh")) {
             continue;
         }
-        const LaunchCommand command = TerminalCatalog::launchCommand(
-            it.key(), it.key(), QStringLiteral("hashcat"), arguments, true);
+        const QString hashcatPath = QStringLiteral("/opt/hashcat");
+        const LaunchCommand command =
+            TerminalCatalog::launchCommand(it.key(), it.key(), hashcatPath, arguments, true);
         QCOMPARE(command.program, it.key());
+        QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+
         QStringList expected = it.value();
-        expected << QStringLiteral("hashcat") << arguments;
+        expected << QStringLiteral("sh") << QStringLiteral("-c") << wrapper
+                 << QStringLiteral("hashcat-gui") << QFileInfo(hashcatPath).absolutePath()
+                 << hashcatPath << arguments;
         QCOMPARE(command.arguments, expected);
     }
 }
@@ -637,6 +652,52 @@ void TestTerminalCatalog::launchDetachedStartsTheProgram()
     QCOMPARE(recorded.size(), 4);
     QCOMPARE(QDir(recorded.at(0)).canonicalPath(), QDir(directory.path()).canonicalPath());
     QCOMPARE(recorded.mid(1), command.arguments);
+#endif
+}
+
+// The wrapper sets the working directory and hands the hashcat command to
+// the shell as positional parameters: the recorded cwd and argv are exactly
+// what the GUI built, even for values a shell would expand or split.
+void TestTerminalCatalog::unixWrapperRunsHashcatInItsDirectoryWithTheArguments()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString record = directory.filePath(QStringLiteral("record.txt"));
+    const QString hashcat = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-wrapper"),
+        QStringLiteral("#!/bin/sh\npwd > \"%1\"\nprintf '%s\\n' \"$@\" >> \"%1\"\n")
+            .arg(record)
+            .toUtf8(),
+        directory.path());
+    QVERIFY2(!hashcat.isEmpty(), "the hashcat stub could not be written");
+
+    // A stand-in terminal: consume xterm's -e and run the wrapper, with stdin
+    // closed so the wrapper's read does not wait for a keypress.
+    const QString terminal = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-terminal-xterm"), "#!/bin/sh\nshift\nexec \"$@\" </dev/null\n",
+        directory.path());
+    QVERIFY2(!terminal.isEmpty(), "the terminal stub could not be written");
+
+    const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0"),
+                                QStringLiteral("$2a$10$abc"), QStringLiteral("?d;calc")};
+    const LaunchCommand command =
+        TerminalCatalog::launchCommand(QStringLiteral("xterm"), terminal, hashcat, arguments, true);
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+
+    QString error;
+    QVERIFY2(TerminalCatalog::launchDetached(command, hashcat, &error), qPrintable(error));
+
+    QTRY_VERIFY_WITH_TIMEOUT(QFile::exists(record), 5000);
+    QFile file(record);
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    const QStringList recorded =
+        QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QCOMPARE(recorded.size(), 1 + arguments.size());
+    QCOMPARE(QDir(recorded.at(0)).canonicalPath(), QDir(directory.path()).canonicalPath());
+    QCOMPARE(recorded.mid(1), arguments);
 #endif
 }
 

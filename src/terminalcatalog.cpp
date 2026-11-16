@@ -25,8 +25,10 @@
 // launchCommand(), which builds an -EncodedCommand script; their entries hold
 // no arguments, so no -Command text can be assembled from the table.
 //
-// gnome-terminal and wezterm have no flag to stay open after the command
-// exits; holding them would need the command wrapped in a shell string.
+// The remaining entries only select the terminal's command mode (or, for
+// kitty, foot and wezterm, the subcommand). Staying open, holding the
+// working directory and showing the exit code are the wrapper's job now;
+// the per-terminal hold flags could not do all three everywhere.
 //
 // ptyxis is not offered: it starts the command through systemd-run, which
 // expands "$" words a second time, so a bcrypt hash or a mask arrived at
@@ -39,16 +41,15 @@ const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
         // them only on Windows, where a console can be created.
         {QStringLiteral("powershell.exe"), {}},
         {QStringLiteral("pwsh"), {}},
-        {QStringLiteral("xterm"), {QStringLiteral("-hold"), QStringLiteral("-e")}},
-        {QStringLiteral("gnome-terminal"), {QStringLiteral("--wait"), QStringLiteral("--")}},
-        {QStringLiteral("konsole"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
-        {QStringLiteral("xfce4-terminal"), {QStringLiteral("--hold"), QStringLiteral("-x")}},
-        {QStringLiteral("alacritty"), {QStringLiteral("--hold"), QStringLiteral("-e")}},
-        {QStringLiteral("kitty"), {QStringLiteral("--hold")}},
-        {QStringLiteral("foot"), {QStringLiteral("--hold")}},
+        {QStringLiteral("xterm"), {QStringLiteral("-e")}},
+        {QStringLiteral("gnome-terminal"), {QStringLiteral("--")}},
+        {QStringLiteral("konsole"), {QStringLiteral("-e")}},
+        {QStringLiteral("xfce4-terminal"), {QStringLiteral("-x")}},
+        {QStringLiteral("alacritty"), {QStringLiteral("-e")}},
+        {QStringLiteral("kitty"), {}},
+        {QStringLiteral("foot"), {}},
         {QStringLiteral("wezterm"), {QStringLiteral("start"), QStringLiteral("--")}},
-        {QStringLiteral("ghostty"),
-         {QStringLiteral("--wait-after-command=true"), QStringLiteral("-e")}},
+        {QStringLiteral("ghostty"), {QStringLiteral("-e")}},
     };
     return table;
 }
@@ -173,7 +174,25 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     LaunchCommand command;
     command.program = terminalProgram;
     command.arguments = it.value();
-    command.arguments << hashcatPath << arguments;
+
+    // Every Unix terminal runs the same wrapper. The hashcat command reaches
+    // sh -c only as positional parameters, so no hash, mask, path or session
+    // value is ever parsed as shell code. The wrapper sets the working
+    // directory itself - a terminal that hands the command to a server
+    // process may not inherit ours - and holds the window open with the exit
+    // code after hashcat ends.
+    const QString wrapper = QStringLiteral(R"(cd "$1" || exit
+shift
+"$@"
+rc=$?
+printf '\n[hashcat exited with %s - press Enter to close]\n' "$rc"
+read -r _)");
+    command.arguments << QStringLiteral("sh") << QStringLiteral("-c")
+                      << wrapper
+                      // $0 for the wrapper, then the directory, the hashcat
+                      // program and its argv as $1 ... $n.
+                      << QStringLiteral("hashcat-gui") << QFileInfo(hashcatPath).absolutePath()
+                      << hashcatPath << arguments;
     return command;
 }
 

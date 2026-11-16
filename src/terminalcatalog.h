@@ -68,8 +68,9 @@ public:
     // -EncodedCommand script that quotes every token and starts hashcat
     // through ProcessStartInfo, so no hash, mask, path or session value is
     // ever parsed as shell code or rewritten by PowerShell's own native
-    // argument passing; every other terminal execs hashcat directly.
-    // keepOpen asks the terminal to stay open after hashcat exits.
+    // argument passing; every other terminal runs a fixed sh wrapper with
+    // the command as positional parameters. keepOpen controls -NoExit for
+    // PowerShell; the Unix wrapper always holds the window open.
     static LaunchCommand launchCommand(const QString &terminal, const QString &terminalProgram,
                                        const QString &hashcatPath, const QStringList &arguments,
                                        bool keepOpen);
