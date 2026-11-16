@@ -9,10 +9,11 @@
 #include <QString>
 #include <QStringList>
 
-// Command-line quoting for the two places a command line is assembled as
-// text: the PowerShell launch script, which hands its Arguments string to
-// CreateProcess verbatim, and the preview/clipboard. Every other launch path
-// passes argv as a list and needs no quoting at all.
+// Command-line quoting for the places a command line is assembled as text:
+// the PowerShell launch script, whose Arguments string goes to CreateProcess
+// verbatim, and the preview/clipboard, which follows the shell the user will
+// paste into. Every other launch path passes argv as a list and needs no
+// quoting at all.
 
 // One token for the MSVCRT / CommandLineToArgvW parser: an embedded quote is
 // escaped with a backslash and the backslashes before it are doubled; a token
@@ -81,6 +82,33 @@ inline QString posixQuoteArgument(const QString &token)
     }
     QString quoted = token;
     quoted.replace(QLatin1Char('\''), QStringLiteral("'\\''"));
+    return QLatin1Char('\'') + quoted + QLatin1Char('\'');
+}
+
+// PowerShell reads U+2018-U+201B as single-quote delimiters too, so a token
+// that holds one cannot be quoted literally.
+inline bool powerShellNeedsBase64(const QString &token)
+{
+    for (const QChar c : token) {
+        if (c >= QChar(0x2018) && c <= QChar(0x201b)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// One token as a PowerShell expression: a single-quoted literal with an
+// embedded quote doubled, or - for the smart quotes PowerShell would read as
+// delimiters - the token's UTF-8 bytes as base64, decoded inside the script.
+// Everything else ($, backticks, ;) is literal inside single quotes.
+inline QString powerShellQuoteArgument(const QString &token)
+{
+    if (powerShellNeedsBase64(token)) {
+        return QStringLiteral("([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('")
+               + QString::fromLatin1(token.toUtf8().toBase64()) + QStringLiteral("')))");
+    }
+    QString quoted = token;
+    quoted.replace(QLatin1Char('\''), QStringLiteral("''"));
     return QLatin1Char('\'') + quoted + QLatin1Char('\'');
 }
 

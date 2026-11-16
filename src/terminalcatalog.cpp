@@ -12,7 +12,6 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QStringEncoder>
-#include <algorithm>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -92,32 +91,6 @@ QString TerminalCatalog::noSupportedTerminalMessage()
               "hashcat-gui needs one to show the hashcat output.");
 }
 
-namespace
-{
-// PowerShell reads the smart single quotes U+2018-U+201B as string delimiters
-// too, so a token holding one cannot be single-quoted safely.
-bool needsBase64Token(const QString &token)
-{
-    return std::ranges::any_of(token,
-                               [](QChar c) { return c >= QChar(0x2018) && c <= QChar(0x201b); });
-}
-
-// One argv token as a PowerShell expression: a single-quoted literal with an
-// embedded quote doubled, or - for the smart quotes PowerShell would read as
-// delimiters - the token's UTF-8 bytes as base64, decoded inside the script.
-// Everything else ($, backticks, ;) is literal inside single quotes.
-QString powerShellToken(const QString &token)
-{
-    if (needsBase64Token(token)) {
-        return QStringLiteral("([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('")
-               + QString::fromLatin1(token.toUtf8().toBase64()) + QStringLiteral("')))");
-    }
-    QString quoted = token;
-    quoted.replace(QLatin1Char('\''), QStringLiteral("''"));
-    return QStringLiteral("'") + quoted + QStringLiteral("'");
-}
-} // namespace
-
 LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
                                              const QString &terminalProgram,
                                              const QString &hashcatPath,
@@ -148,10 +121,10 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     if (isPowerShell(terminal)) {
         QString script =
             QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo\n$si.FileName = ")
-            + powerShellToken(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
-            + powerShellToken(msvcrtJoinArguments(arguments))
+            + powerShellQuoteArgument(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
+            + powerShellQuoteArgument(msvcrtJoinArguments(arguments))
             + QStringLiteral("\n$si.UseShellExecute = $false\n$si.WorkingDirectory = ")
-            + powerShellToken(QFileInfo(hashcatPath).absolutePath())
+            + powerShellQuoteArgument(QFileInfo(hashcatPath).absolutePath())
             + QStringLiteral("\n$p = [System.Diagnostics.Process]::Start($si)\n"
                              "$p.WaitForExit()");
 

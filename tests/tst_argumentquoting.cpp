@@ -20,6 +20,8 @@ private slots:
     void msvcrtJoinsTheArgumentList();
     void posixQuotesForTheShell_data();
     void posixQuotesForTheShell();
+    void powerShellQuotesForTheShell_data();
+    void powerShellQuotesForTheShell();
 };
 
 void TestArgumentQuoting::msvcrtQuotesForTheCommandLineParser_data()
@@ -101,6 +103,45 @@ void TestArgumentQuoting::posixQuotesForTheShell()
     QFETCH(QString, token);
     QFETCH(QString, quoted);
     QCOMPARE(posixQuoteArgument(token), quoted);
+}
+
+// PowerShell's single-quoted string: every token is wrapped, an embedded
+// quote is doubled, and the smart single quotes it would read as delimiters
+// travel as the token's UTF-8 bytes decoded from base64 inside the script.
+void TestArgumentQuoting::powerShellQuotesForTheShell_data()
+{
+    QTest::addColumn<QString>("token");
+    QTest::addColumn<QString>("quoted");
+
+    QTest::newRow("empty") << QString() << QStringLiteral("''");
+    QTest::newRow("plain") << QStringLiteral("plain") << QStringLiteral("'plain'");
+    QTest::newRow("flag") << QStringLiteral("--attack-mode") << QStringLiteral("'--attack-mode'");
+    QTest::newRow("spaces") << QStringLiteral("two words") << QStringLiteral("'two words'");
+    QTest::newRow("single quote") << QStringLiteral("it's") << QStringLiteral("'it''s'");
+    QTest::newRow("double quotes")
+        << QStringLiteral("say \"hi\"") << QStringLiteral("'say \"hi\"'");
+    QTest::newRow("dollar") << QStringLiteral("$2a$10$abc") << QStringLiteral("'$2a$10$abc'");
+    QTest::newRow("subexpression")
+        << QStringLiteral("?d$(Get-Date)") << QStringLiteral("'?d$(Get-Date)'");
+    QTest::newRow("semicolon") << QStringLiteral("?d;calc") << QStringLiteral("'?d;calc'");
+    QTest::newRow("backtick") << QStringLiteral("`tick`") << QStringLiteral("'`tick`'");
+    QTest::newRow("backslash") << QStringLiteral("C:\\dir \\") << QStringLiteral("'C:\\dir \\'");
+    QTest::newRow("newline") << QStringLiteral("line\nbreak") << QStringLiteral("'line\nbreak'");
+    QTest::newRow("smart single quote")
+        << QStringLiteral("?d’?d")
+        << QStringLiteral("([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('"
+                          "P2TigJk/ZA==')))");
+    QTest::newRow("mixed with a smart quote")
+        << QStringLiteral("it's ’mixed’")
+        << QStringLiteral("([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('"
+                          "aXQncyDigJltaXhlZOKAmQ==')))");
+}
+
+void TestArgumentQuoting::powerShellQuotesForTheShell()
+{
+    QFETCH(QString, token);
+    QFETCH(QString, quoted);
+    QCOMPARE(powerShellQuoteArgument(token), quoted);
 }
 
 int main(int argc, char *argv[])

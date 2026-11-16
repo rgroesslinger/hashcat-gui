@@ -105,6 +105,14 @@ QString suggestedExportPath(QLatin1StringView fileName)
     return QDir(suggestedFolder()).filePath(QString(fileName));
 }
 
+// The shell the copied command has to fit: the configured terminal decides,
+// not the platform this build happens to run on.
+CommandPreview::Dialect previewDialect(const QString &terminal)
+{
+    return TerminalCatalog::isPowerShell(terminal) ? CommandPreview::Dialect::PowerShell
+                                                   : CommandPreview::Dialect::Posix;
+}
+
 } // namespace
 
 MainWindow::MainWindow(QWidget *parent)
@@ -1574,14 +1582,16 @@ void MainWindow::commandChanged()
     auto &settings = SettingsManager::instance();
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     const QString binary = hashcatPath.isEmpty() ? QString() : QFileInfo(hashcatPath).fileName();
+    const CommandPreview::Dialect dialect =
+        previewDialect(settings.getKey<QString>(AppConstants::SettingsKeys::Terminal));
 
-    const QString command = CommandPreview::format(binary, generateArguments());
+    const QString command = CommandPreview::format(binary, generateArguments(), dialect);
     ui->lineEdit_command->setText(command);
     ui->lineEdit_command->setCursorPosition(0);
 
     // The line edit shows the beginning of the command only - it is as wide as
     // the window and the command is not. The tooltip carries all of it.
-    ui->lineEdit_command->setToolTip(CommandPreview::tooltip(command));
+    ui->lineEdit_command->setToolTip(CommandPreview::tooltip(command, dialect));
 }
 
 HashcatOptions MainWindow::collectHashcatOptions()

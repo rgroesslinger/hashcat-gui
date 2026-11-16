@@ -82,6 +82,7 @@ private slots:
     void launchValidationFollowsTheWidgets();
     void pcfgCharsetNeedsAMask();
     void commandPreviewCarriesTheBinaryName();
+    void previewUsesTheConfiguredTerminalsDialect();
     void thePreviewTooltipHoldsTheWholeCommand();
     void copyingTheCommandPutsItOnTheClipboard();
     void thePreviewFormattingIsPinned();
@@ -270,6 +271,31 @@ void TestLaunch::commandPreviewCarriesTheBinaryName()
     MainWindow window;
     QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->text(),
              QStringLiteral("hashcat --attack-mode 0"));
+}
+
+// The copied command has to fit the shell it is pasted into: the configured
+// terminal decides the dialect, not the platform this build runs on.
+void TestLaunch::previewUsesTheConfiguredTerminalsDialect()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/opt/hashcat/hashcat"));
+
+    MainWindow window;
+    QLineEdit *preview = MainWindowTestAccess::ui(window)->lineEdit_command;
+    QCOMPARE(preview->text(), QStringLiteral("hashcat --attack-mode 0"));
+
+    // pwsh is a PowerShell terminal: the call operator in front, every token
+    // single-quoted, so a bcrypt hash or a subexpression stays literal.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
+                                       QStringLiteral("pwsh"));
+    MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("job"));
+    QCOMPARE(preview->text(), QStringLiteral("& 'hashcat' '--attack-mode' '0' '--session' 'job'"));
+
+    // A POSIX terminal brings the other dialect back.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
+                                       QStringLiteral("konsole"));
+    MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("job2"));
+    QCOMPARE(preview->text(), QStringLiteral("hashcat --attack-mode 0 --session job2"));
 }
 
 // The line edit shows the beginning of the command only; the tooltip has to
