@@ -41,6 +41,7 @@ private slots:
     void nonAsciiArgumentsSurviveVerbatim();
     void maskMarkersAreCounted();
     void positionalInputsFollowTheMode();
+    void dashLeadingPositionalsGetTheSeparator();
     void modeRequirements_data();
     void modeRequirements();
     void parameterSpelling_data();
@@ -885,6 +886,79 @@ void TestCommandBuilder::positionalInputsFollowTheMode()
         options.wordlists << QStringLiteral("a.txt") << QStringLiteral("b.txt");
 
         const QStringList expected{"--attack-mode", "12", "hash.txt", "?w?d", "a.txt", "b.txt"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+}
+
+// A positional value that starts with a dash must not be read as a hashcat
+// option. "--" ends option parsing, and it appears only when one of the
+// positionals needs it - an ordinary session keeps its exact argv.
+void TestCommandBuilder::dashLeadingPositionalsGetTheSeparator()
+{
+    // A mask that starts with a dash-question mark.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::BruteForce;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.mask = QStringLiteral("-?d?d");
+
+        const QStringList expected{"--attack-mode", "3", "--", "hash.txt", "-?d?d"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // A no-argument option written as a data value.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::BruteForce;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.mask = QStringLiteral("--outfile=x");
+
+        const QStringList expected{"--attack-mode", "3", "--", "hash.txt", "--outfile=x"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // A wordlist name.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Straight;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.wordlists << QStringLiteral("-list.txt");
+
+        const QStringList expected{"--attack-mode", "0", "--", "hash.txt", "-list.txt"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // A feed argument behind a name that does not need the separator itself.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Generic;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.feedName = QStringLiteral("wordlist");
+        options.feedArguments << QStringLiteral("-v");
+
+        const QStringList expected{"--attack-mode", "8", "--", "hash.txt", "wordlist", "-v"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // The hash file itself.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::Straight;
+        options.hashFile = QStringLiteral("-hashes.txt");
+        options.wordlists << QStringLiteral("dict.txt");
+
+        const QStringList expected{"--attack-mode", "0", "--", "-hashes.txt", "dict.txt"};
+        QCOMPARE(CommandBuilder::build(options), expected);
+    }
+
+    // No dash-leading positional: no separator, byte-identical argv.
+    {
+        HashcatOptions options;
+        options.attackMode = AttackMode::BruteForce;
+        options.hashFile = QStringLiteral("hash.txt");
+        options.mask = QStringLiteral("?d?d");
+
+        const QStringList expected{"--attack-mode", "3", "hash.txt", "?d?d"};
         QCOMPARE(CommandBuilder::build(options), expected);
     }
 }

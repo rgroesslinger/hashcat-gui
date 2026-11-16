@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QMap>
+#include <algorithm>
 #include <array>
 #include <cstddef>
 
@@ -484,6 +485,12 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
                   << QString::number(options.hwmonTempAbortCelsius);
     }
 
+    // Everything from here on is read by hashcat as a positional value. A
+    // value that starts with a dash would be parsed as an option - a mask
+    // "-?d?d" or a session value "--outfile=..." - so "--" ends option
+    // parsing first when the tail holds one.
+    const qsizetype positionalStart = arguments.size();
+
     if (!options.hashFile.isEmpty()) {
         arguments << options.hashFile;
     }
@@ -556,6 +563,16 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
             arguments << maskAfterDict;
         }
         break;
+    }
+
+    // A positional value that starts with a dash would otherwise be read as
+    // a hashcat option. The separator is only inserted when it is needed, so
+    // ordinary sessions keep their exact argv.
+    const bool needsSeparator =
+        std::any_of(arguments.constBegin() + positionalStart, arguments.constEnd(),
+                    [](const QString &token) { return token.startsWith(QLatin1Char('-')); });
+    if (needsSeparator) {
+        arguments.insert(positionalStart, QStringLiteral("--"));
     }
 
     return arguments;
