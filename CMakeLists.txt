@@ -61,6 +61,7 @@ set(HASHCAT_GUI_SOURCES
     src/examples.h
     src/examplesession.h
     src/examplesession.cpp
+    src/executable.h
     src/hashcatinfoparser.h
     src/hashcatinfoparser.cpp
     src/hashcatoptions.h
@@ -186,6 +187,7 @@ set(HASHCAT_GUI_TESTS
     tst_commandbuilder
     tst_commandpreview
     tst_examplesession
+    tst_executable
     tst_hashcatinfoparser
     tst_hashcatrunner
     tst_hashtypeloader

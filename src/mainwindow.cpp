@@ -13,6 +13,7 @@
 #include "commandpreview.h"
 #include "examples.h"
 #include "examplesession.h"
+#include "executable.h"
 #include "hashtypeloader.h"
 #include "launchmessage.h"
 #include "launchvalidator.h"
@@ -39,6 +40,7 @@
 #include <QIcon>
 #include <QIntValidator>
 #include <QLayout>
+#include <QMap>
 #include <QMenu>
 #include <QMessageBox>
 #include <QRegularExpression>
@@ -1220,26 +1222,34 @@ void MainWindow::reloadHashTypes()
 {
     const QString hashcatPath =
         SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-    if (hashcatPath.isEmpty()) {
+    const QString resolved = Executable::resolve(hashcatPath);
+    if (resolved.isEmpty()) {
+        // The list belongs to the binary that answered; a path that cannot
+        // run must not leave another binary's types selectable. The loader
+        // call below ends any query still on its way.
+        ui->comboBox_hash_type->clear();
         // A query an earlier call started disabled the combo. Without a new
         // one there is nothing to wait for, so it goes back to the user.
         ui->comboBox_hash_type->setToolTip(
-            tr("Set the hashcat path under %1 → %2 to load the available hash types.")
-                .arg(menuPath(ui->menuFile->menuAction()->text()),
-                     menuPath(ui->actionSettings->text())));
+            hashcatPath.isEmpty()
+                ? tr("Set the hashcat path under %1 → %2 to load the available hash types.")
+                      .arg(menuPath(ui->menuFile->menuAction()->text()),
+                           menuPath(ui->actionSettings->text()))
+                : tr("The configured hashcat executable is not found: %1").arg(hashcatPath));
     }
-    m_hashTypeLoader.reload(hashcatPath);
+    m_hashTypeLoader.reload(resolved);
 }
 
 // The refresh after the settings were saved or imported: re-run the query
 // when the binary changed - or when nothing was ever loaded and the path may
 // be usable now - and rebuild the preview, which carries the binary name and
-// the short/long parameter choice.
+// the short/long parameter choice. The comparison uses the resolved program,
+// the one the loader records.
 void MainWindow::refreshAfterSettingsChange()
 {
     const QString hashcatPath =
         SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-    if (hashcatPath != m_hashTypeLoader.queriedPath()
+    if (Executable::resolve(hashcatPath) != m_hashTypeLoader.queriedPath()
         || (ui->comboBox_hash_type->count() == 0 && !m_hashTypeLoader.isLoading())) {
         reloadHashTypes();
     }
@@ -1498,8 +1508,10 @@ void MainWindow::startClicked()
 
     auto &settings = SettingsManager::instance();
     context.hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    context.resolvedHashcatPath = Executable::resolve(context.hashcatPath);
     context.configuredTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
-    context.availableTerminals = TerminalCatalog::availableTerminals().keys();
+    const QMap<QString, QString> terminals = TerminalCatalog::availableTerminals();
+    context.availableTerminals = terminals.keys();
 
     // Nothing is started unless the configuration is known to be complete.
     const LaunchValidator::LaunchProblem problem = LaunchValidator::validate(context);
@@ -1511,9 +1523,10 @@ void MainWindow::startClicked()
     // The terminal command line is built in one place: PowerShell gets an
     // encoded script, so no hash, mask, path or session value is parsed as
     // shell code. The terminal stays open after hashcat exits, as before.
-    const LaunchCommand command =
-        TerminalCatalog::launchCommand(context.configuredTerminal, context.hashcatPath,
-                                       CommandBuilder::build(context.options), true);
+    // Every program is the resolved absolute one, never the stored text.
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        context.configuredTerminal, terminals.value(context.configuredTerminal),
+        context.resolvedHashcatPath, CommandBuilder::build(context.options), true);
     if (command.program.isEmpty()) {
         QMessageBox::warning(this, tr("Launch failed"),
                              tr("The command line is too long for the terminal. Shorten the "
@@ -1522,7 +1535,7 @@ void MainWindow::startClicked()
     }
 
     QString launchError;
-    if (!TerminalCatalog::launchDetached(command, context.hashcatPath, &launchError)) {
+    if (!TerminalCatalog::launchDetached(command, context.resolvedHashcatPath, &launchError)) {
         QMessageBox::warning(
             this, tr("Launch failed"),
             tr("Could not start “%1”: %2").arg(context.configuredTerminal, launchError));

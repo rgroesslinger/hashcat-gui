@@ -48,6 +48,15 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                 .arg(problem.detail, fileMenuLabel, settingsMenuLabel);
         break;
 
+    case LaunchValidator::LaunchError::HashcatNotExecutable:
+        message.format = Qt::PlainText;
+        message.text = QCoreApplication::translate(
+                           "LaunchMessage", "The configured hashcat path is not an executable "
+                                            "file:\n%1\n"
+                                            "Navigate to %2 → %3 to change it.")
+                           .arg(problem.detail, fileMenuLabel, settingsMenuLabel);
+        break;
+
     case LaunchValidator::LaunchError::NoTerminal:
         message.icon = QMessageBox::Information;
         message.format = Qt::RichText;

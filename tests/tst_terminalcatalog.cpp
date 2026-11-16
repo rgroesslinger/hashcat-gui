@@ -99,6 +99,7 @@ private slots:
     void findHashcatInPathProbesBothUnixNames_data();
     void findHashcatInPathProbesBothUnixNames();
     void findHashcatInPathIsEmptyWithoutOne();
+    void availableTerminalsReturnsResolvedPrograms();
     void launchDetachedStartsTheProgram();
     void launchDetachedReportsAFailure();
 };
@@ -145,8 +146,8 @@ void TestTerminalCatalog::launchCommandExecsUnixTerminalsDirectly()
         if (it.key() == QStringLiteral("powershell.exe") || it.key() == QStringLiteral("pwsh")) {
             continue;
         }
-        const LaunchCommand command =
-            TerminalCatalog::launchCommand(it.key(), QStringLiteral("hashcat"), arguments, true);
+        const LaunchCommand command = TerminalCatalog::launchCommand(
+            it.key(), it.key(), QStringLiteral("hashcat"), arguments, true);
         QCOMPARE(command.program, it.key());
         QStringList expected = it.value();
         expected << QStringLiteral("hashcat") << arguments;
@@ -178,7 +179,7 @@ void TestTerminalCatalog::launchCommandEncodesTheScript()
     const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0"),
                                 QStringLiteral("--mask"), QStringLiteral("?d?d?d?d")};
     const LaunchCommand command =
-        TerminalCatalog::launchCommand(terminal, hashcatPath, arguments, keepOpen);
+        TerminalCatalog::launchCommand(terminal, terminal, hashcatPath, arguments, keepOpen);
 
     QCOMPARE(command.program, terminal);
     QStringList expectedFlags{QStringLiteral("-NoProfile")};
@@ -238,7 +239,7 @@ void TestTerminalCatalog::launchCommandQuotesEveryToken()
     QFETCH(QString, quoted);
 
     const LaunchCommand command = TerminalCatalog::launchCommand(
-        QStringLiteral("pwsh"), QStringLiteral("hashcat"), {token}, false);
+        QStringLiteral("pwsh"), QStringLiteral("pwsh"), QStringLiteral("hashcat"), {token}, false);
     // None of these tokens holds a smart single quote, so the Arguments
     // literal is single-quoted with its own quotes doubled.
     QString literal = quoted;
@@ -267,7 +268,8 @@ void TestTerminalCatalog::launchCommandCarriesSmartQuotesAsBase64()
     QFETCH(QString, token);
 
     const LaunchCommand command = TerminalCatalog::launchCommand(
-        QStringLiteral("powershell.exe"), QStringLiteral("hashcat"), {token}, false);
+        QStringLiteral("powershell.exe"), QStringLiteral("powershell.exe"),
+        QStringLiteral("hashcat"), {token}, false);
     // The base64 carries the token as the MSVCRT quoting left it (pinned in
     // tst_argumentquoting); this case is about the transport.
     const QString expected =
@@ -284,21 +286,22 @@ void TestTerminalCatalog::launchCommandRefusesAnOverlongCommandLine()
 {
     const QStringList arguments{QString(40000, QLatin1Char('a'))};
     const LaunchCommand command = TerminalCatalog::launchCommand(
-        QStringLiteral("pwsh"), QStringLiteral("hashcat"), arguments, true);
+        QStringLiteral("pwsh"), QStringLiteral("pwsh"), QStringLiteral("hashcat"), arguments, true);
     QVERIFY(command.program.isEmpty());
     QVERIFY(command.arguments.isEmpty());
 
     // The same launch well under the limit goes through.
-    const LaunchCommand small = TerminalCatalog::launchCommand(
-        QStringLiteral("pwsh"), QStringLiteral("hashcat"), {QStringLiteral("?d?d")}, true);
+    const LaunchCommand small =
+        TerminalCatalog::launchCommand(QStringLiteral("pwsh"), QStringLiteral("pwsh"),
+                                       QStringLiteral("hashcat"), {QStringLiteral("?d?d")}, true);
     QVERIFY(!small.program.isEmpty());
 }
 
 void TestTerminalCatalog::launchCommandRefusesAnUnknownTerminal()
 {
-    const LaunchCommand command =
-        TerminalCatalog::launchCommand(QStringLiteral("no-such-terminal"),
-                                       QStringLiteral("hashcat"), {QStringLiteral("--help")}, true);
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        QStringLiteral("no-such-terminal"), QStringLiteral("no-such-terminal"),
+        QStringLiteral("hashcat"), {QStringLiteral("--help")}, true);
     QVERIFY(command.program.isEmpty());
     QVERIFY(command.arguments.isEmpty());
 }
@@ -355,7 +358,8 @@ void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell()
     }
 
     QFETCH(QStringList, tokens);
-    const LaunchCommand command = TerminalCatalog::launchCommand(shell, helper, tokens, false);
+    const LaunchCommand command =
+        TerminalCatalog::launchCommand(shell, shell, helper, tokens, false);
     QVERIFY(!command.program.isEmpty());
 
     QProcess proc;
@@ -399,7 +403,7 @@ void TestTerminalCatalog::launchCommandKeepOpenHoldsTheSession()
 
     QFETCH(bool, keepOpen);
     const LaunchCommand command = TerminalCatalog::launchCommand(
-        shell, helper, {QStringLiteral("--attack-mode"), QStringLiteral("0")}, keepOpen);
+        shell, shell, helper, {QStringLiteral("--attack-mode"), QStringLiteral("0")}, keepOpen);
     QVERIFY(!command.program.isEmpty());
 
     QProcess proc;
@@ -495,6 +499,30 @@ void TestTerminalCatalog::findHashcatInPathIsEmptyWithoutOne()
     TestEnvironment::PathGuard guard(empty.path().toUtf8());
 
     QCOMPARE(TerminalCatalog::findHashcatInPath(), QString());
+}
+
+// Discovery answers name -> absolute program, so the launch never hands a
+// bare name to a process and a terminal behind PATH is started from the file
+// this lookup actually found.
+void TestTerminalCatalog::availableTerminalsReturnsResolvedPrograms()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+#ifdef Q_OS_WIN
+    const QString fileName = QStringLiteral("xterm.exe");
+#else
+    const QString fileName = QStringLiteral("xterm");
+#endif
+    const QString stub = TestEnvironment::writeSearchableExecutable(fileName, directory.path());
+    QVERIFY2(!stub.isEmpty(), "the terminal stub could not be written");
+
+    TestEnvironment::PathGuard guard(directory.path().toUtf8());
+
+    const QMap<QString, QString> terminals = TerminalCatalog::availableTerminals();
+    QVERIFY2(terminals.contains(QStringLiteral("xterm")), "the terminal on PATH was not found");
+    const QString resolved = terminals.value(QStringLiteral("xterm"));
+    QVERIFY2(QDir::isAbsolutePath(resolved), "the terminal was not resolved to an absolute path");
+    QCOMPARE(QFileInfo(resolved).canonicalFilePath(), QFileInfo(stub).canonicalFilePath());
 }
 
 // The detached start runs the program in the hashcat binary's own directory

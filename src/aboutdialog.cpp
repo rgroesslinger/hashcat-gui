@@ -6,6 +6,7 @@
 #include "aboutdialog.h"
 
 #include "appconstants.h"
+#include "executable.h"
 #include "hashcatrunner.h"
 #include "settingsmanager.h"
 #include "ui_aboutdialog.h"
@@ -251,29 +252,35 @@ void AboutDialog::updateVersionLabel()
 {
     auto &settings = SettingsManager::instance();
     const QString path = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    const QString resolved = Executable::resolve(path);
 
     if (path.isEmpty()) {
         // No hashcat is configured, so there is no version to show. The
         // details of a bug report say the same.
         setVersionLabel(tr("Not configured"));
+    } else if (resolved.isEmpty()) {
+        // The query would only fail to start; the path is what a bug report
+        // needs to name.
+        ui->label_hc_version_text->setText(QFileInfo(path).fileName());
+        setVersionError(tr("The configured hashcat executable is not found."));
     } else {
         ui->label_hc_version_text->setText(QFileInfo(path).fileName());
 
-        QFutureWatcher<HashcatResult> *watcher = new QFutureWatcher<HashcatResult>(this);
-        connect(watcher, &QFutureWatcher<HashcatResult>::finished, this, [this, watcher] {
-            const HashcatResult &result = watcher->result();
+        if (m_versionWatcher == nullptr) {
+            m_versionWatcher = new QFutureWatcher<HashcatResult>(this);
+            connect(m_versionWatcher, &QFutureWatcher<HashcatResult>::finished, this, [this] {
+                const HashcatResult &result = m_versionWatcher->result();
 
-            if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
-                setVersionError(result.standardError.simplified());
-            } else {
-                setVersionText(result.standardOutput.simplified());
-            }
+                if (result.exitStatus != QProcess::NormalExit || result.exitCode != 0) {
+                    setVersionError(result.standardError.simplified());
+                } else {
+                    setVersionText(result.standardOutput.simplified());
+                }
+            });
+        }
 
-            watcher->deleteLater();
-        });
-
-        watcher->setFuture(
-            HashcatRunner::execute(path, QStringList() << AppConstants::Hashcat::Version));
+        m_versionWatcher->setFuture(
+            HashcatRunner::execute(resolved, QStringList() << AppConstants::Hashcat::Version));
     }
 
     ui->label_hc_gui_version->setText(QApplication::applicationVersion());

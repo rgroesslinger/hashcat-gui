@@ -24,6 +24,7 @@ LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &options)
     context.options = options;
     context.options.hashFile = QStringLiteral("hash.txt");
     context.hashcatPath = QStringLiteral("hashcat");
+    context.resolvedHashcatPath = QStringLiteral("/usr/bin/hashcat");
     context.configuredTerminal = QStringLiteral("konsole");
     context.availableTerminals = QStringList{QStringLiteral("konsole")};
     return LaunchValidator::validate(context);
@@ -31,11 +32,13 @@ LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &options)
 
 // The launch checks on their own: the options hold values that pass.
 LaunchValidator::LaunchProblem validateLaunch(const QString &hashFile, const QString &hashcatPath,
+                                              const QString &resolvedHashcatPath,
                                               const QString &configuredTerminal,
                                               const QStringList &availableTerminals)
 {
     LaunchValidator::LaunchContext context;
     context.hashcatPath = hashcatPath;
+    context.resolvedHashcatPath = resolvedHashcatPath;
     context.configuredTerminal = configuredTerminal;
     context.availableTerminals = availableTerminals;
     context.options.hashFile = hashFile;
@@ -81,6 +84,7 @@ void TestLaunchValidator::validateLaunch_data()
 {
     QTest::addColumn<QString>("hashFile");
     QTest::addColumn<QString>("hashcatPath");
+    QTest::addColumn<QString>("resolvedHashcatPath");
     QTest::addColumn<QString>("configuredTerminal");
     QTest::addColumn<QStringList>("availableTerminals");
     QTest::addColumn<int>("expected");
@@ -88,36 +92,55 @@ void TestLaunchValidator::validateLaunch_data()
 
     const QString gone =
         QDir(QDir::tempPath()).filePath(QStringLiteral("hashcat-gui-test-no-such-binary"));
+    const QString resolved = QStringLiteral("/usr/bin/hashcat");
 
     const QStringList terminals{"konsole", "kitty"};
 
-    QTest::newRow("no hash file") << QString() << QStringLiteral("/usr/bin/hashcat")
+    QTest::newRow("no hash file") << QString() << QStringLiteral("/usr/bin/hashcat") << resolved
                                   << QStringLiteral("konsole") << terminals
                                   << int(LaunchValidator::LaunchError::NoHashFile) << QString();
 
     QTest::newRow("hashcat never configured")
-        << QStringLiteral("hash.txt") << QString() << QStringLiteral("konsole") << terminals
-        << int(LaunchValidator::LaunchError::NoHashcatPath) << QString();
+        << QStringLiteral("hash.txt") << QString() << QString() << QStringLiteral("konsole")
+        << terminals << int(LaunchValidator::LaunchError::NoHashcatPath) << QString();
 
     QTest::newRow("hashcat is gone")
-        << QStringLiteral("hash.txt") << gone << QStringLiteral("konsole") << terminals
+        << QStringLiteral("hash.txt") << gone << QString() << QStringLiteral("konsole") << terminals
         << int(LaunchValidator::LaunchError::HashcatPathMissing) << gone;
 
+    QTest::newRow("bare name off PATH")
+        << QStringLiteral("hash.txt") << QStringLiteral("hashcat-gui-no-such-binary") << QString()
+        << QStringLiteral("konsole") << terminals
+        << int(LaunchValidator::LaunchError::HashcatPathMissing)
+        << QStringLiteral("hashcat-gui-no-such-binary");
+
+    // An existing path that is not a file (the temp directory is one).
+    QTest::newRow("not an executable")
+        << QStringLiteral("hash.txt") << QDir::tempPath() << QString() << QStringLiteral("konsole")
+        << terminals << int(LaunchValidator::LaunchError::HashcatNotExecutable) << QDir::tempPath();
+
+    // A caller that hands over a non-absolute program is refused too.
+    QTest::newRow("resolved path is not absolute")
+        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QStringLiteral("hashcat")
+        << QStringLiteral("konsole") << terminals
+        << int(LaunchValidator::LaunchError::HashcatNotExecutable) << QStringLiteral("hashcat");
+
     QTest::newRow("no terminal selected")
-        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QString() << terminals
-        << int(LaunchValidator::LaunchError::NoTerminal) << QString();
+        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << resolved << QString()
+        << terminals << int(LaunchValidator::LaunchError::NoTerminal) << QString();
 
     QTest::newRow("no terminal installed")
-        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QStringLiteral("konsole")
-        << QStringList() << int(LaunchValidator::LaunchError::NoTerminals) << QString();
+        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << resolved
+        << QStringLiteral("konsole") << QStringList()
+        << int(LaunchValidator::LaunchError::NoTerminals) << QString();
 
     QTest::newRow("configured terminal is not installed")
-        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << QStringLiteral("yakuake")
-        << terminals << int(LaunchValidator::LaunchError::UnknownTerminal)
-        << QStringLiteral("konsole, kitty");
+        << QStringLiteral("hash.txt") << QStringLiteral("hashcat") << resolved
+        << QStringLiteral("yakuake") << terminals
+        << int(LaunchValidator::LaunchError::UnknownTerminal) << QStringLiteral("konsole, kitty");
 
     QTest::newRow("ready to go") << QStringLiteral("hash.txt") << QStringLiteral("hashcat")
-                                 << QStringLiteral("konsole") << terminals
+                                 << resolved << QStringLiteral("konsole") << terminals
                                  << int(LaunchValidator::LaunchError::None) << QString();
 }
 
@@ -125,19 +148,25 @@ void TestLaunchValidator::validateLaunch()
 {
     QFETCH(QString, hashFile);
     QFETCH(QString, hashcatPath);
+    QFETCH(QString, resolvedHashcatPath);
     QFETCH(QString, configuredTerminal);
     QFETCH(QStringList, availableTerminals);
     QFETCH(int, expected);
     QFETCH(QString, expectedDetail);
 
-    const LaunchValidator::LaunchProblem problem =
-        ::validateLaunch(hashFile, hashcatPath, configuredTerminal, availableTerminals);
+    const LaunchValidator::LaunchProblem problem = ::validateLaunch(
+        hashFile, hashcatPath, resolvedHashcatPath, configuredTerminal, availableTerminals);
 
     QCOMPARE(int(problem.code), expected);
     QCOMPARE(problem.detail, expectedDetail);
 
     if (expected == int(LaunchValidator::LaunchError::HashcatPathMissing)) {
         QVERIFY2(!QFileInfo::exists(hashcatPath), "the row needs a path that does not exist");
+    }
+    if (expected == int(LaunchValidator::LaunchError::HashcatNotExecutable)) {
+        QVERIFY2(resolvedHashcatPath.isEmpty() || !QDir::isAbsolutePath(resolvedHashcatPath)
+                     || QFileInfo::exists(hashcatPath),
+                 "the row needs an unresolved or existing path");
     }
 }
 

@@ -7,6 +7,7 @@
 
 #include "appconstants.h"
 #include "appearance.h"
+#include "executable.h"
 #include "settingsmanager.h"
 #include "statefile.h"
 #include "terminalcatalog.h"
@@ -46,11 +47,10 @@ bool hasExpectedType(QLatin1StringView key, const QJsonValue &value)
     return false;
 }
 
-// Whether the path names a file that can be run.
+// Whether the path names a file that can be run - a bare name on PATH too.
 bool isExecutableFile(const QString &path)
 {
-    const QFileInfo file(path);
-    return file.isFile() && file.isExecutable();
+    return !Executable::resolve(path).isEmpty();
 }
 
 // The value the dialog shows for a setting, in the type the setting takes.
@@ -155,7 +155,7 @@ void SettingsDialog::readSettings()
 
     // The combos are filled first: a stored value can only find its entry
     // once the entries exist.
-    QMap<QString, QStringList> availableTerminals = TerminalCatalog::availableTerminals();
+    QMap<QString, QString> availableTerminals = TerminalCatalog::availableTerminals();
     ui->comboBox_terminal->addItems(availableTerminals.keys());
     ui->comboBox_terminal->setPlaceholderText(tr("Select a terminal"));
 

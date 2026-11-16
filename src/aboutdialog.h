@@ -10,7 +10,10 @@
 
 class QTimer;
 class UpdateChecker;
+struct HashcatResult;
 struct UpdateCheckResult;
+
+template <typename T> class QFutureWatcher;
 
 namespace Ui
 {
@@ -86,6 +89,10 @@ private:
     // an error. The label shows the version or the error wrapped; this keeps
     // the version as it is.
     QString m_hashcatVersion;
+
+    // The query for the version, a child of the dialog so it is destroyed
+    // with it even if the reply never arrives.
+    QFutureWatcher<HashcatResult> *m_versionWatcher = nullptr;
 
     // The dialog is fitted to its content once, on the first show.
     bool m_sizedToContent = false;

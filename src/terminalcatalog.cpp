@@ -7,10 +7,10 @@
 
 #include "appconstants.h"
 #include "argumentquoting.h"
+#include "executable.h"
 
 #include <QFileInfo>
 #include <QProcess>
-#include <QStandardPaths>
 #include <QStringEncoder>
 #include <algorithm>
 
@@ -50,19 +50,24 @@ const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
     return table;
 }
 
-QMap<QString, QStringList> TerminalCatalog::availableTerminals()
+QMap<QString, QString> TerminalCatalog::availableTerminals()
 {
-    QMap<QString, QStringList> terminals;
+    QMap<QString, QString> terminals;
 
     const QMap<QString, QStringList> &table = terminalArguments();
     for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
-        QString fullPath = QStandardPaths::findExecutable(it.key());
-        if (!fullPath.isEmpty()) {
-            terminals.insert(it.key(), it.value());
+        const QString path = Executable::resolve(it.key());
+        if (!path.isEmpty()) {
+            terminals.insert(it.key(), path);
         }
     }
 
     return terminals;
+}
+
+bool TerminalCatalog::isPowerShell(const QString &terminal)
+{
+    return terminal == QStringLiteral("powershell.exe") || terminal == QStringLiteral("pwsh");
 }
 
 QString TerminalCatalog::findHashcatInPath()
@@ -71,7 +76,7 @@ QString TerminalCatalog::findHashcatInPath()
     // name already carries the platform's suffix. The installed name comes
     // first, the release archive's second - see ExecutableNames.
     for (const QLatin1StringView name : AppConstants::Hashcat::ExecutableNames) {
-        const QString path = QStandardPaths::findExecutable(QString(name));
+        const QString path = Executable::resolve(QString(name));
         if (!path.isEmpty()) {
             return path;
         }
@@ -111,7 +116,9 @@ QString powerShellToken(const QString &token)
 }
 } // namespace
 
-LaunchCommand TerminalCatalog::launchCommand(const QString &terminal, const QString &hashcatPath,
+LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
+                                             const QString &terminalProgram,
+                                             const QString &hashcatPath,
                                              const QStringList &arguments, bool keepOpen)
 {
     const QMap<QString, QStringList> &table = terminalArguments();
@@ -136,7 +143,7 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal, const QStr
     // WaitForExit holds the session while hashcat runs; the script must not
     // call exit afterwards - an explicit exit ends the session even under
     // -NoExit and would close the terminal the moment hashcat is done.
-    if (terminal == QStringLiteral("powershell.exe") || terminal == QStringLiteral("pwsh")) {
+    if (isPowerShell(terminal)) {
         QString script =
             QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo\n$si.FileName = ")
             + powerShellToken(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
@@ -156,12 +163,12 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal, const QStr
         // on every platform, so a refusal does not depend on the OS.
         constexpr int maxCommandLine = 32767;
         constexpr int commandLineMargin = 64;
-        if (terminal.size() + encoded.size() + commandLineMargin > maxCommandLine) {
+        if (terminalProgram.size() + encoded.size() + commandLineMargin > maxCommandLine) {
             return {};
         }
 
         LaunchCommand command;
-        command.program = terminal;
+        command.program = terminalProgram;
         command.arguments << QStringLiteral("-NoProfile");
         if (keepOpen) {
             command.arguments << QStringLiteral("-NoExit");
@@ -171,7 +178,7 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal, const QStr
     }
 
     LaunchCommand command;
-    command.program = terminal;
+    command.program = terminalProgram;
     command.arguments = it.value();
     command.arguments << hashcatPath << arguments;
     return command;

@@ -19,15 +19,16 @@ namespace LaunchValidator
 {
 enum class LaunchError : std::uint8_t {
     None,
-    NoHashFile,         // no hash file selected
-    NoHashcatPath,      // the hashcat path was never configured
-    HashcatPathMissing, // configured, but the file is not there (anymore)
-    NoTerminal,         // no terminal selected
-    NoTerminals,        // this system has no supported terminal at all
-    UnknownTerminal,    // the configured terminal is not installed
-    NoWordlist,         // the mode reads word lists, none is selected
-    WrongWordlistCount, // the mode wants an exact number of word lists
-    TooManyWordlists,   // more word lists than the mode accepts
+    NoHashFile,           // no hash file selected
+    NoHashcatPath,        // the hashcat path was never configured
+    HashcatPathMissing,   // configured, but the file is not there (anymore)
+    HashcatNotExecutable, // configured, but it is not a file that can run
+    NoTerminal,           // no terminal selected
+    NoTerminals,          // this system has no supported terminal at all
+    UnknownTerminal,      // the configured terminal is not installed
+    NoWordlist,           // the mode reads word lists, none is selected
+    WrongWordlistCount,   // the mode wants an exact number of word lists
+    TooManyWordlists,     // more word lists than the mode accepts
     // The wordlist hashcat multiplies (?q) is read by one feed instance
     // from start to end, so unlike the base it cannot be a folder.
     WordlistMustBeFile,
@@ -59,9 +60,12 @@ enum class LaunchError : std::uint8_t {
 };
 
 // Everything the validation reads. attackMode and hashFile live in options;
-// there are no duplicate fields.
+// there are no duplicate fields. hashcatPath is the stored value, used only
+// for messages; resolvedHashcatPath is the absolute program the caller
+// resolved from it, and the one the launch actually starts.
 struct LaunchContext {
     QString hashcatPath;
+    QString resolvedHashcatPath;
     QString configuredTerminal;
     QStringList availableTerminals;
     HashcatOptions options;

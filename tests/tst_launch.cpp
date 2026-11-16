@@ -55,6 +55,7 @@ LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &options)
     context.options = options;
     context.options.hashFile = QStringLiteral("hash.txt");
     context.hashcatPath = QStringLiteral("hashcat");
+    context.resolvedHashcatPath = QStringLiteral("/usr/bin/hashcat");
     context.configuredTerminal = QStringLiteral("konsole");
     context.availableTerminals = QStringList{QStringLiteral("konsole")};
     return LaunchValidator::validate(context);

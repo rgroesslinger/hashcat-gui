@@ -34,7 +34,13 @@ public:
     // through launchCommand(); their entries hold no arguments.
     static const QMap<QString, QStringList> &terminalArguments();
 
-    static QMap<QString, QStringList> availableTerminals();
+    // Every supported terminal that is installed, mapped to the absolute
+    // program that starts it.
+    static QMap<QString, QString> availableTerminals();
+
+    // True for the two shells that take the encoded script instead of a
+    // plain argv: powershell.exe and pwsh.
+    static bool isPowerShell(const QString &terminal);
 
     // The hashcat executable on the PATH, empty when this system has none.
     //
@@ -47,14 +53,17 @@ public:
     static QString noSupportedTerminalMessage();
 
     // The command line that starts hashcat in the given terminal, built
-    // without starting anything. PowerShell and pwsh get an -EncodedCommand
-    // script that quotes every token and starts hashcat through
-    // ProcessStartInfo, so no hash, mask, path or session value is ever
-    // parsed as shell code or rewritten by PowerShell's own native argument
-    // passing; every other terminal execs hashcat directly. keepOpen asks
-    // the terminal to stay open after hashcat exits.
-    static LaunchCommand launchCommand(const QString &terminal, const QString &hashcatPath,
-                                       const QStringList &arguments, bool keepOpen);
+    // without starting anything. terminalProgram is the resolved absolute
+    // path from availableTerminals(); the name selects the terminal's own
+    // arguments and the PowerShell branch. PowerShell and pwsh get an
+    // -EncodedCommand script that quotes every token and starts hashcat
+    // through ProcessStartInfo, so no hash, mask, path or session value is
+    // ever parsed as shell code or rewritten by PowerShell's own native
+    // argument passing; every other terminal execs hashcat directly.
+    // keepOpen asks the terminal to stay open after hashcat exits.
+    static LaunchCommand launchCommand(const QString &terminal, const QString &terminalProgram,
+                                       const QString &hashcatPath, const QStringList &arguments,
+                                       bool keepOpen);
 
     // Starts the terminal detached, in the hashcat binary's own directory.
     // Returns false and fills errorMessage when the start fails. The caller

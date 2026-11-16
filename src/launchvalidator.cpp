@@ -8,6 +8,7 @@
 #include "appconstants.h"
 #include "commandbuilder.h"
 
+#include <QDir>
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <algorithm>
@@ -22,6 +23,7 @@ LaunchError validateLaunch(const LaunchContext &context, QString *detail)
 {
     const QString &hashFile = context.options.hashFile;
     const QString &hashcatPath = context.hashcatPath;
+    const QString &resolvedHashcatPath = context.resolvedHashcatPath;
     const QString &configuredTerminal = context.configuredTerminal;
     const QStringList &availableTerminals = context.availableTerminals;
 
@@ -37,13 +39,17 @@ LaunchError validateLaunch(const LaunchContext &context, QString *detail)
         return LaunchError::NoHashcatPath;
     }
 
-    // Only absolute paths are checked here. A bare name is left to the shell
-    // search of the terminal, and checking it would need the executable bit,
-    // which QFileInfo does not report reliably for .exe files.
-    const QFileInfo hashcatInfo(hashcatPath);
-    if (hashcatInfo.isAbsolute() && !hashcatInfo.isFile()) {
+    // The caller resolves the stored value to the absolute program the
+    // launch starts. Only that one may reach a process; a value that did not
+    // resolve is reported with the reason the resolver could not use it.
+    if (resolvedHashcatPath.isEmpty() || !QDir::isAbsolutePath(resolvedHashcatPath)) {
         if (detail) {
             *detail = hashcatPath;
+        }
+        // A non-absolute "resolved" value is a caller bug; an empty one is
+        // either a path that is gone or one that exists but cannot run.
+        if (!resolvedHashcatPath.isEmpty() || QFileInfo::exists(hashcatPath)) {
+            return LaunchError::HashcatNotExecutable;
         }
         return LaunchError::HashcatPathMissing;
     }
