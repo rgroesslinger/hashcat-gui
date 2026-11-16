@@ -277,6 +277,19 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
             "Removing cracked hashes is not possible in the association attack mode.");
         break;
 
+    case LaunchValidator::LaunchError::InvalidCharacter:
+        // The value is user supplied, so plain text: a '<' in it would be
+        // taken for markup by the default AutoText.
+        message.icon = QMessageBox::Information;
+        message.format = Qt::PlainText;
+        message.text =
+            QCoreApplication::translate(
+                "LaunchMessage", "This value contains a control character that cannot be passed to "
+                                 "hashcat:\n%1\n"
+                                 "Remove the character and try again.")
+                .arg(problem.detail);
+        break;
+
     case LaunchValidator::LaunchError::None:
         return {};
     }

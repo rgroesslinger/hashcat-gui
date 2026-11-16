@@ -54,6 +54,12 @@ void TestLaunchMessage::messageFor_data()
         << QStringLiteral("The configured hashcat executable does not exist:\n/opt/hashcat\n"
                           "Navigate to File → Settings to change it.");
 
+    QTest::newRow("HashcatNotExecutable")
+        << int(Error::HashcatNotExecutable) << QStringLiteral("/opt/hashcat") << straight << warning
+        << plain
+        << QStringLiteral("The configured hashcat path is not an executable file:\n/opt/hashcat\n"
+                          "Navigate to File → Settings to change it.");
+
     QTest::newRow("NoTerminal")
         << int(Error::NoTerminal) << QString() << straight << info << rich
         << QStringLiteral("Navigate to <b>File → Settings</b> to select the terminal used for "
@@ -181,6 +187,12 @@ void TestLaunchMessage::messageFor_data()
     QTest::newRow("InvalidCachePath")
         << int(Error::InvalidCachePath) << QStringLiteral("/tmp/gone") << straight << warning
         << plain << QStringLiteral("The cache path must be an existing directory:\n/tmp/gone");
+
+    QTest::newRow("InvalidCharacter")
+        << int(Error::InvalidCharacter) << QStringLiteral("hash\\x1b.txt") << straight << info
+        << plain
+        << QStringLiteral("This value contains a control character that cannot be passed to "
+                          "hashcat:\nhash\\x1b.txt\nRemove the character and try again.");
 
     QTest::newRow("IncrementWithSpeedOnly")
         << int(Error::IncrementWithSpeedOnly) << QString() << straight << info << autoText

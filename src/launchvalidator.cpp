@@ -386,12 +386,39 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
     return LaunchError::None;
 }
 
+// NUL and every C0 control except tab. A NUL would silently end the token at
+// exec, so the string hashcat receives is not the string the preview shows;
+// the other controls are passed through to the terminal and the clipboard.
+bool hasForbiddenControlCharacter(const QString &token)
+{
+    return std::ranges::any_of(token, [](QChar c) {
+        const ushort code = c.unicode();
+        return code == 0 || (code < 0x20 && c != QLatin1Char('\t'));
+    });
+}
+
+// The offending token with its controls spelled out, so the message names the
+// value without putting a control character into the dialog text.
+QString showControlCharacters(const QString &token)
+{
+    QString shown;
+    shown.reserve(token.size());
+    for (const QChar c : token) {
+        const ushort code = c.unicode();
+        if (code == 0 || (code < 0x20 && c != QLatin1Char('\t'))) {
+            shown += QStringLiteral("\\x%1").arg(int(code), 2, 16, QLatin1Char('0'));
+        } else {
+            shown += c;
+        }
+    }
+    return shown;
+}
+
 LaunchError validateOptions(const HashcatOptions &options, QString *detail)
 {
     if (detail) {
         detail->clear();
     }
-
     const CommandBuilder::ModeRequirements requirements =
         CommandBuilder::modeRequirements(options.attackMode);
     const int wordlistCount = static_cast<int>(options.wordlists.size());
@@ -564,6 +591,19 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
     // a directory that has gone away.
     if (!options.cachePath.trimmed().isEmpty() && !QFileInfo(options.cachePath).isDir()) {
         return LaunchError::InvalidCachePath;
+    }
+
+    // What the builder would hand to hashcat must be the text the user sees.
+    // The check uses the built argv, so a value the mode leaves out of the
+    // command line is not refused.
+    const QStringList arguments = CommandBuilder::build(options);
+    for (const QString &token : arguments) {
+        if (hasForbiddenControlCharacter(token)) {
+            if (detail) {
+                *detail = showControlCharacters(token);
+            }
+            return LaunchError::InvalidCharacter;
+        }
     }
 
     return LaunchError::None;

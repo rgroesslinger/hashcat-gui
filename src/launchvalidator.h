@@ -57,6 +57,10 @@ enum class LaunchError : std::uint8_t {
     AssociationSettingsWithWordlist, // settings only with no wordlist
     NoHashRecipe,                    // hash mode 4000 without its recipe
     InvalidCachePath,                // --cache-path is not an existing directory
+    // A collected value holds NUL or a C0 control character other than tab.
+    // A NUL would silently truncate the token at exec, so the launched command
+    // would differ from the preview.
+    InvalidCharacter,
 };
 
 // Everything the validation reads. attackMode and hashFile live in options;

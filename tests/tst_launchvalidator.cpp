@@ -78,6 +78,7 @@ private slots:
     void maskMarkersAreValidated();
     void hashRecipeIsRequiredFor4000();
     void cachePathNeedsAnExistingDirectory();
+    void controlCharactersAreRefused();
 };
 
 void TestLaunchValidator::validateLaunch_data()
@@ -853,6 +854,46 @@ void TestLaunchValidator::cachePathNeedsAnExistingDirectory()
     options.cachePath = directory.filePath(QStringLiteral("gone"));
     QCOMPARE(int(::validateOptions(options).code),
              int(LaunchValidator::LaunchError::InvalidCachePath));
+}
+
+// A NUL would silently end the token at exec, so what hashcat receives would
+// not be what the preview shows. Every other C0 control except tab reaches
+// the terminal and the clipboard as itself. The detail spells the character
+// out so the message box can name the value.
+void TestLaunchValidator::controlCharactersAreRefused()
+{
+    HashcatOptions maskRun;
+    maskRun.attackMode = AttackMode::BruteForce;
+    maskRun.mask = QStringLiteral("?d") + QChar(0) + QStringLiteral("?d");
+    LaunchValidator::LaunchProblem problem = ::validateOptions(maskRun);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCharacter));
+    QCOMPARE(problem.detail, QStringLiteral("?d\\x00?d"));
+
+    maskRun.mask = QStringLiteral("?d?d") + QChar(0x1b);
+    problem = ::validateOptions(maskRun);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCharacter));
+    QCOMPARE(problem.detail, QStringLiteral("?d?d\\x1b"));
+
+    // A wordlist in the straight mode is part of the command line too.
+    HashcatOptions wordlistRun;
+    wordlistRun.attackMode = AttackMode::Straight;
+    wordlistRun.wordlists =
+        QStringList{QStringLiteral("dict") + QChar(0x1b) + QStringLiteral(".txt")};
+    problem = ::validateOptions(wordlistRun);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCharacter));
+    QCOMPARE(problem.detail, QStringLiteral("dict\\x1b.txt"));
+
+    // Tab is no control character for this check.
+    wordlistRun.wordlists = QStringList{QStringLiteral("two\twords.txt")};
+    QCOMPARE(int(::validateOptions(wordlistRun).code), int(LaunchValidator::LaunchError::None));
+
+    // A value the attack mode leaves out of the command line is not refused:
+    // mode 3 reads no wordlist, so its control character never reaches hashcat.
+    HashcatOptions ignored;
+    ignored.attackMode = AttackMode::BruteForce;
+    ignored.mask = QStringLiteral("?d?d");
+    ignored.wordlists = QStringList{QStringLiteral("dict") + QChar(0x1b) + QStringLiteral(".txt")};
+    QCOMPARE(int(::validateOptions(ignored).code), int(LaunchValidator::LaunchError::None));
 }
 
 int main(int argc, char *argv[])
