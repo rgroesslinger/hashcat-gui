@@ -56,11 +56,16 @@ void TestLaunchMessage::messageFor_data()
         << QStringLiteral("The configured hashcat executable does not exist:\n/opt/hashcat\n"
                           "Navigate to File → Settings to change it.");
 
+    QString notExecutable =
+        QStringLiteral("The configured hashcat path is not an executable file:\n/opt/hashcat\n"
+                       "Navigate to File → Settings to change it.");
+#ifdef Q_OS_WIN
+    notExecutable += QStringLiteral(
+        "\nWindows executable names include their extension, for example hashcat.exe.");
+#endif
     QTest::newRow("HashcatNotExecutable")
         << int(Error::HashcatNotExecutable) << QStringLiteral("/opt/hashcat") << straight << warning
-        << plain
-        << QStringLiteral("The configured hashcat path is not an executable file:\n/opt/hashcat\n"
-                          "Navigate to File → Settings to change it.");
+        << plain << notExecutable;
 
     QTest::newRow("NoTerminal")
         << int(Error::NoTerminal) << QString() << straight << info << rich

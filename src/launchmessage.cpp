@@ -48,14 +48,24 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                 .arg(problem.detail, fileMenuLabel, settingsMenuLabel);
         break;
 
-    case LaunchValidator::LaunchError::HashcatNotExecutable:
+    case LaunchValidator::LaunchError::HashcatNotExecutable: {
         message.format = Qt::PlainText;
-        message.text = QCoreApplication::translate(
+        QString text = QCoreApplication::translate(
                            "LaunchMessage", "The configured hashcat path is not an executable "
                                             "file:\n%1\n"
                                             "Navigate to %2 → %3 to change it.")
                            .arg(problem.detail, fileMenuLabel, settingsMenuLabel);
+#ifdef Q_OS_WIN
+        // Windows resolves a program by its suffix; "hashcat" without .exe
+        // is a common hand edit here.
+        text += QLatin1Char('\n')
+                + QCoreApplication::translate(
+                    "LaunchMessage",
+                    "Windows executable names include their extension, for example hashcat.exe.");
+#endif
+        message.text = text;
         break;
+    }
 
     case LaunchValidator::LaunchError::NoTerminal:
         message.icon = QMessageBox::Information;
