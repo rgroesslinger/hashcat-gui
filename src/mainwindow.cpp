@@ -1570,10 +1570,13 @@ void MainWindow::startClicked()
     const LaunchCommand command = TerminalCatalog::launchCommand(
         context.configuredTerminal, terminals.value(context.configuredTerminal),
         context.resolvedHashcatPath, CommandBuilder::build(context.options), true);
-    if (command.program.isEmpty()) {
-        QMessageBox::warning(this, tr("Launch failed"),
-                             tr("The command line is too long for the terminal. Shorten the "
-                                "argument lists or their values and try again."));
+    if (command.refusal != LaunchCommand::Refusal::None) {
+        const LaunchMessage message = messageFor(command, context.configuredTerminal);
+        QMessageBox box(this);
+        box.setIcon(message.icon);
+        box.setTextFormat(message.format);
+        box.setText(message.text);
+        box.exec();
         return;
     }
 

@@ -10,13 +10,21 @@
 #include <QMap>
 #include <QString>
 #include <QStringList>
+#include <cstdint>
 
-// The program and the arguments that start hashcat in a terminal. An empty
-// program means the launch is refused: the terminal is unknown, or the
-// command line would exceed the length a Windows process can take.
+// The program and the arguments that start hashcat in a terminal, and - when
+// they could not be built - why. A refusal type keeps the caller from showing
+// the "too long" message for an unknown terminal.
 struct LaunchCommand {
+    enum class Refusal : std::uint8_t {
+        None,
+        UnknownTerminal,
+        CommandTooLong,
+    };
+
     QString program;
     QStringList arguments;
+    Refusal refusal = Refusal::None;
 };
 
 // The supported terminals: discovery, the launch command line, and the one

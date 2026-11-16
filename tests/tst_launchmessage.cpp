@@ -19,6 +19,8 @@ class TestLaunchMessage : public QObject
 private slots:
     void messageFor_data();
     void messageFor();
+    void refusalMessage_data();
+    void refusalMessage();
     void noProblemHasNoMessage();
 };
 
@@ -223,6 +225,61 @@ void TestLaunchMessage::messageFor()
 
     const LaunchMessage message =
         ::messageFor(problem, context, QStringLiteral("File"), QStringLiteral("Settings"));
+    QCOMPARE(int(message.icon), icon);
+    QCOMPARE(int(message.format), format);
+    QCOMPARE(message.text, text);
+}
+
+// A refusal from the command builder gets its own message: an unknown
+// terminal is a configuration problem, while a too-long command is the fixed
+// CreateProcess limit of the encoded PowerShell script.
+void TestLaunchMessage::refusalMessage_data()
+{
+    using Refusal = LaunchCommand::Refusal;
+
+    QTest::addColumn<int>("refusal");
+    QTest::addColumn<QString>("terminal");
+    QTest::addColumn<int>("icon");
+    QTest::addColumn<int>("format");
+    QTest::addColumn<QString>("text");
+
+    const int warning = int(QMessageBox::Warning);
+    const int autoText = int(Qt::AutoText);
+    const int plain = int(Qt::PlainText);
+
+    QTest::newRow("built") << int(Refusal::None) << QStringLiteral("konsole") << warning << autoText
+                           << QString();
+
+    QTest::newRow("unknown terminal")
+        << int(Refusal::UnknownTerminal) << QStringLiteral("yakuake") << warning << plain
+        << QStringLiteral("The configured terminal “yakuake” is not available.");
+
+    QTest::newRow("too long") << int(Refusal::CommandTooLong) << QStringLiteral("pwsh") << warning
+                              << plain
+                              << QStringLiteral(
+                                     "The command line is too long for a PowerShell terminal. The "
+                                     "encoded script must fit into 32,767 characters, which "
+                                     "leaves room for about 12,000 ASCII characters of hashcat "
+                                     "arguments. Shorten the argument lists or their values and "
+                                     "try again.");
+}
+
+void TestLaunchMessage::refusalMessage()
+{
+    QFETCH(int, refusal);
+    QFETCH(QString, terminal);
+    QFETCH(int, icon);
+    QFETCH(int, format);
+    QFETCH(QString, text);
+
+    LaunchCommand command;
+    command.refusal = static_cast<LaunchCommand::Refusal>(refusal);
+    const LaunchMessage message = ::messageFor(command, terminal);
+
+    if (command.refusal == LaunchCommand::Refusal::None) {
+        QVERIFY(message.text.isEmpty());
+        return;
+    }
     QCOMPARE(int(message.icon), icon);
     QCOMPARE(int(message.format), format);
     QCOMPARE(message.text, text);

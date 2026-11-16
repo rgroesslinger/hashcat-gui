@@ -120,7 +120,9 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     const QMap<QString, QStringList> &table = terminalArguments();
     const auto it = table.constFind(terminal);
     if (it == table.constEnd()) {
-        return {};
+        LaunchCommand refused;
+        refused.refusal = LaunchCommand::Refusal::UnknownTerminal;
+        return refused;
     }
 
     // -Command would re-parse the hashcat command line as PowerShell code:
@@ -153,7 +155,9 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
         constexpr int maxCommandLine = 32767;
         constexpr int commandLineMargin = 64;
         if (terminalProgram.size() + encoded.size() + commandLineMargin > maxCommandLine) {
-            return {};
+            LaunchCommand refused;
+            refused.refusal = LaunchCommand::Refusal::CommandTooLong;
+            return refused;
         }
 
         LaunchCommand command;

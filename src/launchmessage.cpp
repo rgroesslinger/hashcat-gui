@@ -296,3 +296,37 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
 
     return message;
 }
+
+// A command the catalog refused to build. The two causes have one message
+// each: an unknown terminal is a configuration problem, while a too-long
+// command is the fixed CreateProcess limit of the encoded PowerShell script.
+LaunchMessage messageFor(const LaunchCommand &command, const QString &configuredTerminal)
+{
+    LaunchMessage message;
+
+    // No default case: a new refusal has to earn its message here.
+    switch (command.refusal) {
+    case LaunchCommand::Refusal::None:
+        return {};
+
+    case LaunchCommand::Refusal::UnknownTerminal:
+        message.format = Qt::PlainText;
+        message.text = QCoreApplication::translate("LaunchMessage",
+                                                   "The configured terminal “%1” is not available.")
+                           .arg(configuredTerminal);
+        break;
+
+    case LaunchCommand::Refusal::CommandTooLong:
+        // The 12,000 is measured by tst_terminalcatalog; the script and the
+        // CreateProcess margin are what set it.
+        message.format = Qt::PlainText;
+        message.text = QCoreApplication::translate(
+            "LaunchMessage",
+            "The command line is too long for a PowerShell terminal. The encoded script must fit "
+            "into 32,767 characters, which leaves room for about 12,000 ASCII characters of "
+            "hashcat arguments. Shorten the argument lists or their values and try again.");
+        break;
+    }
+
+    return message;
+}

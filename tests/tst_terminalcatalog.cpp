@@ -92,6 +92,7 @@ private slots:
     void launchCommandCarriesSmartQuotesAsBase64();
     void launchCommandRefusesAnOverlongCommandLine();
     void launchCommandRefusesAnUnknownTerminal();
+    void commandLengthLimitIsDocumented();
     void launchCommandRoundTripsThroughPowerShell_data();
     void launchCommandRoundTripsThroughPowerShell();
     void launchCommandKeepOpenHoldsTheSession_data();
@@ -297,7 +298,8 @@ void TestTerminalCatalog::launchCommandCarriesSmartQuotesAsBase64()
              qPrintable(decodeScript(command.arguments.last())));
 }
 
-// A command line beyond the Windows limit is refused, never truncated.
+// A command line beyond the Windows limit is refused, never truncated, and
+// the refusal says which cause it was.
 void TestTerminalCatalog::launchCommandRefusesAnOverlongCommandLine()
 {
     const QStringList arguments{QString(40000, QLatin1Char('a'))};
@@ -305,12 +307,14 @@ void TestTerminalCatalog::launchCommandRefusesAnOverlongCommandLine()
         QStringLiteral("pwsh"), QStringLiteral("pwsh"), QStringLiteral("hashcat"), arguments, true);
     QVERIFY(command.program.isEmpty());
     QVERIFY(command.arguments.isEmpty());
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::CommandTooLong));
 
     // The same launch well under the limit goes through.
     const LaunchCommand small =
         TerminalCatalog::launchCommand(QStringLiteral("pwsh"), QStringLiteral("pwsh"),
                                        QStringLiteral("hashcat"), {QStringLiteral("?d?d")}, true);
     QVERIFY(!small.program.isEmpty());
+    QCOMPARE(int(small.refusal), int(LaunchCommand::Refusal::None));
 }
 
 void TestTerminalCatalog::launchCommandRefusesAnUnknownTerminal()
@@ -320,6 +324,36 @@ void TestTerminalCatalog::launchCommandRefusesAnUnknownTerminal()
         QStringLiteral("hashcat"), {QStringLiteral("--help")}, true);
     QVERIFY(command.program.isEmpty());
     QVERIFY(command.arguments.isEmpty());
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::UnknownTerminal));
+}
+
+// The refusal message says "about 12,000 ASCII characters"; that number is
+// the measured one-token limit next to an ordinary program name. If the
+// script overhead or the CreateProcess margin changes, this has to move with
+// the message.
+void TestTerminalCatalog::commandLengthLimitIsDocumented()
+{
+    const QString hashcatPath = QStringLiteral("/opt/hashcat");
+    const auto fits = [&hashcatPath](qsizetype length) {
+        const LaunchCommand command = TerminalCatalog::launchCommand(
+            QStringLiteral("pwsh"), QStringLiteral("pwsh"), hashcatPath,
+            QStringList{QString(length, QLatin1Char('a'))}, false);
+        return command.refusal == LaunchCommand::Refusal::None;
+    };
+
+    qsizetype low = 0;
+    qsizetype high = 20000;
+    while (low < high) {
+        const qsizetype mid = low + (high - low + 1) / 2;
+        if (fits(mid)) {
+            low = mid;
+        } else {
+            high = mid - 1;
+        }
+    }
+    QCOMPARE(low, qsizetype(12038));
+    QVERIFY(fits(low));
+    QVERIFY(!fits(low + 1));
 }
 
 // The encoding is only proven once a real PowerShell has parsed it: start the
