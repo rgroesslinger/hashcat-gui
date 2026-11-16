@@ -48,8 +48,8 @@ re-run `cmake -B build`.
   starts the terminal.
 - Attack-mode gating predicates live in `CommandBuilder`; `modeRequirements()` derives mode hints
   and launch validation. Launch is `LaunchValidator::validate()` (option checks first, launch
-  checks second); `TerminalCatalog::launchDetached()` starts hashcat detached
-  (`CREATE_NEW_CONSOLE` on Windows).
+  checks second); `TerminalCatalog::launchDetached()` starts hashcat detached from resolved
+  absolute paths (`CREATE_NEW_CONSOLE` on Windows).
 - Example sessions in `src/examples.h`: one `Entry` per attack mode in combo order; paths use
   `Examples::DataPrefix` and unpack into `Examples::DataDirectory`.
 - `PathMonitor`: wordlist and PCFG rulesets may be folders (wordlist needs a file, ruleset needs
@@ -62,6 +62,29 @@ re-run `cmake -B build`.
 - Hash types load asynchronously from `hashcat --example-hashes --machine-readable`;
   `m_pendingHashTypeId` applies a session's type later. Never block the GUI thread with a hashcat
   query; read `QSettings` on the calling thread before `QtConcurrent` (it is only reentrant).
+
+## Launch
+
+- `Executable::resolve()` is the only way a configured program becomes a process program: an
+  empty value, a bare name off PATH, a missing file and a non-executable path all resolve to
+  empty. Only the absolute result reaches `QProcess`; the stored settings text is display-only.
+- `CommandBuilder::build()` inserts `--` before the positional tail only when one of those
+  tokens starts with `-`; ordinary argv stays byte-identical. `LaunchValidator` refuses NUL and
+  every C0 control except tab, and reports `HashcatNotExecutable` separately from a missing file.
+- On Windows hashcat runs through `TerminalCatalog::powerShellScript()` as a PowerShell
+  `-EncodedCommand` script; the same function feeds Tools → Copy as PowerShell Script. User data
+  travels only inside the encoded script, quoted by `powerShellQuoteArgument()` over
+  `msvcrtJoinArguments()`. Never switch to `-Command`. An overlong line is a typed
+  `CommandTooLong` refusal; `tst_terminalcatalog` pins the measured limit the message quotes.
+- On Unix every terminal runs one fixed `sh -c` wrapper; hashcat and its arguments are
+  positional parameters after the script, never text spliced into it. The wrapper owns the
+  working directory, the exit code and the hold-open prompt, so the terminal table holds only
+  each terminal's command-mode flag.
+- The preview and clipboard follow the configured terminal's shell
+  (`CommandPreview::Dialect`), not the build platform. `pwsh` is a shell, not a terminal:
+  discovery offers it only on Windows, where `CREATE_NEW_CONSOLE` gives it a window.
+- ptyxis and cmd.exe are deliberately unsupported; `FAQ.yaml` records why. Do not re-add one
+  without a way to pass a command verbatim.
 
 ## Adding a hashcat option
 
