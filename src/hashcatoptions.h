@@ -125,6 +125,10 @@ struct HashcatOptions {
     bool outfileEnabled = false;
     // The template as typed, with <unixtime> and <hash> still in it
     QString outfile;
+    // Seconds since the epoch for <unixtime>, set once when the options are
+    // collected. build() reads no clock, so a preview and a launch are
+    // reproducible from the options they were built with.
+    qint64 unixTime = 0;
     QString outfileFormat = AppConstants::Defaults::OutfileFormat;
     // --outfile-json wins over --outfile-format: the two are exclusive.
     bool outfileJson = false;

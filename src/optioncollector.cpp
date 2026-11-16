@@ -11,6 +11,7 @@
 #include "ui_mainwindow.h"
 
 #include <QComboBox>
+#include <QDateTime>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QRadioButton>
@@ -22,6 +23,11 @@ HashcatOptions OptionCollector::collect(const Ui::MainWindow &ui, bool useShortP
 {
     HashcatOptions options;
     options.useShortParameters = useShortParameters;
+
+    // The one clock read per collection: the preview and the launch each
+    // expand <unixtime> from the options they were built with, so build()
+    // itself stays pure.
+    options.unixTime = QDateTime::currentSecsSinceEpoch();
 
     // currentData() is invalid while the hash type list has not been filled -
     // no hashcat configured, or the query failed. CommandBuilder then leaves

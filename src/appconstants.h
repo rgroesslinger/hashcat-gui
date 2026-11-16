@@ -358,9 +358,6 @@ inline constexpr int RecipeHashType = 4000;
 inline constexpr int QueryTimeoutMs = 20000;
 } // namespace Hashcat
 
-// Conversion factor for the <unixtime> placeholder, which is in seconds.
-inline constexpr qint64 MsecsPerSecond = 1000;
-
 } // namespace AppConstants
 
 #endif // APPCONSTANTS_H

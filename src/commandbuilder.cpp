@@ -7,7 +7,6 @@
 
 #include "appconstants.h"
 
-#include <QDateTime>
 #include <QFileInfo>
 #include <QMap>
 #include <algorithm>
@@ -100,12 +99,11 @@ bool CommandBuilder::attackUsesWordlistEncoding(AttackMode mode)
            || mode == AttackMode::Association || mode == AttackMode::Hybrid;
 }
 
-QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QString &hashFile)
+QString CommandBuilder::expandOutfileTemplate(const QString &tmplate, const QString &hashFile,
+                                              qint64 unixTime)
 {
     QString outfile = tmplate;
-    outfile.replace(
-        AppConstants::Placeholders::UnixTime,
-        QString::number(QDateTime::currentMSecsSinceEpoch() / AppConstants::MsecsPerSecond));
+    outfile.replace(AppConstants::Placeholders::UnixTime, QString::number(unixTime));
     outfile.replace(AppConstants::Placeholders::Hash, QFileInfo(hashFile).fileName(),
                     Qt::CaseInsensitive);
     return outfile;
@@ -452,7 +450,7 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
 
     if (options.outfileEnabled && !options.outfile.isEmpty()) {
         arguments << parameterName(Parameter::Outfile, useShort)
-                  << expandOutfileTemplate(options.outfile, options.hashFile);
+                  << expandOutfileTemplate(options.outfile, options.hashFile, options.unixTime);
     }
 
     // The two outfile shapes are exclusive; JSON wins, so a session that

@@ -98,8 +98,11 @@ public:
 
     static QStringList build(const HashcatOptions &options);
 
-    // Substitutes <unixtime> and <hash> in the outfile template.
-    static QString expandOutfileTemplate(const QString &tmplate, const QString &hashFile);
+    // Substitutes <unixtime> (from the collected seconds) and <hash> in the
+    // outfile template. The caller owns the clock read, so build() stays
+    // reproducible.
+    static QString expandOutfileTemplate(const QString &tmplate, const QString &hashFile,
+                                         qint64 unixTime);
 
     // The ?w and ?q markers in a mask. ?? is a literal question mark and
     // every other ?x is a charset token, so the count cannot be derived

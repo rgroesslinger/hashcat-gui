@@ -8,7 +8,6 @@
 #include "hashcatoptions.h"
 #include "testenvironment.h"
 
-#include <QDateTime>
 #include <QSet>
 #include <array>
 
@@ -639,29 +638,40 @@ void TestCommandBuilder::outfileIsOptInAndExpanded()
     arguments = CommandBuilder::build(options);
     QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--outfile")) + 1),
              QStringLiteral("out/example.hash.txt"));
+
+    // <unixtime> is expanded from the collected seconds, not read here.
+    options.outfile = QStringLiteral("out/<unixtime>-<hash>.txt");
+    options.unixTime = 1700000000;
+    arguments = CommandBuilder::build(options);
+    QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--outfile")) + 1),
+             QStringLiteral("out/1700000000-example.hash.txt"));
 }
 
 void TestCommandBuilder::expandOutfileTemplateSubstitutesUnixTimeAndHash()
 {
-    QVERIFY(CommandBuilder::expandOutfileTemplate(QStringLiteral("plain.txt"),
-                                                  QStringLiteral("/tmp/whatever"))
-            == QStringLiteral("plain.txt"));
+    constexpr qint64 moment = 1700000000;
 
-    const qint64 before = QDateTime::currentMSecsSinceEpoch() / 1000;
-    const QString stamped = CommandBuilder::expandOutfileTemplate(QStringLiteral("<unixtime>"),
-                                                                  QStringLiteral("/tmp/whatever"));
-    const qint64 after = QDateTime::currentMSecsSinceEpoch() / 1000;
+    QCOMPARE(CommandBuilder::expandOutfileTemplate(QStringLiteral("plain.txt"),
+                                                   QStringLiteral("/tmp/whatever"), moment),
+             QStringLiteral("plain.txt"));
 
-    bool isNumber = false;
-    const qint64 unixTime = stamped.toLongLong(&isNumber);
-    QVERIFY2(isNumber, qPrintable(stamped));
-    QVERIFY(unixTime >= before);
-    QVERIFY(unixTime <= after);
+    // The seconds are the caller's: the function reads no clock, so two
+    // builds of the same options produce the same name.
+    QCOMPARE(CommandBuilder::expandOutfileTemplate(QStringLiteral("<unixtime>"),
+                                                   QStringLiteral("/tmp/whatever"), moment),
+             QStringLiteral("1700000000"));
+    QCOMPARE(CommandBuilder::expandOutfileTemplate(QStringLiteral("<unixtime>"),
+                                                   QStringLiteral("/tmp/whatever"), 1),
+             QStringLiteral("1"));
 
-    // the placeholder is matched without regard to case, the file name is not
+    // <hash> is matched without regard to case, the file name is not; the
+    // <unixtime> spelling is the documented lower-case one.
     QCOMPARE(CommandBuilder::expandOutfileTemplate(QStringLiteral("cracked_<HASH>.txt"),
-                                                   QStringLiteral("/tmp/My.Hash.TXT")),
+                                                   QStringLiteral("/tmp/My.Hash.TXT"), moment),
              QStringLiteral("cracked_My.Hash.TXT.txt"));
+    QCOMPARE(CommandBuilder::expandOutfileTemplate(QStringLiteral("<UNIXTIME>.txt"),
+                                                   QStringLiteral("/tmp/My.Hash.TXT"), moment),
+             QStringLiteral("<UNIXTIME>.txt"));
 }
 
 // A mask describes a password, and a password may hold anything - including
