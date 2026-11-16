@@ -101,6 +101,7 @@ private slots:
     void findHashcatInPathProbesBothUnixNames();
     void findHashcatInPathIsEmptyWithoutOne();
     void availableTerminalsReturnsResolvedPrograms();
+    void availableTerminalsOfferPowerShellOnlyOnWindows();
     void launchDetachedStartsTheProgram();
     void launchDetachedReportsAFailure();
 };
@@ -538,6 +539,34 @@ void TestTerminalCatalog::availableTerminalsReturnsResolvedPrograms()
     const QString resolved = terminals.value(QStringLiteral("xterm"));
     QVERIFY2(QDir::isAbsolutePath(resolved), "the terminal was not resolved to an absolute path");
     QCOMPARE(QFileInfo(resolved).canonicalFilePath(), QFileInfo(stub).canonicalFilePath());
+}
+
+// A PowerShell shell is not a terminal: on Linux and macOS it opens no window
+// when started by itself, so discovery must not offer it there. The script
+// branch still recognises the name - the tests and a Windows session use it.
+void TestTerminalCatalog::availableTerminalsOfferPowerShellOnlyOnWindows()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+#ifdef Q_OS_WIN
+    const QString fileName = QStringLiteral("pwsh.exe");
+#else
+    const QString fileName = QStringLiteral("pwsh");
+#endif
+    const QString stub = TestEnvironment::writeSearchableExecutable(fileName, directory.path());
+    QVERIFY2(!stub.isEmpty(), "the pwsh stub could not be written");
+
+    TestEnvironment::PathGuard guard(directory.path().toUtf8());
+
+    const QMap<QString, QString> terminals = TerminalCatalog::availableTerminals();
+#ifdef Q_OS_WIN
+    QVERIFY2(terminals.contains(QStringLiteral("pwsh")),
+             "Windows did not offer the installed pwsh");
+#else
+    QVERIFY2(!terminals.contains(QStringLiteral("pwsh")),
+             "Unix offered pwsh although it opens no window");
+#endif
+    QVERIFY(TerminalCatalog::isPowerShell(QStringLiteral("pwsh")));
 }
 
 // The detached start runs the program in the hashcat binary's own directory
