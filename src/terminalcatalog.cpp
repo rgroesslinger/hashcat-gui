@@ -17,6 +17,24 @@
 #include <windows.h>
 #endif
 
+namespace
+{
+// The directory hashcat runs in: the canonical directory of its program, so a
+// symlink in ~/bin does not send it looking for its kernels in ~/bin. The
+// program path stays the resolved one; only the directory follows the link.
+QString programDirectory(const QString &programPath)
+{
+    // canonicalFilePath() follows the symlink to the real file; an
+    // unresolvable path (a test path, or one that vanished) keeps the plain
+    // absolute directory instead of Qt's "." fallback.
+    const QString canonical = QFileInfo(programPath).canonicalFilePath();
+    if (canonical.isEmpty()) {
+        return QFileInfo(programPath).absolutePath();
+    }
+    return QFileInfo(canonical).absolutePath();
+}
+} // namespace
+
 // The arguments that belong between the terminal program and the hashcat
 // command line, for every supported terminal. The entries are pure data -
 // nothing here looks at the filesystem.
@@ -115,7 +133,7 @@ QString TerminalCatalog::powerShellScript(const QString &hashcatPath, const QStr
            + powerShellQuoteArgument(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
            + powerShellQuoteArgument(msvcrtJoinArguments(arguments))
            + QStringLiteral("\n$si.UseShellExecute = $false\n$si.WorkingDirectory = ")
-           + powerShellQuoteArgument(QFileInfo(hashcatPath).absolutePath())
+           + powerShellQuoteArgument(programDirectory(hashcatPath))
            + QStringLiteral("\n$p = [System.Diagnostics.Process]::Start($si)\n"
                             "$p.WaitForExit()");
 }
@@ -209,7 +227,7 @@ read -r _)");
                       << wrapper
                       // $0 for the wrapper, then the directory, the hashcat
                       // program and its argv as $1 ... $n.
-                      << QStringLiteral("hashcat-gui") << QFileInfo(hashcatPath).absolutePath()
+                      << QStringLiteral("hashcat-gui") << programDirectory(hashcatPath)
                       << hashcatPath << arguments;
     return command;
 }
@@ -227,7 +245,7 @@ bool TerminalCatalog::launchDetached(const LaunchCommand &command, const QString
 
     proc.setProgram(command.program);
     proc.setArguments(command.arguments);
-    proc.setWorkingDirectory(QFileInfo(hashcatPath).absolutePath());
+    proc.setWorkingDirectory(programDirectory(hashcatPath));
 
     if (!proc.startDetached()) {
         if (errorMessage) {

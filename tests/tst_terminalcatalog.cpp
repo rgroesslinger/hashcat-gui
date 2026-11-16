@@ -166,6 +166,7 @@ private slots:
     void findHashcatInPathIsEmptyWithoutOne();
     void availableTerminalsReturnsResolvedPrograms();
     void availableTerminalsOfferPowerShellOnlyOnWindows();
+    void programDirectoryFollowsSymlinks();
     void launchDetachedStartsTheProgram();
     void unixWrapperRunsHashcatInItsDirectoryWithTheArguments();
     void unixWrapperSurvivesInterrupt();
@@ -775,8 +776,41 @@ void TestTerminalCatalog::availableTerminalsOfferPowerShellOnlyOnWindows()
     QVERIFY(TerminalCatalog::isPowerShell(QStringLiteral("pwsh")));
 }
 
+// A hashcat binary reached through a symlink runs next to the real file: its
+// kernels are there, not in the directory the link sits in. The program path
+// itself stays the resolved link.
+void TestTerminalCatalog::programDirectoryFollowsSymlinks()
+{
+#ifdef Q_OS_WIN
+    QSKIP("symlinks need privileges on Windows");
+#else
+    QTemporaryDir target;
+    QTemporaryDir links;
+    QVERIFY(target.isValid() && links.isValid());
+    const QString hashcat = TestEnvironment::writeShellStub(QStringLiteral("hashcat-linked"),
+                                                            "#!/bin/sh\nexit 0\n", target.path());
+    QVERIFY2(!hashcat.isEmpty(), "the hashcat stub could not be written");
+    const QString link = links.filePath(QStringLiteral("hashcat"));
+    QVERIFY2(QFile::link(hashcat, link), "the symlink could not be created");
+
+    const QString expected = QFileInfo(hashcat).canonicalPath();
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        QStringLiteral("xterm"), QStringLiteral("xterm"), link, {QStringLiteral("--help")}, true);
+    const qsizetype marker = command.arguments.indexOf(QStringLiteral("hashcat-gui"));
+    QVERIFY(marker >= 0);
+    QCOMPARE(command.arguments.at(marker + 1), expected);
+
+    const QString script = TerminalCatalog::powerShellScript(link, {QStringLiteral("--help")});
+    QVERIFY2(script.contains(QStringLiteral("$si.WorkingDirectory = ")
+                             + powerShellQuoteArgument(expected)),
+             qPrintable(script));
+#endif
+}
+
 // The detached start runs the program in the hashcat binary's own directory
-// and hands it the arguments unchanged. The stub records both.
+// and hands it the arguments unchanged. The stub records both. The binary is
+// reached through a symlink in another directory: the working directory has
+// to be the real file's, not the link's.
 void TestTerminalCatalog::launchDetachedStartsTheProgram()
 {
 #ifdef Q_OS_WIN
@@ -792,8 +826,14 @@ void TestTerminalCatalog::launchDetachedStartsTheProgram()
             .toUtf8());
     QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
 
-    // The hashcat path does not have to exist: only its directory is used.
-    const QString hashcatPath = directory.filePath(QStringLiteral("hashcat"));
+    const QString hashcat = TestEnvironment::writeShellStub(
+        QStringLiteral("hashcat-detached"), "#!/bin/sh\nexit 0\n", directory.path());
+    QVERIFY2(!hashcat.isEmpty(), "the hashcat stub could not be written");
+    QTemporaryDir links;
+    QVERIFY(links.isValid());
+    const QString hashcatPath = links.filePath(QStringLiteral("hashcat"));
+    QVERIFY2(QFile::link(hashcat, hashcatPath), "the symlink could not be created");
+
     LaunchCommand command;
     command.program = stub;
     command.arguments << QStringLiteral("hashcat") << QStringLiteral("--attack-mode")
@@ -831,6 +871,13 @@ void TestTerminalCatalog::unixWrapperRunsHashcatInItsDirectoryWithTheArguments()
         directory.path());
     QVERIFY2(!hashcat.isEmpty(), "the hashcat stub could not be written");
 
+    // A symlink in another directory: the wrapper's cd has to reach the real
+    // file's directory, not the link's.
+    QTemporaryDir links;
+    QVERIFY(links.isValid());
+    const QString hashcatPath = links.filePath(QStringLiteral("hashcat"));
+    QVERIFY2(QFile::link(hashcat, hashcatPath), "the symlink could not be created");
+
     // A stand-in terminal: consume xterm's -e and run the wrapper, with stdin
     // closed so the wrapper's read does not wait for a keypress.
     const QString terminal = TestEnvironment::writeShellStub(
@@ -840,12 +887,12 @@ void TestTerminalCatalog::unixWrapperRunsHashcatInItsDirectoryWithTheArguments()
 
     const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0"),
                                 QStringLiteral("$2a$10$abc"), QStringLiteral("?d;calc")};
-    const LaunchCommand command =
-        TerminalCatalog::launchCommand(QStringLiteral("xterm"), terminal, hashcat, arguments, true);
+    const LaunchCommand command = TerminalCatalog::launchCommand(QStringLiteral("xterm"), terminal,
+                                                                 hashcatPath, arguments, true);
     QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
 
     QString error;
-    QVERIFY2(TerminalCatalog::launchDetached(command, hashcat, &error), qPrintable(error));
+    QVERIFY2(TerminalCatalog::launchDetached(command, hashcatPath, &error), qPrintable(error));
 
     QTRY_VERIFY_WITH_TIMEOUT(QFile::exists(record), 5000);
     QFile file(record);

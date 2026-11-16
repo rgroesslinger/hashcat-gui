@@ -12,6 +12,7 @@
 - The terminal list follows the platform: Windows offers `powershell.exe` and `pwsh` only, while Linux and macOS offer the table's terminal emulators through the `sh` wrapper. `pwsh` on Linux/macOS is a shell without a window, and the Unix terminals need a shell Windows does not have
 - Every Unix terminal now runs one fixed `sh` wrapper: the command arrives as positional parameters (never as shell text), the wrapper changes into hashcat's directory itself, prints the exit code and waits for Enter. The per-terminal hold flags are gone
 - `<unixtime>` in the outfile template is expanded from the collected options instead of being read inside the command builder, so a preview and a launch are each built from one value rather than two clock reads
+- hashcat runs in the canonical directory of its executable, so a binary reached through a symlink in `~/bin` still finds the kernels next to the real file
 - **Support for hashcat 8.0.0**: the attack mode selector offers all ten of its modes - the PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) modes join the existing ones, each with its own options that only appear where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
 - hashcat 8.0.0 or newer is required; the segment size (`-c`) and workload profile (`-w`) options were removed along with it
 - Example sessions for every attack mode are available under Tools → Load Example Session; each uses a different hash type and test password
