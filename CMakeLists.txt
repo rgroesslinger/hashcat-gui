@@ -3,7 +3,7 @@ project(hashcat-gui
     VERSION 0.8.0
     DESCRIPTION "Graphical user interface for hashcat"
     HOMEPAGE_URL "https://github.com/rgroesslinger/hashcat-gui/"
-    LANGUAGES CXX
+    LANGUAGES C CXX
 )
 
 # The standard install destinations the install() rules below write to.
@@ -216,9 +216,14 @@ elseif(Qt6Test_FOUND)
     # reads its argv back as JSON. It has no Qt Test cases of its own.
     add_executable(argecho tests/argecho.cpp)
     target_link_libraries(argecho PRIVATE Qt6::Core)
+    # The C-runtime twin: plain C, no Qt, so the argv is the one main()
+    # receives, not one Qt rebuilt.
+    add_executable(argecho_crt tests/argecho_crt.c)
     # Outside the test loop, but the analyzers cover all of tests/. It needs
     # no autogen dependency: like main.cpp, it includes nothing generated.
-    list(APPEND ANALYSIS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/argecho.cpp)
+    list(APPEND ANALYSIS_SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/argecho.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/argecho_crt.c)
 
     foreach(test IN LISTS HASHCAT_GUI_TESTS)
         add_executable(${test} tests/${test}.cpp)
@@ -235,6 +240,9 @@ elseif(Qt6Test_FOUND)
         list(APPEND ANALYSIS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/${test}.cpp)
         list(APPEND ANALYSIS_DEPS ${test}_autogen)
     endforeach()
+
+    # The round-trip test starts both helpers; build them before it runs.
+    add_dependencies(tst_terminalcatalog argecho argecho_crt)
 
     # The test only proves :/i18n answers if its binary embeds the catalogs like
     # the application; without LinguistTools there are none and it skips.
@@ -257,6 +265,7 @@ if(CLANG_FORMAT)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.c
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.h)
     add_custom_target(clang-format
         COMMAND ${CLANG_FORMAT} -i ${PROJECT_SOURCES}
