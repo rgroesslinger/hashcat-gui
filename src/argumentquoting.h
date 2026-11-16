@@ -8,6 +8,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <algorithm>
 
 // Command-line quoting for the places a command line is assembled as text:
 // the PowerShell launch script, whose Arguments string goes to CreateProcess
@@ -89,12 +90,8 @@ inline QString posixQuoteArgument(const QString &token)
 // that holds one cannot be quoted literally.
 inline bool powerShellNeedsBase64(const QString &token)
 {
-    for (const QChar c : token) {
-        if (c >= QChar(0x2018) && c <= QChar(0x201b)) {
-            return true;
-        }
-    }
-    return false;
+    return std::ranges::any_of(token,
+                               [](QChar c) { return c >= QChar(0x2018) && c <= QChar(0x201b); });
 }
 
 // One token as a PowerShell expression: a single-quoted literal with an

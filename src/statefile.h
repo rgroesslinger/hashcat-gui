@@ -99,7 +99,8 @@ public:
     // holds besides the one asked for, also when the read failed, so that the
     // message can name them.
     static bool read(const QString &filename, QLatin1StringView section, QJsonObject *values,
-                     int *version, QStringList *otherSections, QString *errorMessage);
+                     int *version, QStringList *otherSections, QString *errorMessage,
+                     bool *versionPresent = nullptr);
 
     // The names in one sentence: "a, b and c" - and "and N more" when there
     // are more of them than fit in a line.

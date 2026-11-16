@@ -56,8 +56,9 @@ enum class LaunchError : std::uint8_t {
     InvalidAssociationSetting,       // a mode 9 token that is not key=value
     AssociationSettingsWithWordlist, // settings only with no wordlist
     NoHashRecipe,                    // hash mode 4000 without its recipe
+    InvalidOutfileFormat,            // --outfile-format is not 1..6 or a list of them
     InvalidCachePath,                // --cache-path is not an existing directory
-    // A collected value holds NUL or a C0 control character other than tab.
+    // A collected value holds NUL or a C0/DEL/C1 control other than tab.
     // A NUL would silently truncate the token at exec, so the launched command
     // would differ from the preview.
     InvalidCharacter,

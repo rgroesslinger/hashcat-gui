@@ -9,8 +9,10 @@
 
 #include <QDir>
 #include <QElapsedTimer>
+#include <QFile>
 #include <QFileInfo>
 #include <QProcess>
+#include <QTemporaryDir>
 
 // The asynchronous hashcat query: the path is a parameter, the output is
 // captured, and a hung child is killed rather than waited out.
@@ -24,6 +26,7 @@ private slots:
     void executeCapturesOutput();
     void executeGivesUpOnTimeout();
     void executeAppendsQuietAndUsesBinaryDirectory();
+    void executeFollowsASymlinkedBinaryToItsRealDirectory();
     void executeDecodesUtf8Output();
 
 private:
@@ -140,6 +143,29 @@ void TestHashcatRunner::executeAppendsQuietAndUsesBinaryDirectory()
     const QStringList expectedArguments{QStringLiteral("--version"),
                                         QString(AppConstants::Hashcat::Quiet)};
     QCOMPARE(output.mid(1), expectedArguments);
+}
+
+// A symlink in another folder must not make the query run in that folder:
+// hashcat looks for its modules next to the real binary.
+void TestHashcatRunner::executeFollowsASymlinkedBinaryToItsRealDirectory()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs or symlinks on this platform");
+#else
+    QVERIFY2(!m_echoScript.isEmpty(), "the shell stub could not be written");
+    QTemporaryDir links;
+    QVERIFY(links.isValid());
+    const QString link = links.filePath(QStringLiteral("hashcat-link"));
+    QVERIFY(QFile::link(m_echoScript, link));
+
+    const HashcatResult result =
+        HashcatRunner::execute(link, {QStringLiteral("--version")}).result();
+    QCOMPARE(int(result.exitStatus), int(QProcess::NormalExit));
+    const QStringList output = result.standardOutput.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QVERIFY(!output.isEmpty());
+    QCOMPARE(QDir(output.value(0)).canonicalPath(),
+             QDir(QFileInfo(m_echoScript).absolutePath()).canonicalPath());
+#endif
 }
 
 // The bytes QProcess hands back are decoded as UTF-8, so a non-ASCII reply

@@ -53,7 +53,9 @@ inline constexpr auto AllAttackModes = std::to_array<AttackMode>({
 struct HashcatOptions {
     bool useShortParameters = false;
 
-    // -1 while no hash type is selected: -m is then left out
+    // -1 while no hash type is selected and -2 for the GUI's "Auto-detect"
+    // entry: -m is left out for either, which is how hashcat autodetect is
+    // requested. Never pass a negative value to hashcat.
     int hashType = -1;
 
     // --hash-recipe, the recipe of hash mode 4000. Emitted only for that

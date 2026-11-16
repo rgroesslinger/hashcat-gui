@@ -30,6 +30,7 @@ private slots:
     void aCorruptFileIsRefused();
     void aJsonArrayIsRefused();
     void aMissingFileIsRefused();
+    void aNegativeVersionIsRefused();
     void aWriteThatFailsIsReported();
     void theErrorIsClearedOnSuccess();
     void nameListFormatsTheNames();
@@ -280,6 +281,19 @@ void TestStateFile::aMissingFileIsRefused()
                              AppConstants::FileSections::Session, nullptr, nullptr, nullptr,
                              &errorMessage));
     QVERIFY(!errorMessage.isEmpty());
+}
+
+// An explicit negative version is malformed, not the "no version at all" hand
+// edit that reads as -1; such a file must never be applied or overwritten.
+void TestStateFile::aNegativeVersionIsRefused()
+{
+    const QString path = scratchFile(QStringLiteral("negative-version.json"));
+    QVERIFY(writeFile(path, R"({"sections": {"session": {"version": -5, "values": {}}}})"));
+
+    const StateFile::Document document = StateFile::readDocument(
+        path, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    QCOMPARE(document.status, StateFile::Status::Unreadable);
+    QVERIFY(!document.error.isEmpty());
 }
 
 // A write that cannot succeed is reported, and a nullptr errorMessage is the

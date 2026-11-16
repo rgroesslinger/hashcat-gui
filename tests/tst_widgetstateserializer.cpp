@@ -38,6 +38,7 @@ private slots:
     void aValueOfTheWrongTypeIsNotApplied();
     void aFractionalNumberIsNotAppliedToASpinBox();
     void aListWithAMalformedEntryIsNotApplied();
+    void aListWithMalformedFieldsIsNotApplied();
     void theInputIsNotModified();
 };
 
@@ -401,6 +402,27 @@ void TestWidgetStateSerializer::aListWithAMalformedEntryIsNotApplied()
 
     QCOMPARE(result.wrongTypes, QStringList{QStringLiteral("listWidget_wordlist")});
     QVERIFY(result.unknownKeys.isEmpty());
+    QCOMPARE(restored.listWidget->count(), 1);
+    QCOMPARE(restored.listWidget->item(0)->text(), QStringLiteral("best64.rule"));
+}
+
+// An object with the right shape but wrong field types would silently become
+// a blank unchecked row; refuse the whole list with a note instead.
+void TestWidgetStateSerializer::aListWithMalformedFieldsIsNotApplied()
+{
+    QJsonObject values;
+    QJsonArray list;
+    list.append(QJsonObject{{QStringLiteral("text"), 42}});
+    values.insert(QStringLiteral("listWidget_wordlist"), list);
+
+    Form restored;
+    auto *kept = new QListWidgetItem(QStringLiteral("best64.rule"), restored.listWidget);
+    kept->setCheckState(Qt::Checked);
+
+    const WidgetStateSerializer::ApplyResult result =
+        WidgetStateSerializer::applyToWidgets(values, &restored.widget);
+
+    QCOMPARE(result.wrongTypes, QStringList{QStringLiteral("listWidget_wordlist")});
     QCOMPARE(restored.listWidget->count(), 1);
     QCOMPARE(restored.listWidget->item(0)->text(), QStringLiteral("best64.rule"));
 }

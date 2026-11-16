@@ -97,6 +97,7 @@ set(HASHCAT_GUI_SOURCES
     src/widgetstateserializer.cpp
     src/pathmonitor.h
     src/pathmonitor.cpp
+    src/programdirectory.h
     src/resources.qrc
     src/aboutdialog.ui
     src/mainwindow.ui

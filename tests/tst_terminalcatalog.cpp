@@ -422,7 +422,14 @@ void TestTerminalCatalog::launchCommandRefusesAnUnknownTerminal()
 // the message.
 void TestTerminalCatalog::commandLengthLimitIsDocumented()
 {
+#ifdef Q_OS_WIN
+    // A root-relative path resolves against the current drive and gains its
+    // "X:" prefix in the working directory, so the path and directory are
+    // shortened to keep the measured script length the same as on POSIX.
+    const QString hashcatPath = QStringLiteral("C:/h/hashcat");
+#else
     const QString hashcatPath = QStringLiteral("/opt/hashcat");
+#endif
     const auto fits = [&hashcatPath](qsizetype length) {
         const LaunchCommand command = TerminalCatalog::launchCommand(
             QStringLiteral("pwsh"), QStringLiteral("pwsh"), hashcatPath,
@@ -433,7 +440,7 @@ void TestTerminalCatalog::commandLengthLimitIsDocumented()
     qsizetype low = 0;
     qsizetype high = 20000;
     while (low < high) {
-        const qsizetype mid = low + (high - low + 1) / 2;
+        const qsizetype mid = low + ((high - low + 1) / 2);
         if (fits(mid)) {
             low = mid;
         } else {
@@ -725,8 +732,12 @@ void TestTerminalCatalog::availableTerminalsReturnsResolvedPrograms()
     QTemporaryDir directory;
     QVERIFY(directory.isValid());
 #ifdef Q_OS_WIN
-    const QString fileName = QStringLiteral("xterm.exe");
+    // Windows offers only the PowerShell shells, so xterm would be filtered
+    // out before the PATH lookup.
+    const QString terminal = QStringLiteral("pwsh");
+    const QString fileName = QStringLiteral("pwsh.exe");
 #else
+    const QString terminal = QStringLiteral("xterm");
     const QString fileName = QStringLiteral("xterm");
 #endif
     const QString stub = TestEnvironment::writeSearchableExecutable(fileName, directory.path());
@@ -735,8 +746,8 @@ void TestTerminalCatalog::availableTerminalsReturnsResolvedPrograms()
     TestEnvironment::PathGuard guard(directory.path().toUtf8());
 
     const QMap<QString, QString> terminals = TerminalCatalog::availableTerminals();
-    QVERIFY2(terminals.contains(QStringLiteral("xterm")), "the terminal on PATH was not found");
-    const QString resolved = terminals.value(QStringLiteral("xterm"));
+    QVERIFY2(terminals.contains(terminal), "the terminal on PATH was not found");
+    const QString resolved = terminals.value(terminal);
     QVERIFY2(QDir::isAbsolutePath(resolved), "the terminal was not resolved to an absolute path");
     QCOMPARE(QFileInfo(resolved).canonicalFilePath(), QFileInfo(stub).canonicalFilePath());
 }

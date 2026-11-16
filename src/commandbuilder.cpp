@@ -54,6 +54,13 @@ bool CommandBuilder::attackUsesRules(AttackMode mode)
 // 0, 6 and 9, and the first one in combination mode. Modes 4 and 5 are left
 // out on purpose: their candidates come from the device engine, which refuses
 // --rule-left late, and upstream's own advice there is to use -r.
+//
+// Mode 7 is included because hashcat 8.0.0 applies -j to its single wordlist;
+// with the supplied binary, -a 7 -j c capitalizes the word and -k is ignored,
+// though hashcat's help and user_options.c say -k should apply. The gating
+// deliberately offers both fields for this mode and leaves the choice to the
+// user; pinned against hashcat v8.0.0 rather than changed on an upstream
+// contradiction.
 bool CommandBuilder::attackUsesRuleLeft(AttackMode mode)
 {
     return mode == AttackMode::Straight || mode == AttackMode::Combination

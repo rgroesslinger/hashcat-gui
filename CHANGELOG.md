@@ -2,24 +2,32 @@
 
 ## Unreleased
 
-- **Support for hashcat 8.0.0**: the attack mode selector offers all ten of its modes - the PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) modes join the existing ones, each with its own options that only appear where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
-- hashcat 8.0.0 or newer is required; the segment size (`-c`) and workload profile (`-w`) options were removed along with it
-- Example sessions for every attack mode are available under Tools → Load Example Session; each uses a different hash type and test password
+### New Features
+- **Support for hashcat 8.0.0**: the attack mode selector offers all ten modes — PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) join the existing ones, each with its own options shown only where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
+- The minimum hashcat version is now 8.0.0; the segment size (`-c`) and workload profile (`-w`) options were removed as part of the upgrade
+- Example sessions for every attack mode are available under Tools → Load Example Session, each with a different hash type and test password
 - Wordlist entries are watched while the window is open: a row whose file does not exist is marked with a warning icon ([#15](https://github.com/rgroesslinger/hashcat-gui/issues/15))
 - The About dialog now checks for updates ([#16](https://github.com/rgroesslinger/hashcat-gui/issues/16))
 - The settings dialog offers the hashcat found on the system PATH when no path is configured ([#17](https://github.com/rgroesslinger/hashcat-gui/issues/17))
 - New options: `--hash-recipe` for hash mode 4000, `--rules-concat` to pass several `-r` files in one run, `--outfile-json` in place of the outfile format, and `--cache-path`
-- The feed modes are validated before launch: PCFG and table settings (range, repeated keys, a grammar held to the mask with `omen=1` or hint words without a source), the hybrid mode's `?w`/`?q` markers against the selected wordlists, the association settings line next to a wordlist, and a cache path that is not a directory
-- A folder can be selected as a wordlist (the base lists only - the multiplied `?q` list has to be a file) and as a PCFG ruleset when it holds a `Grammar/grammar.txt`; a table is still a file only
-- Wordlists and PCFG rulesets offer an “Add folder…” button; an empty wordlist folder, a ruleset folder without a grammar and a folder in the table list are marked, and a folder in the `?q` slot is refused before launch
-- The hash type selector is searchable and provides auto completions
-- Added Ghostty as supported launch terminal
-- Windows PowerShell 5.1 (and pwsh before 7.3) mangled embedded double quotes and dropped empty arguments; no user value reaches a shell as text, and an encoded command beyond the 32,767-character CreateProcess limit (about 12,000 characters of hashcat arguments) is refused instead of truncated
-- The command preview and the clipboard follow the configured terminal's shell - PowerShell with the call operator and single quotes for `powershell.exe` and `pwsh`, POSIX otherwise - so a copied command can be pasted as-is into pwsh 7.3 or later. Windows PowerShell 5.1 still mangles embedded quotes and empty arguments in a pasted native command; use Tools → Copy as PowerShell Script there. That action copies the same readable `ProcessStartInfo` script that the launch encodes
-- Positional values that start with `-` - a mask `-?d?d`, a wordlist, a session value - are protected by `--` before the positional tail, so they are not parsed as hashcat options. NUL and other control characters are refused before launch
-- The attack mode survives a settings change that reloads the hash types; previously the mode selector was refilled and silently jumped back to Straight
-- `cmd.exe` and `ptyxis` were dropped from the supported terminals: Neither has a way to correctly escape some shell characters that may appear in the command. See the FAQ for a more in-depth explanation of the issue
+- A folder can be selected as a wordlist (base lists only — the multiplied `?q` list has to be a file) and as a PCFG ruleset when it contains a `Grammar/grammar.txt`; a table must still be a file
+- Wordlists and PCFG rulesets offer an “Add folder…” button; empty wordlist folders, ruleset folders without a grammar and folders in the table list are marked, and a folder in the `?q` slot is refused before launch
+- The hash type selector is searchable and provides autocompletion
+- Ghostty is now available as a launch terminal
+
+### Improvements
+- Launch validation covers the new attack modes and settings: PCFG and table ranges and repeated keys, a mask with `omen=1`, hint accounts without hint words or file, the hybrid mode's `?w`/`?q` markers against the chosen wordlists, association settings with a wordlist, and a non-directory cache path
+- The command preview and clipboard follow the configured terminal's shell — PowerShell's call operator and single quotes for `powershell.exe` and `pwsh`, POSIX otherwise — so a copied command pastes as-is into pwsh 7.3 or later. Pasting into Windows PowerShell 5.1 still mangles embedded quotes and empty arguments; use Tools → Copy as PowerShell Script there, which copies the launch's `ProcessStartInfo` script
+- `cmd.exe` and `ptyxis` were dropped from the supported terminals: neither can correctly escape some shell characters that may appear in the command. See the FAQ for a more in-depth explanation
 - `<unixtime>` in the outfile template is expanded from the collected options instead of being read inside the command builder, so a preview and a launch are each built from one value rather than two clock reads
+- The hash type selector has a permanent “Auto-detect” entry at the top, selected when neither a session nor a reload names a hash type
+
+### Bug Fixes
+- Launches on Windows PowerShell 5.1 and pwsh before 7.3 could mangle embedded double quotes and drop empty arguments; no user value reaches a shell as text, and an encoded command beyond the 32,767-character CreateProcess limit (about 12,000 characters of arguments) is refused instead of truncated
+- Positional values starting with `-` — a mask `-?d?d`, a wordlist, a session value — are protected by `--`, so they are not parsed as hashcat options. NUL and other control characters are refused before launch
+- The attack mode survives a settings change that reloads the hash types; previously the mode selector was refilled and silently jumped back to Straight
+- The outfile format is validated before launch (comma-separated numbers from 1 to 6; empty is refused), and an unparsable session list no longer wipes the user's rows
+- Settings with the wrong type in a hand-edited INI fall back to their defaults instead of being silently converted
 
 ## 0.8.0 (2026-10-25)
 

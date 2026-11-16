@@ -90,6 +90,7 @@ private slots:
     void hashTypesAreFilledFromHashcat();
     void failedQueryReenablesTheHashTypeCombo_data();
     void failedQueryReenablesTheHashTypeCombo();
+    void failedQueryKeepsThePreviousListOnTheSameBinary();
     void changingTheBinaryReRunsTheQuery();
     void staleQueryDoesNotReplaceTheNewerList_data();
     void staleQueryDoesNotReplaceTheNewerList();
@@ -662,8 +663,8 @@ void TestMainWindow::hashRecipeRowFollowsTheHashType()
 {
     MainWindow window;
 
-    // The combo stays empty until the hashcat query answers; a fresh window
-    // therefore shows no recipe row.
+    // A fresh window selects Auto-detect (or has no items yet), so no recipe
+    // row is shown.
     QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->isHidden());
 
     MainWindowTestAccess::ui(window)->comboBox_hash_type->addItem(QStringLiteral("4000 | Hashcat"),
@@ -671,11 +672,14 @@ void TestMainWindow::hashRecipeRowFollowsTheHashType()
     MainWindowTestAccess::ui(window)->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"),
                                                                   1000);
 
-    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(1); // NTLM
+    const int ntlm = MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(1000);
+    const int recipe = MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(4000);
+    QVERIFY(ntlm >= 0 && recipe >= 0);
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(ntlm);
     QVERIFY(MainWindowTestAccess::ui(window)->label_hash_recipe->isHidden());
     QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->isHidden());
 
-    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(0); // 4000
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(recipe);
     QVERIFY(!MainWindowTestAccess::ui(window)->label_hash_recipe->isHidden());
     QVERIFY(!MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->isHidden());
 
@@ -689,16 +693,14 @@ void TestMainWindow::hashRecipeRowFollowsTheHashType()
     QVERIFY(flag >= 0);
     QCOMPARE(arguments.at(flag + 1), QStringLiteral("md5(md5(salt) . pass)"));
 
+    // Both dialects quote with single quotes: POSIX only where the token
+    // needs it, PowerShell on every token.
     const QString preview = MainWindowTestAccess::ui(window)->lineEdit_command->text();
-#ifdef Q_OS_WIN
-    QVERIFY(preview.contains(QStringLiteral("\"md5(md5(salt) . pass)\"")));
-#else
     QVERIFY(preview.contains(QStringLiteral("'md5(md5(salt) . pass)'")));
-#endif
 
     // Switching the type away drops the flag even though the field still
     // holds the recipe: hashcat refuses the flag for any other type.
-    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(1);
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(ntlm);
     QVERIFY(
         !MainWindowTestAccess::generateArguments(window).contains(QStringLiteral("--hash-recipe")));
 }
@@ -1272,18 +1274,22 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 2);
+    // Auto-detect is the permanent first entry and the working default.
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 3);
     QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
     QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().isEmpty());
 
-    // 0 sorts before 1000, and the ids travel as item data
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 0U);
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 1000U);
+    // Auto-detect comes first, then the ids in QMap key order as item data.
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toInt(),
+             AppConstants::Hashcat::AutoDetectHashType);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 0U);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(2).toUInt(), 1000U);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentIndex(), 0);
 
+    // The default asks hashcat to autodetect, so no -m is emitted.
     const QStringList arguments = MainWindowTestAccess::generateArguments(window);
-    const qsizetype hashType = arguments.indexOf(QStringLiteral("--hash-type"));
-    QVERIFY(hashType >= 0);
-    QCOMPARE(arguments.value(hashType + 1), QStringLiteral("0"));
+    QVERIFY(!arguments.contains(QStringLiteral("--hash-type")));
+    QVERIFY(!arguments.contains(QStringLiteral("-m")));
 }
 
 // Every failure path owes the user the state the success path leaves behind:
@@ -1334,12 +1340,73 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
     QCOMPARE(
         MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip(),
         QStringLiteral("The hash types could not be loaded. Check the hashcat path in Settings."));
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+    // A failed first load leaves only the permanent Auto-detect entry.
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toInt(),
+             AppConstants::Hashcat::AutoDetectHashType);
 }
 
-// Accepting Settings again with the same binary leaves the list alone; a
-// changed binary re-runs the query and replaces it with the modes the new
-// one reports (which resets the selection - the old id may not exist there).
+// An unparseable reply from the same binary must not throw away a list that
+// was already loaded successfully: the IDs still belong to this binary.
+void TestMainWindow::failedQueryKeepsThePreviousListOnTheSameBinary()
+{
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-then-broken"),
+        "#!/bin/sh\n"
+        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+        "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(2).toUInt(), 1000U);
+
+    // Make the same path fail to produce JSON, then re-query it.
+    QVERIFY(!TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-then-broken"),
+                                             "#!/bin/sh\n"
+                                             "printf 'this is not json at all\\n'\n"
+                                             "exit 0\n",
+                                             QFileInfo(stub).absolutePath())
+                 .isEmpty());
+    m_fixture.startWatchdog();
+    MainWindowTestAccess::reloadHashTypes(window);
+
+    QTRY_VERIFY_WITH_TIMEOUT(
+        MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip()
+            == QStringLiteral("The hash types could not be refreshed; showing the previous list."),
+        AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 3);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(2).toUInt(), 1000U);
+
+    // Repair the binary at the same path. Accepting Settings again must retry
+    // even though the old list was kept: this is the only retry the UI offers.
+    m_fixture.stopWatchdog();
+    QVERIFY(!TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-then-broken"),
+                                             "#!/bin/sh\n"
+                                             "printf "
+                                             "'{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":"
+                                             "\"NTLM\"},\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"
+                                             "exit 0\n",
+                                             QFileInfo(stub).absolutePath())
+                 .isEmpty());
+    TestEnvironment::ModalRecorder recorder;
+    recorder.saveSettingsDialog = true;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 4,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().isEmpty());
+}
+
+// Accepting Settings again with the same binary leaves the list and the
+// selection alone; a changed binary re-runs the query and replaces the list
+// with the modes that binary reports.
 void TestMainWindow::changingTheBinaryReRunsTheQuery()
 {
     const QString stubA = TestEnvironment::writeShellStub(
@@ -1347,23 +1414,36 @@ void TestMainWindow::changingTheBinaryReRunsTheQuery()
         "#!/bin/sh\n"
         "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
         "exit 0\n");
+    // The survival stub keeps a lower id than NTLM so index 0 is not NTLM
+    // before Auto-detect exists: a buggy reset to index 0 must fail the test.
     const QString stubB =
         TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-settings-b"),
+                                        "#!/bin/sh\n"
+                                        "printf "
+                                        "'{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"},"
+                                        "\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"
+                                        "exit 0\n");
+    const QString stubC =
+        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-settings-c"),
                                         "#!/bin/sh\n"
                                         "printf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"
                                         "exit 0\n");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
-    QVERIFY2(!stubA.isEmpty() && !stubB.isEmpty(), "the shell stubs could not be written");
+    QVERIFY2(!stubA.isEmpty() && !stubB.isEmpty() && !stubC.isEmpty(),
+             "the shell stubs could not be written");
 #endif
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
 
     MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
                              AppConstants::Hashcat::QueryTimeoutMs);
-    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(1); // NTLM
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentIndex(), 0);
+    const int ntlm = MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(1000);
+    QVERIFY(ntlm >= 0);
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(ntlm);
 
     // The dialog takes its values from the settings, so the path is set
     // before it opens; the recorder saves it, which is what a user pressing
@@ -1377,15 +1457,27 @@ void TestMainWindow::changingTheBinaryReRunsTheQuery()
     QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
     QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
     QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().isEmpty());
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 2);
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentIndex(), 1);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 3);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentData().toInt(), 1000);
 
-    // Changed path: the query runs again and the new list replaces the old.
+    // Changed binary that also knows NTLM: the selection must survive.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubB);
     QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 4,
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentData().toInt(), 1000);
+    QVERIFY(!recorder.messageBoxSeen);
+
+    // Changed binary that does not know NTLM: fall back to Auto-detect and
+    // say why (the recorder closes the warning).
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubC);
+    QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentIndex(), 0);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toInt(),
+             AppConstants::Hashcat::AutoDetectHashType);
+    QVERIFY(recorder.messageBoxSeen);
 }
 
 // The reply of a query an earlier init started describes a binary the list no
@@ -1445,14 +1537,16 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
     MainWindowTestAccess::reloadHashTypes(window);
 
     if (clearPath) {
-        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
+        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toInt(),
+                 AppConstants::Hashcat::AutoDetectHashType);
         QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
         QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().contains(
             QStringLiteral("Settings")));
     } else {
-        QTRY_COMPARE_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1,
+        QTRY_COMPARE_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 2,
                                   AppConstants::Hashcat::QueryTimeoutMs);
-        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
+        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 1400U);
     }
 
     // Let the first query answer; the marker proves the stale reply was
@@ -1465,15 +1559,15 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
     QTest::qWait(100);
 
     // The stale reply changed nothing: the current list is still the newer
-    // one - or still empty after the path was cleared.
+    // one - or still just Auto-detect after the path was cleared.
     if (clearPath) {
-        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
         QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
         QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().contains(
             QStringLiteral("Settings")));
     } else {
-        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
-        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
+        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 2);
+        QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 1400U);
         QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
     }
 #endif
@@ -1616,7 +1710,7 @@ void TestMainWindow::changingTheBinaryKeepsTheAttackMode()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
 
     MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              AppConstants::Hashcat::QueryTimeoutMs);
     MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(2); // brute-force
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_attack->currentData().toInt(),
@@ -1631,9 +1725,10 @@ void TestMainWindow::changingTheBinaryKeepsTheAttackMode()
 
     // The hash-type list is replaced - the selection resets, expected because
     // the new binary may not offer the selected id - but the mode stays. Wait
-    // for the new id, not the count: both lists hold one entry.
+    // for the new id, not the count: both lists hold Auto-detect plus one real
+    // entry.
     QTRY_VERIFY_WITH_TIMEOUT(
-        MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt() == 1400U,
+        MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt() == 1400U,
         AppConstants::Hashcat::QueryTimeoutMs);
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_attack->currentData().toInt(),
              static_cast<int>(AttackMode::BruteForce));
@@ -1668,7 +1763,7 @@ void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
 
     MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
     TestEnvironment::ModalRecorder recorder;
@@ -1678,9 +1773,9 @@ void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
 
     QVERIFY(QMetaObject::invokeMethod(&window, "importSettingsTriggered"));
 
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 1400U);
 }
 
 // The wiring loop and the serializer share one walk: every command widget
@@ -1778,11 +1873,21 @@ void TestMainWindow::listRowEventsRebuildThePreviewOnce()
     const int beforeRemove = MainWindowTestAccess::previewRebuilds(window);
     delete list->takeItem(0);
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - beforeRemove, 1);
+
+    // A move: takeItem/insertItem would emit two events, but the list reports
+    // one rowsMoved and the preview is rebuilt exactly once.
+    CheckedItemList::addPaths(list, {QStringLiteral("/tmp/a.txt"), QStringLiteral("/tmp/b.txt")});
+    list->setCurrentRow(0);
+    const int beforeMove = MainWindowTestAccess::previewRebuilds(window);
+    CheckedItemList::moveSelected(list, 1);
+    QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - beforeMove, 1);
+    QCOMPARE(list->item(0)->text(), QDir::toNativeSeparators(QStringLiteral("/tmp/b.txt")));
+    QCOMPARE(list->currentRow(), 1);
 }
 
 // A failed reload must not keep the previous binary's list: a stale id in
-// the preview would reach the launch validation, and the empty combo is what
-// lets the same-path retry re-query.
+// the preview would reach the launch validation. The combo keeps only
+// Auto-detect; m_hashTypesPath is what lets a changed path re-query.
 void TestMainWindow::aFailedReloadClearsTheHashTypes()
 {
     const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-fail-clear"),
@@ -1798,7 +1903,7 @@ void TestMainWindow::aFailedReloadClearsTheHashTypes()
 
     m_fixture.startWatchdog();
     MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
@@ -1807,7 +1912,7 @@ void TestMainWindow::aFailedReloadClearsTheHashTypes()
     QTRY_VERIFY_WITH_TIMEOUT(!MainWindowTestAccess::hashTypeLoader(window).isLoading(),
                              AppConstants::Hashcat::QueryTimeoutMs);
 
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
     QVERIFY(!MainWindowTestAccess::ui(window)->lineEdit_command->text().contains(
         QStringLiteral("--hash-type")));
 }
@@ -1834,7 +1939,8 @@ void TestMainWindow::retryingTheSamePathAfterAFailureReQueries()
     MainWindow window;
     QTRY_VERIFY_WITH_TIMEOUT(!MainWindowTestAccess::hashTypeLoader(window).isLoading(),
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+    // Only the permanent Auto-detect entry survives a failed first query.
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
 
     // Repair the binary at the same path, then accept Settings again. The
     // watchdog has done its job (the failure box); stop it so it cannot race
@@ -1849,9 +1955,9 @@ void TestMainWindow::retryingTheSamePathAfterAFailureReQueries()
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
 
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt(), 1400U);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 1400U);
 #endif
 }
 
@@ -1875,14 +1981,14 @@ void TestMainWindow::aReloadRebuildsThePreviewOnce()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
 
     MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubB);
     const int before = MainWindowTestAccess::previewRebuilds(window);
     MainWindowTestAccess::reloadHashTypes(window);
     QTRY_VERIFY_WITH_TIMEOUT(
-        MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toUInt() == 1000U,
+        MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt() == 1000U,
         AppConstants::Hashcat::QueryTimeoutMs);
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
 }

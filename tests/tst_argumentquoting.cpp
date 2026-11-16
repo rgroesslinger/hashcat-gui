@@ -220,18 +220,18 @@ void TestArgumentQuoting::msvcrtQuotingRoundTripsThroughAReferenceParser()
     QCOMPARE(splitCommandLine(QStringLiteral("\"\"")), QStringList{QString()});
 
     const QString alphabet = QStringLiteral("ab \\\"\t\n$;&|'");
-    quint32 state = 0x9e3779b9u;
+    quint32 state = 0x9e3779b9U;
     const auto next = [&state] {
-        state = state * 1664525u + 1013904223u;
+        state = (state * 1664525U) + 1013904223U;
         return state;
     };
 
     for (int iteration = 0; iteration < 2000; ++iteration) {
         QStringList tokens;
-        const int count = int(next() % 5u);
+        const int count = int(next() % 5U);
         for (int t = 0; t < count; ++t) {
             QString token;
-            const int length = int(next() % 9u);
+            const int length = int(next() % 9U);
             for (int c = 0; c < length; ++c) {
                 token += alphabet.at(int(next() % quint32(alphabet.size())));
             }

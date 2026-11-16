@@ -265,6 +265,21 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
             "LaunchMessage", "The minimum increment length is larger than the maximum.");
         break;
 
+    // The value below is user supplied, so plain text: a '<' in it would be
+    // taken for markup by the default AutoText.
+    case LaunchValidator::LaunchError::InvalidOutfileFormat:
+        message.format = Qt::PlainText;
+        message.text = problem.detail.isEmpty()
+                           ? QCoreApplication::translate("LaunchMessage",
+                                                         "Enter an outfile format: one or more "
+                                                         "comma-separated numbers from 1 to 6.")
+                           : QCoreApplication::translate(
+                                 "LaunchMessage",
+                                 "The outfile format must be one or more comma-separated numbers "
+                                 "from 1 to 6:\n%1")
+                                 .arg(problem.detail);
+        break;
+
     // The path below is user supplied, so plain text: a '<' in it would be
     // taken for markup by the default AutoText.
     case LaunchValidator::LaunchError::InvalidCachePath:

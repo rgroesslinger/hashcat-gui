@@ -191,6 +191,16 @@ void TestLaunchMessage::messageFor_data()
         << int(Error::InvalidIncrement) << QString() << straight << info << autoText
         << QStringLiteral("The minimum increment length is larger than the maximum.");
 
+    QTest::newRow("InvalidOutfileFormat")
+        << int(Error::InvalidOutfileFormat) << QStringLiteral("1,7") << straight << warning << plain
+        << QStringLiteral("The outfile format must be one or more comma-separated "
+                          "numbers from 1 to 6:\n1,7");
+
+    QTest::newRow("EmptyOutfileFormat")
+        << int(Error::InvalidOutfileFormat) << QString() << straight << warning << plain
+        << QStringLiteral("Enter an outfile format: one or more comma-separated numbers from "
+                          "1 to 6.");
+
     QTest::newRow("InvalidCachePath")
         << int(Error::InvalidCachePath) << QStringLiteral("/tmp/gone") << straight << warning
         << plain << QStringLiteral("The cache path must be an existing directory:\n/tmp/gone");

@@ -8,8 +8,8 @@
 #include "appconstants.h"
 #include "argumentquoting.h"
 #include "executable.h"
+#include "programdirectory.h"
 
-#include <QFileInfo>
 #include <QProcess>
 #include <QStringEncoder>
 
@@ -19,19 +19,9 @@
 
 namespace
 {
-// The directory hashcat runs in: the canonical directory of its program, so a
-// symlink in ~/bin does not send it looking for its kernels in ~/bin. The
-// program path stays the resolved one; only the directory follows the link.
 QString programDirectory(const QString &programPath)
 {
-    // canonicalFilePath() follows the symlink to the real file; an
-    // unresolvable path (a test path, or one that vanished) keeps the plain
-    // absolute directory instead of Qt's "." fallback.
-    const QString canonical = QFileInfo(programPath).canonicalFilePath();
-    if (canonical.isEmpty()) {
-        return QFileInfo(programPath).absolutePath();
-    }
-    return QFileInfo(canonical).absolutePath();
+    return ProgramDirectory::forProgram(programPath);
 }
 } // namespace
 

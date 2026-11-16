@@ -35,9 +35,17 @@ StateFile::Document StateFile::readDocument(const QString &filename, QLatin1Stri
                                             int maxVersion)
 {
     Document document;
+    bool versionPresent = false;
     if (!read(filename, section, &document.values, &document.version, &document.otherSections,
-              &document.error)) {
+              &document.error, &versionPresent)) {
         document.status = Status::Unreadable;
+        return document;
+    }
+    // A section that explicitly names a negative version is malformed, not
+    // the "no version at all" hand-edited file that reads as -1.
+    if (versionPresent && document.version < 0) {
+        document.status = Status::Unreadable;
+        document.error = tr("The section names a version this build cannot understand.");
         return document;
     }
     if (document.version > maxVersion) {
@@ -86,7 +94,8 @@ bool StateFile::write(const QString &filename, QLatin1StringView section, int ve
 }
 
 bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonObject *values,
-                     int *version, QStringList *otherSections, QString *errorMessage)
+                     int *version, QStringList *otherSections, QString *errorMessage,
+                     bool *versionPresent)
 {
     if (values) {
         *values = QJsonObject();
@@ -96,6 +105,9 @@ bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonOb
     }
     if (otherSections) {
         otherSections->clear();
+    }
+    if (versionPresent) {
+        *versionPresent = false;
     }
 
     QFile file(filename);
@@ -159,8 +171,12 @@ bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonOb
     if (values) {
         *values = sectionObject.value(QStringLiteral("values")).toObject();
     }
+    const QJsonValue versionValue = sectionObject.value(QStringLiteral("version"));
     if (version) {
-        *version = sectionObject.value(QStringLiteral("version")).toInt(-1);
+        *version = versionValue.toInt(-1);
+    }
+    if (versionPresent) {
+        *versionPresent = versionValue.isDouble();
     }
 
     setError(errorMessage, QString());

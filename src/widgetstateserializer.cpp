@@ -296,14 +296,21 @@ WidgetStateSerializer::applyToWidgets(const QJsonObject &values, QWidget *widget
             continue;
         }
 
-        // The entries have to be the objects the exporter wrote. An entry
-        // that is not one would become an empty row - and the list of the
-        // user would be gone before the file is even looked at.
+        // The entries have to be the objects the exporter wrote, with a string
+        // text and a bool checked. An entry of another shape would become an
+        // empty row - and the list of the user would be gone before the file
+        // is even looked at, with no note about why.
         const QJsonArray list = value.toArray();
-        const bool allEntriesAreObjects =
-            std::all_of(list.constBegin(), list.constEnd(),
-                        [](const QJsonValue &entry) { return entry.isObject(); });
-        if (!allEntriesAreObjects) {
+        const bool allEntriesAreValid =
+            std::all_of(list.constBegin(), list.constEnd(), [](const QJsonValue &entry) {
+                if (!entry.isObject()) {
+                    return false;
+                }
+                const QJsonObject item = entry.toObject();
+                return item.value(QStringLiteral("text")).isString()
+                       && item.value(QStringLiteral("checked")).isBool();
+            });
+        if (!allEntriesAreValid) {
             result.wrongTypes << name;
             continue;
         }

@@ -6,7 +6,12 @@
 #ifndef SETTINGSMANAGER_H
 #define SETTINGSMANAGER_H
 
+#include <QLatin1String>
+#include <QMetaType>
 #include <QSettings>
+#include <QString>
+#include <QVariant>
+#include <type_traits>
 
 class SettingsManager
 {
@@ -16,7 +21,30 @@ public:
     template <typename T>
     [[nodiscard]] T getKey(const QString &key, const T &defaultValue = T()) const
     {
-        return settings.value(key, QVariant::fromValue(defaultValue)).template value<T>();
+        const QVariant value = settings.value(key, QVariant::fromValue(defaultValue));
+        // QSettings::IniFormat stores everything as text. Within one process
+        // its cache still holds the typed value a setKey() wrote, but a fresh
+        // process reads back a QString - so a plain metaType check would throw
+        // away every bool/int setting on restart. Accept the canonical string
+        // form of the type and refuse any other value instead; a hand-edited
+        // useShortParameters=no then keeps the default rather than becoming
+        // true through QVariant's lossy conversion.
+        if constexpr (std::is_same_v<T, bool>) {
+            if (value.metaType() == QMetaType::fromType<QString>()) {
+                const QString text = value.toString();
+                if (text == QLatin1String("true")) {
+                    return true;
+                }
+                if (text == QLatin1String("false")) {
+                    return false;
+                }
+                return defaultValue;
+            }
+        }
+        if (value.metaType() != QMetaType::fromType<T>()) {
+            return defaultValue;
+        }
+        return value.value<T>();
     }
 
     void setKey(const QString &key, const QVariant &value);

@@ -30,8 +30,9 @@ HashcatOptions OptionCollector::collect(const Ui::MainWindow &ui, bool useShortP
     options.unixTime = QDateTime::currentSecsSinceEpoch();
 
     // currentData() is invalid while the hash type list has not been filled -
-    // no hashcat configured, or the query failed. CommandBuilder then leaves
-    // -m out entirely instead of asking for hash type 0.
+    // no hashcat configured, or the query failed. The Auto-detect entry carries
+    // AppConstants::Hashcat::AutoDetectHashType (-2). CommandBuilder leaves -m
+    // out for either negative value instead of asking for hash type 0.
     const QVariant hashType = ui.comboBox_hash_type->currentData();
     options.hashType = hashType.isValid() ? hashType.toInt() : -1;
     options.hashRecipe = ui.lineEdit_hash_recipe->text();

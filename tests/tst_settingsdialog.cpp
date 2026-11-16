@@ -104,6 +104,7 @@ private slots:
     void savedSettingsHoldTheKnownSettings();
     void savedSettingsCoverEveryKnownKey();
     void everyKnownKeyIsTypeChecked();
+    void wrongTypedSettingFallsBackToDefault();
     void everyKnownKeyIsApplied();
     void theImportedHashcatPathIsNamedWhenItIsMissing();
     void importSettingsFillsTheDialog();
@@ -755,6 +756,26 @@ void TestSettingsDialog::importSettingsDoesNotApplyAValueOfTheWrongType()
     QVERIFY(notes.first().contains(QStringLiteral("useShortParameters")));
     QVERIFY(notes.first().contains(QStringLiteral("hashcatPath")));
     QVERIFY(notes.first().contains(QStringLiteral("terminal")));
+}
+
+// The INI backend returns canonical strings in a fresh process, so those must
+// stay valid; a hand-edited value like "no" must not become true.
+void TestSettingsDialog::wrongTypedSettingFallsBackToDefault()
+{
+    auto &settings = SettingsManager::instance();
+    settings.setKey(QString(AppConstants::SettingsKeys::UseShortParameters),
+                    QStringLiteral("true"));
+    QCOMPARE(settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters, false), true);
+    settings.setKey(QString(AppConstants::SettingsKeys::RestoreSession), QStringLiteral("false"));
+    QCOMPARE(settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true), false);
+
+    settings.setKey(QString(AppConstants::SettingsKeys::UseShortParameters), QStringLiteral("no"));
+    settings.setKey(QString(AppConstants::SettingsKeys::HashcatPath), false);
+
+    QCOMPARE(settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters, true), true);
+    QCOMPARE(settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath,
+                                      QStringLiteral("fallback")),
+             QStringLiteral("fallback"));
 }
 
 int main(int argc, char *argv[])

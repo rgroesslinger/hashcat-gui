@@ -47,8 +47,9 @@ void PathListController::connectChanges()
 {
     connect(m_list->model(), &QAbstractItemModel::rowsInserted, this, &PathListController::changed);
     connect(m_list->model(), &QAbstractItemModel::rowsRemoved, this, &PathListController::changed);
-    // Moves use takeItem/insertItem, so rowsMoved never fires from them; the
-    // connection stays for the model's own sake and needs no monitor refresh.
+    // A move emits rowsMoved as its single notification (see
+    // CheckedItemList::moveSelected). The watched paths do not change, so only
+    // the command is rebuilt - no monitor refresh is connected.
     connect(m_list->model(), &QAbstractItemModel::rowsMoved, this, &PathListController::changed);
     connect(m_list, &QListWidget::itemChanged, this, &PathListController::changed);
 }

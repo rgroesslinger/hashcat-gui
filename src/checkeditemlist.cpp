@@ -5,9 +5,13 @@
 
 #include "checkeditemlist.h"
 
+#include <QAbstractItemModel>
 #include <QDir>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMetaObject>
+#include <QModelIndex>
+#include <QSignalBlocker>
 
 void CheckedItemList::addPaths(QListWidget *list, const QStringList &paths)
 {
@@ -70,7 +74,24 @@ void CheckedItemList::moveSelected(QListWidget *list, int delta)
     if (currentRow < 0 || targetRow < 0 || targetRow >= list->count()) {
         return;
     }
-    QListWidgetItem *item = list->takeItem(currentRow);
-    list->insertItem(targetRow, item);
+    // takeItem/insertItem would emit rowsRemoved and rowsInserted, and both
+    // are wired to a preview rebuild. A move is one change, so block the two
+    // intermediate signals and report a single rowsMoved instead.
+    QAbstractItemModel *model = list->model();
+    {
+        const QSignalBlocker blocker(model);
+        QListWidgetItem *item = list->takeItem(currentRow);
+        list->insertItem(targetRow, item);
+    }
     list->setCurrentRow(targetRow);
+    const bool notified = QMetaObject::invokeMethod(
+        model, "rowsMoved", Q_ARG(QModelIndex, QModelIndex()), Q_ARG(int, currentRow),
+        Q_ARG(int, currentRow), Q_ARG(QModelIndex, QModelIndex()), Q_ARG(int, targetRow));
+    if (!notified) {
+        // A model without a rowsMoved signal would leave the preview stale;
+        // a single rowsInserted still reports one change (and refreshes the
+        // path monitor, which rowsMoved deliberately does not).
+        QMetaObject::invokeMethod(model, "rowsInserted", Q_ARG(QModelIndex, QModelIndex()),
+                                  Q_ARG(int, targetRow), Q_ARG(int, targetRow));
+    }
 }

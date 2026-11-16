@@ -5,7 +5,8 @@
 
 #include "hashcatrunner.h"
 
-#include <QFileInfo>
+#include "programdirectory.h"
+
 #include <QtConcurrent/QtConcurrentRun>
 
 QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const QStringList &args,
@@ -26,7 +27,7 @@ QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const 
 
         proc.setProgram(hashcatPath);
         proc.setArguments(cmdArgs);
-        proc.setWorkingDirectory(QFileInfo(hashcatPath).absolutePath());
+        proc.setWorkingDirectory(ProgramDirectory::forProgram(hashcatPath));
 
         proc.start();
 
@@ -36,13 +37,18 @@ QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const 
         }
 
         if (!proc.waitForFinished(timeoutMs)) {
+            // A crash is reported by waitForFinished() itself; a false return
+            // here is a timeout or a process error, so name the actual cause.
+            const bool timedOut = proc.error() == QProcess::Timedout;
             proc.kill();
             // kill() is asynchronous: the wait blocks until the process has
             // actually exited, so the destructor of proc is not left with a
             // process that is still running.
             proc.waitForFinished(5000);
-            result.timedOut = true;
-            result.standardError = tr("hashcat timed out\n%1").arg(proc.errorString());
+            result.timedOut = timedOut;
+            result.standardError = timedOut
+                                       ? tr("hashcat timed out\n%1").arg(proc.errorString())
+                                       : tr("hashcat failed to run\n%1").arg(proc.errorString());
             return result;
         }
 

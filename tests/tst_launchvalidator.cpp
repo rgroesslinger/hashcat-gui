@@ -79,6 +79,7 @@ private slots:
     void hashRecipeIsRequiredFor4000();
     void cachePathNeedsAnExistingDirectory();
     void controlCharactersAreRefused();
+    void outfileFormatIsValidated();
 };
 
 void TestLaunchValidator::validateLaunch_data()
@@ -874,6 +875,16 @@ void TestLaunchValidator::controlCharactersAreRefused()
     QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCharacter));
     QCOMPARE(problem.detail, QStringLiteral("?d?d\\x1b"));
 
+    // DEL (0x7f) and C1 (0x80-0x9f) are controls too.
+    maskRun.mask = QStringLiteral("?d") + QChar(0x7f);
+    problem = ::validateOptions(maskRun);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCharacter));
+    QCOMPARE(problem.detail, QStringLiteral("?d\\x7f"));
+    maskRun.mask = QStringLiteral("?d") + QChar(0x85);
+    problem = ::validateOptions(maskRun);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCharacter));
+    QCOMPARE(problem.detail, QStringLiteral("?d\\x85"));
+
     // A wordlist in the straight mode is part of the command line too.
     HashcatOptions wordlistRun;
     wordlistRun.attackMode = AttackMode::Straight;
@@ -894,6 +905,40 @@ void TestLaunchValidator::controlCharactersAreRefused()
     ignored.mask = QStringLiteral("?d?d");
     ignored.wordlists = QStringList{QStringLiteral("dict") + QChar(0x1b) + QStringLiteral(".txt")};
     QCOMPARE(int(::validateOptions(ignored).code), int(LaunchValidator::LaunchError::None));
+}
+
+void TestLaunchValidator::outfileFormatIsValidated()
+{
+    const auto withWordlist = [] {
+        HashcatOptions options;
+        options.wordlists = QStringList{QStringLiteral("/tmp/a.txt")};
+        return options;
+    };
+
+    HashcatOptions options = withWordlist();
+    options.outfileFormat = QStringLiteral("3,4");
+    QCOMPARE(int(::validateOptions(options).code), int(LaunchValidator::LaunchError::None));
+
+    const auto refused = [&withWordlist](const QString &value, QString *detail) {
+        HashcatOptions bad = withWordlist();
+        bad.outfileFormat = value;
+        return ::validateOptionsWithDetail(bad, detail);
+    };
+    QString detail;
+    QCOMPARE(refused(QString(), &detail), LaunchValidator::LaunchError::InvalidOutfileFormat);
+    QVERIFY(detail.isEmpty());
+    QCOMPARE(refused(QStringLiteral("1,7"), &detail),
+             LaunchValidator::LaunchError::InvalidOutfileFormat);
+    QCOMPARE(detail, QStringLiteral("1,7"));
+    QCOMPARE(refused(QStringLiteral("1, 2"), &detail),
+             LaunchValidator::LaunchError::InvalidOutfileFormat);
+
+    // The default and JSON mode leave the field out of the command line, so
+    // even a stale value there must not block the launch.
+    HashcatOptions stale = withWordlist();
+    stale.outfileFormat = QStringLiteral("9");
+    stale.outfileJson = true;
+    QCOMPARE(int(::validateOptions(stale).code), int(LaunchValidator::LaunchError::None));
 }
 
 int main(int argc, char *argv[])

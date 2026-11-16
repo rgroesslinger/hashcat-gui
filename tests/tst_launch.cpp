@@ -408,7 +408,7 @@ void TestLaunch::thePreviewFormattingIsPinned()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
 
     MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
                              5000);
 
     // A recipe with spaces, quotes and markup: the command line quotes it for

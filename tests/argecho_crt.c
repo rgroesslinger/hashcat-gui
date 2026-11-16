@@ -17,11 +17,17 @@
 int main(int argc, char *argv[])
 {
     for (int i = 1; i < argc; ++i) {
-        fputs("A ", stdout);
-        for (const unsigned char *byte = (const unsigned char *)argv[i]; *byte; ++byte) {
-            printf("%02x", *byte);
+        if (fputs("A ", stdout) == EOF) {
+            return 1;
         }
-        putchar('\n');
+        for (const unsigned char *byte = (const unsigned char *)argv[i]; *byte; ++byte) {
+            if (printf("%02x", *byte) < 0) {
+                return 1;
+            }
+        }
+        if (putchar('\n') == EOF) {
+            return 1;
+        }
     }
     return 0;
 }

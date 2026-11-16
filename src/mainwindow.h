@@ -158,6 +158,9 @@ private:
     // Starts the hash-type query for the configured binary; never touches
     // the attack combo.
     void reloadHashTypes();
+    // The permanent first entry of the hash type combo. It is re-added on every
+    // refill and after every clear so autodetect stays discoverable.
+    void addAutoDetectHashType();
     // The shared refresh after the settings were saved or imported.
     void refreshAfterSettingsChange();
     // The example submenu is built once, in the constructor; adding the
@@ -195,14 +198,14 @@ private:
     void saveSession();
 
     // Queues the hash type a session names until the list of hash types
-    // exists, and reports one this hashcat does not know - which leaves the
-    // combo without a selection.
+    // exists, and reports one this hashcat does not know - which falls back to
+    // Auto-detect rather than picking a different real hash type.
     [[nodiscard]] QString restoreHashType(const QJsonObject &values);
 
-    // Applies the hash type a session asked for, now that the list of hash
-    // types exists. Returns a message when the session names a hash type
-    // this hashcat does not know.
-    QString applyPendingHashType();
+    // Applies the hash type a session asked for, or the given fallback when
+    // the session named none, now that the list exists. Returns a message when
+    // a real id this hashcat does not know had to be replaced by Auto-detect.
+    QString applyPendingHashType(int fallbackId, bool fromSession);
 
     // The largest minimum the attack tab can need: every mode's groups and
     // hint in one size. Measured before the visible mode is restored. A
@@ -266,6 +269,14 @@ private:
     // The asynchronous hash-type query: the watcher, the stale-query guard
     // and the parsed list. The window maps its signals onto the combo.
     HashTypeLoader m_hashTypeLoader;
+
+    // The binary whose list the combo currently shows. Used to tell a
+    // same-binary refresh (keep the list) from a changed binary (clear it).
+    QString m_hashTypesPath;
+
+    // A same-binary unparseable reply kept the old list; accepting Settings
+    // again with that path must re-run the query, there is no other retry.
+    bool m_hashTypesNeedsRetry = false;
 };
 
 #endif // MAINWINDOW_H

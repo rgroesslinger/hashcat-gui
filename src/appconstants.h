@@ -227,6 +227,9 @@ inline constexpr QLatin1StringView WeightsList{"^[0-9]+(:[0-9]+)*$"};
 inline constexpr QLatin1StringView MaxwordValue{"^(0|16|32)?$"};
 inline constexpr QLatin1StringView DecimalNumber{"^[0-9]+([.][0-9]+)?$"};
 inline constexpr QLatin1StringView BinaryFlag{"^[01]?$"};
+// --outfile-format: one or more comma-separated format numbers from 1 to 6.
+// Empty is not valid: hashcat answers --outfile-format '' with an error.
+inline constexpr QLatin1StringView OutfileFormatList{"^[1-6](,[1-6])*$"};
 // The shape upstream calls a setting (feed_param_is_setting(), deliberately
 // shape based: a misspelled key has to be reported as an unknown setting, not
 // as a filename). A mode 9 token that fails this shape would be read as a
@@ -354,6 +357,11 @@ inline constexpr QLatin1StringView Version{"--version"};
 inline constexpr QLatin1StringView HashRecipe{"--hash-recipe"};
 // The only hash mode that takes a hash recipe.
 inline constexpr int RecipeHashType = 4000;
+// GUI-only sentinel of the "Auto-detect" entry in the hash type combo. Hashcat
+// has no CLI token for autodetect: it is requested by omitting -m, which is
+// what CommandBuilder does for any hash type below zero. Never pass this to
+// hashcat.
+inline constexpr int AutoDetectHashType = -2;
 // How long hashcat is given to answer a query such as --example-hashes
 inline constexpr int QueryTimeoutMs = 20000;
 } // namespace Hashcat

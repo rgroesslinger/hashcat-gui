@@ -66,9 +66,11 @@ private slots:
     void resetSessionRestoresEveryWidget();
     void resettingTheSessionNeedsAConfirmation();
     void theSessionRoundTrips();
+    void autoDetectHashTypeRoundTripsThroughASession();
+    void hashTypeWaitsForAWorkingHashcatPath();
     void turningTheSessionOffRemovesTheStoredSession();
     void sessionHashTypeSurvivesTheAsynchronousQuery();
-    void sessionWithAnUnknownHashTypeSelectsNothing();
+    void sessionWithAnUnknownHashTypeSelectsAutoDetect();
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
     void theImportNamesTheValuesTheSessionDoesNotKnow();
@@ -295,15 +297,84 @@ void TestSession::sessionHashTypeSurvivesTheAsynchronousQuery()
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentIndex(), 1);
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentData().toUInt(), 1000U);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentData().toInt(), 1000);
     QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), -1); // applied and consumed
 }
 
+// A session restored while hashcat has no usable path must keep its hash type
+// pending: the permanent Auto-detect entry must not be mistaken for a loaded
+// list, and a configuration problem must not be reported as an unknown id.
+void TestSession::hashTypeWaitsForAWorkingHashcatPath()
+{
+    QJsonObject values;
+    values.insert(QStringLiteral("comboBox_hash_type"), 1000);
+    QVERIFY(QDir().mkpath(QFileInfo(StateFile::sessionFilePath()).absolutePath()));
+    QVERIFY(StateFile::write(StateFile::sessionFilePath(), AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, QString());
+
+    // The empty configured path queues the Settings dialog from the
+    // constructor; the watchdog closes it so the test can continue.
+    m_fixture.startWatchdog();
+    MainWindow window;
+    window.restoreSession();
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
+    QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
+
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-pending"),
+        "#!/bin/sh\n"
+        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
+        "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    MainWindowTestAccess::reloadHashTypes(window);
+
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
+                             5000);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentData().toInt(), 1000);
+    QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), -1);
+}
+
+// Auto-detect is a GUI sentinel, not a hash mode, but it has to survive a
+// session round trip like every other combo identifier.
+void TestSession::autoDetectHashTypeRoundTripsThroughASession()
+{
+    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-autodetect"));
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow writer;
+    writer.restoreSession();
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(writer)->comboBox_hash_type->count() == 2,
+                             5000);
+    MainWindowTestAccess::ui(writer)->comboBox_hash_type->setCurrentIndex(0);
+    QCOMPARE(MainWindowTestAccess::ui(writer)->comboBox_hash_type->itemData(0).toInt(),
+             AppConstants::Hashcat::AutoDetectHashType);
+    MainWindowTestAccess::saveSession(writer);
+
+    MainWindow reader;
+    reader.restoreSession();
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(reader)->comboBox_hash_type->count() == 2,
+                             5000);
+    QCOMPARE(MainWindowTestAccess::ui(reader)->comboBox_hash_type->currentData().toInt(),
+             AppConstants::Hashcat::AutoDetectHashType);
+    QVERIFY(!MainWindowTestAccess::generateArguments(reader).contains(QStringLiteral("-m")));
+}
+
 // A session that names a hash type this hashcat does not know. Selecting
-// another one would crack with the wrong algorithm, so nothing is selected
-// instead - and the command line asks for no hash type at all.
-void TestSession::sessionWithAnUnknownHashTypeSelectsNothing()
+// another real one would crack with the wrong algorithm, so Auto-detect is
+// selected instead - and the command line asks for no hash type at all.
+void TestSession::sessionWithAnUnknownHashTypeSelectsAutoDetect()
 {
     const QString stub = TestEnvironment::writeShellStub(
         QStringLiteral("stub-hashcat-unknown"),
@@ -335,7 +406,10 @@ void TestSession::sessionWithAnUnknownHashTypeSelectsNothing()
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
-    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentIndex(), -1);
+    // Unknown id falls back to the permanent Auto-detect entry.
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentIndex(), 0);
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toInt(),
+             AppConstants::Hashcat::AutoDetectHashType);
     QVERIFY(!MainWindowTestAccess::generateArguments(window).contains(QStringLiteral("-m")));
     QVERIFY(
         !MainWindowTestAccess::generateArguments(window).contains(QStringLiteral("--hash-type")));
@@ -1014,7 +1088,7 @@ void TestSession::theGoldenSessionRoundTrips()
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 4,
                              5000);
 
     const StateFile::Document document = StateFile::readDocument(
@@ -1104,7 +1178,7 @@ void TestSession::applyingASessionRebuildsThePreviewOnce()
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 4,
                              5000);
 
     const QString goldenPath =
@@ -1139,7 +1213,7 @@ void TestSession::aNoOpApplyWithRowsRebuildsThePreviewOnce()
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              5000);
     CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_wordlist,
                               {QStringLiteral("/tmp/one.txt")});
@@ -1190,7 +1264,7 @@ void TestSession::changingTheSettingsDoesNotChangeTheSnapshot()
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              5000);
     const QJsonObject before = MainWindowTestAccess::defaultSnapshot(window);
     QVERIFY(!before.isEmpty());
@@ -1221,7 +1295,7 @@ void TestSession::resetDoesNotTriggerQueryOrSave()
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
                              5000);
 
     // A stored session, with its content and timestamp.

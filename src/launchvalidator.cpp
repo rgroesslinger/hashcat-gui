@@ -386,14 +386,13 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
     return LaunchError::None;
 }
 
-// NUL and every C0 control except tab. A NUL would silently end the token at
-// exec, so the string hashcat receives is not the string the preview shows;
+// NUL and every C0/C1 control except tab. A NUL would silently end the token
+// at exec, so the string hashcat receives is not the string the preview shows;
 // the other controls are passed through to the terminal and the clipboard.
 bool hasForbiddenControlCharacter(const QString &token)
 {
     return std::ranges::any_of(token, [](QChar c) {
-        const ushort code = c.unicode();
-        return code == 0 || (code < 0x20 && c != QLatin1Char('\t'));
+        return c.unicode() == 0 || (c.category() == QChar::Other_Control && c != QLatin1Char('\t'));
     });
 }
 
@@ -405,7 +404,7 @@ QString showControlCharacters(const QString &token)
     shown.reserve(token.size());
     for (const QChar c : token) {
         const ushort code = c.unicode();
-        if (code == 0 || (code < 0x20 && c != QLatin1Char('\t'))) {
+        if (code == 0 || (c.category() == QChar::Other_Control && c != QLatin1Char('\t'))) {
             shown += QStringLiteral("\\x%1").arg(int(code), 2, 16, QLatin1Char('0'));
         } else {
             shown += c;
@@ -591,6 +590,20 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
     // a directory that has gone away.
     if (!options.cachePath.trimmed().isEmpty() && !QFileInfo(options.cachePath).isDir()) {
         return LaunchError::InvalidCachePath;
+    }
+
+    // The format field is free text and reaches hashcat whenever the builder
+    // emits --outfile-format (i.e. not with JSON and not at its default). The
+    // widget's validator can be bypassed by a session, so check here too;
+    // empty is invalid as well.
+    if (!options.outfileJson && options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
+        const QRegularExpression format{QString(AppConstants::Validation::OutfileFormatList)};
+        if (!format.match(options.outfileFormat).hasMatch()) {
+            if (detail) {
+                *detail = options.outfileFormat;
+            }
+            return LaunchError::InvalidOutfileFormat;
+        }
     }
 
     // What the builder would hand to hashcat must be the text the user sees.
