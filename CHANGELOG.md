@@ -2,17 +2,6 @@
 
 ## Unreleased
 
-- **Launch security**: hashcat is started from resolved absolute executables, and on Windows through PowerShell's `-EncodedCommand` with a `ProcessStartInfo` script whose arguments are quoted for the C runtime. Windows PowerShell 5.1 (and pwsh before 7.3) mangled embedded double quotes and dropped empty arguments, and `-Command` re-parsed hashes, masks, paths and session values as code. No user value reaches a shell as text; an encoded command beyond the 32,767-character CreateProcess limit (about 12,000 characters of hashcat arguments) is refused instead of truncated
-- The command preview and the clipboard follow the configured terminal's shell - PowerShell with the call operator and single quotes for `powershell.exe` and `pwsh`, POSIX otherwise - so a copied command can be pasted as-is. Tools → Copy as PowerShell Script copies the same readable `ProcessStartInfo` script that the launch encodes
-- hashcat and terminal programs are resolved to absolute executables (a bare name through `PATH`, a path against the working directory) and checked before launch; a configured path that exists but cannot run is reported as such
-- Positional values that start with `-` - a mask `-?d?d`, a wordlist, a session value - are protected by `--` before the positional tail, so they are not parsed as hashcat options. NUL and other control characters are refused before launch
-- The attack mode survives a settings change that reloads the hash types; previously the mode selector was refilled and silently jumped back to Straight
-- Importing settings re-runs the hash-type query when the hashcat binary changed, as the settings dialog already did; previously the old list stayed on screen
-- `cmd.exe` and ptyxis were dropped from the supported terminals: `cmd.exe` re-parses `%`, `&`, `^`, `<` and `>` in values, and ptyxis passes the command through `systemd-run`, which expands `$` words again. See the FAQ
-- The terminal list follows the platform: Windows offers `powershell.exe` and `pwsh` only, while Linux and macOS offer the table's terminal emulators through the `sh` wrapper. `pwsh` on Linux/macOS is a shell without a window, and the Unix terminals need a shell Windows does not have
-- Every Unix terminal now runs one fixed `sh` wrapper: the command arrives as positional parameters (never as shell text), the wrapper changes into hashcat's directory itself, prints the exit code and waits for Enter. The per-terminal hold flags are gone
-- `<unixtime>` in the outfile template is expanded from the collected options instead of being read inside the command builder, so a preview and a launch are each built from one value rather than two clock reads
-- hashcat runs in the canonical directory of its executable, so a binary reached through a symlink in `~/bin` still finds the kernels next to the real file
 - **Support for hashcat 8.0.0**: the attack mode selector offers all ten of its modes - the PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) modes join the existing ones, each with its own options that only appear where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
 - hashcat 8.0.0 or newer is required; the segment size (`-c`) and workload profile (`-w`) options were removed along with it
 - Example sessions for every attack mode are available under Tools → Load Example Session; each uses a different hash type and test password
@@ -25,6 +14,12 @@
 - Wordlists and PCFG rulesets offer an “Add folder…” button; an empty wordlist folder, a ruleset folder without a grammar and a folder in the table list are marked, and a folder in the `?q` slot is refused before launch
 - The hash type selector is searchable and provides auto completions
 - Added Ghostty as supported launch terminal
+- Windows PowerShell 5.1 (and pwsh before 7.3) mangled embedded double quotes and dropped empty arguments; no user value reaches a shell as text, and an encoded command beyond the 32,767-character CreateProcess limit (about 12,000 characters of hashcat arguments) is refused instead of truncated
+- The command preview and the clipboard follow the configured terminal's shell - PowerShell with the call operator and single quotes for `powershell.exe` and `pwsh`, POSIX otherwise - so a copied command can be pasted as-is into pwsh 7.3 or later. Windows PowerShell 5.1 still mangles embedded quotes and empty arguments in a pasted native command; use Tools → Copy as PowerShell Script there. That action copies the same readable `ProcessStartInfo` script that the launch encodes
+- Positional values that start with `-` - a mask `-?d?d`, a wordlist, a session value - are protected by `--` before the positional tail, so they are not parsed as hashcat options. NUL and other control characters are refused before launch
+- The attack mode survives a settings change that reloads the hash types; previously the mode selector was refilled and silently jumped back to Straight
+- `cmd.exe` and `ptyxis` were dropped from the supported terminals: Neither has a way to correctly escape some shell characters that may appear in the command. See the FAQ for a more in-depth explanation of the issue
+- `<unixtime>` in the outfile template is expanded from the collected options instead of being read inside the command builder, so a preview and a launch are each built from one value rather than two clock reads
 
 ## 0.8.0 (2026-10-25)
 
