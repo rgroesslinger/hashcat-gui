@@ -40,7 +40,7 @@ public:
     // here looks at the filesystem - so the tests can pin every entry.
     // PowerShell and pwsh are discovered through this table but launched
     // through launchCommand(); their entries hold no arguments, and
-    // availableTerminals() offers them only on Windows.
+    // availableTerminals() offers only them on Windows.
     static const QMap<QString, QStringList> &terminalArguments();
 
     // Every supported terminal that is installed, mapped to the absolute

@@ -739,19 +739,24 @@ void TestTerminalCatalog::availableTerminalsReturnsResolvedPrograms()
 }
 
 // A PowerShell shell is not a terminal: on Linux and macOS it opens no window
-// when started by itself, so discovery must not offer it there. The script
-// branch still recognises the name - the tests and a Windows session use it.
+// when started by itself, so discovery must not offer it there. The other way
+// round, Windows has no sh for the Unix wrapper, so only the PowerShell path
+// is offered there.
 void TestTerminalCatalog::availableTerminalsOfferPowerShellOnlyOnWindows()
 {
     QTemporaryDir directory;
     QVERIFY(directory.isValid());
 #ifdef Q_OS_WIN
-    const QString fileName = QStringLiteral("pwsh.exe");
+    const QString pwshName = QStringLiteral("pwsh.exe");
+    const QString weztermName = QStringLiteral("wezterm.exe");
 #else
-    const QString fileName = QStringLiteral("pwsh");
+    const QString pwshName = QStringLiteral("pwsh");
+    const QString weztermName = QStringLiteral("wezterm");
 #endif
-    const QString stub = TestEnvironment::writeSearchableExecutable(fileName, directory.path());
-    QVERIFY2(!stub.isEmpty(), "the pwsh stub could not be written");
+    const QString pwsh = TestEnvironment::writeSearchableExecutable(pwshName, directory.path());
+    const QString wezterm =
+        TestEnvironment::writeSearchableExecutable(weztermName, directory.path());
+    QVERIFY2(!pwsh.isEmpty() && !wezterm.isEmpty(), "the terminal stubs could not be written");
 
     TestEnvironment::PathGuard guard(directory.path().toUtf8());
 
@@ -759,9 +764,13 @@ void TestTerminalCatalog::availableTerminalsOfferPowerShellOnlyOnWindows()
 #ifdef Q_OS_WIN
     QVERIFY2(terminals.contains(QStringLiteral("pwsh")),
              "Windows did not offer the installed pwsh");
+    QVERIFY2(!terminals.contains(QStringLiteral("wezterm")),
+             "Windows offered a terminal that needs the Unix sh wrapper");
 #else
     QVERIFY2(!terminals.contains(QStringLiteral("pwsh")),
              "Unix offered pwsh although it opens no window");
+    QVERIFY2(terminals.contains(QStringLiteral("wezterm")),
+             "Unix did not offer the installed wezterm");
 #endif
     QVERIFY(TerminalCatalog::isPowerShell(QStringLiteral("pwsh")));
 }

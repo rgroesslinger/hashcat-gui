@@ -37,8 +37,9 @@ const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
         // The table holds both PowerShell shells on every platform so the script
-        // branch and its tests are the same everywhere; availableTerminals() offers
-        // them only on Windows, where a console can be created.
+        // branch and its tests are the same everywhere; availableTerminals()
+        // offers only them on Windows, where a console can be created and no sh
+        // exists for the Unix wrapper.
         {QStringLiteral("powershell.exe"), {}},
         {QStringLiteral("pwsh"), {}},
         {QStringLiteral("xterm"), {QStringLiteral("-e")}},
@@ -60,7 +61,13 @@ QMap<QString, QString> TerminalCatalog::availableTerminals()
 
     const QMap<QString, QStringList> &table = terminalArguments();
     for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
-#ifndef Q_OS_WIN
+#ifdef Q_OS_WIN
+        // Windows has no sh for the Unix wrapper; only the PowerShell path
+        // can start hashcat there.
+        if (!isPowerShell(it.key())) {
+            continue;
+        }
+#else
         // pwsh is installed on Linux and macOS, but it is a shell, not a
         // terminal: started by the GUI it has no window and its output goes
         // nowhere. Only Windows creates a console for it (CREATE_NEW_CONSOLE).

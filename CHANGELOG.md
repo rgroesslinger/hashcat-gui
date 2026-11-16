@@ -9,7 +9,7 @@
 - The attack mode survives a settings change that reloads the hash types; previously the mode selector was refilled and silently jumped back to Straight
 - Importing settings re-runs the hash-type query when the hashcat binary changed, as the settings dialog already did; previously the old list stayed on screen
 - `cmd.exe` and ptyxis were dropped from the supported terminals: `cmd.exe` re-parses `%`, `&`, `^`, `<` and `>` in values, and ptyxis passes the command through `systemd-run`, which expands `$` words again. See the FAQ
-- PowerShell 7 (`pwsh`) is offered only on Windows: on Linux and macOS it is a shell without a terminal window, so its output went nowhere
+- The terminal list follows the platform: Windows offers `powershell.exe` and `pwsh` only, while Linux and macOS offer the table's terminal emulators through the `sh` wrapper. `pwsh` on Linux/macOS is a shell without a window, and the Unix terminals need a shell Windows does not have
 - Every Unix terminal now runs one fixed `sh` wrapper: the command arrives as positional parameters (never as shell text), the wrapper changes into hashcat's directory itself, prints the exit code and waits for Enter. The per-terminal hold flags are gone
 - `<unixtime>` in the outfile template is expanded from the collected options instead of being read inside the command builder, so a preview and a launch are each built from one value rather than two clock reads
 - **Support for hashcat 8.0.0**: the attack mode selector offers all ten of its modes - the PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) modes join the existing ones, each with its own options that only appear where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))

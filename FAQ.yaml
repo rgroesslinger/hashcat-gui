@@ -8,6 +8,8 @@ items:
       there is no quoting that preserves every possible value. On Windows
       hashcat-gui starts hashcat through a PowerShell script that passes the
       arguments unchanged instead, so cmd.exe is not offered as a terminal.
+      Windows lists only `powershell.exe` and `pwsh`; the other terminals in
+      the list are Unix terminals that need the `sh` wrapper.
 
       **ptyxis** hands the command to `systemd-run`, which expands `$`-words a
       second time. A bcrypt hash (`$2a$10$...`), a `$HOME` or a PowerShell

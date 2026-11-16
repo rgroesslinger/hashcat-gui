@@ -83,6 +83,9 @@ re-run `cmake -B build`.
 - The preview and clipboard follow the configured terminal's shell
   (`CommandPreview::Dialect`), not the build platform. `pwsh` is a shell, not a terminal:
   discovery offers it only on Windows, where `CREATE_NEW_CONSOLE` gives it a window.
+- The offered terminals follow the platform: Windows lists `powershell.exe` and `pwsh` only,
+  because the Unix wrapper needs `sh`; Unix lists the table's terminal emulators and never the
+  PowerShell shells.
 - ptyxis and cmd.exe are deliberately unsupported; `FAQ.yaml` records why. Do not re-add one
   without a way to pass a command verbatim.
 
