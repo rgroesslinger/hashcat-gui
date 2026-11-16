@@ -166,6 +166,7 @@ private slots:
     void findHashcatInPathIsEmptyWithoutOne();
     void availableTerminalsReturnsResolvedPrograms();
     void availableTerminalsOfferPowerShellOnlyOnWindows();
+    void noSupportedTerminalMessageNamesPtyxis();
     void programDirectoryFollowsSymlinks();
     void launchDetachedStartsTheProgram();
     void unixWrapperRunsHashcatInItsDirectoryWithTheArguments();
@@ -774,6 +775,27 @@ void TestTerminalCatalog::availableTerminalsOfferPowerShellOnlyOnWindows()
              "Unix did not offer the installed wezterm");
 #endif
     QVERIFY(TerminalCatalog::isPowerShell(QStringLiteral("pwsh")));
+}
+
+// ptyxis is broken for hashcat but may be the only terminal installed. The
+// message then names it and the reason instead of leaving the user with "no
+// supported terminal".
+void TestTerminalCatalog::noSupportedTerminalMessageNamesPtyxis()
+{
+#ifdef Q_OS_WIN
+    QSKIP("ptyxis is a Unix terminal");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString stub =
+        TestEnvironment::writeSearchableExecutable(QStringLiteral("ptyxis"), directory.path());
+    QVERIFY2(!stub.isEmpty(), "the ptyxis stub could not be written");
+    TestEnvironment::PathGuard guard(directory.path().toUtf8());
+
+    const QString message = TerminalCatalog::noSupportedTerminalMessage();
+    QVERIFY2(message.contains(QStringLiteral("ptyxis")), qPrintable(message));
+    QVERIFY2(message.contains(QStringLiteral("$")), qPrintable(message));
+#endif
 }
 
 // A hashcat binary reached through a symlink runs next to the real file: its

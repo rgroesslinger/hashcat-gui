@@ -123,6 +123,16 @@ QString TerminalCatalog::findHashcatInPath()
 
 QString TerminalCatalog::noSupportedTerminalMessage()
 {
+#ifndef Q_OS_WIN
+    // ptyxis is the default terminal on some distributions. When it is the
+    // only one installed, naming the reason is more useful than the generic
+    // "no terminal" text.
+    if (!Executable::resolve(QStringLiteral("ptyxis")).isEmpty()) {
+        return tr("No supported terminal was found. ptyxis is installed, but it changes “$” "
+                  "values before hashcat sees them, so it is not offered. Install another "
+                  "terminal; see the FAQ.");
+    }
+#endif
     return tr("No supported terminal was found on this system. "
               "hashcat-gui needs one to show the hashcat output.");
 }
