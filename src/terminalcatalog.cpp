@@ -179,9 +179,20 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     // sh -c only as positional parameters, so no hash, mask, path or session
     // value is ever parsed as shell code. The wrapper sets the working
     // directory itself - a terminal that hands the command to a server
-    // process may not inherit ours - and holds the window open with the exit
-    // code after hashcat ends.
-    const QString wrapper = QStringLiteral(R"(cd "$1" || exit
+    // process may not inherit ours - reports a directory it cannot enter,
+    // and holds the window open with the exit code after hashcat ends.
+    //
+    // The INT trap is a handler, not an ignored signal: dash otherwise dies
+    // with hashcat on Ctrl-C and the window closes before the status line.
+    // A trapped signal is reset to the default in the child, so hashcat still
+    // receives Ctrl-C normally.
+    const QString wrapper = QStringLiteral(R"(trap : INT
+cd "$1" || {
+    printf 'hashcat-gui: cannot enter %s\n' "$1" >&2
+    printf '[press Enter to close]\n' >&2
+    read -r _
+    exit 1
+}
 shift
 "$@"
 rc=$?

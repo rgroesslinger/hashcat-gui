@@ -22,6 +22,12 @@
 #include <array>
 #include <iterator>
 
+#ifndef Q_OS_WIN
+#include <csignal>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 namespace
 {
 // The script the -EncodedCommand argument carries, back as text.
@@ -162,6 +168,8 @@ private slots:
     void availableTerminalsOfferPowerShellOnlyOnWindows();
     void launchDetachedStartsTheProgram();
     void unixWrapperRunsHashcatInItsDirectoryWithTheArguments();
+    void unixWrapperSurvivesInterrupt();
+    void unixWrapperReportsAFailedDirectory();
     void launchDetachedReportsAFailure();
 };
 
@@ -202,7 +210,13 @@ void TestTerminalCatalog::terminalArgumentsArePinned()
 // directory, the exit code and the hold-open guarantee from drifting.
 void TestTerminalCatalog::launchCommandWrapsUnixTerminals()
 {
-    const QString wrapper = QStringLiteral(R"(cd "$1" || exit
+    const QString wrapper = QStringLiteral(R"(trap : INT
+cd "$1" || {
+    printf 'hashcat-gui: cannot enter %s\n' "$1" >&2
+    printf '[press Enter to close]\n' >&2
+    read -r _
+    exit 1
+}
 shift
 "$@"
 rc=$?
@@ -832,6 +846,144 @@ void TestTerminalCatalog::unixWrapperRunsHashcatInItsDirectoryWithTheArguments()
     QCOMPARE(recorded.size(), 1 + arguments.size());
     QCOMPARE(QDir(recorded.at(0)).canonicalPath(), QDir(directory.path()).canonicalPath());
     QCOMPARE(recorded.mid(1), arguments);
+#endif
+}
+
+// Ctrl-C goes to the whole foreground process group. hashcat handles it and
+// exits, but dash has no handler and would die with it, closing the terminal
+// before the status line. The wrapper traps INT with a handler (never an
+// ignored signal, which the child would inherit), so the status and the
+// prompt always appear. Run under every sh on the machine, with the wrapper's
+// `sh` resolved through a one-entry PATH.
+void TestTerminalCatalog::unixWrapperSurvivesInterrupt()
+{
+#ifdef Q_OS_WIN
+    QSKIP("the Unix wrapper signal test does not apply on Windows");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString hashcat =
+        TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-interrupt"),
+                                        "#!/bin/sh\n"
+                                        "trap 'echo HASH_INT; exit 2' INT\n"
+                                        "echo HASH_STARTED\n"
+                                        "sleep 10\n",
+                                        directory.path());
+    const QString terminal =
+        TestEnvironment::writeShellStub(QStringLiteral("stub-terminal-interrupt"),
+                                        "#!/bin/sh\nshift\nexec \"$@\"\n", directory.path());
+    QVERIFY2(!hashcat.isEmpty() && !terminal.isEmpty(), "the stubs could not be written");
+
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        QStringLiteral("xterm"), terminal, hashcat,
+        {QStringLiteral("--attack-mode"), QStringLiteral("0")}, true);
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+
+    QStringList shells{QStringLiteral("/bin/sh")};
+    for (const QString &name : {QStringLiteral("dash"), QStringLiteral("bash")}) {
+        const QString path = QStandardPaths::findExecutable(name);
+        if (!path.isEmpty() && !shells.contains(path)) {
+            shells << path;
+        }
+    }
+
+    for (const QString &shell : shells) {
+        // The wrapper calls `sh`; the shim comes first so that name picks
+        // this shell, while the original PATH keeps the stub's own tools
+        // (sleep) available.
+        QTemporaryDir shim;
+        QVERIFY(shim.isValid());
+        const QString sh = shim.filePath(QStringLiteral("sh"));
+        QVERIFY2(QFile::link(shell, sh), qPrintable(shell));
+        TestEnvironment::PathGuard guard(shim.path().toUtf8() + ':' + qgetenv("PATH"));
+
+        QProcess process;
+        process.setProgram(command.program);
+        process.setArguments(command.arguments);
+        process.setChildProcessModifier([] { ::setsid(); });
+        process.start();
+        QVERIFY2(process.waitForStarted(10000), qPrintable(process.errorString()));
+
+        QByteArray output;
+        QElapsedTimer timer;
+        timer.start();
+        while (!output.contains("HASH_STARTED")) {
+            QVERIFY2(timer.elapsed() < 10000,
+                     qPrintable(QStringLiteral("%1: %2").arg(shell, QString::fromUtf8(output))));
+            process.waitForReadyRead(100);
+            output += process.readAllStandardOutput();
+        }
+
+        // The stub prints HASH_STARTED before it starts its foreground sleep;
+        // give it that moment so the signal hits the running child, as Ctrl-C
+        // does in a real terminal.
+        QTest::qWait(250);
+        QVERIFY2(::kill(-static_cast<pid_t>(process.processId()), SIGINT) == 0,
+                 qPrintable(QStringLiteral("could not signal %1").arg(shell)));
+
+        // The wrapper has to survive the interrupt; the child's HASH_INT
+        // proves the signal reached the group. The status line may still sit
+        // in the pipe buffer (stdout is not a TTY here), so close stdin first
+        // and assert it after the shell has flushed and exited. An old wrapper
+        // is already gone at this point and cannot print it.
+        while (!output.contains("HASH_INT")) {
+            if (process.state() == QProcess::NotRunning) {
+                break;
+            }
+            QVERIFY2(timer.elapsed() < 10000,
+                     qPrintable(QStringLiteral("%1: %2").arg(shell, QString::fromUtf8(output))));
+            process.waitForReadyRead(100);
+            output += process.readAllStandardOutput();
+        }
+        if (process.state() != QProcess::NotRunning) {
+            process.write("\n");
+            process.closeWriteChannel();
+        }
+        QVERIFY2(process.waitForFinished(10000),
+                 qPrintable(QStringLiteral("%1: %2").arg(shell, QString::fromUtf8(output))));
+        output += process.readAllStandardOutput();
+
+        QVERIFY2(output.contains("HASH_INT"),
+                 qPrintable(QStringLiteral("%1: %2").arg(shell, QString::fromUtf8(output))));
+        QVERIFY2(output.contains("exited with 2"),
+                 qPrintable(QStringLiteral("%1: %2").arg(shell, QString::fromUtf8(output))));
+        QCOMPARE(process.exitStatus(), QProcess::NormalExit);
+        QCOMPARE(process.exitCode(), 0);
+    }
+#endif
+}
+
+// A hashcat directory that is gone must say so and wait, not close the window
+// without a word.
+void TestTerminalCatalog::unixWrapperReportsAFailedDirectory()
+{
+#ifdef Q_OS_WIN
+    QSKIP("the Unix wrapper test does not apply on Windows");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString terminal = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-terminal-failed-cd"), "#!/bin/sh\nshift\nexec \"$@\" </dev/null\n",
+        directory.path());
+    QVERIFY2(!terminal.isEmpty(), "the terminal stub could not be written");
+
+    const QString hashcat = directory.filePath(QStringLiteral("gone/hashcat"));
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        QStringLiteral("xterm"), terminal, hashcat, {QStringLiteral("--help")}, true);
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+
+    QProcess process;
+    process.setProgram(command.program);
+    process.setArguments(command.arguments);
+    process.start();
+    QVERIFY2(process.waitForStarted(10000), qPrintable(process.errorString()));
+    QVERIFY2(process.waitForFinished(10000), "the wrapper did not finish");
+
+    const QByteArray output = process.readAllStandardOutput() + process.readAllStandardError();
+    QVERIFY2(output.contains("cannot enter"), qPrintable(QString::fromUtf8(output)));
+    QVERIFY2(output.contains("[press Enter to close]"), qPrintable(QString::fromUtf8(output)));
+    QCOMPARE(process.exitStatus(), QProcess::NormalExit);
+    QCOMPARE(process.exitCode(), 1);
 #endif
 }
 
