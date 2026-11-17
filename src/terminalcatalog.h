@@ -12,6 +12,10 @@
 #include <QStringList>
 #include <cstdint>
 
+#ifdef Q_OS_WIN
+#include <QProcess>
+#endif
+
 // The program and the arguments that start hashcat in a terminal, and - when
 // they could not be built - why. A refusal type keeps the caller from showing
 // the "too long" message for an unknown terminal.
@@ -86,6 +90,15 @@ public:
     // owns the refusal of an empty command and every message box.
     static bool launchDetached(const LaunchCommand &command, const QString &hashcatPath,
                                QString *errorMessage);
+
+private:
+#ifdef Q_OS_WIN
+    friend class TestTerminalCatalog;
+
+    // Console settings for a detached terminal; separate so Windows tests can
+    // pin the flags.
+    static void configureConsoleLaunch(QProcess::CreateProcessArguments *args);
+#endif
 };
 
 #endif // TERMINALCATALOG_H

@@ -10,6 +10,20 @@
 
 #include <QCoreApplication>
 
+namespace
+{
+#ifdef Q_OS_WIN
+// A hand-typed path often lacks .exe; both path errors benefit from the note.
+QString windowsSuffixNote()
+{
+    return QLatin1Char('\n')
+           + QCoreApplication::translate(
+               "LaunchMessage",
+               "Windows executable names include their extension, for example hashcat.exe.");
+}
+#endif
+} // namespace
+
 // The texts are translated in the LaunchMessage context from the first
 // extraction; the result is an aggregate, so Q_DECLARE_TR_FUNCTIONS cannot
 // be used here.
@@ -39,14 +53,19 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                 .arg(fileMenuLabel, settingsMenuLabel);
         break;
 
-    case LaunchValidator::LaunchError::HashcatPathMissing:
+    case LaunchValidator::LaunchError::HashcatPathMissing: {
         message.format = Qt::PlainText;
-        message.text =
+        QString text =
             QCoreApplication::translate("LaunchMessage",
                                         "The configured hashcat executable does not exist:\n%1\n"
                                         "Navigate to %2 → %3 to change it.")
                 .arg(problem.detail, fileMenuLabel, settingsMenuLabel);
+#ifdef Q_OS_WIN
+        text += windowsSuffixNote();
+#endif
+        message.text = text;
         break;
+    }
 
     case LaunchValidator::LaunchError::HashcatNotExecutable: {
         message.format = Qt::PlainText;
@@ -56,12 +75,7 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                                             "Navigate to %2 → %3 to change it.")
                            .arg(problem.detail, fileMenuLabel, settingsMenuLabel);
 #ifdef Q_OS_WIN
-        // Windows resolves a program by its suffix; "hashcat" without .exe
-        // is a common hand edit here.
-        text += QLatin1Char('\n')
-                + QCoreApplication::translate(
-                    "LaunchMessage",
-                    "Windows executable names include their extension, for example hashcat.exe.");
+        text += windowsSuffixNote();
 #endif
         message.text = text;
         break;

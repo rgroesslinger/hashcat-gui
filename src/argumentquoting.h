@@ -129,16 +129,13 @@ inline bool powerShellNeedsQuoting(const QString &token)
     if (token.startsWith(QLatin1Char('-')) && token.contains(QLatin1Char('.'))) {
         return true;
     }
-    for (const QChar c : token) {
+    return std::ranges::any_of(token, [](QChar c) {
         const char16_t u = c.unicode();
         const bool literal = (u >= u'a' && u <= u'z') || (u >= u'A' && u <= u'Z')
                              || (u >= u'0' && u <= u'9') || u == u'_' || u == u'-' || u == u'+'
                              || u == u'=' || u == u':' || u == u'.' || u == u'/' || u == u'\\';
-        if (!literal) {
-            return true;
-        }
-    }
-    return false;
+        return !literal;
+    });
 }
 
 inline QString powerShellDisplayArgument(const QString &token)

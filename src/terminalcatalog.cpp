@@ -204,21 +204,34 @@ read -r _)");
     return command;
 }
 
+#ifdef Q_OS_WIN
+void TerminalCatalog::configureConsoleLaunch(QProcess::CreateProcessArguments *args)
+{
+    // CREATE_NEW_CONSOLE gives the terminal its own window. QProcess still sets
+    // STARTF_USESTDHANDLES with this process's handles - null from Explorer,
+    // the launching shell's from MSYS2 or cmd.exe - so the window opens blank
+    // while hashcat writes to that shell. Clear the flag, as Qt's own example
+    // does, so the child gets the new console's handles. CREATE_NO_WINDOW is
+    // ignored once CREATE_NEW_CONSOLE is set.
+    args->flags |= CREATE_NEW_CONSOLE;
+    args->startupInfo->dwFlags &= ~STARTF_USESTDHANDLES;
+}
+#endif
+
 bool TerminalCatalog::launchDetached(const LaunchCommand &command, const QString &hashcatPath,
                                      QString *errorMessage)
 {
     QProcess proc;
 
 #ifdef Q_OS_WIN
-    /* Need CREATE_NEW_CONSOLE flag on windows to spawn visible terminal */
-    proc.setCreateProcessArgumentsModifier(
-        [](QProcess::CreateProcessArguments *args) { args->flags |= CREATE_NEW_CONSOLE; });
+    proc.setCreateProcessArgumentsModifier(&TerminalCatalog::configureConsoleLaunch);
 #endif
 
     proc.setProgram(command.program);
     proc.setArguments(command.arguments);
     proc.setWorkingDirectory(ProgramDirectory::forProgram(hashcatPath));
 
+    // The member overload is required: only it runs the modifier set above.
     if (!proc.startDetached()) {
         if (errorMessage) {
             *errorMessage = proc.errorString();

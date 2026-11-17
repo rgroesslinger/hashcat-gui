@@ -27,6 +27,8 @@
 #include <csignal>
 #include <sys/types.h>
 #include <unistd.h>
+#else
+#include <windows.h>
 #endif
 
 namespace
@@ -169,6 +171,7 @@ private slots:
     void availableTerminalsOfferPowerShellOnlyOnWindows();
     void noSupportedTerminalMessageNamesPtyxis();
     void programDirectoryFollowsSymlinks();
+    void detachedLaunchConfiguresTheNewConsole();
     void launchDetachedStartsTheProgram();
     void unixWrapperRunsHashcatInItsDirectoryWithTheArguments();
     void unixWrapperSurvivesInterrupt();
@@ -838,6 +841,33 @@ void TestTerminalCatalog::programDirectoryFollowsSymlinks()
     QVERIFY2(script.contains(QStringLiteral("$si.WorkingDirectory = ")
                              + powerShellQuoteArgument(expected)),
              qPrintable(script));
+#endif
+}
+
+// QProcess sets STARTF_USESTDHANDLES with this process's handles: null from
+// Explorer, the launching shell's from MSYS2 or cmd.exe. Clearing the flag
+// lets the child use the new console's handles instead.
+void TestTerminalCatalog::detachedLaunchConfiguresTheNewConsole()
+{
+#ifdef Q_OS_WIN
+    STARTUPINFOW startupInfo{};
+    startupInfo.dwFlags = STARTF_USESTDHANDLES;
+    // Non-null handles model the MSYS2/cmd.exe case.
+    startupInfo.hStdInput = reinterpret_cast<HANDLE>(quintptr{1});
+    startupInfo.hStdOutput = reinterpret_cast<HANDLE>(quintptr{2});
+    startupInfo.hStdError = reinterpret_cast<HANDLE>(quintptr{3});
+    PROCESS_INFORMATION processInfo{};
+    QProcess::CreateProcessArguments args{};
+    args.flags = CREATE_NO_WINDOW | CREATE_UNICODE_ENVIRONMENT;
+    args.startupInfo = &startupInfo;
+    args.processInformation = &processInfo;
+
+    TerminalCatalog::configureConsoleLaunch(&args);
+
+    QVERIFY(args.flags & CREATE_NEW_CONSOLE);
+    QVERIFY(!(args.startupInfo->dwFlags & STARTF_USESTDHANDLES));
+#else
+    QSKIP("Windows console setup");
 #endif
 }
 
