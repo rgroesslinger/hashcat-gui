@@ -70,6 +70,9 @@ private slots:
     void hashTypeWaitsForAWorkingHashcatPath();
     void turningTheSessionOffRemovesTheStoredSession();
     void sessionHashTypeSurvivesTheAsynchronousQuery();
+    void aFailedQueryKeepsTheSessionHashTypeOnSave();
+    void anInFlightQueryKeepsTheSessionHashTypeOnSave();
+    void exportingWhileTheQueryIsPendingKeepsTheHashType();
     void sessionWithAnUnknownHashTypeSelectsAutoDetect();
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
@@ -296,6 +299,136 @@ void TestSession::sessionHashTypeSurvivesTheAsynchronousQuery()
 
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentData().toInt(), 1000);
     QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), -1); // applied and consumed
+}
+
+namespace
+{
+// The values object of a stored session file, for the save-side checks below.
+QJsonObject storedSessionValues(const QString &file)
+{
+    return readJsonObject(file)
+        .value(QStringLiteral("sections"))
+        .toObject()
+        .value(QString(AppConstants::FileSections::Session))
+        .toObject()
+        .value(QStringLiteral("values"))
+        .toObject();
+}
+} // namespace
+
+// A query that fails resets the combo to Auto-detect alone, but the hash type
+// the session named is still pending: saving the session must keep it, or the
+// next start would run with autodetect instead of the configured type.
+void TestSession::aFailedQueryKeepsTheSessionHashTypeOnSave()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-failed-save"),
+                                                         "#!/bin/sh\nexit 1\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    QJsonObject values;
+    values.insert(QStringLiteral("comboBox_hash_type"), 1000);
+    QVERIFY(QDir().mkpath(QFileInfo(StateFile::sessionFilePath()).absolutePath()));
+    QVERIFY(StateFile::write(StateFile::sessionFilePath(), AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    m_fixture.startWatchdog();
+    MainWindow window;
+    window.restoreSession();
+
+    // The failure is processed: the combo holds Auto-detect alone, the id waits.
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 1,
+                             5000);
+    QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
+
+    MainWindowTestAccess::saveSession(window);
+    QCOMPARE(storedSessionValues(StateFile::sessionFilePath())
+                 .value(QStringLiteral("comboBox_hash_type"))
+                 .toInt(),
+             1000);
+}
+
+// A slow query is still on its way when the user quits: the combo is empty,
+// and the save must keep the pending id instead of storing "no selection".
+void TestSession::anInFlightQueryKeepsTheSessionHashTypeOnSave()
+{
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-slow-save"),
+        "#!/bin/sh\nsleep 1\nprintf '{\"0\":{\"name\":\"MD5\"}}\\n'\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    QJsonObject values;
+    values.insert(QStringLiteral("comboBox_hash_type"), 1000);
+    QVERIFY(QDir().mkpath(QFileInfo(StateFile::sessionFilePath()).absolutePath()));
+    QVERIFY(StateFile::write(StateFile::sessionFilePath(), AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    m_fixture.startWatchdog();
+    MainWindow window;
+    window.restoreSession();
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
+    QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
+
+    // Quit before the reply arrives.
+    MainWindowTestAccess::saveSession(window);
+    QCOMPARE(storedSessionValues(StateFile::sessionFilePath())
+                 .value(QStringLiteral("comboBox_hash_type"))
+                 .toInt(),
+             1000);
+}
+
+// The export is the session too: while the query is pending it must carry the
+// id the session named, not the empty combo's "no selection".
+void TestSession::exportingWhileTheQueryIsPendingKeepsTheHashType()
+{
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-slow-export"),
+        "#!/bin/sh\nsleep 1\nprintf "
+        "'{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    QJsonObject values;
+    values.insert(QStringLiteral("comboBox_hash_type"), 1000);
+    QVERIFY(QDir().mkpath(QFileInfo(StateFile::sessionFilePath()).absolutePath()));
+    QVERIFY(StateFile::write(StateFile::sessionFilePath(), AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    const QString file =
+        TestEnvironment::scratchDir().filePath(QStringLiteral("pending-export.json"));
+
+    // No watchdog here: it would close the file dialog too. The reply arrives
+    // after the export is done and the window is gone, so no box can open.
+    MainWindow window;
+    window.restoreSession();
+    QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.pickFile = file;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&window, "exportTriggered"));
+
+    QVERIFY(QFile::exists(file));
+    QJsonObject exported;
+    int version = 0;
+    QStringList otherSections;
+    QVERIFY2(StateFile::read(file, AppConstants::FileSections::Session, &exported, &version,
+                             &otherSections, nullptr),
+             "the exported session cannot be read again");
+    QCOMPARE(exported.value(QStringLiteral("comboBox_hash_type")).toInt(), 1000);
 }
 
 // A session restored while hashcat has no usable path must keep its hash type

@@ -174,8 +174,7 @@ MainWindow::MainWindow(QWidget *parent)
                 // A session loaded while the combo was empty still has its
                 // id pending; otherwise keep the previous selection. With
                 // neither, Auto-detect is the working default.
-                fromSession = m_pendingHashTypeId >= 0
-                              || m_pendingHashTypeId == AppConstants::Hashcat::AutoDetectHashType;
+                fromSession = hasPendingHashType();
                 problem = applyPendingHashType(
                     hasPrevious ? previousId : AppConstants::Hashcat::AutoDetectHashType,
                     fromSession);
@@ -789,7 +788,7 @@ void MainWindow::exportTriggered()
     }
 
     QString error;
-    const QJsonObject values = SessionTransfer::toDocument(this);
+    const QJsonObject values = sessionValues();
     if (StateFile::write(file, AppConstants::FileSections::Session, AppConstants::Sessions::Version,
                          values, &error)) {
         QMessageBox::information(this, tr("Exported"), tr("Session exported to “%1”.").arg(file));
@@ -1127,6 +1126,15 @@ void MainWindow::loadSession()
     }
 }
 
+// Whether the hash type a restored session named is still waiting for the
+// list of hash types. Auto-detect is a value a session can name, so it counts
+// as pending; every other negative id means the session named none.
+bool MainWindow::hasPendingHashType() const
+{
+    return m_pendingHashTypeId >= 0
+           || m_pendingHashTypeId == AppConstants::Hashcat::AutoDetectHashType;
+}
+
 // The hash type of a session.
 //
 // The mapping applies it when the list of hash types is there; this only
@@ -1184,7 +1192,7 @@ void MainWindow::updateHashTypeDependencies()
 QString MainWindow::applyPendingHashType(int fallbackId, bool fromSession)
 {
     const int pending = m_pendingHashTypeId;
-    const bool hasPending = pending >= 0 || pending == AppConstants::Hashcat::AutoDetectHashType;
+    const bool hasPending = hasPendingHashType();
     const int requested = hasPending ? pending : fallbackId;
 
     QString problem;
@@ -1210,6 +1218,23 @@ QString MainWindow::applyPendingHashType(int fallbackId, bool fromSession)
 
     m_pendingHashTypeId = -1;
     return problem;
+}
+
+// The values a session file gets from the form. One correction belongs to
+// the hash type: while the query that fills the combo has not answered, the
+// id the restored session named is still pending - the combo holds no
+// selection (or Auto-detect alone after a failure), and storing that would
+// silently drop the type the session asked for. The pending id is the value
+// the user configured; once a query succeeds it is consumed and the applied
+// selection is stored as usual.
+QJsonObject MainWindow::sessionValues()
+{
+    QJsonObject values = SessionTransfer::toDocument(this);
+    const int pending = m_pendingHashTypeId;
+    if (hasPendingHashType()) {
+        values.insert(QStringLiteral("comboBox_hash_type"), pending);
+    }
+    return values;
 }
 
 // Save the session – called by aboutToQuit signal
@@ -1243,7 +1268,7 @@ void MainWindow::saveSession()
     QDir().mkpath(QFileInfo(file).absolutePath());
 
     QString error;
-    const QJsonObject values = SessionTransfer::toDocument(this);
+    const QJsonObject values = sessionValues();
     if (!StateFile::write(file, AppConstants::FileSections::Session,
                           AppConstants::Sessions::Version, values, &error)) {
         QMessageBox::warning(this, tr("Save failed"), error);

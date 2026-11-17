@@ -204,6 +204,14 @@ private:
     void loadSession();
     void saveSession();
 
+    // The session as the widgets hold it, with the hash type a pending query
+    // still owes corrected to the id the session named, see the definition.
+    QJsonObject sessionValues();
+
+    // Whether a restored session named a hash type the list has not been able
+    // to apply yet, see m_pendingHashTypeId.
+    [[nodiscard]] bool hasPendingHashType() const;
+
     // Queues the hash type a session names until the list of hash types
     // exists, and reports one this hashcat does not know - which falls back to
     // Auto-detect rather than picking a different real hash type.
