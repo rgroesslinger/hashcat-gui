@@ -48,12 +48,22 @@ bool hasExpectedType(QLatin1StringView key, const QJsonValue &value)
 }
 
 // The value the dialog shows for a setting, in the type the setting takes.
-QJsonValue widgetValue(const Ui::SettingsDialog &ui, QLatin1StringView key)
+// configuredTerminal is the terminal the last applied value named: the combo
+// shows no selection for one that is not installed, and Save keeps it.
+QJsonValue widgetValue(const Ui::SettingsDialog &ui, QLatin1StringView key,
+                       const QString &configuredTerminal)
 {
     if (key == AppConstants::SettingsKeys::HashcatPath) {
         return ui.lineEdit_hc_path->text();
     }
     if (key == AppConstants::SettingsKeys::Terminal) {
+        // A configured terminal that is not installed shows no selection, but
+        // it stays the configured one: saving another setting must not clear
+        // it. An empty configured value is the intentional "none" and saves
+        // as itself.
+        if (ui.comboBox_terminal->currentIndex() < 0 && !configuredTerminal.isEmpty()) {
+            return configuredTerminal;
+        }
         return ui.comboBox_terminal->currentText();
     }
     if (key == AppConstants::SettingsKeys::UseShortParameters) {
@@ -193,7 +203,9 @@ void SettingsDialog::readSettings()
 
     // What the combo shows is what Save will store, so that is what counts as
     // "unchanged": a stale code that fell back to "System default" must not
-    // read as a pending change and trigger a restart.
+    // read as a pending change and trigger a restart. The terminal is the one
+    // exception: a configured one that is not installed shows no selection,
+    // and Save keeps it instead of clearing it (widgetValue()).
     loadedLanguage = ui->comboBox_language->currentData().toString();
 
     updatePathLabels();
@@ -517,7 +529,7 @@ void SettingsDialog::saveClicked()
     // One way out for every setting: the table names the key and its type,
     // the widget provides the value.
     for (const AppConstants::SettingsKeys::Entry &entry : AppConstants::SettingsKeys::All) {
-        const QJsonValue value = widgetValue(*ui, entry.key);
+        const QJsonValue value = widgetValue(*ui, entry.key, m_configuredTerminal);
         switch (entry.type) {
         case AppConstants::SettingsKeys::Type::Boolean:
             settings.setKey(QString(entry.key), value.toBool());

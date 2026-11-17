@@ -95,8 +95,9 @@ private:
     QString m_settingsFolder;
     QString m_sessionFolder;
 
-    // The terminal the last applied value named, so a terminal that is no
-    // longer installed can be named instead of just "select one".
+    // The terminal the last applied value named: one that is no longer
+    // installed is named instead of just "select one", and Save keeps it
+    // rather than storing the combo's empty selection (widgetValue()).
     QString m_configuredTerminal;
 
     bool m_sizedToContent = false;

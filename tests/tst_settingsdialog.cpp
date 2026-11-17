@@ -100,6 +100,8 @@ private slots:
     void doesNotReplaceAConfiguredPath();
     void leavesThePathEmptyWhenHashcatIsNotOnPath();
     void terminalStatusFollowsTheCombo();
+    void aMissingConfiguredTerminalSurvivesTheSave();
+    void anImportedEmptyTerminalStillSavesEmpty();
     void saveIsTheDefaultButton();
     void savedSettingsHoldTheKnownSettings();
     void savedSettingsCoverEveryKnownKey();
@@ -451,6 +453,45 @@ void TestSettingsDialog::terminalStatusFollowsTheCombo()
     QVERIFY(!missing.ui->label_terminal_status->isHidden());
     QVERIFY(missing.ui->label_terminal_status->text().contains(
         QStringLiteral("a-terminal-that-is-gone")));
+}
+
+// A configured terminal that is not installed shows no selection, but saving
+// another setting must not clear it: the value comes back with the terminal.
+void TestSettingsDialog::aMissingConfiguredTerminalSurvivesTheSave()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
+                                       QStringLiteral("a-terminal-that-is-gone"));
+
+    SettingsDialog dialog;
+    QCOMPARE(dialog.ui->comboBox_terminal->currentIndex(), -1);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal),
+             QStringLiteral("a-terminal-that-is-gone"));
+}
+
+// The intentional "none" still saves: an imported empty terminal clears the
+// configured one, the preserve guard only covers a missing selection.
+void TestSettingsDialog::anImportedEmptyTerminalStillSavesEmpty()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
+                                       QStringLiteral("a-terminal-that-is-gone"));
+
+    SettingsDialog dialog;
+    QJsonObject imported;
+    imported.insert(QStringLiteral("terminal"), QString());
+    dialog.applyImportedSettings(imported);
+    QCOMPARE(dialog.ui->comboBox_terminal->currentIndex(), -1);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal),
+             QString());
 }
 
 // The dialog button box gives Enter its target: Save is the default button,
