@@ -1579,7 +1579,8 @@ void MainWindow::copyCommandToClipboard()
         clipboard->setText(text);
         // A one-shot tooltip confirms the copy. The button's own tooltip
         // would not re-render while the pointer stays on the button.
-        QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"), nullptr, {}, 2000);
+        QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"),
+                           ui->pushButton_copy_clipboard, {}, 2000);
     }
 }
 
@@ -1610,7 +1611,7 @@ void MainWindow::copyPowerShellScript()
         TerminalCatalog::powerShellScript(resolved, CommandBuilder::build(collectHashcatOptions()));
     if (QClipboard *clipboard = QApplication::clipboard()) {
         clipboard->setText(script);
-        QToolTip::showText(QCursor::pos(), tr("PowerShell script copied to the clipboard"), nullptr,
+        QToolTip::showText(QCursor::pos(), tr("PowerShell script copied to the clipboard"), this,
                            {}, 2000);
     }
 }

@@ -175,7 +175,8 @@ void AboutDialog::copyDetailsClicked()
     clipboard->setText(detailsText());
     // A one-shot tooltip confirms the copy. The button's own tooltip would
     // not re-render while the pointer stays on the button.
-    QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"), nullptr, {}, 2000);
+    QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"), ui->pushButton_copy_details,
+                       {}, 2000);
 }
 
 // What a bug report needs: the version of the application, of the toolkit
