@@ -1246,7 +1246,7 @@ void TestMainWindow::hashTypeComesFromTheItemData()
 void TestMainWindow::hashTypesAreFilledFromHashcat()
 {
     const QString stub = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat"), "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
+        QStringLiteral("stub-hashcat"), R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -1347,9 +1347,9 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
 // was already loaded successfully: the IDs still belong to this binary.
 void TestMainWindow::failedQueryKeepsThePreviousListOnTheSameBinary()
 {
-    const QString stub = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-then-broken"),
-        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
+    const QString stub =
+        TestEnvironment::writeHashcatStub(QStringLiteral("stub-hashcat-then-broken"),
+                                          R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -1404,9 +1404,9 @@ void TestMainWindow::failedQueryKeepsThePreviousListOnTheSameBinary()
 // with the modes that binary reports.
 void TestMainWindow::changingTheBinaryReRunsTheQuery()
 {
-    const QString stubA = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-settings-a"),
-        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
+    const QString stubA =
+        TestEnvironment::writeHashcatStub(QStringLiteral("stub-hashcat-settings-a"),
+                                          R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
     // The survival stub keeps a lower id than NTLM so index 0 is not NTLM
     // before Auto-detect exists: a buggy reset to index 0 must fail the test.
     const QString stubB =
@@ -1732,8 +1732,7 @@ void TestMainWindow::changingTheBinaryKeepsTheAttackMode()
 void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
 {
     const QString stubA = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-import-a"),
-        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
+        QStringLiteral("stub-hashcat-import-a"), R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
     const QString stubB = TestEnvironment::writeShellStub(
         QStringLiteral("stub-hashcat-import-b"), "#!/bin/sh\n"
                                                  "printf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"

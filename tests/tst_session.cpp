@@ -264,8 +264,7 @@ void TestSession::turningTheSessionOffRemovesTheStoredSession()
 void TestSession::sessionHashTypeSurvivesTheAsynchronousQuery()
 {
     const QString stub = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-session"),
-        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
+        QStringLiteral("stub-hashcat-session"), R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -321,8 +320,7 @@ void TestSession::hashTypeWaitsForAWorkingHashcatPath()
     QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
 
     const QString stub = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-pending"),
-        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
+        QStringLiteral("stub-hashcat-pending"), R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -373,8 +371,7 @@ void TestSession::autoDetectHashTypeRoundTripsThroughASession()
 void TestSession::sessionWithAnUnknownHashTypeSelectsAutoDetect()
 {
     const QString stub = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-unknown"),
-        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
+        QStringLiteral("stub-hashcat-unknown"), R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else

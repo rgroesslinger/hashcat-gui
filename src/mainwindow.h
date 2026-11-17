@@ -189,8 +189,8 @@ private:
                          const LaunchValidator::LaunchContext &context);
     void showLaunchMessage(const LaunchMessage &message);
     // The menu names as shown, for tooltips and messages that point to Settings.
-    QString fileMenuLabel() const;
-    QString settingsMenuLabel() const;
+    [[nodiscard]] QString fileMenuLabel() const;
+    [[nodiscard]] QString settingsMenuLabel() const;
 
     [[nodiscard]] QString sessionFile() const;
 
