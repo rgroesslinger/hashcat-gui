@@ -30,8 +30,6 @@ void HashTypeLoader::reload(const QString &hashcatPath)
     m_watcher = std::make_unique<QFutureWatcher<HashcatResult>>();
     const quint64 generation = m_generation;
     connect(m_watcher.get(), &QFutureWatcher<HashcatResult>::finished, this, [this, generation] {
-        // A later reload() has superseded this query: its reply must not
-        // touch the list.
         if (generation != m_generation) {
             return;
         }

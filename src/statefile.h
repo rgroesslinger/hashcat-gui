@@ -83,21 +83,9 @@ public:
     static bool write(const QString &filename, QLatin1StringView section, int version,
                       const QJsonObject &values, QString *errorMessage);
 
-    // Reads the section of the given name out of the file.
-    //
-    // Returns false when the file cannot be used: it is no JSON, it holds no
-    // section of that name, or it cannot be read. errorMessage then says why,
-    // and it names the section:
-    //
-    //   "The file does not contain a session section."
-    //   "The file does not contain a session section; it holds settings."
-    //
-    // version receives the version of the values the section holds - the
-    // caller compares it with the current one. A version that is not a number
-    // reads as -1, which the caller applies like the version of a hand-edited,
-    // older file. otherSections receives the names of the sections the file
-    // holds besides the one asked for, also when the read failed, so that the
-    // message can name them.
+    // Reads one section's values, its version (-1 when absent) and the other
+    // section names, also on a failed read. See readDocument() for the version
+    // policy; errorMessage names the section and says why the file was refused.
     static bool read(const QString &filename, QLatin1StringView section, QJsonObject *values,
                      int *version, QStringList *otherSections, QString *errorMessage,
                      bool *versionPresent = nullptr);

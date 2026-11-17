@@ -47,12 +47,6 @@ bool hasExpectedType(QLatin1StringView key, const QJsonValue &value)
     return false;
 }
 
-// Whether the path names a file that can be run - a bare name on PATH too.
-bool isExecutableFile(const QString &path)
-{
-    return !Executable::resolve(path).isEmpty();
-}
-
 // The value the dialog shows for a setting, in the type the setting takes.
 QJsonValue widgetValue(const Ui::SettingsDialog &ui, QLatin1StringView key)
 {
@@ -144,8 +138,6 @@ void SettingsDialog::showEvent(QShowEvent *event)
     }
     m_sizedToContent = true;
 
-    // The content decides how large the dialog is; the user may then make it
-    // whatever size they like.
     resize(sizeHint());
 }
 
@@ -281,10 +273,6 @@ void SettingsDialog::openSessionFolderClicked()
     QDesktopServices::openUrl(QUrl::fromLocalFile(m_sessionFolder));
 }
 
-// The settings as they are stored right now.
-//
-// The export is a backup of the configuration the application runs with, so
-// it holds what is saved and not what the dialog shows but has not saved.
 QJsonObject SettingsDialog::savedSettings()
 {
     auto &settings = SettingsManager::instance();
@@ -385,7 +373,8 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
         // A path of another machine is the normal case of an import. It is
         // applied - the user reviews the dialog before saving - and named, so
         // that the missing file is not a surprise later.
-        if (source == ValueSource::Imported && !path.isEmpty() && !isExecutableFile(path)) {
+        if (source == ValueSource::Imported && !path.isEmpty()
+            && Executable::resolve(path).isEmpty()) {
             return tr("The hashcat path “%1” was not found on this computer.").arg(path);
         }
         return {};
@@ -467,7 +456,7 @@ void SettingsDialog::updateStatusLabels()
 void SettingsDialog::updateHashcatStatus()
 {
     const QString path = ui->lineEdit_hc_path->text();
-    const bool executable = isExecutableFile(path);
+    const bool executable = !Executable::resolve(path).isEmpty();
 
     // The download link belongs to the same help block as the path status: it
     // is only useful while no executable has been selected.

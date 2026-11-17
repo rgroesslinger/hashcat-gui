@@ -20,17 +20,13 @@ bool isBundledName(const QString &path)
            && !QDir::isAbsolutePath(path);
 }
 
-// hashcat's scan_directory() reads the non-hidden regular files directly inside
-// a folder and does not recurse; a folder without one leaves the feed with
-// nothing to read and the run stops with "No usable dictionary file found."
+// hashcat's scan_directory() reads only non-hidden regular files, no recursion;
+// a folder with none stops the feed. QDir::Hidden means different things on
+// Unix and Windows, so include hidden entries and apply the dotfile rule
+// ourselves.
 bool hasWordlistFiles(const QString &path)
 {
     const QDir folder(path);
-    // hashcat's scan_directory() skips names starting with '.' on every platform,
-    // but QDir only treats those as hidden on Unix: on Windows a dotfile is an
-    // ordinary file, and QDir::Files hides the attribute-hidden ones instead.
-    // Ask for both and apply hashcat's rule, so the folder is judged the way the
-    // feed will read it.
     const QFileInfoList entries =
         folder.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoDotAndDotDot);
     return std::ranges::any_of(entries, [](const QFileInfo &info) {

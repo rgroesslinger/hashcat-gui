@@ -39,8 +39,9 @@ public:
     // terminal program and the hashcat command line. Pure data - nothing
     // here looks at the filesystem - so the tests can pin every entry.
     // PowerShell and pwsh are discovered through this table but launched
-    // through launchCommand(); their entries hold no arguments, and
-    // availableTerminals() offers only them on Windows.
+    // through launchCommand(); their entries hold no arguments. Both shells
+    // stay in the table on every platform so the script branch and its tests
+    // are the same everywhere; availableTerminals() offers only them on Windows.
     static const QMap<QString, QStringList> &terminalArguments();
 
     // Every supported terminal that is installed, mapped to the absolute

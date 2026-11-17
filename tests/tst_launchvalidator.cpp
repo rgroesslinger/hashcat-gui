@@ -13,23 +13,10 @@
 #include <QTemporaryDir>
 #include <array>
 
+using TestEnvironment::validateOptions;
+
 namespace
 {
-// The option checks on their own: the launch fields hold values that pass,
-// so only the options can fail. validate() runs the option checks first,
-// which is the precedence these tests pin.
-LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &options)
-{
-    LaunchValidator::LaunchContext context;
-    context.options = options;
-    context.options.hashFile = QStringLiteral("hash.txt");
-    context.hashcatPath = QStringLiteral("hashcat");
-    context.resolvedHashcatPath = QStringLiteral("/usr/bin/hashcat");
-    context.configuredTerminal = QStringLiteral("konsole");
-    context.availableTerminals = QStringList{QStringLiteral("konsole")};
-    return LaunchValidator::validate(context);
-}
-
 // The launch checks on their own: the options hold values that pass.
 LaunchValidator::LaunchProblem validateLaunch(const QString &hashFile, const QString &hashcatPath,
                                               const QString &resolvedHashcatPath,

@@ -29,6 +29,7 @@ class MainWindow;
 }
 
 class QListWidget;
+struct LaunchMessage;
 
 class MainWindow : public QMainWindow
 {
@@ -161,6 +162,8 @@ private:
     // The permanent first entry of the hash type combo. It is re-added on every
     // refill and after every clear so autodetect stays discoverable.
     void addAutoDetectHashType();
+    // Drops the current list, leaving only Auto-detect and no path or retry pending.
+    void resetHashTypeCombo();
     // The shared refresh after the settings were saved or imported.
     void refreshAfterSettingsChange();
     // The example submenu is built once, in the constructor; adding the
@@ -184,6 +187,10 @@ private:
     // Presents what LaunchValidator::validate() reported
     void showLaunchError(const LaunchValidator::LaunchProblem &problem,
                          const LaunchValidator::LaunchContext &context);
+    void showLaunchMessage(const LaunchMessage &message);
+    // The menu names as shown, for tooltips and messages that point to Settings.
+    QString fileMenuLabel() const;
+    QString settingsMenuLabel() const;
 
     [[nodiscard]] QString sessionFile() const;
 
@@ -207,11 +214,7 @@ private:
     // a real id this hashcat does not know had to be replaced by Auto-detect.
     QString applyPendingHashType(int fallbackId, bool fromSession);
 
-    // The largest minimum the attack tab can need: every mode's groups and
-    // hint in one size. Measured before the visible mode is restored. A
-    // wrapping widget announces one line in its minimum size hint, so
-    // wrapWidth - the content width it wraps at - adds the height it really
-    // needs; zero measures without that correction.
+    // The largest minimum the attack tab needs across all modes; see the definition for wrapWidth.
     QSize attackModeEnvelope(int wrapWidth);
 
     // Gives the window the size its tabs need once, on the first show. The

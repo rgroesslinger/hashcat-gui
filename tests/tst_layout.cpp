@@ -158,34 +158,15 @@ void TestLayout::windowFitsItsContent()
     const QSize chrome = window.size() - attackArea->size();
     const QSize cap = window.screen()->availableGeometry().size() - QSize(40, 80);
 
-    // The attack tab hides the groups the other modes need, so its minimum is
-    // that of the selected mode. The window has to hold all of them: measure
-    // each mode through the same combo switch the user uses.
-    const int attackIndex = MainWindowTestAccess::ui(window)->comboBox_attack->currentIndex();
-    const auto attackEnvelopeOf = [&](int wrapWidth) {
-        QSize envelope(0, 0);
-        for (int i = 0; i < MainWindowTestAccess::ui(window)->comboBox_attack->count(); ++i) {
-            MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(i);
-            QCoreApplication::processEvents();
-            QSize minimum = attackContent->minimumSizeHint();
-            if (wrapWidth > 0) {
-                const int wrapped = attackContent->heightForWidth(wrapWidth);
-                if (wrapped > minimum.height()) {
-                    minimum.setHeight(wrapped);
-                }
-            }
-            envelope = envelope.expandedTo(minimum);
-        }
-        MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(attackIndex);
-        QCoreApplication::processEvents();
-        return envelope;
-    };
+    // The attack tab hides the groups the other modes need, so the window has
+    // to hold the largest minimum across all of them. The helper's result is
+    // checked against an independent loop in windowFitsEveryAttackMode().
 
     QSize attackEnvelope;
     QSize natural;
     int contentWidth = 0;
     for (int pass = 0; pass < 3; ++pass) {
-        attackEnvelope = attackEnvelopeOf(contentWidth);
+        attackEnvelope = MainWindowTestAccess::attackModeEnvelope(window, contentWidth);
         QSize contentMinimum(0, 0);
         QList<QScrollArea *> tabAreas;
         QList<QSize> minima;

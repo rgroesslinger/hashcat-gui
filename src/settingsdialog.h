@@ -99,7 +99,6 @@ private:
     // longer installed can be named instead of just "select one".
     QString m_configuredTerminal;
 
-    // The dialog is fitted to its content once, on the first show.
     bool m_sizedToContent = false;
 };
 

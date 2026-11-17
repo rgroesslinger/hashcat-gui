@@ -35,10 +35,10 @@ public:
     static QJsonValue withExamplePaths(const QJsonValue &value, const QString &directory);
 
     // Writes every bundled data file to the example directory, replacing the
-    // copy a previous load left there, and returns the native directory with
-    // a trailing separator. The whole set is written, not only the files the
-    // selected session names: the files are tiny, and an example must never
-    // depend on what another one unpacked before it.
+    // copy a previous load left there, and writes the native directory, with
+    // a trailing separator, to *directory. The whole set is written, not only
+    // the files the selected session names: the files are tiny, and an example
+    // must never depend on what another one unpacked before it.
     static bool materialize(QString *directory, QString *error);
 };
 

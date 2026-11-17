@@ -13,8 +13,6 @@
 QStringList SessionTransfer::applyToWidgets(const StateFile::Document &document, QWidget *root,
                                             const QStringList &ignoredNames)
 {
-    // The serializer works on a copy, so the caller can still read the
-    // values afterwards - the hash type, for one.
     const WidgetStateSerializer::ApplyResult notApplied =
         WidgetStateSerializer::applyToWidgets(document.values, root, ignoredNames);
 

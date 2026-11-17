@@ -58,7 +58,7 @@ Requires Qt 6.8+ (Core, Gui, Widgets, Concurrent, Network), C++20, GCC/Clang (no
 ## Launch
 
 - `Executable::resolve()` is the only path from a configured program to `QProcess`; empty values,
-  bare PATH names, missing files and non-executable paths resolve to empty. Settings text is
+  names not found on PATH, missing files and non-executable paths resolve to empty. Settings text is
   display-only.
 - `build()` inserts `--` before the positional tail only when a token starts with `-`; ordinary argv
   stays byte-identical. `LaunchValidator` refuses NUL and every C0/C1 control except tab, and

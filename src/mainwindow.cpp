@@ -115,6 +115,16 @@ CommandPreview::Dialect previewDialect(const QString &terminal)
 
 } // namespace
 
+QString MainWindow::fileMenuLabel() const
+{
+    return menuPath(ui->menuFile->menuAction()->text());
+}
+
+QString MainWindow::settingsMenuLabel() const
+{
+    return menuPath(ui->actionSettings->text());
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), m_attackModeView(*ui), m_hashTypeLoader(this)
 {
@@ -190,10 +200,7 @@ MainWindow::MainWindow(QWidget *parent)
                 // same path must retry - there is no separate retry button.
                 m_hashTypesNeedsRetry = true;
             } else {
-                ui->comboBox_hash_type->clear();
-                addAutoDetectHashType();
-                m_hashTypesPath.clear();
-                m_hashTypesNeedsRetry = false;
+                resetHashTypeCombo();
             }
 
             // The combo was disabled while the query ran. Restore its
@@ -1065,9 +1072,9 @@ bool MainWindow::restoreSessionEnabled() const
 // Restores the session once, between construction and show(): the window
 // must not paint the default state first, and the first fitToContent() has
 // to measure the restored content. The flag means "the restore pass ran",
-// not "a file was applied" - it is set before every early return, so the
-// aboutToQuit save still stores the "no file yet" case. A second call is a
-// no-op: applying twice would consume the pending hash type again.
+// not "a file was applied" - it is set before loadSession()'s early returns,
+// so the aboutToQuit save still stores the "no file yet" case. A second call
+// is a no-op: applying twice would consume the pending hash type again.
 void MainWindow::restoreSession()
 {
     if (m_sessionRestored) {
@@ -1290,17 +1297,13 @@ void MainWindow::reloadHashTypes()
         // The list belongs to the binary that answered; a path that cannot
         // run must not leave another binary's types selectable. The loader
         // call below ends any query still on its way.
-        ui->comboBox_hash_type->clear();
-        addAutoDetectHashType();
-        m_hashTypesPath.clear();
-        m_hashTypesNeedsRetry = false;
+        resetHashTypeCombo();
         // A query an earlier call started disabled the combo. Without a new
         // one there is nothing to wait for, so it goes back to the user.
         ui->comboBox_hash_type->setToolTip(
             hashcatPath.isEmpty()
                 ? tr("Set the hashcat path under %1 → %2 to load the available hash types.")
-                      .arg(menuPath(ui->menuFile->menuAction()->text()),
-                           menuPath(ui->actionSettings->text()))
+                      .arg(fileMenuLabel(), settingsMenuLabel())
                 : tr("The configured hashcat executable is not found: %1").arg(hashcatPath));
     }
     m_hashTypeLoader.reload(resolved);
@@ -1313,6 +1316,14 @@ void MainWindow::reloadHashTypes()
 void MainWindow::addAutoDetectHashType()
 {
     ui->comboBox_hash_type->addItem(tr("Auto-detect"), AppConstants::Hashcat::AutoDetectHashType);
+}
+
+void MainWindow::resetHashTypeCombo()
+{
+    ui->comboBox_hash_type->clear();
+    addAutoDetectHashType();
+    m_hashTypesPath.clear();
+    m_hashTypesNeedsRetry = false;
 }
 
 // The refresh after the settings were saved or imported: re-run the query
@@ -1587,8 +1598,7 @@ void MainWindow::copyPowerShellScript()
             QMessageBox::Information, tr("Copy as PowerShell Script"),
             hashcatPath.isEmpty()
                 ? tr("Select the hashcat executable under %1 → %2 first.")
-                      .arg(menuPath(ui->menuFile->menuAction()->text()),
-                           menuPath(ui->actionSettings->text()))
+                      .arg(fileMenuLabel(), settingsMenuLabel())
                 : tr("The configured hashcat executable is not found:\n%1").arg(hashcatPath),
             QMessageBox::Ok, this);
         box.setTextFormat(Qt::PlainText);
@@ -1636,12 +1646,7 @@ void MainWindow::startClicked()
         context.configuredTerminal, terminals.value(context.configuredTerminal),
         context.resolvedHashcatPath, CommandBuilder::build(context.options), true);
     if (command.refusal != LaunchCommand::Refusal::None) {
-        const LaunchMessage message = messageFor(command, context.configuredTerminal);
-        QMessageBox box(this);
-        box.setIcon(message.icon);
-        box.setTextFormat(message.format);
-        box.setText(message.text);
-        box.exec();
+        showLaunchMessage(messageFor(command, context.configuredTerminal));
         return;
     }
 
@@ -1656,15 +1661,17 @@ void MainWindow::startClicked()
 void MainWindow::showLaunchError(const LaunchValidator::LaunchProblem &problem,
                                  const LaunchValidator::LaunchContext &context)
 {
-    // The menu labels are computed here: menuPath also serves the hash-type
-    // tooltip, and the presenter must not know the menu widgets.
-    const QString menu = menuPath(ui->menuFile->menuAction()->text());
-    const QString settingsEntry = menuPath(ui->actionSettings->text());
-    const LaunchMessage message = messageFor(problem, context, menu, settingsEntry);
+    // The menu labels are computed here: the presenter must not know the menu widgets.
+    const LaunchMessage message =
+        messageFor(problem, context, fileMenuLabel(), settingsMenuLabel());
     if (message.text.isEmpty()) {
         return;
     }
+    showLaunchMessage(message);
+}
 
+void MainWindow::showLaunchMessage(const LaunchMessage &message)
+{
     QMessageBox box(this);
     box.setIcon(message.icon);
     box.setTextFormat(message.format);

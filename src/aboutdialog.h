@@ -63,8 +63,7 @@ private:
     void startUpdateCheck();
     void showUpdateResult(const UpdateCheckResult &result);
 
-    // Shows the version of hashcat. The text is wrapped, so a long message
-    // grows the dialog instead of being cut off.
+    // Shows the version of hashcat.
     void setVersionText(const QString &text);
 
     // Fills the rows that describe the system the application runs on.
@@ -76,7 +75,7 @@ private:
     // Fills the row with the license of the application.
     void updateLicense();
 
-    // Shows the error hashcat answered with in place of the version.
+    // Shows an error in place of the version.
     void setVersionError(const QString &error);
 
     // Wraps the text into the label at the width the label shows.
@@ -94,7 +93,6 @@ private:
     // with it even if the reply never arrives.
     QFutureWatcher<HashcatResult> *m_versionWatcher = nullptr;
 
-    // The dialog is fitted to its content once, on the first show.
     bool m_sizedToContent = false;
 
     // The update check: the timer keeps the progress indicator visible for

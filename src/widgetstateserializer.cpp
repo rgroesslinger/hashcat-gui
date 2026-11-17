@@ -122,8 +122,6 @@ WidgetStateSerializer::ApplyResult
 WidgetStateSerializer::applyToWidgets(const QJsonObject &values, QWidget *widget,
                                       const QStringList &ignoredWidgets)
 {
-    // The names are removed from a copy, so that the caller can still read the
-    // values afterwards - the hash type, for one.
     QJsonObject mutableObj = values;
 
     for (const QString &name : ignoredWidgets) {

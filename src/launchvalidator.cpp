@@ -175,6 +175,33 @@ bool bareExtraToken(const QStringList &tokens, QString *tokenOut)
     return true;
 }
 
+QString namedSetting(QLatin1StringView name, const QString &value)
+{
+    return QString(name) + QLatin1Char('=') + value.trimmed();
+}
+
+// The extra-settings tail shared by both feeds: a bare token would be read as
+// another positional file, and a key set in the UI must not be named twice.
+LaunchError checkExtraSettings(const QStringList &keys, const QStringList &tokens,
+                               LaunchError error, QString *detail)
+{
+    QString token;
+    if (bareExtraToken(tokens, &token)) {
+        if (detail) {
+            *detail = token;
+        }
+        return error;
+    }
+    QString repeated;
+    if (repeatedSetting(keys, tokens, &repeated)) {
+        if (detail) {
+            *detail = repeated + QStringLiteral(": given more than once");
+        }
+        return error;
+    }
+    return LaunchError::None;
+}
+
 // The checks of the mode 4 (PCFG) settings. The feed parses them only after
 // the backend devices are set up, so a bad value would surface in the
 // terminal long after the GUI is out of the picture - and maxgain's declared
@@ -186,9 +213,6 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
             *detail = what;
         }
         return LaunchError::InvalidPcfgSetting;
-    };
-    const auto named = [](QLatin1StringView name, const QString &value) {
-        return QString(name) + QLatin1Char('=') + value.trimmed();
     };
 
     struct Bound {
@@ -209,7 +233,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
     });
     for (const Bound &bound : bounds) {
         if (!bound.value.trimmed().isEmpty() && !numberInRange(bound.value, bound.min, bound.max)) {
-            return fail(named(bound.name, bound.value));
+            return fail(namedSetting(bound.name, bound.value));
         }
     }
 
@@ -219,7 +243,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         const QString maxword = options.pcfgMaxword.trimmed();
         if (maxword != QLatin1String("0") && maxword != QLatin1String("16")
             && maxword != QLatin1String("32")) {
-            return fail(named(AppConstants::HashcatSettings::Maxword, maxword));
+            return fail(namedSetting(AppConstants::HashcatSettings::Maxword, maxword));
         }
     }
 
@@ -227,7 +251,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         bool ok = false;
         const double maxgain = options.pcfgMaxgain.trimmed().toDouble(&ok);
         if (!ok || maxgain < 1.0 || maxgain > 64.0) {
-            return fail(named(AppConstants::HashcatSettings::Maxgain, options.pcfgMaxgain));
+            return fail(namedSetting(AppConstants::HashcatSettings::Maxgain, options.pcfgMaxgain));
         }
     }
 
@@ -240,7 +264,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         if (!shape.match(weights).hasMatch() || values.size() != expected
             || std::ranges::any_of(values,
                                    [](const QString &value) { return value.toLongLong() <= 0; })) {
-            return fail(named(AppConstants::HashcatSettings::Weights, weights));
+            return fail(namedSetting(AppConstants::HashcatSettings::Weights, weights));
         }
     }
 
@@ -257,7 +281,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         // rewrites them; the PCFG grammar would take them literally.
         const CommandBuilder::MaskMarkers markers = CommandBuilder::maskMarkers(mask);
         if (markers.word > 0 || markers.second > 0) {
-            return fail(named(AppConstants::HashcatSettings::Mask, mask));
+            return fail(namedSetting(AppConstants::HashcatSettings::Mask, mask));
         }
         // The feed refuses the pair with omen=1, and it refuses the hint
         // words from the accounts while the grammar is held to the mask -
@@ -266,7 +290,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         const QString omen =
             QString(AppConstants::HashcatSettings::Omen) + QLatin1Char('=') + QStringLiteral("1");
         if (options.pcfgExtraSettings.contains(omen)) {
-            return fail(named(AppConstants::HashcatSettings::Mask, mask));
+            return fail(namedSetting(AppConstants::HashcatSettings::Mask, mask));
         }
         for (const QString &token : options.pcfgExtraSettings) {
             if (!token.startsWith(QString(AppConstants::HashcatSettings::Hintaccount)
@@ -280,7 +304,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
                 && !hasSetting(options.pcfgExtraSettings, AppConstants::HashcatSettings::Hintwords)
                 && !hasSetting(options.pcfgExtraSettings,
                                AppConstants::HashcatSettings::Hintfile)) {
-                return fail(named(AppConstants::HashcatSettings::Mask, mask));
+                return fail(namedSetting(AppConstants::HashcatSettings::Mask, mask));
             }
         }
     }
@@ -297,12 +321,7 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         }
     }
 
-    QString token;
-    if (bareExtraToken(options.pcfgExtraSettings, &token)) {
-        return fail(token);
-    }
-    QString repeated;
-    const QStringList keys =
+    return checkExtraSettings(
         typedSettingKeys({{options.pcfgScale, AppConstants::HashcatSettings::Scale},
                           {options.pcfgCostmax, AppConstants::HashcatSettings::Costmax},
                           {options.pcfgWeights, AppConstants::HashcatSettings::Weights},
@@ -311,12 +330,8 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
                           {options.pcfgMaxword, AppConstants::HashcatSettings::Maxword},
                           {options.pcfgMaxgain, AppConstants::HashcatSettings::Maxgain},
                           {options.pcfgWalk, AppConstants::HashcatSettings::Walk},
-                          {options.pcfgMask, AppConstants::HashcatSettings::Mask}});
-    if (repeatedSetting(keys, options.pcfgExtraSettings, &repeated)) {
-        return fail(repeated + QStringLiteral(": given more than once"));
-    }
-
-    return LaunchError::None;
+                          {options.pcfgMask, AppConstants::HashcatSettings::Mask}}),
+        options.pcfgExtraSettings, LaunchError::InvalidPcfgSetting, detail);
 }
 
 // The checks of the mode 5 (table) settings, for the same reason as the
@@ -329,9 +344,6 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
         }
         return LaunchError::InvalidTableSetting;
     };
-    const auto named = [](QLatin1StringView name, const QString &value) {
-        return QString(name) + QLatin1Char('=') + value.trimmed();
-    };
 
     // The three flags: empty (the default), 0 or 1.
     const auto flags = std::to_array<std::pair<QString, QLatin1StringView>>({
@@ -342,13 +354,13 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
     for (const auto &[value, name] : flags) {
         const QString trimmed = value.trimmed();
         if (!trimmed.isEmpty() && trimmed != QLatin1String("0") && trimmed != QLatin1String("1")) {
-            return fail(named(name, value));
+            return fail(namedSetting(name, value));
         }
     }
     // One substitution needs the other positions left alone.
     if (options.tableSingle.trimmed() == QLatin1String("1")
         && options.tableIdentity.trimmed() == QLatin1String("0")) {
-        return fail(named(AppConstants::HashcatSettings::Identity, options.tableIdentity));
+        return fail(namedSetting(AppConstants::HashcatSettings::Identity, options.tableIdentity));
     }
 
     // cap and maxperm reach beyond every Qt integer type (0...0xffffffff
@@ -357,33 +369,24 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
         bool ok = false;
         const qlonglong cap = options.tableCap.trimmed().toLongLong(&ok);
         if (!ok || cap < 0 || cap > Q_INT64_C(0xffffffff)) {
-            return fail(named(AppConstants::HashcatSettings::Cap, options.tableCap));
+            return fail(namedSetting(AppConstants::HashcatSettings::Cap, options.tableCap));
         }
     }
     if (!options.tableMaxperm.trimmed().isEmpty()) {
         bool ok = false;
         options.tableMaxperm.trimmed().toULongLong(&ok);
         if (!ok) {
-            return fail(named(AppConstants::HashcatSettings::Maxperm, options.tableMaxperm));
+            return fail(namedSetting(AppConstants::HashcatSettings::Maxperm, options.tableMaxperm));
         }
     }
 
-    QString token;
-    if (bareExtraToken(options.tableExtraSettings, &token)) {
-        return fail(token);
-    }
-    QString repeated;
-    const QStringList keys =
+    return checkExtraSettings(
         typedSettingKeys({{options.tableIdentity, AppConstants::HashcatSettings::Identity},
                           {options.tableTemplate, AppConstants::HashcatSettings::Template},
                           {options.tableSingle, AppConstants::HashcatSettings::Single},
                           {options.tableCap, AppConstants::HashcatSettings::Cap},
-                          {options.tableMaxperm, AppConstants::HashcatSettings::Maxperm}});
-    if (repeatedSetting(keys, options.tableExtraSettings, &repeated)) {
-        return fail(repeated + QStringLiteral(": given more than once"));
-    }
-
-    return LaunchError::None;
+                          {options.tableMaxperm, AppConstants::HashcatSettings::Maxperm}}),
+        options.tableExtraSettings, LaunchError::InvalidTableSetting, detail);
 }
 
 // NUL and every C0/C1 control except tab. A NUL would silently end the token
@@ -493,8 +496,8 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
             if (!shape.match(token).hasMatch()) {
                 // The value is not inspected: an unknown key or a phase that
                 // is not running is refused by hashcat itself, with a message
-                // that names the setting. A token that fails the shape is not
-                // refused at all: upstream would read it as a wordlist.
+                // that names the setting. A token that fails this shape would
+                // be read as a wordlist upstream, so the GUI refuses it here.
                 if (detail) {
                     *detail = token;
                 }

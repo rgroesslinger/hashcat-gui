@@ -185,9 +185,7 @@ inline QStringList groupBoxesWithoutTopAlignment(QWidget *page)
 // wants a box of its own needs a hashcat that answers.
 inline QString hashcatStub(const QString &name)
 {
-    return TestEnvironment::writeShellStub(name, "#!/bin/sh\n"
-                                                 "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
-                                                 "exit 0\n");
+    return TestEnvironment::writeHashcatStub(name);
 }
 
 // The example submenu action for one attack mode.

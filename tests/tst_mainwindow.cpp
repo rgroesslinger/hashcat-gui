@@ -1245,11 +1245,8 @@ void TestMainWindow::hashTypeComesFromTheItemData()
 // any position.
 void TestMainWindow::hashTypesAreFilledFromHashcat()
 {
-    const QString stub = TestEnvironment::writeShellStub(
-        QStringLiteral("stub-hashcat"),
-        "#!/bin/sh\n"
-        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
-        "exit 0\n");
+    const QString stub = TestEnvironment::writeHashcatStub(
+        QStringLiteral("stub-hashcat"), "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -1350,11 +1347,9 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
 // was already loaded successfully: the IDs still belong to this binary.
 void TestMainWindow::failedQueryKeepsThePreviousListOnTheSameBinary()
 {
-    const QString stub = TestEnvironment::writeShellStub(
+    const QString stub = TestEnvironment::writeHashcatStub(
         QStringLiteral("stub-hashcat-then-broken"),
-        "#!/bin/sh\n"
-        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
-        "exit 0\n");
+        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -1409,11 +1404,9 @@ void TestMainWindow::failedQueryKeepsThePreviousListOnTheSameBinary()
 // with the modes that binary reports.
 void TestMainWindow::changingTheBinaryReRunsTheQuery()
 {
-    const QString stubA = TestEnvironment::writeShellStub(
+    const QString stubA = TestEnvironment::writeHashcatStub(
         QStringLiteral("stub-hashcat-settings-a"),
-        "#!/bin/sh\n"
-        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
-        "exit 0\n");
+        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
     // The survival stub keeps a lower id than NTLM so index 0 is not NTLM
     // before Auto-detect exists: a buggy reset to index 0 must fail the test.
     const QString stubB =
@@ -1738,11 +1731,9 @@ void TestMainWindow::changingTheBinaryKeepsTheAttackMode()
 // a save from the settings dialog does; the old list must not stay on screen.
 void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
 {
-    const QString stubA = TestEnvironment::writeShellStub(
+    const QString stubA = TestEnvironment::writeHashcatStub(
         QStringLiteral("stub-hashcat-import-a"),
-        "#!/bin/sh\n"
-        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
-        "exit 0\n");
+        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
     const QString stubB = TestEnvironment::writeShellStub(
         QStringLiteral("stub-hashcat-import-b"), "#!/bin/sh\n"
                                                  "printf '{\"1400\":{\"name\":\"SHA2-256\"}}\\n'\n"

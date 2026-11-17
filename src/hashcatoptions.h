@@ -109,7 +109,8 @@ struct HashcatOptions {
 
     // The single rules of the two wordlist sides (-j / -k). Which side exists
     // depends on the attack mode, see CommandBuilder::attackUsesRuleLeft() and
-    // attackUsesRuleRight(); -r / -g are not allowed in combination mode.
+    // attackUsesRuleRight(); -r / -g are emitted for every mode that accepts
+    // rules, see CommandBuilder::attackUsesRules().
     QString ruleLeft;
     QString ruleRight;
 

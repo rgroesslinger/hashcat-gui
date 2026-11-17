@@ -22,9 +22,7 @@
 namespace AppConstants
 {
 
-// The languages the settings dialog offers, sorted by each name in its own
-// language so the combo reads naturally for every user.
-//
+// The languages the settings dialog offers.
 // What gets stored is always the locale code, never the display text, so
 // relabeling an entry cannot orphan a saved setting. Both members hold UTF-8
 // and are converted with QString::fromUtf8() where they are shown.

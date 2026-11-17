@@ -25,10 +25,9 @@ public:
         // QSettings::IniFormat stores everything as text. Within one process
         // its cache still holds the typed value a setKey() wrote, but a fresh
         // process reads back a QString - so a plain metaType check would throw
-        // away every bool/int setting on restart. Accept the canonical string
-        // form of the type and refuse any other value instead; a hand-edited
-        // useShortParameters=no then keeps the default rather than becoming
-        // true through QVariant's lossy conversion.
+        // away every bool setting on restart. Accept "true"/"false" and refuse
+        // any other value; a hand-edited useShortParameters=no then keeps the
+        // default rather than becoming true through QVariant's lossy conversion.
         if constexpr (std::is_same_v<T, bool>) {
             if (value.metaType() == QMetaType::fromType<QString>()) {
                 const QString text = value.toString();

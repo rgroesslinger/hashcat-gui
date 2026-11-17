@@ -6,6 +6,9 @@
 #ifndef TESTENVIRONMENT_H
 #define TESTENVIRONMENT_H
 
+#include "hashcatoptions.h"
+#include "launchvalidator.h"
+
 #include <QAbstractButton>
 #include <QApplication>
 #include <QByteArray>
@@ -33,6 +36,21 @@
 // SettingsManager's singleton and are destroyed last, after it.
 namespace TestEnvironment
 {
+
+// A launch context whose non-option fields pass, so option tests can fail on
+// the options alone. validate() checks options first; that is the precedence
+// these tests pin.
+inline LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &options)
+{
+    LaunchValidator::LaunchContext context;
+    context.options = options;
+    context.options.hashFile = QStringLiteral("hash.txt");
+    context.hashcatPath = QStringLiteral("hashcat");
+    context.resolvedHashcatPath = QStringLiteral("/usr/bin/hashcat");
+    context.configuredTerminal = QStringLiteral("konsole");
+    context.availableTerminals = QStringList{QStringLiteral("konsole")};
+    return LaunchValidator::validate(context);
+}
 
 inline QTemporaryDir &configHome()
 {
@@ -97,6 +115,18 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
     QFile::setPermissions(path, QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner);
     return path;
 #endif
+}
+
+// A hashcat stand-in that answers --example-hashes with the given JSON map.
+// The default has one entry; tests pass their own when a selection needs more.
+inline QString
+writeHashcatStub([[maybe_unused]] const QString &name,
+                 const QByteArray &json = QByteArrayLiteral("{\"0\":{\"name\":\"MD5\"}}"))
+{
+    QByteArray script = QByteArrayLiteral("#!/bin/sh\nprintf '");
+    script += json;
+    script += QByteArrayLiteral("\\n'\nexit 0\n");
+    return writeShellStub(name, script);
 }
 
 // A file named `name` that the platform's executable search accepts, for the

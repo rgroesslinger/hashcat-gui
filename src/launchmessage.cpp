@@ -19,6 +19,9 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
 {
     LaunchMessage message;
 
+    // Messages that interpolate user input use Qt::PlainText: the default
+    // AutoText would read a '<' in a path, value or token as markup.
+
     // No default case: a new LaunchError has to earn its message here.
     switch (problem.code) {
     case LaunchValidator::LaunchError::NoHashFile:
@@ -36,9 +39,6 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                 .arg(fileMenuLabel, settingsMenuLabel);
         break;
 
-    // The messages that interpolate user supplied strings are set to plain
-    // text explicitly: the default is AutoText, which would take a path or a
-    // terminal name containing a '<' for markup and display it mangled.
     case LaunchValidator::LaunchError::HashcatPathMissing:
         message.format = Qt::PlainText;
         message.text =
@@ -100,9 +100,9 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
         break;
 
     case LaunchValidator::LaunchError::WrongWordlistCount: {
-        // The wording below uses minWordlists as the exact count. That is only
-        // correct while Combination is the sole mode with maxWordlists >= 0,
-        // and there min == max; a mode with a range reports TooManyWordlists.
+        // WrongWordlistCount is only emitted for Combination (exactCount in
+        // validateOptions), where min == max; other counts use NoWordlist or
+        // TooManyWordlists.
         const CommandBuilder::ModeRequirements requirements =
             CommandBuilder::modeRequirements(context.options.attackMode);
         message.icon = QMessageBox::Information;
@@ -135,8 +135,6 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
         break;
     }
 
-    // The row is user supplied, so plain text: a '<' in the path would be
-    // taken for markup by the default AutoText.
     case LaunchValidator::LaunchError::WordlistMustBeFile:
         message.format = Qt::PlainText;
         message.text = QCoreApplication::translate(
@@ -224,9 +222,6 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                              "mask=?1?1?1?1, or clear the custom charset.");
         break;
 
-    // The settings errors name a value or token the user typed, so they are
-    // set to plain text explicitly: a value containing '<' would be taken
-    // for markup by the default AutoText.
     case LaunchValidator::LaunchError::InvalidPcfgSetting:
     case LaunchValidator::LaunchError::InvalidTableSetting:
         message.icon = QMessageBox::Information;
@@ -265,8 +260,6 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
             "LaunchMessage", "The minimum increment length is larger than the maximum.");
         break;
 
-    // The value below is user supplied, so plain text: a '<' in it would be
-    // taken for markup by the default AutoText.
     case LaunchValidator::LaunchError::InvalidOutfileFormat:
         message.format = Qt::PlainText;
         message.text = problem.detail.isEmpty()
@@ -280,8 +273,6 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                                  .arg(problem.detail);
         break;
 
-    // The path below is user supplied, so plain text: a '<' in it would be
-    // taken for markup by the default AutoText.
     case LaunchValidator::LaunchError::InvalidCachePath:
         message.format = Qt::PlainText;
         message.text = QCoreApplication::translate(
@@ -303,8 +294,6 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
         break;
 
     case LaunchValidator::LaunchError::InvalidCharacter:
-        // The value is user supplied, so plain text: a '<' in it would be
-        // taken for markup by the default AutoText.
         message.icon = QMessageBox::Information;
         message.format = Qt::PlainText;
         message.text =

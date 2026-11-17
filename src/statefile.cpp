@@ -73,9 +73,7 @@ bool StateFile::write(const QString &filename, QLatin1StringView section, int ve
     QJsonObject root;
     root.insert(QStringLiteral("sections"), sections);
 
-    // QSaveFile writes to a temporary file next to the target and renames it
-    // over the target only when the write succeeded. A crash in the middle
-    // therefore leaves the old file alone instead of a truncated one.
+    // QSaveFile writes a temporary file and renames it on commit.
     QSaveFile file(filename);
     if (!file.open(QIODevice::WriteOnly)) {
         setError(errorMessage,

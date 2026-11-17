@@ -263,11 +263,9 @@ void TestSession::turningTheSessionOffRemovesTheStoredSession()
 // applied when the reply delivers the items.
 void TestSession::sessionHashTypeSurvivesTheAsynchronousQuery()
 {
-    const QString stub = TestEnvironment::writeShellStub(
+    const QString stub = TestEnvironment::writeHashcatStub(
         QStringLiteral("stub-hashcat-session"),
-        "#!/bin/sh\n"
-        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
-        "exit 0\n");
+        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -322,11 +320,9 @@ void TestSession::hashTypeWaitsForAWorkingHashcatPath()
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
     QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
 
-    const QString stub = TestEnvironment::writeShellStub(
+    const QString stub = TestEnvironment::writeHashcatStub(
         QStringLiteral("stub-hashcat-pending"),
-        "#!/bin/sh\n"
-        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
-        "exit 0\n");
+        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else
@@ -376,11 +372,9 @@ void TestSession::autoDetectHashTypeRoundTripsThroughASession()
 // selected instead - and the command line asks for no hash type at all.
 void TestSession::sessionWithAnUnknownHashTypeSelectsAutoDetect()
 {
-    const QString stub = TestEnvironment::writeShellStub(
+    const QString stub = TestEnvironment::writeHashcatStub(
         QStringLiteral("stub-hashcat-unknown"),
-        "#!/bin/sh\n"
-        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
-        "exit 0\n");
+        "{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}");
 #ifdef Q_OS_WIN
     QSKIP("no shell stub on this platform");
 #else

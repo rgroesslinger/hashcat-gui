@@ -170,8 +170,6 @@ void AboutDialog::showEvent(QShowEvent *event)
     }
     m_sizedToContent = true;
 
-    // The content decides how large the dialog is; the user may then make it
-    // whatever size they like.
     resize(sizeHint());
 }
 
@@ -286,28 +284,21 @@ void AboutDialog::updateVersionLabel()
     ui->label_hc_gui_version->setText(QApplication::applicationVersion());
 }
 
-// Shows the version of hashcat.
 void AboutDialog::setVersionText(const QString &text)
 {
     m_hashcatVersion = text;
     setVersionLabel(text);
 }
 
-// The error hashcat answered with: it goes into the label, not into the
-// version the details report.
+// The error shown in place of the version, kept out of the reported string.
 void AboutDialog::setVersionError(const QString &error)
 {
     m_hashcatVersion.clear();
     setVersionLabel(tr("Error: %1").arg(error));
 }
 
-// The text is wrapped before it goes into the label, because the label
-// neither breaks words that are longer than its line nor tells its layout
-// how tall the wrapped text is.
 void AboutDialog::setVersionLabel(const QString &text)
 {
-    // The label has a fixed width, so the text is wrapped at the width it
-    // will be shown in.
     const int width = ui->label_hc_version->minimumWidth();
     ui->label_hc_version->setText(wrapText(text, ui->label_hc_version->font(), width));
 }

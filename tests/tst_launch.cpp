@@ -4,7 +4,6 @@
  */
 
 #include "appconstants.h"
-#include "checkeditemlist.h"
 #include "commandbuilder.h"
 #include "hashcatoptions.h"
 #include "launchvalidator.h"
@@ -46,24 +45,7 @@
 #include <QWidget>
 #include <utility>
 
-namespace
-{
-// The option checks on their own: the launch fields hold values that pass,
-// so only the options can fail. validate() runs the option checks first,
-// which is the precedence these tests pin.
-LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &options)
-{
-    LaunchValidator::LaunchContext context;
-    context.options = options;
-    context.options.hashFile = QStringLiteral("hash.txt");
-    context.hashcatPath = QStringLiteral("hashcat");
-    context.resolvedHashcatPath = QStringLiteral("/usr/bin/hashcat");
-    context.configuredTerminal = QStringLiteral("konsole");
-    context.availableTerminals = QStringList{QStringLiteral("konsole")};
-    return LaunchValidator::validate(context);
-}
-
-} // namespace
+using TestEnvironment::validateOptions;
 
 // The launch half of the main window: validation through the widgets, error
 // presentation, preview and clipboard.
@@ -88,7 +70,6 @@ private slots:
     void thePreviewTooltipHoldsTheWholeCommand();
     void copyingTheCommandPutsItOnTheClipboard();
     void copyingThePowerShellScriptPutsItOnTheClipboard();
-    void thePreviewFormattingIsPinned();
 
 private:
     MainWindowFixture m_fixture;
@@ -134,6 +115,17 @@ void TestLaunch::commandPreviewFollowsWidgetChanges()
     MainWindowTestAccess::ui(window)->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"),
                                                                   1000);
     QVERIFY(preview->text().contains(QStringLiteral("--hash-type 1000")));
+
+    // The recipe belongs to hash mode 4000; this is the integration check that
+    // its field reaches the preview at all. Its quoting is pinned in
+    // tst_commandpreview.
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->addItem(QStringLiteral("4000 | recipe"),
+                                                                  4000);
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(
+        MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(4000));
+    MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->setText(QStringLiteral("md5($p)"));
+    QVERIFY(preview->text().contains(QStringLiteral("--hash-recipe")));
+    QVERIFY(preview->text().contains(QStringLiteral("md5($p)")));
 
     // The attack mode refreshes the preview through updateViewAttackMode(),
     // not through a second commandChanged connection.
@@ -302,45 +294,27 @@ void TestLaunch::previewUsesTheConfiguredTerminalsDialect()
 }
 
 // The line edit shows the beginning of the command only; the tooltip has to
-// carry all of it.
+// carry all of it. Escaping and wrapping are pinned in tst_commandpreview.
 void TestLaunch::thePreviewTooltipHoldsTheWholeCommand()
 {
     MainWindow window;
+    auto *ui = MainWindowTestAccess::ui(window);
 
-    // More word lists than the window can show, and a path that looks like a
-    // tag.
     for (int i = 0; i < 12; ++i) {
         auto *item = new QListWidgetItem(QStringLiteral("/tmp/wordlist-number-%1.txt").arg(i),
-                                         MainWindowTestAccess::ui(window)->listWidget_wordlist);
+                                         ui->listWidget_wordlist);
         item->setCheckState(Qt::Checked);
     }
-    MainWindowTestAccess::ui(window)->checkBox_outfile->setChecked(true);
-    MainWindowTestAccess::ui(window)->lineEdit_outfile->setText(
-        QStringLiteral("/tmp/<b>out</b>.txt"));
+    ui->checkBox_outfile->setChecked(true);
+    ui->lineEdit_outfile->setText(QStringLiteral("/tmp/out.txt"));
 
-    const QString command = MainWindowTestAccess::ui(window)->lineEdit_command->text();
-    const QString tooltip = MainWindowTestAccess::ui(window)->lineEdit_command->toolTip();
-
-    // Every part of the command is in the tooltip. The path that looks like a
-    // tag is escaped, so that it is shown as typed.
+    const QString command = ui->lineEdit_command->text();
+    const QString tooltip = ui->lineEdit_command->toolTip();
     const QStringList parts = command.split(QLatin1Char(' '));
     for (const QString &part : std::as_const(parts)) {
-        QVERIFY2(tooltip.contains(part.toHtmlEscaped()),
+        QVERIFY2(tooltip.contains(part),
                  qPrintable(QStringLiteral("the tooltip does not hold \"%1\"").arg(part)));
     }
-
-    QVERIFY(tooltip.contains(QStringLiteral("&lt;b&gt;out&lt;/b&gt;.txt")));
-
-    // A command that looks like markup becomes rich text, where a line break
-    // has to be explicit.
-    QVERIFY(tooltip.contains(QStringLiteral("<br>")));
-
-    // Without markup the tooltip stays plain text and keeps its line breaks.
-    MainWindowTestAccess::ui(window)->lineEdit_outfile->setText(QStringLiteral("/tmp/out.txt"));
-    const QString plainTooltip = MainWindowTestAccess::ui(window)->lineEdit_command->toolTip();
-    QVERIFY(plainTooltip.contains(QStringLiteral("/tmp/out.txt")));
-    QVERIFY(plainTooltip.contains(QLatin1Char('\n')));
-    QVERIFY(!plainTooltip.contains(QStringLiteral("<br>")));
 }
 
 // Copying puts the command on the clipboard and says that it did.
@@ -388,68 +362,6 @@ void TestLaunch::copyingThePowerShellScriptPutsItOnTheClipboard()
     QVERIFY(
         expected.contains(QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo")));
     QVERIFY(expected.contains(stub));
-}
-
-// The preview's display formatting, pinned before it moves to its own unit:
-// every token the shell would split is quoted for display, markup-like text
-// is escaped in the tooltip, and the tooltip wraps at 120 columns.
-void TestLaunch::thePreviewFormattingIsPinned()
-{
-    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-preview"),
-                                                         "#!/bin/sh\n"
-                                                         "printf '{\"0\":{\"name\":\"MD5\"},"
-                                                         "\"4000\":{\"name\":\"recipe\"}}\\n'\n"
-                                                         "exit 0\n");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
-
-    MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 3,
-                             5000);
-
-    // A recipe with spaces, quotes and markup: the command line quotes it for
-    // display - escaping the recipe's own quotes - and the tooltip escapes
-    // the markup.
-    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(
-        MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(4000));
-    MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->setText(
-        QStringLiteral("md5($p.\"<b>\")"));
-#ifdef Q_OS_WIN
-    // The recipe holds no whitespace, so the MSVCRT quoting escapes its
-    // double quotes but does not wrap it.
-    const QString quotedRecipe = QStringLiteral("md5($p.\\\"<b>\\\")");
-    const QString quotedRecipeTooltip = QStringLiteral("md5($p.\\&quot;&lt;b&gt;\\&quot;)");
-#else
-    const QString quotedRecipe = QStringLiteral("'md5($p.\"<b>\")'");
-    const QString quotedRecipeTooltip = QStringLiteral("'md5($p.&quot;&lt;b&gt;&quot;)'");
-#endif
-    const QString recipeCommand = QStringLiteral("stub-hashcat-preview --hash-type 4000 "
-                                                 "--hash-recipe ")
-                                  + quotedRecipe + QStringLiteral(" --attack-mode 0");
-    QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->text(), recipeCommand);
-    QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->toolTip(),
-             QStringLiteral("stub-hashcat-preview --hash-type 4000 --hash-recipe ")
-                 + quotedRecipeTooltip + QStringLiteral(" --attack-mode 0"));
-
-    // Two long positional wordlists: the tooltip breaks between arguments at
-    // 120 columns, a flag keeps its value on the same line.
-    MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(
-        MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(0));
-    const QString pathA = QString(80, QLatin1Char('a'));
-    const QString pathB = QString(80, QLatin1Char('b'));
-    CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_wordlist,
-                              {pathA, pathB});
-    const QString wrappedCommand = QStringLiteral("stub-hashcat-preview --hash-type 0 "
-                                                  "--attack-mode 0 ")
-                                   + pathA + QLatin1Char(' ') + pathB;
-    QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->text(), wrappedCommand);
-    QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->toolTip(),
-             QStringLiteral("stub-hashcat-preview --hash-type 0 --attack-mode 0\n") + pathA
-                 + QLatin1Char('\n') + pathB);
 }
 
 int main(int argc, char *argv[])

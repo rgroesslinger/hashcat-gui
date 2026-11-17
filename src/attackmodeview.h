@@ -40,7 +40,10 @@ public:
     // What the user has to provide for the mode, in the wording of
     // CommandBuilder::modeRequirements(), so the hint and the launch
     // validation cannot tell the user different things. The label wraps at
-    // the tab width, so the texts stay free of line breaks.
+    // the tab width, so the texts stay free of line breaks and translations
+    // can rewrap. A wrapped label reports one line in its minimum size hint,
+    // so the fit reserves its height through heightForWidth(); see
+    // attackModeEnvelope() and fitToContent().
     static QString hint(AttackMode mode);
 
     // Shows the groups the mode uses, hides the rest, and sets the hint.

@@ -17,26 +17,10 @@
 #include <windows.h>
 #endif
 
-namespace
-{
-QString programDirectory(const QString &programPath)
-{
-    return ProgramDirectory::forProgram(programPath);
-}
-} // namespace
-
-// The arguments that belong between the terminal program and the hashcat
-// command line, for every supported terminal. The entries are pure data -
-// nothing here looks at the filesystem.
-//
-// PowerShell and pwsh are discovered through this table but launched through
-// launchCommand(), which builds an -EncodedCommand script; their entries hold
-// no arguments, so no -Command text can be assembled from the table.
-//
-// The remaining entries only select the terminal's command mode (or, for
-// kitty, foot and wezterm, the subcommand). Staying open, holding the
-// working directory and showing the exit code are the wrapper's job now;
-// the per-terminal hold flags could not do all three everywhere.
+// The Unix entries only select the terminal's command mode (or, for kitty,
+// foot and wezterm, the subcommand). Staying open, holding the working
+// directory and showing the exit code are the wrapper's job; the per-terminal
+// hold flags could not do all three everywhere.
 //
 // ptyxis is not offered: it starts the command through systemd-run, which
 // expands "$" words a second time, so a bcrypt hash or a mask arrived at
@@ -44,10 +28,6 @@ QString programDirectory(const QString &programPath)
 const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
-        // The table holds both PowerShell shells on every platform so the script
-        // branch and its tests are the same everywhere; availableTerminals()
-        // offers only them on Windows, where a console can be created and no sh
-        // exists for the Unix wrapper.
         {QStringLiteral("powershell.exe"), {}},
         {QStringLiteral("pwsh"), {}},
         {QStringLiteral("xterm"), {QStringLiteral("-e")}},
@@ -133,7 +113,7 @@ QString TerminalCatalog::powerShellScript(const QString &hashcatPath, const QStr
            + powerShellQuoteArgument(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
            + powerShellQuoteArgument(msvcrtJoinArguments(arguments))
            + QStringLiteral("\n$si.UseShellExecute = $false\n$si.WorkingDirectory = ")
-           + powerShellQuoteArgument(programDirectory(hashcatPath))
+           + powerShellQuoteArgument(ProgramDirectory::forProgram(hashcatPath))
            + QStringLiteral("\n$p = [System.Diagnostics.Process]::Start($si)\n"
                             "$p.WaitForExit()");
 }
@@ -200,17 +180,9 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     command.program = terminalProgram;
     command.arguments = it.value();
 
-    // Every Unix terminal runs the same wrapper. The hashcat command reaches
-    // sh -c only as positional parameters, so no hash, mask, path or session
-    // value is ever parsed as shell code. The wrapper sets the working
-    // directory itself - a terminal that hands the command to a server
-    // process may not inherit ours - reports a directory it cannot enter,
-    // and holds the window open with the exit code after hashcat ends.
-    //
-    // The INT trap is a handler, not an ignored signal: dash otherwise dies
-    // with hashcat on Ctrl-C and the window closes before the status line.
-    // A trapped signal is reset to the default in the child, so hashcat still
-    // receives Ctrl-C normally.
+    // Fixed sh -c wrapper: cd to $1, run "$@" as positional parameters, then
+    // print the exit code and hold open. The INT trap keeps dash alive on Ctrl-C
+    // and is reset to default in the child so hashcat still gets the signal.
     const QString wrapper = QStringLiteral(R"(trap : INT
 cd "$1" || {
     printf 'hashcat-gui: cannot enter %s\n' "$1" >&2
@@ -227,7 +199,7 @@ read -r _)");
                       << wrapper
                       // $0 for the wrapper, then the directory, the hashcat
                       // program and its argv as $1 ... $n.
-                      << QStringLiteral("hashcat-gui") << programDirectory(hashcatPath)
+                      << QStringLiteral("hashcat-gui") << ProgramDirectory::forProgram(hashcatPath)
                       << hashcatPath << arguments;
     return command;
 }
@@ -245,7 +217,7 @@ bool TerminalCatalog::launchDetached(const LaunchCommand &command, const QString
 
     proc.setProgram(command.program);
     proc.setArguments(command.arguments);
-    proc.setWorkingDirectory(programDirectory(hashcatPath));
+    proc.setWorkingDirectory(ProgramDirectory::forProgram(hashcatPath));
 
     if (!proc.startDetached()) {
         if (errorMessage) {

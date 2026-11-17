@@ -95,12 +95,7 @@ void AttackModeView::apply(AttackMode mode) const
 
 QString AttackModeView::hint(AttackMode mode)
 {
-    // A sentence per mode. The label wraps at the tab width (wordWrap in the
-    // .ui file), so the texts stay free of line breaks and translations can
-    // rewrap as they like. The height a wrapped hint needs is not part of a
-    // minimum size hint - a wrapping label reports one line - so the fit
-    // reserves it through heightForWidth() at the final width,
-    // see attackModeEnvelope() and fitToContent().
+    // One sentence per mode; the .ui wraps the label.
     switch (mode) {
     case AttackMode::Straight:
         return tr("This mode needs at least one wordlist.");
