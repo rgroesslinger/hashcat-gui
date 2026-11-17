@@ -12,11 +12,13 @@
 #include <QClipboard>
 #include <QGroupBox>
 #include <QHash>
+#include <QIcon>
 #include <QLabel>
 #include <QLayout>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSysInfo>
+#include <QWidget>
 
 namespace
 {
@@ -64,12 +66,14 @@ private slots:
     void copyDetailsPutsThemOnTheClipboard();
     void okAcceptsTheDialog();
     void saysThatNoHashcatIsConfigured();
+    void updateCheckDoesNotRunOnOpen();
+    void updateButtonIsCompactAndHasAnIcon();
     void updateCheckShowsProgressBeforeTheResult();
+    void updateCheckKeepsTheUserResizedWindow();
     void updateCheckReportsNewerVersion();
     void updateCheckReportsLatestVersion();
     void updateCheckReportsFailure();
-    void closingBeforeTheDelaySkipsTheCheck();
-    void updateCheckRunsOnlyOnce();
+    void updateCheckCannotBeRunAgain();
 };
 
 void TestAboutDialog::initTestCase()
@@ -86,7 +90,7 @@ void TestAboutDialog::init()
 void TestAboutDialog::fitsItsContent()
 {
     FakeUpdateChecker checker;
-    AboutDialog dialog(&checker, 60000);
+    AboutDialog dialog(&checker);
     dialog.show();
     QCoreApplication::processEvents();
 
@@ -103,7 +107,7 @@ void TestAboutDialog::fitsItsContent()
 void TestAboutDialog::resizingKeepsTheContentAtTheTop()
 {
     FakeUpdateChecker checker;
-    AboutDialog dialog(&checker, 60000);
+    AboutDialog dialog(&checker);
     dialog.show();
     QCoreApplication::processEvents();
 
@@ -153,7 +157,7 @@ void TestAboutDialog::resizingKeepsTheContentAtTheTop()
 void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
 {
     FakeUpdateChecker checker;
-    AboutDialog dialog(&checker, 60000);
+    AboutDialog dialog(&checker);
     dialog.show();
     QCoreApplication::processEvents();
 
@@ -362,12 +366,42 @@ void TestAboutDialog::saysThatNoHashcatIsConfigured()
     QCOMPARE(label->text(), QStringLiteral("Not configured"));
 }
 
-// The update row starts busy: the progress indicator and the checking label
-// are visible, the answer and the release link are not.
+// Opening the dialog must not contact the network. The check is opt-in: it
+// only runs when the user presses the button.
+void TestAboutDialog::updateCheckDoesNotRunOnOpen()
+{
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker);
+    dialog.show();
+    QCoreApplication::processEvents();
+
+    QCOMPARE(checker.checks, 0);
+}
+
+// The check is a small action, not a full-width row, and it carries a refresh
+// symbol so it reads even without its label.
+void TestAboutDialog::updateButtonIsCompactAndHasAnIcon()
+{
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker);
+    dialog.show();
+    QCoreApplication::processEvents();
+
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
+    QWidget *row = dialog.findChild<QWidget *>(QStringLiteral("widget_update"));
+    QVERIFY(button);
+    QVERIFY(row);
+    QVERIFY(button->width() < row->width());
+    QVERIFY(!button->icon().isNull());
+}
+
+// The update row starts idle with just the button. Clicking it shows the
+// progress indicator; the answer takes its place once it arrives.
 void TestAboutDialog::updateCheckShowsProgressBeforeTheResult()
 {
     FakeUpdateChecker checker;
-    AboutDialog dialog(&checker, 60000);
+    AboutDialog dialog(&checker);
     dialog.show();
     QCoreApplication::processEvents();
 
@@ -375,11 +409,25 @@ void TestAboutDialog::updateCheckShowsProgressBeforeTheResult()
     QProgressBar *progress = dialog.findChild<QProgressBar *>(QStringLiteral("progressBar_update"));
     QLabel *result = dialog.findChild<QLabel *>(QStringLiteral("label_update_result"));
     QLabel *link = dialog.findChild<QLabel *>(QStringLiteral("label_update_link"));
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
     QVERIFY(checking);
     QVERIFY(progress);
     QVERIFY(result);
     QVERIFY(link);
+    QVERIFY(button);
 
+    QVERIFY(button->isVisible());
+    QVERIFY(button->isEnabled());
+    QCOMPARE(checker.checks, 0);
+    QVERIFY(!checking->isVisible());
+    QVERIFY(!progress->isVisible());
+    QVERIFY(!result->isVisible());
+    QVERIFY(!link->isVisible());
+
+    button->click();
+
+    QCOMPARE(checker.checks, 1);
     QVERIFY(checking->isVisible());
     QVERIFY(progress->isVisible());
     QCOMPARE(progress->minimum(), 0);
@@ -390,7 +438,32 @@ void TestAboutDialog::updateCheckShowsProgressBeforeTheResult()
     QVERIFY(progress->maximumWidth() < progress->parentWidget()->width());
     QVERIFY(!result->isVisible());
     QVERIFY(!link->isVisible());
-    QCOMPARE(checker.checks, 0);
+    // A second click while the answer is in flight must not start a request.
+    QVERIFY(!button->isEnabled());
+}
+
+// Showing the busy row grows the dialog only as far as the row needs. A
+// window the user has made larger keeps its size.
+void TestAboutDialog::updateCheckKeepsTheUserResizedWindow()
+{
+    FakeUpdateChecker checker;
+    AboutDialog dialog(&checker);
+    dialog.show();
+    QCoreApplication::processEvents();
+
+    dialog.resize(dialog.width() + 120, dialog.height() + 120);
+    QCoreApplication::processEvents();
+    const QSize enlarged = dialog.size();
+
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
+    QVERIFY(button);
+    button->click();
+    QCoreApplication::processEvents();
+
+    QCOMPARE(checker.checks, 1);
+    QVERIFY(dialog.width() >= enlarged.width());
+    QVERIFY(dialog.height() >= enlarged.height());
 }
 
 void TestAboutDialog::updateCheckReportsNewerVersion()
@@ -400,8 +473,13 @@ void TestAboutDialog::updateCheckReportsNewerVersion()
     checker.result.status = UpdateCheckResult::Status::UpdateAvailable;
     checker.result.latestVersion = QStringLiteral("0.9.0");
 
-    AboutDialog dialog(&checker, 0);
+    AboutDialog dialog(&checker);
     dialog.show();
+
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
+    QVERIFY(button);
+    button->click();
 
     QTRY_COMPARE(checker.checks, 1);
 
@@ -425,6 +503,7 @@ void TestAboutDialog::updateCheckReportsNewerVersion()
     QVERIFY(link->openExternalLinks());
     QVERIFY(link->text().contains(QString(AppConstants::Urls::LatestReleasePage)));
     QCOMPARE(link->toolTip(), QString(AppConstants::Urls::LatestReleasePage));
+    QVERIFY(button->isHidden());
 }
 
 void TestAboutDialog::updateCheckReportsLatestVersion()
@@ -434,8 +513,13 @@ void TestAboutDialog::updateCheckReportsLatestVersion()
     checker.result.status = UpdateCheckResult::Status::UpToDate;
     checker.result.latestVersion = QStringLiteral("0.8.0");
 
-    AboutDialog dialog(&checker, 0);
+    AboutDialog dialog(&checker);
     dialog.show();
+
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
+    QVERIFY(button);
+    button->click();
 
     QTRY_COMPARE(checker.checks, 1);
 
@@ -451,6 +535,7 @@ void TestAboutDialog::updateCheckReportsLatestVersion()
     // Direct, and without the version the rows above already show.
     QCOMPARE(result->text(), QStringLiteral("No updates available."));
     QVERIFY(!link->isVisible());
+    QVERIFY(button->isHidden());
 }
 
 void TestAboutDialog::updateCheckReportsFailure()
@@ -460,8 +545,13 @@ void TestAboutDialog::updateCheckReportsFailure()
     checker.result.status = UpdateCheckResult::Status::Failed;
     checker.result.detail = QStringLiteral("network unreachable");
 
-    AboutDialog dialog(&checker, 0);
+    AboutDialog dialog(&checker);
     dialog.show();
+
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
+    QVERIFY(button);
+    button->click();
 
     QTRY_COMPARE(checker.checks, 1);
 
@@ -473,36 +563,40 @@ void TestAboutDialog::updateCheckReportsFailure()
     QTRY_VERIFY(result->isVisible());
     QVERIFY(result->text().contains(QStringLiteral("network unreachable")));
     QVERIFY(!link->isVisible());
+    // A failed check is no answer: the button stays, so the user can try
+    // again without closing and reopening the dialog.
+    QVERIFY(button->isVisible());
+    QVERIFY(button->isEnabled());
+
+    QProgressBar *progress = dialog.findChild<QProgressBar *>(QStringLiteral("progressBar_update"));
+    QVERIFY(progress);
+    checker.answers = false;
+    button->click();
+    QCOMPARE(checker.checks, 2);
+    QVERIFY(!result->isVisible());
+    QVERIFY(progress->isVisible());
+    QVERIFY(!button->isEnabled());
 }
 
-// An About dialog that is closed before the delay must not leave a request
-// behind.
-void TestAboutDialog::closingBeforeTheDelaySkipsTheCheck()
+// A successful answer ends the check: the button is gone afterwards, and
+// even a stray click cannot start a second request.
+void TestAboutDialog::updateCheckCannotBeRunAgain()
 {
     FakeUpdateChecker checker;
-    {
-        AboutDialog dialog(&checker, 200);
-        dialog.show();
-        QCoreApplication::processEvents();
-        QCOMPARE(checker.checks, 0);
-        dialog.close();
-    }
+    checker.answers = true;
+    checker.result.status = UpdateCheckResult::Status::UpToDate;
 
-    QTest::qWait(300);
-    QCOMPARE(checker.checks, 0);
-}
-
-// Showing the same dialog again does not ask GitHub a second time.
-void TestAboutDialog::updateCheckRunsOnlyOnce()
-{
-    FakeUpdateChecker checker;
-    AboutDialog dialog(&checker, 0);
+    AboutDialog dialog(&checker);
     dialog.show();
-    QTRY_COMPARE(checker.checks, 1);
 
-    dialog.hide();
-    dialog.show();
-    QTest::qWait(100);
+    QPushButton *button =
+        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
+    QVERIFY(button);
+    button->click();
+    QCOMPARE(checker.checks, 1);
+    QVERIFY(button->isHidden());
+
+    button->click();
     QCOMPARE(checker.checks, 1);
 }
 

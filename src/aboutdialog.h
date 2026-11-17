@@ -8,7 +8,6 @@
 
 #include <QDialog>
 
-class QTimer;
 class UpdateChecker;
 struct HashcatResult;
 struct UpdateCheckResult;
@@ -42,6 +41,7 @@ protected:
 
 private slots:
     void copyDetailsClicked();
+    void checkUpdatesClicked();
 
 private:
     // The tests read the dialog through the Ui the same way the main
@@ -52,16 +52,19 @@ private:
     // The update checker is replaceable so a test can answer without a
     // network. Production uses the constructor above and gets a checker of
     // its own.
-    AboutDialog(UpdateChecker *checker, int indicatorDelayMs, QWidget *parent = nullptr);
+    AboutDialog(UpdateChecker *checker, QWidget *parent = nullptr);
 
     // Fills the row that holds the version of hashcat.
     void updateVersionLabel();
 
-    // Wires the update check: a one-shot timer starts the request after the
-    // progress indicator has been on screen for a moment.
-    void setupUpdateCheck(UpdateChecker *checker, int indicatorDelayMs);
-    void startUpdateCheck();
+    // Wires the update row. The check is opt-in: nothing contacts the network
+    // until the user presses the button.
+    void setupUpdateCheck(UpdateChecker *checker);
     void showUpdateResult(const UpdateCheckResult &result);
+
+    // Grows the dialog when the update row needs more room. A window the user
+    // has resized is left at its size; only the missing space is added.
+    void growToFitContent();
 
     // Shows the version of hashcat.
     void setVersionText(const QString &text);
@@ -95,12 +98,8 @@ private:
 
     bool m_sizedToContent = false;
 
-    // The update check: the timer keeps the progress indicator visible for
-    // at least its interval, and the flag makes sure an About window that is
-    // shown again does not ask GitHub a second time.
-    QTimer *m_updateTimer = nullptr;
+    // The check runs only on request, through the button in the update row.
     UpdateChecker *m_updateChecker = nullptr;
-    bool m_updateCheckStarted = false;
 
     Ui::AboutDialog *ui;
 };

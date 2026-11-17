@@ -19,15 +19,16 @@
 #include <QFileInfo>
 #include <QFont>
 #include <QFutureWatcher>
+#include <QIcon>
 #include <QLabel>
 #include <QPixmap>
 #include <QPushButton>
 #include <QShowEvent>
 #include <QStringList>
+#include <QStyle>
 #include <QSysInfo>
 #include <QTextLayout>
 #include <QTextOption>
-#include <QTimer>
 #include <QToolTip>
 
 namespace
@@ -97,12 +98,9 @@ QString wrapText(const QString &text, const QFont &font, int width)
 }
 } // namespace
 
-AboutDialog::AboutDialog(QWidget *parent)
-    : AboutDialog(nullptr, AppConstants::UpdateCheck::IndicatorDelayMs, parent)
-{
-}
+AboutDialog::AboutDialog(QWidget *parent) : AboutDialog(nullptr, parent) {}
 
-AboutDialog::AboutDialog(UpdateChecker *checker, int indicatorDelayMs, QWidget *parent)
+AboutDialog::AboutDialog(UpdateChecker *checker, QWidget *parent)
     : QDialog(parent), ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);
@@ -116,7 +114,7 @@ AboutDialog::AboutDialog(UpdateChecker *checker, int indicatorDelayMs, QWidget *
     updateSystemLabels();
     updateLinks();
     updateLicense();
-    setupUpdateCheck(checker, indicatorDelayMs);
+    setupUpdateCheck(checker);
 
     // The logo is scaled to the size the .ui gives the label, in device
     // pixels, so the artwork stays sharp on a high-dpi display without the
@@ -157,13 +155,6 @@ AboutDialog::~AboutDialog()
 void AboutDialog::showEvent(QShowEvent *event)
 {
     QDialog::showEvent(event);
-
-    // The timer starts when the dialog is actually on screen, not when it is
-    // constructed: the progress indicator has to be visible before the
-    // request can make it disappear again.
-    if (!m_updateCheckStarted) {
-        m_updateTimer->start();
-    }
 
     if (m_sizedToContent) {
         return;
@@ -303,17 +294,23 @@ void AboutDialog::setVersionLabel(const QString &text)
     ui->label_hc_version->setText(wrapText(text, ui->label_hc_version->font(), width));
 }
 
-// The update row starts in its busy state: the result and the link only
-// appear once there is something to say.
-void AboutDialog::setupUpdateCheck(UpdateChecker *checker, int indicatorDelayMs)
+// The update row starts idle: only the button is visible. Opening the dialog
+// must not contact the network - the user decides when to check.
+void AboutDialog::setupUpdateCheck(UpdateChecker *checker)
 {
+    ui->label_update_checking->hide();
+    ui->progressBar_update->hide();
     ui->label_update_result->hide();
     ui->label_update_link->hide();
 
-    m_updateTimer = new QTimer(this);
-    m_updateTimer->setSingleShot(true);
-    m_updateTimer->setInterval(indicatorDelayMs);
-    connect(m_updateTimer, &QTimer::timeout, this, &AboutDialog::startUpdateCheck);
+    // Qt has no dedicated update icon among its standard pixmaps. Use the
+    // platform's refresh symbol where there is an icon theme, and Qt's reload
+    // arrows everywhere else.
+    ui->pushButton_check_updates->setIcon(QIcon::fromTheme(
+        QStringLiteral("view-refresh"), style()->standardIcon(QStyle::SP_BrowserReload)));
+
+    connect(ui->pushButton_check_updates, &QPushButton::clicked, this,
+            &AboutDialog::checkUpdatesClicked);
 
     // A checker passed in belongs to its caller - the tests keep it on the
     // stack. The checker this dialog creates itself is a child and is
@@ -322,13 +319,32 @@ void AboutDialog::setupUpdateCheck(UpdateChecker *checker, int indicatorDelayMs)
     connect(m_updateChecker, &UpdateChecker::finished, this, &AboutDialog::showUpdateResult);
 }
 
-void AboutDialog::startUpdateCheck()
+void AboutDialog::checkUpdatesClicked()
 {
-    if (m_updateCheckStarted) {
+    // The button is disabled while a request is in flight and hidden once a
+    // successful answer has arrived, so neither state can start a second
+    // request.
+    if (!ui->pushButton_check_updates->isEnabled()) {
         return;
     }
-    m_updateCheckStarted = true;
+
+    ui->pushButton_check_updates->setEnabled(false);
+    ui->label_update_checking->show();
+    ui->progressBar_update->show();
+    ui->label_update_result->hide();
+    ui->label_update_link->hide();
+
+    growToFitContent();
     m_updateChecker->check();
+}
+
+// Grows the dialog when the update row needs more room. A window the user
+// has resized is left at its size; only the missing space is added.
+void AboutDialog::growToFitContent()
+{
+    ensurePolished();
+    layout()->activate();
+    resize(size().expandedTo(sizeHint()));
 }
 
 // Replaces the progress indicator with the answer. The result label is plain
@@ -359,6 +375,13 @@ void AboutDialog::showUpdateResult(const UpdateCheckResult &result)
         break;
     }
 
+    // A successful answer is final: the button gives way to it. A failed
+    // check is not an answer, so the button stays and the user can try again
+    // without reopening the dialog.
+    const bool answered = result.status != UpdateCheckResult::Status::Failed;
+    ui->pushButton_check_updates->setVisible(!answered);
+    ui->pushButton_check_updates->setEnabled(!answered);
+
     // The answer can be taller than the indicator it replaces.
-    adjustSize();
+    growToFitContent();
 }

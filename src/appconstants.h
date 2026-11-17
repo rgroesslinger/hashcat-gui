@@ -321,9 +321,6 @@ inline constexpr QLatin1StringView FaqHashTypesTimeout{
 // How the About dialog asks GitHub for a newer release.
 namespace UpdateCheck
 {
-// The progress indicator stays on screen at least this long before the
-// request starts, so a fast answer cannot make it flash.
-inline constexpr int IndicatorDelayMs = 1000;
 // A request that hangs must not keep the dialog busy forever.
 inline constexpr int RequestTimeoutMs = 10000;
 } // namespace UpdateCheck
