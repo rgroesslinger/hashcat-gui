@@ -9,13 +9,11 @@
 #include "testenvironment.h"
 
 #include <QCheckBox>
-#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QLineEdit>
 #include <QListWidget>
-#include <QStandardPaths>
 #include <QWidget>
 
 // The document statuses, the transfer onto the widgets, the note order and
@@ -25,7 +23,6 @@ class TestSessionTransfer : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase();
     void documentStatuses_data();
     void documentStatuses();
     void theTransferAppliesTheValues();
@@ -57,8 +54,8 @@ private:
     {
         QJsonObject values;
         values.insert(QStringLiteral("lineEdit_a"), QStringLiteral("x"));
-        const QString file = QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
-                                 .filePath(QStringLiteral("transfer-test.json"));
+        const QString file =
+            TestEnvironment::scratchDir().filePath(QStringLiteral("transfer-test.json"));
         QString error;
         if (!StateFile::write(file, AppConstants::FileSections::Session, version, values, &error)) {
             qFatal("could not write the test session: %s", qPrintable(error));
@@ -66,11 +63,6 @@ private:
         return file;
     }
 };
-
-void TestSessionTransfer::initTestCase()
-{
-    QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-}
 
 void TestSessionTransfer::documentStatuses_data()
 {
@@ -97,26 +89,25 @@ void TestSessionTransfer::documentStatuses()
     QFETCH(int, status);
     QFETCH(int, version);
 
-    const QString dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString file;
     if (kind == QStringLiteral("current") || kind == QStringLiteral("older")
         || kind == QStringLiteral("newer")) {
         file = writeSession(version);
     } else if (kind == QStringLiteral("noVersion")) {
         // A hand-edited file: values without a version.
-        file = QDir(dir).filePath(QStringLiteral("no-version.json"));
+        file = TestEnvironment::scratchDir().filePath(QStringLiteral("no-version.json"));
         QFile out(file);
         QVERIFY(out.open(QIODevice::WriteOnly));
         out.write(R"({"sections":{"session":{"values":{"lineEdit_a":"x"}}}})");
         out.close();
     } else if (kind == QStringLiteral("notJson")) {
-        file = QDir(dir).filePath(QStringLiteral("not-json.json"));
+        file = TestEnvironment::scratchDir().filePath(QStringLiteral("not-json.json"));
         QFile out(file);
         QVERIFY(out.open(QIODevice::WriteOnly));
         out.write("this is not JSON");
         out.close();
     } else {
-        file = QDir(dir).filePath(QStringLiteral("other-section.json"));
+        file = TestEnvironment::scratchDir().filePath(QStringLiteral("other-section.json"));
         QString error;
         QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,
                                  AppConstants::Settings::Version, {}, &error));

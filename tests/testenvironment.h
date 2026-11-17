@@ -20,20 +20,30 @@
 #include <QFileInfo>
 #include <QGroupBox>
 #include <QMessageBox>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QTimer>
 #include <QtTest/QTest>
 
-// Scratch base directories for a test process.
+// Scratch state for a test process.
 //
-// QSettings and QStandardPaths resolve XDG_CONFIG_HOME / XDG_DATA_HOME on
-// first use; redirecting them here means no test can read or overwrite the
-// settings, session file or window geometry of whoever runs ctest.
+// One switch plus one path pin keep every writable location the tests touch
+// below the platform's test root: QStandardPaths::setTestModeEnabled(true)
+// moves the locations QStandardPaths resolves (Unix ~/.qttest,
+// Windows %APPDATA%\qttest for data and %LOCALAPPDATA%\qttest for config), and
+// QSettings is pointed at that same config root because Qt's IniFormat
+// resolution on Windows bypasses QStandardPaths. The application name gives
+// each suite its own directory below the roots; ctest runs suites in parallel
+// and the roots are fixed, so the per-executable name is what keeps one suite
+// from reading or deleting another's session, examples and settings.
 //
-// The three statics are first touched from main(), so they outlive
-// SettingsManager's singleton and are destroyed last, after it.
+// The roots persist across runs; nothing is deleted wholesale. Freshness is a
+// per-test property: MainWindowFixture::init() removes the session and the
+// unpacked examples before every test, and every fixture calls resetSettings()
+// to clear the ini. A run that crashed leaves at most those files, and the next
+// test removes or overwrites them.
 namespace TestEnvironment
 {
 
@@ -52,38 +62,30 @@ inline LaunchValidator::LaunchProblem validateOptions(const HashcatOptions &opti
     return LaunchValidator::validate(context);
 }
 
-inline QTemporaryDir &configHome()
+// A run-scoped scratch directory for files tests need at a stable path:
+// import/export JSON, the binary an import dialog is offered, the shell
+// stubs and PATH-lookup executables (step 6). Unique per process and removed
+// when the process exits, so parallel or consecutive runs never share one.
+inline QTemporaryDir &scratchDir()
 {
     static QTemporaryDir dir;
-    return dir;
-}
-
-inline QTemporaryDir &dataHome()
-{
-    static QTemporaryDir dir;
-    return dir;
-}
-
-inline QTemporaryDir &cacheHome()
-{
-    static QTemporaryDir dir;
-    return dir;
-}
-
-// Has to run before the first QSettings or QStandardPaths call.
-inline void redirectBaseDirectories()
-{
-    // A scratch directory that could not be created would send QSettings and
-    // QStandardPaths back at the real ones - the exact leak this redirect
-    // exists to stop. Stop the run instead of testing against somebody's own
-    // configuration.
-    if (!configHome().isValid() || !dataHome().isValid() || !cacheHome().isValid()) {
-        qFatal("TestEnvironment: could not create the scratch base directories");
+    if (!dir.isValid()) {
+        qFatal("TestEnvironment: could not create the scratch directory");
     }
+    return dir;
+}
 
-    qputenv("XDG_CONFIG_HOME", configHome().path().toUtf8());
-    qputenv("XDG_DATA_HOME", dataHome().path().toUtf8());
-    qputenv("XDG_CACHE_HOME", cacheHome().path().toUtf8());
+// A fresh start for one test: clear the ini instead of writing a list of
+// default values. QSettings instances with the same organization/application
+// share one QConfFile, so this also resets a SettingsManager constructed
+// earlier; absent keys then fall back to SettingsKeys::defaultOf in production.
+// Has to run after configureSuite(), so the cleared file is the pinned one.
+inline void resetSettings()
+{
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope,
+                       QCoreApplication::applicationName(), QStringLiteral("settings"));
+    settings.clear();
+    settings.sync();
 }
 
 // A hashcat stand-in the tests can execute. Returns an empty path where a #!
@@ -100,12 +102,7 @@ inline QString writeShellStub([[maybe_unused]] const QString &name,
     // would fail. Skip the stub tests instead of reporting that failure.
     return {};
 #else
-    static QTemporaryDir scratch;
-    if (directory.isEmpty() && !scratch.isValid()) {
-        return {};
-    }
-
-    QString path = QDir(directory.isEmpty() ? scratch.path() : directory).filePath(name);
+    QString path = QDir(directory.isEmpty() ? scratchDir().path() : directory).filePath(name);
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
         return {};
@@ -137,12 +134,7 @@ writeHashcatStub([[maybe_unused]] const QString &name,
 inline QString writeSearchableExecutable(const QString &name, const QString &directory = QString())
 {
 #ifdef Q_OS_WIN
-    static QTemporaryDir scratch;
-    if (directory.isEmpty() && !scratch.isValid()) {
-        return {};
-    }
-
-    QString path = QDir(directory.isEmpty() ? scratch.path() : directory).filePath(name);
+    QString path = QDir(directory.isEmpty() ? scratchDir().path() : directory).filePath(name);
     // Several tests ask for the same name; the first copy is good enough.
     if (QFile::exists(path)) {
         return path;
@@ -299,50 +291,52 @@ inline void checkGroupBoxTitleAlignment(QObject *root)
                             .arg(offenders.join(QStringLiteral(", ")))));
 }
 
-// XDG redirects are per process, but on Windows QSettings and QStandardPaths
-// derive their writable locations from the application name alone (XDG plays
-// no part there): the settings file and AppDataLocation both end up below
-// %APPDATA%\<name>. The CI job runs ctest with CTEST_PARALLEL_LEVEL, so a fixed
-// name made concurrent suites share that directory, and one suite's cleanup
-// deleted the session and example files another was reading. Naming each suite
-// after its own executable keeps them apart with one directory per suite.
+// Everything that needs the application instance and has to happen before the
+// first QSettings or QStandardPaths use: the suite name and the settings root.
 //
-// Has to run after the Q(Core)Application exists and before the first
-// QSettings or QStandardPaths use. Removing the directories on startup, rather
-// than at exit, also clears up after a run that crashed or was killed, and
-// keeps the number of directories bounded across runs.
-inline void useScratchApplicationData()
+// The application name doubles as the suite's directory below the test roots
+// and as the QSettings organization, which is what separates the parallel
+// ctest suites. It needs the application instance (applicationFilePath()
+// returns empty before it exists), so this runs right after the constructor -
+// the same place main.cpp names the real application. The organization name
+// stays unset: main.cpp documents that setting it would change
+// AppDataLocation.
+//
+// QSettings resolves IniFormat/UserScope through GenericConfigLocation on
+// Unix, so test mode already moves it; on Windows it reads
+// FOLDERID_RoamingAppData directly and ignores test mode. Pinning
+// GenericConfigLocation puts settings.ini below the test root on both
+// platforms (on Unix this is the default again, so there is one code path and
+// no #ifdef). QSettings appends the organization - the suite name - itself.
+inline void configureSuite()
 {
-    const QString name = QStringLiteral("hashcat-gui-tests-%1")
-                             .arg(QFileInfo(QCoreApplication::applicationFilePath()).baseName());
-    QCoreApplication::setApplicationName(name);
+    QCoreApplication::setApplicationName(
+        QStringLiteral("hashcat-gui-tests-%1")
+            .arg(QFileInfo(QCoreApplication::applicationFilePath()).baseName()));
 
-    for (auto type : {QStandardPaths::AppDataLocation, QStandardPaths::AppConfigLocation}) {
-        const QString location = QStandardPaths::writableLocation(type);
-        // Only ever remove this suite's own directory - never a path that lost
-        // the name suffix and points at somebody's real profile.
-        if (QFileInfo(location).fileName() == name) {
-            QDir(location).removeRecursively();
-        }
-    }
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
+                       QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation));
 }
 
-// Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behavior, plus the redirect
-// and the scratch application data above. needsGui decides between
+// Replaces QTEST_MAIN / QTEST_GUILESS_MAIN: same behavior, plus the test-mode
+// switch and the suite configuration below. needsGui decides between
 // QApplication and QCoreApplication - the command builder and helper utils
 // tests never need a display.
 inline int run(QObject *test, int argc, char **argv, bool needsGui)
 {
-    redirectBaseDirectories();
+    // Before the application object and before any QSettings: QSettings
+    // remembers the location it resolves on first construction, and the
+    // application constructor may resolve paths of its own.
+    QStandardPaths::setTestModeEnabled(true);
 
     int result = 0;
     if (needsGui) {
         QApplication app(argc, argv);
-        useScratchApplicationData();
+        configureSuite();
         result = QTest::qExec(test, argc, argv);
     } else {
         QCoreApplication app(argc, argv);
-        useScratchApplicationData();
+        configureSuite();
         result = QTest::qExec(test, argc, argv);
     }
 

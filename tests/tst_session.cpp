@@ -127,8 +127,8 @@ void TestSession::resetSessionRestoresEveryWidget()
     QVERIFY(recorder.messageBoxSeen);
 
     QString error;
-    const QString freshFile = TestEnvironment::configHome().filePath(QStringLiteral("fresh.json"));
-    const QString resetFile = TestEnvironment::configHome().filePath(QStringLiteral("reset.json"));
+    const QString freshFile = TestEnvironment::scratchDir().filePath(QStringLiteral("fresh.json"));
+    const QString resetFile = TestEnvironment::scratchDir().filePath(QStringLiteral("reset.json"));
     const QStringList ignored{AppConstants::Files::PreviewWidget};
     QVERIFY2(StateFile::write(freshFile, AppConstants::FileSections::Session,
                               AppConstants::Sessions::Version,
@@ -413,7 +413,7 @@ void TestSession::theSettingsAreExportedThroughTheFileMenu()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/opt/somewhere/hashcat"));
 
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("settings.json"));
+    const QString file = TestEnvironment::scratchDir().filePath(QStringLiteral("settings.json"));
 
     MainWindow window;
 
@@ -440,7 +440,7 @@ void TestSession::theSettingsAreExportedThroughTheFileMenu()
 // the user reviews them before they are applied.
 void TestSession::theSettingsAreImportedThroughTheFileMenu()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("import.json"));
+    const QString file = TestEnvironment::scratchDir().filePath(QStringLiteral("import.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("hashcatPath"), QStringLiteral("/imported/hashcat-from-the-file"));
@@ -477,8 +477,6 @@ void TestSession::theSettingsAreImportedThroughTheFileMenu()
     QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath),
              QStringLiteral("/imported/hashcat-from-the-file"));
     // The preview follows the new binary and the new parameter style without
-    // the user touching a widget.
-    // The preview follows the new binary and the new parameter style without
     // the user touching a widget. The hash type the stub reports is in it
     // as well.
     const QString preview = MainWindowTestAccess::ui(window)->lineEdit_command->text();
@@ -491,7 +489,7 @@ void TestSession::theSettingsAreImportedThroughTheFileMenu()
 // known are applied all the same, and the ones that are not are named.
 void TestSession::theImportNamesTheValuesTheSessionDoesNotKnow()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("session.json"));
+    const QString file = TestEnvironment::scratchDir().filePath(QStringLiteral("session.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_runtime"), 64);
@@ -528,7 +526,7 @@ void TestSession::theImportNamesTheValuesTheSessionDoesNotKnow()
 // that version - while a name that was never ours is still reported.
 void TestSession::theImportIgnoresRetiredWidgetNames()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("retired.json"));
+    const QString file = TestEnvironment::scratchDir().filePath(QStringLiteral("retired.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_runtime"), 64);
@@ -619,7 +617,7 @@ void TestSession::retiredWidgetNamesAreNotReused()
 // name survived may mean something else there. The note names the version.
 void TestSession::aNewerSessionIsRefused()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("newer.json"));
+    const QString file = TestEnvironment::scratchDir().filePath(QStringLiteral("newer.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_runtime"), 64);
@@ -654,7 +652,7 @@ void TestSession::aNewerSessionIsRefused()
 // named may be missing.
 void TestSession::anOlderSessionIsAppliedWithANote()
 {
-    const QString file = TestEnvironment::configHome().filePath(QStringLiteral("older.json"));
+    const QString file = TestEnvironment::scratchDir().filePath(QStringLiteral("older.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_runtime"), 64);
@@ -689,7 +687,7 @@ void TestSession::anOlderSessionIsAppliedWithANote()
 void TestSession::aNewerSettingsFileIsRefused()
 {
     const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("newer-settings.json"));
+        TestEnvironment::scratchDir().filePath(QStringLiteral("newer-settings.json"));
 
     QJsonObject values;
     values.insert(QStringLiteral("useShortParameters"), true);

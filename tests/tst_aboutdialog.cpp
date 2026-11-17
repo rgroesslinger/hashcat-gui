@@ -50,6 +50,7 @@ class TestAboutDialog : public QObject
 
 private slots:
     void initTestCase();
+    void init();
     void fitsItsContent();
     void resizingKeepsTheContentAtTheTop();
     void longVersionTextWrapsInsteadOfWidening();
@@ -75,6 +76,11 @@ void TestAboutDialog::initTestCase()
 {
     QCoreApplication::setApplicationVersion(QStringLiteral("0.8.0"));
     qRegisterMetaType<UpdateCheckResult>("UpdateCheckResult");
+}
+
+void TestAboutDialog::init()
+{
+    TestEnvironment::resetSettings();
 }
 
 void TestAboutDialog::fitsItsContent()

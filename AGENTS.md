@@ -110,7 +110,7 @@ Connect to `commandChanged()` once; the attack-mode combo uses `attackIndexChang
 - Catalogs use `lupdate -no-obsolete -locations none`; don't run `update_translations` in
   development. New languages update `HASHCAT_GUI_TRANSLATIONS` and
   `AppConstants::Languages::Available`; `tst_translations` enforces the match.
-- Tests use `TestEnvironment::run` (redirects XDG), header-declared friends
+- Tests use `TestEnvironment::run` (QStandardPaths test mode), header-declared friends
   (`MainWindowTestAccess`), and `QSKIP` shell stubs on Windows.
 - Commit subject ≤72 chars, capitalized, imperative, no period; body only for what and why.
 - `FAQ.md` is generated from `FAQ.yaml`: `mdfaqgen FAQ.yaml FAQ.md`.

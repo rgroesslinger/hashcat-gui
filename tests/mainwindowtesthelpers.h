@@ -7,9 +7,10 @@
 #define MAINWINDOWTESTHELPERS_H
 
 #include "appconstants.h"
+#include "appearance.h"
 #include "examples.h"
 #include "mainwindowtestaccess.h"
-#include "settingsmanager.h"
+#include "statefile.h"
 #include "testenvironment.h"
 #include "ui_mainwindow.h"
 
@@ -224,25 +225,23 @@ public:
         });
     }
 
-    // Every test starts from the same settings, and cleanup() puts back
-    // whatever it found, so the order the slots run in stops mattering.
     void init()
     {
-        auto &settings = SettingsManager::instance();
-        m_savedHashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-        m_savedTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
-        m_savedShortParameters =
-            settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
-        m_savedRestoreSession =
-            settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true);
+        // The test-mode directories persist across runs, so a run that crashed or
+        // was killed can leave a session and unpacked examples behind. Removing
+        // them here - not in cleanup() - is what guarantees that the first test of
+        // the next run starts as fresh as every later one. resetSettings() clears
+        // the ini so every setting falls back to its production default.
+        QFile::remove(StateFile::sessionFilePath());
+        QDir(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                 .filePath(QString(Examples::DataDirectory)))
+            .removeRecursively();
+        TestEnvironment::resetSettings();
 
-        // A deterministic starting point: no configured hashcat, no configured
-        // terminal, long parameters, the session restored. Everything else comes
-        // from the fresh XDG directories, which hold no session to load.
-        settings.setKey(AppConstants::SettingsKeys::HashcatPath, QString());
-        settings.setKey(AppConstants::SettingsKeys::Terminal, QString());
-        settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
-        settings.setKey(AppConstants::SettingsKeys::RestoreSession, true);
+        // Save applies the color scheme to the whole application, and the import
+        // tests drive Save: reset it like TestSettingsDialog::init() does, so the
+        // contract is the same in every fixture.
+        Appearance::applyColorScheme(QString());
 
         m_closedModals = 0;
     }
@@ -250,23 +249,6 @@ public:
     void cleanup()
     {
         m_watchdog.stop();
-
-        // The round-trip test writes a session into the redirected data
-        // directory, and that directory lives for the whole run: every later
-        // window would silently load whatever was left there.
-        const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        QFile::remove(QDir(appData).filePath(AppConstants::Files::SessionFile));
-
-        // Loading an example unpacks its data below the same directory. It is
-        // replaced on every load, so removing it only keeps one test from seeing
-        // what another left behind.
-        QDir(QDir(appData).filePath(QString(Examples::DataDirectory))).removeRecursively();
-
-        auto &settings = SettingsManager::instance();
-        settings.setKey(AppConstants::SettingsKeys::HashcatPath, m_savedHashcatPath);
-        settings.setKey(AppConstants::SettingsKeys::Terminal, m_savedTerminal);
-        settings.setKey(AppConstants::SettingsKeys::UseShortParameters, m_savedShortParameters);
-        settings.setKey(AppConstants::SettingsKeys::RestoreSession, m_savedRestoreSession);
     }
 
     void startWatchdog()
@@ -283,10 +265,6 @@ public:
     }
 
 private:
-    QString m_savedHashcatPath;
-    QString m_savedTerminal;
-    bool m_savedShortParameters = false;
-    bool m_savedRestoreSession = true;
     // The modals the watchdog had to close: a test that expects none.
     int m_closedModals = 0;
     QTimer m_watchdog;

@@ -18,6 +18,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QPushButton>
+#include <QStandardPaths>
 #include <iterator>
 
 namespace
@@ -86,7 +87,6 @@ class TestSettingsDialog : public QObject
 
 private slots:
     void init();
-    void cleanup();
     void languageComboStoresLocaleCodes();
     void unknownLanguageCodeFallsBackToSystemDefault();
     void staleLanguageCodeDoesNotDemandARestart();
@@ -114,52 +114,17 @@ private slots:
     void colorSchemeFollowsTheSetting();
     void fitsItsContent();
     void groupBoxesShareOneTitleAlignment();
-
-private:
-    QString m_savedHashcatPath;
-    QString m_savedTerminal;
-    QString m_savedLanguage;
-    QString m_savedColorScheme;
-    bool m_savedShortParameters = false;
-    bool m_savedRestoreSession = true;
 };
 
-// Every test starts from the same settings, and cleanup() puts back whatever
-// it found, so the order the slots run in stops mattering.
+// Every test starts from the same settings: init() clears the ini, so the
+// order the slots run in stops mattering.
 void TestSettingsDialog::init()
 {
-    auto &settings = SettingsManager::instance();
-    m_savedHashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-    m_savedTerminal = settings.getKey<QString>(AppConstants::SettingsKeys::Terminal);
-    m_savedLanguage = settings.getKey<QString>(AppConstants::SettingsKeys::Language);
-    m_savedColorScheme = settings.getKey<QString>(AppConstants::SettingsKeys::ColorScheme);
-    m_savedShortParameters = settings.getKey<bool>(AppConstants::SettingsKeys::UseShortParameters);
-    m_savedRestoreSession = settings.getKey<bool>(AppConstants::SettingsKeys::RestoreSession, true);
+    TestEnvironment::resetSettings();
 
-    // A fresh install: nothing configured, system default language, the
-    // system color scheme, the session restored. Each test then stores what
-    // it needs on top of this.
-    settings.setKey(AppConstants::SettingsKeys::HashcatPath, QString());
-    settings.setKey(AppConstants::SettingsKeys::Terminal, QString());
-    settings.setKey(AppConstants::SettingsKeys::Language,
-                    QString::fromUtf8(AppConstants::Languages::Default));
-    settings.setKey(AppConstants::SettingsKeys::ColorScheme, QString());
-    settings.setKey(AppConstants::SettingsKeys::UseShortParameters, false);
-    settings.setKey(AppConstants::SettingsKeys::RestoreSession, true);
-}
-
-void TestSettingsDialog::cleanup()
-{
-    auto &settings = SettingsManager::instance();
-    settings.setKey(AppConstants::SettingsKeys::HashcatPath, m_savedHashcatPath);
-    settings.setKey(AppConstants::SettingsKeys::Terminal, m_savedTerminal);
-    settings.setKey(AppConstants::SettingsKeys::Language, m_savedLanguage);
-    settings.setKey(AppConstants::SettingsKeys::UseShortParameters, m_savedShortParameters);
-    settings.setKey(AppConstants::SettingsKeys::RestoreSession, m_savedRestoreSession);
-    settings.setKey(AppConstants::SettingsKeys::ColorScheme, m_savedColorScheme);
-    // The scheme is a property of the whole application, so it returns to
-    // what the user had as well.
-    Appearance::applyColorScheme(m_savedColorScheme);
+    // The scheme is a property of the whole application, so reset it as well:
+    // a test that applied one cannot leak it into the next.
+    Appearance::applyColorScheme(QString());
 }
 
 // System default plus one row per catalog, each shown in its own language
@@ -272,7 +237,7 @@ void TestSettingsDialog::selectPathClickedRejectsAPlainFile()
 #ifdef Q_OS_WIN
     QSKIP("Windows opens a real file dialog that nothing here can drive");
 #else
-    const QString plain = TestEnvironment::configHome().filePath(QStringLiteral("plain.bin"));
+    const QString plain = TestEnvironment::scratchDir().filePath(QStringLiteral("plain.bin"));
     QFile file(plain);
     QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Truncate));
     file.write("not a program\n");
@@ -342,6 +307,13 @@ void TestSettingsDialog::showsWhereTheFilesAreStored()
     const QString settingsFile = SettingsManager::instance().fileName();
     QVERIFY(!settingsFile.isEmpty());
     QVERIFY(dialog.ui->lineEdit_settings_path->text().contains(QFileInfo(settingsFile).fileName()));
+
+    // The harness itself: test mode is on and the ini went through the pin, so
+    // a missing flag (which would write into ~/.config on Linux) or a Windows
+    // run without configureSuite()'s setPath (%APPDATA%\<suite>\) is caught.
+    QVERIFY(QStandardPaths::isTestModeEnabled());
+    QVERIFY(SettingsManager::instance().fileName().startsWith(
+        QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation)));
 
     const QString sessionFile = StateFile::sessionFilePath();
     QVERIFY(dialog.ui->lineEdit_session_path->text().contains(QFileInfo(sessionFile).fileName()));

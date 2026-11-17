@@ -1744,7 +1744,7 @@ void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
 #endif
 
     const QString file =
-        TestEnvironment::configHome().filePath(QStringLiteral("import-binary.json"));
+        TestEnvironment::scratchDir().filePath(QStringLiteral("import-binary.json"));
     QJsonObject values;
     values.insert(QStringLiteral("hashcatPath"), stubB);
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,

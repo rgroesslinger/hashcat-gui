@@ -43,7 +43,7 @@ namespace
 // A file in the scratch directory of the test.
 QString scratchFile(const QString &name)
 {
-    return TestEnvironment::configHome().filePath(name);
+    return TestEnvironment::scratchDir().filePath(name);
 }
 
 // Writes a file with the given content.
