@@ -12,10 +12,11 @@ namespace
 {
 // One token as the dialect's shell reads it: the preview is copied to the
 // clipboard and pasted into a shell, so a token the shell would split or
-// expand is quoted, and a quoted token's own quotes are escaped.
+// expand is quoted, and a quoted token's own quotes are escaped. Tokens the
+// shell reads literally stay bare so the command remains readable.
 QString displayToken(const QString &token, CommandPreview::Dialect dialect)
 {
-    return dialect == CommandPreview::Dialect::PowerShell ? powerShellQuoteArgument(token)
+    return dialect == CommandPreview::Dialect::PowerShell ? powerShellDisplayArgument(token)
                                                           : posixQuoteArgument(token);
 }
 

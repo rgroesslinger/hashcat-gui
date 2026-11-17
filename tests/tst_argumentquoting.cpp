@@ -86,6 +86,8 @@ private slots:
     void posixQuotesForTheShell();
     void powerShellQuotesForTheShell_data();
     void powerShellQuotesForTheShell();
+    void powerShellDisplayQuotesOnlyWhatNeedsIt_data();
+    void powerShellDisplayQuotesOnlyWhatNeedsIt();
     void msvcrtQuotingRoundTripsThroughAReferenceParser();
 };
 
@@ -207,6 +209,49 @@ void TestArgumentQuoting::powerShellQuotesForTheShell()
     QFETCH(QString, token);
     QFETCH(QString, quoted);
     QCOMPARE(powerShellQuoteArgument(token), quoted);
+}
+
+// The display form keeps PowerShell's operators and expansions quoted but
+// leaves its literals bare, unlike the launch script's expression above. A
+// comma starts an array, a wildcard is expanded by pwsh on Unix, a single-dash
+// token ends at a dot, and a backslash is an ordinary path character.
+void TestArgumentQuoting::powerShellDisplayQuotesOnlyWhatNeedsIt_data()
+{
+    QTest::addColumn<QString>("token");
+    QTest::addColumn<QString>("quoted");
+
+    QTest::newRow("flag") << QStringLiteral("--hash-recipe") << QStringLiteral("--hash-recipe");
+    QTest::newRow("number") << QStringLiteral("1400") << QStringLiteral("1400");
+    QTest::newRow("mask") << QStringLiteral("?d?d") << QStringLiteral("'?d?d'");
+    QTest::newRow("wildcard") << QStringLiteral("*glob*") << QStringLiteral("'*glob*'");
+    QTest::newRow("windows path") << QStringLiteral("C:\\hashcat\\hashcat.exe")
+                                  << QStringLiteral("C:\\hashcat\\hashcat.exe");
+    QTest::newRow("dotted option value")
+        << QStringLiteral("my.session") << QStringLiteral("my.session");
+    QTest::newRow("dotted parameter") << QStringLiteral("-a.b") << QStringLiteral("'-a.b'");
+    QTest::newRow("comma") << QStringLiteral("1,2") << QStringLiteral("'1,2'");
+    QTest::newRow("empty") << QString() << QStringLiteral("''");
+    QTest::newRow("spaces") << QStringLiteral("two words") << QStringLiteral("'two words'");
+    QTest::newRow("dollar") << QStringLiteral("$2a$10$abc") << QStringLiteral("'$2a$10$abc'");
+    QTest::newRow("semicolon") << QStringLiteral("?d;calc") << QStringLiteral("'?d;calc'");
+    QTest::newRow("subexpression")
+        << QStringLiteral("?d$(Get-Date)") << QStringLiteral("'?d$(Get-Date)'");
+    QTest::newRow("single quote") << QStringLiteral("it's") << QStringLiteral("'it''s'");
+    QTest::newRow("backtick") << QStringLiteral("`tick`") << QStringLiteral("'`tick`'");
+    QTest::newRow("at sign") << QStringLiteral("@args") << QStringLiteral("'@args'");
+    QTest::newRow("comment") << QStringLiteral("#x") << QStringLiteral("'#x'");
+    QTest::newRow("non-ascii") << QStringLiteral("ünïcödé") << QStringLiteral("'ünïcödé'");
+    QTest::newRow("smart single quote")
+        << QStringLiteral("?d’?d")
+        << QStringLiteral("([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('"
+                          "P2TigJk/ZA==')))");
+}
+
+void TestArgumentQuoting::powerShellDisplayQuotesOnlyWhatNeedsIt()
+{
+    QFETCH(QString, token);
+    QFETCH(QString, quoted);
+    QCOMPARE(powerShellDisplayArgument(token), quoted);
 }
 
 // The quoter and an independent parser: any token list that survives this

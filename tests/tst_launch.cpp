@@ -279,12 +279,13 @@ void TestLaunch::previewUsesTheConfiguredTerminalsDialect()
     QLineEdit *preview = MainWindowTestAccess::ui(window)->lineEdit_command;
     QCOMPARE(preview->text(), QStringLiteral("hashcat --attack-mode 0"));
 
-    // pwsh is a PowerShell terminal: the call operator in front, every token
-    // single-quoted, so a bcrypt hash or a subexpression stays literal.
+    // pwsh is a PowerShell terminal: the call operator in front, and the
+    // tokens PowerShell would split or expand quoted, so a bcrypt hash or a
+    // subexpression stays literal while flags and values stay readable.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
                                        QStringLiteral("pwsh"));
     MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("job"));
-    QCOMPARE(preview->text(), QStringLiteral("& 'hashcat' '--attack-mode' '0' '--session' 'job'"));
+    QCOMPARE(preview->text(), QStringLiteral("& hashcat --attack-mode 0 --session job"));
 
     // A POSIX terminal brings the other dialect back.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,

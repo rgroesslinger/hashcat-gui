@@ -7,16 +7,16 @@
 #include "testenvironment.h"
 
 // The display formatting of the command line: spacing, the shell quoting of
-// every token in the configured terminal's dialect, the tooltip's 120-column
-// wrap and its markup escaping.
+// the tokens that need it in the configured terminal's dialect, the tooltip's
+// 120-column wrap and its markup escaping.
 class TestCommandPreview : public QObject
 {
     Q_OBJECT
 
 private slots:
     void formatJoinsTheBinaryAndTheArguments();
-    void formatQuotesEveryTokenForTheShell_data();
-    void formatQuotesEveryTokenForTheShell();
+    void formatQuotesTokensForTheShell_data();
+    void formatQuotesTokensForTheShell();
     void formatQuotesTheBinaryName();
     void tooltipHoldsTheWholeCommand();
     void tooltipWrapsAt120Columns();
@@ -34,7 +34,7 @@ void TestCommandPreview::formatJoinsTheBinaryAndTheArguments()
     QCOMPARE(CommandPreview::format(QStringLiteral("hashcat"), arguments, Dialect::Posix),
              QStringLiteral("hashcat --attack-mode 0"));
     QCOMPARE(CommandPreview::format(QStringLiteral("hashcat"), arguments, Dialect::PowerShell),
-             QStringLiteral("& 'hashcat' '--attack-mode' '0'"));
+             QStringLiteral("& hashcat --attack-mode 0"));
 
     // Without a configured binary the preview is the bare argument list,
     // which must not start with a blank. PowerShell has nothing to call, so
@@ -42,26 +42,35 @@ void TestCommandPreview::formatJoinsTheBinaryAndTheArguments()
     QCOMPARE(CommandPreview::format(QString(), arguments, Dialect::Posix),
              QStringLiteral("--attack-mode 0"));
     QCOMPARE(CommandPreview::format(QString(), arguments, Dialect::PowerShell),
-             QStringLiteral("'--attack-mode' '0'"));
+             QStringLiteral("--attack-mode 0"));
     QCOMPARE(CommandPreview::format(QStringLiteral("hashcat"), {}, Dialect::Posix),
              QStringLiteral("hashcat "));
     QCOMPARE(CommandPreview::format(QStringLiteral("hashcat"), {}, Dialect::PowerShell),
-             QStringLiteral("& 'hashcat' "));
+             QStringLiteral("& hashcat "));
     QCOMPARE(CommandPreview::format(QString(), {}, Dialect::Posix), QString());
     QCOMPARE(CommandPreview::format(QString(), {}, Dialect::PowerShell), QString());
 }
 
-// One token per row, quoted the way each shell reads it: POSIX single quotes
-// for everything outside the literal character set; PowerShell single quotes
-// for every token, with an embedded quote doubled. The smart quotes PowerShell
-// would take for delimiters travel as a base64 expression. The recipe is no
+// One token per row, quoted the way each shell reads it: both dialects leave
+// literal tokens bare and single-quote the rest, with a POSIX '\'' splice, a
+// doubled PowerShell quote and a base64 expression for the smart quotes
+// PowerShell would take for delimiters. The two dialects disagree on commas
+// (POSIX leaves one bare, PowerShell quotes it because it starts an array) and
+// backslashes; both quote the wildcards pwsh expands on Unix. The recipe is no
 // special case - it is quoted by the same rules as every other token.
-void TestCommandPreview::formatQuotesEveryTokenForTheShell_data()
+void TestCommandPreview::formatQuotesTokensForTheShell_data()
 {
     QTest::addColumn<QString>("token");
     QTest::addColumn<QString>("posix");
     QTest::addColumn<QString>("powerShell");
 
+    QTest::newRow("flag") << QStringLiteral("--hash-recipe") << QStringLiteral("--hash-recipe")
+                          << QStringLiteral("--hash-recipe");
+    QTest::newRow("number") << QStringLiteral("1400") << QStringLiteral("1400")
+                            << QStringLiteral("1400");
+    QTest::newRow("windows path") << QStringLiteral("C:\\hashcat\\hashcat.exe")
+                                  << QStringLiteral("'C:\\hashcat\\hashcat.exe'")
+                                  << QStringLiteral("C:\\hashcat\\hashcat.exe");
     QTest::newRow("recipe") << QStringLiteral("md5($p.$s)") << QStringLiteral("'md5($p.$s)'")
                             << QStringLiteral("'md5($p.$s)'");
     QTest::newRow("recipe with double quotes")
@@ -102,7 +111,7 @@ void TestCommandPreview::formatQuotesEveryTokenForTheShell_data()
                              << QStringLiteral("'line\nbreak'");
 }
 
-void TestCommandPreview::formatQuotesEveryTokenForTheShell()
+void TestCommandPreview::formatQuotesTokensForTheShell()
 {
     QFETCH(QString, token);
     QFETCH(QString, posix);
@@ -110,14 +119,6 @@ void TestCommandPreview::formatQuotesEveryTokenForTheShell()
 
     QCOMPARE(CommandPreview::format(QString(), {token}, Dialect::Posix), posix);
     QCOMPARE(CommandPreview::format(QString(), {token}, Dialect::PowerShell), powerShell);
-
-    // A trailing flag with no value has nothing to quote on POSIX; PowerShell
-    // quotes it like every other token.
-    QCOMPARE(CommandPreview::format(QString(), {QStringLiteral("--hash-recipe")}, Dialect::Posix),
-             QStringLiteral("--hash-recipe"));
-    QCOMPARE(
-        CommandPreview::format(QString(), {QStringLiteral("--hash-recipe")}, Dialect::PowerShell),
-        QStringLiteral("'--hash-recipe'"));
 }
 
 void TestCommandPreview::formatQuotesTheBinaryName()
@@ -127,7 +128,7 @@ void TestCommandPreview::formatQuotesTheBinaryName()
     QCOMPARE(CommandPreview::format(QStringLiteral("my hashcat"), arguments, Dialect::Posix),
              QStringLiteral("'my hashcat' --attack-mode 0"));
     QCOMPARE(CommandPreview::format(QStringLiteral("my hashcat"), arguments, Dialect::PowerShell),
-             QStringLiteral("& 'my hashcat' '--attack-mode' '0'"));
+             QStringLiteral("& 'my hashcat' --attack-mode 0"));
 }
 
 void TestCommandPreview::tooltipHoldsTheWholeCommand()
@@ -181,9 +182,10 @@ void TestCommandPreview::tooltipKeepsQuotedTokensWhole()
     QCOMPARE(rejoined, command);
 }
 
-// The same for the PowerShell dialect, whose tokens are all single-quoted and
-// whose backslash is literal: a trailing backslash must not break the quote
-// tracking, and the call operator stays with the binary.
+// The same for the PowerShell dialect, which leaves literal tokens bare and
+// single-quotes the rest, and whose backslash is literal: a trailing backslash
+// must not break the quote tracking, and the call operator stays with the
+// binary.
 void TestCommandPreview::tooltipKeepsPowerShellTokensWhole()
 {
     const QString filler = QString(110, QLatin1Char('a'));
@@ -195,7 +197,7 @@ void TestCommandPreview::tooltipKeepsPowerShellTokensWhole()
                                 QStringLiteral("two words"), QStringLiteral("tail")},
                                Dialect::PowerShell);
     const QString tooltip = CommandPreview::tooltip(command, Dialect::PowerShell);
-    QVERIFY2(tooltip.startsWith(QStringLiteral("& 'hashcat'")), qPrintable(tooltip));
+    QVERIFY2(tooltip.startsWith(QStringLiteral("& hashcat")), qPrintable(tooltip));
     QVERIFY(tooltip.contains(QStringLiteral("'two words'")));
     QVERIFY(!tooltip.contains(QStringLiteral("'two\nwords'")));
     QVERIFY(tooltip.contains(longDir));

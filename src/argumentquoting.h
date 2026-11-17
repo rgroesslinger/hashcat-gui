@@ -109,4 +109,41 @@ inline QString powerShellQuoteArgument(const QString &token)
     return QLatin1Char('\'') + quoted + QLatin1Char('\'');
 }
 
+// A token for a PowerShell command line the user will paste: leave it bare
+// when PowerShell reads every character literally, otherwise quote it. The
+// argument-mode metacharacters (space, @, #, %, $, ;, quotes, backtick,
+// braces, parentheses, |, &, <, >, and the comma, which starts an array and
+// is a parse error at the end of the line), every non-ASCII character and the
+// wildcards ? and * are quoted: Windows passes a wildcard through unchanged,
+// but pwsh on Unix expands an unquoted one against the file system, and the
+// same preview is copied on either platform. The launch script uses
+// powerShellQuoteArgument() instead: every value there is an expression on the
+// right of an '=' and must be a quoted literal even when it is safe here.
+inline bool powerShellNeedsQuoting(const QString &token)
+{
+    if (token.isEmpty()) {
+        return true;
+    }
+    // A token that starts with '-' is a parameter name to PowerShell, and that
+    // name ends before a '.': "-a.b" reaches hashcat as "-a" and ".b".
+    if (token.startsWith(QLatin1Char('-')) && token.contains(QLatin1Char('.'))) {
+        return true;
+    }
+    for (const QChar c : token) {
+        const char16_t u = c.unicode();
+        const bool literal = (u >= u'a' && u <= u'z') || (u >= u'A' && u <= u'Z')
+                             || (u >= u'0' && u <= u'9') || u == u'_' || u == u'-' || u == u'+'
+                             || u == u'=' || u == u':' || u == u'.' || u == u'/' || u == u'\\';
+        if (!literal) {
+            return true;
+        }
+    }
+    return false;
+}
+
+inline QString powerShellDisplayArgument(const QString &token)
+{
+    return powerShellNeedsQuoting(token) ? powerShellQuoteArgument(token) : token;
+}
+
 #endif // ARGUMENTQUOTING_H
