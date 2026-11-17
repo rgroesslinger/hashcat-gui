@@ -117,9 +117,13 @@ target_compile_features(hashcat-gui-core PUBLIC cxx_std_20)
 set(HASHCAT_GUI_UTF8_DEFINITIONS QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII)
 target_compile_definitions(hashcat-gui-core PRIVATE ${HASHCAT_GUI_UTF8_DEFINITIONS})
 
+# The Windows version resource takes its numbers from project().
+# configure_file bakes them in at configure time and windres needs no defines.
+configure_file(src/hashcat-gui.rc.in ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui.rc @ONLY)
+
 qt_add_executable(hashcat-gui WIN32
     src/main.cpp
-    src/hashcat-gui.rc
+    ${CMAKE_CURRENT_BINARY_DIR}/hashcat-gui.rc
 )
 
 target_link_libraries(hashcat-gui PRIVATE hashcat-gui-core)
