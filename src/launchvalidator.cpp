@@ -592,6 +592,9 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
     // browse dialog only offers directories, so this one is a hand edit or
     // a directory that has gone away.
     if (!options.cachePath.trimmed().isEmpty() && !QFileInfo(options.cachePath).isDir()) {
+        if (detail) {
+            *detail = options.cachePath;
+        }
         return LaunchError::InvalidCachePath;
     }
 

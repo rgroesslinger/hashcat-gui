@@ -835,13 +835,16 @@ void TestLaunchValidator::cachePathNeedsAnExistingDirectory()
     QVERIFY(file.open(QIODevice::WriteOnly));
     file.close();
     options.cachePath = file.fileName();
-    QCOMPARE(int(::validateOptions(options).code),
-             int(LaunchValidator::LaunchError::InvalidCachePath));
+    LaunchValidator::LaunchProblem problem = ::validateOptions(options);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCachePath));
+    // The message names the path, so the validator has to hand it over.
+    QCOMPARE(problem.detail, options.cachePath);
 
     // Neither is a directory that has gone away.
     options.cachePath = directory.filePath(QStringLiteral("gone"));
-    QCOMPARE(int(::validateOptions(options).code),
-             int(LaunchValidator::LaunchError::InvalidCachePath));
+    problem = ::validateOptions(options);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCachePath));
+    QCOMPARE(problem.detail, options.cachePath);
 }
 
 // A NUL would silently end the token at exec, so what hashcat receives would
