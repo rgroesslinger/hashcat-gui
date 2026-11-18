@@ -218,6 +218,12 @@
               </item>
               <item>
                <widget class="QComboBox" name="comboBox_hash_type">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>1</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <property name="minimumSize">
                  <size>
                   <width>300</width>
@@ -521,7 +527,7 @@
                <bool>false</bool>
               </property>
               <property name="toolTip">
-               <string>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</string>
+               <string>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">phases=words,rules</string>
@@ -783,7 +789,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</string>
+               <string>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">1</string>
@@ -898,21 +904,21 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</string>
+               <string>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</string>
               </property>
               <property name="placeholderText">
                <string notr="true">1</string>
               </property>
              </widget>
                  </item>
-                 <item row="4" column="2">
+                 <item row="6" column="0" colspan="3">
              <widget class="QLabel" name="label_pcfg_mask">
               <property name="text">
                <string>Mask:</string>
               </property>
              </widget>
                  </item>
-                 <item row="5" column="2">
+                 <item row="7" column="0" colspan="3">
              <widget class="QLineEdit" name="lineEdit_pcfg_mask">
               <property name="minimumSize">
                <size>
@@ -1040,6 +1046,38 @@
               </property>
               <property name="text">
                <string>Remove</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QToolButton" name="toolButton_table_up">
+              <property name="toolTip">
+               <string>Move item up</string>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::ArrowType::UpArrow</enum>
+              </property>
+              <property name="accessibleName">
+               <string>Move selected table up</string>
+              </property>
+             </widget>
+                     </item>
+                     <item>
+             <widget class="QToolButton" name="toolButton_table_down">
+              <property name="toolTip">
+               <string>Move item down</string>
+              </property>
+              <property name="autoRaise">
+               <bool>true</bool>
+              </property>
+              <property name="arrowType">
+               <enum>Qt::ArrowType::DownArrow</enum>
+              </property>
+              <property name="accessibleName">
+               <string>Move selected table down</string>
               </property>
              </widget>
                      </item>
@@ -1635,10 +1673,16 @@
                         <bool>false</bool>
                        </property>
                        <property name="sizePolicy">
-                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                          <horstretch>0</horstretch>
                          <verstretch>0</verstretch>
                         </sizepolicy>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>120</width>
+                         <height>16777215</height>
+                        </size>
                        </property>
                        <property name="prefix">
                         <string/>
@@ -1794,8 +1838,14 @@
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>70</width>
+                         <height>0</height>
+                        </size>
+                       </property>
                        <property name="toolTip">
-                        <string>Minimum mask length; 0 uses hashcat’s default.</string>
+                        <string>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</string>
                        </property>
                        <property name="maximum">
                         <number>256</number>
@@ -1817,8 +1867,14 @@
                        <property name="enabled">
                         <bool>false</bool>
                        </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>70</width>
+                         <height>0</height>
+                        </size>
+                       </property>
                        <property name="toolTip">
-                        <string>Maximum mask length; 0 uses hashcat’s default.</string>
+                        <string>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</string>
                        </property>
                        <property name="maximum">
                         <number>256</number>
@@ -1868,6 +1924,9 @@
                      </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset1">
+                       <property name="toolTip">
+                        <string>Use ?1 in the mask to insert this charset.</string>
+                       </property>
                        <property name="text">
                         <string>Charset 1:</string>
                        </property>
@@ -1901,6 +1960,9 @@
                      </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset2">
+                       <property name="toolTip">
+                        <string>Use ?2 in the mask to insert this charset.</string>
+                       </property>
                        <property name="text">
                         <string>Charset 2:</string>
                        </property>
@@ -1934,6 +1996,9 @@
                      </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset3">
+                       <property name="toolTip">
+                        <string>Use ?3 in the mask to insert this charset.</string>
+                       </property>
                        <property name="text">
                         <string>Charset 3:</string>
                        </property>
@@ -1967,6 +2032,9 @@
                      </property>
                      <item>
                       <widget class="QCheckBox" name="checkBox_custom_charset4">
+                       <property name="toolTip">
+                        <string>Use ?4 in the mask to insert this charset.</string>
+                       </property>
                        <property name="text">
                         <string>Charset 4:</string>
                        </property>
@@ -2616,6 +2684,9 @@
       </item>
       <item>
        <widget class="QLineEdit" name="lineEdit_command">
+        <property name="accessibleName">
+         <string>Command preview</string>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>

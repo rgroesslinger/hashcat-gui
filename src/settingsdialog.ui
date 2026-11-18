@@ -39,6 +39,9 @@
           <property name="accessibleName">
            <string>hashcat executable</string>
           </property>
+          <property name="toolTip">
+           <string>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</string>
+          </property>
           <property name="placeholderText">
            <string>Not configured</string>
           </property>
@@ -46,6 +49,9 @@
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_select_path">
+          <property name="toolTip">
+           <string>Browse for the hashcat executable.</string>
+          </property>
           <property name="text">
            <string>Select…</string>
           </property>

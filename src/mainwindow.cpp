@@ -167,7 +167,7 @@ MainWindow::MainWindow(QWidget *parent)
                 for (auto it = hashTypes.constBegin(); it != hashTypes.constEnd(); ++it) {
                     ui->comboBox_hash_type->addItem(it.value(), it.key());
                 }
-                ui->comboBox_hash_type->setToolTip(QString());
+                ui->comboBox_hash_type->setToolTip(m_hashTypeBaseToolTip);
                 m_hashTypesPath = m_hashTypeLoader.queriedPath();
                 m_hashTypesNeedsRetry = false;
 
@@ -271,6 +271,14 @@ void MainWindow::configureWidgets()
     hashTypeCompleter->setFilterMode(Qt::MatchContains);
     hashTypeCompleter->setCaseSensitivity(Qt::CaseInsensitive);
 
+    // The combo's normal-state tooltip: what Auto-detect does and that the
+    // list is searchable. The loading and error paths override it temporarily;
+    // a successful load restores this text.
+    m_hashTypeBaseToolTip =
+        tr("The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. "
+           "Type to search the list.");
+    ui->comboBox_hash_type->setToolTip(m_hashTypeBaseToolTip);
+
     // The path rows say what they are at a glance: a file, a folder, or the
     // warning of a path hashcat cannot use. The style owns the pixmaps, and
     // the rows are compared by icon key, so these are asked for once.
@@ -348,8 +356,8 @@ void MainWindow::configureWidgets()
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
     const QString charsetTip =
         tr("Use ?1–?4 in a mask to insert a custom charset. A mask is used by "
-           "Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no "
-           "mask names is refused.")
+           "Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom "
+           "charset needs mask=; a charset the mask does not reference is ignored.")
         + QLatin1String("\n\n") + tr("Built-in charsets:") + QLatin1String("\n\n")
         + QString::fromUtf8(AppConstants::HelpText::BuiltinCharsets);
     ui->lineEdit_mask->setToolTip(tr("Password candidate mask. ?1–?4 insert a custom charset, "
@@ -379,6 +387,53 @@ void MainWindow::configureWidgets()
                                   + QLatin1String("\n\n")
                                   + QString::fromUtf8(AppConstants::HelpText::OpenClDeviceTypes);
     ui->lineEdit_opencl_device_types->setToolTip(deviceTypeTip);
+
+    // Associate each caption with its field: clicking the label focuses the
+    // field and screen readers announce the pair, as in the Settings dialog.
+    const auto buddies = std::to_array<std::pair<QLabel *, QWidget *>>({
+        {ui->label_hashfile, ui->lineEdit_hashfile},
+        {ui->label_attack_mode, ui->comboBox_attack},
+        {ui->label_hash_type, ui->comboBox_hash_type},
+        {ui->label_hash_recipe, ui->lineEdit_hash_recipe},
+        {ui->label_encoding_from, ui->lineEdit_encoding_from},
+        {ui->label_encoding_to, ui->lineEdit_encoding_to},
+        {ui->label_association_settings, ui->lineEdit_association_settings},
+        {ui->label_pcfg_ruleset_name, ui->lineEdit_pcfg_ruleset_name},
+        {ui->label_pcfg_scale, ui->lineEdit_pcfg_scale},
+        {ui->label_pcfg_costmax, ui->lineEdit_pcfg_costmax},
+        {ui->label_pcfg_weights, ui->lineEdit_pcfg_weights},
+        {ui->label_pcfg_threads, ui->lineEdit_pcfg_threads},
+        {ui->label_pcfg_kbits, ui->lineEdit_pcfg_kbits},
+        {ui->label_pcfg_maxword, ui->lineEdit_pcfg_maxword},
+        {ui->label_pcfg_maxgain, ui->lineEdit_pcfg_maxgain},
+        {ui->label_pcfg_walk, ui->lineEdit_pcfg_walk},
+        {ui->label_pcfg_mask, ui->lineEdit_pcfg_mask},
+        {ui->label_pcfg_extra, ui->lineEdit_pcfg_extra},
+        {ui->label_table_identity, ui->lineEdit_table_identity},
+        {ui->label_table_template, ui->lineEdit_table_template},
+        {ui->label_table_single, ui->lineEdit_table_single},
+        {ui->label_table_cap, ui->lineEdit_table_cap},
+        {ui->label_table_maxperm, ui->lineEdit_table_maxperm},
+        {ui->label_table_extra, ui->lineEdit_table_extra},
+        {ui->label_feed, ui->lineEdit_feed},
+        {ui->label_feed_argument, ui->lineEdit_feed_argument},
+        {ui->label_rule_left, ui->lineEdit_rule_left},
+        {ui->label_rule_right, ui->lineEdit_rule_right},
+        {ui->label_increment_min, ui->spinBox_increment_min},
+        {ui->label_increment_max, ui->spinBox_increment_max},
+        {ui->label_session, ui->lineEdit_session},
+        {ui->label_runtime, ui->spinBox_runtime},
+        {ui->label_skip, ui->lineEdit_skip},
+        {ui->label_limit, ui->lineEdit_limit},
+        {ui->label_cache_path, ui->lineEdit_cache_path},
+        {ui->label_cpu_affinity, ui->lineEdit_cpu_affinity},
+        {ui->label_backend_devices, ui->lineEdit_backend_devices},
+        {ui->label_opencl_device_types, ui->lineEdit_opencl_device_types},
+        {ui->label_outfile_format, ui->lineEdit_outfile_format},
+    });
+    for (const auto &[label, field] : buddies) {
+        label->setBuddy(field);
+    }
 }
 
 // Every widget whose value reaches the command line is connected here, once.
@@ -492,6 +547,9 @@ void MainWindow::connectListSignals()
     connect(ui->pushButton_open_table, &QPushButton::clicked, this, &MainWindow::addTableClicked);
     connect(ui->pushButton_remove_table, &QPushButton::clicked, this,
             &MainWindow::removeTableClicked);
+    connect(ui->toolButton_table_up, &QToolButton::clicked, this, &MainWindow::tableMoveUpClicked);
+    connect(ui->toolButton_table_down, &QToolButton::clicked, this,
+            &MainWindow::tableMoveDownClicked);
     connect(ui->pushButton_open_feed, &QPushButton::clicked, this, &MainWindow::addFeedClicked);
     connect(ui->pushButton_add_feed_argument, &QPushButton::clicked, this,
             &MainWindow::addFeedArgumentClicked);
@@ -1400,6 +1458,16 @@ void MainWindow::addTableClicked()
 void MainWindow::removeTableClicked()
 {
     m_tableList->removeSelected();
+}
+
+void MainWindow::tableMoveUpClicked()
+{
+    m_tableList->moveSelected(-1);
+}
+
+void MainWindow::tableMoveDownClicked()
+{
+    m_tableList->moveSelected(1);
 }
 
 void MainWindow::addFeedClicked()

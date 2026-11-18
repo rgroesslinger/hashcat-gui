@@ -44,6 +44,7 @@
 #include <QSpinBox>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QToolButton>
 #include <QToolTip>
 #include <QWidget>
 #include <utility>
@@ -100,6 +101,7 @@ private slots:
     void staleQueryDoesNotReplaceTheNewerList();
     void outfileSuggestionFollowsUntilTheUserTakesOver();
     void wordlistMoveSurvivesAMissingSelection();
+    void tableMoveButtonsReorderRows();
     void theDefaultsMatchTheUiFiles();
     void switchingTheAttackModeRebuildsThePreviewOnce();
     void destroyingTheWindowWithListRowsIsSafe();
@@ -1265,7 +1267,12 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     // Auto-detect is the permanent first entry and the working default.
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 3);
     QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
-    QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().isEmpty());
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip(),
+             MainWindowTestAccess::hashTypeBaseToolTip(window));
+    // Comparing against the member alone would also pass if both were empty;
+    // pin that the restored tooltip really carries the explanatory content.
+    QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().contains(
+        QStringLiteral("Auto-detect")));
 
     // Auto-detect comes first, then the ids in QMap key order as item data.
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toInt(),
@@ -1387,7 +1394,8 @@ void TestMainWindow::failedQueryKeepsThePreviousListOnTheSameBinary()
     QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 4,
                              AppConstants::Hashcat::QueryTimeoutMs);
-    QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().isEmpty());
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip(),
+             MainWindowTestAccess::hashTypeBaseToolTip(window));
 }
 
 // Accepting Settings again with the same binary leaves the list and the
@@ -1440,7 +1448,8 @@ void TestMainWindow::changingTheBinaryReRunsTheQuery()
     // are. A re-query would clear the combo and disable it synchronously.
     QVERIFY(QMetaObject::invokeMethod(&window, "settingsTriggered"));
     QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
-    QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip().isEmpty());
+    QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip(),
+             MainWindowTestAccess::hashTypeBaseToolTip(window));
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 3);
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->currentData().toInt(), 1000);
 
@@ -1631,6 +1640,44 @@ void TestMainWindow::wordlistMoveSurvivesAMissingSelection()
     QVERIFY(QMetaObject::invokeMethod(&window, "wordlistMoveUpClicked"));
     QVERIFY(QMetaObject::invokeMethod(&window, "wordlistMoveDownClicked"));
     QCOMPARE(list->count(), 0);
+}
+
+// The table list gained the same inline reorder buttons as PCFG and feed:
+// table order matters (with cap set the first replacements per source win), so
+// the buttons must move the current row and stay a no-op without a selection.
+void TestMainWindow::tableMoveButtonsReorderRows()
+{
+    MainWindow window;
+    QListWidget *list = MainWindowTestAccess::ui(window)->listWidget_tables;
+    QToolButton *up = MainWindowTestAccess::ui(window)->toolButton_table_up;
+    QToolButton *down = MainWindowTestAccess::ui(window)->toolButton_table_down;
+
+    new QListWidgetItem(QStringLiteral("a.table"), list);
+    new QListWidgetItem(QStringLiteral("b.table"), list);
+
+    const auto texts = [list] {
+        QStringList result;
+        for (int i = 0; i < list->count(); ++i) {
+            result << list->item(i)->text();
+        }
+        return result;
+    };
+
+    // Click the buttons themselves so the connect() wiring is exercised, not
+    // just the slots. No current row: both directions are a no-op.
+    QCOMPARE(list->currentRow(), -1);
+    up->click();
+    down->click();
+    QCOMPARE(texts(), (QStringList{QStringLiteral("a.table"), QStringLiteral("b.table")}));
+
+    // Move the second row up, then back down.
+    list->setCurrentRow(1);
+    up->click();
+    QCOMPARE(texts(), (QStringList{QStringLiteral("b.table"), QStringLiteral("a.table")}));
+    QCOMPARE(list->currentRow(), 0);
+    down->click();
+    QCOMPARE(texts(), (QStringList{QStringLiteral("a.table"), QStringLiteral("b.table")}));
+    QCOMPARE(list->currentRow(), 1);
 }
 
 // The defaults the code documents and the defaults the .ui files bake in are

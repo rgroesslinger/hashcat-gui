@@ -70,6 +70,11 @@ struct MainWindowTestAccess {
         return window.m_hashTypeLoader;
     }
 
+    static QString hashTypeBaseToolTip(MainWindow &window)
+    {
+        return window.m_hashTypeBaseToolTip;
+    }
+
     static void fitToContent(MainWindow &window)
     {
         window.fitToContent();

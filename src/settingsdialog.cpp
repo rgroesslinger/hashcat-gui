@@ -103,6 +103,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
     ui->comboBox_color_scheme->setToolTip(
         tr("Not all color schemes are available on all platforms."));
 
+    ui->comboBox_terminal->setToolTip(tr("The terminal hashcat is started in."));
+
     ui->checkBox_use_short_parameters->setToolTip(
         tr("Use the short option names (-m) instead of the long ones (--hash-type) in the "
            "command."));

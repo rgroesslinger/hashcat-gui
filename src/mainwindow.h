@@ -87,6 +87,8 @@ private slots:
     void pcfgRulesetMoveDownClicked();
     void addTableClicked();
     void removeTableClicked();
+    void tableMoveUpClicked();
+    void tableMoveDownClicked();
     void addFeedClicked();
     void addFeedArgumentClicked();
     void removeFeedArgumentClicked();
@@ -282,6 +284,10 @@ private:
     // The binary whose list the combo currently shows. Used to tell a
     // same-binary refresh (keep the list) from a changed binary (clear it).
     QString m_hashTypesPath;
+
+    // The combo's explanatory tooltip in its normal state. The loading and
+    // error paths override it temporarily; a successful load restores it.
+    QString m_hashTypeBaseToolTip;
 
     // A same-binary unparseable reply kept the old list; accepting Settings
     // again with that path must re-run the query, there is no other retry.
