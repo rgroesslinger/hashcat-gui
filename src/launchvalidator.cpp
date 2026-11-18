@@ -13,6 +13,7 @@
 #include <QRegularExpression>
 #include <algorithm>
 #include <array>
+#include <optional>
 #include <utility>
 
 namespace LaunchValidator
@@ -108,6 +109,29 @@ QString settingValue(const QStringList &tokens, QLatin1StringView key)
         }
     }
     return {};
+}
+
+// The value a setting takes: the typed field first, the extra tokens second.
+// Every cross-field check reads this, so a value cannot hide in either place.
+QString effectiveSetting(const QString &typed, const QStringList &tokens, QLatin1StringView key)
+{
+    const QString value = typed.trimmed();
+    return value.isEmpty() ? settingValue(tokens, key).trimmed() : value;
+}
+
+// The feed's boolean spellings (feed_param_store, FEED_PARAM_TYPE_BOOL):
+// exactly these eight, case-sensitive. Anything else is no boolean at all.
+std::optional<bool> feedBoolean(const QString &value)
+{
+    if (value == QLatin1String("1") || value == QLatin1String("yes")
+        || value == QLatin1String("true") || value == QLatin1String("on")) {
+        return true;
+    }
+    if (value == QLatin1String("0") || value == QLatin1String("no")
+        || value == QLatin1String("false") || value == QLatin1String("off")) {
+        return false;
+    }
+    return std::nullopt;
 }
 
 // The keys of the settings a typed field holds, counted once per field that
@@ -279,11 +303,8 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
 
     // The mask may come from the typed field or from the extra settings line;
     // the feed sees one key either way, so every check below has to as well.
-    QString mask = options.pcfgMask.trimmed();
-    if (mask.isEmpty()) {
-        mask =
-            settingValue(options.pcfgExtraSettings, AppConstants::HashcatSettings::Mask).trimmed();
-    }
+    const QString mask = effectiveSetting(options.pcfgMask, options.pcfgExtraSettings,
+                                          AppConstants::HashcatSettings::Mask);
 
     if (!mask.isEmpty()) {
         // The ?w/?q markers belong to the hybrid mode 12, where hashcat
@@ -292,29 +313,27 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         if (markers.word > 0 || markers.second > 0) {
             return fail(namedSetting(AppConstants::HashcatSettings::Mask, mask));
         }
-        // The feed refuses the pair with omen=1, and it refuses the hint
-        // words from the accounts while the grammar is held to the mask -
-        // which is exactly the case without a named source; hintaccount=0
-        // is no conflict.
-        const QString omen =
-            QString(AppConstants::HashcatSettings::Omen) + QLatin1Char('=') + QStringLiteral("1");
-        if (options.pcfgExtraSettings.contains(omen)) {
+        // The feed refuses a named, non-zero omen with the mask. omen is a
+        // U64, so omen=01 is omen=1; a value that is not a number is the
+        // feed's own refusal, not this conflict.
+        const QString omen = effectiveSetting(QString(), options.pcfgExtraSettings,
+                                              AppConstants::HashcatSettings::Omen);
+        bool omenOk = false;
+        const qulonglong omenValue = omen.toULongLong(&omenOk, 10);
+        if (omenOk && omenValue != 0) {
             return fail(namedSetting(AppConstants::HashcatSettings::Mask, mask));
         }
-        for (const QString &token : options.pcfgExtraSettings) {
-            if (!token.startsWith(QString(AppConstants::HashcatSettings::Hintaccount)
-                                  + QLatin1Char('='))) {
-                continue;
-            }
-            bool ok = false;
-            const qlonglong hintaccount =
-                token.mid(token.indexOf(QLatin1Char('=')) + 1).toLongLong(&ok);
-            if (ok && hintaccount > 0
-                && !hasSetting(options.pcfgExtraSettings, AppConstants::HashcatSettings::Hintwords)
-                && !hasSetting(options.pcfgExtraSettings,
-                               AppConstants::HashcatSettings::Hintfile)) {
-                return fail(namedSetting(AppConstants::HashcatSettings::Mask, mask));
-            }
+        // The hint words from the accounts have no source while the grammar
+        // is held to the mask - which is exactly the case without a named
+        // source; hintaccount=0 is no conflict.
+        const QString hintaccount = effectiveSetting(QString(), options.pcfgExtraSettings,
+                                                     AppConstants::HashcatSettings::Hintaccount);
+        bool hintOk = false;
+        const qlonglong hintCount = hintaccount.toLongLong(&hintOk);
+        if (hintOk && hintCount > 0
+            && !hasSetting(options.pcfgExtraSettings, AppConstants::HashcatSettings::Hintwords)
+            && !hasSetting(options.pcfgExtraSettings, AppConstants::HashcatSettings::Hintfile)) {
+            return fail(namedSetting(AppConstants::HashcatSettings::Mask, mask));
         }
     }
 
@@ -354,7 +373,8 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
         return LaunchError::InvalidTableSetting;
     };
 
-    // The three flags: empty (the default), 0 or 1.
+    // The three flags: empty (the default) or one of the feed's boolean
+    // spellings - the typed field takes the same ones as the extra line.
     const auto flags = std::to_array<std::pair<QString, QLatin1StringView>>({
         {options.tableIdentity, AppConstants::HashcatSettings::Identity},
         {options.tableTemplate, AppConstants::HashcatSettings::Template},
@@ -362,14 +382,18 @@ LaunchError checkTableSettings(const HashcatOptions &options, QString *detail)
     });
     for (const auto &[value, name] : flags) {
         const QString trimmed = value.trimmed();
-        if (!trimmed.isEmpty() && trimmed != QLatin1String("0") && trimmed != QLatin1String("1")) {
+        if (!trimmed.isEmpty() && !feedBoolean(trimmed)) {
             return fail(namedSetting(name, value));
         }
     }
-    // One substitution needs the other positions left alone.
-    if (options.tableSingle.trimmed() == QLatin1String("1")
-        && options.tableIdentity.trimmed() == QLatin1String("0")) {
-        return fail(namedSetting(AppConstants::HashcatSettings::Identity, options.tableIdentity));
+    // One substitution needs the other positions left alone. Either flag may
+    // arrive typed or as an extra token, in any boolean spelling.
+    const QString single = effectiveSetting(options.tableSingle, options.tableExtraSettings,
+                                            AppConstants::HashcatSettings::Single);
+    const QString identity = effectiveSetting(options.tableIdentity, options.tableExtraSettings,
+                                              AppConstants::HashcatSettings::Identity);
+    if (feedBoolean(single) == true && feedBoolean(identity) == false) {
+        return fail(namedSetting(AppConstants::HashcatSettings::Identity, identity));
     }
 
     // cap and maxperm reach beyond every Qt integer type (0...0xffffffff

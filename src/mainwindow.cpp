@@ -325,7 +325,7 @@ void MainWindow::configureWidgets()
 
     // The shapes that are not a plain integer range: the colon separated
     // weights list, maxword's multiple of 16, the dot separated decimal and
-    // the 0/1 flags of the table feed.
+    // the boolean flags of the table feed.
     const auto feedShapes = std::to_array<std::pair<QLineEdit *, QLatin1StringView>>({
         {ui->lineEdit_pcfg_weights, AppConstants::Validation::WeightsList},
         {ui->lineEdit_pcfg_maxword, AppConstants::Validation::MaxwordValue},

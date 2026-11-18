@@ -146,11 +146,14 @@ namespace
 
 // One positional key=value setting of the feed modes. An empty value means
 // "not set" and stays out of the command line; hashcat refuses a key it is
-// given more than once, so there is exactly one field per key.
+// given more than once, so there is exactly one field per key. The value is
+// trimmed as the launch checks trim it - hashcat refuses a padded number or
+// boolean, so what was validated has to be what runs.
 void appendSetting(QStringList &arguments, QLatin1StringView key, const QString &value)
 {
-    if (!value.isEmpty()) {
-        arguments << QStringLiteral("%1=%2").arg(QString(key), value);
+    const QString trimmed = value.trimmed();
+    if (!trimmed.isEmpty()) {
+        arguments << QStringLiteral("%1=%2").arg(QString(key), trimmed);
     }
 }
 

@@ -212,11 +212,13 @@ inline constexpr QLatin1StringView Digits{"^[0-9]*$"};
 inline constexpr QLatin1StringView DeviceTypes{R"(^\s*([12]\s*(,\s*[12]\s*)*)?$)"};
 // The shapes the feeds of the attack modes 4 and 5 parse themselves and a
 // plain integer validator cannot hold: the colon separated weights list,
-// maxword's multiple of 16, the dot separated decimal and the 0/1 flags.
+// maxword's multiple of 16, the dot separated decimal and the boolean flags.
 inline constexpr QLatin1StringView WeightsList{"^[0-9]+(:[0-9]+)*$"};
 inline constexpr QLatin1StringView MaxwordValue{"^(0|16|32)?$"};
 inline constexpr QLatin1StringView DecimalNumber{"^[0-9]+([.][0-9]+)?$"};
-inline constexpr QLatin1StringView BinaryFlag{"^[01]?$"};
+// The table flags: the feed reads them as booleans and takes exactly these
+// spellings, case-sensitive (feed_param_store); empty is its default.
+inline constexpr QLatin1StringView BinaryFlag{"^([01]|yes|no|true|false|on|off)?$"};
 // --outfile-format: one or more comma-separated format numbers from 1 to 6.
 // Empty is not valid: hashcat answers --outfile-format '' with an error.
 inline constexpr QLatin1StringView OutfileFormatList{"^[1-6](,[1-6])*$"};

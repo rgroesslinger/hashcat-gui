@@ -40,6 +40,7 @@ private slots:
     void nonAsciiArgumentsSurviveVerbatim();
     void maskMarkersAreCounted();
     void positionalInputsFollowTheMode();
+    void feedSettingsAreEmittedTrimmed();
     void dashLeadingPositionalsGetTheSeparator();
     void modeRequirements_data();
     void modeRequirements();
@@ -892,6 +893,37 @@ void TestCommandBuilder::positionalInputsFollowTheMode()
         const QStringList expected{"--attack-mode", "12", "hash.txt", "?w?d", "a.txt", "b.txt"};
         QCOMPARE(CommandBuilder::build(options), expected);
     }
+}
+
+// The launch checks read the feed settings trimmed; the builder has to emit
+// them the same way, or a value the checks accept reaches hashcat padded and
+// is refused there. The collector trims widget text already - this pins the
+// builder for options built directly.
+void TestCommandBuilder::feedSettingsAreEmittedTrimmed()
+{
+    HashcatOptions table;
+    table.attackMode = AttackMode::Table;
+    table.hashFile = QStringLiteral("hash.txt");
+    table.wordlists << QStringLiteral("dict.txt");
+    table.tableFiles << QStringLiteral("table.txt");
+    table.tableIdentity = QStringLiteral(" 1 ");
+    table.tableTemplate = QStringLiteral(" on ");
+    table.tableSingle = QStringLiteral("   ");
+    table.tableCap = QStringLiteral(" 5 ");
+
+    // A whitespace-only value is "not set", like an empty one.
+    const QStringList expected{"--attack-mode", "5",          "hash.txt",    "dict.txt",
+                               "table.txt",     "identity=1", "template=on", "cap=5"};
+    QCOMPARE(CommandBuilder::build(table), expected);
+
+    HashcatOptions pcfg;
+    pcfg.attackMode = AttackMode::Pcfg;
+    pcfg.hashFile = QStringLiteral("hash.txt");
+    pcfg.pcfgScale = QStringLiteral(" 2 ");
+    pcfg.pcfgMask = QStringLiteral(" ?u?l ");
+
+    const QStringList pcfgExpected{"--attack-mode", "4", "hash.txt", "scale=2", "mask=?u?l"};
+    QCOMPARE(CommandBuilder::build(pcfg), pcfgExpected);
 }
 
 // A positional value that starts with a dash must not be read as a hashcat

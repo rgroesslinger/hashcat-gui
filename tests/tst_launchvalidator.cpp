@@ -551,9 +551,11 @@ void TestLaunchValidator::pcfgSettingsAreValidated()
                  int(LaunchValidator::LaunchError::InvalidPcfgSetting));
     }
 
-    // The grammar held to the mask refuses the pair with omen=1, and the
-    // hint words from the accounts have no source while the mask is on.
-    const QStringList maskConflicts{QStringLiteral("omen=1"), QStringLiteral("hintaccount=8")};
+    // The grammar held to the mask refuses a named, non-zero omen - a U64,
+    // so omen=01 is omen=1 - and the hint words from the accounts have no
+    // source while the mask is on.
+    const QStringList maskConflicts{QStringLiteral("omen=1"), QStringLiteral("omen=01"),
+                                    QStringLiteral("omen=2"), QStringLiteral("hintaccount=8")};
     for (const QString &token : maskConflicts) {
         HashcatOptions options = clean;
         options.pcfgExtraSettings = QStringList{token};
@@ -576,6 +578,11 @@ void TestLaunchValidator::pcfgSettingsAreValidated()
     HashcatOptions noHint = clean;
     noHint.pcfgExtraSettings = QStringList{QStringLiteral("hintaccount=0")};
     expect(noHint, LaunchValidator::LaunchError::None);
+
+    // omen=0 spelled with leading zeros is still zero: no conflict.
+    HashcatOptions omenZero = clean;
+    omenZero.pcfgExtraSettings = QStringList{QStringLiteral("omen=00")};
+    expect(omenZero, LaunchValidator::LaunchError::None);
 
     HashcatOptions noMask = clean;
     noMask.pcfgMask.clear();
@@ -666,6 +673,69 @@ void TestLaunchValidator::tableSettingsAreValidated()
     QCOMPARE(int(validateOptionsWithDetail(substitution, &detail)),
              int(LaunchValidator::LaunchError::InvalidTableSetting));
     QCOMPARE(detail, QStringLiteral("identity=0"));
+
+    // The flags are feed booleans: the typed field takes the same spellings
+    // as the extra line, and the conflict reads either of them - typed plus
+    // extra, extra plus typed, and extra plus extra.
+    const QStringList trueSpellings{QStringLiteral("1"), QStringLiteral("yes"),
+                                    QStringLiteral("true"), QStringLiteral("on")};
+    const QStringList falseSpellings{QStringLiteral("0"), QStringLiteral("no"),
+                                     QStringLiteral("false"), QStringLiteral("off")};
+    for (const QString &yes : trueSpellings) {
+        for (const QString &no : falseSpellings) {
+            HashcatOptions typed = clean;
+            typed.tableSingle = yes;
+            typed.tableIdentity = no;
+            QCOMPARE(int(validateOptionsWithDetail(typed, &detail)),
+                     int(LaunchValidator::LaunchError::InvalidTableSetting));
+            QCOMPARE(detail, QStringLiteral("identity=") + no);
+
+            HashcatOptions typedSingle = clean;
+            typedSingle.tableSingle = yes;
+            typedSingle.tableIdentity.clear();
+            typedSingle.tableExtraSettings = QStringList{QStringLiteral("identity=") + no};
+            QCOMPARE(int(validateOptionsWithDetail(typedSingle, &detail)),
+                     int(LaunchValidator::LaunchError::InvalidTableSetting));
+            QCOMPARE(detail, QStringLiteral("identity=") + no);
+
+            HashcatOptions typedIdentity = clean;
+            typedIdentity.tableSingle.clear();
+            typedIdentity.tableIdentity = no;
+            typedIdentity.tableExtraSettings = QStringList{QStringLiteral("single=") + yes};
+            QCOMPARE(int(validateOptionsWithDetail(typedIdentity, &detail)),
+                     int(LaunchValidator::LaunchError::InvalidTableSetting));
+            QCOMPARE(detail, QStringLiteral("identity=") + no);
+
+            HashcatOptions extra = clean;
+            extra.tableSingle.clear();
+            extra.tableIdentity.clear();
+            extra.tableExtraSettings =
+                QStringList{QStringLiteral("single=") + yes, QStringLiteral("identity=") + no};
+            QCOMPARE(int(validateOptionsWithDetail(extra, &detail)),
+                     int(LaunchValidator::LaunchError::InvalidTableSetting));
+            QCOMPARE(detail, QStringLiteral("identity=") + no);
+        }
+    }
+
+    // The same spellings without the conflict are valid settings, and a
+    // spelling the feed does not know is refused - case-sensitive, like the
+    // feed's own comparison.
+    HashcatOptions spelled = clean;
+    spelled.tableSingle = QStringLiteral("true");
+    spelled.tableIdentity = QStringLiteral("yes");
+    spelled.tableTemplate = QStringLiteral("off");
+    QCOMPARE(int(::validateOptions(spelled).code), int(LaunchValidator::LaunchError::None));
+
+    HashcatOptions noConflict = clean;
+    noConflict.tableSingle = QStringLiteral("on");
+    noConflict.tableIdentity = QStringLiteral("on");
+    QCOMPARE(int(::validateOptions(noConflict).code), int(LaunchValidator::LaunchError::None));
+
+    HashcatOptions badSpelling = clean;
+    badSpelling.tableSingle = QStringLiteral("TRUE");
+    QCOMPARE(int(validateOptionsWithDetail(badSpelling, &detail)),
+             int(LaunchValidator::LaunchError::InvalidTableSetting));
+    QCOMPARE(detail, QStringLiteral("single=TRUE"));
 
     // cap and maxperm reach beyond every Qt integer type, so their bounds
     // are checked here, not by a spin box.
