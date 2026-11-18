@@ -381,12 +381,9 @@ void MainWindow::configureWidgets()
     ui->lineEdit_opencl_device_types->setToolTip(deviceTypeTip);
 }
 
-// Every widget whose value reaches the command line is connected here
-// exactly once, from the same walk the serializer uses. Controls that also
-// enable fields, open dialogs or change the gating get their own connection
-// elsewhere; that second connection is the side effect, not a second preview
-// update. The attack mode combo is the one exception: it refreshes the
-// preview through attackIndexChanged().
+// Every widget whose value reaches the command line is connected here, once.
+// Controls that also enable fields or change the gating get their own
+// connection; the attack combo refreshes the preview via attackIndexChanged().
 void MainWindow::connectCommandSignals()
 {
     const StateWidgetLists widgets = collectStateWidgets(this);
@@ -421,7 +418,6 @@ void MainWindow::connectCommandSignals()
 
     // The hash file also drives the outfile suggestion.
     connect(ui->lineEdit_hashfile, &QLineEdit::textChanged, this, &MainWindow::hashFileTextChanged);
-    // The recipe row belongs to hash mode 4000 alone; the combo decides.
     connect(ui->comboBox_hash_type, &QComboBox::currentIndexChanged, this,
             &MainWindow::updateHashTypeDependencies);
 }
@@ -588,10 +584,6 @@ void MainWindow::bindDisabled(QAbstractButton *toggle, const QList<QWidget *> &t
 
 MainWindow::~MainWindow()
 {
-    // The controllers own connections into the list models. ~QListWidget
-    // resets its model while the connections still run, so they have to be
-    // gone before delete ui - being a child of the list would not help,
-    // rowsRemoved fires before ~QObject disconnects.
     m_wordlistList.reset();
     m_pcfgRulesetList.reset();
     m_tableList.reset();
@@ -611,12 +603,9 @@ void MainWindow::showEvent(QShowEvent *event)
     }
 }
 
-// Give the window the size the tabs need: the tallest tab decides the height,
-// the widest one the width. A shorter tab keeps an empty strip; a taller one
-// gets a scrollbar only when the screen is too small. The attack tab is
-// measured across every mode, not only the selected one: its groups are
-// hidden per mode, and a mode the user switches to later must not turn the
-// window into a scroll area.
+// Size the window for every tab: the tallest sets the height, the widest the
+// width, and the attack tab is measured across all modes so switching modes
+// cannot introduce a scrollbar.
 void MainWindow::fitToContent()
 {
     QWidget *currentTab = ui->tabWidget_main->currentWidget();
@@ -653,11 +642,8 @@ void MainWindow::fitToContent()
         QSize minimum;
     };
 
-    // The width decides how far a wrapping widget - the mode hint - rewraps,
-    // and its wrapped height in turn decides whether a tab needs room for a
-    // vertical scrollbar, which adds to the width. Measure once without
-    // wrapping, then again at the width the first pass chose, and repeat
-    // while the width is still moving.
+    // The width decides how far the mode hint rewraps, its wrapped height
+    // whether a scrollbar is needed; iterate until the width settles.
     QSize target;
     int contentWidth = 0;
     for (int pass = 0; pass < 3; ++pass) {
@@ -678,9 +664,7 @@ void MainWindow::fitToContent()
             activateLayouts(area->widget());
             QSize minimum = area->widget()->minimumSizeHint();
             if (contentWidth > 0) {
-                // A wrapping widget announces a single line in its minimum
-                // size hint; the height it needs at the tab width is a
-                // heightForWidth() question, which the layouts pass up.
+                // Wrapping labels report one line; ask for the real height.
                 const int wrapped = area->widget()->heightForWidth(contentWidth);
                 if (wrapped > minimum.height()) {
                     minimum.setHeight(wrapped);
@@ -727,15 +711,9 @@ void MainWindow::fitToContent()
     resize(target);
 }
 
-// The window must hold every attack mode without a scrollbar, but the tab
-// only reports the selected mode's minimum: the groups the other modes use are
-// hidden. Walk every mode once, with updates off, and take the largest minimum
-// in each direction. The widest and the tallest mode need not be the same one.
-//
-// A wrapping widget (the mode hint) announces one line in its minimum size
-// hint, no matter how long its text is: wrapWidth is the content width it
-// wraps at, so that the height it really needs enters the envelope. Zero
-// measures without that correction, for the caller that has no width yet.
+// The largest minimum over every mode, because the tab reports only the
+// selected one's. wrapWidth is the content width the mode hint wraps at; zero
+// means the caller has no width yet and no wrapping correction is applied.
 QSize MainWindow::attackModeEnvelope(int wrapWidth)
 {
     QWidget *content = ui->scrollArea_attack->widget();
@@ -776,7 +754,6 @@ QSize MainWindow::attackModeEnvelope(int wrapWidth)
 
 /*************** Menu Bar ***************/
 
-// File → Export
 void MainWindow::exportTriggered()
 {
     const QString file = QFileDialog::getSaveFileName(
@@ -797,7 +774,6 @@ void MainWindow::exportTriggered()
     }
 }
 
-// File → Import
 void MainWindow::importTriggered()
 {
     const QString file = QFileDialog::getOpenFileName(this, tr("Import session"), suggestedFolder(),
@@ -834,11 +810,6 @@ void MainWindow::importTriggered()
     }
 }
 
-// Applies the values of a session file to the widgets and collects the notes
-// about what could not be applied.
-//
-// The caller decides what to do with the notes: an import has a headline, the
-// auto-load stays quiet when there is nothing to say.
 QStringList MainWindow::applySessionFile(const StateFile::Document &document)
 {
     // A retired widget's value cannot be applied, but it is not news: every
@@ -865,7 +836,6 @@ QStringList MainWindow::applySessionFile(const StateFile::Document &document)
     return notes;
 }
 
-// File → Export Settings
 void MainWindow::exportSettingsTriggered()
 {
     const QString file = QFileDialog::getSaveFileName(
@@ -886,7 +856,6 @@ void MainWindow::exportSettingsTriggered()
     }
 }
 
-// File → Import Settings
 void MainWindow::importSettingsTriggered()
 {
     const QString file = QFileDialog::getOpenFileName(this, tr("Import settings"),
@@ -943,8 +912,7 @@ void MainWindow::loadExampleSession(AttackMode mode)
         return;
     }
 
-    // Loading the example replaces the session the user has set up in the
-    // form, so it is only carried out after the user confirmed it.
+    // Loading replaces the form, so confirm first.
     const auto answer = QMessageBox::question(
         this, tr("Load example session"),
         tr("Load the %1 example? The current session is lost.\n\n"
@@ -987,8 +955,6 @@ void MainWindow::loadExampleSession(AttackMode mode)
 // Tools → Reset Session
 void MainWindow::resetSessionTriggered()
 {
-    // Resetting throws away the session the user has set up in the form,
-    // so it is only carried out after the user confirmed it.
     const auto answer =
         QMessageBox::question(this, tr("Reset session"),
                               tr("Reset every field to its default? The current session is lost."),
@@ -1023,7 +989,6 @@ void MainWindow::resetSessionTriggered()
     commandChanged();
 }
 
-// File → Settings
 void MainWindow::settingsTriggered()
 {
     SettingsDialog settingsDialog(this);
@@ -1032,35 +997,27 @@ void MainWindow::settingsTriggered()
     }
 }
 
-// File → Quit
 void MainWindow::quitTriggered()
 {
     qApp->quit();
 }
 
-// Help → About Qt
 void MainWindow::aboutQtTriggered()
 {
     QApplication::aboutQt();
 }
 
-// Help → About
 void MainWindow::aboutTriggered()
 {
     AboutDialog about(this);
     about.exec();
 }
 
-// Path to the session JSON
 QString MainWindow::sessionFile() const
 {
     return StateFile::sessionFilePath();
 }
 
-// Whether the application keeps the session between two runs.
-//
-// The user can ask for a fresh form at every start, and then there is
-// nothing to restore and nothing to store.
 bool MainWindow::restoreSessionEnabled() const
 {
     return SettingsManager::instance().getKey<bool>(
@@ -1068,12 +1025,10 @@ bool MainWindow::restoreSessionEnabled() const
         AppConstants::SettingsKeys::defaultOf<bool>(AppConstants::SettingsKeys::RestoreSession));
 }
 
-// Restores the session once, between construction and show(): the window
-// must not paint the default state first, and the first fitToContent() has
-// to measure the restored content. The flag means "the restore pass ran",
-// not "a file was applied" - it is set before loadSession()'s early returns,
-// so the aboutToQuit save still stores the "no file yet" case. A second call
-// is a no-op: applying twice would consume the pending hash type again.
+// Restores the session once, before show(): the window must not paint the
+// default state first, and the first fit has to measure the restored content.
+// The flag means the pass ran, not that a file was applied; a second call is
+// a no-op.
 void MainWindow::restoreSession()
 {
     if (m_sessionRestored) {
@@ -1083,7 +1038,6 @@ void MainWindow::restoreSession()
     loadSession();
 }
 
-// Load the session - called from restoreSession()
 void MainWindow::loadSession()
 {
     if (!restoreSessionEnabled()) {
@@ -1135,15 +1089,9 @@ bool MainWindow::hasPendingHashType() const
            || m_pendingHashTypeId == AppConstants::Hashcat::AutoDetectHashType;
 }
 
-// The hash type of a session.
-//
-// The mapping applies it when the list of hash types is there; this only
-// checks whether this hashcat knows the one the file names, and it waits for
-// the list while the query that fills it is still on its way.
-//
-// A hash type this hashcat does not know falls back to Auto-detect: selecting
-// another real type would crack with the wrong algorithm, while Auto-detect
-// leaves the decision to hashcat and says so in the UI.
+// The hash type a session names. It waits for the list while the query is in
+// flight; an id this hashcat does not know falls back to Auto-detect rather
+// than picking another real type that would crack with the wrong algorithm.
 QString MainWindow::restoreHashType(const QJsonObject &values)
 {
     const int id = values.value(QStringLiteral("comboBox_hash_type")).toInt(-1);
@@ -1186,9 +1134,6 @@ void MainWindow::updateHashTypeDependencies()
     ui->lineEdit_hash_recipe->setVisible(recipe);
 }
 
-// Applies the hash type a session asked for, or the fallback when the session
-// named none, now that the list exists. A real id the binary does not know
-// gives way to Auto-detect and earns a warning; Auto-detect itself is silent.
 QString MainWindow::applyPendingHashType(int fallbackId, bool fromSession)
 {
     const int pending = m_pendingHashTypeId;
@@ -1220,13 +1165,9 @@ QString MainWindow::applyPendingHashType(int fallbackId, bool fromSession)
     return problem;
 }
 
-// The values a session file gets from the form. One correction belongs to
-// the hash type: while the query that fills the combo has not answered, the
-// id the restored session named is still pending - the combo holds no
-// selection (or Auto-detect alone after a failure), and storing that would
-// silently drop the type the session asked for. The pending id is the value
-// the user configured; once a query succeeds it is consumed and the applied
-// selection is stored as usual.
+// The values a save writes. While the hash type query has not answered, the
+// session's id is still pending and not in the combo, so store the pending id
+// instead of the empty selection.
 QJsonObject MainWindow::sessionValues()
 {
     QJsonObject values = SessionTransfer::toDocument(this);
@@ -1237,7 +1178,6 @@ QJsonObject MainWindow::sessionValues()
     return values;
 }
 
-// Save the session – called by aboutToQuit signal
 void MainWindow::saveSession()
 {
     // A session that was never restored must not be overwritten by a blank
@@ -1275,12 +1215,6 @@ void MainWindow::saveSession()
     }
 }
 
-// Whether this version understands the session file.
-//
-// A file it can read and whose format version it knows may be written over:
-// it is the session of an earlier run, or of this one. A file it cannot read
-// at all, or one that holds a format version this build does not know, was
-// written by another version and is left alone.
 bool MainWindow::sessionFileIsUnderstood(const QString &file) const
 {
     const StateFile::Document document = StateFile::readDocument(
@@ -1311,8 +1245,6 @@ void MainWindow::initAttackModes()
     }
 }
 
-// Starts the hash-type query for the configured binary. Never touches the
-// attack combo - the mode the user selected survives a settings change.
 void MainWindow::reloadHashTypes()
 {
     const QString hashcatPath =
@@ -1334,10 +1266,6 @@ void MainWindow::reloadHashTypes()
     m_hashTypeLoader.reload(resolved);
 }
 
-// The permanent first entry of the hash type combo. It is a GUI-only sentinel:
-// CommandBuilder turns it into an omitted -m, which is how hashcat autodetect
-// is requested. Added programmatically so the constructor-time default
-// snapshot stays unchanged.
 void MainWindow::addAutoDetectHashType()
 {
     ui->comboBox_hash_type->addItem(tr("Auto-detect"), AppConstants::Hashcat::AutoDetectHashType);
@@ -1378,7 +1306,6 @@ void MainWindow::updateViewAttackMode()
     commandChanged();
 }
 
-// The attack mode the user selected.
 AttackMode MainWindow::currentAttackMode() const
 {
     return static_cast<AttackMode>(ui->comboBox_attack->currentData().toInt());
@@ -1602,8 +1529,6 @@ void MainWindow::copyCommandToClipboard()
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard) {
         clipboard->setText(text);
-        // A one-shot tooltip confirms the copy. The button's own tooltip
-        // would not re-render while the pointer stays on the button.
         QToolTip::showText(QCursor::pos(), tr("Copied to the clipboard"),
                            ui->pushButton_copy_clipboard, {}, 2000);
     }

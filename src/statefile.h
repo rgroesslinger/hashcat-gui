@@ -13,10 +13,8 @@
 #include <QStringList>
 #include <cstdint>
 
-// A file the application writes and reads again: the session it keeps between
-// two runs and the settings the user exports share one shape.
-//
-// The file is a JSON object with the sections it holds:
+// A file the application writes and reads again: the session between two runs
+// and the exported settings share one shape.
 //
 //   {
 //     "sections": {
@@ -24,16 +22,12 @@
 //     }
 //   }
 //
-// The envelope - the shape of the file as a whole - is frozen. A change to it
-// would make every file of an older version unreadable, and the version of a
-// section cannot protect it, because the version lives inside the section.
-//
-// The class owns the envelope and nothing else: it does not know which
-// widgets or which settings a section holds, and it does not know the version
-// of one - the caller passes it in and compares what it reads.
+// The envelope is frozen: an older version cannot read a changed one, and a
+// section's version lives inside the section, so it cannot protect the
+// envelope. The class owns the envelope only; the caller passes in and
+// compares section versions.
 class StateFile
 {
-    // The messages of the class end up in dialogs opened by the caller
     Q_DECLARE_TR_FUNCTIONS(StateFile)
 
 public:
@@ -70,16 +64,10 @@ public:
     static Document readDocument(const QString &filename, QLatin1StringView section,
                                  int maxVersion);
 
-    // Writes the values into the file as the section of the given name.
-    //
-    // The file is replaced as a whole, not merged into: a section a previous
-    // write put there is gone, so the caller decides everything the file
-    // holds. A file holds one section today; a combined file would be an
-    // explicit write of all its sections, never a merge into one that already
-    // exists, which would keep stale or foreign sections alive.
-    //
-    // The write is atomic: a crash in the middle leaves the old file alone
-    // instead of a truncated one.
+    // Writes the values as the named section, replacing the file: a section a
+    // previous write put there is gone, and a combined file would be an
+    // explicit write, never a merge. The write is atomic, so a crash leaves
+    // the old file intact.
     static bool write(const QString &filename, QLatin1StringView section, int version,
                       const QJsonObject &values, QString *errorMessage);
 

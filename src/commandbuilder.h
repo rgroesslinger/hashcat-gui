@@ -14,10 +14,8 @@
 
 // Turns a HashcatOptions into the hashcat argument vector.
 //
-// The order of the arguments is stable on purpose: it is what the command
-// preview shows, what gets copied to the clipboard and what the tests assert
-// on. Every option that the UI leaves at its default value is left out, so
-// the preview does not grow a pile of "1,2", "-c 32" style noise.
+// The order is stable: the preview, the clipboard and the tests depend on it.
+// Options at their default are left out, so the preview stays readable.
 class CommandBuilder
 {
 public:
@@ -69,12 +67,9 @@ public:
         Count,
     };
 
-    // What an attack mode needs from the user before hashcat can run.
-    //
-    // The numbers come from hashcat's own argument validation: combination
-    // mode multiplies two word lists and refuses every other number, the
-    // table feed takes exactly one wordlist and every table after it, the
-    // mask based modes brute-force a mask.
+    // What an attack mode needs from the user. The numbers come from hashcat's
+    // own validation: combination multiplies two word lists, the table feed
+    // takes one wordlist and every table, the mask modes a mask.
     struct ModeRequirements {
         // How many word lists the mode reads at least.
         int minWordlists = 0;
@@ -122,11 +117,7 @@ public:
     static bool attackUsesHexWordlist(AttackMode mode);
     static bool attackUsesWordlistEncoding(AttackMode mode);
 
-    // What the attack mode needs from the user, see ModeRequirements.
-    //
-    // The answer is derived from the predicates above, so the group boxes,
-    // the mode hint and the launch validation cannot tell the user different
-    // things about the same mode.
+    // What the attack mode needs, see ModeRequirements.
     static ModeRequirements modeRequirements(AttackMode mode);
 
     // The command line spelling of a hashcat option: the short form when

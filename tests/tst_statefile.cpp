@@ -145,9 +145,7 @@ void TestStateFile::writingASectionReplacesTheFile()
 }
 
 // The values are written as UTF-8, so the bytes on disk are the encoded
-// characters and a reader that is not this program sees the same text. The
-// literals are \u escapes, so the test does not depend on the encoding of its
-// own source file.
+// characters and a reader that is not this program sees the same text.
 void TestStateFile::theValuesAreWrittenAsUtf8()
 {
     const QString path = scratchFile(QStringLiteral("utf8.json"));
@@ -334,7 +332,6 @@ void TestStateFile::nameListFormatsTheNames()
              QStringLiteral("a, b and c"));
 }
 
-// More names than fit in a line: the first ones and the number of the rest.
 void TestStateFile::nameListCountsTheNamesItLeavesOut()
 {
     QStringList names;

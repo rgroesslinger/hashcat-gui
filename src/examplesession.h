@@ -17,7 +17,6 @@
 // stay with the caller.
 class ExampleSession
 {
-    // The unpacking failures end up in dialogs opened by the caller
     Q_DECLARE_TR_FUNCTIONS(ExampleSession)
 
 public:

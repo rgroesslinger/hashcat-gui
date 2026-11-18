@@ -51,13 +51,11 @@ void TestCommandPreview::formatJoinsTheBinaryAndTheArguments()
     QCOMPARE(CommandPreview::format(QString(), {}, Dialect::PowerShell), QString());
 }
 
-// One token per row, quoted the way each shell reads it: both dialects leave
-// literal tokens bare and single-quote the rest, with a POSIX '\'' splice, a
-// doubled PowerShell quote and a base64 expression for the smart quotes
-// PowerShell would take for delimiters. The two dialects disagree on commas
-// (POSIX leaves one bare, PowerShell quotes it because it starts an array) and
-// backslashes; both quote the wildcards pwsh expands on Unix. The recipe is no
-// special case - it is quoted by the same rules as every other token.
+// One token per row, quoted the way each shell reads it: literal tokens stay
+// bare, the rest are single-quoted (POSIX splice, doubled PowerShell quote,
+// base64 for smart quotes). The dialects differ on commas and backslashes;
+// both quote the wildcards pwsh expands on Unix, and the recipe follows the
+// same rules.
 void TestCommandPreview::formatQuotesTokensForTheShell_data()
 {
     QTest::addColumn<QString>("token");

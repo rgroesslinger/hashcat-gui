@@ -29,17 +29,13 @@ struct HashcatResult {
     QString standardError;
 };
 
-// Runs hashcat asynchronously; the caller attaches a QFutureWatcher and reads
-// the result in its finished handler:
+// Runs hashcat asynchronously. The caller attaches a QFutureWatcher:
 //   auto *w = new QFutureWatcher<HashcatResult>(this);
 //   connect(w, &QFutureWatcher<HashcatResult>::finished, this, ...);
 //   w->setFuture(HashcatRunner::execute(path, {"--help"}));
-//
-// The path is a parameter, read on the calling thread: QSettings is only
-// reentrant, and the worker below runs on the thread pool.
+// The path is read on the calling thread; the worker runs on the thread pool.
 class HashcatRunner
 {
-    // The failure strings end up in dialogs opened by the caller
     Q_DECLARE_TR_FUNCTIONS(HashcatRunner)
 
 public:

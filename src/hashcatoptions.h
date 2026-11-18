@@ -44,12 +44,9 @@ inline constexpr auto AllAttackModes = std::to_array<AttackMode>({
 
 // One UI independent description of a hashcat invocation.
 //
-// MainWindow fills it from the widgets, CommandBuilder turns it into an
-// argument vector, which makes the argument rules testable without a window
-// and keeps the gating rules - which attack mode contributes a wordlist, a
-// mask or a custom charset - in the builder instead of in the group boxes.
-//
-// The member defaults are what the widgets in mainwindow.ui start with.
+// MainWindow fills it from the widgets and CommandBuilder turns it into argv,
+// so the argument rules are testable without a window and the gating stays in
+// the builder. The member defaults are the widgets' start values.
 struct HashcatOptions {
     bool useShortParameters = false;
 

@@ -16,15 +16,11 @@ namespace Ui
 class MainWindow;
 }
 
-// The attack mode's face on the form: which groups the mode uses, and the
-// hint that says what it expects. Mode gating only - the option dependencies
-// that follow a checkbox, not the mode, stay with the window.
-//
-// The very predicates CommandBuilder applies decide the visibility, so the
-// widgets show exactly the options that end up in the command line and the
-// two can never drift apart. Groups are hidden rather than disabled so the
-// form only shows the options the mode uses; the window keeps room for the
-// busiest mode anyway, see MainWindow::attackModeEnvelope().
+// The attack mode's face on the form: which groups it uses and the hint that
+// says what it expects. Mode gating only; option dependencies stay with the
+// window. CommandBuilder's predicates decide visibility, so the widgets show
+// exactly what reaches the command line, and hidden groups leave the form to
+// the mode while the window keeps room for the busiest one.
 class AttackModeView
 {
     // The mode names and hints are the unit's own texts
@@ -37,13 +33,11 @@ public:
     // example submenu so the two cannot drift apart.
     static QString name(AttackMode mode);
 
-    // What the user has to provide for the mode, in the wording of
-    // CommandBuilder::modeRequirements(), so the hint and the launch
-    // validation cannot tell the user different things. The label wraps at
-    // the tab width, so the texts stay free of line breaks and translations
-    // can rewrap. A wrapped label reports one line in its minimum size hint,
-    // so the fit reserves its height through heightForWidth(); see
-    // attackModeEnvelope() and fitToContent().
+    // What the user has to provide, in CommandBuilder::modeRequirements()'s
+    // wording, so the hint and the launch validation agree. The label wraps at
+    // the tab width and stays free of line breaks; a wrapped label reports one
+    // line, so the fit reserves its height through heightForWidth() (see
+    // attackModeEnvelope()).
     static QString hint(AttackMode mode);
 
     // Shows the groups the mode uses, hides the rest, and sets the hint.

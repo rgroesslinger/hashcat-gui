@@ -173,16 +173,11 @@ void TestMainWindow::attackModeIdsTravelAsItemData()
     }
 }
 
-// Which widgets each mode shows. The predicates are the same ones the
-// builder emits with, so what the user sees and what reaches the command
-// line can never drift apart; the same table tst_commandbuilder::predicates
-// pins for the builder.
-//
-// The mode-specific groups are hidden, not disabled: a disabled group still
-// takes its share of the tab, so the window would keep the height of its
-// busiest mode in every other one. A hidden widget reports isHidden(); the
-// window itself is never shown here, so isVisible() would answer for the
-// window, not for the gating.
+// Which widgets each mode shows. The predicates are the builder's own, so the
+// form and the command line cannot drift apart; tst_commandbuilder::predicates
+// pins the same table. Groups are hidden, not disabled, because a disabled
+// group still takes its share of the tab. A hidden widget reports isHidden();
+// the window is never shown here, so isVisible() would answer for the window.
 void TestMainWindow::widgetsFollowTheBuilderPredicates()
 {
     MainWindow window;
@@ -632,8 +627,6 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
     };
 
     for (int i = 0; i < MainWindowTestAccess::ui(window)->comboBox_attack->count(); ++i) {
-        // -1 first, so that every iteration really changes the index and runs
-        // attackIndexChanged()
         MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(-1);
         MainWindowTestAccess::ui(window)->comboBox_attack->setCurrentIndex(i);
 
@@ -654,11 +647,9 @@ void TestMainWindow::modeHintFollowsTheAttackMode()
     }
 }
 
-// The launch validation works on what the window collects, so the two have to
-// agree: what the widgets show is what the validation complains about.
-// The recipe row belongs to hash mode 4000 alone, and the recipe is one
-// argument - the preview quotes it so a copied command does not split at
-// its spaces.
+// The launch validation works on what the window collects: what the widgets
+// show is what it complains about. The recipe row exists only for hash mode
+// 4000, and the recipe is one quoted argument.
 void TestMainWindow::hashRecipeRowFollowsTheHashType()
 {
     MainWindow window;
@@ -985,9 +976,6 @@ void TestMainWindow::missingWordlistsAreMarked()
     QVERIFY(QDir().mkpath(directoryPath));
     QVERIFY(writeFile(QDir(directoryPath).filePath(QStringLiteral("words.txt"))));
 
-    // A configured path keeps the constructor from queueing the settings
-    // dialog; the test spins the event loop below. The watchdog closes the
-    // query's failure warning, whose modal loop would otherwise swallow it.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/nonexistent/hashcat"));
     m_fixture.startWatchdog();
@@ -1153,9 +1141,6 @@ void TestMainWindow::folderPathsAreMarked()
     const QString emptyFolder = directory.filePath(QStringLiteral("empty"));
     QVERIFY(QDir().mkpath(emptyFolder));
 
-    // A configured path keeps the constructor from queueing the settings
-    // dialog; the test spins the event loop below. The watchdog closes the
-    // query's failure warning, whose modal loop would otherwise swallow it.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/nonexistent/hashcat"));
     m_fixture.startWatchdog();
@@ -1665,10 +1650,8 @@ void TestMainWindow::switchingTheAttackModeRebuildsThePreviewOnce()
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
 }
 
-// The list owners must be gone before delete ui: ~QListWidget resets its
-// model while the handlers still run, and a handler reading a dead member is
-// a crash. Rows in every list make the reset fire; the run under ASan is the
-// real proof.
+// The list owners are gone before delete ui; rows in every list make the model
+// reset fire. ASan is the real proof.
 void TestMainWindow::destroyingTheWindowWithListRowsIsSafe()
 {
     auto window = std::make_unique<MainWindow>();

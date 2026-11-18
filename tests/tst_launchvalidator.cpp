@@ -634,7 +634,6 @@ void TestLaunchValidator::tableSettingsAreValidated()
     clean.tableMaxperm = QStringLiteral("1048576");
     QCOMPARE(int(::validateOptions(clean).code), int(LaunchValidator::LaunchError::None));
 
-    // The three flags: empty (the default), 0 or 1.
     HashcatOptions flag = clean;
     flag.tableTemplate = QStringLiteral("2");
     QString detail;
@@ -642,7 +641,6 @@ void TestLaunchValidator::tableSettingsAreValidated()
              int(LaunchValidator::LaunchError::InvalidTableSetting));
     QCOMPARE(detail, QStringLiteral("template=2"));
 
-    // One substitution needs the other positions left alone.
     HashcatOptions substitution = clean;
     substitution.tableSingle = QStringLiteral("1");
     substitution.tableIdentity = QStringLiteral("0");

@@ -129,8 +129,7 @@ private:
     // on every mode change and once per mode by the envelope measurement.
     AttackModeView m_attackModeView;
 
-    // One controller per argument list: the rows, their checked state and
-    // the monitor decoration. Destroyed before delete ui, see the destructor.
+    // Destroyed before delete ui; see PathListController.
     std::unique_ptr<PathListController> m_wordlistList;
     std::unique_ptr<PathListController> m_pcfgRulesetList;
     std::unique_ptr<PathListController> m_tableList;
@@ -159,8 +158,8 @@ private:
     // Starts the hash-type query for the configured binary; never touches
     // the attack combo.
     void reloadHashTypes();
-    // The permanent first entry of the hash type combo. It is re-added on every
-    // refill and after every clear so autodetect stays discoverable.
+    // The permanent first entry: a GUI-only sentinel. A negative id omits -m,
+    // hashcat's only autodetect trigger.
     void addAutoDetectHashType();
     // Drops the current list, leaving only Auto-detect and no path or retry pending.
     void resetHashTypeCombo();
@@ -171,7 +170,6 @@ private:
     void initExampleSessionMenu();
     void updateViewAttackMode();
 
-    // The attack mode the user selected.
     [[nodiscard]] AttackMode currentAttackMode() const;
 
     // Applies the values of a session file to the widgets and collects the

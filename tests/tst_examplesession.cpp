@@ -17,7 +17,6 @@
 
 namespace
 {
-// The data paths a session names, with the <examples>/ token still in place.
 void collectPaths(const QJsonValue &value, QStringList *paths)
 {
     if (value.isString()) {

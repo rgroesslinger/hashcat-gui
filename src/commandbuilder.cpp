@@ -50,17 +50,10 @@ bool CommandBuilder::attackUsesRules(AttackMode mode)
            || mode == AttackMode::Association || mode == AttackMode::Hybrid;
 }
 
-// -j applies to the wordlist on the left. That is the only wordlist in modes
-// 0, 6 and 9, and the first one in combination mode. Modes 4 and 5 are left
-// out on purpose: their candidates come from the device engine, which refuses
-// --rule-left late, and upstream's own advice there is to use -r.
-//
-// Mode 7 is included because hashcat 8.0.0 applies -j to its single wordlist;
-// with the supplied binary, -a 7 -j c capitalizes the word and -k is ignored,
-// though hashcat's help and user_options.c say -k should apply. The gating
-// deliberately offers both fields for this mode and leaves the choice to the
-// user; pinned against hashcat v8.0.0 rather than changed on an upstream
-// contradiction.
+// -j applies to the left wordlist: the only one in modes 0, 6 and 9, and the
+// first in combination mode. Modes 4 and 5 use -r instead, because their
+// candidates come from the device engine. Mode 7 is included because hashcat
+// 8.0.0 applies -j there (though its help says -k), and the user chooses.
 bool CommandBuilder::attackUsesRuleLeft(AttackMode mode)
 {
     return mode == AttackMode::Straight || mode == AttackMode::Combination
@@ -163,12 +156,9 @@ void appendSetting(QStringList &arguments, QLatin1StringView key, const QString 
 
 } // namespace
 
-// What the user has to provide for the attack mode: hashcat's own argument
-// validation decides which numbers of word lists a mode accepts.
-//
-// The mask and the word lists come from the predicates above, so the group
-// boxes, the mode hint and the launch validation cannot tell the user
-// different things about the same mode.
+// What the mode needs from the user. hashcat's own argument validation
+// decides the accepted word-list counts. The mask and word lists come from
+// the predicates above, so groups, hint and launch validation agree.
 CommandBuilder::ModeRequirements CommandBuilder::modeRequirements(AttackMode mode)
 {
     ModeRequirements requirements;

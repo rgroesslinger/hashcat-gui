@@ -13,12 +13,9 @@
 
 // The bundled example sessions, one per supported attack mode.
 //
-// The table lives here rather than in appconstants.h because the attack mode
-// is an AttackMode, and hashcatoptions.h - which defines it - includes
-// appconstants.h. Keeping the two apart avoids that cycle. The data files are
-// resources: they are unpacked to the application data directory before a
-// session that names them is applied, because hashcat can only read real
-// paths.
+// The table lives here, not in appconstants.h, because AttackMode comes from
+// hashcatoptions.h, which includes appconstants.h. Data files are resources,
+// unpacked to the data directory before use: hashcat reads real paths.
 namespace Examples
 {
 struct Entry {

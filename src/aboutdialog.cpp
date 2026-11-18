@@ -67,13 +67,9 @@ void setLink(QLabel *label, QLatin1StringView url, const QString &text)
     setLinkText(label, url, link(url, text));
 }
 
-// Wraps the text into lines of at most width pixels.
-//
-// A label wraps its text at word boundaries only and does not tell its
-// layout how tall the result becomes. The version text is therefore wrapped
-// here - a word longer than the line is broken as well - and handed to the
-// label with the line breaks in it. The label can then report its size, and
-// the dialog grows with the text instead of cutting it off.
+// Wraps the text at word boundaries, breaking a word longer than the line.
+// The inserted breaks let the label report its height, so the dialog grows
+// with the text instead of cutting it off.
 QString wrapText(const QString &text, const QFont &font, int width)
 {
     QTextOption option;
@@ -179,11 +175,8 @@ void AboutDialog::copyDetailsClicked()
                        {}, 2000);
 }
 
-// What a bug report needs: the version of the application, of the toolkit
-// and of the system, and the hashcat it drives.
-//
-// The text goes into bug reports, so it is not translated - a report that
-// mixes languages is harder to read.
+// The versions for a bug report. Not translated: a report that mixes
+// languages is harder to read.
 QString AboutDialog::detailsText() const
 {
     QStringList details;
@@ -227,10 +220,8 @@ void AboutDialog::updateLinks()
     setLink(ui->label_link_hashcat_faq, AppConstants::Urls::HashcatFaq, tr("hashcat FAQ"));
 }
 
-// The license of the application.
-//
-// hashcat is a program of its own, with a license of its own; the dialog does
-// not distribute it, so it does not state its terms either.
+// hashcat has its own license; the dialog does not distribute it, so it does
+// not state its terms.
 void AboutDialog::updateLicense()
 {
     setLinkText(ui->label_license_gui, AppConstants::Urls::License,

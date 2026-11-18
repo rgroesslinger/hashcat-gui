@@ -68,9 +68,6 @@ private:
     MainWindowFixture m_fixture;
 };
 
-// The titles of the group boxes have to look alike. The alignment is the only
-// thing that decides it, and a group box without it would draw its title
-// above the frame while its neighbors break the border with it.
 void TestLayout::groupBoxesShareOneTitleAlignment()
 {
     MainWindow window;
@@ -78,10 +75,6 @@ void TestLayout::groupBoxesShareOneTitleAlignment()
     TestEnvironment::checkGroupBoxTitleAlignment(&window);
 }
 
-// A group box in a row is as tall as its tallest neighbor. Without the top
-// alignment Qt spreads the children of the shorter boxes over that height or
-// centers them, so two boxes next to each other would start their content at
-// different heights.
 void TestLayout::generalTabGroupBoxesAlignTheirContentToTheTop()
 {
     MainWindow window;
@@ -124,9 +117,7 @@ void TestLayout::attackTabGroupBoxesAlignTheirContentToTheTop()
 void TestLayout::windowFitsItsContent()
 {
     // A configured path keeps the constructor from queueing the settings
-    // dialog, whose modal loop would want the event loop this test spins. The
-    // path need not exist: the query it starts only ever fills the hash type
-    // combo, which stays empty and keeps the measured size stable.
+    // dialog; the path need not exist.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/nonexistent/hashcat"));
     m_fixture.startWatchdog();
@@ -147,14 +138,10 @@ void TestLayout::windowFitsItsContent()
     QVERIFY(generalArea->widget()->minimumSizeHint().width()
             > attackContent->minimumSizeHint().width());
 
-    // The size fitToContent() should have produced: the common window chrome
-    // plus the largest content minimum in each direction. A tab whose content
-    // is taller than the final viewport also needs room for its vertical
-    // scrollbar, otherwise it would show a horizontal one as well. The width
-    // decides how far the wrapping mode hint rewraps, and its wrapped height
-    // in turn decides the scrollbar - so the fit goes through the same
-    // passes: once without wrapping, then again at the width the pass before
-    // chose, while the width is still moving.
+    // The expected size: window chrome plus the largest content minimum in
+    // each direction. A tall tab also needs its vertical scrollbar, and the
+    // width decides how far the mode hint rewraps, so measure without
+    // wrapping, then at the chosen width, until the width settles.
     const QSize chrome = window.size() - attackArea->size();
     const QSize cap = window.screen()->availableGeometry().size() - QSize(40, 80);
 
@@ -256,11 +243,7 @@ void TestLayout::windowFitsItsContent()
         QTRY_VERIFY(attackArea->verticalScrollBar()->isVisible());
     }
 
-    // The hint under the mode selector wraps at the tab width, and the fit
-    // reserves the height that needs: a wrapping label announces a single
-    // line in its minimum size hint, no matter how long its text is. The
-    // checks above - no scrollbar for content that fits, no empty strip
-    // beyond the envelope - are what pin that accounting down.
+    // The hint wraps at the tab width and the fit reserves the wrapped height.
     QVERIFY(MainWindowTestAccess::ui(window)->label_mode_hint->wordWrap());
 }
 

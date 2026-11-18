@@ -106,14 +106,10 @@ private:
     MainWindowFixture m_fixture;
 };
 
-// The reset has to bring every widget that holds a value back to its
-// default - and only after the user confirmed it, so the box is answered
-// here.
-//
-// The test does not know the widgets: it changes every one of them, resets
-// the form and compares the whole state with a fresh window. A widget the
-// reset forgets - now or after it is added - shows up as a difference, and
-// the list of widgets does not have to be kept in two places.
+// The reset brings every widget back to its default, only after the user
+// confirmed. The test changes every widget, resets and compares the whole
+// state with a fresh window, so a forgotten widget shows up as a difference
+// without keeping the widget list in two places.
 void TestSession::resetSessionRestoresEveryWidget()
 {
     MainWindow fresh;
@@ -647,9 +643,8 @@ void TestSession::theImportNamesTheValuesTheSessionDoesNotKnow()
 
     QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
 
-    // The value that named a widget was applied...
     QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 64);
-    // ... and the one that named nothing is named in the notes.
+    // The name that was never ours is named in the notes.
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
 }
@@ -687,9 +682,8 @@ void TestSession::theImportIgnoresRetiredWidgetNames()
 
     QVERIFY(QMetaObject::invokeMethod(&window, "importTriggered"));
 
-    // The value that named a widget was applied...
     QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 64);
-    // ... the name that was never ours is still named...
+    // The name that was never ours is still named.
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
     // ... and the retired ones are not.
@@ -880,9 +874,8 @@ void TestSession::anOlderStartupSessionIsAppliedWithANote()
     MainWindow window;
     window.restoreSession();
 
-    // The value that named a widget was applied...
     QCOMPARE(MainWindowTestAccess::ui(window)->spinBox_runtime->value(), 64);
-    // ... and the note says that the file was made by an older version.
+    // The note says that the file was made by an older version.
     QVERIFY(recorder.messageBoxSeen);
     QCOMPARE(recorder.title, QStringLiteral("Session warning"));
     QVERIFY(recorder.text.contains(QStringLiteral("older version")));

@@ -290,9 +290,6 @@ void TestCommandBuilder::uiDefaultsAreNotRepeated()
     QCOMPARE(CommandBuilder::build(options), full);
 }
 
-// --hex-charset describes masks and custom charsets. The PCFG feed takes the
-// same markers in its mask= setting, so mode 4 emits it as well; mode 8 has
-// no mask field, and in the other modes hashcat would accept and ignore it.
 void TestCommandBuilder::hexCharsetFollowsTheCharsetModes()
 {
     const QList<AttackMode> modes{
@@ -674,11 +671,8 @@ void TestCommandBuilder::expandOutfileTemplateSubstitutesUnixTimeAndHash()
              QStringLiteral("<UNIXTIME>.txt"));
 }
 
-// A mask describes a password, and a password may hold anything - including
-// characters outside ASCII. The mask, charset and paths have to reach the
-// argument vector unchanged, as the UTF-8 bytes the operating system hands to
-// hashcat. The literals are \u escapes, so the test does not depend on its own
-// source encoding.
+// A password may hold characters outside ASCII: the mask, charset and paths
+// must reach argv as the UTF-8 bytes the operating system hands to hashcat.
 void TestCommandBuilder::nonAsciiArgumentsSurviveVerbatim()
 {
     const QString mask = QStringLiteral("Passw\u00f6rd?d");       // Passwörd?d

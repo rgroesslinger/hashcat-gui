@@ -969,12 +969,10 @@ void TestTerminalCatalog::unixWrapperRunsHashcatInItsDirectoryWithTheArguments()
 #endif
 }
 
-// Ctrl-C goes to the whole foreground process group. hashcat handles it and
-// exits, but dash has no handler and would die with it, closing the terminal
-// before the status line. The wrapper traps INT with a handler (never an
-// ignored signal, which the child would inherit), so the status and the
-// prompt always appear. Run under every sh on the machine, with the wrapper's
-// `sh` resolved through a one-entry PATH.
+// Ctrl-C goes to the whole foreground process group. hashcat handles it, but
+// dash would die and close the terminal before the status line. The wrapper
+// traps INT (never an ignored signal, which the child would inherit), so the
+// status and prompt always appear. Run under every sh on the machine.
 void TestTerminalCatalog::unixWrapperSurvivesInterrupt()
 {
 #ifdef Q_OS_WIN

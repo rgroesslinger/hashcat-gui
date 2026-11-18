@@ -42,10 +42,7 @@ public:
     QStringList applyImportedSettings(const QJsonObject &settings);
 
 protected:
-    // The dialog opens as large as its content. The height of the
-    // word-wrapped labels is only known once they have been polished, so the
-    // fit happens when the dialog is shown - once per open, so that a window
-    // the user has resized in the meantime is left alone.
+    // Fits the dialog once, on its first show.
     void showEvent(QShowEvent *event) override;
 
 private slots:
@@ -65,24 +62,18 @@ private:
         Imported,
     };
 
-    // The tests read the widget state through the Ui the same way the main
-    // window's tests do: friendship keeps it private instead of widening the
-    // dialog's public surface for their sake.
     friend class TestSettingsDialog;
 
-    // Applies one setting to the widget that shows it. Returns a note for the
-    // user, empty when there is nothing to say.
+    // Applies one setting to its widget. Returns a note when the value cannot
+    // be used; stored and imported values differ only in the fallback.
     QString applyValue(const QString &key, const QJsonValue &value, ValueSource source);
 
-    // Fills the rows that show where the settings and the session are stored.
     void updatePathLabels();
 
-    // Says what is wrong with the hashcat path or the terminal selection.
     void updateStatusLabels();
     void updateHashcatStatus();
     void updateTerminalStatus();
 
-    // The home directory as a tilde.
     static QString shortenPath(const QString &path);
 
     Ui::SettingsDialog *ui;

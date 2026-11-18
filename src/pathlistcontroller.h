@@ -14,14 +14,11 @@
 
 class QListWidget;
 
-// One argument list and its path monitor: the rows, their checked state,
-// and the decoration that says which paths hashcat can use. It takes paths
-// and never opens a dialog - the "Add ..." strings stay with the window.
+// One argument list, its checked rows and the monitor that says which paths
+// hashcat can use. It takes paths and never opens a dialog.
 //
-// Teardown: the controller must be destroyed or disconnected before the
-// list's ui is deleted. ~QListWidget resets its model while the connections
-// still run, and being a child of the list does not help - rowsRemoved fires
-// before ~QObject disconnects.
+// Destroy before the list's ui or disconnect: ~QListWidget resets its model
+// while the connections still run (rowsRemoved fires before ~QObject).
 class PathListController : public QObject
 {
     Q_OBJECT

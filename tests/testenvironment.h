@@ -27,23 +27,11 @@
 #include <QTimer>
 #include <QtTest/QTest>
 
-// Scratch state for a test process.
-//
-// One switch plus one path pin keep every writable location the tests touch
-// below the platform's test root: QStandardPaths::setTestModeEnabled(true)
-// moves the locations QStandardPaths resolves (Unix ~/.qttest,
-// Windows %APPDATA%\qttest for data and %LOCALAPPDATA%\qttest for config), and
-// QSettings is pointed at that same config root because Qt's IniFormat
-// resolution on Windows bypasses QStandardPaths. The application name gives
-// each suite its own directory below the roots; ctest runs suites in parallel
-// and the roots are fixed, so the per-executable name is what keeps one suite
-// from reading or deleting another's session, examples and settings.
-//
-// The roots persist across runs; nothing is deleted wholesale. Freshness is a
-// per-test property: MainWindowFixture::init() removes the session and the
-// unpacked examples before every test, and every fixture calls resetSettings()
-// to clear the ini. A run that crashed leaves at most those files, and the next
-// test removes or overwrites them.
+// Scratch state for a test process. QStandardPaths test mode puts every
+// writable location below the test root; QSettings is pinned there too
+// (IniFormat bypasses QStandardPaths on Windows), and the suite name separates
+// parallel ctest suites. Freshness is per test: the fixture removes the
+// session and examples, and resetSettings() clears the ini.
 namespace TestEnvironment
 {
 
@@ -262,11 +250,9 @@ private:
 
 // The title alignment every group box has to use.
 //
-// Qt 6 dropped QGroupBox::titlePosition, so the vertical bit of the title
-// alignment is the only lever left: with it the title breaks the top border
-// of the frame, without it the Fusion style pushes the frame below the title
-// and the title ends up above the box. A group box that forgets the property
-// therefore looks different from its neighbors.
+// Qt 6 dropped QGroupBox::titlePosition, so the vertical alignment bit is the
+// only lever: with it the title breaks the frame's top border, without it the
+// Fusion style pushes the frame below the title.
 inline Qt::Alignment groupBoxTitleAlignment()
 {
     return Qt::AlignLeft | Qt::AlignVCenter;
@@ -291,23 +277,11 @@ inline void checkGroupBoxTitleAlignment(QObject *root)
                             .arg(offenders.join(QStringLiteral(", ")))));
 }
 
-// Everything that needs the application instance and has to happen before the
-// first QSettings or QStandardPaths use: the suite name and the settings root.
-//
-// The application name doubles as the suite's directory below the test roots
-// and as the QSettings organization, which is what separates the parallel
-// ctest suites. It needs the application instance (applicationFilePath()
-// returns empty before it exists), so this runs right after the constructor -
-// the same place main.cpp names the real application. The organization name
-// stays unset: main.cpp documents that setting it would change
-// AppDataLocation.
-//
-// QSettings resolves IniFormat/UserScope through GenericConfigLocation on
-// Unix, so test mode already moves it; on Windows it reads
-// FOLDERID_RoamingAppData directly and ignores test mode. Pinning
-// GenericConfigLocation puts settings.ini below the test root on both
-// platforms (on Unix this is the default again, so there is one code path and
-// no #ifdef). QSettings appends the organization - the suite name - itself.
+// Runs right after the constructor, before the first QSettings or
+// QStandardPaths use. The application name is the suite's directory and the
+// QSettings organization, which separates parallel ctest suites, so it needs
+// the instance. The organization name stays unset (see main.cpp). QSettings
+// needs GenericConfigLocation pinned to reach the same root on Windows.
 inline void configureSuite()
 {
     QCoreApplication::setApplicationName(

@@ -12,8 +12,7 @@
 class Appearance
 {
 public:
-    // An empty scheme follows the system again - the desktop decides - while
-    // the other two force a light or a dark appearance.
+    // An empty scheme follows the system; the other two force light or dark.
     static void applyColorScheme(const QString &scheme);
 };
 

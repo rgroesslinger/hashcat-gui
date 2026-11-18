@@ -96,7 +96,6 @@ void TestAboutDialog::fitsItsContent()
 
     QCOMPARE(dialog.size(), dialog.sizeHint());
 
-    // The user may make the dialog whatever size they like afterwards.
     QVERIFY(dialog.minimumSize() != dialog.maximumSize());
 }
 
@@ -183,9 +182,6 @@ void TestAboutDialog::longVersionTextWrapsInsteadOfWidening()
     }
 }
 
-// The titles of the group boxes have to look alike. The alignment is the only
-// thing that decides it, and a group box without it would draw its title
-// above the frame while its neighbors break the border with it.
 void TestAboutDialog::groupBoxesShareOneTitleAlignment()
 {
     AboutDialog dialog;
@@ -236,8 +232,6 @@ void TestAboutDialog::showsTheLogoAndTheApplicationName()
     QVERIFY(!description->text().isEmpty());
 }
 
-// hashcat's answer is not markup: a message with "<" in it is shown as typed
-// instead of disappearing as if it were a tag.
 void TestAboutDialog::versionLabelShowsPlainText()
 {
     AboutDialog dialog;

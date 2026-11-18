@@ -14,11 +14,9 @@
 
 // Application wide constants.
 //
-// Everything that is a protocol token - a settings key, a file name, a
-// hashcat option, a placeholder - is a QLatin1StringView: ASCII, allocation
-// free, and still convertible to QString. User-visible text that may be
-// non-ASCII (the language names below) stays a UTF-8 const char * converted
-// with QString::fromUtf8() at the use site.
+// Protocol tokens are QLatin1StringView (ASCII, allocation free). User-visible
+// text that may be non-ASCII stays UTF-8 and is converted with
+// QString::fromUtf8().
 namespace AppConstants
 {
 
@@ -161,17 +159,11 @@ inline constexpr QLatin1StringView SettingsExport{"hashcat-gui-settings.json"};
 inline constexpr QLatin1StringView PreviewWidget{"lineEdit_command"};
 } // namespace Files
 
-// The session format.
-//
-// A session stores the widgets by their object name, so the names are part of
-// the format: a session written by another version of hashcat-gui can name
-// widgets that no longer exist. An older file is applied and the values it
-// cannot use are named; a file of a newer format is refused, because a name
-// that survived may mean something else there.
-//
-// A removed widget is not a rename: the version stays, and its name goes to
-// RetiredWidgetNames so that every session written before the removal loads
-// without a warning. A retired name is never reused.
+// The session format: widgets are stored by object name, so a name is part of
+// it. An older file is applied and its unusable values are named; a newer one
+// is refused, because a surviving name may mean something else there. A
+// removed widget does not bump the version: its name goes to
+// RetiredWidgetNames (never reused), so old sessions load without a warning.
 namespace Sessions
 {
 inline constexpr int Version = 1;

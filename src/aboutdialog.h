@@ -33,10 +33,7 @@ public:
     AboutDialog &operator=(AboutDialog &&) = delete;
 
 protected:
-    // The dialog opens as large as its content. The height of the
-    // word-wrapped labels is only known once they have been polished, so the
-    // fit happens when the dialog is shown - once per open, so that a window
-    // the user has resized in the meantime is left alone.
+    // Fits the dialog to its content on the first show only.
     void showEvent(QShowEvent *event) override;
 
 private slots:
@@ -44,9 +41,6 @@ private slots:
     void checkUpdatesClicked();
 
 private:
-    // The tests read the dialog through the Ui the same way the main
-    // window's tests do: friendship keeps it private instead of widening the
-    // dialog's public surface for their sake.
     friend class TestAboutDialog;
 
     // The update checker is replaceable so a test can answer without a
@@ -54,7 +48,6 @@ private:
     // its own.
     AboutDialog(UpdateChecker *checker, QWidget *parent = nullptr);
 
-    // Fills the row that holds the version of hashcat.
     void updateVersionLabel();
 
     // Wires the update row. The check is opt-in: nothing contacts the network
@@ -62,29 +55,21 @@ private:
     void setupUpdateCheck(UpdateChecker *checker);
     void showUpdateResult(const UpdateCheckResult &result);
 
-    // Grows the dialog when the update row needs more room. A window the user
-    // has resized is left at its size; only the missing space is added.
     void growToFitContent();
 
-    // Shows the version of hashcat.
     void setVersionText(const QString &text);
 
-    // Fills the rows that describe the system the application runs on.
     void updateSystemLabels();
 
-    // Fills the row of links to the project and to hashcat.
     void updateLinks();
 
-    // Fills the row with the license of the application.
     void updateLicense();
 
-    // Shows an error in place of the version.
     void setVersionError(const QString &error);
 
     // Wraps the text into the label at the width the label shows.
     void setVersionLabel(const QString &text);
 
-    // What a bug report needs: the versions and the hashcat in use.
     [[nodiscard]] QString detailsText() const;
 
     // The version of hashcat - empty while the query is in flight and after

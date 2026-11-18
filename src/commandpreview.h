@@ -23,21 +23,14 @@ public:
         PowerShell, // powershell.exe and pwsh: call operator, single quotes
     };
 
-    // The binary name (empty when none is configured) and one token per
-    // argument, joined with spaces. Every token the dialect's shell would
-    // split or expand - spaces, quotes, masks, recipes - is quoted for
-    // display, so a copied command can be pasted into that shell. PowerShell
-    // puts the call operator in front of the binary. The argv handed to
-    // hashcat keeps the tokens unquoted.
+    // The binary name (empty when unconfigured) and one quoted token per
+    // argument, joined with spaces, so the command can be pasted into the
+    // dialect's shell. The argv handed to hashcat stays unquoted.
     static QString format(const QString &binary, const QStringList &arguments, Dialect dialect);
 
-    // The tooltip of the command preview: the whole command, because the
-    // line edit shows only its beginning. Plain text, not rich text: a rich
-    // text tooltip is squeezed into whatever width its text control happens
-    // to have and grows tall instead, while a plain text one keeps the line
-    // breaks it is given. The breaks go between the arguments at 120
-    // columns, so a flag stays with the value that follows it; markup-like
-    // text is escaped.
+    // The tooltip shows the whole command, plain text so it keeps its line
+    // breaks, with the arguments joined at 120 columns. Markup-like text is
+    // escaped; a rich-text tooltip would grow tall instead of wide.
     static QString tooltip(const QString &command, Dialect dialect);
 };
 

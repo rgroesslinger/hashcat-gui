@@ -22,12 +22,11 @@ public:
     [[nodiscard]] T getKey(const QString &key, const T &defaultValue = T()) const
     {
         const QVariant value = settings.value(key, QVariant::fromValue(defaultValue));
-        // QSettings::IniFormat stores everything as text. Within one process
-        // its cache still holds the typed value a setKey() wrote, but a fresh
-        // process reads back a QString - so a plain metaType check would throw
-        // away every bool setting on restart. Accept "true"/"false" and refuse
-        // any other value; a hand-edited useShortParameters=no then keeps the
-        // default rather than becoming true through QVariant's lossy conversion.
+        // IniFormat stores text. Within one process the cache holds the typed
+        // value, but a fresh process reads a QString, so a plain metaType check
+        // would drop every bool on restart. Accept "true"/"false" and refuse
+        // anything else, so a hand-edited "no" keeps the default instead of
+        // becoming true through QVariant's lossy conversion.
         if constexpr (std::is_same_v<T, bool>) {
             if (value.metaType() == QMetaType::fromType<QString>()) {
                 const QString text = value.toString();

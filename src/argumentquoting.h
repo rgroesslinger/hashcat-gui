@@ -109,16 +109,11 @@ inline QString powerShellQuoteArgument(const QString &token)
     return QLatin1Char('\'') + quoted + QLatin1Char('\'');
 }
 
-// A token for a PowerShell command line the user will paste: leave it bare
-// when PowerShell reads every character literally, otherwise quote it. The
-// argument-mode metacharacters (space, @, #, %, $, ;, quotes, backtick,
-// braces, parentheses, |, &, <, >, and the comma, which starts an array and
-// is a parse error at the end of the line), every non-ASCII character and the
-// wildcards ? and * are quoted: Windows passes a wildcard through unchanged,
-// but pwsh on Unix expands an unquoted one against the file system, and the
-// same preview is copied on either platform. The launch script uses
-// powerShellQuoteArgument() instead: every value there is an expression on the
-// right of an '=' and must be a quoted literal even when it is safe here.
+// Whether a token needs quoting for a pasted PowerShell command line:
+// metacharacters, non-ASCII characters and the wildcards ? and * (pwsh expands
+// them on Unix) are quoted, since the same preview is copied on either
+// platform. The launch script uses powerShellQuoteArgument(), which always
+// quotes.
 inline bool powerShellNeedsQuoting(const QString &token)
 {
     if (token.isEmpty()) {

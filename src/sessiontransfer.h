@@ -21,7 +21,6 @@ class QWidget;
 // the caller.
 class SessionTransfer
 {
-    // The notes end up in dialogs opened by the caller
     Q_DECLARE_TR_FUNCTIONS(SessionTransfer)
 
 public:

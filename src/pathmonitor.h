@@ -12,19 +12,11 @@
 #include <QStringList>
 #include <cstdint>
 
-// Keeps track of whether the paths of one list are usable by hashcat.
+// Whether the paths of one list are usable by hashcat.
 //
-// QFileSystemWatcher cannot watch a path that is gone, and deleting a watched
-// path invalidates its watch. The monitor therefore watches the parent
-// directories and asks QFileInfo about the paths themselves: a directory emits
-// when one of its entries is created, removed or renamed, and the watch keeps
-// working across all three.
-//
-// A folder is an input of its own for wordlists and PCFG rulesets, so those
-// monitors watch the folder too: a wordlist folder says nothing about its files,
-// and a ruleset folder says nothing about its grammar. A path whose parent
-// directory is gone is watched through the nearest existing ancestor instead,
-// so recreating the directory is noticed as well.
+// QFileSystemWatcher cannot watch a gone path, so the parents are watched and
+// QFileInfo answers for the paths. Wordlist and PCFG folders are watched
+// themselves; a gone parent is watched through its nearest existing ancestor.
 class PathMonitor : public QObject
 {
     Q_OBJECT
@@ -39,7 +31,6 @@ public:
 
     explicit PathMonitor(Kind kind, QObject *parent = nullptr);
 
-    // What this monitor judges the paths by.
     [[nodiscard]] Kind kind() const
     {
         return m_kind;
@@ -49,7 +40,6 @@ public:
     // inserted receives its state even when the path was watched before.
     void setPaths(const QStringList &paths);
 
-    // Whether the last check found a path hashcat can use.
     [[nodiscard]] bool isAvailable(const QString &path) const;
 
 signals:

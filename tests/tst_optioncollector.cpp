@@ -112,7 +112,6 @@ void TestOptionCollector::theHashAndRuleGroupsAreRead()
     QCOMPARE(options.rulesConcat, true);
     QCOMPARE(options.generateRules, 0);
 
-    // The generated-rules radio is the other half of the choice.
     form.ui.radioButton_generate_rules->setChecked(true);
     form.ui.spinBox_generate_rules->setValue(500);
     options = OptionCollector::collect(form.ui, false);
@@ -235,7 +234,6 @@ void TestOptionCollector::onlyCheckedRowsReachTheOptions()
     CheckedItemList::addPaths(form.ui.listWidget_feed_arguments, {QStringLiteral("arg")});
 
     const HashcatOptions options = OptionCollector::collect(form.ui, false);
-    // The rows hold the platform's own separator form, like the dialogs return.
     QCOMPARE(options.wordlists,
              QStringList{QDir::toNativeSeparators(QStringLiteral("/tmp/a.txt"))});
     QCOMPARE(options.feedArguments, QStringList{QStringLiteral("arg")});

@@ -17,14 +17,10 @@
 #include <QSpinBox>
 #include <QWidget>
 
-// Whether the widget is one the application put there.
-//
-// Two kinds of widgets are not: the editor a spin box or an editable combo
-// box builds for itself is a child of that widget, and the name Qt gives it
-// is the same for every spin box - a value stored under it would mean
-// nothing, and a file that names it would change a spin box. A widget
-// without a name at all would share the key "" with every other unnamed
-// widget.
+// Whether the application put the widget there. A spin box's or editable
+// combo's internal editor is a child with the same name for every instance,
+// so a stored value under it would mean nothing; an unnamed widget would share
+// the key "" with every other one.
 inline bool isApplicationWidget(const QWidget *widget)
 {
     if (widget->objectName().isEmpty()) {

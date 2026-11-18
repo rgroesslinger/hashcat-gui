@@ -216,8 +216,7 @@ void TestWidgetStateSerializer::anUnknownIdentifierChangesNothing()
 }
 
 // A field may hold non-ASCII text, and it has to survive the round trip
-// unchanged. The literals are \u escapes so that the test does not depend on
-// the encoding of its own source file.
+// unchanged.
 void TestWidgetStateSerializer::nonAsciiValuesSurviveTheValues()
 {
     const QString text = QStringLiteral("W\u00f6rterbuch \u2013 \u00e4\u00f6\u00fc\u00df");
@@ -327,7 +326,6 @@ void TestWidgetStateSerializer::aValueNoWidgetClaimedIsReported()
 
     QCOMPARE(result.unknownKeys, QStringList{QStringLiteral("lineEdit_fromTheFuture")});
     QVERIFY(result.wrongTypes.isEmpty());
-    // The value that did name a widget was applied.
     QCOMPARE(restored.lineEdit->text(), QStringLiteral("-m 0 --quiet"));
 }
 

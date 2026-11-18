@@ -264,7 +264,6 @@ QString SettingsDialog::shortenPath(const QString &path)
     return QLatin1Char('~') + path.mid(home.size());
 }
 
-// Opens the folder the settings are stored in.
 void SettingsDialog::openFolderClicked()
 {
     if (m_settingsFolder.isEmpty()) {
@@ -275,7 +274,6 @@ void SettingsDialog::openFolderClicked()
     QDesktopServices::openUrl(QUrl::fromLocalFile(m_settingsFolder));
 }
 
-// Opens the folder the session is stored in.
 void SettingsDialog::openSessionFolderClicked()
 {
     if (m_sessionFolder.isEmpty()) {
@@ -307,10 +305,6 @@ QJsonObject SettingsDialog::savedSettings()
     return stored;
 }
 
-// Fills the dialog with the settings of an imported file.
-//
-// Returns the notes for the user: a value the dialog cannot take - a
-// terminal that is not installed - is worth a word.
 QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
 {
     QStringList notes;
@@ -370,12 +364,6 @@ QStringList SettingsDialog::applyImportedSettings(const QJsonObject &settings)
     return notes;
 }
 
-// Applies one setting to the widget that shows it.
-//
-// The stored and the imported value take the same path, so a key cannot be
-// read one way and imported another. They differ only in what happens to a
-// value the dialog does not offer: the stored one falls back to the default,
-// the imported one is left alone and named.
 QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, ValueSource source)
 {
     if (key == AppConstants::SettingsKeys::HashcatPath) {
@@ -458,7 +446,6 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
     return {};
 }
 
-// Says what is wrong with the hashcat path or the terminal selection.
 void SettingsDialog::updateStatusLabels()
 {
     updateHashcatStatus();

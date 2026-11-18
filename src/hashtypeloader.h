@@ -27,12 +27,9 @@ struct HashTypeFailure {
 
 Q_DECLARE_METATYPE(HashTypeFailure)
 
-// The asynchronous --example-hashes query: one watcher, one generation
-// counter, and the parsed list or the failure as a signal. The loader keeps
-// no texts of its own; the path is a parameter, read on the calling thread.
-//
-// A superseded query must not touch the list: reload() replaces the watcher
-// and raises the generation, so a reply that arrives late is dropped.
+// The asynchronous --example-hashes query: one watcher, one generation counter,
+// and the parsed list or failure as a signal. The path is read on the calling
+// thread. A superseded query is dropped by raising the generation in reload().
 class HashTypeLoader : public QObject
 {
     Q_OBJECT

@@ -37,12 +37,9 @@ public:
         QStringList wrongTypes;
     };
 
-    // Applies a JSON object to the widgets and reports the values that could
-    // not be applied.
-    //
-    // The input object is not modified: the names are removed from a copy to
-    // compute the remainder, so that the caller can still read the values
-    // afterwards - the hash type, for one.
+    // Applies a JSON object and reports the values that could not be applied.
+    // The input is not modified: names are removed from a copy, so the caller
+    // can still read the values afterwards (the hash type, for one).
     static ApplyResult applyToWidgets(const QJsonObject &values, QWidget *widget,
                                       const QStringList &ignoredWidgets = {});
 };

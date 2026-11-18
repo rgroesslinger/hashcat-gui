@@ -20,12 +20,9 @@ class HashcatInfoParser
     Q_DECLARE_TR_FUNCTIONS(HashcatInfoParser)
 
 public:
-    // Fills hashModes with "<id> | <name>" entries keyed by hash type id.
-    //
-    // Returns false and writes an already translated reason into errorMessage
-    // (when that is not nullptr) when the reply cannot be used. hashModes is
-    // left untouched on failure so a failed refresh does not throw away a
-    // list that is still on screen.
+    // Fills hashModes with "<id> | <name>" entries. Returns false and writes a
+    // translated reason when the reply cannot be used; hashModes is left
+    // untouched on failure, so a refresh does not clear the list on screen.
     static bool parseExampleHashes(const QString &rawOutput, QMap<quint32, QString> &hashModes,
                                    QString *errorMessage = nullptr);
 };

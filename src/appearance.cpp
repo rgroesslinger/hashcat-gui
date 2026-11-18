@@ -22,7 +22,6 @@ void Appearance::applyColorScheme(const QString &scheme)
     } else if (scheme == AppConstants::Appearance::ColorSchemeLight) {
         hints->setColorScheme(Qt::ColorScheme::Light);
     } else {
-        // The system default: the desktop decides again.
         hints->unsetColorScheme();
     }
 }

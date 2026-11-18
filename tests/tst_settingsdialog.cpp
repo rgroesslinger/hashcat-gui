@@ -691,9 +691,7 @@ void TestSettingsDialog::colorSchemeFollowsTheSetting()
     QVERIFY(!dialog.ui->comboBox_color_scheme->toolTip().isEmpty());
 }
 
-// The dialog opens as large as its content: the size in the .ui would clip
-// the content under a large font or a long translation and leave an empty
-// margin under a small one.
+// The dialog sizes itself to its content.
 void TestSettingsDialog::fitsItsContent()
 {
     SettingsDialog dialog;
@@ -702,13 +700,9 @@ void TestSettingsDialog::fitsItsContent()
 
     QCOMPARE(dialog.size(), dialog.sizeHint());
 
-    // The user may make the dialog whatever size they like afterwards.
     QVERIFY(dialog.minimumSize() != dialog.maximumSize());
 }
 
-// The titles of the group boxes have to look alike. The alignment is the only
-// thing that decides it, and a group box without it would draw its title
-// above the frame while its neighbors break the border with it.
 void TestSettingsDialog::groupBoxesShareOneTitleAlignment()
 {
     SettingsDialog dialog;
@@ -743,9 +737,8 @@ void TestSettingsDialog::importSettingsNamesTheUnknownKeys()
     QVERIFY(unknownNotes.first().contains(QStringLiteral("anotherOne")));
 }
 
-// A value of the wrong type cannot be applied: converting it would change a
-// setting the user did not ask for. The setting keeps what it has, and the
-// value is reported.
+// A value of the wrong type cannot be applied; it is reported, and the
+// setting keeps what it has.
 void TestSettingsDialog::importSettingsDoesNotApplyAValueOfTheWrongType()
 {
     QJsonObject stored;

@@ -17,14 +17,10 @@
 #include <windows.h>
 #endif
 
-// The Unix entries only select the terminal's command mode (or, for kitty,
-// foot and wezterm, the subcommand). Staying open, holding the working
-// directory and showing the exit code are the wrapper's job; the per-terminal
-// hold flags could not do all three everywhere.
-//
-// ptyxis is not offered: it starts the command through systemd-run, which
-// expands "$" words a second time, so a bcrypt hash or a mask arrived at
-// hashcat changed. See the FAQ.
+// The Unix entries only select the terminal's command mode (kitty, foot and
+// wezterm: the subcommand). Staying open, the working directory and the exit
+// code are the wrapper's job. ptyxis is not offered: systemd-run expands "$"
+// a second time and would change a hash or mask. See the FAQ.
 const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
 {
     static const QMap<QString, QStringList> table = {
@@ -131,22 +127,10 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
         return refused;
     }
 
-    // -Command would re-parse the hashcat command line as PowerShell code:
-    // hashes, masks, outfiles and session values would run as expressions.
-    // -EncodedCommand takes the script as UTF-16LE base64 instead, and the
-    // script quotes every token, so nothing a session carries can execute.
-    //
-    // The script starts hashcat through ProcessStartInfo, not through
-    // PowerShell's own native invocation: Windows PowerShell 5.1 (and pwsh
-    // before 7.3) does not escape embedded quotes on the way to a native
-    // command line and drops empty arguments. ProcessStartInfo.Arguments is
-    // used verbatim by CreateProcess, so the MSVCRT quoting here is the only
-    // transformation between the collected argv and hashcat's argv, on every
-    // PowerShell version.
-    //
-    // WaitForExit holds the session while hashcat runs; the script must not
-    // call exit afterwards - an explicit exit ends the session even under
-    // -NoExit and would close the terminal the moment hashcat is done.
+    // -Command would re-parse argv as PowerShell code; -EncodedCommand takes
+    // the quoted script as UTF-16LE base64, and ProcessStartInfo.Arguments
+    // keeps the collected argv verbatim on every PowerShell version.
+    // WaitForExit holds the session: the script must not call exit afterwards.
     if (isPowerShell(terminal)) {
         const QString script = powerShellScript(hashcatPath, arguments);
 
@@ -207,12 +191,9 @@ read -r _)");
 #ifdef Q_OS_WIN
 void TerminalCatalog::configureConsoleLaunch(QProcess::CreateProcessArguments *args)
 {
-    // CREATE_NEW_CONSOLE gives the terminal its own window. QProcess still sets
-    // STARTF_USESTDHANDLES with this process's handles - null from Explorer,
-    // the launching shell's from MSYS2 or cmd.exe - so the window opens blank
-    // while hashcat writes to that shell. Clear the flag, as Qt's own example
-    // does, so the child gets the new console's handles. CREATE_NO_WINDOW is
-    // ignored once CREATE_NEW_CONSOLE is set.
+    // CREATE_NEW_CONSOLE gives the terminal its own window, but QProcess still
+    // sets STARTF_USESTDHANDLES with this process's handles, so the child would
+    // write to the launching shell. Clear the flag so it gets the new console's.
     args->flags |= CREATE_NEW_CONSOLE;
     args->startupInfo->dwFlags &= ~STARTF_USESTDHANDLES;
 }
