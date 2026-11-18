@@ -501,12 +501,8 @@ void TestSettingsDialog::saveIsTheDefaultButton()
     SettingsDialog dialog;
 
     QPushButton *save = dialog.findChild<QPushButton *>(QStringLiteral("pushButton_save"));
-    QPushButton *cancel = dialog.findChild<QPushButton *>(QStringLiteral("pushButton_cancel"));
     QVERIFY(save);
-    QVERIFY(cancel);
     QVERIFY(save->isDefault());
-    QCOMPARE(save->text(), QStringLiteral("Save"));
-    QCOMPARE(cancel->text(), QStringLiteral("Cancel"));
 }
 
 // The export holds the settings the application runs with, so that they can

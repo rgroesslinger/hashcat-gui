@@ -130,26 +130,28 @@ void TestMainWindow::freshWindowMatchesTheDefaultOptions()
 void TestMainWindow::hashTypeComboIsSearchable()
 {
     MainWindow window;
+    auto *combo = MainWindowTestAccess::ui(window)->comboBox_hash_type;
 
-    // The constructor makes the field editable and gives it a completer.
-    QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEditable());
-    QCompleter *completer = MainWindowTestAccess::ui(window)->comboBox_hash_type->completer();
+    QVERIFY(combo->isEditable());
+    QCompleter *completer = combo->completer();
     if (completer == nullptr) {
         QFAIL("the hash type combo has no completer");
     }
 
-    // The list arrives asynchronously and is refilled as hashcat changes, so
-    // the completer is bound to the combo's own model, not a snapshot taken
-    // at construction: it has to follow every later clear()/addItem().
-    QVERIFY(completer->model() == MainWindowTestAccess::ui(window)->comboBox_hash_type->model());
+    // The list is refilled as hashcat changes, so the completer follows the
+    // combo's own model instead of a snapshot taken at construction.
+    QVERIFY(completer->model() == combo->model());
 
-    // A hundred entries that differ only in case make case-insensitivity the
-    // whole feature.
-    QCOMPARE(completer->caseSensitivity(), Qt::CaseInsensitive);
+    combo->clear();
+    combo->addItem(QStringLiteral("MD5"), 0U);
+    combo->addItem(QStringLiteral("NTLM"), 1000U);
 
-    // The completer's popup does not realize its filter under the offscreen
-    // platform used by the tests, so the filtered match itself cannot be
-    // observed here; the configuration above is what the feature depends on.
+    completer->setCompletionPrefix(QStringLiteral("nt"));
+    QCOMPARE(completer->completionCount(), 1);
+    QCOMPARE(completer->currentCompletion(), QStringLiteral("NTLM"));
+
+    completer->setCompletionPrefix(QStringLiteral("nope"));
+    QCOMPARE(completer->completionCount(), 0);
 }
 
 void TestMainWindow::attackModeIdsTravelAsItemData()
@@ -379,7 +381,7 @@ void TestMainWindow::exampleSessionFilesAreValid()
         // A data path that no resource is bundled under would fail only when
         // the example is loaded, with a missing wordlist or rules file.
         QStringList paths;
-        collectExamplePaths(document.values, &paths);
+        TestEnvironment::collectExamplePaths(document.values, &paths);
         for (const QString &path : std::as_const(paths)) {
             const QString name = QFileInfo(path).fileName();
             bool found = false;

@@ -6,6 +6,7 @@
 #ifndef TESTENVIRONMENT_H
 #define TESTENVIRONMENT_H
 
+#include "examples.h"
 #include "hashcatoptions.h"
 #include "launchvalidator.h"
 
@@ -19,6 +20,9 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGroupBox>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QMessageBox>
 #include <QSettings>
 #include <QStandardPaths>
@@ -34,6 +38,31 @@
 // session and examples, and resetSettings() clears the ini.
 namespace TestEnvironment
 {
+
+// The data paths a session names, with the <examples>/ token still in place.
+inline void collectExamplePaths(const QJsonValue &value, QStringList *paths)
+{
+    if (value.isString()) {
+        const QString text = value.toString();
+        if (text.contains(QString(Examples::DataPrefix))) {
+            paths->append(text);
+        }
+        return;
+    }
+    if (value.isObject()) {
+        const QJsonObject object = value.toObject();
+        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+            collectExamplePaths(it.value(), paths);
+        }
+        return;
+    }
+    if (value.isArray()) {
+        const QJsonArray array = value.toArray();
+        for (const auto &entry : array) {
+            collectExamplePaths(entry, paths);
+        }
+    }
+}
 
 // A launch context whose non-option fields pass, so option tests can fail on
 // the options alone. validate() checks options first; that is the precedence

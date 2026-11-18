@@ -18,29 +18,9 @@ class TestTranslations : public QObject
     Q_OBJECT
 
 private slots:
-    void germanCatalogIsEmbedded();
-    void serbianCatalogIsEmbedded();
     void everyOfferedLanguageIsEmbedded();
     void everyEmbeddedCatalogIsOffered();
 };
-
-// Two catalogs get a check of their own; the rest are covered by
-// everyOfferedLanguageIsEmbedded() below.
-void TestTranslations::germanCatalogIsEmbedded()
-{
-#ifndef HASHCAT_GUI_QM_EMBEDDED
-    QSKIP("built without Qt6 LinguistTools - there are no catalogs to embed");
-#endif
-    QVERIFY(QFile::exists(QStringLiteral(":/i18n/hashcat-gui_de.qm")));
-}
-
-void TestTranslations::serbianCatalogIsEmbedded()
-{
-#ifndef HASHCAT_GUI_QM_EMBEDDED
-    QSKIP("built without Qt6 LinguistTools - there are no catalogs to embed");
-#endif
-    QVERIFY(QFile::exists(QStringLiteral(":/i18n/hashcat-gui_sr.qm")));
-}
 
 // Every language the settings dialog offers must really arrive - a code
 // without a catalog would be a combo entry whose selection changes nothing.

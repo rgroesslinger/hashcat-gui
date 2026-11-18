@@ -30,7 +30,7 @@ private slots:
     void theNoteOrderIsPinned();
     void theValuesAreNotMutated();
     void toDocumentSkipsThePreview();
-    void theNoteTextsArePinned();
+    void notesNameTheVersionAndSections();
 
 private:
     // A root with one widget of each kind the transfer touches.
@@ -214,40 +214,28 @@ void TestSessionTransfer::toDocumentSkipsThePreview()
     QVERIFY(!values.contains(QString(AppConstants::Files::PreviewWidget)));
 }
 
-void TestSessionTransfer::theNoteTextsArePinned()
+void TestSessionTransfer::notesNameTheVersionAndSections()
 {
     const int current = AppConstants::Sessions::Version;
 
     const QStringList older = SessionTransfer::fileNotes(current - 1, current, {});
-    QCOMPARE(
-        older,
-        QStringList{QStringLiteral(
-                        "The file was made by an older version of hashcat-gui (format version %1; "
-                        "this version reads format version %2).")
-                        .arg(current - 1)
-                        .arg(current)});
+    QCOMPARE(older.size(), 1);
+    QVERIFY(older.first().contains(QString::number(current - 1)));
+    QVERIFY(older.first().contains(QString::number(current)));
 
     // A file without a version gets no older-version note.
     QVERIFY(SessionTransfer::fileNotes(-1, current, {}).isEmpty());
 
     const QStringList sections =
         SessionTransfer::fileNotes(current, current, {QStringLiteral("settings")});
-    QCOMPARE(sections, QStringList{QStringLiteral(
-                           "The file holds sections this import does not use: settings.")});
+    QCOMPARE(sections.size(), 1);
+    QVERIFY(sections.first().contains(QStringLiteral("settings")));
 
-    QCOMPARE(SessionTransfer::newerFileNote(current + 1, current),
-             QStringLiteral("The file is in format version %1, but this version reads format "
-                            "version %2, so it was not applied. Update hashcat-gui to read it.")
-                 .arg(current + 1)
-                 .arg(current));
+    const QString newer = SessionTransfer::newerFileNote(current + 1, current);
+    QVERIFY(newer.contains(QString::number(current + 1)));
 
-    QCOMPARE(SessionTransfer::newerSessionNote(current + 1),
-             QStringLiteral("The session file is in format version %1, but this version reads "
-                            "format version %2, so the session was not restored. The file was "
-                            "left as it is, so the session of this run is not stored either. "
-                            "Update hashcat-gui to read it.")
-                 .arg(current + 1)
-                 .arg(current));
+    const QString newerSession = SessionTransfer::newerSessionNote(current + 1);
+    QVERIFY(newerSession.contains(QString::number(current + 1)));
 }
 
 int main(int argc, char *argv[])

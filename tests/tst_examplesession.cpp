@@ -13,34 +13,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QStandardPaths>
-#include <utility>
-
-namespace
-{
-void collectPaths(const QJsonValue &value, QStringList *paths)
-{
-    if (value.isString()) {
-        const QString text = value.toString();
-        if (text.contains(QString(Examples::DataPrefix))) {
-            paths->append(text);
-        }
-        return;
-    }
-    if (value.isObject()) {
-        const QJsonObject object = value.toObject();
-        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-            collectPaths(it.value(), paths);
-        }
-        return;
-    }
-    if (value.isArray()) {
-        const QJsonArray array = value.toArray();
-        for (const auto &entry : array) {
-            collectPaths(entry, paths);
-        }
-    }
-}
-} // namespace
 
 // The bundled examples: finding one, the <examples>/ token, and unpacking
 // the data files hashcat can read.
@@ -154,7 +126,7 @@ void TestExampleSession::everyExampleNamesOnlyBundledData()
                  qPrintable(error));
 
         QStringList paths;
-        collectPaths(QJsonValue(values), &paths);
+        TestEnvironment::collectExamplePaths(QJsonValue(values), &paths);
         for (const QString &path : std::as_const(paths)) {
             const QString name = path.mid(QString(Examples::DataPrefix).size());
             QVERIFY2(bundled.contains(name),

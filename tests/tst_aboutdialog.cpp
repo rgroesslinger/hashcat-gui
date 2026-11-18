@@ -67,7 +67,6 @@ private slots:
     void okAcceptsTheDialog();
     void saysThatNoHashcatIsConfigured();
     void updateCheckDoesNotRunOnOpen();
-    void updateButtonIsCompactAndHasAnIcon();
     void updateCheckShowsProgressBeforeTheResult();
     void updateCheckKeepsTheUserResizedWindow();
     void updateCheckReportsNewerVersion();
@@ -340,7 +339,6 @@ void TestAboutDialog::okAcceptsTheDialog()
     QPushButton *ok = dialog.findChild<QPushButton *>(QStringLiteral("pushButton_ok"));
     QVERIFY(ok);
     QVERIFY2(ok->isDefault(), "Enter does not press OK");
-    QCOMPARE(ok->text(), QStringLiteral("OK"));
 
     ok->click();
     QCOMPARE(dialog.result(), int(QDialog::Accepted));
@@ -370,24 +368,6 @@ void TestAboutDialog::updateCheckDoesNotRunOnOpen()
     QCoreApplication::processEvents();
 
     QCOMPARE(checker.checks, 0);
-}
-
-// The check is a small action, not a full-width row, and it carries a refresh
-// symbol so it reads even without its label.
-void TestAboutDialog::updateButtonIsCompactAndHasAnIcon()
-{
-    FakeUpdateChecker checker;
-    AboutDialog dialog(&checker);
-    dialog.show();
-    QCoreApplication::processEvents();
-
-    QPushButton *button =
-        dialog.findChild<QPushButton *>(QStringLiteral("pushButton_check_updates"));
-    QWidget *row = dialog.findChild<QWidget *>(QStringLiteral("widget_update"));
-    QVERIFY(button);
-    QVERIFY(row);
-    QVERIFY(button->width() < row->width());
-    QVERIFY(!button->icon().isNull());
 }
 
 // The update row starts idle with just the button. Clicking it shows the

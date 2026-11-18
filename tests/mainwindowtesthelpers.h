@@ -139,31 +139,6 @@ inline bool writeFile(const QString &path)
     return file.write(content) == content.size();
 }
 
-// The data paths a session names, with the <examples>/ token still in place.
-inline void collectExamplePaths(const QJsonValue &value, QStringList *paths)
-{
-    if (value.isString()) {
-        const QString text = value.toString();
-        if (text.contains(QString(Examples::DataPrefix))) {
-            paths->append(text);
-        }
-        return;
-    }
-    if (value.isObject()) {
-        const QJsonObject object = value.toObject();
-        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
-            collectExamplePaths(it.value(), paths);
-        }
-        return;
-    }
-    if (value.isArray()) {
-        const QJsonArray array = value.toArray();
-        for (const auto &entry : array) {
-            collectExamplePaths(entry, paths);
-        }
-    }
-}
-
 // A group box in a row is as tall as its tallest neighbour. Without top
 // alignment Qt spreads the children of the shorter boxes over that height or
 // centers them, so the content would not start at the same height.

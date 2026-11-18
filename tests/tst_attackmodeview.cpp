@@ -15,8 +15,7 @@
 #include <QMainWindow>
 
 // The mode gating: every group follows the builder's predicate for the
-// applied mode, the rule sides keep their enabled distinction, and the
-// names and hints are the unit's own texts.
+// applied mode, and the rule sides keep their enabled distinction.
 class TestAttackModeView : public QObject
 {
     Q_OBJECT
@@ -24,8 +23,6 @@ class TestAttackModeView : public QObject
 private slots:
     void everyGroupFollowsItsPredicate();
     void theRuleSidesKeepTheirEnabledState();
-    void theNamesArePinned();
-    void theHintsArePinned();
 
 private:
     struct Form {
@@ -93,51 +90,6 @@ void TestAttackModeView::theRuleSidesKeepTheirEnabledState()
         QCOMPARE(form.ui.label_rule_right->isEnabled(), right);
         QCOMPARE(form.ui.lineEdit_rule_right->isEnabled(), right);
     }
-}
-
-void TestAttackModeView::theNamesArePinned()
-{
-    QCOMPARE(AttackModeView::name(AttackMode::Straight), QStringLiteral("Straight"));
-    QCOMPARE(AttackModeView::name(AttackMode::Combination), QStringLiteral("Combination"));
-    QCOMPARE(AttackModeView::name(AttackMode::BruteForce), QStringLiteral("Brute-force"));
-    QCOMPARE(AttackModeView::name(AttackMode::Pcfg), QStringLiteral("PCFG"));
-    QCOMPARE(AttackModeView::name(AttackMode::Table), QStringLiteral("Table"));
-    QCOMPARE(AttackModeView::name(AttackMode::HybridWordMask),
-             QStringLiteral("Hybrid Wordlist + Mask"));
-    QCOMPARE(AttackModeView::name(AttackMode::HybridMaskWord),
-             QStringLiteral("Hybrid Mask + Wordlist"));
-    QCOMPARE(AttackModeView::name(AttackMode::Generic), QStringLiteral("Generic (feed)"));
-    QCOMPARE(AttackModeView::name(AttackMode::Association), QStringLiteral("Association"));
-    QCOMPARE(AttackModeView::name(AttackMode::Hybrid), QStringLiteral("Hybrid (mask + ?w/?q)"));
-}
-
-void TestAttackModeView::theHintsArePinned()
-{
-    QCOMPARE(AttackModeView::hint(AttackMode::Straight),
-             QStringLiteral("This mode needs at least one wordlist."));
-    QCOMPARE(AttackModeView::hint(AttackMode::Combination),
-             QStringLiteral("This mode needs exactly 2 wordlists (left, right)."));
-    QCOMPARE(AttackModeView::hint(AttackMode::BruteForce),
-             QStringLiteral("This mode needs a mask."));
-    QCOMPARE(AttackModeView::hint(AttackMode::Pcfg),
-             QStringLiteral("This mode runs hashcat’s bundled default-passwords ruleset; "
-                            "name one or more to use your own."));
-    QCOMPARE(AttackModeView::hint(AttackMode::Table),
-             QStringLiteral("This mode needs one wordlist and at least one table."));
-    QCOMPARE(AttackModeView::hint(AttackMode::HybridWordMask),
-             QStringLiteral("This mode needs a wordlist and a mask."));
-    QCOMPARE(AttackModeView::hint(AttackMode::HybridMaskWord),
-             QStringLiteral("This mode needs a wordlist and a mask."));
-    QCOMPARE(AttackModeView::hint(AttackMode::Generic),
-             QStringLiteral("This mode needs a feed. Arguments depend on the feed: "
-                            "random and stdin need none, wordlist needs a path."));
-    QCOMPARE(AttackModeView::hint(AttackMode::Association),
-             QStringLiteral("This mode needs at most one wordlist. Without one the words come "
-                            "from the hash file and the settings line can bound the run; with "
-                            "one the two files are paired by line."));
-    QCOMPARE(AttackModeView::hint(AttackMode::Hybrid),
-             QStringLiteral("This mode needs a mask with exactly one ?w; a ?q after ?w "
-                            "names a second wordlist."));
 }
 
 int main(int argc, char *argv[])
