@@ -13,6 +13,8 @@
 #include <QProcess>
 #include <QString>
 #include <QStringList>
+#include <atomic>
+#include <memory>
 
 // Result of a single hashcat invocation.
 //
@@ -25,6 +27,8 @@ struct HashcatResult {
     // The query hit its deadline. The status members alone cannot tell that
     // from a crash: the process was killed to end the wait.
     bool timedOut = false;
+    // A superseded query: the process was killed before it answered.
+    bool cancelled = false;
     QString standardOutput;
     QString standardError;
 };
@@ -39,8 +43,14 @@ class HashcatRunner
     Q_DECLARE_TR_FUNCTIONS(HashcatRunner)
 
 public:
+    // Shared between the caller and the worker: setting it kills the running
+    // process and ends the query early. QFuture::cancel() alone stops neither
+    // the task nor its process.
+    using CancelToken = std::shared_ptr<std::atomic_bool>;
+
     static QFuture<HashcatResult> execute(const QString &hashcatPath, const QStringList &args,
-                                          int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs);
+                                          int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs,
+                                          CancelToken cancel = {});
 };
 
 #endif // HASHCATRUNNER_H

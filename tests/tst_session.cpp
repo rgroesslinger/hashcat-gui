@@ -406,8 +406,9 @@ void TestSession::exportingWhileTheQueryIsPendingKeepsTheHashType()
     const QString file =
         TestEnvironment::scratchDir().filePath(QStringLiteral("pending-export.json"));
 
-    // No watchdog here: it would close the file dialog too. The reply arrives
-    // after the export is done and the window is gone, so no box can open.
+    // No watchdog here: it would close the file dialog too. The window's
+    // destructor cancels the query, so no reply - and no box - can arrive
+    // after the export is done and the window is gone.
     MainWindow window;
     window.restoreSession();
     QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);

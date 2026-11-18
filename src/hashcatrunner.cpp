@@ -7,18 +7,34 @@
 
 #include "programdirectory.h"
 
+#include <QElapsedTimer>
 #include <QtConcurrent/QtConcurrentRun>
+#include <algorithm>
 
 QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const QStringList &args,
-                                              int timeoutMs)
+                                              int timeoutMs, CancelToken cancel)
 {
-    return QtConcurrent::run([hashcatPath, args, timeoutMs]() -> HashcatResult {
+    return QtConcurrent::run([hashcatPath, args, timeoutMs, cancel]() -> HashcatResult {
         HashcatResult result;
         QProcess proc;
         QStringList cmdArgs = args;
 
         if (hashcatPath.isEmpty()) {
             result.standardError = tr("The hashcat path is not configured.");
+            return result;
+        }
+
+        const auto cancelled = [&cancel] { return cancel && cancel->load(); };
+        // kill() is asynchronous: the wait blocks until the process has
+        // actually exited, so the destructor of proc is not left with a
+        // process that is still running.
+        const auto stop = [&proc] {
+            proc.kill();
+            proc.waitForFinished(5000);
+        };
+
+        if (cancelled()) {
+            result.cancelled = true;
             return result;
         }
 
@@ -36,20 +52,34 @@ QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const 
             return result;
         }
 
-        if (!proc.waitForFinished(timeoutMs)) {
+        // The wait runs in short chunks so a cancelled query kills its
+        // process instead of running on to the timeout.
+        constexpr int pollMs = 100;
+        QElapsedTimer deadline;
+        deadline.start();
+        for (;;) {
+            if (cancelled()) {
+                stop();
+                result.cancelled = true;
+                return result;
+            }
+            const qint64 remaining = timeoutMs - deadline.elapsed();
+            if (remaining <= 0) {
+                stop();
+                result.timedOut = true;
+                result.standardError = tr("hashcat timed out\n%1").arg(proc.errorString());
+                return result;
+            }
+            if (proc.waitForFinished(static_cast<int>(std::min<qint64>(remaining, pollMs)))) {
+                break;
+            }
             // A crash is reported by waitForFinished() itself; a false return
-            // here is a timeout or a process error, so name the actual cause.
-            const bool timedOut = proc.error() == QProcess::Timedout;
-            proc.kill();
-            // kill() is asynchronous: the wait blocks until the process has
-            // actually exited, so the destructor of proc is not left with a
-            // process that is still running.
-            proc.waitForFinished(5000);
-            result.timedOut = timedOut;
-            result.standardError = timedOut
-                                       ? tr("hashcat timed out\n%1").arg(proc.errorString())
-                                       : tr("hashcat failed to run\n%1").arg(proc.errorString());
-            return result;
+            // with another error is a process error, so name the actual cause.
+            if (proc.error() != QProcess::Timedout) {
+                stop();
+                result.standardError = tr("hashcat failed to run\n%1").arg(proc.errorString());
+                return result;
+            }
         }
 
         result.exitStatus = proc.exitStatus();

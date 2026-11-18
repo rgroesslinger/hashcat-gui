@@ -29,16 +29,25 @@ Q_DECLARE_METATYPE(HashTypeFailure)
 
 // The asynchronous --example-hashes query: one watcher, one generation counter,
 // and the parsed list or failure as a signal. The path is read on the calling
-// thread. A superseded query is dropped by raising the generation in reload().
+// thread. A superseded query is cancelled - its process killed, not just its
+// reply dropped by the generation guard.
 class HashTypeLoader : public QObject
 {
     Q_OBJECT
 
 public:
     // The query is injectable so the tests do not wait for a real process.
-    using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int)>;
+    // It receives the token that cancels its process when it is superseded.
+    using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
+                                                       HashcatRunner::CancelToken)>;
 
     explicit HashTypeLoader(QObject *parent, Query query = HashcatRunner::execute);
+    ~HashTypeLoader() override;
+
+    HashTypeLoader(const HashTypeLoader &) = delete;
+    HashTypeLoader &operator=(const HashTypeLoader &) = delete;
+    HashTypeLoader(HashTypeLoader &&) = delete;
+    HashTypeLoader &operator=(HashTypeLoader &&) = delete;
 
     // Starts the query for the given binary; an empty path starts none and
     // ends any loading state. Remembers the path as the one queried.
@@ -64,6 +73,7 @@ private:
     Query m_query;
     QString m_queriedHashcatPath;
     std::unique_ptr<QFutureWatcher<HashcatResult>> m_watcher;
+    HashcatRunner::CancelToken m_cancel;
     quint64 m_generation = 0;
     bool m_loading = false;
 };

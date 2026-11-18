@@ -13,6 +13,12 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QTemporaryDir>
+#include <atomic>
+#include <memory>
+#ifndef Q_OS_WIN
+// POSIX kill()/pid_t: include-cleaner maps them past this C++ wrapper.
+#include <csignal> // IWYU pragma: keep
+#endif
 
 // The asynchronous hashcat query: the path is a parameter, the output is
 // captured, and a hung child is killed rather than waited out.
@@ -25,6 +31,8 @@ private slots:
     void executeWithoutAPath();
     void executeCapturesOutput();
     void executeGivesUpOnTimeout();
+    void executeKillsTheProcessOnCancellation();
+    void aCancelledQueryNeverStartsTheProcess();
     void executeAppendsQuietAndUsesBinaryDirectory();
     void executeFollowsASymlinkedBinaryToItsRealDirectory();
     void executeDecodesUtf8Output();
@@ -112,6 +120,70 @@ void TestHashcatRunner::executeGivesUpOnTimeout()
     QCOMPARE(result.exitCode, -1);
     QVERIFY(result.timedOut);
     QVERIFY(result.standardError.contains(QStringLiteral("timed out")));
+}
+
+// A cancelled query kills its process instead of running on to the timeout:
+// the token reaches the QProcess, which QFuture::cancel() alone never does.
+void TestHashcatRunner::executeKillsTheProcessOnCancellation()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs on this platform");
+#else
+    QVERIFY2(stubsAvailable(), "the shell stub could not be written");
+
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString pidFile = directory.filePath(QStringLiteral("cancelled.pid"));
+    // The stub reports its pid and then becomes the sleeper itself, so the
+    // process the query kills is the one named in the file.
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-cancel"),
+        QStringLiteral("#!/bin/sh\necho $$ > '%1'\nexec sleep 30\n").arg(pidFile).toUtf8(),
+        directory.path());
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+
+    const auto cancel = std::make_shared<std::atomic_bool>(false);
+    QElapsedTimer elapsed;
+    elapsed.start();
+    const QFuture<HashcatResult> future =
+        HashcatRunner::execute(stub, {QStringLiteral("--help")}, 30000, cancel);
+
+    QTRY_VERIFY_WITH_TIMEOUT(QFileInfo(pidFile).size() > 0, 5000);
+    QFile pidReader(pidFile);
+    QVERIFY(pidReader.open(QIODevice::ReadOnly));
+    const qint64 pid = pidReader.readAll().trimmed().toLongLong();
+    QVERIFY(pid > 0);
+    QCOMPARE(::kill(static_cast<pid_t>(pid), 0), 0);
+
+    cancel->store(true);
+    QTRY_VERIFY_WITH_TIMEOUT(future.isFinished(), 5000);
+    QVERIFY2(elapsed.elapsed() < 10000, qPrintable(QStringLiteral("%1 ms").arg(elapsed.elapsed())));
+
+    const HashcatResult result = future.result();
+    QVERIFY(result.cancelled);
+    QVERIFY(!result.timedOut);
+    QCOMPARE(int(result.exitStatus), int(QProcess::CrashExit));
+    QCOMPARE(result.exitCode, -1);
+    // The process itself is gone, not merely ignored.
+    QTRY_VERIFY_WITH_TIMEOUT(::kill(static_cast<pid_t>(pid), 0) != 0, 5000);
+#endif
+}
+
+// A token set before the query starts runs no process at all; the path is
+// never touched, so this holds on every platform.
+void TestHashcatRunner::aCancelledQueryNeverStartsTheProcess()
+{
+    const auto cancel = std::make_shared<std::atomic_bool>(true);
+    const HashcatResult result =
+        HashcatRunner::execute(QStringLiteral("hashcat-gui-no-such-binary"),
+                               {QStringLiteral("--help")}, 20000, cancel)
+            .result();
+
+    QVERIFY(result.cancelled);
+    QVERIFY(!result.timedOut);
+    QCOMPARE(int(result.exitStatus), int(QProcess::CrashExit));
+    QCOMPARE(result.exitCode, -1);
+    QVERIFY(result.standardOutput.isEmpty());
 }
 
 // The contract with every caller: the caller's arguments go first, --quiet

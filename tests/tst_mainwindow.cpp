@@ -47,6 +47,10 @@
 #include <QToolTip>
 #include <QWidget>
 #include <utility>
+#ifndef Q_OS_WIN
+// POSIX kill()/pid_t: include-cleaner maps them past this C++ wrapper.
+#include <csignal> // IWYU pragma: keep
+#endif
 
 // The widget half of the main window: defaults, gating, lists, examples
 // and the hash-type query.
@@ -1460,10 +1464,11 @@ void TestMainWindow::changingTheBinaryReRunsTheQuery()
     QVERIFY(recorder.messageBoxSeen);
 }
 
-// The reply of a query an earlier init started describes a binary the list no
-// longer comes from. It must not replace the newer list - and must not fill the
-// combo after the path was cleared. The first stub holds its answer until the
-// test lets it go, so the two replies cannot race by accident.
+// A query an earlier init started belongs to a binary the list no longer
+// comes from. The reload that supersedes it kills its process, so its reply
+// can neither replace the newer list nor fill the combo after the path was
+// cleared. The first stub holds its answer behind a gate and reports its pid,
+// so the test can prove the process died before the gate ever opens.
 void TestMainWindow::staleQueryDoesNotReplaceTheNewerList_data()
 {
     QTest::addColumn<bool>("clearPath");
@@ -1483,9 +1488,13 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
     QVERIFY(release.isValid());
     const QString releaseFile = release.filePath(QStringLiteral("release"));
     const QString markerFile = release.filePath(QStringLiteral("answered"));
+    const QString pidFile = release.filePath(QStringLiteral("slow.pid"));
 
     QByteArray slowScript = "#!/bin/sh\n"
-                            "while [ ! -e '";
+                            "echo $$ > '";
+    slowScript += pidFile.toUtf8();
+    slowScript += "'\n"
+                  "while [ ! -e '";
     slowScript += releaseFile.toUtf8();
     slowScript += "' ]; do sleep 0.05; done\n"
                   "printf '{\"1000\":{\"name\":\"NTLM\"}}\\n'\n"
@@ -1506,15 +1515,23 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
 
     MainWindow window;
 
-    // The first query is still on its way; it is the one that will answer
-    // last. The stub writes a marker once it has printed its reply, so the
-    // test can wait for the stale answer without a watcher to observe.
+    // The first query is still on its way; it is the one that would answer
+    // last. The stub writes its pid before waiting, so the test can observe
+    // the process itself.
     QVERIFY(!MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
+    QTRY_VERIFY_WITH_TIMEOUT(QFileInfo(pidFile).size() > 0, AppConstants::Hashcat::QueryTimeoutMs);
+    QFile pidReader(pidFile);
+    QVERIFY(pidReader.open(QIODevice::ReadOnly));
+    const qint64 slowPid = pidReader.readAll().trimmed().toLongLong();
+    QVERIFY(slowPid > 0);
 
-    // A second reload supersedes it before the stub has answered.
+    // A second reload supersedes it before the stub has answered - and kills
+    // its process instead of leaving it running to the query timeout.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        clearPath ? QString() : fastStub);
     MainWindowTestAccess::reloadHashTypes(window);
+    QTRY_VERIFY_WITH_TIMEOUT(::kill(static_cast<pid_t>(slowPid), 0) != 0,
+                             AppConstants::Hashcat::QueryTimeoutMs);
 
     if (clearPath) {
         QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
@@ -1529,17 +1546,16 @@ void TestMainWindow::staleQueryDoesNotReplaceTheNewerList()
         QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 1400U);
     }
 
-    // Let the first query answer; the marker proves the stale reply was
-    // produced. The loader dropped that watcher when the second reload
-    // replaced it, so the reply cannot reach the combo.
+    // Open the gate the stale query waited on: the process is dead, so the
+    // marker is never written and the stale reply cannot reach the combo.
     QFile releaseFlag(releaseFile);
     QVERIFY(releaseFlag.open(QIODevice::WriteOnly));
     releaseFlag.close();
-    QTRY_VERIFY_WITH_TIMEOUT(QFile::exists(markerFile), AppConstants::Hashcat::QueryTimeoutMs);
-    QTest::qWait(100);
+    QTest::qWait(200);
+    QVERIFY(!QFile::exists(markerFile));
 
-    // The stale reply changed nothing: the current list is still the newer
-    // one - or still just Auto-detect after the path was cleared.
+    // The current list is still the newer one - or still just Auto-detect
+    // after the path was cleared.
     if (clearPath) {
         QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
         QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());

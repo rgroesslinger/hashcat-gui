@@ -13,20 +13,37 @@ HashTypeLoader::HashTypeLoader(QObject *parent, Query query)
 {
 }
 
+HashTypeLoader::~HashTypeLoader()
+{
+    // A query still on its way must not keep hashcat running after the GUI
+    // is gone; the thread pool would wait for it at exit.
+    if (m_cancel) {
+        m_cancel->store(true);
+    }
+}
+
 void HashTypeLoader::reload(const QString &hashcatPath)
 {
     m_queriedHashcatPath = hashcatPath;
     ++m_generation;
 
+    // Stop the earlier query's process, not just its reply: left running, it
+    // would hold a hashcat --example-hashes until its timeout, and several
+    // reconfigurations in a row would stack them up.
+    if (m_cancel) {
+        m_cancel->store(true);
+    }
+    m_cancel.reset();
+    m_watcher.reset();
+
     if (hashcatPath.isEmpty()) {
-        // No query: an earlier one may still be on its way, but its reply
-        // belongs to a path this list no longer comes from.
-        m_watcher.reset();
+        // No query: the list no longer comes from any path.
         setLoading(false);
         return;
     }
 
     setLoading(true);
+    m_cancel = std::make_shared<std::atomic_bool>(false);
     m_watcher = std::make_unique<QFutureWatcher<HashcatResult>>();
     const quint64 generation = m_generation;
     connect(m_watcher.get(), &QFutureWatcher<HashcatResult>::finished, this, [this, generation] {
@@ -56,7 +73,7 @@ void HashTypeLoader::reload(const QString &hashcatPath)
     m_watcher->setFuture(m_query(hashcatPath,
                                  QStringList() << AppConstants::Hashcat::ExampleHashes
                                                << AppConstants::Hashcat::MachineReadable,
-                                 AppConstants::Hashcat::QueryTimeoutMs));
+                                 AppConstants::Hashcat::QueryTimeoutMs, m_cancel));
 }
 
 void HashTypeLoader::setLoading(bool loading)

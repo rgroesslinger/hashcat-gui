@@ -6,13 +6,21 @@
 #include "hashtypeloader.h"
 #include "testenvironment.h"
 
+#include <QFile>
+#include <QFileInfo>
 #include <QSignalSpy>
+#include <QTemporaryDir>
 #include <QThread>
 #include <QtConcurrent/QtConcurrentRun>
+#ifndef Q_OS_WIN
+// POSIX kill()/pid_t: include-cleaner maps them past this C++ wrapper.
+#include <csignal> // IWYU pragma: keep
+#endif
 
 // The loader with an injected query: no real process, no 20-second wait.
 // The parsed list, the three failure kinds, the loading state, and the
-// generation guard that drops a superseded reply.
+// generation guard that drops a superseded reply - plus the cancellation
+// that kills a superseded query's process, against the real runner.
 class TestHashTypeLoader : public QObject
 {
     Q_OBJECT
@@ -25,6 +33,7 @@ private slots:
     void anEmptyPathStartsNoQuery();
     void theLoadingStateIsAnnounced();
     void aSupersededQueryDoesNotEmit();
+    void aSupersededQueryIsCancelled();
 
 private:
     static HashcatResult okResult(const QByteArray &output)
@@ -39,7 +48,8 @@ private:
     // A query that answers with the given result, optionally after a delay.
     static HashTypeLoader::Query canned(const HashcatResult &result, int delayMs = 0)
     {
-        return [result, delayMs](const QString &, const QStringList &, int) {
+        return [result, delayMs](const QString &, const QStringList &, int,
+                                 const HashcatRunner::CancelToken &) {
             return QtConcurrent::run([result, delayMs] {
                 if (delayMs > 0) {
                     QThread::msleep(delayMs);
@@ -120,7 +130,8 @@ void TestHashTypeLoader::unparseableOutputIsReported()
 void TestHashTypeLoader::anEmptyPathStartsNoQuery()
 {
     int calls = 0;
-    HashTypeLoader loader(nullptr, [&calls](const QString &, const QStringList &, int) {
+    HashTypeLoader loader(nullptr, [&calls](const QString &, const QStringList &, int,
+                                            const HashcatRunner::CancelToken &) {
         ++calls;
         return QtConcurrent::run([] { return HashcatResult{}; });
     });
@@ -155,9 +166,14 @@ void TestHashTypeLoader::aSupersededQueryDoesNotEmit()
 {
     // The query answers slowly for "slow" and fast for "fast"; the second
     // reload replaces the watcher and raises the generation before the slow
-    // answer arrives.
-    HashTypeLoader loader(nullptr, [](const QString &path, const QStringList &, int) {
+    // answer arrives - and hands the slow query's cancel token to the test.
+    HashcatRunner::CancelToken slowToken;
+    HashTypeLoader loader(nullptr, [&slowToken](const QString &path, const QStringList &, int,
+                                                const HashcatRunner::CancelToken &token) {
         const bool slow = path == QStringLiteral("slow");
+        if (slow) {
+            slowToken = token;
+        }
         return QtConcurrent::run([slow] {
             if (slow) {
                 QThread::msleep(200);
@@ -178,10 +194,76 @@ void TestHashTypeLoader::aSupersededQueryDoesNotEmit()
     const auto types = loaded.at(0).at(0).value<QMap<quint32, QString>>();
     QCOMPARE(types.value(1400), QStringLiteral("1400 | SHA2-256"));
 
+    // The superseded query was asked to stop, not just ignored.
+    QVERIFY(slowToken);
+    QVERIFY(slowToken->load());
+
     // The slow answer arrives after the wait: nothing more is emitted.
     QTest::qWait(400);
     QCOMPARE(loaded.count(), 1);
     QCOMPARE(loader.queriedPath(), QStringLiteral("fast"));
+}
+
+// Against the real runner: a superseded query's hashcat process is killed,
+// not left running to its 20-second timeout - and an empty path cancels a
+// running query the same way.
+void TestHashTypeLoader::aSupersededQueryIsCancelled()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs on this platform");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString pidFile = directory.filePath(QStringLiteral("slow.pid"));
+    // The slow stub reports its pid and becomes the sleeper itself; the fast
+    // one answers the query at once.
+    const QString slow = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-loader-slow"),
+        QStringLiteral("#!/bin/sh\necho $$ > '%1'\nexec sleep 30\n").arg(pidFile).toUtf8(),
+        directory.path());
+    const QString fast =
+        TestEnvironment::writeHashcatStub(QStringLiteral("stub-hashcat-loader-fast"));
+    QVERIFY2(!slow.isEmpty() && !fast.isEmpty(), "the shell stubs could not be written");
+
+    const auto readPid = [&pidFile] {
+        QFile file(pidFile);
+        if (!file.open(QIODevice::ReadOnly)) {
+            return qint64(0);
+        }
+        return file.readAll().trimmed().toLongLong();
+    };
+
+    HashTypeLoader loader(nullptr); // the real HashcatRunner::execute
+    QSignalSpy loaded(&loader, &HashTypeLoader::loaded);
+    QSignalSpy failed(&loader, &HashTypeLoader::failed);
+
+    loader.reload(slow);
+    QTRY_VERIFY_WITH_TIMEOUT(QFileInfo(pidFile).size() > 0, 5000);
+    const qint64 slowPid = readPid();
+    QVERIFY(slowPid > 0);
+    QCOMPARE(::kill(static_cast<pid_t>(slowPid), 0), 0);
+
+    loader.reload(fast);
+    QTRY_COMPARE_WITH_TIMEOUT(loaded.count(), 1, 5000);
+    // The superseded process is gone; only the fast reply is emitted.
+    QTRY_VERIFY_WITH_TIMEOUT(::kill(static_cast<pid_t>(slowPid), 0) != 0, 5000);
+    QCOMPARE(failed.count(), 0);
+    const auto types = loaded.at(0).at(0).value<QMap<quint32, QString>>();
+    QCOMPARE(types.value(0), QStringLiteral("0 | MD5"));
+
+    // An empty path starts no query and kills the one still running.
+    QVERIFY(QFile::remove(pidFile));
+    loader.reload(slow);
+    QTRY_VERIFY_WITH_TIMEOUT(QFileInfo(pidFile).size() > 0, 5000);
+    const qint64 secondPid = readPid();
+    QVERIFY(secondPid > 0);
+    loader.reload(QString());
+    QTRY_VERIFY_WITH_TIMEOUT(::kill(static_cast<pid_t>(secondPid), 0) != 0, 5000);
+    QVERIFY(!loader.isLoading());
+    QTest::qWait(200);
+    QCOMPARE(loaded.count(), 1);
+    QCOMPARE(failed.count(), 0);
+#endif
 }
 
 int main(int argc, char *argv[])
