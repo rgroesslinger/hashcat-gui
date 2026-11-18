@@ -344,6 +344,9 @@ inline constexpr QLatin1StringView Version{"--version"};
 inline constexpr QLatin1StringView HashRecipe{"--hash-recipe"};
 // The only hash mode that takes a hash recipe.
 inline constexpr int RecipeHashType = 4000;
+// The PCFG feed reads at most this many rulesets (PCFG_MAXROOT); more are
+// refused only after the backend devices are set up.
+inline constexpr int MaxPcfgRulesets = 16;
 // GUI-only sentinel of the "Auto-detect" entry in the hash type combo. Hashcat
 // has no CLI token for autodetect: it is requested by omitting -m, which is
 // what CommandBuilder does for any hash type below zero. Never pass this to

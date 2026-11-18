@@ -167,6 +167,11 @@ void TestLaunchMessage::messageFor_data()
                           "mask. Add a mask= setting that references ?1–?4, for example "
                           "mask=?1?1?1?1, or clear the custom charset.");
 
+    QTest::newRow("TooManyPcfgRulesets")
+        << int(Error::TooManyPcfgRulesets) << QStringLiteral("17") << int(AttackMode::Pcfg) << info
+        << autoText
+        << QStringLiteral("The PCFG feed reads at most 16 rulesets.\nCurrently selected: 17.");
+
     QTest::newRow("InvalidPcfgSetting")
         << int(Error::InvalidPcfgSetting) << QStringLiteral("scale=99") << straight << info << plain
         << QStringLiteral("The setting “scale=99” is not valid for this mode.");

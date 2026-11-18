@@ -208,6 +208,15 @@ LaunchError checkExtraSettings(const QStringList &keys, const QStringList &token
 // 1.0-64.0 range is never enforced upstream, so its check exists only here.
 LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
 {
+    // The feed reads at most PCFG_MAXROOT rulesets and refuses more only
+    // after backend device init.
+    if (options.pcfgRulesets.size() > AppConstants::Hashcat::MaxPcfgRulesets) {
+        if (detail) {
+            *detail = QString::number(options.pcfgRulesets.size());
+        }
+        return LaunchError::TooManyPcfgRulesets;
+    }
+
     const auto fail = [detail](const QString &what) -> LaunchError {
         if (detail) {
             *detail = what;

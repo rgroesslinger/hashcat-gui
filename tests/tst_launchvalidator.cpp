@@ -59,6 +59,7 @@ private slots:
     void validateOptions();
     void feedModeRequirements();
     void amplifierFolderIsRefused();
+    void pcfgRulesetsAreBounded();
     void pcfgSettingsAreValidated();
     void tableSettingsAreValidated();
     void associationSettingsAreValidated();
@@ -469,6 +470,24 @@ void TestLaunchValidator::amplifierFolderIsRefused()
     oneForCombination.wordlists = {folder};
     expect(oneForCombination, LaunchValidator::LaunchError::WrongWordlistCount,
            QStringLiteral("1"));
+}
+
+// The feed reads at most 16 rulesets (PCFG_MAXROOT) and refuses more only
+// after backend device init - the late failure the validator exists for.
+void TestLaunchValidator::pcfgRulesetsAreBounded()
+{
+    HashcatOptions options;
+    options.attackMode = AttackMode::Pcfg;
+    for (int i = 0; i < AppConstants::Hashcat::MaxPcfgRulesets; ++i) {
+        options.pcfgRulesets << QStringLiteral("/tmp/ruleset%1.pcfg").arg(i);
+    }
+    QCOMPARE(int(::validateOptions(options).code), int(LaunchValidator::LaunchError::None));
+
+    options.pcfgRulesets << QStringLiteral("/tmp/one-too-many.pcfg");
+    QString detail;
+    QCOMPARE(int(validateOptionsWithDetail(options, &detail)),
+             int(LaunchValidator::LaunchError::TooManyPcfgRulesets));
+    QCOMPARE(detail, QStringLiteral("17"));
 }
 
 // The mode 4 settings: the feed parses them only after the backend devices

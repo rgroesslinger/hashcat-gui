@@ -5,6 +5,7 @@
 
 #include "launchmessage.h"
 
+#include "appconstants.h"
 #include "commandbuilder.h"
 #include "terminalcatalog.h"
 
@@ -234,6 +235,15 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
             "LaunchMessage", "A custom charset is used only inside a mask, and this run named no "
                              "mask. Add a mask= setting that references ?1–?4, for example "
                              "mask=?1?1?1?1, or clear the custom charset.");
+        break;
+
+    case LaunchValidator::LaunchError::TooManyPcfgRulesets:
+        message.icon = QMessageBox::Information;
+        message.text = QCoreApplication::translate(
+                           "LaunchMessage",
+                           "The PCFG feed reads at most %1 rulesets.\nCurrently selected: %2.")
+                           .arg(AppConstants::Hashcat::MaxPcfgRulesets)
+                           .arg(problem.detail);
         break;
 
     case LaunchValidator::LaunchError::InvalidPcfgSetting:
