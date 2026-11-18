@@ -213,7 +213,10 @@ inline constexpr QLatin1StringView DeviceTypes{R"(^\s*([12]\s*(,\s*[12]\s*)*)?$)
 // The shapes the feeds of the attack modes 4 and 5 parse themselves and a
 // plain integer validator cannot hold: the colon separated weights list,
 // maxword's multiple of 16, the dot separated decimal and the boolean flags.
-inline constexpr QLatin1StringView WeightsList{"^[0-9]+(:[0-9]+)*$"};
+// weights: the feed parses each share with strtod(), so a fraction or an
+// exponent is a number too; inf/nan and hex floats stay out deliberately.
+inline constexpr QLatin1StringView WeightsList{
+    "^[0-9]+([.][0-9]+)?([eE][+-]?[0-9]+)?(:[0-9]+([.][0-9]+)?([eE][+-]?[0-9]+)?)*$"};
 inline constexpr QLatin1StringView MaxwordValue{"^(0|16|32)?$"};
 inline constexpr QLatin1StringView DecimalNumber{"^[0-9]+([.][0-9]+)?$"};
 // The table flags: the feed reads them as booleans and takes exactly these

@@ -539,10 +539,22 @@ void TestLaunchValidator::pcfgSettingsAreValidated()
         QCOMPARE(problem.detail, bad.reported);
     }
 
-    // weights: a plain colon separated list of values above zero, one per
-    // ruleset - an empty list is the one bundled default.
-    const QStringList weightCases{QStringLiteral("0"), QStringLiteral("a:b"),
-                                  QStringLiteral("1:1")};
+    // weights: a colon separated list of shares above zero, one per ruleset
+    // - an empty list is the one bundled default. The feed parses each share
+    // with strtod(), so fractions and exponents are numbers too.
+    const QStringList validWeights{QStringLiteral("2.5:1"), QStringLiteral("1e2:3"),
+                                   QStringLiteral("1E2:0.5"), QStringLiteral("2:1e-2")};
+    for (const QString &weights : validWeights) {
+        HashcatOptions options = clean;
+        options.pcfgWeights = weights;
+        expect(options, LaunchValidator::LaunchError::None);
+    }
+
+    // The shape stays conservative: no bare-dot forms, no inf/nan, and an
+    // exponent that overflows to infinity is no finite share.
+    const QStringList weightCases{
+        QStringLiteral("0"),  QStringLiteral("a:b"), QStringLiteral("1:1"), QStringLiteral("1e999"),
+        QStringLiteral("-1"), QStringLiteral(".5"),  QStringLiteral("2.")};
     for (const QString &weights : weightCases) {
         HashcatOptions options = clean;
         options.pcfgRulesets.clear();
@@ -550,6 +562,20 @@ void TestLaunchValidator::pcfgSettingsAreValidated()
         QCOMPARE(int(::validateOptions(options).code),
                  int(LaunchValidator::LaunchError::InvalidPcfgSetting));
     }
+
+    // A fraction above zero is a share like any other, also for the one
+    // bundled default ruleset.
+    HashcatOptions oneShare = clean;
+    oneShare.pcfgRulesets.clear();
+    oneShare.pcfgWeights = QStringLiteral("0.5");
+    expect(oneShare, LaunchValidator::LaunchError::None);
+
+    // One share per ruleset, in both directions.
+    HashcatOptions weightsCount = clean;
+    weightsCount.pcfgWeights = QStringLiteral("2.5");
+    expect(weightsCount, LaunchValidator::LaunchError::InvalidPcfgSetting);
+    weightsCount.pcfgWeights = QStringLiteral("2.5:1:1");
+    expect(weightsCount, LaunchValidator::LaunchError::InvalidPcfgSetting);
 
     // The grammar held to the mask refuses a named, non-zero omen - a U64,
     // so omen=01 is omen=1 - and the hint words from the accounts have no

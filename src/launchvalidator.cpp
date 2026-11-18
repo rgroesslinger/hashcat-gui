@@ -13,6 +13,7 @@
 #include <QRegularExpression>
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <optional>
 #include <utility>
 
@@ -293,10 +294,15 @@ LaunchError checkPcfgSettings(const HashcatOptions &options, QString *detail)
         const QRegularExpression shape{QString(AppConstants::Validation::WeightsList)};
         const QStringList values = weights.split(QLatin1Char(':'));
         // A weight per ruleset; an empty list is the one bundled default.
+        // The feed parses each share with strtod() and only requires it
+        // above zero - finite, where strtod() would also take inf and nan.
         const qsizetype expected = std::max<qsizetype>(1, options.pcfgRulesets.size());
         if (!shape.match(weights).hasMatch() || values.size() != expected
-            || std::ranges::any_of(values,
-                                   [](const QString &value) { return value.toLongLong() <= 0; })) {
+            || std::ranges::any_of(values, [](const QString &value) {
+                   bool ok = false;
+                   const double share = value.toDouble(&ok);
+                   return !ok || !std::isfinite(share) || share <= 0.0;
+               })) {
             return fail(namedSetting(AppConstants::HashcatSettings::Weights, weights));
         }
     }
