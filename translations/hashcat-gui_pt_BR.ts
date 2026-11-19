@@ -28,6 +28,14 @@
         <translation>Verificando atualizações…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>Perguntar ao GitHub se há uma versão mais recente disponível</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Verificar atualizações</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>Informações do sistema</translation>
     </message>
@@ -86,6 +94,10 @@
     <message>
         <source>Not configured</source>
         <translation>Não configurado</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>O executável do hashcat configurado não foi encontrado.</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -235,9 +247,19 @@
         <translation>O hashcat excedeu o tempo limite
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>Falha ao executar o hashcat
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Os nomes de executáveis do Windows incluem a extensão, por exemplo hashcat.exe.</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>Escolha um arquivo de hashes.</translation>
@@ -251,6 +273,14 @@
 %1
 Navigate to %2 → %3 to change it.</source>
         <translation>O executável do hashcat configurado não existe:
+%1
+Acesse %2 → %3 para alterá-lo.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>O caminho do hashcat configurado não é um arquivo executável:
 %1
 Acesse %2 → %3 para alterá-lo.</translation>
     </message>
@@ -339,6 +369,12 @@ Selecionadas no momento: %2.</translation>
         <translation>Um conjunto de caracteres personalizado só é usado dentro de uma máscara, e esta execução não informou nenhuma máscara. Adicione uma configuração mask= que referencie ?1–?4, por exemplo mask=?1?1?1?1, ou limpe o conjunto de caracteres personalizado.</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>O feed PCFG lê no máximo %1 conjuntos de regras.
+Selecionados no momento: %2.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>A configuração “%1” não é válida para este modo.</translation>
     </message>
@@ -361,6 +397,16 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>O comprimento mínimo do incremento é maior que o máximo.</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>Informe um formato para o arquivo de saída: um ou mais números de 1 a 6, separados por vírgulas.</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>O formato do arquivo de saída deve ser um ou mais números de 1 a 6, separados por vírgulas:
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
         <translation>O caminho do cache deve ser um diretório existente:
@@ -373,6 +419,22 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>Remover hashes quebrados não é possível no modo de ataque de associação.</translation>
+    </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>Este valor contém um caractere de controle que não pode ser passado ao hashcat:
+%1
+Remova o caractere e tente novamente.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>O terminal configurado “%1” não está disponível.</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>A linha de comando é longa demais para um terminal PowerShell. O script codificado deve caber em 32.767 caracteres, o que deixa espaço para cerca de 12.000 caracteres ASCII de argumentos do hashcat. Reduza as listas de argumentos ou seus valores e tente novamente.</translation>
     </message>
 </context>
 <context>
@@ -458,6 +520,10 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Configurações (sem lista de palavras):</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>Configurações key=value separadas por espaços para o modo de ataque 9, p. ex. phases=words,rules ou rules.rulefile=…. Usadas apenas sem uma lista de palavras. O padrão phases=words,rules,pcfg nunca termina (a fase pcfg é ilimitada); defina phases=words,rules para uma execução limitada.</translation>
+    </message>
+    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
     </message>
@@ -506,6 +572,10 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Weights:</translation>
     </message>
     <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>Um número positivo por conjunto de regras, separados por dois-pontos, p. ex. 2:1; a quantidade deve corresponder ao número de conjuntos de regras.</translation>
+    </message>
+    <message>
         <source>Threads:</source>
         <translation>Threads:</translation>
     </message>
@@ -542,6 +612,10 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Walk:</translation>
     </message>
     <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>1 (padrão) avança para a próxima palavra-base quando a ordenação permite (o caminho rápido); 0 recalcula cada palavra-base a partir da sua posição (unranking). Os candidatos são idênticos nos dois casos.</translation>
+    </message>
+    <message>
         <source>Mask:</source>
         <translation>Máscara:</translation>
     </message>
@@ -564,6 +638,14 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
     <message>
         <source>Add tables…</source>
         <translation>Adicionar tabelas…</translation>
+    </message>
+    <message>
+        <source>Move selected table up</source>
+        <translation>Mover a tabela selecionada para cima</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>Mover a tabela selecionada para baixo</translation>
     </message>
     <message>
         <source>Identity:</source>
@@ -604,6 +686,14 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
     <message>
         <source>Argument:</source>
         <translation>Argumento:</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>Copiar como script do PowerShell</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>Copiar o script do PowerShell não codificado que inicia o hashcat</translation>
     </message>
     <message>
         <source>Add</source>
@@ -718,10 +808,6 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Remover listas de palavras</translation>
     </message>
     <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>Configurações key=value separadas por espaços para o modo de ataque 9, p. ex. phases=words,rules ou rules.rulefile=…. Usadas apenas sem lista de palavras.</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>Um arquivo de conjunto de regras, uma pasta com Grammar/grammar.txt ou um nome incluído. Linhas desmarcadas são ignoradas; se nenhuma estiver marcada, default-passwords é executado.</translation>
     </message>
@@ -750,16 +836,8 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Mover o conjunto de regras selecionado para baixo</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>Um número simples por conjunto de regras, separados por dois-pontos, p. ex. 2:1; a quantidade deve corresponder ao número de conjuntos de regras.</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>Comprimento máximo de candidato que o kernel constrói, em palavras de 4 bytes: 0 (auto), 16 ou 32.</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>1 avança para a próxima palavra-base quando a ordem permite, em vez de calculá-la por unranking; os candidatos são idênticos, apenas o caminho rápido é desativado.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -894,24 +972,48 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Mín.:</translation>
     </message>
     <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>Comprimento mínimo da máscara; 0 omite a opção e usa o padrão do hashcat (1).</translation>
+    </message>
+    <message>
         <source>Max:</source>
         <translation>Máx.:</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>Comprimento máximo da máscara; 0 omite a opção e usa o padrão do hashcat (o comprimento da máscara).</translation>
     </message>
     <message>
         <source>Custom charsets</source>
         <translation>Conjuntos de caracteres personalizados</translation>
     </message>
     <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>Use ?1 na máscara para inserir este conjunto de caracteres.</translation>
+    </message>
+    <message>
         <source>Charset 1:</source>
         <translation>Conjunto de caracteres 1:</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>Use ?2 na máscara para inserir este conjunto de caracteres.</translation>
     </message>
     <message>
         <source>Charset 2:</source>
         <translation>Conjunto de caracteres 2:</translation>
     </message>
     <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>Use ?3 na máscara para inserir este conjunto de caracteres.</translation>
+    </message>
+    <message>
         <source>Charset 3:</source>
         <translation>Conjunto de caracteres 3:</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>Use ?4 na máscara para inserir este conjunto de caracteres.</translation>
     </message>
     <message>
         <source>Charset 4:</source>
@@ -958,6 +1060,10 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Atualizar o status automaticamente</translation>
     </message>
     <message>
+        <source>Command preview</source>
+        <translation>Visualização do comando</translation>
+    </message>
+    <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
     </message>
@@ -990,20 +1096,12 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Incrementar o comprimento da máscara do mínimo ao máximo.</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>Comprimento mínimo da máscara; 0 usa o padrão do hashcat.</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>Comprimento máximo da máscara; 0 usa o padrão do hashcat.</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
         <translation>Abortar a sessão após este número de segundos; 0 executa até o hashcat terminar.</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> s</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;s</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1074,8 +1172,8 @@ md5(md5(salt) . pass). Digite-a no campo de receita do hash.</translation>
         <translation>Abortar quando qualquer dispositivo de backend ultrapassar esta temperatura em °C; 0 desativa.</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -1294,6 +1392,22 @@ Padrão: 1,2</translation>
         <translation>Tipos de dispositivo OpenCL a usar, separados por vírgulas.</translation>
     </message>
     <message>
+        <source>Hash type changed</source>
+        <translation>Tipo de hash alterado</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>Não foi possível atualizar os tipos de hash; exibindo a lista anterior.</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>O algoritmo de hash (-m). “Detecção automática” omite -m e deixa o hashcat identificar o tipo. Digite para pesquisar na lista.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>Use ?1–?4 em uma máscara para inserir um conjunto de caracteres personalizado. Uma máscara é usada por Força bruta, pelos modos híbridos e pela configuração mask= do PCFG. No PCFG, um conjunto de caracteres personalizado precisa de mask=; um conjunto de caracteres que a máscara não referencia é ignorado.</translation>
+    </message>
+    <message>
         <source>Export session</source>
         <translation>Exportar sessão</translation>
     </message>
@@ -1360,6 +1474,14 @@ Padrão: 1,2</translation>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>A sessão indica o tipo de hash %1, que esta versão do hashcat não suporta.</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>A sessão indica o tipo de hash %1, que esta versão do hashcat não suporta. “Detecção automática” foi selecionada.</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>O tipo de hash selecionado %1 não é oferecido por esta versão do hashcat. “Detecção automática” foi selecionada.</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1432,10 +1554,6 @@ Erro: %1</translation>
         <translation>Defina o caminho do hashcat em %1 → %2 para carregar os tipos de hash disponíveis.</translation>
     </message>
     <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>Use ?1–?4 em uma máscara para inserir um conjunto de caracteres personalizado. Uma máscara é usada por Força bruta, pelos modos híbridos e pela configuração mask= do PCFG; um conjunto de caracteres que nenhuma máscara cita é recusado.</translation>
-    </message>
-    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Máscara de candidatos de senha. ?1–?4 inserem um conjunto de caracteres personalizado, ?w insere a palavra da lista de palavras e ?q uma segunda palavra da lista de palavras no modo Híbrido (máscara + ?w/?q), e ?? é um ? literal.</translation>
     </message>
@@ -1450,22 +1568,40 @@ O exemplo quebra um hash de teste; o hashcat deve recuperar a senha %2.</transla
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Isso pode ser causado pelo Windows Defender ou por outro software antivírus. Consulte a &lt;a href="%1"&gt;entrada do FAQ&lt;/a&gt; para ver como resolver.</translation>
+Isso pode ser causado pelo Windows Defender ou por outro software antivírus. Consulte a &lt;a href=&quot;%1&quot;&gt;entrada do FAQ&lt;/a&gt; para ver como resolver.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>O executável do hashcat configurado não foi encontrado: %1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>Detecção automática</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
         <translation>Copiado para a área de transferência</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>Falha ao iniciar</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>Selecione primeiro o executável do hashcat em %1 → %2.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>A linha de comando é longa demais para o terminal. Reduza as listas de argumentos ou seus valores e tente novamente.</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>O executável do hashcat configurado não foi encontrado:
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>Script do PowerShell copiado para a área de transferência</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Falha ao iniciar</translation>
     </message>
 </context>
 <context>
@@ -1543,6 +1679,14 @@ Isso pode ser causado pelo Windows Defender ou por outro software antivírus. Co
         <translation>hashcat</translation>
     </message>
     <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>Caminho do executável do hashcat, ou um nome simples como hashcat para procurar no PATH.</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>Procurar o executável do hashcat.</translation>
+    </message>
+    <message>
         <source>Select…</source>
         <translation>Selecionar…</translation>
     </message>
@@ -1613,6 +1757,10 @@ Isso pode ser causado pelo Windows Defender ou por outro software antivírus. Co
     <message>
         <source>Download from %1</source>
         <translation>Baixar de %1</translation>
+    </message>
+    <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>O terminal em que o hashcat é iniciado.</translation>
     </message>
     <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
@@ -1718,6 +1866,10 @@ Isso pode ser causado pelo Windows Defender ou por outro software antivírus. Co
         <translation>Não foi possível abrir “%1” para gravação: %2</translation>
     </message>
     <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>A seção indica uma versão que esta compilação não consegue interpretar.</translation>
+    </message>
+    <message>
         <source>Could not write to “%1”: %2</source>
         <translation>Não foi possível gravar em “%1”: %2</translation>
     </message>
@@ -1756,6 +1908,10 @@ Isso pode ser causado pelo Windows Defender ou por outro software antivírus. Co
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>Nenhum terminal compatível foi encontrado. O ptyxis está instalado, mas altera os valores “$” antes que o hashcat os veja, por isso não é oferecido. Instale outro terminal; consulte o FAQ.</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Nenhum terminal compatível foi encontrado neste sistema. O hashcat-gui precisa de um para mostrar a saída do hashcat.</translation>

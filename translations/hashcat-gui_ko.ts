@@ -28,6 +28,14 @@
         <translation>업데이트를 확인하는 중…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>새 릴리스를 사용할 수 있는지 GitHub에 확인합니다</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>업데이트 확인</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>시스템 정보</translation>
     </message>
@@ -86,6 +94,10 @@
     <message>
         <source>Not configured</source>
         <translation>설정되지 않음</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>설정된 hashcat 실행 파일을 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -235,9 +247,19 @@
         <translation>hashcat 시간이 초과되었습니다
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>hashcat 실행에 실패했습니다
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Windows 실행 파일 이름에는 확장자가 포함됩니다(예: hashcat.exe).</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>해시 파일을 선택하세요.</translation>
@@ -251,6 +273,14 @@
 %1
 Navigate to %2 → %3 to change it.</source>
         <translation>설정된 hashcat 실행 파일이 없습니다:
+%1
+변경하려면 %2 → %3(으)로 이동하세요.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>설정된 hashcat 경로가 실행 파일이 아닙니다:
 %1
 변경하려면 %2 → %3(으)로 이동하세요.</translation>
     </message>
@@ -339,6 +369,12 @@ Currently selected: %2.</source>
         <translation>사용자 지정 문자 집합은 마스크 안에서만 사용되는데, 이번 실행에는 마스크가 지정되지 않았습니다. ?1–?4를 참조하는 mask= 설정을 추가하거나(예: mask=?1?1?1?1) 사용자 지정 문자 집합을 비우세요.</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>PCFG 피드는 규칙 세트를 최대 %1개까지 읽습니다.
+현재 선택: %2개.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>설정 “%1”은(는) 이 모드에서 유효하지 않습니다.</translation>
     </message>
@@ -361,6 +397,16 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>증가 최소 길이가 최대 길이보다 큽니다.</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>출력 파일 형식을 입력하세요: 1에서 6 사이의 숫자를 하나 이상 쉼표로 구분하여 입력합니다.</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>출력 파일 형식은 1에서 6 사이의 숫자를 하나 이상 쉼표로 구분한 값이어야 합니다:
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
         <translation>캐시 경로는 존재하는 디렉터리여야 합니다:
@@ -373,6 +419,22 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>연관 공격 모드에서는 크래킹한 해시를 제거할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>이 값에 hashcat에 전달할 수 없는 제어 문자가 포함되어 있습니다:
+%1
+문자를 제거한 후 다시 시도하세요.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>설정된 터미널 “%1”을(를) 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>명령줄이 PowerShell 터미널에 사용하기에는 너무 깁니다. 인코딩된 스크립트는 32,767자 이내여야 하며, 이는 hashcat 인수로 약 12,000개의 ASCII 문자를 사용할 수 있다는 뜻입니다. 인수 목록이나 값을 줄인 후 다시 시도하세요.</translation>
     </message>
 </context>
 <context>
@@ -454,10 +516,6 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>인코딩 대상:</translation>
     </message>
     <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>공격 모드 9용 공백으로 구분된 key=value 설정입니다(예: phases=words,rules 또는 rules.rulefile=…). 단어 목록이 없을 때만 사용됩니다.</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>규칙 세트 파일, Grammar/grammar.txt가 있는 폴더, 또는 내장 이름. 체크되지 않은 행은 건너뛰며, 하나도 체크되지 않으면 default-passwords가 실행됩니다.</translation>
     </message>
@@ -486,16 +544,8 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>선택한 규칙 세트 아래로 이동</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>규칙 세트마다 일반 숫자를 하나씩 콜론으로 구분하여 입력합니다(예: 2:1). 숫자의 개수는 규칙 세트의 개수와 일치해야 합니다.</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>커널이 만드는 후보의 최대 길이(4바이트 단어 단위): 0(자동), 16 또는 32.</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>1이면 순서가 허용하는 경우 언랭킹 대신 다음 기본 단어로 넘어갑니다. 후보는 동일하며 빠른 경로만 꺼집니다.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -634,12 +684,40 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>오른쪽 규칙:</translation>
     </message>
     <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>마스크 최소 길이입니다. 0이면 옵션을 생략하고 hashcat의 기본값(1)을 사용합니다.</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>마스크 최대 길이입니다. 0이면 옵션을 생략하고 hashcat의 기본값(마스크 길이)을 사용합니다.</translation>
+    </message>
+    <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>마스크에서 ?1을 사용하면 이 문자 집합이 삽입됩니다.</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>마스크에서 ?2를 사용하면 이 문자 집합이 삽입됩니다.</translation>
+    </message>
+    <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>마스크에서 ?3을 사용하면 이 문자 집합이 삽입됩니다.</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>마스크에서 ?4를 사용하면 이 문자 집합이 삽입됩니다.</translation>
+    </message>
+    <message>
         <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
         <translation>마스크와 사용자 지정 문자 집합을 16진수 바이트로 해석합니다.</translation>
     </message>
     <message>
         <source>Charset is hex</source>
         <translation>문자 집합이 16진수</translation>
+    </message>
+    <message>
+        <source>Command preview</source>
+        <translation>명령 미리보기</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
@@ -754,6 +832,10 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>설정(단어 목록 없음):</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>공격 모드 9용 공백으로 구분된 key=value 설정입니다(예: phases=words,rules 또는 rules.rulefile=…). 단어 목록이 없을 때만 사용됩니다. 기본값 phases=words,rules,pcfg는 끝나지 않으므로(pcfg 단계는 제한이 없음) 실행을 제한하려면 phases=words,rules를 설정하세요.</translation>
+    </message>
+    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
     </message>
@@ -802,6 +884,10 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>Weights:</translation>
     </message>
     <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>규칙 세트마다 양수 하나를 콜론으로 구분하여 입력합니다(예: 2:1). 개수는 규칙 세트 수와 일치해야 합니다.</translation>
+    </message>
+    <message>
         <source>Threads:</source>
         <translation>스레드:</translation>
     </message>
@@ -838,6 +924,10 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>Walk:</translation>
     </message>
     <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>1(기본값)이면 순서가 허용하는 경우 다음 기본 단어로 바로 넘어갑니다(빠른 경로). 0이면 모든 기본 단어를 언랭킹으로 계산합니다. 어느 쪽이든 후보는 동일합니다.</translation>
+    </message>
+    <message>
         <source>Mask:</source>
         <translation>마스크:</translation>
     </message>
@@ -860,6 +950,14 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
     <message>
         <source>Add tables…</source>
         <translation>테이블 추가…</translation>
+    </message>
+    <message>
+        <source>Move selected table up</source>
+        <translation>선택한 테이블 위로 이동</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>선택한 테이블 아래로 이동</translation>
     </message>
     <message>
         <source>Identity:</source>
@@ -900,6 +998,14 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
     <message>
         <source>Argument:</source>
         <translation>인수:</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>PowerShell 스크립트로 복사</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>hashcat을 시작하는 인코딩되지 않은 PowerShell 스크립트를 복사합니다</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1140,20 +1246,12 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>마스크 길이를 최솟값에서 최댓값까지 늘립니다.</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>마스크의 최소 길이입니다. 0이면 hashcat의 기본값을 사용합니다.</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>마스크의 최대 길이입니다. 0이면 hashcat의 기본값을 사용합니다.</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
         <translation>이 시간(초)이 지나면 세션을 중단합니다. 0이면 hashcat이 끝날 때까지 실행합니다.</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> 초</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;초</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1176,8 +1274,8 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
         <translation>공격의 예상 속도를 출력한 뒤 종료</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Copy command</source>
@@ -1306,6 +1404,22 @@ Default: 1,2</source>
         <translation>사용할 OpenCL 장치 유형입니다(쉼표로 구분).</translation>
     </message>
     <message>
+        <source>Hash type changed</source>
+        <translation>해시 유형 변경됨</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>해시 유형을 새로 고칠 수 없어 이전 목록을 표시합니다.</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>해시 알고리즘(-m)입니다. “자동 감지”를 선택하면 -m을 생략하고 hashcat이 유형을 식별합니다. 입력하여 목록을 검색할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>마스크에서 ?1–?4를 사용하면 사용자 지정 문자 집합을 삽입할 수 있습니다. 마스크는 무차별 대입, 하이브리드 모드, PCFG의 mask= 설정에서 사용됩니다. PCFG에서 사용자 지정 문자 집합을 쓰려면 mask=가 필요하며, 마스크가 참조하지 않는 문자 집합은 무시됩니다.</translation>
+    </message>
+    <message>
         <source>Export session</source>
         <translation>세션 내보내기</translation>
     </message>
@@ -1394,10 +1508,6 @@ Default: 1,2</source>
         <translation>세션에 지정된 해시 유형 %1은(는) 이 hashcat 버전에서 지원되지 않습니다.</translation>
     </message>
     <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>마스크에서 ?1–?4를 사용하면 사용자 지정 문자 집합을 삽입할 수 있습니다. 마스크는 무차별 대입, 하이브리드 모드, PCFG의 mask= 설정에서 사용되며, 어떤 마스크에도 지정되지 않은 문자 집합은 거부됩니다.</translation>
-    </message>
-    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>비밀번호 후보 마스크입니다. ?1–?4는 사용자 지정 문자 집합을, ?w는 단어 목록의 단어를, ?q는 “하이브리드(마스크 + ?w/?q)” 모드에서 두 번째 단어 목록의 단어를 삽입하며, ??는 리터럴 ?입니다.</translation>
     </message>
@@ -1422,14 +1532,30 @@ Error: %1</source>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니다. 해결 방법은 &lt;a href="%1"&gt;FAQ 항목&lt;/a&gt;을 참조하세요.</translation>
+Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니다. 해결 방법은 &lt;a href=&quot;%1&quot;&gt;FAQ 항목&lt;/a&gt;을 참조하세요.</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>세션에 지정된 해시 유형 %1은(는) 이 hashcat 버전에서 지원되지 않습니다. “자동 감지”가 선택되었습니다.</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>선택한 해시 유형 %1은(는) 이 hashcat 버전에서 제공되지 않습니다. “자동 감지”가 선택되었습니다.</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>사용 가능한 해시 유형을 불러오려면 %1 → %2에서 hashcat 경로를 설정하세요.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>설정된 hashcat 실행 파일을 찾을 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>자동 감지</translation>
     </message>
     <message>
         <source>Open cache directory</source>
@@ -1460,12 +1586,22 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>클립보드에 복사됨</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>실행 실패</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>먼저 %1 → %2에서 hashcat 실행 파일을 선택하세요.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>명령줄이 터미널에 대해 너무 깁니다. 인수 목록이나 해당 값을 줄인 후 다시 시도하세요.</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>설정된 hashcat 실행 파일을 찾을 수 없습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>PowerShell 스크립트가 클립보드에 복사됨</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>실행 실패</translation>
     </message>
 </context>
 <context>
@@ -1541,6 +1677,14 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
+    </message>
+    <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>hashcat 실행 파일의 경로, 또는 PATH에서 찾을 hashcat 같은 단순 이름.</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>hashcat 실행 파일을 찾아봅니다.</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1621,6 +1765,10 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
     <message>
         <source>Download from %1</source>
         <translation>다운로드: %1</translation>
+    </message>
+    <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>hashcat을 시작할 터미널입니다.</translation>
     </message>
     <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
@@ -1718,6 +1866,10 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>“%1”을(를) 쓰기용으로 열 수 없습니다: %2</translation>
     </message>
     <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>이 섹션은 이 빌드에서 이해할 수 없는 버전을 지정합니다.</translation>
+    </message>
+    <message>
         <source>Could not write to “%1”: %2</source>
         <translation>“%1”에 쓸 수 없습니다: %2</translation>
     </message>
@@ -1756,6 +1908,10 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>지원되는 터미널을 찾을 수 없습니다. ptyxis가 설치되어 있지만 hashcat이 값을 읽기 전에 “$” 값을 변경하므로 제공되지 않습니다. 다른 터미널을 설치하세요. FAQ를 참조하세요.</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>이 시스템에서 지원되는 터미널을 찾을 수 없습니다. hashcat 출력을 표시하려면 hashcat-gui에 터미널이 필요합니다.</translation>

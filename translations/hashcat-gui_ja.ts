@@ -28,6 +28,14 @@
         <translation>アップデートを確認しています…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>新しいリリースが利用可能かどうかを GitHub に問い合わせます</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>アップデートを確認</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>システム情報</translation>
     </message>
@@ -86,6 +94,10 @@
     <message>
         <source>Not configured</source>
         <translation>未設定</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>設定された hashcat 実行ファイルが見つかりません。</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -235,9 +247,19 @@
         <translation>hashcat がタイムアウトしました
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>hashcat の実行に失敗しました
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Windows の実行ファイル名には拡張子が含まれます (例: hashcat.exe)。</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>ハッシュファイルを選択してください。</translation>
@@ -251,6 +273,14 @@
 %1
 Navigate to %2 → %3 to change it.</source>
         <translation>設定された hashcat 実行ファイルが存在しません:
+%1
+変更するには %2 → %3 を開いてください。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>設定された hashcat のパスは実行ファイルではありません:
 %1
 変更するには %2 → %3 を開いてください。</translation>
     </message>
@@ -339,6 +369,12 @@ Currently selected: %2.</source>
         <translation>カスタム文字セットはマスク内でのみ使用されますが、今回の実行ではマスクが指定されていません。?1–?4 を参照する mask= 設定を追加するか (例: mask=?1?1?1?1)、カスタム文字セットをクリアしてください。</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>PCFG フィードが読み込むルールセットは最大 %1 個です。
+現在の選択: %2。</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>設定「%1」はこのモードでは無効です。</translation>
     </message>
@@ -361,6 +397,16 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>インクリメントの最小長が最大長より大きくなっています。</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>出力ファイル形式を入力してください: 1 から 6 までの数字を 1 つ以上、カンマ区切りで指定します。</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>出力ファイル形式には、1 から 6 までの数字を 1 つ以上、カンマ区切りで指定する必要があります:
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
         <translation>キャッシュパスは既存のディレクトリである必要があります:
@@ -373,6 +419,22 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>「関連付け」攻撃モードでは、解読済みのハッシュを削除できません。</translation>
+    </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>この値には hashcat に渡せない制御文字が含まれています:
+%1
+文字を削除してもう一度お試しください。</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>設定されたターミナル「%1」は利用できません。</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>コマンドラインが PowerShell ターミナルには長すぎます。エンコードされたスクリプトは 32,767 文字以内に収める必要があり、hashcat の引数に使える ASCII 文字は約 12,000 文字です。引数リストまたはその値を短くして、もう一度お試しください。</translation>
     </message>
 </context>
 <context>
@@ -454,10 +516,6 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>エンコード先:</translation>
     </message>
     <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>攻撃モード 9 用の、スペース区切りの key=value 設定 (例: phases=words,rules や rules.rulefile=…)。ワードリストを使用しない場合のみ有効です。</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>ルールセットのファイル、Grammar/grammar.txt を含むフォルダー、または同梱の名前。チェックされていない行はスキップされ、1 つもチェックされていない場合は default-passwords が実行されます。</translation>
     </message>
@@ -486,16 +544,8 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>選択したルールセットを下へ移動</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>ルールセットごとに 1 つの数値をコロンで区切って指定します (例: 2:1)。数値の個数はルールセットの数と一致する必要があります。</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>カーネルが構築する候補の最大長 (4 バイトワード単位): 0 (自動)、16、または 32。</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>1 にすると、順序が許す場合はアンランキングせずに次の基本ワードへ進みます。候補は同一で、高速パスのみ無効になります。</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -634,12 +684,40 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>右ルール:</translation>
     </message>
     <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>マスクの最小長。0 の場合はオプションを省略し、hashcat の既定値 (1) を使用します。</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>マスクの最大長。0 の場合はオプションを省略し、hashcat の既定値 (マスク長) を使用します。</translation>
+    </message>
+    <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>マスク内で ?1 を使用すると、この文字セットが挿入されます。</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>マスク内で ?2 を使用すると、この文字セットが挿入されます。</translation>
+    </message>
+    <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>マスク内で ?3 を使用すると、この文字セットが挿入されます。</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>マスク内で ?4 を使用すると、この文字セットが挿入されます。</translation>
+    </message>
+    <message>
         <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
         <translation>マスクとカスタム文字セットを 16 進バイトとして解釈します。</translation>
     </message>
     <message>
         <source>Charset is hex</source>
         <translation>文字セットは 16 進数</translation>
+    </message>
+    <message>
+        <source>Command preview</source>
+        <translation>コマンドのプレビュー</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
@@ -754,6 +832,10 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>設定 (ワードリストなし):</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>攻撃モード 9 用のスペース区切りの key=value 設定 (例: phases=words,rules、rules.rulefile=…)。ワードリストがない場合にのみ使用されます。既定の phases=words,rules,pcfg は終了しません (pcfg フェーズは無制限です)。実行を有限にするには phases=words,rules を指定してください。</translation>
+    </message>
+    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
     </message>
@@ -802,6 +884,10 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>Weights:</translation>
     </message>
     <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>ルールセットごとに 1 つの正の数をコロン区切りで指定します (例: 2:1)。個数はルールセットの数と一致する必要があります。</translation>
+    </message>
+    <message>
         <source>Threads:</source>
         <translation>スレッド:</translation>
     </message>
@@ -838,6 +924,10 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>Walk:</translation>
     </message>
     <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>1 (既定) では、順序が許す場合に次のベースワードへ順に進みます (高速パス)。0 ではすべてのベースワードをアンランキングで求めます。どちらでも候補は同一です。</translation>
+    </message>
+    <message>
         <source>Mask:</source>
         <translation>マスク:</translation>
     </message>
@@ -860,6 +950,14 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
     <message>
         <source>Add tables…</source>
         <translation>テーブルを追加…</translation>
+    </message>
+    <message>
+        <source>Move selected table up</source>
+        <translation>選択したテーブルを上へ移動</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>選択したテーブルを下へ移動</translation>
     </message>
     <message>
         <source>Identity:</source>
@@ -900,6 +998,14 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
     <message>
         <source>Argument:</source>
         <translation>引数:</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>PowerShell スクリプトとしてコピー</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>hashcat を起動する、エンコードされていない PowerShell スクリプトをコピーします</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1140,20 +1246,12 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>マスク長を最小値から最大値まで増やします。</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>マスクの最小長。0 の場合は hashcat の既定値を使用します。</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>マスクの最大長。0 の場合は hashcat の既定値を使用します。</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
         <translation>この秒数が経過するとセッションを中止します。0 の場合は hashcat が終了するまで実行します。</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> 秒</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;秒</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1176,8 +1274,8 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
         <translation>攻撃の予想速度を表示して終了する</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Copy command</source>
@@ -1306,6 +1404,22 @@ Default: 1,2</source>
         <translation>使用する OpenCL デバイスタイプ (カンマ区切り)。</translation>
     </message>
     <message>
+        <source>Hash type changed</source>
+        <translation>ハッシュタイプが変更されました</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>ハッシュタイプを更新できませんでした。以前の一覧を表示しています。</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>ハッシュアルゴリズム (-m)。「自動検出」を選ぶと -m を省略し、hashcat がタイプを識別します。入力すると一覧を検索できます。</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>マスク内で ?1–?4 を使用すると、カスタム文字セットを挿入できます。マスクはブルートフォース、ハイブリッドモード、PCFG の mask= 設定で使用されます。PCFG でカスタム文字セットを使うには mask= が必要で、マスクが参照しない文字セットは無視されます。</translation>
+    </message>
+    <message>
         <source>Export session</source>
         <translation>セッションのエクスポート</translation>
     </message>
@@ -1394,10 +1508,6 @@ Default: 1,2</source>
         <translation>セッションがハッシュタイプ %1 を指定していますが、この hashcat のバージョンはサポートしていません。</translation>
     </message>
     <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>マスク内で ?1–?4 を使うと、カスタム文字セットを挿入できます。マスクは、ブルートフォース、ハイブリッドモード、PCFG の mask= 設定で使用されます。どのマスクでも指定されていない文字セットは拒否されます。</translation>
-    </message>
-    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>パスワード候補のマスク。?1–?4 はカスタム文字セットを挿入し、?w はワードリストの単語を、?q は「ハイブリッド (マスク + ?w/?q)」モードで 2 つ目のワードリストの単語を挿入します。?? はリテラルの ? です。</translation>
     </message>
@@ -1422,14 +1532,30 @@ Error: %1</source>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-これは Windows Defender などのウイルス対策ソフトが原因の場合があります。対処方法は&lt;a href="%1"&gt;FAQ の項目&lt;/a&gt;を参照してください。</translation>
+これは Windows Defender などのウイルス対策ソフトが原因の場合があります。対処方法は&lt;a href=&quot;%1&quot;&gt;FAQ の項目&lt;/a&gt;を参照してください。</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>セッションがハッシュタイプ %1 を指定していますが、この hashcat のバージョンはサポートしていません。「自動検出」が選択されました。</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>選択されたハッシュタイプ %1 は、この hashcat のバージョンでは提供されていません。「自動検出」が選択されました。</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>利用可能なハッシュタイプを読み込むには、%1 → %2 で hashcat のパスを設定してください。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>設定された hashcat 実行ファイルが見つかりません: %1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>自動検出</translation>
     </message>
     <message>
         <source>Open cache directory</source>
@@ -1460,12 +1586,22 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>クリップボードにコピーしました</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>起動に失敗しました</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>最初に %1 → %2 で hashcat 実行ファイルを選択してください。</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>コマンドラインがターミナルに対して長すぎます。引数リストまたはその値を短くして、再試行してください。</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>設定された hashcat 実行ファイルが見つかりません:
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>PowerShell スクリプトをクリップボードにコピーしました</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>起動に失敗しました</translation>
     </message>
 </context>
 <context>
@@ -1541,6 +1677,14 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
+    </message>
+    <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>hashcat 実行ファイルのパス、または PATH から検索する hashcat のような名前。</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>hashcat 実行ファイルを参照します。</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1621,6 +1765,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>Download from %1</source>
         <translation>ダウンロード元: %1</translation>
+    </message>
+    <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>hashcat を起動するターミナル。</translation>
     </message>
     <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
@@ -1718,6 +1866,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>「%1」を書き込み用に開けませんでした: %2</translation>
     </message>
     <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>このセクションは、このビルドでは解釈できないバージョンを指定しています。</translation>
+    </message>
+    <message>
         <source>Could not write to “%1”: %2</source>
         <translation>「%1」に書き込めませんでした: %2</translation>
     </message>
@@ -1756,6 +1908,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>サポートされているターミナルが見つかりませんでした。ptyxis はインストールされていますが、hashcat が参照する前に「$」の値を変更してしまうため、提供されません。別のターミナルをインストールしてください。FAQ を参照してください。</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>サポートされているターミナルがこのシステムで見つかりませんでした。hashcat の出力を表示するには、hashcat-gui にターミナルが必要です。</translation>

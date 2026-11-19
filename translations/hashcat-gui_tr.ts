@@ -28,6 +28,14 @@
         <translation>Güncellemeler denetleniyor…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>GitHub’a daha yeni bir sürümün olup olmadığını sor</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Güncellemeleri denetle</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>Sistem bilgisi</translation>
     </message>
@@ -86,6 +94,10 @@
     <message>
         <source>Not configured</source>
         <translation>Yapılandırılmamış</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>Yapılandırılmış hashcat çalıştırılabilir dosyası bulunamadı.</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -235,9 +247,19 @@
         <translation>hashcat zaman aşımına uğradı
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>hashcat çalıştırılamadı
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Windows çalıştırılabilir dosya adları uzantılarını içerir, örneğin hashcat.exe.</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>Lütfen bir hash dosyası seçin.</translation>
@@ -251,6 +273,14 @@
 %1
 Navigate to %2 → %3 to change it.</source>
         <translation>Yapılandırılmış hashcat çalıştırılabilir dosyası mevcut değil:
+%1
+Değiştirmek için %2 → %3 bölümüne gidin.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>Yapılandırılmış hashcat yolu çalıştırılabilir bir dosya değil:
 %1
 Değiştirmek için %2 → %3 bölümüne gidin.</translation>
     </message>
@@ -339,6 +369,12 @@ Currently selected: %2.</source>
         <translation>Özel karakter kümesi yalnızca bir maskenin içinde kullanılır ve bu çalıştırmada hiçbir maske belirtilmedi. ?1–?4 değerlerine başvuran bir mask= ayarı ekleyin, örneğin mask=?1?1?1?1, ya da özel karakter kümesini temizleyin.</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>PCFG feed’i en fazla %1 kural kümesi okur.
+Şu anda seçili: %2.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>“%1” ayarı bu mod için geçerli değil.</translation>
     </message>
@@ -361,6 +397,16 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>En düşük artış uzunluğu en yüksek olandan büyük.</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>Bir çıktı dosyası biçimi girin: virgülle ayrılmış, 1 ile 6 arasında bir veya daha fazla sayı.</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>Çıktı dosyası biçimi, virgülle ayrılmış, 1 ile 6 arasında bir veya daha fazla sayı olmalıdır:
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
         <translation>Önbellek yolu mevcut bir dizin olmalıdır:
@@ -373,6 +419,22 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>Kırılmış hash’leri kaldırmak ilişkilendirme saldırı modunda mümkün değildir.</translation>
+    </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>Bu değer, hashcat’e iletilemeyen bir denetim karakteri içeriyor:
+%1
+Karakteri kaldırıp yeniden deneyin.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>Yapılandırılmış terminal “%1” kullanılamıyor.</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>Komut satırı bir PowerShell terminali için çok uzun. Kodlanmış betik 32.767 karaktere sığmalıdır; bu da hashcat bağımsız değişkenleri için yaklaşık 12.000 ASCII karakterlik yer bırakır. Bağımsız değişken listelerini veya değerlerini kısaltıp yeniden deneyin.</translation>
     </message>
 </context>
 <context>
@@ -458,6 +520,10 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Ayarlar (kelime listesi yok):</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>Saldırı modu 9 için boşlukla ayrılmış key=value ayarları, ör. phases=words,rules veya rules.rulefile=…. Yalnızca kelime listesi olmadan kullanılır. Varsayılan phases=words,rules,pcfg asla bitmez (pcfg aşaması sınırsızdır); sınırlı bir çalıştırma için phases=words,rules ayarlayın.</translation>
+    </message>
+    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
     </message>
@@ -506,6 +572,10 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Weights:</translation>
     </message>
     <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>Kural kümesi başına bir pozitif sayı, iki nokta üst üste ile ayrılmış, ör. 2:1; sayıların adedi kural kümesi sayısıyla eşleşmelidir.</translation>
+    </message>
+    <message>
         <source>Threads:</source>
         <translation>İş parçacıkları:</translation>
     </message>
@@ -542,6 +612,10 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Walk:</translation>
     </message>
     <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>1 (varsayılan), sıralama izin verdiği yerde bir sonraki temel sözcüğe geçer (hızlı yol); 0 her temel sözcüğü sırasından yeniden hesaplar (unranking). Adaylar her iki durumda da aynıdır.</translation>
+    </message>
+    <message>
         <source>Mask:</source>
         <translation>Maske:</translation>
     </message>
@@ -564,6 +638,14 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
     <message>
         <source>Add tables…</source>
         <translation>Tablo ekle…</translation>
+    </message>
+    <message>
+        <source>Move selected table up</source>
+        <translation>Seçili tabloyu yukarı taşı</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>Seçili tabloyu aşağı taşı</translation>
     </message>
     <message>
         <source>Identity:</source>
@@ -604,6 +686,14 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
     <message>
         <source>Argument:</source>
         <translation>Bağımsız değişken:</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>PowerShell betiği olarak kopyala</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>hashcat’i başlatan kodlanmamış PowerShell betiğini kopyala</translation>
     </message>
     <message>
         <source>Add</source>
@@ -718,10 +808,6 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Kelime listelerini kaldır</translation>
     </message>
     <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>Saldırı modu 9 için boşlukla ayrılmış key=value ayarları, ör. phases=words,rules veya rules.rulefile=…. Yalnızca kelime listesi olmadan kullanılır.</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>Bir kural kümesi dosyası, Grammar/grammar.txt içeren bir klasör veya yerleşik bir ad. İşaretsiz satırlar atlanır; hiçbiri işaretli değilse default-passwords çalışır.</translation>
     </message>
@@ -750,16 +836,8 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Seçili kural kümesini aşağı taşı</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>Kural kümesi başına bir düz sayı, iki nokta üst üste ile ayrılmış, ör. 2:1; sayıların adedi kural kümelerinin sayısıyla eşleşmelidir.</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>Çekirdeğin oluşturduğu en büyük aday uzunluğu, 4 baytlık sözcük cinsinden: 0 (otomatik), 16 veya 32.</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>1, sıranın izin verdiği yerlerde adayı sıralamayı çözmek (unranking) yerine bir sonraki temel sözcüğe geçer; adaylar aynıdır, yalnızca hızlı yol devre dışı kalır.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -894,24 +972,48 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>En az:</translation>
     </message>
     <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>En düşük maske uzunluğu; 0 seçeneği atlar ve hashcat’in varsayılanını (1) kullanır.</translation>
+    </message>
+    <message>
         <source>Max:</source>
         <translation>En çok:</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>En yüksek maske uzunluğu; 0 seçeneği atlar ve hashcat’in varsayılanını (maske uzunluğu) kullanır.</translation>
     </message>
     <message>
         <source>Custom charsets</source>
         <translation>Özel karakter kümeleri</translation>
     </message>
     <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>Bu karakter kümesini eklemek için maskede ?1 kullanın.</translation>
+    </message>
+    <message>
         <source>Charset 1:</source>
         <translation>Karakter kümesi 1:</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>Bu karakter kümesini eklemek için maskede ?2 kullanın.</translation>
     </message>
     <message>
         <source>Charset 2:</source>
         <translation>Karakter kümesi 2:</translation>
     </message>
     <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>Bu karakter kümesini eklemek için maskede ?3 kullanın.</translation>
+    </message>
+    <message>
         <source>Charset 3:</source>
         <translation>Karakter kümesi 3:</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>Bu karakter kümesini eklemek için maskede ?4 kullanın.</translation>
     </message>
     <message>
         <source>Charset 4:</source>
@@ -958,6 +1060,10 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Durumu otomatik güncelle</translation>
     </message>
     <message>
+        <source>Command preview</source>
+        <translation>Komut önizlemesi</translation>
+    </message>
+    <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
     </message>
@@ -990,20 +1096,12 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Maske uzunluğunu en azdan en çoğa doğru artır.</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>En az maske uzunluğu; 0, hashcat’in varsayılanını kullanır.</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>En çok maske uzunluğu; 0, hashcat’in varsayılanını kullanır.</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
         <translation>Oturumu bu kadar saniye sonra durdur; 0, hashcat bitirene kadar çalışır.</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> sn</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;sn</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1074,8 +1172,8 @@ md5(md5(salt) . pass). Bunu hash tarifi alanına girin.</translation>
         <translation>Herhangi bir arka uç aygıtı bu sıcaklığı (°C) aştığında durdur; 0 devre dışı bırakır.</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -1294,6 +1392,22 @@ Varsayılan: 1,2</translation>
         <translation>Kullanılacak OpenCL aygıt türleri, virgülle ayrılmış.</translation>
     </message>
     <message>
+        <source>Hash type changed</source>
+        <translation>Hash türü değişti</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>Hash türleri yenilenemedi; önceki liste gösteriliyor.</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>Hash algoritması (-m). “Otomatik algıla” -m’yi atlar ve türü hashcat’in belirlemesine bırakır. Listede aramak için yazın.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>Maskede özel bir karakter kümesi eklemek için ?1–?4 kullanın. Maske; Kaba kuvvet, hibrit modlar ve PCFG’nin mask= ayarı tarafından kullanılır. PCFG’de özel bir karakter kümesi için mask= gerekir; maskenin başvurmadığı bir karakter kümesi yok sayılır.</translation>
+    </message>
+    <message>
         <source>Export session</source>
         <translation>Oturumu dışa aktar</translation>
     </message>
@@ -1360,6 +1474,14 @@ Varsayılan: 1,2</translation>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>Oturum, bu hashcat sürümünün desteklemediği %1 hash türünü belirtiyor.</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>Oturum, bu hashcat sürümünün desteklemediği %1 hash türünü belirtiyor. “Otomatik algıla” seçildi.</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>Seçilen %1 hash türü bu hashcat sürümü tarafından sunulmuyor. “Otomatik algıla” seçildi.</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1432,10 +1554,6 @@ Hata: %1</translation>
         <translation>Kullanılabilir hash türlerini yüklemek için hashcat yolunu %1 → %2 altında ayarlayın.</translation>
     </message>
     <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>Bir maskeye özel karakter kümesi eklemek için ?1–?4 kullanın. Maske; Kaba kuvvet, hibrit modlar ve PCFG’nin mask= ayarı tarafından kullanılır; hiçbir maskenin adını vermediği karakter kümesi reddedilir.</translation>
-    </message>
-    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Parola adayı maskesi. ?1–?4 özel bir karakter kümesi ekler, ?w kelime listesindeki sözcüğü, ?q ise Hibrit (maske + ?w/?q) modunda kelime listesindeki ikinci bir sözcüğü ekler; ?? ise düz bir ? karakteridir.</translation>
     </message>
@@ -1450,22 +1568,40 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklanabilir. Çözüm için &lt;a href="%1"&gt;SSS girdisine&lt;/a&gt; bakın.</translation>
+Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklanabilir. Çözüm için &lt;a href=&quot;%1&quot;&gt;SSS girdisine&lt;/a&gt; bakın.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>Yapılandırılmış hashcat çalıştırılabilir dosyası bulunamadı: %1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>Otomatik algıla</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
         <translation>Panoya kopyalandı</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>Başlatma başarısız</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>Önce %1 → %2 altında hashcat çalıştırılabilir dosyasını seçin.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>Komut satırı terminal için çok uzun. Argüman listalarını veya değerlerini kısaltıp yeniden deneyin.</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>Yapılandırılmış hashcat çalıştırılabilir dosyası bulunamadı:
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>PowerShell betiği panoya kopyalandı</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Başlatma başarısız</translation>
     </message>
 </context>
 <context>
@@ -1543,6 +1679,14 @@ Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklana
         <translation>hashcat</translation>
     </message>
     <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>hashcat çalıştırılabilir dosyasının yolu veya PATH içinde aranacak hashcat gibi yalın bir ad.</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>hashcat çalıştırılabilir dosyasına gözat.</translation>
+    </message>
+    <message>
         <source>Select…</source>
         <translation>Seç…</translation>
     </message>
@@ -1613,6 +1757,10 @@ Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklana
     <message>
         <source>Download from %1</source>
         <translation>%1 adresinden indir</translation>
+    </message>
+    <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>hashcat’in başlatıldığı terminal.</translation>
     </message>
     <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
@@ -1718,6 +1866,10 @@ Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklana
         <translation>“%1” yazmak için açılamadı: %2</translation>
     </message>
     <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>Bölüm, bu derlemenin anlayamadığı bir sürümü belirtiyor.</translation>
+    </message>
+    <message>
         <source>Could not write to “%1”: %2</source>
         <translation>“%1” dosyasına yazılamadı: %2</translation>
     </message>
@@ -1756,6 +1908,10 @@ Bu, Windows Defender veya başka bir virüsten koruma yazılımından kaynaklana
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>Desteklenen bir terminal bulunamadı. ptyxis yüklü, ancak hashcat görmeden önce “$” değerlerini değiştirdiği için sunulmuyor. Başka bir terminal yükleyin; SSS’ye bakın.</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Bu sistemde desteklenen bir terminal bulunamadı. hashcat çıktısını göstermek için hashcat-gui’nin bir terminale ihtiyacı var.</translation>

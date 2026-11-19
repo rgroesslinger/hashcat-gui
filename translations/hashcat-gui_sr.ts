@@ -28,6 +28,14 @@
         <translation>Provera ažuriranja…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>Pitaj GitHub da li je dostupno novije izdanje</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Proveri ažuriranja</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>Informacije o sistemu</translation>
     </message>
@@ -86,6 +94,10 @@
     <message>
         <source>Not configured</source>
         <translation>Nije konfigurisano</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>Konfigurisani hashcat program nije pronađen.</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -235,9 +247,19 @@
         <translation>hashcat je dostigao vremenski limit
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>Izvršavanje hashcat-a nije uspelo
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Nazivi izvršnih datoteka u sistemu Windows uključuju ekstenziju, na primer hashcat.exe.</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>Izaberite datoteku sa hash-ovima.</translation>
@@ -251,6 +273,14 @@
 %1
 Navigate to %2 → %3 to change it.</source>
         <translation>Konfigurisani hashcat program ne postoji:
+%1
+Idite na %2 → %3 da to promenite.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>Konfigurisana putanja do hashcat-a nije izvršna datoteka:
 %1
 Idite na %2 → %3 da to promenite.</translation>
     </message>
@@ -339,6 +369,12 @@ Trenutno izabrano: %2.</translation>
         <translation>Prilagođeni skup znakova koristi se samo unutar maske, a ovo pokretanje nije navelo nijednu masku. Dodajte podešavanje mask= koje upućuje na ?1–?4, na primer mask=?1?1?1?1, ili obrišite prilagođeni skup znakova.</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>PCFG feed čita najviše %1 skupova pravila.
+Trenutno izabrano: %2.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>Podešavanje „%1“ nije ispravno za ovaj režim.</translation>
     </message>
@@ -361,6 +397,16 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Minimalna dužina povećavanja veća je od maksimalne.</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>Unesite format izlazne datoteke: jedan ili više brojeva od 1 do 6, razdvojenih zarezima.</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>Format izlazne datoteke mora biti jedan ili više brojeva od 1 do 6, razdvojenih zarezima:
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
         <translation>Putanja keša mora biti postojeći direktorijum:
@@ -373,6 +419,22 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>Uklanjanje provaljenih hash-ova nije moguće u režimu napada asocijacije.</translation>
+    </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>Ova vrednost sadrži kontrolni znak koji se ne može proslediti programu hashcat:
+%1
+Uklonite znak i pokušajte ponovo.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>Konfigurisani terminal „%1“ nije dostupan.</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>Naredbeni red je predugačak za PowerShell terminal. Kodirana skripta mora da stane u 32.767 znakova, što ostavlja mesta za oko 12.000 ASCII znakova hashcat argumenata. Skratite liste argumenata ili njihove vrednosti i pokušajte ponovo.</translation>
     </message>
 </context>
 <context>
@@ -454,10 +516,6 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Kodiranje u:</translation>
     </message>
     <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>Podešavanja key=value razdvojena razmacima za režim napada 9, npr. phases=words,rules ili rules.rulefile=…. Koriste se samo bez liste reči.</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>Datoteka skupa pravila, fascikla sa Grammar/grammar.txt ili ugrađeno ime. Neoznačeni redovi se preskaču; ako nijedan nije označen, pokreće se default-passwords.</translation>
     </message>
@@ -486,16 +544,8 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Pomeri izabrani skup pravila dole</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>Po jedan običan broj za svaki skup pravila, razdvojeni dvotačkom, npr. 2:1; broj vrednosti mora da odgovara broju skupova pravila.</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>Maksimalna dužina kandidata koju kernel gradi, u 4-bajtnim rečima: 0 (auto), 16 ili 32.</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>1 prelazi na sledeću osnovnu reč gde redosled to dozvoljava, umesto da je izračuna pomoću unranking-a; kandidati su identični, isključuje se samo brza putanja.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -634,12 +684,40 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Desno pravilo:</translation>
     </message>
     <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>Minimalna dužina maske; 0 izostavlja opciju i koristi podrazumevanu vrednost programa hashcat (1).</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>Maksimalna dužina maske; 0 izostavlja opciju i koristi podrazumevanu vrednost programa hashcat (dužina maske).</translation>
+    </message>
+    <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>Koristite ?1 u maski da biste umetnuli ovaj skup znakova.</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>Koristite ?2 u maski da biste umetnuli ovaj skup znakova.</translation>
+    </message>
+    <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>Koristite ?3 u maski da biste umetnuli ovaj skup znakova.</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>Koristite ?4 u maski da biste umetnuli ovaj skup znakova.</translation>
+    </message>
+    <message>
         <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
         <translation>Tumači masku i prilagođene skupove znakova kao heksadecimalne bajtove.</translation>
     </message>
     <message>
         <source>Charset is hex</source>
         <translation>Skup znakova je heksadecimalan</translation>
+    </message>
+    <message>
+        <source>Command preview</source>
+        <translation>Pregled naredbe</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
@@ -754,6 +832,10 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Podešavanja (bez liste reči):</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>Podešavanja key=value razdvojena razmacima za režim napada 9, na primer phases=words,rules ili rules.rulefile=…. Koriste se samo bez liste reči. Podrazumevano phases=words,rules,pcfg nikada se ne završava (pcfg faza je neograničena); podesite phases=words,rules za ograničeno izvršavanje.</translation>
+    </message>
+    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
     </message>
@@ -802,6 +884,10 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Weights:</translation>
     </message>
     <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>Jedan pozitivan broj po skupu pravila, razdvojeni dvotačkom, na primer 2:1; broj vrednosti mora odgovarati broju skupova pravila.</translation>
+    </message>
+    <message>
         <source>Threads:</source>
         <translation>Niti:</translation>
     </message>
@@ -838,6 +924,10 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Walk:</translation>
     </message>
     <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>1 (podrazumevano) prelazi na sledeću osnovnu reč kada redosled to dozvoljava (brza putanja); 0 iznova izračunava svaku osnovnu reč na osnovu njenog ranga (unranking). Kandidati su u oba slučaja identični.</translation>
+    </message>
+    <message>
         <source>Mask:</source>
         <translation>Maska:</translation>
     </message>
@@ -860,6 +950,14 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
     <message>
         <source>Add tables…</source>
         <translation>Dodaj tabele…</translation>
+    </message>
+    <message>
+        <source>Move selected table up</source>
+        <translation>Pomeri izabranu tabelu gore</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>Pomeri izabranu tabelu dole</translation>
     </message>
     <message>
         <source>Identity:</source>
@@ -900,6 +998,14 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
     <message>
         <source>Argument:</source>
         <translation>Argument:</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>Kopiraj kao PowerShell skriptu</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>Kopiraj nekodiranu PowerShell skriptu koja pokreće hashcat</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1140,20 +1246,12 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Povećavaj dužinu maske od minimuma do maksimuma.</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>Minimalna dužina maske; 0 koristi podrazumevanu vrednost programa hashcat.</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>Maksimalna dužina maske; 0 koristi podrazumevanu vrednost programa hashcat.</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
         <translation>Prekini sesiju posle ovoliko sekundi; 0 radi dok hashcat ne završi.</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> s</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;s</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1176,8 +1274,8 @@ md5(md5(salt) . pass). Unesite ga u polje recepta za hash.</translation>
         <translation>Ispiši očekivanu brzinu napada i izađi</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Copy command</source>
@@ -1306,6 +1404,22 @@ Podrazumevano: 1,2</translation>
         <translation>Vrste OpenCL uređaja koje treba koristiti, razdvojene zarezima.</translation>
     </message>
     <message>
+        <source>Hash type changed</source>
+        <translation>Vrsta hash-a je promenjena</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>Vrste hash-ova nisu mogle da se osveže; prikazuje se prethodna lista.</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>Algoritam hash-a (-m). „Automatsko prepoznavanje“ izostavlja -m i prepušta hashcat-u da prepozna vrstu. Kucajte da biste pretražili listu.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>Koristite ?1–?4 u maski da biste umetnuli prilagođeni skup znakova. Masku koriste Brute-force, hibridni režimi i podešavanje mask= u PCFG-u. U PCFG-u prilagođeni skup znakova zahteva mask=; skup znakova na koji se maska ne poziva zanemaruje se.</translation>
+    </message>
+    <message>
         <source>Export session</source>
         <translation>Izvoz sesije</translation>
     </message>
@@ -1394,10 +1508,6 @@ Podrazumevano: 1,2</translation>
         <translation>Sesija navodi vrstu hash-a %1, koju ova verzija hashcat-a ne podržava.</translation>
     </message>
     <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>Koristite ?1–?4 u maski da biste umetnuli prilagođeni skup znakova. Masku koriste Brute-force, hibridni režimi i podešavanje mask= u PCFG-u; skup znakova koji nijedna maska ne navodi se odbija.</translation>
-    </message>
-    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Maska kandidata za lozinku. ?1–?4 umeću prilagođeni skup znakova, ?w umeće reč iz liste reči, a ?q drugu reč iz liste reči u režimu Hibrid (maska + ?w/?q), dok ?? označava bukvalno ?.</translation>
     </message>
@@ -1422,14 +1532,30 @@ Greška: %1</translation>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potražite u &lt;a href="%1"&gt;stavci FAQ-a&lt;/a&gt;.</translation>
+Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potražite u &lt;a href=&quot;%1&quot;&gt;stavci FAQ-a&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>Sesija navodi vrstu hash-a %1, koju ova verzija hashcat-a ne podržava. Izabrano je „Automatsko prepoznavanje“.</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>Izabrana vrsta hash-a %1 nije dostupna u ovoj verziji hashcat-a. Izabrano je „Automatsko prepoznavanje“.</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>Podesite putanju do hashcat-a u %1 → %2 da biste učitali dostupne vrste hash-ova.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>Konfigurisani hashcat program nije pronađen: %1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>Automatsko prepoznavanje</translation>
     </message>
     <message>
         <source>Open cache directory</source>
@@ -1460,12 +1586,22 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
         <translation>Kopirano u privremenu memoriju</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>Pokretanje nije uspelo</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>Prvo izaberite hashcat program u %1 → %2.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>Komandna linija je preduga za terminal. Skratite liste argumenata ili njihove vrednosti i pokušajte ponovo.</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>Konfigurisani hashcat program nije pronađen:
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>PowerShell skripta je kopirana u privremenu memoriju</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Pokretanje nije uspelo</translation>
     </message>
 </context>
 <context>
@@ -1541,6 +1677,14 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
+    </message>
+    <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>Putanja do hashcat programa ili prost naziv poput hashcat koji se traži na PATH-u.</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>Potraži hashcat program.</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1621,6 +1765,10 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
     <message>
         <source>Download from %1</source>
         <translation>Preuzmi sa %1</translation>
+    </message>
+    <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>Terminal u kojem se pokreće hashcat.</translation>
     </message>
     <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
@@ -1718,6 +1866,10 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
         <translation>„%1“ nije moglo da se otvori za upisivanje: %2</translation>
     </message>
     <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>Odeljak navodi verziju koju ovaj program ne može da protumači.</translation>
+    </message>
+    <message>
         <source>Could not write to “%1”: %2</source>
         <translation>U „%1“ nije moglo da se upiše: %2</translation>
     </message>
@@ -1756,6 +1908,10 @@ Uzrok može biti Windows Defender ili drugi antivirusni softver. Rešenje potra�
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>Nije pronađen podržani terminal. ptyxis je instaliran, ali menja vrednosti „$“ pre nego što ih hashcat vidi, pa se ne nudi. Instalirajte drugi terminal; pogledajte FAQ.</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Na ovom sistemu nije pronađen podržani terminal. hashcat-gui ga zahteva da bi prikazao izlaz programa hashcat.</translation>

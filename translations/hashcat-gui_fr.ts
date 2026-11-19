@@ -28,6 +28,14 @@
         <translation>Recherche de mises à jour…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>Demander à GitHub si une version plus récente est disponible</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Rechercher des mises à jour</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>Informations système</translation>
     </message>
@@ -88,12 +96,16 @@
         <translation>Non configuré</translation>
     </message>
     <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>L’exécutable hashcat configuré est introuvable.</translation>
+    </message>
+    <message>
         <source>Error: %1</source>
-        <translation>Erreur : %1</translation>
+        <translation>Erreur&#xa0;: %1</translation>
     </message>
     <message>
         <source>A newer version is available: %1.</source>
-        <translation>Une version plus récente est disponible : %1.</translation>
+        <translation>Une version plus récente est disponible&#xa0;: %1.</translation>
     </message>
     <message>
         <source>Release page</source>
@@ -109,7 +121,7 @@
     </message>
     <message>
         <source>Could not check for updates: %1</source>
-        <translation>Impossible de rechercher les mises à jour : %1</translation>
+        <translation>Impossible de rechercher les mises à jour&#xa0;: %1</translation>
     </message>
 </context>
 <context>
@@ -136,11 +148,11 @@
     </message>
     <message>
         <source>Hybrid Wordlist + Mask</source>
-        <translation>Hybride : liste de mots + masque</translation>
+        <translation>Hybride&#xa0;: liste de mots + masque</translation>
     </message>
     <message>
         <source>Hybrid Mask + Wordlist</source>
-        <translation>Hybride : masque + liste de mots</translation>
+        <translation>Hybride&#xa0;: masque + liste de mots</translation>
     </message>
     <message>
         <source>Generic (feed)</source>
@@ -168,7 +180,7 @@
     </message>
     <message>
         <source>This mode runs hashcat’s bundled default-passwords ruleset; name one or more to use your own.</source>
-        <translation>Ce mode exécute le jeu de règles default-passwords fourni avec hashcat ; indiquez-en un ou plusieurs pour utiliser les vôtres.</translation>
+        <translation>Ce mode exécute le jeu de règles default-passwords fourni avec hashcat&#xa0;; indiquez-en un ou plusieurs pour utiliser les vôtres.</translation>
     </message>
     <message>
         <source>This mode needs one wordlist and at least one table.</source>
@@ -180,30 +192,30 @@
     </message>
     <message>
         <source>This mode needs a feed. Arguments depend on the feed: random and stdin need none, wordlist needs a path.</source>
-        <translation>Ce mode nécessite un feed. Les arguments dépendent du feed : random et stdin n’en demandent aucun, wordlist demande un chemin.</translation>
+        <translation>Ce mode nécessite un feed. Les arguments dépendent du feed&#xa0;: random et stdin n’en demandent aucun, wordlist demande un chemin.</translation>
     </message>
     <message>
         <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>Ce mode nécessite au plus une liste de mots. Sans liste, les mots proviennent du fichier de hashes et la ligne de réglages peut borner l’exécution ; avec une liste, les deux fichiers sont associés ligne par ligne.</translation>
+        <translation>Ce mode nécessite au plus une liste de mots. Sans liste, les mots proviennent du fichier de hashes et la ligne de réglages peut borner l’exécution&#xa0;; avec une liste, les deux fichiers sont associés ligne par ligne.</translation>
     </message>
     <message>
         <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
-        <translation>Ce mode nécessite un masque contenant exactement un ?w ; un ?q après ?w désigne une seconde liste de mots.</translation>
+        <translation>Ce mode nécessite un masque contenant exactement un ?w&#xa0;; un ?q après ?w désigne une seconde liste de mots.</translation>
     </message>
 </context>
 <context>
     <name>ExampleSession</name>
     <message>
         <source>Could not create the example directory “%1”.</source>
-        <translation>Impossible de créer le répertoire d’exemple « %1 ».</translation>
+        <translation>Impossible de créer le répertoire d’exemple «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>Could not read the bundled file “%1”: %2</source>
-        <translation>Impossible de lire le fichier fourni « %1 » : %2</translation>
+        <translation>Impossible de lire le fichier fourni «&#xa0;%1&#xa0;»&#xa0;: %2</translation>
     </message>
     <message>
         <source>Could not write “%1”: %2</source>
-        <translation>Impossible d’écrire « %1 » : %2</translation>
+        <translation>Impossible d’écrire «&#xa0;%1&#xa0;»&#xa0;: %2</translation>
     </message>
 </context>
 <context>
@@ -235,9 +247,19 @@
         <translation>hashcat a dépassé le délai d’attente
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>Échec de l’exécution de hashcat
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Les noms d’exécutables Windows incluent leur extension, par exemple hashcat.exe.</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>Veuillez choisir un fichier de hashes.</translation>
@@ -250,7 +272,15 @@
         <source>The configured hashcat executable does not exist:
 %1
 Navigate to %2 → %3 to change it.</source>
-        <translation>L’exécutable hashcat configuré n’existe pas :
+        <translation>L’exécutable hashcat configuré n’existe pas&#xa0;:
+%1
+Accédez à %2 → %3 pour le modifier.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>Le chemin hashcat configuré n’est pas un fichier exécutable&#xa0;:
 %1
 Accédez à %2 → %3 pour le modifier.</translation>
     </message>
@@ -261,7 +291,7 @@ Accédez à %2 → %3 pour le modifier.</translation>
     <message>
         <source>The configured terminal “%1” is not available. Available terminals: %2
 Navigate to %3 → %4 to change it.</source>
-        <translation>Le terminal configuré « %1 » n’est pas disponible. Terminaux disponibles : %2
+        <translation>Le terminal configuré «&#xa0;%1&#xa0;» n’est pas disponible. Terminaux disponibles&#xa0;: %2
 Accédez à %3 → %4 pour le modifier.</translation>
     </message>
     <message>
@@ -272,22 +302,22 @@ Accédez à %3 → %4 pour le modifier.</translation>
         <source>This mode needs exactly %1 wordlists (left, right).
 Currently selected: %2.</source>
         <translation>Ce mode nécessite exactement %1 listes de mots (gauche, droite).
-Actuellement sélectionnées : %2.</translation>
+Actuellement sélectionnées&#xa0;: %2.</translation>
     </message>
     <message>
         <source>Maximum number of wordlists for this mode: %1.
 Currently selected: %2.</source>
-        <translation>Nombre maximal de listes de mots pour ce mode : %1.
-Actuellement sélectionnées : %2.</translation>
+        <translation>Nombre maximal de listes de mots pour ce mode&#xa0;: %1.
+Actuellement sélectionnées&#xa0;: %2.</translation>
     </message>
     <message>
         <source>hashcat pairs the two files by line here; this GUI offers only one wordlist for that role.</source>
-        <translation>Ici, hashcat associe les deux fichiers ligne par ligne ; cette interface ne propose qu’une seule liste de mots pour ce rôle.</translation>
+        <translation>Ici, hashcat associe les deux fichiers ligne par ligne&#xa0;; cette interface ne propose qu’une seule liste de mots pour ce rôle.</translation>
     </message>
     <message>
         <source>This wordlist has to be a file: hashcat reads it as the multiplied wordlist (the ?q side), and a folder cannot be used there:
 %1</source>
-        <translation>Cette liste de mots doit être un fichier : hashcat la lit comme la liste de mots multipliée (le côté ?q), et un dossier n’y est pas utilisable :
+        <translation>Cette liste de mots doit être un fichier&#xa0;: hashcat la lit comme la liste de mots multipliée (le côté ?q), et un dossier n’y est pas utilisable&#xa0;:
 %1</translation>
     </message>
     <message>
@@ -300,11 +330,11 @@ Actuellement sélectionnées : %2.</translation>
     </message>
     <message>
         <source>This mode needs a feed: a bundled name (wordlist, stdin, random, …) or the path of a feed file.</source>
-        <translation>Ce mode nécessite un feed : un nom fourni (wordlist, stdin, random, …) ou le chemin d’un fichier de feed.</translation>
+        <translation>Ce mode nécessite un feed&#xa0;: un nom fourni (wordlist, stdin, random, …) ou le chemin d’un fichier de feed.</translation>
     </message>
     <message>
         <source>This mode pairs the wordlists with the mask; the mask needs a ?w for the word.</source>
-        <translation>Ce mode associe les listes de mots au masque ; le masque nécessite un ?w pour le mot.</translation>
+        <translation>Ce mode associe les listes de mots au masque&#xa0;; le masque nécessite un ?w pour le mot.</translation>
     </message>
     <message>
         <source>The mask contains more than one ?w.</source>
@@ -339,12 +369,18 @@ Actuellement sélectionnées : %2.</translation>
         <translation>Un jeu de caractères personnalisé n’est utilisé qu’à l’intérieur d’un masque, et cette exécution n’a indiqué aucun masque. Ajoutez un réglage mask= qui référence ?1–?4, par exemple mask=?1?1?1?1, ou videz le jeu de caractères personnalisé.</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>Le feed PCFG lit au plus %1 jeux de règles.
+Actuellement sélectionnés&#xa0;: %2.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
-        <translation>Le réglage « %1 » n’est pas valide pour ce mode.</translation>
+        <translation>Le réglage «&#xa0;%1&#xa0;» n’est pas valide pour ce mode.</translation>
     </message>
     <message>
         <source>The token “%1” is not a setting; settings are written as key=value.</source>
-        <translation>Le token « %1 » n’est pas un réglage ; les réglages s’écrivent sous la forme key=value.</translation>
+        <translation>Le token «&#xa0;%1&#xa0;» n’est pas un réglage&#xa0;; les réglages s’écrivent sous la forme key=value.</translation>
     </message>
     <message>
         <source>The settings line applies only while the words come from the hash file. Clear either the settings line or the wordlist list.</source>
@@ -361,9 +397,19 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
         <translation>La longueur minimale de l’incrément est supérieure à la longueur maximale.</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>Saisissez un format de fichier de sortie&#xa0;: un ou plusieurs nombres de 1 à 6, séparés par des virgules.</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>Le format du fichier de sortie doit être un ou plusieurs nombres de 1 à 6, séparés par des virgules&#xa0;:
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
-        <translation>Le chemin du cache doit être un répertoire existant :
+        <translation>Le chemin du cache doit être un répertoire existant&#xa0;:
 %1</translation>
     </message>
     <message>
@@ -374,12 +420,28 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>Retirer les hashes craqués n’est pas possible dans le mode d’attaque par association.</translation>
     </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>Cette valeur contient un caractère de contrôle qui ne peut pas être transmis à hashcat&#xa0;:
+%1
+Supprimez ce caractère et réessayez.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>Le terminal configuré «&#xa0;%1&#xa0;» n’est pas disponible.</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>La ligne de commande est trop longue pour un terminal PowerShell. Le script encodé doit tenir dans 32&#xa0;767 caractères, ce qui laisse de la place pour environ 12&#xa0;000 caractères ASCII d’arguments hashcat. Raccourcissez les listes d’arguments ou leurs valeurs, puis réessayez.</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
         <source>Hash file or hash:</source>
-        <translation>Fichier de hashes ou hash :</translation>
+        <translation>Fichier de hashes ou hash&#xa0;:</translation>
     </message>
     <message>
         <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
@@ -395,7 +457,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Rewrite the hash file without cracked hashes, including potfile-known ones; the potfile is untouched. Refused in attack mode 9.</source>
-        <translation>Réécrire le fichier de hashes sans les hashes craqués, y compris ceux déjà connus du potfile ; le potfile reste intact. Refusé en mode d’attaque 9.</translation>
+        <translation>Réécrire le fichier de hashes sans les hashes craqués, y compris ceux déjà connus du potfile&#xa0;; le potfile reste intact. Refusé en mode d’attaque 9.</translation>
     </message>
     <message>
         <source>Remove hash from hash list once it is cracked</source>
@@ -403,11 +465,11 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Ignore the username before the mode’s separator (usually “:”), so accounts sharing a hash are cracked once.</source>
-        <translation>Ignorer le nom d’utilisateur avant le séparateur du mode (généralement « : »), afin que les comptes partageant un hash ne soient craqués qu’une fois.</translation>
+        <translation>Ignorer le nom d’utilisateur avant le séparateur du mode (généralement «&#xa0;:&#xa0;»), afin que les comptes partageant un hash ne soient craqués qu’une fois.</translation>
     </message>
     <message>
         <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
-        <translation>Recette de hash, p. ex. « md5(md5(salt) . pass) ». Entourez-la des guillemets extérieurs du shell et placez les chaînes internes entre l’autre type de guillemets ; PowerShell exige un accent grave avant $.</translation>
+        <translation>Recette de hash, p. ex. «&#xa0;md5(md5(salt) . pass)&#xa0;». Entourez-la des guillemets extérieurs du shell et placez les chaînes internes entre l’autre type de guillemets&#xa0;; PowerShell exige un accent grave avant $.</translation>
     </message>
     <message>
         <source>Move item up</source>
@@ -447,19 +509,15 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Encoding from:</source>
-        <translation>Encodage source :</translation>
+        <translation>Encodage source&#xa0;:</translation>
     </message>
     <message>
         <source>Encoding to:</source>
-        <translation>Encodage cible :</translation>
-    </message>
-    <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>Réglages key=value séparés par des espaces pour le mode d’attaque 9, p. ex. phases=words,rules ou rules.rulefile=…. Utilisés uniquement sans liste de mots.</translation>
+        <translation>Encodage cible&#xa0;:</translation>
     </message>
     <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
-        <translation>Un fichier de jeu de règles, un dossier contenant Grammar/grammar.txt ou un nom fourni. Les lignes non cochées sont ignorées ; si aucune n’est cochée, default-passwords est exécuté.</translation>
+        <translation>Un fichier de jeu de règles, un dossier contenant Grammar/grammar.txt ou un nom fourni. Les lignes non cochées sont ignorées&#xa0;; si aucune n’est cochée, default-passwords est exécuté.</translation>
     </message>
     <message>
         <source>Add one or more PCFG ruleset files.</source>
@@ -486,20 +544,12 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
         <translation>Descendre le jeu de règles sélectionné</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>Un nombre simple par jeu de règles, séparés par des deux-points, p. ex. 2:1 ; leur nombre doit correspondre à celui des jeux de règles.</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
-        <translation>Longueur maximale des candidats que construit le kernel, en mots de 4 octets : 0 (auto), 16 ou 32.</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>1 passe au mot de base suivant lorsque l’ordre le permet, au lieu de le calculer par unranking ; les candidats sont identiques, seul le chemin rapide est désactivé.</translation>
+        <translation>Longueur maximale des candidats que construit le kernel, en mots de 4 octets&#xa0;: 0 (auto), 16 ou 32.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
-        <translation>Réglages key=value séparés par des espaces : omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Les jeux de règles viennent en premier.</translation>
+        <translation>Réglages key=value séparés par des espaces&#xa0;: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Les jeux de règles viennent en premier.</translation>
     </message>
     <message>
         <source>Add one or more table files.</source>
@@ -519,27 +569,27 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>1 reads the wordlist as patterns: no word is returned unchanged and unmatched words are dropped. 0 (default) keeps them.</source>
-        <translation>1 lit la liste de mots comme des motifs : aucun mot n’est renvoyé tel quel et les mots sans correspondance sont écartés. 0 (par défaut) les conserve.</translation>
+        <translation>1 lit la liste de mots comme des motifs&#xa0;: aucun mot n’est renvoyé tel quel et les mots sans correspondance sont écartés. 0 (par défaut) les conserve.</translation>
     </message>
     <message>
         <source>single=1: one substitution per candidate instead of the cross product; fewer candidates, more host work on fast hashes.</source>
-        <translation>single=1 : une substitution par candidat au lieu du produit cartésien ; moins de candidats, plus de travail pour l’hôte avec les hashes rapides.</translation>
+        <translation>single=1&#xa0;: une substitution par candidat au lieu du produit cartésien&#xa0;; moins de candidats, plus de travail pour l’hôte avec les hashes rapides.</translation>
     </message>
     <message>
         <source>Keep only the first N replacements of each source word; 0 means no limit. Applies to single=1 too.</source>
-        <translation>Ne conserver que les N premières substitutions de chaque mot source ; 0 signifie aucune limite. S’applique aussi à single=1.</translation>
+        <translation>Ne conserver que les N premières substitutions de chaque mot source&#xa0;; 0 signifie aucune limite. S’applique aussi à single=1.</translation>
     </message>
     <message>
         <source>How much of a word’s cross product the host enumerates before giving up; 0 means no limit.</source>
-        <translation>Part du produit cartésien d’un mot que l’hôte énumère avant d’abandonner ; 0 signifie aucune limite.</translation>
+        <translation>Part du produit cartésien d’un mot que l’hôte énumère avant d’abandonner&#xa0;; 0 signifie aucune limite.</translation>
     </message>
     <message>
         <source>Key=value settings separated by spaces; everything after the first one is a setting, so tables come first.</source>
-        <translation>Réglages key=value séparés par des espaces ; tout ce qui suit le premier est un réglage, les tables viennent donc en premier.</translation>
+        <translation>Réglages key=value séparés par des espaces&#xa0;; tout ce qui suit le premier est un réglage, les tables viennent donc en premier.</translation>
     </message>
     <message>
         <source>Feed name or path. A slash means a path; otherwise hashcat tries feed_&lt;name&gt;, rust_&lt;name&gt;, then &lt;name&gt; in its feeds directory.</source>
-        <translation>Nom ou chemin du feed. Une barre oblique indique un chemin ; sinon, hashcat essaie feed_&lt;name&gt;, rust_&lt;name&gt;, puis &lt;name&gt; dans son répertoire de feeds.</translation>
+        <translation>Nom ou chemin du feed. Une barre oblique indique un chemin&#xa0;; sinon, hashcat essaie feed_&lt;name&gt;, rust_&lt;name&gt;, puis &lt;name&gt; dans son répertoire de feeds.</translation>
     </message>
     <message>
         <source>Browse for a feed plugin instead of naming it.</source>
@@ -551,7 +601,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Argument passed to the feed; meaning and count depend on the feed (the wordlist feed takes wordlist paths).</source>
-        <translation>Argument transmis au feed ; la signification et le nombre des arguments dépendent du feed (le feed wordlist prend des chemins de listes de mots).</translation>
+        <translation>Argument transmis au feed&#xa0;; la signification et le nombre des arguments dépendent du feed (le feed wordlist prend des chemins de listes de mots).</translation>
     </message>
     <message>
         <source>Add an argument for the feed, in order.</source>
@@ -579,7 +629,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Rules file 1:</source>
-        <translation>Fichier de règles 1 :</translation>
+        <translation>Fichier de règles 1&#xa0;:</translation>
     </message>
     <message>
         <source>Choose the rules file for slot 1.</source>
@@ -591,7 +641,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Rules file 2:</source>
-        <translation>Fichier de règles 2 :</translation>
+        <translation>Fichier de règles 2&#xa0;:</translation>
     </message>
     <message>
         <source>Choose the rules file for slot 2.</source>
@@ -603,7 +653,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Rules file 3:</source>
-        <translation>Fichier de règles 3 :</translation>
+        <translation>Fichier de règles 3&#xa0;:</translation>
     </message>
     <message>
         <source>Choose the rules file for slot 3.</source>
@@ -615,11 +665,11 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Number of random rules hashcat generates (-g). Only used with Generate rules; no rules file is read.</source>
-        <translation>Nombre de règles aléatoires que hashcat génère (-g). Utilisé uniquement avec « Générer des règles » ; aucun fichier de règles n’est lu.</translation>
+        <translation>Nombre de règles aléatoires que hashcat génère (-g). Utilisé uniquement avec «&#xa0;Générer des règles&#xa0;»&#xa0;; aucun fichier de règles n’est lu.</translation>
     </message>
     <message>
         <source>Treat every -r file as one list: rule counts add instead of multiplying.</source>
-        <translation>Traiter chaque fichier -r comme une seule liste : les nombres de règles s’additionnent au lieu de se multiplier.</translation>
+        <translation>Traiter chaque fichier -r comme une seule liste&#xa0;: les nombres de règles s’additionnent au lieu de se multiplier.</translation>
     </message>
     <message>
         <source>Wordlist rules</source>
@@ -627,11 +677,35 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Left rule:</source>
-        <translation>Règle de gauche :</translation>
+        <translation>Règle de gauche&#xa0;:</translation>
     </message>
     <message>
         <source>Right rule:</source>
-        <translation>Règle de droite :</translation>
+        <translation>Règle de droite&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>Longueur minimale du masque&#xa0;; 0 omet l’option et utilise la valeur par défaut de hashcat (1).</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>Longueur maximale du masque&#xa0;; 0 omet l’option et utilise la valeur par défaut de hashcat (la longueur du masque).</translation>
+    </message>
+    <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>Utiliser ?1 dans le masque pour insérer ce jeu de caractères.</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>Utiliser ?2 dans le masque pour insérer ce jeu de caractères.</translation>
+    </message>
+    <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>Utiliser ?3 dans le masque pour insérer ce jeu de caractères.</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>Utiliser ?4 dans le masque pour insérer ce jeu de caractères.</translation>
     </message>
     <message>
         <source>Interpret the mask and custom charsets as hexadecimal bytes.</source>
@@ -640,6 +714,10 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     <message>
         <source>Charset is hex</source>
         <translation>Jeu de caractères en hexadécimal</translation>
+    </message>
+    <message>
+        <source>Command preview</source>
+        <translation>Aperçu de la commande</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
@@ -651,15 +729,15 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Min:</source>
-        <translation>Min :</translation>
+        <translation>Min&#xa0;:</translation>
     </message>
     <message>
         <source>Max:</source>
-        <translation>Max :</translation>
+        <translation>Max&#xa0;:</translation>
     </message>
     <message>
         <source>Use hashcat’s optimized kernels (-O); they cap the maximum password length.</source>
-        <translation>Utiliser les kernels optimisés de hashcat (-O) ; ils limitent la longueur maximale du mot de passe.</translation>
+        <translation>Utiliser les kernels optimisés de hashcat (-O)&#xa0;; ils limitent la longueur maximale du mot de passe.</translation>
     </message>
     <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
@@ -703,7 +781,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Mode:</source>
-        <translation>Mode :</translation>
+        <translation>Mode&#xa0;:</translation>
     </message>
     <message>
         <source>Attack</source>
@@ -723,11 +801,11 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Hash type:</source>
-        <translation>Type de hash :</translation>
+        <translation>Type de hash&#xa0;:</translation>
     </message>
     <message>
         <source>Hash recipe:</source>
-        <translation>Recette de hash :</translation>
+        <translation>Recette de hash&#xa0;:</translation>
     </message>
     <message>
         <source>Add files…</source>
@@ -743,7 +821,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Only checked rows are used. A folder is one wordlist: hashcat reads the files directly inside it.</source>
-        <translation>Seules les lignes cochées sont utilisées. Un dossier est une liste de mots : hashcat lit les fichiers situés directement dedans.</translation>
+        <translation>Seules les lignes cochées sont utilisées. Un dossier est une liste de mots&#xa0;: hashcat lit les fichiers situés directement dedans.</translation>
     </message>
     <message>
         <source>Assume words in the wordlist are given in hexadecimal.</source>
@@ -751,7 +829,11 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Settings (no wordlist):</source>
-        <translation>Réglages (sans liste de mots) :</translation>
+        <translation>Réglages (sans liste de mots)&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>Réglages key=value séparés par des espaces pour le mode d’attaque 9, p. ex. phases=words,rules ou rules.rulefile=…. Utilisés uniquement sans liste de mots. La valeur par défaut phases=words,rules,pcfg ne se termine jamais (la phase pcfg n’est pas bornée)&#xa0;; définissez phases=words,rules pour une exécution bornée.</translation>
     </message>
     <message>
         <source>PCFG</source>
@@ -759,11 +841,11 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Name:</source>
-        <translation>Nom :</translation>
+        <translation>Nom&#xa0;:</translation>
     </message>
     <message>
         <source>A bundled or installed ruleset name, such as default-passwords or hints. A slash means a path; hashcat searches its profile and shared pcfg folders first.</source>
-        <translation>Nom d’un jeu de règles fourni ou installé, comme default-passwords ou hints. Une barre oblique indique un chemin ; hashcat cherche d’abord dans son dossier de profil et dans les dossiers pcfg partagés.</translation>
+        <translation>Nom d’un jeu de règles fourni ou installé, comme default-passwords ou hints. Une barre oblique indique un chemin&#xa0;; hashcat cherche d’abord dans son dossier de profil et dans les dossiers pcfg partagés.</translation>
     </message>
     <message>
         <source>default-passwords, hints, or a ruleset path</source>
@@ -783,7 +865,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Scale:</source>
-        <translation>Scale :</translation>
+        <translation>Scale&#xa0;:</translation>
     </message>
     <message>
         <source>Quantization steps per bit (1–64)</source>
@@ -791,7 +873,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Costmax:</source>
-        <translation>Costmax :</translation>
+        <translation>Costmax&#xa0;:</translation>
     </message>
     <message>
         <source>Highest cost level to enumerate (1–64)</source>
@@ -799,15 +881,19 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Weights:</source>
-        <translation>Weights :</translation>
+        <translation>Weights&#xa0;:</translation>
+    </message>
+    <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>Un nombre positif par jeu de règles, séparés par des deux-points, p. ex. 2:1&#xa0;; le nombre de valeurs doit correspondre au nombre de jeux de règles.</translation>
     </message>
     <message>
         <source>Threads:</source>
-        <translation>Threads :</translation>
+        <translation>Threads&#xa0;:</translation>
     </message>
     <message>
         <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
-        <translation>Cœurs qui génèrent les mots de base (0–16) ; 0 s’exécute dans le thread appelant.</translation>
+        <translation>Cœurs qui génèrent les mots de base (0–16)&#xa0;; 0 s’exécute dans le thread appelant.</translation>
     </message>
     <message>
         <source>auto</source>
@@ -815,7 +901,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Kbits:</source>
-        <translation>Kbits :</translation>
+        <translation>Kbits&#xa0;:</translation>
     </message>
     <message>
         <source>Bits one inner loop may span (0–27)</source>
@@ -823,23 +909,27 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Maxword:</source>
-        <translation>Maxword :</translation>
+        <translation>Maxword&#xa0;:</translation>
     </message>
     <message>
         <source>Maxgain:</source>
-        <translation>Maxgain :</translation>
+        <translation>Maxgain&#xa0;:</translation>
     </message>
     <message>
         <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
-        <translation>1.0–64.0 ; le séparateur décimal est un point, et non le séparateur des paramètres régionaux.</translation>
+        <translation>1.0–64.0&#xa0;; le séparateur décimal est un point, et non le séparateur des paramètres régionaux.</translation>
     </message>
     <message>
         <source>Walk:</source>
-        <translation>Walk :</translation>
+        <translation>Walk&#xa0;:</translation>
+    </message>
+    <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>1 (par défaut) passe au mot de base suivant lorsque l’ordre le permet (la voie rapide)&#xa0;; 0 recalcule chaque mot de base à partir de son rang (unranking). Les candidats sont identiques dans les deux cas.</translation>
     </message>
     <message>
         <source>Mask:</source>
-        <translation>Masque :</translation>
+        <translation>Masque&#xa0;:</translation>
     </message>
     <message>
         <source>A mask selects the candidates the grammar may spell. ?1–?4 insert a custom charset. Cannot combine with omen=1, or hintaccount without hintwords/hintfile.</source>
@@ -847,7 +937,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Extra settings (key=value):</source>
-        <translation>Réglages supplémentaires (key=value) :</translation>
+        <translation>Réglages supplémentaires (key=value)&#xa0;:</translation>
     </message>
     <message>
         <source>Table</source>
@@ -862,24 +952,32 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
         <translation>Ajouter des tables…</translation>
     </message>
     <message>
+        <source>Move selected table up</source>
+        <translation>Monter la table sélectionnée</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>Descendre la table sélectionnée</translation>
+    </message>
+    <message>
         <source>Identity:</source>
-        <translation>Identity :</translation>
+        <translation>Identity&#xa0;:</translation>
     </message>
     <message>
         <source>Template:</source>
-        <translation>Template :</translation>
+        <translation>Template&#xa0;:</translation>
     </message>
     <message>
         <source>Single:</source>
-        <translation>Single :</translation>
+        <translation>Single&#xa0;:</translation>
     </message>
     <message>
         <source>Cap:</source>
-        <translation>Cap :</translation>
+        <translation>Cap&#xa0;:</translation>
     </message>
     <message>
         <source>Maxperm:</source>
-        <translation>Maxperm :</translation>
+        <translation>Maxperm&#xa0;:</translation>
     </message>
     <message>
         <source>Generic feed</source>
@@ -887,7 +985,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Feed:</source>
-        <translation>Feed :</translation>
+        <translation>Feed&#xa0;:</translation>
     </message>
     <message>
         <source>wordlist, stdin, random, association, pcfg, table, hybrid, mask, or a feed path</source>
@@ -899,7 +997,15 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Argument:</source>
-        <translation>Argument :</translation>
+        <translation>Argument&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>Copier comme script PowerShell</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>Copier le script PowerShell non encodé qui lance hashcat</translation>
     </message>
     <message>
         <source>Add</source>
@@ -907,7 +1013,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Arguments the feed reads, in order; only checked rows are used.</source>
-        <translation>Arguments lus par le feed, dans l’ordre ; seules les lignes cochées sont utilisées.</translation>
+        <translation>Arguments lus par le feed, dans l’ordre&#xa0;; seules les lignes cochées sont utilisées.</translation>
     </message>
     <message>
         <source>Rules</source>
@@ -915,7 +1021,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Use rules files:</source>
-        <translation>Utiliser des fichiers de règles :</translation>
+        <translation>Utiliser des fichiers de règles&#xa0;:</translation>
     </message>
     <message>
         <source>Enable rules file slot 1 for this run.</source>
@@ -923,7 +1029,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Rules file for slot 1; applied to each word. Leave empty to leave the slot unused.</source>
-        <translation>Fichier de règles pour l’emplacement 1 ; appliqué à chaque mot. Laissez vide pour ne pas utiliser l’emplacement.</translation>
+        <translation>Fichier de règles pour l’emplacement 1&#xa0;; appliqué à chaque mot. Laissez vide pour ne pas utiliser l’emplacement.</translation>
     </message>
     <message>
         <source>Enable rules file slot 2 for this run.</source>
@@ -931,7 +1037,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Rules file for slot 2; applied to each word. Leave empty to leave the slot unused.</source>
-        <translation>Fichier de règles pour l’emplacement 2 ; appliqué à chaque mot. Laissez vide pour ne pas utiliser l’emplacement.</translation>
+        <translation>Fichier de règles pour l’emplacement 2&#xa0;; appliqué à chaque mot. Laissez vide pour ne pas utiliser l’emplacement.</translation>
     </message>
     <message>
         <source>Enable rules file slot 3 for this run.</source>
@@ -939,7 +1045,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Rules file for slot 3; applied to each word. Leave empty to leave the slot unused.</source>
-        <translation>Fichier de règles pour l’emplacement 3 ; appliqué à chaque mot. Laissez vide pour ne pas utiliser l’emplacement.</translation>
+        <translation>Fichier de règles pour l’emplacement 3&#xa0;; appliqué à chaque mot. Laissez vide pour ne pas utiliser l’emplacement.</translation>
     </message>
     <message>
         <source>Generate the rules automatically instead of reading them from a file.</source>
@@ -947,7 +1053,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Generate rules:</source>
-        <translation>Générer des règles :</translation>
+        <translation>Générer des règles&#xa0;:</translation>
     </message>
     <message>
         <source>Join -r files into one list</source>
@@ -967,7 +1073,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Built-in charsets:</source>
-        <translation>Jeux de caractères intégrés :</translation>
+        <translation>Jeux de caractères intégrés&#xa0;:</translation>
     </message>
     <message>
         <source>Custom charsets</source>
@@ -975,19 +1081,19 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Charset 1:</source>
-        <translation>Jeu de caractères 1 :</translation>
+        <translation>Jeu de caractères 1&#xa0;:</translation>
     </message>
     <message>
         <source>Charset 2:</source>
-        <translation>Jeu de caractères 2 :</translation>
+        <translation>Jeu de caractères 2&#xa0;:</translation>
     </message>
     <message>
         <source>Charset 3:</source>
-        <translation>Jeu de caractères 3 :</translation>
+        <translation>Jeu de caractères 3&#xa0;:</translation>
     </message>
     <message>
         <source>Charset 4:</source>
-        <translation>Jeu de caractères 4 :</translation>
+        <translation>Jeu de caractères 4&#xa0;:</translation>
     </message>
     <message>
         <source>Session and limits</source>
@@ -995,7 +1101,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Session name:</source>
-        <translation>Nom de la session :</translation>
+        <translation>Nom de la session&#xa0;:</translation>
     </message>
     <message>
         <source>Name hashcat uses for its restore file and status output.</source>
@@ -1003,7 +1109,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Runtime limit:</source>
-        <translation>Durée maximale :</translation>
+        <translation>Durée maximale&#xa0;:</translation>
     </message>
     <message>
         <source>unlimited</source>
@@ -1011,11 +1117,11 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Skip:</source>
-        <translation>Ignorer :</translation>
+        <translation>Ignorer&#xa0;:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation>Limite :</translation>
+        <translation>Limite&#xa0;:</translation>
     </message>
     <message>
         <source>Keep updating the run status (speed, progress, ETA) instead of printing one final line.</source>
@@ -1027,7 +1133,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Seconds between status updates; only used when automatic status is enabled.</source>
-        <translation>Secondes entre les mises à jour de l’état ; utilisé uniquement lorsque l’état automatique est activé.</translation>
+        <translation>Secondes entre les mises à jour de l’état&#xa0;; utilisé uniquement lorsque l’état automatique est activé.</translation>
     </message>
     <message>
         <source>Ignore warnings and start hashcat anyway. Use with care.</source>
@@ -1043,7 +1149,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Cache path:</source>
-        <translation>Chemin du cache :</translation>
+        <translation>Chemin du cache&#xa0;:</translation>
     </message>
     <message>
         <source>Directory hashcat keeps its cache in. Must exist.</source>
@@ -1063,19 +1169,19 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>CPU affinity:</source>
-        <translation>Affinité CPU :</translation>
+        <translation>Affinité CPU&#xa0;:</translation>
     </message>
     <message>
         <source>Backend devices:</source>
-        <translation>Périphériques backend :</translation>
+        <translation>Périphériques backend&#xa0;:</translation>
     </message>
     <message>
         <source>Device types:</source>
-        <translation>Types de périphériques :</translation>
+        <translation>Types de périphériques&#xa0;:</translation>
     </message>
     <message>
         <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
-        <translation>Interrompre lorsqu’un périphérique backend dépasse cette température en °C ; 0 désactive cette limite.</translation>
+        <translation>Interrompre lorsqu’un périphérique backend dépasse cette température en °C&#xa0;; 0 désactive cette limite.</translation>
     </message>
     <message>
         <source>Write recovered hashes to the file below, in the selected formats.</source>
@@ -1083,14 +1189,14 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Write recovered hashes to file:</source>
-        <translation>Écrire les hashes retrouvés dans le fichier :</translation>
+        <translation>Écrire les hashes retrouvés dans le fichier&#xa0;:</translation>
     </message>
     <message>
         <source>The file the recovered hashes are written to. Format variables:
 
 &lt;hash&gt; = current hash filename or hash
 &lt;unixtime&gt; = current Unix timestamp</source>
-        <translation>Le fichier dans lequel les hashes retrouvés sont écrits. Variables de format :
+        <translation>Le fichier dans lequel les hashes retrouvés sont écrits. Variables de format&#xa0;:
 
 &lt;hash&gt; = nom du fichier de hashes actuel ou hash
 &lt;unixtime&gt; = horodatage Unix actuel</translation>
@@ -1105,7 +1211,7 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Format:</source>
-        <translation>Format :</translation>
+        <translation>Format&#xa0;:</translation>
     </message>
     <message>
         <source>Do not write the potfile</source>
@@ -1140,20 +1246,12 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
         <translation>Incrémenter la longueur du masque du minimum au maximum.</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>Longueur minimale du masque ; 0 utilise la valeur par défaut de hashcat.</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>Longueur maximale du masque ; 0 utilise la valeur par défaut de hashcat.</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
-        <translation>Interrompre la session après ce nombre de secondes ; 0 s’exécute jusqu’à ce que hashcat termine.</translation>
+        <translation>Interrompre la session après ce nombre de secondes&#xa0;; 0 s’exécute jusqu’à ce que hashcat termine.</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> s</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;s</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1169,15 +1267,15 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
     </message>
     <message>
         <source>Print only the attack’s speed, then quit; no cracking.</source>
-        <translation>Afficher uniquement la vitesse de l’attaque, puis quitter ; aucun craquage.</translation>
+        <translation>Afficher uniquement la vitesse de l’attaque, puis quitter&#xa0;; aucun craquage.</translation>
     </message>
     <message>
         <source>Return expected speed of the attack, then quit</source>
         <translation>Afficher la vitesse attendue de l’attaque, puis quitter</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Copy command</source>
@@ -1267,11 +1365,11 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
         <source>Outfile format to use, separated by commas.
 Default: 1,2</source>
         <translation>Format du fichier de sortie à utiliser, séparé par des virgules.
-Par défaut : 1,2</translation>
+Par défaut&#xa0;: 1,2</translation>
     </message>
     <message>
         <source>Common encodings:</source>
-        <translation>Encodages courants :</translation>
+        <translation>Encodages courants&#xa0;:</translation>
     </message>
     <message>
         <source>Force the internal wordlist encoding from this code. Leave empty to let hashcat decide.</source>
@@ -1299,11 +1397,27 @@ Par défaut : 1,2</translation>
     </message>
     <message>
         <source>Settings exported to “%1”.</source>
-        <translation>Réglages exportés vers « %1 ».</translation>
+        <translation>Réglages exportés vers «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>OpenCL device types to use, separated by commas.</source>
         <translation>Types de périphériques OpenCL à utiliser, séparés par des virgules.</translation>
+    </message>
+    <message>
+        <source>Hash type changed</source>
+        <translation>Type de hash modifié</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>Les types de hash n’ont pas pu être actualisés&#xa0;; la liste précédente est affichée.</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>L’algorithme de hash (-m). «&#xa0;Détection automatique&#xa0;» omet -m et laisse hashcat identifier le type. Saisissez du texte pour rechercher dans la liste.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>Utiliser ?1–?4 dans un masque pour insérer un jeu de caractères personnalisé. Un masque est utilisé par Force brute, les modes hybrides et le réglage mask= de PCFG. Dans PCFG, un jeu de caractères personnalisé nécessite mask=&#xa0;; un jeu de caractères que le masque ne référence pas est ignoré.</translation>
     </message>
     <message>
         <source>Export session</source>
@@ -1311,7 +1425,7 @@ Par défaut : 1,2</translation>
     </message>
     <message>
         <source>Session exported to “%1”.</source>
-        <translation>Session exportée vers « %1 ».</translation>
+        <translation>Session exportée vers «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>Import session</source>
@@ -1319,13 +1433,13 @@ Par défaut : 1,2</translation>
     </message>
     <message>
         <source>Session imported from “%1”.</source>
-        <translation>Session importée depuis « %1 ».</translation>
+        <translation>Session importée depuis «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>Session imported from “%1”.
 
 %2</source>
-        <translation>Session importée depuis « %1 ».
+        <translation>Session importée depuis «&#xa0;%1&#xa0;».
 
 %2</translation>
     </message>
@@ -1339,7 +1453,7 @@ Par défaut : 1,2</translation>
     </message>
     <message>
         <source>Settings loaded from “%1”.</source>
-        <translation>Réglages chargés depuis « %1 ».</translation>
+        <translation>Réglages chargés depuis «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>Review them and save to apply them.</source>
@@ -1355,7 +1469,7 @@ Par défaut : 1,2</translation>
     </message>
     <message>
         <source>Reset every field to its default? The current session is lost.</source>
-        <translation>Réinitialiser tous les champs à leur valeur par défaut ? La session actuelle sera perdue.</translation>
+        <translation>Réinitialiser tous les champs à leur valeur par défaut&#xa0;? La session actuelle sera perdue.</translation>
     </message>
     <message>
         <source>Session warning</source>
@@ -1387,15 +1501,11 @@ Par défaut : 1,2</translation>
     </message>
     <message>
         <source>Could not start “%1”: %2</source>
-        <translation>Impossible de démarrer « %1 » : %2</translation>
+        <translation>Impossible de démarrer «&#xa0;%1&#xa0;»&#xa0;: %2</translation>
     </message>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>La session désigne le type de hash %1, que cette version de hashcat ne prend pas en charge.</translation>
-    </message>
-    <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>Utilisez ?1–?4 dans un masque pour insérer un jeu de caractères personnalisé. Un masque est utilisé par Force brute, les modes hybrides et le réglage mask= de PCFG ; un jeu de caractères qu’aucun masque ne nomme est refusé.</translation>
     </message>
     <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
@@ -1405,15 +1515,15 @@ Par défaut : 1,2</translation>
         <source>Load the %1 example? The current session is lost.
 
 The example cracks a test hash; hashcat should recover the password %2.</source>
-        <translation>Charger l’exemple %1 ? La session actuelle sera perdue.
+        <translation>Charger l’exemple %1&#xa0;? La session actuelle sera perdue.
 
-L’exemple craque un hash de test ; hashcat devrait retrouver le mot de passe %2.</translation>
+L’exemple craque un hash de test&#xa0;; hashcat devrait retrouver le mot de passe %2.</translation>
     </message>
     <message>
         <source>Failed to obtain supported hash types.
 Error: %1</source>
         <translation>Impossible d’obtenir les types de hash pris en charge.
-Erreur : %1</translation>
+Erreur&#xa0;: %1</translation>
     </message>
     <message>
         <source>The hash types could not be loaded. Check the hashcat path in Settings.</source>
@@ -1422,14 +1532,30 @@ Erreur : %1</translation>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Consultez &lt;a href="%1"&gt;l’entrée de la FAQ&lt;/a&gt; pour y remédier.</translation>
+Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Consultez &lt;a href=&quot;%1&quot;&gt;l’entrée de la FAQ&lt;/a&gt; pour y remédier.</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>La session désigne le type de hash %1, que cette version de hashcat ne prend pas en charge. «&#xa0;Détection automatique&#xa0;» a été sélectionné.</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>Le type de hash sélectionné %1 n’est pas proposé par cette version de hashcat. «&#xa0;Détection automatique&#xa0;» a été sélectionné.</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
         <translation>Définissez le chemin de hashcat sous %1 → %2 pour charger les types de hash disponibles.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>L’exécutable hashcat configuré est introuvable&#xa0;: %1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>Détection automatique</translation>
     </message>
     <message>
         <source>Open cache directory</source>
@@ -1460,12 +1586,22 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
         <translation>Copié dans le presse-papiers</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>Échec du lancement</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>Sélectionnez d’abord l’exécutable hashcat sous %1 → %2.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>La ligne de commande est trop longue pour le terminal. Raccourcissez les listes d’arguments ou leurs valeurs, puis réessayez.</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>L’exécutable hashcat configuré est introuvable&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>Script PowerShell copié dans le presse-papiers</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Échec du lancement</translation>
     </message>
 </context>
 <context>
@@ -1477,31 +1613,31 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     <message>
         <source>This wordlist does not exist:
 %1</source>
-        <translation>Cette liste de mots n’existe pas :
+        <translation>Cette liste de mots n’existe pas&#xa0;:
 %1</translation>
     </message>
     <message>
         <source>This ruleset folder has no Grammar/grammar.txt:
 %1</source>
-        <translation>Ce dossier de jeu de règles ne contient pas de Grammar/grammar.txt :
+        <translation>Ce dossier de jeu de règles ne contient pas de Grammar/grammar.txt&#xa0;:
 %1</translation>
     </message>
     <message>
         <source>This ruleset does not exist:
 %1</source>
-        <translation>Ce jeu de règles n’existe pas :
+        <translation>Ce jeu de règles n’existe pas&#xa0;:
 %1</translation>
     </message>
     <message>
         <source>A table must be a file; hashcat does not read a folder:
 %1</source>
-        <translation>Une table doit être un fichier ; hashcat ne lit pas un dossier :
+        <translation>Une table doit être un fichier&#xa0;; hashcat ne lit pas un dossier&#xa0;:
 %1</translation>
     </message>
     <message>
         <source>This table does not exist:
 %1</source>
-        <translation>Cette table n’existe pas :
+        <translation>Cette table n’existe pas&#xa0;:
 %1</translation>
     </message>
 </context>
@@ -1509,11 +1645,11 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     <name>SessionTransfer</name>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
-        <translation>Le fichier a été créé par une version plus ancienne de hashcat-gui (version de format %1 ; cette version lit la version de format %2).</translation>
+        <translation>Le fichier a été créé par une version plus ancienne de hashcat-gui (version de format %1&#xa0;; cette version lit la version de format %2).</translation>
     </message>
     <message>
         <source>The file holds sections this import does not use: %1.</source>
-        <translation>Le fichier contient des sections que cette importation n’utilise pas : %1.</translation>
+        <translation>Le fichier contient des sections que cette importation n’utilise pas&#xa0;: %1.</translation>
     </message>
     <message>
         <source>The file is in format version %1, but this version reads format version %2, so it was not applied. Update hashcat-gui to read it.</source>
@@ -1541,6 +1677,14 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     <message>
         <source>hashcat</source>
         <translation>hashcat</translation>
+    </message>
+    <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>Chemin de l’exécutable hashcat, ou nom simple tel que hashcat à rechercher dans le PATH.</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>Parcourir pour trouver l’exécutable hashcat.</translation>
     </message>
     <message>
         <source>Select…</source>
@@ -1623,6 +1767,10 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
         <translation>Télécharger depuis %1</translation>
     </message>
     <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>Le terminal dans lequel hashcat est lancé.</translation>
+    </message>
+    <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
         <translation>Utiliser les noms courts des options (-m) au lieu des noms longs (--hash-type) dans la commande.</translation>
     </message>
@@ -1644,23 +1792,23 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     </message>
     <message>
         <source>The hashcat path “%1” was not found on this computer.</source>
-        <translation>Le chemin de hashcat « %1 » est introuvable sur cet ordinateur.</translation>
+        <translation>Le chemin de hashcat «&#xa0;%1&#xa0;» est introuvable sur cet ordinateur.</translation>
     </message>
     <message>
         <source>The terminal “%1” is not installed and was not applied.</source>
-        <translation>Le terminal « %1 » n’est pas installé et n’a pas été appliqué.</translation>
+        <translation>Le terminal «&#xa0;%1&#xa0;» n’est pas installé et n’a pas été appliqué.</translation>
     </message>
     <message>
         <source>The color scheme “%1” is not offered and was not applied.</source>
-        <translation>Le schéma de couleurs « %1 » n’est pas proposé et n’a pas été appliqué.</translation>
+        <translation>Le schéma de couleurs «&#xa0;%1&#xa0;» n’est pas proposé et n’a pas été appliqué.</translation>
     </message>
     <message>
         <source>The language “%1” is not offered and was not applied.</source>
-        <translation>La langue « %1 » n’est pas proposée et n’a pas été appliquée.</translation>
+        <translation>La langue «&#xa0;%1&#xa0;» n’est pas proposée et n’a pas été appliquée.</translation>
     </message>
     <message>
         <source>The configured terminal “%1” is not installed.</source>
-        <translation>Le terminal configuré « %1 » n’est pas installé.</translation>
+        <translation>Le terminal configuré «&#xa0;%1&#xa0;» n’est pas installé.</translation>
     </message>
     <message>
         <source>Executable Files (*.exe *.bin hashcat);;All Files (*)</source>
@@ -1668,7 +1816,7 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     </message>
     <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
-        <translation>Aucun exécutable hashcat n’est configuré ; hashcat ne peut pas être lancé.</translation>
+        <translation>Aucun exécutable hashcat n’est configuré&#xa0;; hashcat ne peut pas être lancé.</translation>
     </message>
     <message>
         <source>The configured hashcat executable was not found on this computer.</source>
@@ -1703,7 +1851,7 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     <name>StateFile</name>
     <message>
         <source>The file is not valid JSON: %1</source>
-        <translation>Le fichier n’est pas un JSON valide : %1</translation>
+        <translation>Le fichier n’est pas un JSON valide&#xa0;: %1</translation>
     </message>
     <message>
         <source>The file does not contain a JSON object.</source>
@@ -1715,27 +1863,31 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     </message>
     <message>
         <source>Could not open “%1” for writing: %2</source>
-        <translation>Impossible d’ouvrir « %1 » en écriture : %2</translation>
+        <translation>Impossible d’ouvrir «&#xa0;%1&#xa0;» en écriture&#xa0;: %2</translation>
+    </message>
+    <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>La section désigne une version que cette compilation ne peut pas interpréter.</translation>
     </message>
     <message>
         <source>Could not write to “%1”: %2</source>
-        <translation>Impossible d’écrire dans « %1 » : %2</translation>
+        <translation>Impossible d’écrire dans «&#xa0;%1&#xa0;»&#xa0;: %2</translation>
     </message>
     <message>
         <source>Could not open “%1” for reading: %2</source>
-        <translation>Impossible d’ouvrir « %1 » en lecture : %2</translation>
+        <translation>Impossible d’ouvrir «&#xa0;%1&#xa0;» en lecture&#xa0;: %2</translation>
     </message>
     <message>
         <source>The file does not contain a “%1” section.</source>
-        <translation>Le fichier ne contient pas de section « %1 ».</translation>
+        <translation>Le fichier ne contient pas de section «&#xa0;%1&#xa0;».</translation>
     </message>
     <message>
         <source>The file does not contain a “%1” section; it holds %2.</source>
-        <translation>Le fichier ne contient pas de section « %1 » ; il contient %2.</translation>
+        <translation>Le fichier ne contient pas de section «&#xa0;%1&#xa0;»&#xa0;; il contient %2.</translation>
     </message>
     <message>
         <source>The “%1” section does not contain any values.</source>
-        <translation>La section « %1 » ne contient aucune valeur.</translation>
+        <translation>La section «&#xa0;%1&#xa0;» ne contient aucune valeur.</translation>
     </message>
     <message>
         <source> and </source>
@@ -1747,15 +1899,19 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     </message>
     <message>
         <source>The file names values this version does not know, so they were not applied: %1.</source>
-        <translation>Le fichier mentionne des valeurs que cette version ne connaît pas, elles n’ont donc pas été appliquées : %1.</translation>
+        <translation>Le fichier mentionne des valeurs que cette version ne connaît pas, elles n’ont donc pas été appliquées&#xa0;: %1.</translation>
     </message>
     <message>
         <source>The file holds values of the wrong type, so they were not applied: %1.</source>
-        <translation>Le fichier contient des valeurs d’un mauvais type, elles n’ont donc pas été appliquées : %1.</translation>
+        <translation>Le fichier contient des valeurs d’un mauvais type, elles n’ont donc pas été appliquées&#xa0;: %1.</translation>
     </message>
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>Aucun terminal pris en charge n’a été trouvé. ptyxis est installé, mais il modifie les valeurs «&#xa0;$&#xa0;» avant que hashcat ne les voie&#xa0;; il n’est donc pas proposé. Installez un autre terminal&#xa0;; consultez la FAQ.</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>Aucun terminal pris en charge n’a été trouvé sur ce système. hashcat-gui en a besoin d’un pour afficher la sortie de hashcat.</translation>
@@ -1765,7 +1921,7 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     <name>UpdateChecker</name>
     <message>
         <source>GitHub answered with HTTP status %1: %2</source>
-        <translation>GitHub a répondu avec le statut HTTP %1 : %2</translation>
+        <translation>GitHub a répondu avec le statut HTTP %1&#xa0;: %2</translation>
     </message>
     <message>
         <source>GitHub answered with HTTP status %1.</source>

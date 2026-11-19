@@ -28,6 +28,14 @@
         <translation>Перевірка оновлень…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>Запитати в GitHub, чи доступний новіший випуск</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Перевірити оновлення</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>Відомості про систему</translation>
     </message>
@@ -86,6 +94,10 @@
     <message>
         <source>Not configured</source>
         <translation>Не налаштовано</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>Налаштований виконуваний файл hashcat не знайдено.</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -184,7 +196,7 @@
     </message>
     <message>
         <source>This mode needs at most one wordlist. Without one the words come from the hash file and the settings line can bound the run; with one the two files are paired by line.</source>
-        <translation>Цьому режиму потрібно щонайбільше один словник. Без словника слова беруться з файлу гешів, а рядок налаштувань може обмежити запуск; зі словником два файли зіставляються порядково.</translation>
+        <translation>Цьому режиму потрібно не більше одного словника. Без словника слова беруться з файлу гешів, а рядок налаштувань може обмежити запуск; зі словником два файли зіставляються порядково.</translation>
     </message>
     <message>
         <source>This mode needs a mask with exactly one ?w; a ?q after ?w names a second wordlist.</source>
@@ -235,9 +247,19 @@
         <translation>Вичерпано час очікування hashcat
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>Не вдалося виконати hashcat
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Імена виконуваних файлів Windows містять розширення, наприклад hashcat.exe.</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>Виберіть файл гешів.</translation>
@@ -251,6 +273,14 @@
 %1
 Navigate to %2 → %3 to change it.</source>
         <translation>Налаштованого виконуваного файлу hashcat не існує:
+%1
+Перейдіть до %2 → %3, щоб змінити його.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>Налаштований шлях до hashcat не вказує на виконуваний файл:
 %1
 Перейдіть до %2 → %3, щоб змінити його.</translation>
     </message>
@@ -339,6 +369,12 @@ Currently selected: %2.</source>
         <translation>Власний набір символів використовується лише всередині маски, а в цьому запуску маску не вказано. Додайте налаштування mask=, що посилається на ?1–?4, наприклад mask=?1?1?1?1, або очистьте власний набір символів.</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>Feed PCFG читає щонайбільше %1 наборів правил.
+Наразі вибрано: %2.</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>Налаштування «%1» недійсне для цього режиму.</translation>
     </message>
@@ -361,6 +397,16 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Мінімальна довжина приросту більша за максимальну.</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>Введіть формат вихідного файлу: одне або кілька чисел від 1 до 6 через кому.</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>Формат вихідного файлу має складатися з одного або кількох чисел від 1 до 6 через кому:
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
         <translation>Шлях до кешу має вказувати на наявний каталог:
@@ -373,6 +419,22 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>Вилучення зламаних гешів неможливе в асоціативному режимі атаки.</translation>
+    </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>Це значення містить керівний символ, який не можна передати до hashcat:
+%1
+Вилучіть символ і повторіть спробу.</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>Налаштований термінал «%1» недоступний.</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>Командний рядок надто довгий для терміналу PowerShell. Закодований скрипт має вміститися в 32&#xa0;767 символів, що залишає місце приблизно для 12&#xa0;000 ASCII-символів аргументів hashcat. Скоротіть списки аргументів або їхні значення й повторіть спробу.</translation>
     </message>
 </context>
 <context>
@@ -458,6 +520,10 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Налаштування (без словника):</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>Налаштування key=value через пробіл для режиму атаки 9, наприклад phases=words,rules або rules.rulefile=…. Використовуються лише без словника. Типове значення phases=words,rules,pcfg ніколи не завершується (фаза pcfg необмежена); задайте phases=words,rules для обмеженого запуску.</translation>
+    </message>
+    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
     </message>
@@ -506,6 +572,10 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Weights:</translation>
     </message>
     <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>Одне додатне число на набір правил через двокрапку, наприклад 2:1; кількість чисел має збігатися з кількістю наборів правил.</translation>
+    </message>
+    <message>
         <source>Threads:</source>
         <translation>Потоки:</translation>
     </message>
@@ -542,6 +612,10 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Walk:</translation>
     </message>
     <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>1 (типово) переходить до наступного базового слова, коли це дозволяє порядок (швидкий шлях); 0 обчислює кожне базове слово заново за його номером (unranking). Кандидати в обох випадках однакові.</translation>
+    </message>
+    <message>
         <source>Mask:</source>
         <translation>Маска:</translation>
     </message>
@@ -564,6 +638,14 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
     <message>
         <source>Add tables…</source>
         <translation>Додати таблиці…</translation>
+    </message>
+    <message>
+        <source>Move selected table up</source>
+        <translation>Перемістити вибрану таблицю угору</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>Перемістити вибрану таблицю униз</translation>
     </message>
     <message>
         <source>Identity:</source>
@@ -604,6 +686,14 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
     <message>
         <source>Argument:</source>
         <translation>Аргумент:</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>Копіювати як скрипт PowerShell</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>Копіювати незакодований скрипт PowerShell, що запускає hashcat</translation>
     </message>
     <message>
         <source>Add</source>
@@ -718,10 +808,6 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Вилучити словники</translation>
     </message>
     <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>Налаштування key=value через пробіл для режиму атаки 9, наприклад phases=words,rules або rules.rulefile=…. Використовуються лише без словника.</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>Файл набору правил, тека з Grammar/grammar.txt або вбудована назва. Непозначені рядки пропускаються; якщо не позначено жодного, запускається default-passwords.</translation>
     </message>
@@ -750,16 +836,8 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Перемістити вибраний набір правил униз</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>По одному простому числу на набір правил, через двокрапку, наприклад 2:1; кількість чисел має збігатися з кількістю наборів правил.</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>Максимальна довжина кандидата, яку будує ядро, у 4-байтових словах: 0 (авто), 16 або 32.</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>1 переходить до наступного базового слова там, де це дозволяє порядок, замість його обчислення через unranking; кандидати ті самі, вимикається лише швидкий шлях.</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -894,24 +972,48 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Мін.:</translation>
     </message>
     <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>Мінімальна довжина маски; 0 пропускає параметр і використовує типове значення hashcat (1).</translation>
+    </message>
+    <message>
         <source>Max:</source>
         <translation>Макс.:</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>Максимальна довжина маски; 0 пропускає параметр і використовує типове значення hashcat (довжина маски).</translation>
     </message>
     <message>
         <source>Custom charsets</source>
         <translation>Власні набори символів</translation>
     </message>
     <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>Використовуйте ?1 у масці, щоб вставити цей набір символів.</translation>
+    </message>
+    <message>
         <source>Charset 1:</source>
         <translation>Набір символів 1:</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>Використовуйте ?2 у масці, щоб вставити цей набір символів.</translation>
     </message>
     <message>
         <source>Charset 2:</source>
         <translation>Набір символів 2:</translation>
     </message>
     <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>Використовуйте ?3 у масці, щоб вставити цей набір символів.</translation>
+    </message>
+    <message>
         <source>Charset 3:</source>
         <translation>Набір символів 3:</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>Використовуйте ?4 у масці, щоб вставити цей набір символів.</translation>
     </message>
     <message>
         <source>Charset 4:</source>
@@ -958,6 +1060,10 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Оновлювати стан автоматично</translation>
     </message>
     <message>
+        <source>Command preview</source>
+        <translation>Попередній перегляд команди</translation>
+    </message>
+    <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
     </message>
@@ -990,20 +1096,12 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Збільшувати довжину маски від мінімальної до максимальної.</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>Мінімальна довжина маски; 0 — типове значення hashcat.</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>Максимальна довжина маски; 0 — типове значення hashcat.</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
         <translation>Перервати сеанс через указану кількість секунд; 0 — працювати, доки hashcat не завершить роботу.</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> с</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;с</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1074,8 +1172,8 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
         <translation>Перервати, коли будь-який пристрій бекенда перевищить цю температуру в °C; 0 вимикає перевірку.</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -1294,6 +1392,22 @@ Default: 1,2</source>
         <translation>Типи пристроїв OpenCL для використання, через кому.</translation>
     </message>
     <message>
+        <source>Hash type changed</source>
+        <translation>Тип геша змінено</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>Не вдалося оновити типи гешів; показано попередній список.</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>Алгоритм геша (-m). «Автовизначення» пропускає -m і дає hashcat змогу визначити тип. Почніть вводити текст, щоб шукати в списку.</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>Використовуйте ?1–?4 у масці, щоб вставити власний набір символів. Маска використовується в режимах «Повний перебір», гібридних і в налаштуванні mask= для PCFG. У PCFG власному набору символів потрібен mask=; набір символів, на який маска не посилається, ігнорується.</translation>
+    </message>
+    <message>
         <source>Export session</source>
         <translation>Експорт сеансу</translation>
     </message>
@@ -1360,6 +1474,14 @@ Default: 1,2</source>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>Сеанс указує тип геша %1, який ця версія hashcat не підтримує.</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>Сеанс указує тип геша %1, який ця версія hashcat не підтримує. Вибрано «Автовизначення».</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>Вибраний тип геша %1 не пропонується цією версією hashcat. Вибрано «Автовизначення».</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1432,10 +1554,6 @@ Error: %1</source>
         <translation>Укажіть шлях до hashcat у %1 → %2, щоб завантажити доступні типи гешів.</translation>
     </message>
     <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>Використовуйте ?1–?4 у масці, щоб вставити власний набір символів. Маска використовується режимом «Повний перебір», гібридними режимами та налаштуванням mask= у PCFG; набір символів, який не названо в жодній масці, відхиляється.</translation>
-    </message>
-    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>Маска кандидатів у паролі. ?1–?4 вставляють власний набір символів, ?w вставляє слово зі словника, а ?q — друге слово зі словника в режимі «Гібридна (маска + ?w/?q)», ?? означає літерал ?.</translation>
     </message>
@@ -1450,22 +1568,40 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-Це може бути спричинено Windows Defender або іншим антивірусним ПЗ. Спосіб усунення див. у &lt;a href="%1"&gt;записі ЧаП&lt;/a&gt;.</translation>
+Це може бути спричинено Windows Defender або іншим антивірусним ПЗ. Спосіб усунення див. у &lt;a href=&quot;%1&quot;&gt;записі ЧаП&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>Налаштований виконуваний файл hashcat не знайдено: %1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>Автовизначення</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
         <translation>Скопійовано до буфера обміну</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>Не вдалося запустити</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>Спочатку виберіть виконуваний файл hashcat у %1 → %2.</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>Командний рядок задовгий для термінала. Скоротіть списки аргументів або їхні значення та повторіть спробу.</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>Налаштований виконуваний файл hashcat не знайдено:
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>Скрипт PowerShell скопійовано до буфера обміну</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>Не вдалося запустити</translation>
     </message>
 </context>
 <context>
@@ -1543,6 +1679,14 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>hashcat</translation>
     </message>
     <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>Шлях до виконуваного файлу hashcat або просте ім’я, як-от hashcat, яке шукатиметься в PATH.</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>Вибрати виконуваний файл hashcat.</translation>
+    </message>
+    <message>
         <source>Select…</source>
         <translation>Вибрати…</translation>
     </message>
@@ -1613,6 +1757,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>Download from %1</source>
         <translation>Завантажити з %1</translation>
+    </message>
+    <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>Термінал, у якому запускається hashcat.</translation>
     </message>
     <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
@@ -1718,6 +1866,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>Не вдалося відкрити «%1» для запису: %2</translation>
     </message>
     <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>Розділ указує версію, яку ця збірка не може зрозуміти.</translation>
+    </message>
+    <message>
         <source>Could not write to “%1”: %2</source>
         <translation>Не вдалося записати в «%1»: %2</translation>
     </message>
@@ -1756,6 +1908,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>Підтримуваний термінал не знайдено. ptyxis установлено, але він змінює значення «$», перш ніж їх побачить hashcat, тому він не пропонується. Установіть інший термінал; див. ЧаП.</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>У цій системі не знайдено підтримуваного термінала. hashcat-gui потрібен термінал, щоб показувати вивід hashcat.</translation>

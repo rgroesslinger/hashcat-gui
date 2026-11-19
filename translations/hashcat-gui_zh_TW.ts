@@ -28,6 +28,14 @@
         <translation>正在檢查更新…</translation>
     </message>
     <message>
+        <source>Ask GitHub whether a newer release is available</source>
+        <translation>詢問 GitHub 是否有較新的版本可用</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>檢查更新</translation>
+    </message>
+    <message>
         <source>System information</source>
         <translation>系統資訊</translation>
     </message>
@@ -86,6 +94,10 @@
     <message>
         <source>Not configured</source>
         <translation>未設定</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found.</source>
+        <translation>找不到已設定的 hashcat 可執行檔。</translation>
     </message>
     <message>
         <source>Error: %1</source>
@@ -235,9 +247,19 @@
         <translation>hashcat 逾時
 %1</translation>
     </message>
+    <message>
+        <source>hashcat failed to run
+%1</source>
+        <translation>hashcat 執行失敗
+%1</translation>
+    </message>
 </context>
 <context>
     <name>LaunchMessage</name>
+    <message>
+        <source>Windows executable names include their extension, for example hashcat.exe.</source>
+        <translation>Windows 可執行檔名稱包含其副檔名，例如 hashcat.exe。</translation>
+    </message>
     <message>
         <source>Please choose a hash file.</source>
         <translation>請選擇一個雜湊檔案。</translation>
@@ -251,6 +273,14 @@
 %1
 Navigate to %2 → %3 to change it.</source>
         <translation>設定的 hashcat 可執行檔不存在：
+%1
+請前往 %2 → %3 進行修改。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat path is not an executable file:
+%1
+Navigate to %2 → %3 to change it.</source>
+        <translation>已設定的 hashcat 路徑不是可執行檔：
 %1
 請前往 %2 → %3 進行修改。</translation>
     </message>
@@ -339,6 +369,12 @@ Currently selected: %2.</source>
         <translation>自訂字元集只能在遮罩中使用，而本次執行未指定遮罩。請新增引用 ?1–?4 的 mask= 設定（例如 mask=?1?1?1?1），或清除自訂字元集。</translation>
     </message>
     <message>
+        <source>The PCFG feed reads at most %1 rulesets.
+Currently selected: %2.</source>
+        <translation>PCFG feed 最多讀取 %1 個規則集。
+目前已選擇：%2 個。</translation>
+    </message>
+    <message>
         <source>The setting “%1” is not valid for this mode.</source>
         <translation>設定「%1」對此模式無效。</translation>
     </message>
@@ -361,6 +397,16 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>遞增的最小長度大於最大長度。</translation>
     </message>
     <message>
+        <source>Enter an outfile format: one or more comma-separated numbers from 1 to 6.</source>
+        <translation>請輸入輸出檔案格式：一個或多個 1 到 6 的數字，以逗號分隔。</translation>
+    </message>
+    <message>
+        <source>The outfile format must be one or more comma-separated numbers from 1 to 6:
+%1</source>
+        <translation>輸出檔案格式必須是一個或多個 1 到 6 的數字，以逗號分隔：
+%1</translation>
+    </message>
+    <message>
         <source>The cache path must be an existing directory:
 %1</source>
         <translation>快取路徑必須是已存在的目錄：
@@ -373,6 +419,22 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>在「關聯」攻擊模式下無法移除已破解的雜湊。</translation>
+    </message>
+    <message>
+        <source>This value contains a control character that cannot be passed to hashcat:
+%1
+Remove the character and try again.</source>
+        <translation>此值包含無法傳遞給 hashcat 的控制字元：
+%1
+請移除該字元後重試。</translation>
+    </message>
+    <message>
+        <source>The configured terminal “%1” is not available.</source>
+        <translation>已設定的終端機「%1」無法使用。</translation>
+    </message>
+    <message>
+        <source>The command line is too long for a PowerShell terminal. The encoded script must fit into 32,767 characters, which leaves room for about 12,000 ASCII characters of hashcat arguments. Shorten the argument lists or their values and try again.</source>
+        <translation>命令列對於 PowerShell 終端機來說過長。編碼後的指令碼必須能放入 32,767 個字元，這為 hashcat 參數留出約 12,000 個 ASCII 字元的空間。請縮短參數清單或其值後重試。</translation>
     </message>
 </context>
 <context>
@@ -458,6 +520,10 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>設定（無字典）：</translation>
     </message>
     <message>
+        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist. The default phases=words,rules,pcfg never ends (the pcfg phase is unbounded); set phases=words,rules for a bounded run.</source>
+        <translation>攻擊模式 9 的以空格分隔的 key=value 設定，例如 phases=words,rules 或 rules.rulefile=…。僅在沒有字典時使用。預設值 phases=words,rules,pcfg 永遠不會結束（pcfg 階段沒有上限）；請設定 phases=words,rules 以取得有限的執行。</translation>
+    </message>
+    <message>
         <source>PCFG</source>
         <translation>PCFG</translation>
     </message>
@@ -506,6 +572,10 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>Weights:</translation>
     </message>
     <message>
+        <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
+        <translation>每個規則集一個正數，以冒號分隔，例如 2:1；數量必須與規則集的數量一致。</translation>
+    </message>
+    <message>
         <source>Threads:</source>
         <translation>執行緒：</translation>
     </message>
@@ -542,6 +612,10 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>Walk:</translation>
     </message>
     <message>
+        <source>1 (default) steps to the next base word where the ordering allows (the fast path); 0 unranks every base word. The candidates are identical either way.</source>
+        <translation>設為 1（預設）時，在順序允許的情況下直接步進到下一個基礎單字（快速路徑）；設為 0 時對每個基礎單字重新進行反排名（unranking）。兩種方式產生的候選完全相同。</translation>
+    </message>
+    <message>
         <source>Mask:</source>
         <translation>遮罩：</translation>
     </message>
@@ -564,6 +638,14 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
     <message>
         <source>Add tables…</source>
         <translation>新增表格…</translation>
+    </message>
+    <message>
+        <source>Move selected table up</source>
+        <translation>上移所選表格</translation>
+    </message>
+    <message>
+        <source>Move selected table down</source>
+        <translation>下移所選表格</translation>
     </message>
     <message>
         <source>Identity:</source>
@@ -604,6 +686,14 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
     <message>
         <source>Argument:</source>
         <translation>參數：</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>複製為 PowerShell 指令碼</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat</source>
+        <translation>複製啟動 hashcat 的未編碼 PowerShell 指令碼</translation>
     </message>
     <message>
         <source>Add</source>
@@ -718,10 +808,6 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>移除字典</translation>
     </message>
     <message>
-        <source>Space-separated key=value settings for attack mode 9, e.g. phases=words,rules or rules.rulefile=…. Only used without a wordlist.</source>
-        <translation>用於攻擊模式 9、以空格分隔的 key=value 設定，例如 phases=words,rules 或 rules.rulefile=…。僅在沒有字典時使用。</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>規則集檔案、包含 Grammar/grammar.txt 的資料夾，或內建名稱。未勾選的列會被略過；若一列都未勾選，則執行 default-passwords。</translation>
     </message>
@@ -750,16 +836,8 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>下移所選規則集</translation>
     </message>
     <message>
-        <source>One plain number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
-        <translation>每個規則集對應一個普通數字，以冒號分隔，例如 2:1；數字的個數必須與規則集的數量一致。</translation>
-    </message>
-    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>核心建構的候選最大長度，以 4 位元組字為單位：0（自動）、16 或 32。</translation>
-    </message>
-    <message>
-        <source>1 steps to the next base word where the order allows instead of unranking it; the candidates are identical, only the fast path is off.</source>
-        <translation>設為 1 時，在順序允許的情況下直接步進到下一個基礎單字，而不是透過 unranking 計算；候選內容相同，只是關閉了快速路徑。</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
@@ -894,24 +972,48 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>最小：</translation>
     </message>
     <message>
+        <source>Minimum mask length; 0 omits the flag and uses hashcat’s default (1).</source>
+        <translation>遮罩最小長度；0 表示省略該選項並使用 hashcat 的預設值（1）。</translation>
+    </message>
+    <message>
         <source>Max:</source>
         <translation>最大：</translation>
+    </message>
+    <message>
+        <source>Maximum mask length; 0 omits the flag and uses hashcat’s default (the mask length).</source>
+        <translation>遮罩最大長度；0 表示省略該選項並使用 hashcat 的預設值（遮罩長度）。</translation>
     </message>
     <message>
         <source>Custom charsets</source>
         <translation>自訂字元集</translation>
     </message>
     <message>
+        <source>Use ?1 in the mask to insert this charset.</source>
+        <translation>在遮罩中使用 ?1 以插入此字元集。</translation>
+    </message>
+    <message>
         <source>Charset 1:</source>
         <translation>字元集 1：</translation>
+    </message>
+    <message>
+        <source>Use ?2 in the mask to insert this charset.</source>
+        <translation>在遮罩中使用 ?2 以插入此字元集。</translation>
     </message>
     <message>
         <source>Charset 2:</source>
         <translation>字元集 2：</translation>
     </message>
     <message>
+        <source>Use ?3 in the mask to insert this charset.</source>
+        <translation>在遮罩中使用 ?3 以插入此字元集。</translation>
+    </message>
+    <message>
         <source>Charset 3:</source>
         <translation>字元集 3：</translation>
+    </message>
+    <message>
+        <source>Use ?4 in the mask to insert this charset.</source>
+        <translation>在遮罩中使用 ?4 以插入此字元集。</translation>
     </message>
     <message>
         <source>Charset 4:</source>
@@ -958,6 +1060,10 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>自動更新狀態</translation>
     </message>
     <message>
+        <source>Command preview</source>
+        <translation>命令預覽</translation>
+    </message>
+    <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
     </message>
@@ -990,20 +1096,12 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>將遮罩長度從最小值遞增到最大值。</translation>
     </message>
     <message>
-        <source>Minimum mask length; 0 uses hashcat’s default.</source>
-        <translation>遮罩的最小長度；0 表示使用 hashcat 的預設值。</translation>
-    </message>
-    <message>
-        <source>Maximum mask length; 0 uses hashcat’s default.</source>
-        <translation>遮罩的最大長度；0 表示使用 hashcat 的預設值。</translation>
-    </message>
-    <message>
         <source>Abort the session after this many seconds; 0 runs until hashcat finishes.</source>
         <translation>在此秒數後中止工作階段；0 表示一直執行到 hashcat 結束。</translation>
     </message>
     <message>
-        <source> s</source>
-        <translation> 秒</translation>
+        <source>&#xa0;s</source>
+        <translation>&#xa0;秒</translation>
     </message>
     <message>
         <source>Skip this many candidates from the start.</source>
@@ -1074,8 +1172,8 @@ md5(md5(salt) . pass)。請在雜湊配方欄位中輸入。</translation>
         <translation>當任一後端裝置超過此溫度（°C）時中止；0 表示停用。</translation>
     </message>
     <message>
-        <source> °C</source>
-        <translation> °C</translation>
+        <source>&#xa0;°C</source>
+        <translation>&#xa0;°C</translation>
     </message>
     <message>
         <source>Save…</source>
@@ -1294,6 +1392,22 @@ Default: 1,2</source>
         <translation>要使用的 OpenCL 裝置類型，以逗號分隔。</translation>
     </message>
     <message>
+        <source>Hash type changed</source>
+        <translation>雜湊類型已變更</translation>
+    </message>
+    <message>
+        <source>The hash types could not be refreshed; showing the previous list.</source>
+        <translation>無法重新整理雜湊類型；顯示的是先前的清單。</translation>
+    </message>
+    <message>
+        <source>The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. Type to search the list.</source>
+        <translation>雜湊演算法（-m）。「自動偵測」會省略 -m，由 hashcat 識別類型。輸入文字可搜尋清單。</translation>
+    </message>
+    <message>
+        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting. In PCFG a custom charset needs mask=; a charset the mask does not reference is ignored.</source>
+        <translation>在遮罩中使用 ?1–?4 可插入自訂字元集。暴力破解、混合模式以及 PCFG 的 mask= 設定會使用遮罩。在 PCFG 中，自訂字元集需要 mask=；遮罩未引用的字元集會被忽略。</translation>
+    </message>
+    <message>
         <source>Export session</source>
         <translation>匯出工作階段</translation>
     </message>
@@ -1360,6 +1474,14 @@ Default: 1,2</source>
     <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>工作階段指定了雜湊類型 %1，此版本的 hashcat 不支援該類型。</translation>
+    </message>
+    <message>
+        <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
+        <translation>工作階段指定了雜湊類型 %1，此版本的 hashcat 不支援該類型。已選擇「自動偵測」。</translation>
+    </message>
+    <message>
+        <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
+        <translation>此版本的 hashcat 未提供所選的雜湊類型 %1。已選擇「自動偵測」。</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1432,10 +1554,6 @@ Error: %1</source>
         <translation>請在 %1 → %2 中設定 hashcat 路徑，以載入可用的雜湊類型。</translation>
     </message>
     <message>
-        <source>Use ?1–?4 in a mask to insert a custom charset. A mask is used by Brute-force, the hybrid modes and PCFG’s mask= setting; a charset that no mask names is refused.</source>
-        <translation>在遮罩中使用 ?1–?4 可插入自訂字元集。暴力破解、混合模式以及 PCFG 的 mask= 設定會使用遮罩；未被任何遮罩引用的字元集會被拒絕。</translation>
-    </message>
-    <message>
         <source>Password candidate mask. ?1–?4 insert a custom charset, ?w inserts the wordlist word and ?q a second wordlist word in the Hybrid (mask + ?w/?q) mode, and ?? is a literal ?.</source>
         <translation>密碼候選遮罩。?1–?4 插入自訂字元集，?w 插入字典中的單字，?q 在「混合（遮罩 + ?w/?q）」模式下插入第二個字典中的單字，?? 表示字面的 ?。</translation>
     </message>
@@ -1450,22 +1568,40 @@ The example cracks a test hash; hashcat should recover the password %2.</source>
     <message>
         <source>
 
-This can be caused by Windows Defender or other antivirus software. See the &lt;a href="%1"&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
+This can be caused by Windows Defender or other antivirus software. See the &lt;a href=&quot;%1&quot;&gt;FAQ entry&lt;/a&gt; for a remedy.</source>
         <translation>
 
-這可能是由 Windows Defender 或其他防毒軟體引起的。解決方法請參閱&lt;a href="%1"&gt;常見問題項目&lt;/a&gt;。</translation>
+這可能是由 Windows Defender 或其他防毒軟體引起的。解決方法請參閱&lt;a href=&quot;%1&quot;&gt;常見問題項目&lt;/a&gt;。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found: %1</source>
+        <translation>找不到已設定的 hashcat 可執行檔：%1</translation>
+    </message>
+    <message>
+        <source>Auto-detect</source>
+        <translation>自動偵測</translation>
     </message>
     <message>
         <source>Copied to the clipboard</source>
         <translation>已複製到剪貼簿</translation>
     </message>
     <message>
-        <source>Launch failed</source>
-        <translation>啟動失敗</translation>
+        <source>Select the hashcat executable under %1 → %2 first.</source>
+        <translation>請先在 %1 → %2 中選擇 hashcat 可執行檔。</translation>
     </message>
     <message>
-        <source>The command line is too long for the terminal. Shorten the argument lists or their values and try again.</source>
-        <translation>命令列對終端機來說過長。請縮短引數清單或其值，然後重試。</translation>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>找不到已設定的 hashcat 可執行檔：
+%1</translation>
+    </message>
+    <message>
+        <source>PowerShell script copied to the clipboard</source>
+        <translation>PowerShell 指令碼已複製到剪貼簿</translation>
+    </message>
+    <message>
+        <source>Launch failed</source>
+        <translation>啟動失敗</translation>
     </message>
 </context>
 <context>
@@ -1543,6 +1679,14 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>hashcat</translation>
     </message>
     <message>
+        <source>Path to the hashcat executable, or a bare name such as hashcat to look up on PATH.</source>
+        <translation>hashcat 可執行檔的路徑，或在 PATH 中尋找的簡單名稱（如 hashcat）。</translation>
+    </message>
+    <message>
+        <source>Browse for the hashcat executable.</source>
+        <translation>瀏覽選取 hashcat 可執行檔。</translation>
+    </message>
+    <message>
         <source>Select…</source>
         <translation>選取…</translation>
     </message>
@@ -1613,6 +1757,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>Download from %1</source>
         <translation>從 %1 下載</translation>
+    </message>
+    <message>
+        <source>The terminal hashcat is started in.</source>
+        <translation>啟動 hashcat 所用的終端機。</translation>
     </message>
     <message>
         <source>Use the short option names (-m) instead of the long ones (--hash-type) in the command.</source>
@@ -1718,6 +1866,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>無法開啟「%1」進行寫入：%2</translation>
     </message>
     <message>
+        <source>The section names a version this build cannot understand.</source>
+        <translation>該區段指明了此組建無法理解的版本。</translation>
+    </message>
+    <message>
         <source>Could not write to “%1”: %2</source>
         <translation>無法寫入「%1」：%2</translation>
     </message>
@@ -1756,6 +1908,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 </context>
 <context>
     <name>TerminalCatalog</name>
+    <message>
+        <source>No supported terminal was found. ptyxis is installed, but it changes “$” values before hashcat sees them, so it is not offered. Install another terminal; see the FAQ.</source>
+        <translation>找不到支援的終端機。ptyxis 已安裝，但它會在 hashcat 看到之前修改「$」值，因此不予提供。請安裝其他終端機；請參閱常見問題。</translation>
+    </message>
     <message>
         <source>No supported terminal was found on this system. hashcat-gui needs one to show the hashcat output.</source>
         <translation>此系統上找不到支援的終端機。hashcat-gui 需要終端機來顯示 hashcat 的輸出。</translation>
