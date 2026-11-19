@@ -4,14 +4,20 @@
  */
 
 #include "appconstants.h"
+#include "argumentquoting.h"
 #include "checkeditemlist.h"
+#include "commandbuilder.h"
+#include "commandpreview.h"
+#include "hashcatoptions.h"
 #include "hashtypeloader.h"
+#include "launchvalidator.h"
 #include "mainwindow.h"
 #include "mainwindowtestaccess.h"
 #include "mainwindowtesthelpers.h"
 #include "sessiontransfer.h"
 #include "settingsmanager.h"
 #include "statefile.h"
+#include "terminalcatalog.h"
 #include "testenvironment.h"
 #include "ui_mainwindow.h"
 #include "widgetstateserializer.h"
@@ -47,6 +53,8 @@
 #include <QToolTip>
 #include <QWidget>
 #include <array>
+
+using TestEnvironment::validateOptions;
 
 // The session half of the main window: persistence, import/export, version
 // notes, retired names and the frozen format guards.
@@ -92,6 +100,7 @@ private slots:
     void theStartupShowsNoBox();
     void theSerializedKeySetIsFrozen();
     void theGoldenSessionRoundTrips();
+    void theEscapingSessionRoundTrips();
     void applyingASessionRebuildsThePreviewOnce();
     void aNoOpApplyWithRowsRebuildsThePreviewOnce();
     void resettingTheSessionRebuildsThePreviewOnce();
@@ -1272,6 +1281,187 @@ void TestSession::theGoldenSessionRoundTrips()
         QStringLiteral("/tmp/golden-right.txt"),
     };
     QCOMPARE(MainWindowTestAccess::generateArguments(window), expectedArguments);
+}
+
+// The manual session in tests/data/escaping_session.json goes through the same
+// import path a user takes: applying and saving it has to be byte-identical.
+// Its values are a shell's worst cases - spaces, both quote kinds, smart
+// quotes, $, ;, &, |, backslashes, globs and non-ASCII - so pinning the argv
+// and both preview dialects keeps the session -> widget -> argv -> quoting
+// chain from drifting. tst_terminalcatalog reads the same file for its
+// real-shell round trips.
+void TestSession::theEscapingSessionRoundTrips()
+{
+    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-escaping"),
+                                                         "#!/bin/sh\n"
+                                                         "printf '{\"0\":{\"name\":\"MD5\"},"
+                                                         "\"1000\":{\"name\":\"NTLM\"},"
+                                                         "\"4000\":{\"name\":\"recipe\"}}\\n'\n"
+                                                         "exit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
+                                       QStringLiteral("konsole"));
+
+    const QString sessionPath =
+        QStringLiteral(QT_TESTCASE_SOURCEDIR "/tests/data/escaping_session.json");
+    QFile sessionFile(sessionPath);
+    QVERIFY2(sessionFile.open(QIODevice::ReadOnly), qPrintable(sessionPath));
+    const QByteArray sessionBytes = sessionFile.readAll();
+    sessionFile.close();
+    const StateFile::Document document = StateFile::readDocument(
+        sessionPath, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    QVERIFY2(document.status == StateFile::Status::Read, qPrintable(sessionPath));
+    QCOMPARE(document.version, AppConstants::Sessions::Version);
+
+    MainWindow window;
+    window.restoreSession();
+    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 4,
+                             5000);
+
+    const QStringList notes = MainWindowTestAccess::applySessionFile(window, document);
+    QVERIFY2(notes.isEmpty(), qPrintable(notes.join(QStringLiteral("\n"))));
+
+    MainWindowTestAccess::saveSession(window);
+    QFile saved(StateFile::sessionFilePath());
+    QVERIFY(saved.open(QIODevice::ReadOnly));
+    QCOMPARE(saved.readAll(), sessionBytes);
+
+    const HashcatOptions options = MainWindowTestAccess::collectHashcatOptions(window);
+    QCOMPARE(int(validateOptions(options).code), int(LaunchValidator::LaunchError::None));
+
+    const QString recipe = QStringLiteral("md5($p.'x’y')");
+    const QString session = QStringLiteral("sess 'one' & two");
+    const QString ruleLeft = QStringLiteral("s/a/b;$(touch /tmp/x)");
+    const QString ruleRight = QStringLiteral("$p;'quote'");
+    const QString rules1 = QStringLiteral("/tmp/rules 'one'é.rule");
+    const QString rules2 = QStringLiteral("/tmp/r\\ules;$(x).rule");
+    const QString rules3 = QStringLiteral("/tmp/rules “smart”.rule");
+    const QString hashFile = QStringLiteral("/tmp/hashes 'x' \"y\" $;.txt");
+    const QString word1 = QStringLiteral("/tmp/word 'list one'*.txt");
+    const QString word2 = QStringLiteral("/tmp/w\\ord;$(id)&two@.txt");
+    const QString encodingFrom = QStringLiteral("utf-8;$(x)");
+    const QString encodingTo = QStringLiteral("iso-8859-1 'x'");
+    const QString skip = QStringLiteral("10; $(x)");
+    const QString limit = QStringLiteral("100 & 'x'");
+    const QString outfile = QStringLiteral("/tmp/out<&>'x'#.log");
+    const QString cpuAffinity = QStringLiteral("0,1;$(x)");
+    const QString backendDevices = QStringLiteral("1 & '2' | `x`");
+    const QString openclTypes = QStringLiteral("1,2 'x'?");
+
+    const QStringList expectedArguments{
+        QStringLiteral("--hash-type"),
+        QStringLiteral("4000"),
+        QStringLiteral("--hash-recipe"),
+        recipe,
+        QStringLiteral("--attack-mode"),
+        QStringLiteral("1"),
+        QStringLiteral("--force"),
+        QStringLiteral("--remove"),
+        QStringLiteral("--username"),
+        QStringLiteral("--session"),
+        session,
+        QStringLiteral("--runtime"),
+        QStringLiteral("60"),
+        QStringLiteral("--status"),
+        QStringLiteral("--status-timer"),
+        QStringLiteral("30"),
+        QStringLiteral("--potfile-disable"),
+        QStringLiteral("--rules-file"),
+        rules1,
+        QStringLiteral("--rules-file"),
+        rules2,
+        QStringLiteral("--rules-file"),
+        rules3,
+        QStringLiteral("--rules-concat"),
+        QStringLiteral("--rule-left"),
+        ruleLeft,
+        QStringLiteral("--rule-right"),
+        ruleRight,
+        QStringLiteral("--speed-only"),
+        QStringLiteral("--optimized-kernel-enable"),
+        QStringLiteral("--skip"),
+        skip,
+        QStringLiteral("--limit"),
+        limit,
+        QStringLiteral("--hex-salt"),
+        QStringLiteral("--hex-wordlist"),
+        QStringLiteral("--encoding-from"),
+        encodingFrom,
+        QStringLiteral("--encoding-to"),
+        encodingTo,
+        QStringLiteral("--outfile"),
+        outfile,
+        QStringLiteral("--outfile-json"),
+        QStringLiteral("--cpu-affinity"),
+        cpuAffinity,
+        QStringLiteral("--backend-devices"),
+        backendDevices,
+        QStringLiteral("--opencl-device-types"),
+        openclTypes,
+        QStringLiteral("--hwmon-temp-abort"),
+        QStringLiteral("85"),
+        hashFile,
+        word1,
+        word2,
+    };
+    const QStringList arguments = CommandBuilder::build(options);
+    QCOMPARE(arguments, expectedArguments);
+
+    // Both preview dialects have to quote the same argv so it can be pasted
+    // into either shell. Literal token text pins the quoting itself: the POSIX
+    // '\'' splice, PowerShell's doubled single quote, and each dialect's read
+    // of the other quote kind and of metacharacters.
+    const QString posix = CommandPreview::format(QStringLiteral("hashcat"), arguments,
+                                                 CommandPreview::Dialect::Posix);
+    const QString powerShell = CommandPreview::format(QStringLiteral("hashcat"), arguments,
+                                                      CommandPreview::Dialect::PowerShell);
+    QVERIFY(posix.contains(QStringLiteral("'sess '\\''one'\\'' & two'")));
+    QVERIFY(powerShell.contains(QStringLiteral("'sess ''one'' & two'")));
+    QVERIFY(posix.contains(QStringLiteral("'/tmp/hashes '\\''x'\\'' \"y\" $;.txt'")));
+    QVERIFY(powerShell.contains(QStringLiteral("'s/a/b;$(touch /tmp/x)'")));
+
+    // The recipe holds a smart single quote, so PowerShell cannot carry it as
+    // a literal: the whole MSVCRT-joined Arguments tail travels as base64.
+    const QString joined = msvcrtJoinArguments(arguments);
+    QVERIFY(powerShellNeedsBase64(joined));
+    const QString expectedCarrier =
+        QStringLiteral("$si.Arguments = "
+                       "([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('")
+        + QString::fromLatin1(joined.toUtf8().toBase64()) + QStringLiteral("')))");
+    const QString script = TerminalCatalog::powerShellScript(QStringLiteral("hashcat"), arguments);
+    QVERIFY2(script.contains(expectedCarrier), qPrintable(script));
+
+    // The preview and both copy actions have to carry the same hostile argv
+    // through the window's own wiring: the configured binary's file name, the
+    // configured terminal's dialect and the collected arguments.
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    const QString binary = QFileInfo(stub).fileName();
+    const QStringList windowArguments = MainWindowTestAccess::generateArguments(window);
+    QCOMPARE(ui->lineEdit_command->text(),
+             CommandPreview::format(binary, windowArguments, CommandPreview::Dialect::Posix));
+    QVERIFY(QMetaObject::invokeMethod(&window, "copyCommandToClipboard"));
+    QCOMPARE(QApplication::clipboard()->text(), ui->lineEdit_command->text());
+
+    // pwsh flips the dialect; the copy follows it, not the build platform.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
+                                       QStringLiteral("pwsh"));
+    QVERIFY(QMetaObject::invokeMethod(&window, "commandChanged"));
+    QCOMPARE(ui->lineEdit_command->text(),
+             CommandPreview::format(binary, windowArguments, CommandPreview::Dialect::PowerShell));
+    QVERIFY(QMetaObject::invokeMethod(&window, "copyCommandToClipboard"));
+    QCOMPARE(QApplication::clipboard()->text(), ui->lineEdit_command->text());
+
+    // The Tools action copies the readable script built from the resolved
+    // path and the window's own collection.
+    ui->actionCopyPowerShellScript->trigger();
+    QCOMPARE(QApplication::clipboard()->text(),
+             TerminalCatalog::powerShellScript(stub, windowArguments));
+    QToolTip::hideText();
 }
 
 // A bulk apply rebuilds the preview exactly once, not once per widget: the

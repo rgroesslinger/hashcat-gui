@@ -1,0 +1,116 @@
+{
+    "sections": {
+        "session": {
+            "values": {
+                "checkBox_custom_charset1": true,
+                "checkBox_custom_charset2": true,
+                "checkBox_custom_charset3": true,
+                "checkBox_custom_charset4": true,
+                "checkBox_force": true,
+                "checkBox_hex_charset": true,
+                "checkBox_hex_salt": true,
+                "checkBox_hex_wordlist": true,
+                "checkBox_hwmon_temp_abort": true,
+                "checkBox_ignoreusername": true,
+                "checkBox_increment": true,
+                "checkBox_optimized_kernel": true,
+                "checkBox_outfile": true,
+                "checkBox_outfile_json": true,
+                "checkBox_potfile_disable": true,
+                "checkBox_remove": true,
+                "checkBox_rules_concat": true,
+                "checkBox_rulesfile_1": true,
+                "checkBox_rulesfile_2": true,
+                "checkBox_rulesfile_3": true,
+                "checkBox_speed_only": true,
+                "checkBox_status": true,
+                "comboBox_attack": 1,
+                "comboBox_hash_type": 4000,
+                "lineEdit_association_settings": "phases=words;$(x)",
+                "lineEdit_backend_devices": "1 & '2' | `x`",
+                "lineEdit_cache_path": "",
+                "lineEdit_cpu_affinity": "0,1;$(x)",
+                "lineEdit_custom_charset1": "?l;$(x)",
+                "lineEdit_custom_charset2": "?u 'x'",
+                "lineEdit_custom_charset3": "?d’?d",
+                "lineEdit_custom_charset4": "?s;&|",
+                "lineEdit_encoding_from": "utf-8;$(x)",
+                "lineEdit_encoding_to": "iso-8859-1 'x'",
+                "lineEdit_feed": "wordlist;$(x)",
+                "lineEdit_feed_argument": "staging 'arg'",
+                "lineEdit_hash_recipe": "md5($p.'x’y')",
+                "lineEdit_hashfile": "/tmp/hashes 'x' \"y\" $;.txt",
+                "lineEdit_limit": "100 & 'x'",
+                "lineEdit_mask": "?d’?d;$(x) ${HOME}",
+                "lineEdit_opencl_device_types": "1,2 'x'?",
+                "lineEdit_outfile": "/tmp/out<&>'x'#.log",
+                "lineEdit_outfile_format": "2,3",
+                "lineEdit_pcfg_costmax": "16;$(x)",
+                "lineEdit_pcfg_extra": "omen=1;$(x)",
+                "lineEdit_pcfg_kbits": "10;$(x)",
+                "lineEdit_pcfg_mask": "?d’?d",
+                "lineEdit_pcfg_maxgain": "2.5;$(x)",
+                "lineEdit_pcfg_maxword": "16;$(x)",
+                "lineEdit_pcfg_ruleset_name": "staging 'one'",
+                "lineEdit_pcfg_scale": "8;$(x)",
+                "lineEdit_pcfg_threads": "4;$(x)",
+                "lineEdit_pcfg_walk": "1;$(x)",
+                "lineEdit_pcfg_weights": "1:2;$(x)",
+                "lineEdit_rule_left": "s/a/b;$(touch /tmp/x)",
+                "lineEdit_rule_right": "$p;'quote'",
+                "lineEdit_rulesfile_1": "/tmp/rules 'one'é.rule",
+                "lineEdit_rulesfile_2": "/tmp/r\\ules;$(x).rule",
+                "lineEdit_rulesfile_3": "/tmp/rules “smart”.rule",
+                "lineEdit_session": "sess 'one' & two",
+                "lineEdit_skip": "10; $(x)",
+                "lineEdit_table_cap": "1000;$(x)",
+                "lineEdit_table_extra": "substitutions=1;$(x)",
+                "lineEdit_table_identity": "1;$(x)",
+                "lineEdit_table_maxperm": "5000;$(x)",
+                "lineEdit_table_single": "0;$(x)",
+                "lineEdit_table_template": "0;$(x)",
+                "listWidget_feed_arguments": [
+                    {
+                        "checked": true,
+                        "text": "arg 'one'"
+                    },
+                    {
+                        "checked": false,
+                        "text": "arg;$(two)"
+                    }
+                ],
+                "listWidget_pcfg_rulesets": [
+                    {
+                        "checked": true,
+                        "text": "/tmp/ruleset 'one'.pcfg"
+                    }
+                ],
+                "listWidget_tables": [
+                    {
+                        "checked": true,
+                        "text": "/tmp/table;$(x).table"
+                    }
+                ],
+                "listWidget_wordlist": [
+                    {
+                        "checked": true,
+                        "text": "/tmp/word 'list one'*.txt"
+                    },
+                    {
+                        "checked": true,
+                        "text": "/tmp/w\\ord;$(id)&two@.txt"
+                    }
+                ],
+                "radioButton_generate_rules": false,
+                "radioButton_use_rules_file": true,
+                "spinBox_generate_rules": 500,
+                "spinBox_hwmon_temp_abort": 85,
+                "spinBox_increment_max": 6,
+                "spinBox_increment_min": 2,
+                "spinBox_runtime": 60,
+                "spinBox_status_timer": 30
+            },
+            "version": 1
+        }
+    }
+}

@@ -15,6 +15,8 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QProcess>
 #include <QStandardPaths>
 #include <QStringDecoder>
@@ -119,6 +121,91 @@ QList<QByteArray> localBytes(const QStringList &tokens)
         bytes << token.toLocal8Bit();
     }
     return bytes;
+}
+
+// The hostile values of tests/data/escaping_session.json, read from the
+// fixture so the round-trip rows cannot drift from it. The mode-1 values
+// come first, in the argv order tst_session pins; the other attack modes'
+// values follow, since quoting needs no mode. Empty when the file is
+// unreadable or a value is missing or not a string, which fails the rows
+// instead of silently testing less.
+QStringList escapingSessionTokens()
+{
+    QFile file(QStringLiteral(QT_TESTCASE_SOURCEDIR "/tests/data/escaping_session.json"));
+    if (!file.open(QIODevice::ReadOnly)) {
+        return {};
+    }
+    const QJsonObject values = QJsonDocument::fromJson(file.readAll())
+                                   .object()
+                                   .value(QStringLiteral("sections"))
+                                   .toObject()
+                                   .value(QStringLiteral("session"))
+                                   .toObject()
+                                   .value(QStringLiteral("values"))
+                                   .toObject();
+    QStringList tokens;
+    bool complete = true;
+    const auto append = [&](const QString &key) {
+        const QJsonValue value = values.value(key);
+        complete &= value.isString();
+        tokens << value.toString();
+    };
+    const auto appendRows = [&](const QString &key) {
+        const QJsonArray rows = values.value(key).toArray();
+        complete &= !rows.isEmpty();
+        for (const auto &entry : rows) {
+            const QJsonValue text = entry.toObject().value(QStringLiteral("text"));
+            complete &= text.isString();
+            tokens << text.toString();
+        }
+    };
+    for (const QString &key :
+         {QStringLiteral("lineEdit_hash_recipe"), QStringLiteral("lineEdit_session"),
+          QStringLiteral("lineEdit_rule_left"), QStringLiteral("lineEdit_rule_right"),
+          QStringLiteral("lineEdit_rulesfile_1"), QStringLiteral("lineEdit_rulesfile_2"),
+          QStringLiteral("lineEdit_rulesfile_3"), QStringLiteral("lineEdit_hashfile")}) {
+        append(key);
+    }
+    appendRows(QStringLiteral("listWidget_wordlist"));
+    for (const QString &key :
+         {QStringLiteral("lineEdit_encoding_from"), QStringLiteral("lineEdit_encoding_to"),
+          QStringLiteral("lineEdit_skip"), QStringLiteral("lineEdit_limit"),
+          QStringLiteral("lineEdit_outfile"), QStringLiteral("lineEdit_cpu_affinity"),
+          QStringLiteral("lineEdit_backend_devices"),
+          QStringLiteral("lineEdit_opencl_device_types")}) {
+        append(key);
+    }
+    for (const QString &key : {QStringLiteral("lineEdit_association_settings"),
+                               QStringLiteral("lineEdit_custom_charset1"),
+                               QStringLiteral("lineEdit_custom_charset2"),
+                               QStringLiteral("lineEdit_custom_charset3"),
+                               QStringLiteral("lineEdit_custom_charset4"),
+                               QStringLiteral("lineEdit_mask"),
+                               QStringLiteral("lineEdit_feed"),
+                               QStringLiteral("lineEdit_feed_argument"),
+                               QStringLiteral("lineEdit_pcfg_costmax"),
+                               QStringLiteral("lineEdit_pcfg_extra"),
+                               QStringLiteral("lineEdit_pcfg_kbits"),
+                               QStringLiteral("lineEdit_pcfg_mask"),
+                               QStringLiteral("lineEdit_pcfg_maxgain"),
+                               QStringLiteral("lineEdit_pcfg_maxword"),
+                               QStringLiteral("lineEdit_pcfg_ruleset_name"),
+                               QStringLiteral("lineEdit_pcfg_scale"),
+                               QStringLiteral("lineEdit_pcfg_threads"),
+                               QStringLiteral("lineEdit_pcfg_walk"),
+                               QStringLiteral("lineEdit_pcfg_weights"),
+                               QStringLiteral("lineEdit_table_cap"),
+                               QStringLiteral("lineEdit_table_extra"),
+                               QStringLiteral("lineEdit_table_identity"),
+                               QStringLiteral("lineEdit_table_maxperm"),
+                               QStringLiteral("lineEdit_table_single"),
+                               QStringLiteral("lineEdit_table_template")}) {
+        append(key);
+    }
+    appendRows(QStringLiteral("listWidget_feed_arguments"));
+    appendRows(QStringLiteral("listWidget_pcfg_rulesets"));
+    appendRows(QStringLiteral("listWidget_tables"));
+    return complete ? tokens : QStringList{};
 }
 
 // A failed check must not leave the shell behind: -NoExit holds it forever.
@@ -494,6 +581,12 @@ void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell_data()
                                                            QStringLiteral("trail\\"),
                                                            QStringLiteral("a'b\"c\\d e"),
                                                            QStringLiteral("$2a$10$abc")};
+    // Read from the fixture so the rows cannot drift; tst_session pins the
+    // mode-1 subset as argv.
+    const QStringList escapingTokens = escapingSessionTokens();
+    QVERIFY2(!escapingTokens.isEmpty(),
+             "tests/data/escaping_session.json is unreadable or incomplete");
+    QTest::newRow("escaping session") << escapingTokens;
 }
 
 void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell()
@@ -630,6 +723,12 @@ void TestTerminalCatalog::posixQuotingRoundTripsThroughTheShell_data()
                                                 QStringLiteral("trail\\")};
     QTest::newRow("line breaks") << QStringList{QStringLiteral("line\nbreak"),
                                                 QStringLiteral("tab\there")};
+    // The same escaping-session values as the PowerShell row above, through
+    // /bin/sh -c this time.
+    const QStringList escapingTokens = escapingSessionTokens();
+    QVERIFY2(!escapingTokens.isEmpty(),
+             "tests/data/escaping_session.json is unreadable or incomplete");
+    QTest::newRow("escaping session") << escapingTokens;
 }
 
 void TestTerminalCatalog::posixQuotingRoundTripsThroughTheShell()
