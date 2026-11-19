@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShowEvent>
+#include <QStandardItemModel>
 #include <QUrl>
 #include <algorithm>
 
@@ -44,6 +45,24 @@ bool hasExpectedType(QLatin1StringView key, const QJsonValue &value)
         }
     }
 
+    return false;
+}
+
+// The terminal combo lists every supported terminal and disables the ones
+// that are not installed. True when at least one entry can be chosen.
+bool hasSelectableTerminal(const QComboBox &combo)
+{
+    const auto *model = qobject_cast<const QStandardItemModel *>(combo.model());
+    if (!model) {
+        return combo.count() > 0;
+    }
+
+    for (int row = 0; row < combo.count(); ++row) {
+        const QStandardItem *item = model->item(row);
+        if (item && item->isEnabled()) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -159,8 +178,20 @@ void SettingsDialog::readSettings()
 
     // The combos are filled first: a stored value can only find its entry
     // once the entries exist.
-    QMap<QString, QString> availableTerminals = TerminalCatalog::availableTerminals();
-    ui->comboBox_terminal->addItems(availableTerminals.keys());
+    //
+    // Every terminal this platform offers is listed, installed or not: a
+    // machine without one still sees what hashcat-gui can use, and the
+    // entries that cannot be started are disabled instead of hidden.
+    const QStringList offeredTerminals = TerminalCatalog::offeredTerminals();
+    ui->comboBox_terminal->addItems(offeredTerminals);
+    if (const auto *model = qobject_cast<QStandardItemModel *>(ui->comboBox_terminal->model())) {
+        for (int row = 0; row < ui->comboBox_terminal->count(); ++row) {
+            QStandardItem *item = model->item(row);
+            if (item && !TerminalCatalog::isInstalled(offeredTerminals.at(row))) {
+                item->setEnabled(false);
+            }
+        }
+    }
     ui->comboBox_terminal->setPlaceholderText(tr("Select a terminal"));
 
     // The color scheme: the combo carries the value that gets stored, so
@@ -386,14 +417,17 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
         const QString terminal = value.toString();
         m_configuredTerminal = terminal;
         const int index = ui->comboBox_terminal->findText(terminal);
-        if (index >= 0) {
+        // The combo lists terminals that are not installed too, but a
+        // disabled entry cannot be chosen.
+        if (index >= 0 && TerminalCatalog::isInstalled(terminal)) {
             ui->comboBox_terminal->setCurrentIndex(index);
             return {};
         }
 
-        // No entry at all: the combo has no empty item, but no selection is
-        // how it shows "none". The status below the combo names a terminal
-        // that is gone; the import says so in its notes on top of that.
+        // No entry at all, or one that cannot be used: the combo has no
+        // empty item, but no selection is how it shows "none". The status
+        // below the combo names a terminal that is gone; the import says so
+        // in its notes on top of that.
         if (terminal.isEmpty() || source == ValueSource::Stored) {
             ui->comboBox_terminal->setCurrentIndex(-1);
             return {};
@@ -475,7 +509,7 @@ void SettingsDialog::updateHashcatStatus()
 
 void SettingsDialog::updateTerminalStatus()
 {
-    if (ui->comboBox_terminal->count() == 0) {
+    if (!hasSelectableTerminal(*ui->comboBox_terminal)) {
         ui->label_terminal_status->setText(TerminalCatalog::noSupportedTerminalMessage());
         ui->label_terminal_status->setVisible(true);
         return;

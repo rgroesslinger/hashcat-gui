@@ -39,29 +39,43 @@ const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
     return table;
 }
 
-QMap<QString, QString> TerminalCatalog::availableTerminals()
+QStringList TerminalCatalog::offeredTerminals()
 {
-    QMap<QString, QString> terminals;
+    QStringList terminals;
 
     const QMap<QString, QStringList> &table = terminalArguments();
     for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
 #ifdef Q_OS_WIN
         // Windows has no sh for the Unix wrapper; only the PowerShell path
         // can start hashcat there.
-        if (!isPowerShell(it.key())) {
-            continue;
-        }
+        const bool offered = isPowerShell(it.key());
 #else
         // pwsh is installed on Linux and macOS, but it is a shell, not a
         // terminal: started by the GUI it has no window and its output goes
         // nowhere. Only Windows creates a console for it (CREATE_NEW_CONSOLE).
-        if (isPowerShell(it.key())) {
-            continue;
-        }
+        const bool offered = !isPowerShell(it.key());
 #endif
-        const QString path = Executable::resolve(it.key());
-        if (!path.isEmpty()) {
-            terminals.insert(it.key(), path);
+        if (offered) {
+            terminals << it.key();
+        }
+    }
+
+    return terminals;
+}
+
+bool TerminalCatalog::isInstalled(const QString &terminal)
+{
+    return !Executable::resolve(terminal).isEmpty();
+}
+
+QMap<QString, QString> TerminalCatalog::availableTerminals()
+{
+    QMap<QString, QString> terminals;
+
+    const QStringList offered = offeredTerminals();
+    for (const QString &terminal : offered) {
+        if (isInstalled(terminal)) {
+            terminals.insert(terminal, Executable::resolve(terminal));
         }
     }
 

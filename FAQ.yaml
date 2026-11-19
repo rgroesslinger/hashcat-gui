@@ -42,4 +42,6 @@ items:
 
       **ptyxis** hands the command to `systemd-run`, which expands `$`-words a
       second time. In a test a bcrypt hash disappeared; ptyxis has no
-      option to pass the command verbatim.
+      option to pass the command verbatim. It will be re-enabled once an
+      [upstream fix](https://gitlab.gnome.org/chergert/ptyxis/-/merge_requests/168)
+      has landed.

@@ -8,6 +8,7 @@
 #include "settingsdialog.h"
 #include "settingsmanager.h"
 #include "statefile.h"
+#include "terminalcatalog.h"
 #include "testenvironment.h"
 #include "ui_settingsdialog.h"
 
@@ -18,6 +19,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QPushButton>
+#include <QStandardItemModel>
 #include <QStandardPaths>
 #include <iterator>
 
@@ -33,9 +35,15 @@ QJsonValue importableValue(QLatin1StringView key, const Ui::SettingsDialog &ui)
         return QStringLiteral("/imported/hashcat");
     }
     if (key == AppConstants::SettingsKeys::Terminal) {
-        // The terminals this machine has: a terminal that is not installed is
-        // not applied, and the import names it.
-        return ui.comboBox_terminal->count() > 0 ? ui.comboBox_terminal->itemText(0) : QString();
+        // The combo lists every supported terminal, so pick an installed one:
+        // a disabled entry is not applied and would only exercise the note.
+        const auto *model = qobject_cast<const QStandardItemModel *>(ui.comboBox_terminal->model());
+        for (int row = 0; row < ui.comboBox_terminal->count(); ++row) {
+            if (!model || (model->item(row) && model->item(row)->isEnabled())) {
+                return ui.comboBox_terminal->itemText(row);
+            }
+        }
+        return QString();
     }
     if (key == AppConstants::SettingsKeys::UseShortParameters) {
         return !ui.checkBox_use_short_parameters->isChecked();
@@ -100,6 +108,9 @@ private slots:
     void doesNotReplaceAConfiguredPath();
     void leavesThePathEmptyWhenHashcatIsNotOnPath();
     void terminalStatusFollowsTheCombo();
+    void terminalComboListsEverySupportedTerminal();
+    void terminalComboExplainsWhenNoneIsInstalled();
+    void aListedTerminalThatIsNotInstalledIsRefused();
     void aMissingConfiguredTerminalSurvivesTheSave();
     void anImportedEmptyTerminalStillSavesEmpty();
     void saveIsTheDefaultButton();
@@ -428,18 +439,37 @@ void TestSettingsDialog::leavesThePathEmptyWhenHashcatIsNotOnPath()
 // of leaving an empty combo. A selection makes the note go away.
 void TestSettingsDialog::terminalStatusFollowsTheCombo()
 {
+    // Make the selection path deterministic: one terminal this machine
+    // really has, so at least one entry is enabled.
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString stub = TestEnvironment::writeSearchableExecutable(
+#ifdef Q_OS_WIN
+        QStringLiteral("pwsh.exe"),
+#else
+        QStringLiteral("xterm"),
+#endif
+        directory.path());
+    QVERIFY2(!stub.isEmpty(), "the terminal stub could not be written");
+    TestEnvironment::PathGuard guard(directory.path().toUtf8());
+
     SettingsDialog dialog;
 
-    if (dialog.ui->comboBox_terminal->count() == 0) {
-        QVERIFY2(!dialog.ui->label_terminal_status->isHidden(),
-                 "the dialog does not say that no terminal was found");
-        return;
+    const auto *model = qobject_cast<QStandardItemModel *>(dialog.ui->comboBox_terminal->model());
+    QVERIFY(model);
+    int selectable = -1;
+    for (int row = 0; row < dialog.ui->comboBox_terminal->count(); ++row) {
+        if (model->item(row)->isEnabled()) {
+            selectable = row;
+            break;
+        }
     }
+    QVERIFY2(selectable >= 0, "the installed terminal was not selectable");
 
     QCOMPARE(dialog.ui->comboBox_terminal->currentIndex(), -1);
     QVERIFY(!dialog.ui->label_terminal_status->isHidden());
 
-    dialog.ui->comboBox_terminal->setCurrentIndex(0);
+    dialog.ui->comboBox_terminal->setCurrentIndex(selectable);
     QVERIFY2(dialog.ui->label_terminal_status->isHidden(),
              "a selected terminal was reported as missing");
 
@@ -453,6 +483,109 @@ void TestSettingsDialog::terminalStatusFollowsTheCombo()
     QVERIFY(!missing.ui->label_terminal_status->isHidden());
     QVERIFY(missing.ui->label_terminal_status->text().contains(
         QStringLiteral("a-terminal-that-is-gone")));
+}
+
+// The combo lists every terminal this platform supports, installed or not,
+// and an entry is disabled exactly when that terminal is not installed.
+void TestSettingsDialog::terminalComboListsEverySupportedTerminal()
+{
+    SettingsDialog dialog;
+
+    const QStringList offered = TerminalCatalog::offeredTerminals();
+    QVERIFY(!offered.isEmpty());
+    QCOMPARE(dialog.ui->comboBox_terminal->count(), offered.size());
+
+    const auto *model = qobject_cast<QStandardItemModel *>(dialog.ui->comboBox_terminal->model());
+    QVERIFY(model);
+    for (int row = 0; row < dialog.ui->comboBox_terminal->count(); ++row) {
+        const QString terminal = dialog.ui->comboBox_terminal->itemText(row);
+        QCOMPARE(model->item(row)->isEnabled(), TerminalCatalog::isInstalled(terminal));
+    }
+}
+
+// The situation the listing exists for: no supported terminal at all. Every
+// entry is disabled and the note says that none was found, instead of the
+// combo being empty.
+void TestSettingsDialog::terminalComboExplainsWhenNoneIsInstalled()
+{
+#ifdef Q_OS_WIN
+    QSKIP("Windows always has PowerShell");
+#else
+    QTemporaryDir empty;
+    QVERIFY(empty.isValid());
+    TestEnvironment::PathGuard guard(empty.path().toUtf8());
+
+    SettingsDialog dialog;
+
+    const auto *model = qobject_cast<QStandardItemModel *>(dialog.ui->comboBox_terminal->model());
+    QVERIFY(model);
+    for (int row = 0; row < dialog.ui->comboBox_terminal->count(); ++row) {
+        QVERIFY2(!model->item(row)->isEnabled(),
+                 qPrintable(QStringLiteral("the missing terminal \"%1\" was selectable")
+                                .arg(dialog.ui->comboBox_terminal->itemText(row))));
+    }
+
+    QVERIFY(!dialog.ui->label_terminal_status->isHidden());
+    QCOMPARE(dialog.ui->label_terminal_status->text(),
+             TerminalCatalog::noSupportedTerminalMessage());
+#endif
+}
+
+// A terminal this platform lists but this machine does not have: the entry
+// exists but is disabled, so the combo shows no selection and an import names
+// the value instead of applying it. A save keeps the configured value.
+void TestSettingsDialog::aListedTerminalThatIsNotInstalledIsRefused()
+{
+    const QStringList offered = TerminalCatalog::offeredTerminals();
+    QVERIFY(offered.size() >= 2);
+
+    // One terminal really on PATH, so this is not the "no terminal at all"
+    // case; every other offered entry stays missing.
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+#ifdef Q_OS_WIN
+    QString stubName = offered.first();
+    if (!stubName.endsWith(QStringLiteral(".exe"))) {
+        stubName += QStringLiteral(".exe");
+    }
+#else
+    const QString &stubName = offered.first();
+#endif
+    QVERIFY2(!TestEnvironment::writeSearchableExecutable(stubName, directory.path()).isEmpty(),
+             "the terminal stub could not be written");
+    TestEnvironment::PathGuard guard(directory.path().toUtf8());
+
+    QString missing;
+    for (const QString &terminal : offered) {
+        if (!TerminalCatalog::isInstalled(terminal)) {
+            missing = terminal;
+            break;
+        }
+    }
+    QVERIFY2(!missing.isEmpty(), "the stripped PATH still installs every terminal");
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal, missing);
+    SettingsDialog dialog;
+
+    // Unlike a name the catalog does not know, this one has an entry - and it
+    // must still not be selected.
+    QVERIFY(dialog.ui->comboBox_terminal->findText(missing) >= 0);
+    QCOMPARE(dialog.ui->comboBox_terminal->currentIndex(), -1);
+    QVERIFY(!dialog.ui->label_terminal_status->isHidden());
+    QVERIFY(dialog.ui->label_terminal_status->text().contains(missing));
+
+    QJsonObject imported;
+    imported.insert(QStringLiteral("terminal"), missing);
+    const QStringList notes = dialog.applyImportedSettings(imported);
+    QCOMPARE(dialog.ui->comboBox_terminal->currentIndex(), -1);
+    QCOMPARE(notes.size(), 1);
+    QVERIFY2(notes.first().contains(missing), qPrintable(notes.first()));
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+    QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal),
+             missing);
 }
 
 // A configured terminal that is not installed shows no selection, but saving

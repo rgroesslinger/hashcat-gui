@@ -45,9 +45,17 @@ public:
     // only them on Windows.
     static const QMap<QString, QStringList> &terminalArguments();
 
+    // Every terminal this platform offers, installed or not, sorted by
+    // name. The settings combo lists them all and disables the ones that
+    // cannot be started.
+    static QStringList offeredTerminals();
+
     // Every supported terminal that is installed, mapped to the absolute
     // program that starts it.
     static QMap<QString, QString> availableTerminals();
+
+    // True when the terminal resolves to a program this system can start.
+    static bool isInstalled(const QString &terminal);
 
     // True for the two shells that take the encoded script instead of a
     // plain argv: powershell.exe and pwsh.

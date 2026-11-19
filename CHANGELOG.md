@@ -17,8 +17,9 @@
 
 ### Improvements
 - Launch validation covers the new attack modes and settings: PCFG and table ranges and repeated keys, a mask with `omen=1`, hint accounts without hint words or file, the hybrid mode's `?w`/`?q` markers against the chosen wordlists, association settings with a wordlist, and a non-directory cache path
-- The command preview and clipboard follow the configured terminal's shell — PowerShell's call operator for `powershell.exe` and `pwsh`, POSIX otherwise — so a copied command pastes as-is into pwsh 7.3 or later. Only tokens the shell would split or expand are quoted, leaving flags, numbers and plain paths readable. Pasting into Windows PowerShell 5.1 still mangles embedded quotes and empty arguments; use Tools → Copy as PowerShell Script there, which copies the launch's `ProcessStartInfo` script
-- `cmd.exe` and `ptyxis` were dropped from the supported terminals: neither can correctly escape some shell characters that may appear in the command. See the FAQ for a more in-depth explanation
+- The command preview and clipboard now follow the configured terminal's shell — PowerShell's call operator for `powershell.exe` and `pwsh`, POSIX otherwise — and quote only tokens the shell would split or expand, leaving flags, numbers and plain paths readable
+- `cmd.exe` and `ptyxis` were dropped from the supported terminals: neither can correctly escape some shell characters that may appear in the command. See the FAQ for a more in-depth explanation; ptyxis will be re-enabled once an [upstream fix](https://gitlab.gnome.org/chergert/ptyxis/-/merge_requests/168) has landed
+- The settings dialog lists every terminal the platform supports and disables the ones that are not installed, so a system without a terminal shows what is available instead of an empty dropdown
 - `<unixtime>` in the outfile template is expanded from the collected options instead of being read inside the command builder, so a preview and a launch are each built from one value rather than two clock reads
 - The hash type selector has a permanent “Auto-detect” entry at the top, selected when neither a session nor a reload names a hash type
 

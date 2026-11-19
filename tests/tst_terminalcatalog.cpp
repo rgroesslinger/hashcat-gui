@@ -254,8 +254,10 @@ private slots:
     void findHashcatInPathProbesBothUnixNames_data();
     void findHashcatInPathProbesBothUnixNames();
     void findHashcatInPathIsEmptyWithoutOne();
+    void offeredTerminalsListEverySupportedTerminal();
     void availableTerminalsReturnsResolvedPrograms();
     void availableTerminalsOfferPowerShellOnlyOnWindows();
+    void isInstalledFollowsThePath();
     void noSupportedTerminalMessageNamesPtyxis();
     void programDirectoryFollowsSymlinks();
     void detachedLaunchConfiguresTheNewConsole();
@@ -826,6 +828,26 @@ void TestTerminalCatalog::findHashcatInPathIsEmptyWithoutOne()
     QCOMPARE(TerminalCatalog::findHashcatInPath(), QString());
 }
 
+// The settings combo lists every terminal this platform offers, installed or
+// not; only the platform filter applies. The PowerShell shells stay out of
+// the Unix list and every other terminal stays out of the Windows one.
+void TestTerminalCatalog::offeredTerminalsListEverySupportedTerminal()
+{
+    const QMap<QString, QStringList> &table = TerminalCatalog::terminalArguments();
+#ifdef Q_OS_WIN
+    const QStringList expected = {QStringLiteral("powershell.exe"), QStringLiteral("pwsh")};
+#else
+    QStringList expected;
+    for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
+        if (!TerminalCatalog::isPowerShell(it.key())) {
+            expected << it.key();
+        }
+    }
+#endif
+
+    QCOMPARE(TerminalCatalog::offeredTerminals(), expected);
+}
+
 // Discovery answers name -> absolute program, so the launch never hands a
 // bare name to a process and a terminal behind PATH is started from the file
 // this lookup actually found.
@@ -889,6 +911,36 @@ void TestTerminalCatalog::availableTerminalsOfferPowerShellOnlyOnWindows()
              "Unix did not offer the installed wezterm");
 #endif
     QVERIFY(TerminalCatalog::isPowerShell(QStringLiteral("pwsh")));
+}
+
+// isInstalled() is the lookup availableTerminals() filters by, so the
+// disabled entries of the settings combo and the launch list cannot drift
+// apart.
+void TestTerminalCatalog::isInstalledFollowsThePath()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+#ifdef Q_OS_WIN
+    const QString terminal = QStringLiteral("pwsh");
+    const QString fileName = QStringLiteral("pwsh.exe");
+#else
+    const QString terminal = QStringLiteral("xterm");
+    const QString fileName = QStringLiteral("xterm");
+#endif
+    const QString stub = TestEnvironment::writeSearchableExecutable(fileName, directory.path());
+    QVERIFY2(!stub.isEmpty(), "the terminal stub could not be written");
+
+    {
+        TestEnvironment::PathGuard guard(directory.path().toUtf8());
+        QVERIFY(TerminalCatalog::isInstalled(terminal));
+        QVERIFY(TerminalCatalog::availableTerminals().contains(terminal));
+    }
+
+    QTemporaryDir empty;
+    QVERIFY(empty.isValid());
+    TestEnvironment::PathGuard guard(empty.path().toUtf8());
+    QVERIFY(!TerminalCatalog::isInstalled(terminal));
+    QVERIFY(!TerminalCatalog::availableTerminals().contains(terminal));
 }
 
 // ptyxis is broken for hashcat but may be the only terminal installed. The
