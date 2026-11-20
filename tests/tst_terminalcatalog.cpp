@@ -283,6 +283,7 @@ void TestTerminalCatalog::terminalArgumentsArePinned()
         {"pwsh", {}},
         {"xterm", {"-e"}},
         {"gnome-terminal", {"--"}},
+        {"kgx", {"--"}},
         {"konsole", {"-e"}},
         {"xfce4-terminal", {"-x"}},
         {"alacritty", {"-e"}},

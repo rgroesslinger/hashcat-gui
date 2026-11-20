@@ -28,6 +28,7 @@ const QMap<QString, QStringList> &TerminalCatalog::terminalArguments()
         {QStringLiteral("pwsh"), {}},
         {QStringLiteral("xterm"), {QStringLiteral("-e")}},
         {QStringLiteral("gnome-terminal"), {QStringLiteral("--")}},
+        {QStringLiteral("kgx"), {QStringLiteral("--")}},
         {QStringLiteral("konsole"), {QStringLiteral("-e")}},
         {QStringLiteral("xfce4-terminal"), {QStringLiteral("-x")}},
         {QStringLiteral("alacritty"), {QStringLiteral("-e")}},

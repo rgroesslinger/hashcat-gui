@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- kgx (GNOME Console) is now available as a launch terminal
+
 ## 0.9.0 (2026-11-20)
 
 ### New Features
