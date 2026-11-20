@@ -833,10 +833,10 @@ void TestTerminalCatalog::findHashcatInPathIsEmptyWithoutOne()
 // the Unix list and every other terminal stays out of the Windows one.
 void TestTerminalCatalog::offeredTerminalsListEverySupportedTerminal()
 {
-    const QMap<QString, QStringList> &table = TerminalCatalog::terminalArguments();
 #ifdef Q_OS_WIN
     const QStringList expected = {QStringLiteral("powershell.exe"), QStringLiteral("pwsh")};
 #else
+    const QMap<QString, QStringList> &table = TerminalCatalog::terminalArguments();
     QStringList expected;
     for (auto it = table.constBegin(); it != table.constEnd(); ++it) {
         if (!TerminalCatalog::isPowerShell(it.key())) {

@@ -3,7 +3,8 @@
 ## 0.9.0 (2026-11-20)
 
 ### New Features
-- **Support for hashcat 8.0.0**: the attack mode selector offers all ten modes — PCFG (4), table (5), generic feed (8), association (9) and hybrid (12) join the existing ones, each with its own options shown only where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
+- **Support for hashcat 8.0.0**: the attack mode selector offers all ten modes — PCFG, table, generic feed and hybrid join the existing ones, each with its own options shown only where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
+- Association mode now supports hashcat 8's account-aware form: without a wordlist, the words come from the hash file, and `phases=…` selects the phases to run
 - The minimum hashcat version is now 8.0.0; the segment size (`-c`) and workload profile (`-w`) options were removed as part of the upgrade
 - Example sessions for every attack mode are available under Tools → Load Example Session, each with a different hash type and test password
 - Wordlist entries are watched while the window is open: a row whose file does not exist is marked with a warning icon ([#15](https://github.com/rgroesslinger/hashcat-gui/issues/15))
