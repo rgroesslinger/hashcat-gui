@@ -68,6 +68,9 @@ Requires Qt 6.8+ (Core, Gui, Widgets, Concurrent, Network), C++20, GCC/Clang (no
   are `CommandTooLong` refusals.
 - Unix runs every terminal through one fixed `sh -c` wrapper, with hashcat and args as positional
   parameters, never spliced text; the wrapper owns working directory, exit code and hold-open prompt.
+- New or changed terminals must pass `tests/terminal-probe.sh` (live argv round-trip, fresh and
+  forwarded to a running instance; needs a display): ctest only runs a stub terminal and cannot see
+  string-mode or forwarding bugs.
 - Preview/clipboard follow the configured terminal's shell (`CommandPreview::Dialect`), not the build
   platform. `pwsh` is offered only on Windows; Unix offers the terminal table, Windows only
   `powershell.exe`/`pwsh`.
