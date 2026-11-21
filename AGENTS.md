@@ -124,5 +124,6 @@ Connect to `commandChanged()` once; the attack-mode combo uses `attackIndexChang
 
 - CI: GCC/Clang on Linux and Windows, plus Debug ASan/UBSan (leak detection off). Windows sets
   `HASHCAT_GUI_REQUIRE_SHELL_TESTS=1`, so skipped shell round-trips in `tst_terminalcatalog` fail.
-- OBS and the Windows release use `-DBUILD_TESTING=OFF -DHASHCAT_GUI_REQUIRE_TRANSLATIONS=ON`;
-  missing LinguistTools is a configure error. Windows: `build-release.yml`; Linux: `obs/`.
+- OBS, the Windows release and the AppImage job use `-DBUILD_TESTING=OFF
+  -DHASHCAT_GUI_REQUIRE_TRANSLATIONS=ON`; missing LinguistTools is a configure error. Windows and
+  AppImage: `build-release.yml`; Linux: `obs/`.

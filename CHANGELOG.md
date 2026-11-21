@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- A Linux x86_64 AppImage is now published on the release page
 - kgx (GNOME Console) is now available as a launch terminal
 - The launch terminal can now print the exact command hashcat receives, so a mangled value (such as a `$` hash expanded a second time by a terminal) is immediately visible instead of going unnoticed; enable it under Settings → General
 

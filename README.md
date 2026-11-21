@@ -14,7 +14,7 @@ A graphical user interface for [hashcat](https://github.com/hashcat/hashcat/), t
 - **A runnable example for each mode** — `Tools → Load Example Session` opens a bundled session with its own wordlist, rules or table, so you can check the setup before running your own data.
 - **Session saving** — the last session is restored automatically; sessions and settings can be exported and imported.
 - **Real list management** — several wordlists, rule slots, PCFG rulesets, tables and feed arguments with per-row include checkboxes.
-- **Native packaging** — packages for openSUSE, Fedora, Debian, Ubuntu, and a Windows build.
+- **Native packaging** — packages for openSUSE, Fedora, Debian and Ubuntu, a Windows build, and a Linux AppImage.
 
 ## Installation
 
@@ -23,6 +23,8 @@ hashcat 8.0.0 or newer is required.
 ### Linux
 
 Packages for openSUSE, Fedora, Debian and Ubuntu are hosted on the [openSUSE Build Service (OBS)](https://build.opensuse.org/package/show/home:rgroesslinger/hashcat-gui). You have the option to download the package directly or configure your package manager to automatically receive updates for future releases by adding the OBS repository. Instructions on how to add the repository can be found on the [download page](https://software.opensuse.org/download.html?project=home:rgroesslinger&package=hashcat-gui). You can verify the fingerprint of the OpenPGP key used for signing these packages on the [Signing keys page](https://build.opensuse.org/projects/home:rgroesslinger/signing_keys).
+
+A Linux x86_64 **AppImage** is also available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/). Download the `.AppImage`, make it executable (`chmod +x hashcat-gui-*.AppImage`) and run it. It needs glibc 2.43 or newer on the host (check with `ldd --version`).
 
 ### Windows
 
