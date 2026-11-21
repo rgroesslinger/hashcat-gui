@@ -233,7 +233,9 @@ class TestTerminalCatalog : public QObject
 
 private slots:
     void terminalArgumentsArePinned();
+    void launchCommandWrapsUnixTerminals_data();
     void launchCommandWrapsUnixTerminals();
+    void powerShellScriptOmitsTheEchoWhenDisabled();
     void launchCommandEncodesTheScript_data();
     void launchCommandEncodesTheScript();
     void powerShellScriptIsTheOneThatIsEncoded();
@@ -265,6 +267,9 @@ private slots:
     void unixWrapperRunsHashcatInItsDirectoryWithTheArguments();
     void unixWrapperSurvivesInterrupt();
     void unixWrapperReportsAFailedDirectory();
+    void unixWrapperEchoesTheArgumentsItReceived();
+    void unixWrapperWithoutEchoRunsHashcat();
+    void unixWrapperExposesAMangledCommandLine();
     void launchDetachedReportsAFailure();
 };
 
@@ -302,22 +307,53 @@ void TestTerminalCatalog::terminalArgumentsArePinned()
 
 // Every terminal except PowerShell runs the same sh wrapper: the terminal's
 // own mode argument, then sh -c with the script, then the hashcat command as
-// positional parameters. Pinning the exact script keeps the working
-// directory, the exit code and the hold-open guarantee from drifting.
+// positional parameters. Pin both variants: the quiet one is what launches by
+// default, and the echo one is opt-in. Either way the working directory, the
+// exit code and the hold-open guarantee must not drift.
+void TestTerminalCatalog::launchCommandWrapsUnixTerminals_data()
+{
+    QTest::addColumn<bool>("showCommand");
+    QTest::newRow("with echo") << true;
+    QTest::newRow("quiet") << false;
+}
+
 void TestTerminalCatalog::launchCommandWrapsUnixTerminals()
 {
-    const QString wrapper = QStringLiteral(R"(trap : INT
-cd "$1" || {
-    printf 'hashcat-gui: cannot enter %s\n' "$1" >&2
+    QFETCH(bool, showCommand);
+
+    const QString quietWrapper = QStringLiteral(R"(trap : INT
+dir=$1
+shift
+cd "$dir" || {
+    printf 'hashcat-gui: cannot enter %s\n' "$dir" >&2
     printf '[press Enter to close]\n' >&2
     read -r _
     exit 1
 }
-shift
 "$@"
 rc=$?
 printf '\n[hashcat exited with %s - press Enter to close]\n' "$rc"
 read -r _)");
+    const QString echoWrapper = QStringLiteral(R"(trap : INT
+dir=$1
+shift
+printf 'hashcat-gui: command received by hashcat (verbatim):\n' >&2
+i=0
+for a in "$@"; do
+    printf 'hashcat-gui:   [%s] %s\n' "$i" "$a" >&2
+    i=$((i + 1))
+done
+cd "$dir" || {
+    printf 'hashcat-gui: cannot enter %s\n' "$dir" >&2
+    printf '[press Enter to close]\n' >&2
+    read -r _
+    exit 1
+}
+"$@"
+rc=$?
+printf '\n[hashcat exited with %s - press Enter to close]\n' "$rc"
+read -r _)");
+    const QString &wrapper = showCommand ? echoWrapper : quietWrapper;
 
     const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0")};
     const QMap<QString, QStringList> &table = TerminalCatalog::terminalArguments();
@@ -326,8 +362,8 @@ read -r _)");
             continue;
         }
         const QString hashcatPath = QStringLiteral("/opt/hashcat");
-        const LaunchCommand command =
-            TerminalCatalog::launchCommand(it.key(), it.key(), hashcatPath, arguments, true);
+        const LaunchCommand command = TerminalCatalog::launchCommand(
+            it.key(), it.key(), hashcatPath, arguments, true, showCommand);
         QCOMPARE(command.program, it.key());
         QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
 
@@ -337,6 +373,23 @@ read -r _)");
                  << hashcatPath << arguments;
         QCOMPARE(command.arguments, expected);
     }
+}
+
+// The encoded script has no echo when the setting is off, but still starts
+// hashcat through ProcessStartInfo.
+void TestTerminalCatalog::powerShellScriptOmitsTheEchoWhenDisabled()
+{
+    const QString hashcatPath = QStringLiteral("/opt/hashcat/hashcat");
+    const QStringList arguments{QStringLiteral("-m"), QStringLiteral("0"),
+                                QStringLiteral("$2a$10$abc")};
+
+    const LaunchCommand command = TerminalCatalog::launchCommand(
+        QStringLiteral("pwsh"), QStringLiteral("pwsh"), hashcatPath, arguments, true, false);
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+    const QString decoded = decodeScript(command.arguments.last());
+    QVERIFY(!decoded.contains(QStringLiteral("command received by hashcat")));
+    QVERIFY(!decoded.contains(QStringLiteral("[Console]::Error.WriteLine")));
+    QVERIFY(decoded.contains(QStringLiteral("$p = [System.Diagnostics.Process]::Start($si)")));
 }
 
 // The PowerShell launch carries its script as UTF-16LE base64; the flags are
@@ -363,7 +416,7 @@ void TestTerminalCatalog::launchCommandEncodesTheScript()
     const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0"),
                                 QStringLiteral("--mask"), QStringLiteral("?d?d?d?d")};
     const LaunchCommand command =
-        TerminalCatalog::launchCommand(terminal, terminal, hashcatPath, arguments, keepOpen);
+        TerminalCatalog::launchCommand(terminal, terminal, hashcatPath, arguments, keepOpen, true);
 
     QCOMPARE(command.program, terminal);
     QStringList expectedFlags{QStringLiteral("-NoProfile")};
@@ -381,9 +434,13 @@ void TestTerminalCatalog::launchCommandEncodesTheScript()
                        "$si.UseShellExecute = $false\n"
                        "$si.WorkingDirectory = '")
         + QFileInfo(hashcatPath).absolutePath()
-        + QStringLiteral("'\n"
-                         "$p = [System.Diagnostics.Process]::Start($si)\n"
-                         "$p.WaitForExit()");
+        + QStringLiteral(
+            "'\n"
+            "[Console]::Error.WriteLine('hashcat-gui: command received by hashcat (verbatim):')\n"
+            "[Console]::Error.WriteLine(('hashcat-gui:   FileName = ' + $si.FileName))\n"
+            "[Console]::Error.WriteLine(('hashcat-gui:   Arguments = ' + $si.Arguments))\n"
+            "$p = [System.Diagnostics.Process]::Start($si)\n"
+            "$p.WaitForExit()");
     QCOMPARE(decodeScript(command.arguments.last()), expectedScript);
 }
 
@@ -395,9 +452,9 @@ void TestTerminalCatalog::powerShellScriptIsTheOneThatIsEncoded()
     const QStringList arguments{QStringLiteral("--attack-mode"), QStringLiteral("0"),
                                 QStringLiteral("$2a$10$abc"), QStringLiteral("?d;calc")};
 
-    const QString script = TerminalCatalog::powerShellScript(hashcatPath, arguments);
+    const QString script = TerminalCatalog::powerShellScript(hashcatPath, arguments, true);
     const LaunchCommand command = TerminalCatalog::launchCommand(
-        QStringLiteral("pwsh"), QStringLiteral("pwsh"), hashcatPath, arguments, false);
+        QStringLiteral("pwsh"), QStringLiteral("pwsh"), hashcatPath, arguments, false, true);
 
     QCOMPARE(decodeScript(command.arguments.last()), script);
 }
@@ -523,26 +580,29 @@ void TestTerminalCatalog::commandLengthLimitIsDocumented()
 #else
     const QString hashcatPath = QStringLiteral("/opt/hashcat");
 #endif
-    const auto fits = [&hashcatPath](qsizetype length) {
+    const auto fits = [&hashcatPath](qsizetype length, bool showCommand) {
         const LaunchCommand command = TerminalCatalog::launchCommand(
             QStringLiteral("pwsh"), QStringLiteral("pwsh"), hashcatPath,
-            QStringList{QString(length, QLatin1Char('a'))}, false);
+            QStringList{QString(length, QLatin1Char('a'))}, false, showCommand);
         return command.refusal == LaunchCommand::Refusal::None;
     };
-
-    qsizetype low = 0;
-    qsizetype high = 20000;
-    while (low < high) {
-        const qsizetype mid = low + ((high - low + 1) / 2);
-        if (fits(mid)) {
-            low = mid;
-        } else {
-            high = mid - 1;
+    const auto limit = [&fits](bool showCommand) {
+        qsizetype low = 0;
+        qsizetype high = 20000;
+        while (low < high) {
+            const qsizetype mid = low + ((high - low + 1) / 2);
+            if (fits(mid, showCommand)) {
+                low = mid;
+            } else {
+                high = mid - 1;
+            }
         }
-    }
-    QCOMPARE(low, qsizetype(12038));
-    QVERIFY(fits(low));
-    QVERIFY(!fits(low + 1));
+        return low;
+    };
+
+    // The echo costs script bytes, so the budget shrinks while it is on.
+    QCOMPARE(limit(true), qsizetype(11805));
+    QCOMPARE(limit(false), qsizetype(12038));
 }
 
 // The encoding is only proven once a real PowerShell has parsed it: start the
@@ -612,7 +672,7 @@ void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell()
     for (const QString &shell : shells) {
         for (const QString &helper : {qtHelper, crtHelper}) {
             const LaunchCommand command =
-                TerminalCatalog::launchCommand(shell, shell, helper, tokens, false);
+                TerminalCatalog::launchCommand(shell, shell, helper, tokens, false, true);
             QVERIFY2(!command.program.isEmpty(), qPrintable(shell));
 
             QProcess proc;
@@ -622,6 +682,12 @@ void TestTerminalCatalog::launchCommandRoundTripsThroughPowerShell()
             QVERIFY2(proc.waitForStarted(10000), qPrintable(proc.errorString()));
             QVERIFY2(proc.waitForFinished(30000), "the shell did not finish in time");
             QCOMPARE(proc.exitCode(), 0);
+
+            const QByteArray errors = proc.readAllStandardError();
+            QVERIFY2(errors.contains("hashcat-gui: command received by hashcat (verbatim):"),
+                     qPrintable(QString::fromUtf8(errors)));
+            QVERIFY2(errors.contains("hashcat-gui:   Arguments = "),
+                     qPrintable(QString::fromUtf8(errors)));
 
             const QByteArray output = proc.readAllStandardOutput();
             if (helper == crtHelper) {
@@ -1124,7 +1190,8 @@ void TestTerminalCatalog::unixWrapperRunsHashcatInItsDirectoryWithTheArguments()
 // Ctrl-C goes to the whole foreground process group. hashcat handles it, but
 // dash would die and close the terminal before the status line. The wrapper
 // traps INT (never an ignored signal, which the child would inherit), so the
-// status and prompt always appear. Run under every sh on the machine.
+// status and prompt always appear. Run under every sh on the machine, with
+// the command echo on so its loop is covered by every shell too.
 void TestTerminalCatalog::unixWrapperSurvivesInterrupt()
 {
 #ifdef Q_OS_WIN
@@ -1146,7 +1213,7 @@ void TestTerminalCatalog::unixWrapperSurvivesInterrupt()
 
     const LaunchCommand command = TerminalCatalog::launchCommand(
         QStringLiteral("xterm"), terminal, hashcat,
-        {QStringLiteral("--attack-mode"), QStringLiteral("0")}, true);
+        {QStringLiteral("--attack-mode"), QStringLiteral("0")}, true, true);
     QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
 
     QStringList shells{QStringLiteral("/bin/sh")};
@@ -1254,6 +1321,187 @@ void TestTerminalCatalog::unixWrapperReportsAFailedDirectory()
     QVERIFY2(output.contains("[press Enter to close]"), qPrintable(QString::fromUtf8(output)));
     QCOMPARE(process.exitStatus(), QProcess::NormalExit);
     QCOMPARE(process.exitCode(), 1);
+#endif
+}
+
+// The wrapper prints the argv it actually received before it runs hashcat, so
+// the first lines of the terminal show the command verbatim - a bcrypt hash
+// stays "$2a$10$..." instead of becoming a shell variable.
+void TestTerminalCatalog::unixWrapperEchoesTheArgumentsItReceived()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString record = directory.filePath(QStringLiteral("record.txt"));
+    const QString hashcat = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-echo"),
+                                                            QStringLiteral(R"(#!/bin/sh
+pwd > "%1"
+printf '%s\n' "$@" >> "%1"
+)")
+                                                                .arg(record)
+                                                                .toUtf8(),
+                                                            directory.path());
+    const QString terminal = TestEnvironment::writeShellStub(QStringLiteral("stub-terminal-echo"),
+                                                             QStringLiteral(R"(#!/bin/sh
+shift
+exec "$@" </dev/null
+)")
+                                                                 .toUtf8(),
+                                                             directory.path());
+    QVERIFY2(!hashcat.isEmpty() && !terminal.isEmpty(), "the stubs could not be written");
+
+    const QStringList arguments{QStringLiteral("-m"),
+                                QStringLiteral("0"),
+                                QStringLiteral("$2a$10$abcdefghijklmnopqrstuu"),
+                                QStringLiteral("two words"),
+                                QStringLiteral("it's"),
+                                QStringLiteral("?d;calc")};
+    const LaunchCommand command = TerminalCatalog::launchCommand(QStringLiteral("xterm"), terminal,
+                                                                 hashcat, arguments, true, true);
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+
+    QProcess process;
+    process.setProgram(command.program);
+    process.setArguments(command.arguments);
+    process.start();
+    QVERIFY2(process.waitForStarted(10000), qPrintable(process.errorString()));
+    QVERIFY2(process.waitForFinished(10000), "the wrapper did not finish");
+
+    const QString output = QString::fromUtf8(process.readAllStandardError());
+    QVERIFY2(
+        output.contains(QStringLiteral("hashcat-gui: command received by hashcat (verbatim):")),
+        qPrintable(output));
+    QVERIFY2(output.contains(QStringLiteral("[0] ") + hashcat), qPrintable(output));
+    for (qsizetype i = 0; i < arguments.size(); ++i) {
+        QVERIFY2(output.contains(QStringLiteral("[") + QString::number(i + 1) + QStringLiteral("] ")
+                                 + arguments.at(i)),
+                 qPrintable(output));
+    }
+
+    QFile file(record);
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    const QStringList recorded =
+        QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QCOMPARE(recorded.mid(1), arguments);
+#endif
+}
+
+// With the echo off the wrapper still cd's and runs the exact argv, only
+// without the banner.
+void TestTerminalCatalog::unixWrapperWithoutEchoRunsHashcat()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString record = directory.filePath(QStringLiteral("quiet.txt"));
+    const QString hashcat = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-quiet"),
+                                                            QStringLiteral(R"(#!/bin/sh
+pwd > "%1"
+printf '%s\n' "$@" >> "%1"
+)")
+                                                                .arg(record)
+                                                                .toUtf8(),
+                                                            directory.path());
+    const QString terminal = TestEnvironment::writeShellStub(QStringLiteral("stub-terminal-quiet"),
+                                                             QStringLiteral(R"(#!/bin/sh
+shift
+exec "$@" </dev/null
+)")
+                                                                 .toUtf8(),
+                                                             directory.path());
+    QVERIFY2(!hashcat.isEmpty() && !terminal.isEmpty(), "the stubs could not be written");
+
+    const QStringList arguments{QStringLiteral("-m"), QStringLiteral("$2a$10$abc")};
+    const LaunchCommand command = TerminalCatalog::launchCommand(QStringLiteral("xterm"), terminal,
+                                                                 hashcat, arguments, true, false);
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+
+    QProcess process;
+    process.setProgram(command.program);
+    process.setArguments(command.arguments);
+    process.start();
+    QVERIFY2(process.waitForStarted(10000), qPrintable(process.errorString()));
+    QVERIFY2(process.waitForFinished(10000), "the wrapper did not finish");
+
+    const QString output = QString::fromUtf8(process.readAllStandardError());
+    QVERIFY2(!output.contains(QStringLiteral("command received by hashcat")), qPrintable(output));
+
+    QFile file(record);
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    const QStringList recorded =
+        QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QCOMPARE(recorded.mid(1), arguments);
+#endif
+}
+
+// A terminal that re-expands "$" before the wrapper sees the command (the
+// ptyxis class of bug) must not hide the damage: the echo reads the received
+// argv, and hashcat gets the very same mangled value.
+void TestTerminalCatalog::unixWrapperExposesAMangledCommandLine()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    const QString bash = QStandardPaths::findExecutable(QStringLiteral("bash"));
+    if (bash.isEmpty()) {
+        QSKIP("bash is needed to model a terminal that expands tokens");
+    }
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString record = directory.filePath(QStringLiteral("mangled.txt"));
+    const QString hashcat = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-mangled"),
+                                                            QStringLiteral(R"(#!/bin/sh
+printf '%s\n' "$@" > "%1"
+)")
+                                                                .arg(record)
+                                                                .toUtf8(),
+                                                            directory.path());
+    // The shebang uses the path the guard found; a PATH-only bash need not
+    // live at /bin/bash.
+    QByteArray mangler = "#!" + bash.toUtf8();
+    mangler += R"(
+shift
+args=()
+for a in "$@"; do
+    case "$a" in
+        *2a*) a=$(printf '%s' "$a" | tr -d '$') ;;
+    esac
+    args+=("$a")
+done
+exec "${args[@]}" </dev/null
+)";
+    const QString terminal = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-terminal-mangles-dollars"), mangler, directory.path());
+    QVERIFY2(!hashcat.isEmpty() && !terminal.isEmpty(), "the stubs could not be written");
+
+    const QString hash = QStringLiteral("$2a$10$abcdefghijklmnopqrstuu");
+    const QString mangled = QStringLiteral("2a10abcdefghijklmnopqrstuu");
+    const QStringList arguments{QStringLiteral("-m"), QStringLiteral("0"), hash};
+    const LaunchCommand command = TerminalCatalog::launchCommand(QStringLiteral("xterm"), terminal,
+                                                                 hashcat, arguments, true, true);
+    QCOMPARE(int(command.refusal), int(LaunchCommand::Refusal::None));
+
+    QProcess process;
+    process.setProgram(command.program);
+    process.setArguments(command.arguments);
+    process.start();
+    QVERIFY2(process.waitForStarted(10000), qPrintable(process.errorString()));
+    QVERIFY2(process.waitForFinished(10000), "the wrapper did not finish");
+
+    QFile file(record);
+    QVERIFY(file.open(QIODevice::ReadOnly));
+    const QStringList recorded =
+        QString::fromUtf8(file.readAll()).split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    QCOMPARE(recorded.size(), arguments.size());
+    QCOMPARE(recorded.last(), mangled);
+
+    const QString output = QString::fromUtf8(process.readAllStandardError());
+    QVERIFY2(output.contains(QStringLiteral("[3] ") + mangled), qPrintable(output));
+    QVERIFY2(!output.contains(QStringLiteral("[3] ") + hash), qPrintable(output));
 #endif
 }
 

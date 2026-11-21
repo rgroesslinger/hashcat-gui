@@ -2,6 +2,7 @@
 
 ## Unreleased
 - kgx (GNOME Console) is now available as a launch terminal
+- The launch terminal can now print the exact command hashcat receives, so a mangled value (such as a `$` hash expanded a second time by a terminal) is immediately visible instead of going unnoticed; enable it under Settings → General
 
 ## 0.9.0 (2026-11-20)
 

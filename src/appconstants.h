@@ -63,6 +63,8 @@ namespace SettingsKeys
 inline constexpr QLatin1StringView HashcatPath{"hashcatPath"};
 inline constexpr QLatin1StringView Terminal{"terminal"};
 inline constexpr QLatin1StringView UseShortParameters{"useShortParameters"};
+// Whether the terminal prints the command hashcat receives before it starts.
+inline constexpr QLatin1StringView ShowLaunchCommand{"showLaunchCommand"};
 // Whether the application restores the last session at the next start.
 inline constexpr QLatin1StringView RestoreSession{"restoreSession"};
 // The color scheme the user chose, see the Appearance namespace below.
@@ -94,6 +96,7 @@ inline constexpr auto All = std::to_array<Entry>({
     {HashcatPath, Type::String, "", false},
     {Terminal, Type::String, "", false},
     {UseShortParameters, Type::Boolean, "", false},
+    {ShowLaunchCommand, Type::Boolean, "", false},
     {RestoreSession, Type::Boolean, "", true},
     {ColorScheme, Type::String, "", false},
     {Language, Type::String, Languages::Default, false},

@@ -88,6 +88,9 @@ QJsonValue widgetValue(const Ui::SettingsDialog &ui, QLatin1StringView key,
     if (key == AppConstants::SettingsKeys::UseShortParameters) {
         return ui.checkBox_use_short_parameters->isChecked();
     }
+    if (key == AppConstants::SettingsKeys::ShowLaunchCommand) {
+        return ui.checkBox_show_launch_command->isChecked();
+    }
     if (key == AppConstants::SettingsKeys::RestoreSession) {
         return ui.checkBox_restore_session->isChecked();
     }
@@ -115,7 +118,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
     ui->label_terminal->setBuddy(ui->comboBox_terminal);
     ui->label_language->setBuddy(ui->comboBox_language);
     ui->label_color_scheme->setBuddy(ui->comboBox_color_scheme);
-    ui->label_parameters->setBuddy(ui->checkBox_use_short_parameters);
     ui->label_session_path_text->setBuddy(ui->lineEdit_session_path);
     ui->label_settings_path_text->setBuddy(ui->lineEdit_settings_path);
 
@@ -437,6 +439,11 @@ QString SettingsDialog::applyValue(const QString &key, const QJsonValue &value, 
 
     if (key == AppConstants::SettingsKeys::UseShortParameters) {
         ui->checkBox_use_short_parameters->setChecked(value.toBool());
+        return {};
+    }
+
+    if (key == AppConstants::SettingsKeys::ShowLaunchCommand) {
+        ui->checkBox_show_launch_command->setChecked(value.toBool());
         return {};
     }
 

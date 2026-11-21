@@ -48,6 +48,9 @@ QJsonValue importableValue(QLatin1StringView key, const Ui::SettingsDialog &ui)
     if (key == AppConstants::SettingsKeys::UseShortParameters) {
         return !ui.checkBox_use_short_parameters->isChecked();
     }
+    if (key == AppConstants::SettingsKeys::ShowLaunchCommand) {
+        return !ui.checkBox_show_launch_command->isChecked();
+    }
     if (key == AppConstants::SettingsKeys::RestoreSession) {
         return !ui.checkBox_restore_session->isChecked();
     }
@@ -70,6 +73,9 @@ bool dialogShows(const Ui::SettingsDialog &ui, QLatin1StringView key, const QJso
     }
     if (key == AppConstants::SettingsKeys::UseShortParameters) {
         return ui.checkBox_use_short_parameters->isChecked() == value.toBool();
+    }
+    if (key == AppConstants::SettingsKeys::ShowLaunchCommand) {
+        return ui.checkBox_show_launch_command->isChecked() == value.toBool();
     }
     if (key == AppConstants::SettingsKeys::RestoreSession) {
         return ui.checkBox_restore_session->isChecked() == value.toBool();
@@ -101,6 +107,7 @@ private slots:
     void selectPathClickedAcceptsAnExecutable();
     void selectPathClickedRejectsAPlainFile();
     void restoreSessionFollowsTheSetting();
+    void showLaunchCommandFollowsTheSetting();
     void shortenPathOnlyShortensTheHomeDirectory();
     void showsWhereTheFilesAreStored();
     void hashcatPathStatusFollowsTheField();
@@ -287,6 +294,28 @@ void TestSettingsDialog::restoreSessionFollowsTheSetting()
 
     QCOMPARE(SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::RestoreSession),
              true);
+}
+
+// The command echo is a setting, so the checkbox follows it and Save stores
+// what it shows.
+void TestSettingsDialog::showLaunchCommandFollowsTheSetting()
+{
+    QVERIFY(!AppConstants::SettingsKeys::defaultOf<bool>(
+        AppConstants::SettingsKeys::ShowLaunchCommand));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::ShowLaunchCommand, true);
+
+    SettingsDialog dialog;
+    QCOMPARE(dialog.ui->checkBox_show_launch_command->isChecked(), true);
+
+    dialog.ui->checkBox_show_launch_command->setChecked(false);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+
+    QCOMPARE(
+        SettingsManager::instance().getKey<bool>(AppConstants::SettingsKeys::ShowLaunchCommand),
+        false);
 }
 
 // Only a path inside the home directory gets the tilde: a sibling folder
@@ -653,6 +682,7 @@ void TestSettingsDialog::savedSettingsHoldTheKnownSettings()
              QStringLiteral("/opt/somewhere/hashcat"));
     QCOMPARE(stored.value(QStringLiteral("terminal")).toString(), QStringLiteral("kitty"));
     QVERIFY(stored.contains(QStringLiteral("useShortParameters")));
+    QVERIFY(stored.contains(QStringLiteral("showLaunchCommand")));
     QVERIFY(stored.contains(QStringLiteral("restoreSession")));
     QVERIFY(stored.contains(QStringLiteral("language")));
     QVERIFY(stored.contains(QStringLiteral("colorScheme")));

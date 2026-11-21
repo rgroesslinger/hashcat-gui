@@ -118,21 +118,34 @@ QString TerminalCatalog::noSupportedTerminalMessage()
               "hashcat-gui needs one to show the hashcat output.");
 }
 
-QString TerminalCatalog::powerShellScript(const QString &hashcatPath, const QStringList &arguments)
+QString TerminalCatalog::powerShellScript(const QString &hashcatPath, const QStringList &arguments,
+                                          bool showCommand)
 {
+    // The echo reads the fields CreateProcess will consume, not a separately
+    // rendered copy, so what the terminal shows is what hashcat receives.
+    const QString echo =
+        showCommand ? QStringLiteral("[Console]::Error.WriteLine('hashcat-gui: command received by "
+                                     "hashcat (verbatim):')\n"
+                                     "[Console]::Error.WriteLine(('hashcat-gui:   FileName = ' + "
+                                     "$si.FileName))\n"
+                                     "[Console]::Error.WriteLine(('hashcat-gui:   Arguments = ' + "
+                                     "$si.Arguments))\n")
+                    : QString();
     return QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo\n$si.FileName = ")
            + powerShellQuoteArgument(hashcatPath) + QStringLiteral("\n$si.Arguments = ")
            + powerShellQuoteArgument(msvcrtJoinArguments(arguments))
            + QStringLiteral("\n$si.UseShellExecute = $false\n$si.WorkingDirectory = ")
            + powerShellQuoteArgument(ProgramDirectory::forProgram(hashcatPath))
-           + QStringLiteral("\n$p = [System.Diagnostics.Process]::Start($si)\n"
+           + QStringLiteral("\n") + echo
+           + QStringLiteral("$p = [System.Diagnostics.Process]::Start($si)\n"
                             "$p.WaitForExit()");
 }
 
 LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
                                              const QString &terminalProgram,
                                              const QString &hashcatPath,
-                                             const QStringList &arguments, bool keepOpen)
+                                             const QStringList &arguments, bool keepOpen,
+                                             bool showCommand)
 {
     const QMap<QString, QStringList> &table = terminalArguments();
     const auto it = table.constFind(terminal);
@@ -147,7 +160,7 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     // keeps the collected argv verbatim on every PowerShell version.
     // WaitForExit holds the session: the script must not call exit afterwards.
     if (isPowerShell(terminal)) {
-        const QString script = powerShellScript(hashcatPath, arguments);
+        const QString script = powerShellScript(hashcatPath, arguments, showCommand);
 
         QStringEncoder encoder(QStringEncoder::Utf16LE);
         const QByteArray encodedBytes = encoder.encode(script);
@@ -179,21 +192,37 @@ LaunchCommand TerminalCatalog::launchCommand(const QString &terminal,
     command.program = terminalProgram;
     command.arguments = it.value();
 
-    // Fixed sh -c wrapper: cd to $1, run "$@" as positional parameters, then
-    // print the exit code and hold open. The INT trap keeps dash alive on Ctrl-C
-    // and is reset to default in the child so hashcat still gets the signal.
-    const QString wrapper = QStringLiteral(R"(trap : INT
-cd "$1" || {
-    printf 'hashcat-gui: cannot enter %s\n' "$1" >&2
+    // Fixed sh -c wrapper: the echo is the only conditional block, so the
+    // fixed part stays one literal and the cd/exit/hold-open contract reads in
+    // one place. The echo reads the wrapper's own parameters, never a spliced
+    // value, so a terminal that mangles the command line is visible. The INT
+    // trap keeps dash alive on Ctrl-C and is reset to default in the child so
+    // hashcat still gets the signal.
+    QString commandEcho;
+    if (showCommand) {
+        commandEcho =
+            QStringLiteral(R"(printf 'hashcat-gui: command received by hashcat (verbatim):\n' >&2
+i=0
+for a in "$@"; do
+    printf 'hashcat-gui:   [%s] %s\n' "$i" "$a" >&2
+    i=$((i + 1))
+done
+)");
+    }
+    const QString wrapperTemplate = QStringLiteral(R"(trap : INT
+dir=$1
+shift
+%1cd "$dir" || {
+    printf 'hashcat-gui: cannot enter %s\n' "$dir" >&2
     printf '[press Enter to close]\n' >&2
     read -r _
     exit 1
 }
-shift
 "$@"
 rc=$?
 printf '\n[hashcat exited with %s - press Enter to close]\n' "$rc"
 read -r _)");
+    const QString wrapper = wrapperTemplate.arg(commandEcho);
     command.arguments << QStringLiteral("sh") << QStringLiteral("-c")
                       << wrapper
                       // $0 for the wrapper, then the directory, the hashcat

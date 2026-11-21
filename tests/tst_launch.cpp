@@ -337,7 +337,7 @@ void TestLaunch::copyingTheCommandPutsItOnTheClipboard()
 }
 
 // The Tools action copies the readable script the PowerShell launch encodes,
-// and it is reachable from the Tools menu.
+// it follows the command echo setting, and it is in the Tools menu.
 void TestLaunch::copyingThePowerShellScriptPutsItOnTheClipboard()
 {
     const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-script-copy"),
@@ -358,11 +358,18 @@ void TestLaunch::copyingThePowerShellScriptPutsItOnTheClipboard()
     ui->actionCopyPowerShellScript->trigger();
 
     const QString expected = TerminalCatalog::powerShellScript(
-        stub, CommandBuilder::build(MainWindowTestAccess::collectHashcatOptions(window)));
+        stub, CommandBuilder::build(MainWindowTestAccess::collectHashcatOptions(window)), false);
     QCOMPARE(QApplication::clipboard()->text(), expected);
     QVERIFY(
         expected.contains(QStringLiteral("$si = New-Object System.Diagnostics.ProcessStartInfo")));
     QVERIFY(expected.contains(stub));
+    QVERIFY(!expected.contains(QStringLiteral("command received by hashcat")));
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::ShowLaunchCommand, true);
+    ui->actionCopyPowerShellScript->trigger();
+    QVERIFY(
+        QApplication::clipboard()->text().contains(QStringLiteral("command received by hashcat")));
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::ShowLaunchCommand, false);
 }
 
 int main(int argc, char *argv[])

@@ -113,6 +113,14 @@ CommandPreview::Dialect previewDialect(const QString &terminal)
                                                    : CommandPreview::Dialect::Posix;
 }
 
+// The default comes from the setting table, like every other setting.
+bool showLaunchCommand()
+{
+    return SettingsManager::instance().getKey<bool>(
+        AppConstants::SettingsKeys::ShowLaunchCommand,
+        AppConstants::SettingsKeys::defaultOf<bool>(AppConstants::SettingsKeys::ShowLaunchCommand));
+}
+
 } // namespace
 
 QString MainWindow::fileMenuLabel() const
@@ -1625,8 +1633,8 @@ void MainWindow::copyPowerShellScript()
         return;
     }
 
-    const QString script =
-        TerminalCatalog::powerShellScript(resolved, CommandBuilder::build(collectHashcatOptions()));
+    const QString script = TerminalCatalog::powerShellScript(
+        resolved, CommandBuilder::build(collectHashcatOptions()), showLaunchCommand());
     if (QClipboard *clipboard = QApplication::clipboard()) {
         clipboard->setText(script);
         QToolTip::showText(QCursor::pos(), tr("PowerShell script copied to the clipboard"), this,
@@ -1663,7 +1671,8 @@ void MainWindow::startClicked()
     // Every program is the resolved absolute one, never the stored text.
     const LaunchCommand command = TerminalCatalog::launchCommand(
         context.configuredTerminal, terminals.value(context.configuredTerminal),
-        context.resolvedHashcatPath, CommandBuilder::build(context.options), true);
+        context.resolvedHashcatPath, CommandBuilder::build(context.options), true,
+        showLaunchCommand());
     if (command.refusal != LaunchCommand::Refusal::None) {
         showLaunchMessage(messageFor(command, context.configuredTerminal));
         return;

@@ -76,14 +76,16 @@ public:
     // -EncodedCommand script that quotes every token and starts hashcat through
     // ProcessStartInfo; other terminals run a fixed sh wrapper. keepOpen
     // controls -NoExit, while the wrapper always holds the window open.
+    // showCommand makes the command hashcat receives the first terminal output.
     static LaunchCommand launchCommand(const QString &terminal, const QString &terminalProgram,
                                        const QString &hashcatPath, const QStringList &arguments,
-                                       bool keepOpen);
+                                       bool keepOpen, bool showCommand = false);
 
     // The readable PowerShell script that starts hashcat through
     // ProcessStartInfo. launchCommand() encodes exactly this script, and the
     // Tools action copies it unencoded, so the two cannot drift apart.
-    static QString powerShellScript(const QString &hashcatPath, const QStringList &arguments);
+    static QString powerShellScript(const QString &hashcatPath, const QStringList &arguments,
+                                    bool showCommand = false);
 
     // Starts the terminal detached, in the hashcat binary's own directory.
     // Returns false and fills errorMessage when the start fails. The caller
