@@ -83,10 +83,17 @@ void AttackModeView::apply(AttackMode mode) const
     // Inside the mask group: hashcat 8.0.0 refuses -i in mode 12, so the
     // increment row only exists where the flag is offered.
     m_ui->checkBox_increment->setVisible(usesIncrement);
+    m_ui->checkBox_increment_inverse->setVisible(usesIncrement);
     m_ui->label_increment_min->setVisible(usesIncrement);
     m_ui->spinBox_increment_min->setVisible(usesIncrement);
     m_ui->label_increment_max->setVisible(usesIncrement);
     m_ui->spinBox_increment_max->setVisible(usesIncrement);
+
+    // Mode 9 turns the potfile off; the row follows the builder.
+    const bool usesPotfile = mode != AttackMode::Association;
+    m_ui->label_potfile_path->setVisible(usesPotfile);
+    m_ui->lineEdit_potfile_path->setVisible(usesPotfile);
+    m_ui->pushButton_open_potfile_path->setVisible(usesPotfile);
 
     // Tell the user what the mode expects, so the launch validation does not
     // have to be the first thing that explains it.

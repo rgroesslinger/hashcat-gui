@@ -228,6 +228,11 @@ void TestLaunchMessage::messageFor_data()
         << int(Error::RemoveInAssociation) << QString() << straight << info << autoText
         << QStringLiteral("Removing cracked hashes is not possible in the association attack "
                           "mode.");
+
+    QTest::newRow("KeepGuessingWithRemove")
+        << int(Error::KeepGuessingWithRemove) << QString() << straight << info << autoText
+        << QStringLiteral("Keep guessing cannot be combined with removing cracked hashes from the "
+                          "hash file. Clear either option.");
 }
 
 void TestLaunchMessage::messageFor()

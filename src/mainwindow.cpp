@@ -438,6 +438,7 @@ void MainWindow::configureWidgets()
         {ui->label_backend_devices, ui->lineEdit_backend_devices},
         {ui->label_opencl_device_types, ui->lineEdit_opencl_device_types},
         {ui->label_outfile_format, ui->lineEdit_outfile_format},
+        {ui->label_potfile_path, ui->lineEdit_potfile_path},
     });
     for (const auto &[label, field] : buddies) {
         label->setBuddy(field);
@@ -512,6 +513,8 @@ void MainWindow::connectActionSignals()
             &MainWindow::openHashFileClicked);
     connect(ui->pushButton_open_outfile, &QPushButton::clicked, this,
             &MainWindow::openOutfileClicked);
+    connect(ui->pushButton_open_potfile_path, &QPushButton::clicked, this,
+            &MainWindow::openPotfilePathClicked);
     connect(ui->pushButton_open_cache_path, &QPushButton::clicked, this,
             &MainWindow::openCachePathClicked);
     connect(ui->pushButton_start, &QPushButton::clicked, this, &MainWindow::startClicked);
@@ -612,10 +615,14 @@ void MainWindow::connectDependencySignals()
     // value stays in the field so switching back restores what was typed.
     bindEnabled(ui->checkBox_outfile, {ui->lineEdit_outfile, ui->pushButton_open_outfile});
     bindDisabled(ui->checkBox_outfile_json, {ui->lineEdit_outfile_format});
+    // Exclusive like JSON and the format; the builder drops the path.
+    bindDisabled(ui->checkBox_potfile_disable, {ui->label_potfile_path, ui->lineEdit_potfile_path,
+                                                ui->pushButton_open_potfile_path});
 
     // The option dependencies that follow a checkbox, not the attack mode.
-    bindEnabled(ui->checkBox_increment, {ui->label_increment_min, ui->spinBox_increment_min,
-                                         ui->label_increment_max, ui->spinBox_increment_max});
+    bindEnabled(ui->checkBox_increment,
+                {ui->label_increment_min, ui->spinBox_increment_min, ui->label_increment_max,
+                 ui->spinBox_increment_max, ui->checkBox_increment_inverse});
     bindEnabled(ui->checkBox_status, {ui->spinBox_status_timer});
     bindEnabled(ui->checkBox_hwmon_temp_abort, {ui->spinBox_hwmon_temp_abort});
 
@@ -1395,6 +1402,15 @@ void MainWindow::openOutfileClicked()
     QString outfile = QFileDialog::getSaveFileName(this, tr("Save output file"));
     if (!outfile.isEmpty()) {
         ui->lineEdit_outfile->setText(QDir::toNativeSeparators(outfile));
+    }
+}
+
+void MainWindow::openPotfilePathClicked()
+{
+    // The potfile may not exist yet, so offer a new name too.
+    const QString path = QFileDialog::getSaveFileName(this, tr("Choose potfile"));
+    if (!path.isEmpty()) {
+        ui->lineEdit_potfile_path->setText(QDir::toNativeSeparators(path));
     }
 }
 

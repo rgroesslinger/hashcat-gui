@@ -234,8 +234,11 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
         {Parameter::HexWordlist, {QString(), QStringLiteral("--hex-wordlist")}},
         {Parameter::HwmonTempAbort, {QString(), QStringLiteral("--hwmon-temp-abort")}},
         {Parameter::Increment, {QStringLiteral("-i"), QStringLiteral("--increment")}},
+        {Parameter::IncrementInverse,
+         {QStringLiteral("-ii"), QStringLiteral("--increment-inverse")}},
         {Parameter::IncrementMax, {QString(), QStringLiteral("--increment-max")}},
         {Parameter::IncrementMin, {QString(), QStringLiteral("--increment-min")}},
+        {Parameter::KeepGuessing, {QString(), QStringLiteral("--keep-guessing")}},
         {Parameter::Limit, {QStringLiteral("-l"), QStringLiteral("--limit")}},
         {Parameter::OpenclDeviceTypes,
          {QStringLiteral("-D"), QStringLiteral("--opencl-device-types")}},
@@ -245,6 +248,7 @@ QString CommandBuilder::parameterName(Parameter key, bool useShort)
         {Parameter::OutfileFormat, {QString(), QStringLiteral("--outfile-format")}},
         {Parameter::OutfileJson, {QString(), QStringLiteral("--outfile-json")}},
         {Parameter::PotfileDisable, {QString(), QStringLiteral("--potfile-disable")}},
+        {Parameter::PotfilePath, {QString(), QStringLiteral("--potfile-path")}},
         {Parameter::Remove, {QString(), QStringLiteral("--remove")}},
         {Parameter::RuleLeft, {QStringLiteral("-j"), QStringLiteral("--rule-left")}},
         {Parameter::RuleRight, {QStringLiteral("-k"), QStringLiteral("--rule-right")}},
@@ -305,6 +309,10 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
         arguments << parameterName(Parameter::Remove, useShort);
     }
 
+    if (options.keepGuessing) {
+        arguments << parameterName(Parameter::KeepGuessing, useShort);
+    }
+
     if (options.ignoreUsername) {
         arguments << parameterName(Parameter::Username, useShort);
     }
@@ -329,6 +337,13 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
 
     if (options.potfileDisable) {
         arguments << parameterName(Parameter::PotfileDisable, useShort);
+    }
+
+    // Mode 9 and the disable box both turn the potfile off; either leaves
+    // the path out, the way JSON takes the format.
+    if (mode != AttackMode::Association && !options.potfileDisable
+        && !options.potfilePath.isEmpty()) {
+        arguments << parameterName(Parameter::PotfilePath, useShort) << options.potfilePath;
     }
 
     // rules - either existing rules files or a number of generated rules
@@ -394,7 +409,16 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
     // modes that accept the flag: the two bounds are part of the same option,
     // and without the flag they would be ignored.
     if (attackUsesIncrement(mode) && options.increment) {
-        arguments << parameterName(Parameter::Increment, useShort);
+        // -ii already enables incrementing inverted; a -i beside it counts
+        // past hashcat's limit of two. The long forms coexist.
+        if (useShort && options.incrementInverse) {
+            arguments << parameterName(Parameter::IncrementInverse, useShort);
+        } else {
+            arguments << parameterName(Parameter::Increment, useShort);
+            if (options.incrementInverse) {
+                arguments << parameterName(Parameter::IncrementInverse, useShort);
+            }
+        }
         if (options.incrementMin > 0) {
             arguments << parameterName(Parameter::IncrementMin, useShort)
                       << QString::number(options.incrementMin);

@@ -127,6 +127,7 @@ void TestOptionCollector::theMaskAndCharsetGroupsAreRead()
     form.ui.comboBox_attack->setCurrentIndex(0);
     form.ui.lineEdit_mask->setText(QStringLiteral("?d?d?d?d"));
     form.ui.checkBox_increment->setChecked(true);
+    form.ui.checkBox_increment_inverse->setChecked(true);
     form.ui.spinBox_increment_min->setValue(2);
     form.ui.spinBox_increment_max->setValue(6);
     form.ui.checkBox_custom_charset1->setChecked(true);
@@ -138,6 +139,7 @@ void TestOptionCollector::theMaskAndCharsetGroupsAreRead()
     QCOMPARE(options.attackMode, AttackMode::BruteForce);
     QCOMPARE(options.mask, QStringLiteral("?d?d?d?d"));
     QCOMPARE(options.increment, true);
+    QCOMPARE(options.incrementInverse, true);
     QCOMPARE(options.incrementMin, 2);
     QCOMPARE(options.incrementMax, 6);
     QCOMPARE(options.customCharsets.at(0).enabled, true);
@@ -192,6 +194,7 @@ void TestOptionCollector::theGeneralGroupIsRead()
     form.ui.spinBox_status_timer->setValue(30);
     form.ui.checkBox_force->setChecked(true);
     form.ui.checkBox_potfile_disable->setChecked(true);
+    form.ui.lineEdit_potfile_path->setText(QStringLiteral("/tmp/custom.pot"));
     form.ui.checkBox_optimized_kernel->setChecked(true);
     form.ui.checkBox_speed_only->setChecked(true);
     form.ui.lineEdit_opencl_device_types->setText(QStringLiteral("1,2"));
@@ -199,6 +202,7 @@ void TestOptionCollector::theGeneralGroupIsRead()
     form.ui.spinBox_hwmon_temp_abort->setValue(85);
     form.ui.checkBox_remove->setChecked(true);
     form.ui.checkBox_ignoreusername->setChecked(true);
+    form.ui.checkBox_keep_guessing->setChecked(true);
 
     const HashcatOptions options = OptionCollector::collect(form.ui, false);
     QCOMPARE(options.outfileEnabled, true);
@@ -216,6 +220,7 @@ void TestOptionCollector::theGeneralGroupIsRead()
     QCOMPARE(options.statusTimer, 30);
     QCOMPARE(options.force, true);
     QCOMPARE(options.potfileDisable, true);
+    QCOMPARE(options.potfilePath, QStringLiteral("/tmp/custom.pot"));
     QCOMPARE(options.optimizedKernel, true);
     QCOMPARE(options.speedOnly, true);
     QCOMPARE(options.openclDeviceTypes, QStringLiteral("1,2"));
@@ -223,6 +228,7 @@ void TestOptionCollector::theGeneralGroupIsRead()
     QCOMPARE(options.hwmonTempAbortCelsius, 85);
     QCOMPARE(options.remove, true);
     QCOMPARE(options.ignoreUsername, true);
+    QCOMPARE(options.keepGuessing, true);
 }
 
 void TestOptionCollector::onlyCheckedRowsReachTheOptions()

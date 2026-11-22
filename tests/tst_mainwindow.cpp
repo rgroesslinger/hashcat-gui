@@ -81,6 +81,7 @@ private slots:
     void loadExampleSessionUnpacksItsDataFiles();
     void optionDependenciesFollowTheirCheckboxes();
     void outfileJsonTakesOverFromTheFormatField();
+    void potfileDisableTakesOverFromThePathField();
     void rulesFileFieldsObeyTheGeneratedSide();
     void modeHintFollowsTheAttackMode();
     void hashRecipeRowFollowsTheHashType();
@@ -299,6 +300,8 @@ void TestMainWindow::widgetsFollowTheBuilderPredicates()
 
         // Inside the mask group: hashcat 8.0.0 refuses -i in mode 12.
         QCOMPARE(shown(MainWindowTestAccess::ui(window)->checkBox_increment), expected->increment);
+        QCOMPARE(shown(MainWindowTestAccess::ui(window)->checkBox_increment_inverse),
+                 expected->increment);
         QCOMPARE(shown(MainWindowTestAccess::ui(window)->label_increment_min), expected->increment);
         QCOMPARE(shown(MainWindowTestAccess::ui(window)->spinBox_increment_min),
                  expected->increment);
@@ -525,6 +528,7 @@ void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
     // A fresh window: every dependent value starts switched off.
     QVERIFY(!MainWindowTestAccess::ui(window)->spinBox_increment_min->isEnabled());
     QVERIFY(!MainWindowTestAccess::ui(window)->spinBox_increment_max->isEnabled());
+    QVERIFY(!MainWindowTestAccess::ui(window)->checkBox_increment_inverse->isEnabled());
     QVERIFY(!MainWindowTestAccess::ui(window)->spinBox_status_timer->isEnabled());
     QVERIFY(!MainWindowTestAccess::ui(window)->spinBox_hwmon_temp_abort->isEnabled());
 
@@ -533,9 +537,11 @@ void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
     QVERIFY(MainWindowTestAccess::ui(window)->spinBox_increment_max->isEnabled());
     QVERIFY(MainWindowTestAccess::ui(window)->label_increment_min->isEnabled());
     QVERIFY(MainWindowTestAccess::ui(window)->label_increment_max->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->checkBox_increment_inverse->isEnabled());
     MainWindowTestAccess::ui(window)->checkBox_increment->setChecked(false);
     QVERIFY(!MainWindowTestAccess::ui(window)->spinBox_increment_min->isEnabled());
     QVERIFY(!MainWindowTestAccess::ui(window)->spinBox_increment_max->isEnabled());
+    QVERIFY(!MainWindowTestAccess::ui(window)->checkBox_increment_inverse->isEnabled());
 
     MainWindowTestAccess::ui(window)->checkBox_status->setChecked(true);
     QVERIFY(MainWindowTestAccess::ui(window)->spinBox_status_timer->isEnabled());
@@ -546,6 +552,16 @@ void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
     QVERIFY(MainWindowTestAccess::ui(window)->spinBox_hwmon_temp_abort->isEnabled());
     MainWindowTestAccess::ui(window)->checkBox_hwmon_temp_abort->setChecked(false);
     QVERIFY(!MainWindowTestAccess::ui(window)->spinBox_hwmon_temp_abort->isEnabled());
+
+    // The potfile path row goes dark while the potfile is turned off; the
+    // builder drops the path for as long (potfileDisableTakesOver below).
+    QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_potfile_path->isEnabled());
+    MainWindowTestAccess::ui(window)->checkBox_potfile_disable->setChecked(true);
+    QVERIFY(!MainWindowTestAccess::ui(window)->lineEdit_potfile_path->isEnabled());
+    QVERIFY(!MainWindowTestAccess::ui(window)->pushButton_open_potfile_path->isEnabled());
+    MainWindowTestAccess::ui(window)->checkBox_potfile_disable->setChecked(false);
+    QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_potfile_path->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->pushButton_open_potfile_path->isEnabled());
 }
 
 // JSON and the format field are exclusive: the box takes the field over,
@@ -580,6 +596,36 @@ void TestMainWindow::outfileJsonTakesOverFromTheFormatField()
     QVERIFY(!MainWindowTestAccess::ui(window)->checkBox_rules_concat->isEnabled());
     MainWindowTestAccess::ui(window)->radioButton_use_rules_file->setChecked(true);
     QVERIFY(MainWindowTestAccess::ui(window)->checkBox_rules_concat->isEnabled());
+}
+
+// The disable box takes the path over, keeps its value, and the builder
+// suppresses --potfile-path - the JSON/format takeover again. A refusal
+// would point at a field the box has just disabled.
+void TestMainWindow::potfileDisableTakesOverFromThePathField()
+{
+    MainWindow window;
+
+    MainWindowTestAccess::ui(window)->lineEdit_potfile_path->setText(
+        QStringLiteral("/tmp/custom.pot"));
+    QVERIFY(
+        MainWindowTestAccess::generateArguments(window).contains(QStringLiteral("--potfile-path")));
+
+    MainWindowTestAccess::ui(window)->checkBox_potfile_disable->setChecked(true);
+    QVERIFY(!MainWindowTestAccess::ui(window)->lineEdit_potfile_path->isEnabled());
+    // The value survives, so switching back restores what was typed.
+    QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_potfile_path->text(),
+             QStringLiteral("/tmp/custom.pot"));
+    const QStringList disabled = MainWindowTestAccess::generateArguments(window);
+    QVERIFY(disabled.contains(QStringLiteral("--potfile-disable")));
+    QVERIFY(!disabled.contains(QStringLiteral("--potfile-path")));
+
+    MainWindowTestAccess::ui(window)->checkBox_potfile_disable->setChecked(false);
+    QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_potfile_path->isEnabled());
+    QCOMPARE(MainWindowTestAccess::generateArguments(window).value(
+                 MainWindowTestAccess::generateArguments(window).indexOf(
+                     QStringLiteral("--potfile-path"))
+                 + 1),
+             QStringLiteral("/tmp/custom.pot"));
 }
 
 // An import applies the file boxes without touching the radio pair, so a
@@ -1902,8 +1948,8 @@ void TestMainWindow::everyCommandWidgetReachesThePreview()
         ++touched;
     }
 
-    // 41 line edits, 22 checkboxes, 2 radios, 6 spin boxes, 2 combos.
-    QCOMPARE(touched, 73);
+    // 42 line edits, 24 checkboxes, 2 radios, 6 spin boxes, 2 combos.
+    QCOMPARE(touched, 76);
 }
 
 // One owner per connection: a single list row event rebuilds the preview

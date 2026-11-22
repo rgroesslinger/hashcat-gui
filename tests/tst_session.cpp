@@ -1107,6 +1107,8 @@ void TestSession::theSerializedKeySetIsFrozen()
         QLatin1StringView{"checkBox_hwmon_temp_abort"},
         QLatin1StringView{"checkBox_ignoreusername"},
         QLatin1StringView{"checkBox_increment"},
+        QLatin1StringView{"checkBox_increment_inverse"},
+        QLatin1StringView{"checkBox_keep_guessing"},
         QLatin1StringView{"checkBox_optimized_kernel"},
         QLatin1StringView{"checkBox_outfile"},
         QLatin1StringView{"checkBox_outfile_json"},
@@ -1150,6 +1152,7 @@ void TestSession::theSerializedKeySetIsFrozen()
         QLatin1StringView{"lineEdit_pcfg_threads"},
         QLatin1StringView{"lineEdit_pcfg_walk"},
         QLatin1StringView{"lineEdit_pcfg_weights"},
+        QLatin1StringView{"lineEdit_potfile_path"},
         QLatin1StringView{"lineEdit_rule_left"},
         QLatin1StringView{"lineEdit_rule_right"},
         QLatin1StringView{"lineEdit_rulesfile_1"},
@@ -1184,8 +1187,9 @@ void TestSession::theSerializedKeySetIsFrozen()
     QCOMPARE(values.keys(), expectedNames);
 }
 
-// One canonical session with every serialized widget non-default: applying it
-// and saving again has to be byte-identical, and the argv it produces is
+// One canonical session with every serialized widget non-default, except
+// keep-guessing (it excludes --remove; the pair would not launch). Applying
+// it and saving again has to be byte-identical, and the argv it produces is
 // pinned. Together with the key-set test this guards the frozen session
 // format and the argv order through every extraction step.
 void TestSession::theGoldenSessionRoundTrips()

@@ -138,7 +138,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_65">
               <property name="spacing">
-               <number>4</number>
+               <number>12</number>
               </property>
               <item>
                <widget class="QCheckBox" name="checkBox_remove">
@@ -159,6 +159,29 @@
                  <string>Ignore username in hash file</string>
                 </property>
                </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox_keep_guessing">
+                <property name="toolTip">
+                 <string>Keep attacking a hash after it is cracked, to find further plains such as collisions. Cannot be combined with removing cracked hashes.</string>
+                </property>
+                <property name="text">
+                 <string>Keep guessing</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_hash_flags">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
@@ -1884,6 +1907,19 @@
                        </property>
                       </widget>
                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="checkBox_increment_inverse">
+                        <property name="enabled">
+                         <bool>false</bool>
+                        </property>
+                        <property name="toolTip">
+                         <string>Grow the mask from the right end instead of the left (hashcat -ii).</string>
+                        </property>
+                        <property name="text">
+                         <string>Right-to-left</string>
+                        </property>
+                       </widget>
+                      </item>
                      <item>
                       <spacer name="horizontalSpacer_increment">
                        <property name="orientation">
@@ -2623,6 +2659,43 @@
                      </property>
                     </widget>
                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_potfile_path">
+                      <property name="spacing">
+                       <number>4</number>
+                      </property>
+                      <item>
+                       <widget class="QLabel" name="label_potfile_path">
+                        <property name="text">
+                         <string>Potfile:</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QLineEdit" name="lineEdit_potfile_path">
+                        <property name="toolTip">
+                         <string>Read and write recovered hashes in this potfile instead of the default one.</string>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="pushButton_open_potfile_path">
+                        <property name="toolTip">
+                         <string>Choose the potfile path.</string>
+                        </property>
+                        <property name="accessibleName">
+                         <string>Choose potfile</string>
+                        </property>
+                        <property name="text">
+                         <string>Browse…</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
                   </layout>
                  </item>
                 </layout>

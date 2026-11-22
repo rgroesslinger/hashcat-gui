@@ -57,6 +57,7 @@ private slots:
     void validateLaunch();
     void validateOptions_data();
     void validateOptions();
+    void optionConflictsAreRefused();
     void feedModeRequirements();
     void amplifierFolderIsRefused();
     void pcfgRulesetsAreBounded();
@@ -329,6 +330,36 @@ void TestLaunchValidator::validateOptions()
 
     QCOMPARE(int(problem.code), expected);
     QCOMPARE(problem.detail, expectedDetail);
+}
+
+// The option pair hashcat answers with a usage error: keep-guessing with
+// remove. The potfile pair resolves in the builder, not here.
+void TestLaunchValidator::optionConflictsAreRefused()
+{
+    HashcatOptions options;
+    options.attackMode = AttackMode::Straight;
+    options.wordlists = QStringList{QStringLiteral("/tmp/a.txt")};
+
+    options.keepGuessing = true;
+    options.remove = true;
+    QCOMPARE(::validateOptions(options).code, LaunchValidator::LaunchError::KeepGuessingWithRemove);
+
+    options.remove = false;
+    QCOMPARE(::validateOptions(options).code, LaunchValidator::LaunchError::None);
+
+    // The mode-9 refusal of --remove is reported before the pair conflict.
+    options.attackMode = AttackMode::Association;
+    options.remove = true;
+    QCOMPARE(::validateOptions(options).code, LaunchValidator::LaunchError::RemoveInAssociation);
+
+    // The builder drops the path under the disable box, so the pair is no
+    // conflict.
+    options.attackMode = AttackMode::Straight;
+    options.keepGuessing = false;
+    options.remove = false;
+    options.potfilePath = QStringLiteral("/tmp/custom.pot");
+    options.potfileDisable = true;
+    QCOMPARE(::validateOptions(options).code, LaunchValidator::LaunchError::None);
 }
 
 // What the feed modes owe beyond the shared checks: the table a mode 5 run
@@ -955,6 +986,12 @@ void TestLaunchValidator::cachePathNeedsAnExistingDirectory()
 
     // Neither is a directory that has gone away.
     options.cachePath = directory.filePath(QStringLiteral("gone"));
+    problem = ::validateOptions(options);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCachePath));
+    QCOMPARE(problem.detail, options.cachePath);
+
+    // Whitespace is emitted verbatim, so the raw check must catch it.
+    options.cachePath = QStringLiteral("   ");
     problem = ::validateOptions(options);
     QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCachePath));
     QCOMPARE(problem.detail, options.cachePath);

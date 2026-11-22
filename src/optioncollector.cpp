@@ -41,6 +41,7 @@ HashcatOptions OptionCollector::collect(const Ui::MainWindow &ui, bool useShortP
 
     options.remove = ui.checkBox_remove->isChecked();
     options.ignoreUsername = ui.checkBox_ignoreusername->isChecked();
+    options.keepGuessing = ui.checkBox_keep_guessing->isChecked();
 
     options.force = ui.checkBox_force->isChecked();
     options.session = ui.lineEdit_session->text();
@@ -50,6 +51,7 @@ HashcatOptions OptionCollector::collect(const Ui::MainWindow &ui, bool useShortP
     options.status = ui.checkBox_status->isChecked();
     options.statusTimer = ui.spinBox_status_timer->value();
     options.potfileDisable = ui.checkBox_potfile_disable->isChecked();
+    options.potfilePath = ui.lineEdit_potfile_path->text();
 
     if (ui.radioButton_use_rules_file->isChecked()) {
         const std::array boxes = {ui.checkBox_rulesfile_1, ui.checkBox_rulesfile_2,
@@ -79,6 +81,8 @@ HashcatOptions OptionCollector::collect(const Ui::MainWindow &ui, bool useShortP
                         && ui.checkBox_increment->isChecked();
     options.incrementMin = ui.spinBox_increment_min->value();
     options.incrementMax = ui.spinBox_increment_max->value();
+    // Raw like the bounds; the builder emits -ii only with -i.
+    options.incrementInverse = ui.checkBox_increment_inverse->isChecked();
     options.speedOnly = ui.checkBox_speed_only->isChecked();
     options.optimizedKernel = ui.checkBox_optimized_kernel->isChecked();
 

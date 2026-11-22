@@ -40,6 +40,7 @@ enum class LaunchError : std::uint8_t {
     // measurement meaningless.
     IncrementWithSpeedOnly,
     RemoveInAssociation,             // hashcat refuses --remove in attack mode 9
+    KeepGuessingWithRemove,          // hashcat refuses --keep-guessing with --remove
     NoTable,                         // the table feed got no table
     NoFeed,                          // the generic feed got no feed name
     MaskNeedsWordMarker,             // the mode 12 mask names no ?w word

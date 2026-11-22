@@ -317,6 +317,14 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
             "Removing cracked hashes is not possible in the association attack mode.");
         break;
 
+    case LaunchValidator::LaunchError::KeepGuessingWithRemove:
+        message.icon = QMessageBox::Information;
+        message.text = QCoreApplication::translate(
+            "LaunchMessage",
+            "Keep guessing cannot be combined with removing cracked hashes from the hash file. "
+            "Clear either option.");
+        break;
+
     case LaunchValidator::LaunchError::InvalidCharacter:
         message.icon = QMessageBox::Information;
         message.format = Qt::PlainText;

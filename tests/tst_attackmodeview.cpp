@@ -64,10 +64,16 @@ void TestAttackModeView::everyGroupFollowsItsPredicate()
         QCOMPARE(!form.ui.lineEdit_encoding_to->isHidden(), usesEncoding);
         const bool usesIncrement = CommandBuilder::attackUsesIncrement(mode);
         QCOMPARE(!form.ui.checkBox_increment->isHidden(), usesIncrement);
+        QCOMPARE(!form.ui.checkBox_increment_inverse->isHidden(), usesIncrement);
         QCOMPARE(!form.ui.label_increment_min->isHidden(), usesIncrement);
         QCOMPARE(!form.ui.spinBox_increment_min->isHidden(), usesIncrement);
         QCOMPARE(!form.ui.label_increment_max->isHidden(), usesIncrement);
         QCOMPARE(!form.ui.spinBox_increment_max->isHidden(), usesIncrement);
+        // Mode 9 turns the potfile off, so the path row follows the builder.
+        const bool usesPotfile = mode != AttackMode::Association;
+        QCOMPARE(!form.ui.label_potfile_path->isHidden(), usesPotfile);
+        QCOMPARE(!form.ui.lineEdit_potfile_path->isHidden(), usesPotfile);
+        QCOMPARE(!form.ui.pushButton_open_potfile_path->isHidden(), usesPotfile);
         QCOMPARE(form.ui.label_mode_hint->text(), AttackModeView::hint(mode));
     }
 }

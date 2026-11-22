@@ -627,10 +627,16 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
         return LaunchError::RemoveInAssociation;
     }
 
+    // hashcat refuses the pair: removing a hash ends the guessing.
+    if (options.keepGuessing && options.remove) {
+        return LaunchError::KeepGuessingWithRemove;
+    }
+
     // hashcat refuses a cache path that is not an existing directory; the
     // browse dialog only offers directories, so this one is a hand edit or
-    // a directory that has gone away.
-    if (!options.cachePath.trimmed().isEmpty() && !QFileInfo(options.cachePath).isDir()) {
+    // a directory that has gone away. Raw like the builder: whitespace is
+    // emitted too.
+    if (!options.cachePath.isEmpty() && !QFileInfo(options.cachePath).isDir()) {
         if (detail) {
             *detail = options.cachePath;
         }

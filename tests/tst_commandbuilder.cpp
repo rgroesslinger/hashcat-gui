@@ -30,6 +30,7 @@ private slots:
     void hexCharsetFollowsTheCharsetModes();
     void advancedOptionsAreEmitted();
     void incrementFollowsItsOwnModesAndTheFlag();
+    void keepGuessingAndPotfilePathFollowTheirRules();
     void wordlistRulesFollowTheirSide();
     void wordlistOptionsFollowWordlistModes();
     void statusTimerNeedsStatus();
@@ -184,6 +185,13 @@ void TestCommandBuilder::tierTwoOptionsFollowTheirConditions()
         const QStringList arguments = CommandBuilder::build(options);
         QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--cache-path")) + 1),
                  QStringLiteral("/tmp/hc-cache"));
+
+        // Whitespace is a value like any other; the launch validation
+        // gates it on the same raw text.
+        options.cachePath = QStringLiteral("   ");
+        const QStringList spaced = CommandBuilder::build(options);
+        QCOMPARE(spaced.value(spaced.indexOf(QStringLiteral("--cache-path")) + 1),
+                 QStringLiteral("   "));
     }
 }
 
@@ -321,14 +329,17 @@ void TestCommandBuilder::advancedOptionsAreEmitted()
     HashcatOptions options;
     options.attackMode = AttackMode::HybridWordMask;
     options.force = true;
+    options.keepGuessing = true;
     options.session = QStringLiteral("job");
     options.runtime = 60;
     options.status = true;
     options.statusTimer = 5;
     options.potfileDisable = true;
+    options.potfilePath = QStringLiteral("/tmp/pot.txt");
     options.skip = QStringLiteral("100");
     options.limit = QStringLiteral("200");
     options.increment = true;
+    options.incrementInverse = true;
     options.incrementMin = 2;
     options.incrementMax = 8;
     options.hexCharset = true;
@@ -347,6 +358,7 @@ void TestCommandBuilder::advancedOptionsAreEmitted()
         "--attack-mode",
         "6",
         "--force",
+        "--keep-guessing",
         "--session",
         "job",
         "--runtime",
@@ -360,6 +372,7 @@ void TestCommandBuilder::advancedOptionsAreEmitted()
         "--limit",
         "200",
         "--increment",
+        "--increment-inverse",
         "--increment-min",
         "2",
         "--increment-max",
@@ -403,25 +416,59 @@ void TestCommandBuilder::incrementFollowsItsOwnModesAndTheFlag()
         HashcatOptions options;
         options.attackMode = mode;
         options.increment = true;
+        options.incrementInverse = true;
         options.incrementMin = 2;
         options.incrementMax = 4;
 
         const QStringList arguments = CommandBuilder::build(options);
         const bool emitted = arguments.contains(QStringLiteral("--increment"))
+                             && arguments.contains(QStringLiteral("--increment-inverse"))
                              && arguments.contains(QStringLiteral("--increment-min"))
                              && arguments.contains(QStringLiteral("--increment-max"));
         QCOMPARE(emitted, incrementModes.contains(mode));
     }
 
     // The bounds are part of the increment option; without the flag they
-    // would only be noise in the preview.
+    // would only be noise in the preview. The inverse direction is too.
     HashcatOptions options;
     options.attackMode = AttackMode::HybridWordMask;
+    options.incrementInverse = true;
     options.incrementMin = 2;
     options.incrementMax = 4;
     const QStringList arguments = CommandBuilder::build(options);
     QVERIFY(!arguments.contains(QStringLiteral("--increment-min")));
     QVERIFY(!arguments.contains(QStringLiteral("--increment-max")));
+    QVERIFY(!arguments.contains(QStringLiteral("--increment-inverse")));
+}
+
+// --keep-guessing applies to every attack mode; the potfile path does not
+// reach the association command, because mode 9 turns the potfile off and
+// hashcat refuses the flag there.
+void TestCommandBuilder::keepGuessingAndPotfilePathFollowTheirRules()
+{
+    const QList<AttackMode> modes{
+        AttackMode::Straight,       AttackMode::Combination, AttackMode::BruteForce,
+        AttackMode::Pcfg,           AttackMode::Table,       AttackMode::HybridWordMask,
+        AttackMode::HybridMaskWord, AttackMode::Generic,     AttackMode::Association,
+        AttackMode::Hybrid,
+    };
+
+    for (const AttackMode mode : modes) {
+        HashcatOptions options;
+        options.attackMode = mode;
+        options.keepGuessing = true;
+        options.potfilePath = QStringLiteral("/tmp/pot.txt");
+
+        const QStringList arguments = CommandBuilder::build(options);
+        QVERIFY(arguments.contains(QStringLiteral("--keep-guessing")));
+        QCOMPARE(arguments.contains(QStringLiteral("--potfile-path")),
+                 mode != AttackMode::Association);
+
+        // The disable box wins over the path in every mode, the way JSON
+        // wins over the outfile format; the pair never reaches hashcat.
+        options.potfileDisable = true;
+        QVERIFY(!CommandBuilder::build(options).contains(QStringLiteral("--potfile-path")));
+    }
 }
 
 void TestCommandBuilder::wordlistRulesFollowTheirSide()
@@ -539,11 +586,13 @@ void TestCommandBuilder::advancedShortForms()
     options.useShortParameters = true;
     options.attackMode = AttackMode::Combination;
     options.force = true;
+    options.keepGuessing = true;
     options.session = QStringLiteral("job");
     options.runtime = 60;
     options.status = true;
     options.statusTimer = 5;
     options.potfileDisable = true;
+    options.potfilePath = QStringLiteral("/tmp/pot.txt");
     options.ruleLeft = QStringLiteral("c");
     options.ruleRight = QStringLiteral("^x");
     options.skip = QStringLiteral("100");
@@ -559,6 +608,7 @@ void TestCommandBuilder::advancedShortForms()
         "-a",
         "1",
         "--force",
+        "--keep-guessing",
         "--session",
         "job",
         "--runtime",
@@ -588,10 +638,19 @@ void TestCommandBuilder::advancedShortForms()
     QCOMPARE(CommandBuilder::build(options), expected);
 
     // --increment is the one option with a short form that the combination
-    // mode above cannot exercise.
+    // mode above cannot exercise. With inverse it collapses to -ii alone:
+    // hashcat refuses -i -ii.
     options.attackMode = AttackMode::BruteForce;
     options.increment = true;
-    QVERIFY(CommandBuilder::build(options).contains(QStringLiteral("-i")));
+    options.incrementInverse = true;
+    QStringList shortForms = CommandBuilder::build(options);
+    QVERIFY(shortForms.contains(QStringLiteral("-ii")));
+    QVERIFY(!shortForms.contains(QStringLiteral("-i")));
+
+    options.incrementInverse = false;
+    shortForms = CommandBuilder::build(options);
+    QVERIFY(shortForms.contains(QStringLiteral("-i")));
+    QVERIFY(!shortForms.contains(QStringLiteral("-ii")));
 }
 
 void TestCommandBuilder::shortFallsBackToLong()
@@ -1074,8 +1133,10 @@ void TestCommandBuilder::parameterSpelling_data()
         {Parameter::HexWordlist, "--hex-wordlist", ""},
         {Parameter::HwmonTempAbort, "--hwmon-temp-abort", ""},
         {Parameter::Increment, "--increment", "-i"},
+        {Parameter::IncrementInverse, "--increment-inverse", "-ii"},
         {Parameter::IncrementMax, "--increment-max", ""},
         {Parameter::IncrementMin, "--increment-min", ""},
+        {Parameter::KeepGuessing, "--keep-guessing", ""},
         {Parameter::Limit, "--limit", "-l"},
         {Parameter::OpenclDeviceTypes, "--opencl-device-types", "-D"},
         {Parameter::OptimizedKernel, "--optimized-kernel-enable", "-O"},
@@ -1083,6 +1144,7 @@ void TestCommandBuilder::parameterSpelling_data()
         {Parameter::OutfileFormat, "--outfile-format", ""},
         {Parameter::OutfileJson, "--outfile-json", ""},
         {Parameter::PotfileDisable, "--potfile-disable", ""},
+        {Parameter::PotfilePath, "--potfile-path", ""},
         {Parameter::Remove, "--remove", ""},
         {Parameter::RuleLeft, "--rule-left", "-j"},
         {Parameter::RuleRight, "--rule-right", "-k"},

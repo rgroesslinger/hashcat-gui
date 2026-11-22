@@ -63,6 +63,8 @@ struct HashcatOptions {
 
     bool remove = false;
     bool ignoreUsername = false;
+    // --keep-guessing; hashcat refuses the pair with --remove.
+    bool keepGuessing = false;
 
     // Files selected for -r, in list order. Only filled for attack modes
     // that accept rules.
@@ -88,9 +90,15 @@ struct HashcatOptions {
     int statusTimer = AppConstants::Defaults::StatusTimer; // seconds
     bool force = false;
     bool potfileDisable = false;
+    // --potfile-path; left out in mode 9 and under --potfile-disable, the
+    // way JSON wins over the outfile format.
+    QString potfilePath;
 
     // Mask incrementing, only meaningful in the mask based attack modes.
     bool increment = false;
+    // -ii, right-to-left; only with incrementing, in short form instead of
+    // -i (hashcat reads -ii as both).
+    bool incrementInverse = false;
     int incrementMin = AppConstants::Defaults::IncrementMin; // 0 = hashcat default
     int incrementMax = AppConstants::Defaults::IncrementMax; // 0 = hashcat default
 
