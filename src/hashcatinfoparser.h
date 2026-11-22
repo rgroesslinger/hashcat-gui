@@ -7,6 +7,7 @@
 #define HASHCATINFOPARSER_H
 
 #include <QCoreApplication>
+#include <QList>
 #include <QMap>
 #include <QString>
 
@@ -25,6 +26,17 @@ public:
     // untouched on failure, so a refresh does not clear the list on screen.
     static bool parseExampleHashes(const QString &rawOutput, QMap<quint32, QString> &hashModes,
                                    QString *errorMessage = nullptr);
+
+    struct IdentifiedHashMode {
+        quint32 id = 0;
+        QString name;
+        QString category;
+    };
+
+    // Parses --identify's `# | Name | Category` table; "no match" (exit 255)
+    // is an empty answer, not a failure.
+    static bool parseIdentify(const QString &rawOutput, QList<IdentifiedHashMode> &matches,
+                              QString *errorMessage = nullptr);
 };
 
 #endif // HASHCATINFOPARSER_H

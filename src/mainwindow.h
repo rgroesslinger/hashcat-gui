@@ -65,6 +65,8 @@ private slots:
     void resetSessionTriggered();
     void aboutQtTriggered();
     void aboutTriggered();
+    void identifyHashTriggered();
+    void applyIdentifiedHashType(int hashTypeId, const QString &input);
 
     // main-tab buttons
     void startClicked();

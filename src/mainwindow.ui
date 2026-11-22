@@ -2793,6 +2793,8 @@
     </widget>
     <addaction name="menuLoadExampleSession"/>
     <addaction name="separator"/>
+    <addaction name="actionIdentifyHash"/>
+    <addaction name="separator"/>
     <addaction name="actionResetSession"/>
     <addaction name="separator"/>
     <addaction name="actionCopyPowerShellScript"/>
@@ -2884,6 +2886,14 @@
    </property>
    <property name="toolTip">
     <string>Copy the unencoded PowerShell script that starts hashcat</string>
+   </property>
+  </action>
+  <action name="actionIdentifyHash">
+   <property name="text">
+    <string>&amp;Identify Hash…</string>
+   </property>
+   <property name="toolTip">
+    <string>Ask hashcat which hash modes match a hash</string>
    </property>
   </action>
  </widget>

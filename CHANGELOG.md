@@ -6,6 +6,7 @@
 - The launch terminal can now print the exact command hashcat receives, so a mangled value (such as a `$` hash expanded a second time by a terminal) is immediately visible instead of going unnoticed; enable it under Settings → General
 - The copy-to-clipboard button no longer appears blank on systems without an icon theme
 - New options: `--keep-guessing` to keep attacking a hash after it is cracked, `--potfile-path` to read and write a chosen potfile instead of the default one, and `--increment-inverse` (`-ii`) to grow a mask from right to left
+- Tools → Identify Hash asks hashcat which hash modes match a hash, shows them as candidates and applies the selected one (and the hash input) to the attack
 
 ## 0.9.0 (2026-11-20)
 

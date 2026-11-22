@@ -65,6 +65,11 @@ struct MainWindowTestAccess {
         window.reloadHashTypes();
     }
 
+    static void applyIdentifiedHashType(MainWindow &window, int id, const QString &input)
+    {
+        window.applyIdentifiedHashType(id, input);
+    }
+
     static HashTypeLoader &hashTypeLoader(MainWindow &window)
     {
         return window.m_hashTypeLoader;

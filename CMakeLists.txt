@@ -69,6 +69,8 @@ set(HASHCAT_GUI_SOURCES
     src/hashcatrunner.cpp
     src/hashtypeloader.h
     src/hashtypeloader.cpp
+    src/identifydialog.h
+    src/identifydialog.cpp
     src/launchvalidator.h
     src/launchvalidator.cpp
     src/launchmessage.h
@@ -100,6 +102,7 @@ set(HASHCAT_GUI_SOURCES
     src/programdirectory.h
     src/resources.qrc
     src/aboutdialog.ui
+    src/identifydialog.ui
     src/mainwindow.ui
     src/settingsdialog.ui
 )
@@ -196,6 +199,7 @@ set(HASHCAT_GUI_TESTS
     tst_hashcatinfoparser
     tst_hashcatrunner
     tst_hashtypeloader
+    tst_identifydialog
     tst_launch
     tst_launchmessage
     tst_launchvalidator

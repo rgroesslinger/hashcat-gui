@@ -115,6 +115,7 @@ private slots:
     void aFailedReloadClearsTheHashTypes();
     void retryingTheSamePathAfterAFailureReQueries();
     void aReloadRebuildsThePreviewOnce();
+    void anIdentifyResultDuringAReloadSaysTheListIsStillLoading();
 
 private:
     MainWindowFixture m_fixture;
@@ -2092,6 +2093,51 @@ void TestMainWindow::aReloadRebuildsThePreviewOnce()
         MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt() == 1000U,
         AppConstants::Hashcat::QueryTimeoutMs);
     QCOMPARE(MainWindowTestAccess::previewRebuilds(window) - before, 1);
+}
+
+// While a reload is in flight the combo still holds the old binary's list. An
+// id only the incoming binary knows must be called "still loading", not
+// unsupported, and must not change the form.
+void TestMainWindow::anIdentifyResultDuringAReloadSaysTheListIsStillLoading()
+{
+    const QString stubA = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-identify-a"),
+        "#!/bin/sh\nprintf '{\"0\":{\"name\":\"MD5\"}}\\n'\nexit 0\n");
+    const QString stubB = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-identify-b"),
+        "#!/bin/sh\nsleep 1\nprintf '{\"1000\":{\"name\":\"NTLM\"}}\\n'\nexit 0\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stubA.isEmpty() && !stubB.isEmpty(), "the shell stubs could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubA);
+
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() == 2,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    QVERIFY(!MainWindowTestAccess::hashTypeLoader(window).isLoading());
+
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stubB);
+    MainWindowTestAccess::reloadHashTypes(window);
+    QVERIFY(MainWindowTestAccess::hashTypeLoader(window).isLoading());
+    QVERIFY(ui->comboBox_hash_type->findData(1000) < 0);
+    const QVariant beforeType = ui->comboBox_hash_type->currentData();
+    const QString beforeInput = ui->lineEdit_hashfile->text();
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    MainWindowTestAccess::applyIdentifiedHashType(window, 1000, QStringLiteral("a-hash"));
+
+    QVERIFY(recorder.messageBoxSeen);
+    QVERIFY(recorder.text.contains(QStringLiteral("still loading")));
+    QVERIFY(!recorder.text.contains(QStringLiteral("not in this hashcat")));
+    QCOMPARE(ui->comboBox_hash_type->currentData(), beforeType);
+    QCOMPARE(ui->lineEdit_hashfile->text(), beforeInput);
+
+    QTRY_VERIFY_WITH_TIMEOUT(!MainWindowTestAccess::hashTypeLoader(window).isLoading(),
+                             AppConstants::Hashcat::QueryTimeoutMs);
 }
 
 int main(int argc, char *argv[])

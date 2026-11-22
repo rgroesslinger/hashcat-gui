@@ -38,8 +38,15 @@ QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const 
             return result;
         }
 
-        // Always run in quiet mode when reading output
-        cmdArgs << AppConstants::Hashcat::Quiet;
+        // Insert before an existing '--': after it, hashcat reads --quiet as
+        // a positional. Current callers use '--' only as a terminator.
+        const QString terminator(AppConstants::Hashcat::OptionTerminator);
+        const auto endOfOptions = std::ranges::find(cmdArgs, terminator);
+        if (endOfOptions == cmdArgs.cend()) {
+            cmdArgs << AppConstants::Hashcat::Quiet;
+        } else {
+            cmdArgs.insert(endOfOptions, AppConstants::Hashcat::Quiet);
+        }
 
         proc.setProgram(hashcatPath);
         proc.setArguments(cmdArgs);

@@ -34,6 +34,7 @@ private slots:
     void executeKillsTheProcessOnCancellation();
     void aCancelledQueryNeverStartsTheProcess();
     void executeAppendsQuietAndUsesBinaryDirectory();
+    void executePutsQuietBeforeAnOptionTerminator();
     void executeFollowsASymlinkedBinaryToItsRealDirectory();
     void executeDecodesUtf8Output();
 
@@ -214,6 +215,30 @@ void TestHashcatRunner::executeAppendsQuietAndUsesBinaryDirectory()
     // the caller's arguments, then --quiet - in that order
     const QStringList expectedArguments{QStringLiteral("--version"),
                                         QString(AppConstants::Hashcat::Quiet)};
+    QCOMPARE(output.mid(1), expectedArguments);
+}
+
+// '--' ends hashcat's option parsing. A query that needs one (a leading '-'
+// in an --identify value) must still get --quiet as an option, not as a
+// positional file name after the terminator.
+void TestHashcatRunner::executePutsQuietBeforeAnOptionTerminator()
+{
+#ifdef Q_OS_WIN
+    QSKIP("no shell stubs on this platform");
+#else
+    QVERIFY2(!m_echoScript.isEmpty(), "the shell stub could not be written");
+#endif
+
+    const HashcatResult result =
+        HashcatRunner::execute(m_echoScript, {QStringLiteral("--identify"), QStringLiteral("--"),
+                                              QStringLiteral("-x")})
+            .result();
+
+    QCOMPARE(int(result.exitStatus), int(QProcess::NormalExit));
+    const QStringList output = result.standardOutput.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    const QStringList expectedArguments{
+        QStringLiteral("--identify"), QString(AppConstants::Hashcat::Quiet),
+        QString(AppConstants::Hashcat::OptionTerminator), QStringLiteral("-x")};
     QCOMPARE(output.mid(1), expectedArguments);
 }
 

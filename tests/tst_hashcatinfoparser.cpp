@@ -24,6 +24,10 @@ private slots:
     void invalidReplyIsRejected();
     void failedParseKeepsThePreviousList();
     void utf8NamesArePreserved();
+    void identifyTableParses();
+    void identifySkipsPreambleAndSeparator();
+    void identifyNoMatchIsAnEmptySuccess();
+    void identifyNeedsATable();
 };
 
 // What hashcat prints: multi-line and indented, with fields the parser never
@@ -193,6 +197,76 @@ void TestHashcatInfoParser::utf8NamesArePreserved()
              QStringLiteral("0 | MD5 \u2013 \u00e4\u00f6\u00fc\u00df \u65e5\u672c\u8a9e"));
     // every character is still whole: no replacement character crept in
     QVERIFY(!hashModes.value(0).contains(QChar(0xFFFD)));
+}
+
+void TestHashcatInfoParser::identifyTableParses()
+{
+    const QString raw =
+        QStringLiteral(R"(The following 3 hash-modes match the structure of your input hash:
+
+      # | Name                                                       | Category
+  ======+============================================================+======================================
+  40102 | HAVAL-128 (3 passes)                                       | Raw Hash
+      0 | MD5                                                        | Raw Hash
+   1000 | NTLM                                                       | Operating System
+
+)");
+
+    QList<HashcatInfoParser::IdentifiedHashMode> matches;
+    QVERIFY(HashcatInfoParser::parseIdentify(raw, matches));
+    QCOMPARE(matches.size(), 3);
+    QCOMPARE(matches.at(0).id, quint32(40102));
+    QCOMPARE(matches.at(0).name, QStringLiteral("HAVAL-128 (3 passes)"));
+    QCOMPARE(matches.at(0).category, QStringLiteral("Raw Hash"));
+    QCOMPARE(matches.at(1).id, quint32(0));
+    QCOMPARE(matches.at(2).id, quint32(1000));
+    QCOMPARE(matches.at(2).category, QStringLiteral("Operating System"));
+}
+
+void TestHashcatInfoParser::identifySkipsPreambleAndSeparator()
+{
+    const QString raw = QStringLiteral(R"(a warning from a plugin
+The following 1 hash-modes match the structure of your input hash:
+
+      # | Name                                                       | Category
+  ======+============================================================+======================================
+      0 | MD5                                                        | Raw Hash
+
+Started: Sun Nov 22 17:54:08 2026
+)");
+
+    QList<HashcatInfoParser::IdentifiedHashMode> matches;
+    QVERIFY(HashcatInfoParser::parseIdentify(raw, matches));
+    QCOMPARE(matches.size(), 1);
+    QCOMPARE(matches.at(0).name, QStringLiteral("MD5"));
+}
+
+void TestHashcatInfoParser::identifyNoMatchIsAnEmptySuccess()
+{
+    QList<HashcatInfoParser::IdentifiedHashMode> matches{
+        {0, QStringLiteral("MD5"), QStringLiteral("Raw Hash")}};
+    QString error = QStringLiteral("left over from an earlier failure");
+
+    QVERIFY(HashcatInfoParser::parseIdentify(
+        QStringLiteral("No hash-mode matches the structure of the input hash."), matches, &error));
+    QVERIFY(matches.isEmpty());
+    QVERIFY(error.isEmpty());
+}
+
+void TestHashcatInfoParser::identifyNeedsATable()
+{
+    QList<HashcatInfoParser::IdentifiedHashMode> matches;
+    QString error;
+
+    QVERIFY(
+        !HashcatInfoParser::parseIdentify(QStringLiteral("Segmentation fault"), matches, &error));
+    QVERIFY(!error.isEmpty());
+
+    const QString headerOnly = QStringLiteral(R"(      # | Name | Category
+  ======+======+==========
+)");
+    QVERIFY(!HashcatInfoParser::parseIdentify(headerOnly, matches, &error));
+    QVERIFY(!error.isEmpty());
 }
 
 int main(int argc, char *argv[])

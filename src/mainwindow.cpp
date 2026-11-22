@@ -15,6 +15,7 @@
 #include "examplesession.h"
 #include "executable.h"
 #include "hashtypeloader.h"
+#include "identifydialog.h"
 #include "launchmessage.h"
 #include "launchvalidator.h"
 #include "optioncollector.h"
@@ -507,6 +508,7 @@ void MainWindow::connectActionSignals()
     connect(ui->actionAboutQt, &QAction::triggered, this, &MainWindow::aboutQtTriggered);
     connect(ui->actionCopyPowerShellScript, &QAction::triggered, this,
             &MainWindow::copyPowerShellScript);
+    connect(ui->actionIdentifyHash, &QAction::triggered, this, &MainWindow::identifyHashTriggered);
 
     /* ---------- stand-alone widgets ---------- */
     connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
@@ -1089,6 +1091,40 @@ void MainWindow::aboutTriggered()
 {
     AboutDialog about(this);
     about.exec();
+}
+
+void MainWindow::identifyHashTriggered()
+{
+    // Stack-local like AboutDialog: persistent widgets enter session serialization.
+    IdentifyDialog dialog(this);
+    dialog.setInput(ui->lineEdit_hashfile->text());
+    connect(&dialog, &IdentifyDialog::applyRequested, this, &MainWindow::applyIdentifiedHashType);
+    dialog.exec();
+}
+
+void MainWindow::applyIdentifiedHashType(int hashTypeId, const QString &input)
+{
+    // An empty or in-flight list is not the final word from this binary: a
+    // reload still shows the previous list, so don't call the id unsupported.
+    if (m_hashTypeLoader.isLoading()
+        || (m_hashTypesPath.isEmpty() && ui->comboBox_hash_type->count() <= 1)) {
+        QMessageBox::information(this, tr("Identify hash"),
+                                 tr("The hash type list is unavailable or still loading. Nothing "
+                                    "was changed. Check the hashcat path in Settings or try again "
+                                    "once the list is available."));
+        return;
+    }
+
+    const int index = ui->comboBox_hash_type->findData(hashTypeId);
+    if (index < 0) {
+        QMessageBox::warning(this, tr("Identify hash"),
+                             tr("Hash mode %1 is not in this hashcat's hash-type list. "
+                                "Nothing was changed.")
+                                 .arg(hashTypeId));
+        return;
+    }
+    ui->comboBox_hash_type->setCurrentIndex(index);
+    ui->lineEdit_hashfile->setText(input);
 }
 
 QString MainWindow::sessionFile() const

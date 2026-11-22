@@ -7,6 +7,8 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QRegularExpression>
+#include <QStringList>
 
 namespace
 {
@@ -55,5 +57,67 @@ bool HashcatInfoParser::parseExampleHashes(const QString &rawOutput,
     }
 
     hashModes = std::move(parsed);
+    return true;
+}
+
+bool HashcatInfoParser::parseIdentify(const QString &rawOutput, QList<IdentifiedHashMode> &matches,
+                                      QString *errorMessage)
+{
+    setError(errorMessage, QString());
+
+    static const QRegularExpression row(
+        QStringLiteral(R"(^\s*(\d+)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*$)"));
+    const QString noMatch = QStringLiteral("No hash-mode matches the structure of the input hash.");
+    const QStringList lines = rawOutput.split(QLatin1Char('\n'));
+
+    bool sawHeader = false;
+    QList<IdentifiedHashMode> parsed;
+    for (const QString &line : lines) {
+        const QString text = line.trimmed();
+
+        if (!sawHeader) {
+            // Exit 255 with this sentence is an answer, not a failed query.
+            if (text == noMatch) {
+                matches.clear();
+                return true;
+            }
+            // Warnings can precede the header.
+            if (text.contains(QStringLiteral("| Name"))
+                && text.contains(QStringLiteral("| Category"))) {
+                sawHeader = true;
+            }
+            continue;
+        }
+
+        if (text.isEmpty()) {
+            if (!parsed.isEmpty()) {
+                break;
+            }
+            continue;
+        }
+
+        const QRegularExpressionMatch match = row.match(text);
+        if (!match.hasMatch()) {
+            // The '====+====' separator lands here.
+            if (!parsed.isEmpty()) {
+                break;
+            }
+            continue;
+        }
+
+        bool isNumber = false;
+        const quint32 id = match.captured(1).toUInt(&isNumber);
+        if (!isNumber) {
+            continue;
+        }
+        parsed.append({id, match.captured(2), match.captured(3)});
+    }
+
+    if (!sawHeader || parsed.isEmpty()) {
+        setError(errorMessage, tr("hashcat did not report any matching hash modes."));
+        return false;
+    }
+
+    matches = std::move(parsed);
     return true;
 }
