@@ -2794,6 +2794,7 @@
     <addaction name="menuLoadExampleSession"/>
     <addaction name="separator"/>
     <addaction name="actionIdentifyHash"/>
+    <addaction name="actionBackendInfo"/>
     <addaction name="separator"/>
     <addaction name="actionResetSession"/>
     <addaction name="separator"/>
@@ -2894,6 +2895,14 @@
    </property>
    <property name="toolTip">
     <string>Ask hashcat which hash modes match a hash</string>
+   </property>
+  </action>
+  <action name="actionBackendInfo">
+   <property name="text">
+    <string>&amp;Backend Information…</string>
+   </property>
+   <property name="toolTip">
+    <string>Show the devices and backends hashcat detected</string>
    </property>
   </action>
  </widget>

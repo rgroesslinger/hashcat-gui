@@ -52,6 +52,8 @@ set(HASHCAT_GUI_SOURCES
     src/argumentquoting.h
     src/attackmodeview.h
     src/attackmodeview.cpp
+    src/backendinfodialog.h
+    src/backendinfodialog.cpp
     src/checkeditemlist.h
     src/checkeditemlist.cpp
     src/commandbuilder.h
@@ -102,6 +104,7 @@ set(HASHCAT_GUI_SOURCES
     src/programdirectory.h
     src/resources.qrc
     src/aboutdialog.ui
+    src/backendinfodialog.ui
     src/identifydialog.ui
     src/mainwindow.ui
     src/settingsdialog.ui
@@ -192,6 +195,7 @@ set(HASHCAT_GUI_TESTS
     tst_aboutdialog
     tst_argumentquoting
     tst_attackmodeview
+    tst_backendinfodialog
     tst_commandbuilder
     tst_commandpreview
     tst_examplesession

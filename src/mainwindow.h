@@ -66,6 +66,7 @@ private slots:
     void aboutQtTriggered();
     void aboutTriggered();
     void identifyHashTriggered();
+    void backendInfoTriggered();
     void applyIdentifiedHashType(int hashTypeId, const QString &input);
 
     // main-tab buttons

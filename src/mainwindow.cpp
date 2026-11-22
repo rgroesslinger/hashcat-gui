@@ -8,6 +8,7 @@
 #include "aboutdialog.h"
 #include "appconstants.h"
 #include "attackmodeview.h"
+#include "backendinfodialog.h"
 #include "checkeditemlist.h"
 #include "commandbuilder.h"
 #include "commandpreview.h"
@@ -509,6 +510,7 @@ void MainWindow::connectActionSignals()
     connect(ui->actionCopyPowerShellScript, &QAction::triggered, this,
             &MainWindow::copyPowerShellScript);
     connect(ui->actionIdentifyHash, &QAction::triggered, this, &MainWindow::identifyHashTriggered);
+    connect(ui->actionBackendInfo, &QAction::triggered, this, &MainWindow::backendInfoTriggered);
 
     /* ---------- stand-alone widgets ---------- */
     connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
@@ -1099,6 +1101,12 @@ void MainWindow::identifyHashTriggered()
     IdentifyDialog dialog(this);
     dialog.setInput(ui->lineEdit_hashfile->text());
     connect(&dialog, &IdentifyDialog::applyRequested, this, &MainWindow::applyIdentifiedHashType);
+    dialog.exec();
+}
+
+void MainWindow::backendInfoTriggered()
+{
+    BackendInfoDialog dialog(this);
     dialog.exec();
 }
 

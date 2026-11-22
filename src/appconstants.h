@@ -348,8 +348,11 @@ inline constexpr QLatin1StringView ExampleHashes{"--example-hashes"};
 inline constexpr QLatin1StringView MachineReadable{"--machine-readable"};
 inline constexpr QLatin1StringView Version{"--version"};
 inline constexpr QLatin1StringView Identify{"--identify"};
+inline constexpr QLatin1StringView BackendInfo{"--backend-info"};
 // A value starting with '-' would be read as an option, not as the hash to identify.
 inline constexpr QLatin1StringView OptionTerminator{"--"};
+// Backend init can be slow on a fresh driver; queries that need it get longer.
+inline constexpr int BackendInfoTimeoutMs = 60000;
 // The flag that carries the recipe of hash mode 4000. Both the builder and
 // the preview need the token: the preview quotes the value that follows it.
 inline constexpr QLatin1StringView HashRecipe{"--hash-recipe"};
