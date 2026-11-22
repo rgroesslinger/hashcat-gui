@@ -2674,9 +2674,6 @@
         <property name="text">
          <string/>
         </property>
-        <property name="icon">
-         <iconset theme="QIcon::ThemeIcon::EditCopy"/>
-        </property>
         <property name="accessibleName">
          <string>Copy command</string>
         </property>

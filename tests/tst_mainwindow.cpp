@@ -29,6 +29,7 @@
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QIcon>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -69,6 +70,7 @@ private slots:
         m_fixture.cleanup();
     }
     void freshWindowMatchesTheDefaultOptions();
+    void copyButtonHasAnIconWithoutATheme();
     void hashTypeComboIsSearchable();
     void attackModeIdsTravelAsItemData();
     void widgetsFollowTheBuilderPredicates();
@@ -131,6 +133,21 @@ void TestMainWindow::freshWindowMatchesTheDefaultOptions()
     // ... and that is what the preview shows, character for character
     QCOMPARE(MainWindowTestAccess::ui(window)->lineEdit_command->text(),
              expected.join(QLatin1Char(' ')));
+}
+
+// Without an icon theme there is no edit-copy symbol (Windows, minimal
+// desktops); the style fallback must still give the text-less button an icon.
+void TestMainWindow::copyButtonHasAnIconWithoutATheme()
+{
+    const QString theme = QIcon::themeName();
+    QIcon::setThemeName(QStringLiteral("hashcat-gui-no-such-theme"));
+
+    MainWindow window;
+    const QIcon icon = MainWindowTestAccess::ui(window)->pushButton_copy_clipboard->icon();
+    QVERIFY(!icon.isNull());
+    QVERIFY(!icon.pixmap(16, 16).isNull());
+
+    QIcon::setThemeName(theme);
 }
 
 void TestMainWindow::hashTypeComboIsSearchable()

@@ -442,6 +442,11 @@ void MainWindow::configureWidgets()
     for (const auto &[label, field] : buddies) {
         label->setBuddy(field);
     }
+
+    // Qt has no copy icon among its standard pixmaps. Use the platform's copy
+    // symbol where there is an icon theme, and a text document everywhere else.
+    ui->pushButton_copy_clipboard->setIcon(QIcon::fromTheme(
+        QStringLiteral("edit-copy"), style()->standardIcon(QStyle::SP_FileDialogDetailedView)));
 }
 
 // Every widget whose value reaches the command line is connected here, once.
