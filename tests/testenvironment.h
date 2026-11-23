@@ -105,6 +105,27 @@ inline void resetSettings()
     settings.sync();
 }
 
+// Writes a file the tests can inspect, replacing its content.
+inline bool writeFile(const QString &path,
+                      const QByteArray &content = QByteArrayLiteral("password\n"))
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return false;
+    }
+    return file.write(content) == content.size();
+}
+
+// Appends to a file the tests can inspect.
+inline bool appendFile(const QString &path, const QByteArray &content)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        return false;
+    }
+    return file.write(content) == content.size();
+}
+
 // A hashcat stand-in the tests can execute. Returns an empty path where a #!
 // script cannot run (Windows) or be written; callers QSKIP on Windows and
 // treat an empty path as a hard failure elsewhere. An empty directory puts the

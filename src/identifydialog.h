@@ -12,7 +12,6 @@
 #include <QDialog>
 #include <QFutureWatcher>
 #include <QList>
-#include <functional>
 #include <memory>
 
 class QTreeWidgetItem;
@@ -29,8 +28,7 @@ class IdentifyDialog : public QDialog
     Q_OBJECT
 
 public:
-    using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
-                                                       HashcatRunner::CancelToken)>;
+    using Query = HashcatRunner::Query;
 
     explicit IdentifyDialog(QWidget *parent = nullptr, Query query = HashcatRunner::execute);
     ~IdentifyDialog() override;

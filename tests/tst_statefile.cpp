@@ -45,19 +45,9 @@ QString scratchFile(const QString &name)
 {
     return TestEnvironment::scratchDir().filePath(name);
 }
-
-// Writes a file with the given content.
-bool writeFile(const QString &path, const QByteArray &content)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        return false;
-    }
-    file.write(content);
-    file.close();
-    return true;
-}
 } // namespace
+
+using TestEnvironment::writeFile;
 
 // What goes in comes out again: the values of a section, and the version
 // they were written with.

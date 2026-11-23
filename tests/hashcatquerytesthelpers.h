@@ -16,11 +16,8 @@
 #include <QThread>
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <functional>
-
 // The injectable query shape shared by the read-only hashcat dialogs.
-using HashcatQuery = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
-                                                          HashcatRunner::CancelToken)>;
+using HashcatQuery = HashcatRunner::Query;
 
 // A file Executable::resolve() accepts on both platforms. Nothing runs it.
 inline QString fakeProgram(QTemporaryDir &dir)
@@ -39,7 +36,7 @@ inline QString fakeProgram(QTemporaryDir &dir)
     return path;
 }
 
-inline HashcatResult normalResult(const QString &output, int exitCode = 0)
+inline HashcatResult normalResult(const QString &output = QString(), int exitCode = 0)
 {
     HashcatResult result;
     result.exitStatus = QProcess::NormalExit;
@@ -51,6 +48,14 @@ inline HashcatResult normalResult(const QString &output, int exitCode = 0)
 inline HashcatResult failedResult(int exitCode, const QString &output, const QString &error)
 {
     HashcatResult result = normalResult(output, exitCode);
+    result.standardError = error;
+    return result;
+}
+
+inline HashcatResult timedOutResult(const QString &error = QString())
+{
+    HashcatResult result;
+    result.timedOut = true;
     result.standardError = error;
     return result;
 }

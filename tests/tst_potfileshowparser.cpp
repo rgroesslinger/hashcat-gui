@@ -4,40 +4,10 @@
  */
 
 #include "potfileshowparser.h"
+#include "potfiletesthelpers.h"
 #include "testenvironment.h"
 
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QTest>
-
-namespace
-{
-
-QString hex(const QByteArray &bytes)
-{
-    return QString::fromLatin1(bytes.toHex());
-}
-
-QString line(const QByteArray &hash, const QByteArray &plain, const QString &username = QString())
-{
-    QJsonObject object;
-    object.insert(QStringLiteral("hash_hex"), hex(hash));
-    object.insert(QStringLiteral("password_hex"), hex(plain));
-    if (!username.isEmpty()) {
-        object.insert(QStringLiteral("username_hex"), hex(username.toUtf8()));
-    }
-    return QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact));
-}
-
-QString binaryHashFileLine(const QByteArray &filename, const QByteArray &plain)
-{
-    QJsonObject object;
-    object.insert(QStringLiteral("filename_hex"), hex(filename));
-    object.insert(QStringLiteral("password_hex"), hex(plain));
-    return QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact));
-}
-
-} // namespace
 
 class TestPotfileShowParser : public QObject
 {
@@ -56,9 +26,9 @@ private slots:
 
 void TestPotfileShowParser::parsesEntriesAndFlags()
 {
-    const QString output = line("hash-one", "hello", QStringLiteral("alice")) + QLatin1Char('\n')
-                           + line("hash-two", "") + QLatin1Char('\n')
-                           + line("hash-three", "$HCENC$1$key$cipher");
+    const QString output = showLine("hash-one", "hello", QStringLiteral("alice"))
+                           + QLatin1Char('\n') + showLine("hash-two", "") + QLatin1Char('\n')
+                           + showLine("hash-three", "$HCENC$1$key$cipher");
 
     const PotfileShowParser::Result result = PotfileShowParser::parse(output);
     QCOMPARE(result.totalCount, 3);
@@ -83,7 +53,7 @@ void TestPotfileShowParser::parsesEntriesAndFlags()
 void TestPotfileShowParser::decodesHexEscapedPlaintext()
 {
     const QString output =
-        line("hash", "$HEX[613a62]") + QLatin1Char('\n') + line("hash-two", "$HEX[c3a9]");
+        showLine("hash", "$HEX[613a62]") + QLatin1Char('\n') + showLine("hash-two", "$HEX[c3a9]");
     const PotfileShowParser::Result result = PotfileShowParser::parse(output);
 
     QCOMPARE(result.entries.size(), 2);
@@ -94,7 +64,7 @@ void TestPotfileShowParser::decodesHexEscapedPlaintext()
 
 void TestPotfileShowParser::keepsNonUtf8HexEscapeLiteral()
 {
-    const QString output = line("hash", "$HEX[ff]");
+    const QString output = showLine("hash", "$HEX[ff]");
     const PotfileShowParser::Result result = PotfileShowParser::parse(output);
 
     QCOMPARE(result.entries.size(), 1);
@@ -103,7 +73,7 @@ void TestPotfileShowParser::keepsNonUtf8HexEscapeLiteral()
 
 void TestPotfileShowParser::keepsAnInvalidHexEscapeLiteral()
 {
-    const QString output = line("hash", "$HEX[zz]");
+    const QString output = showLine("hash", "$HEX[zz]");
     const PotfileShowParser::Result result = PotfileShowParser::parse(output);
 
     QCOMPARE(result.entries.size(), 1);
@@ -112,7 +82,7 @@ void TestPotfileShowParser::keepsAnInvalidHexEscapeLiteral()
 
 void TestPotfileShowParser::parsesBinaryHashFileEntries()
 {
-    const QString output = binaryHashFileLine("hashes.hc22000", "secret");
+    const QString output = binaryHashFileShowLine("hashes.hc22000", "secret");
     const PotfileShowParser::Result result = PotfileShowParser::parse(output);
 
     QCOMPARE(result.totalCount, 1);
@@ -125,8 +95,8 @@ void TestPotfileShowParser::parsesBinaryHashFileEntries()
 
 void TestPotfileShowParser::capsRetainedEntriesButKeepsTheTotal()
 {
-    const QString output = line("one", "a") + QLatin1Char('\n') + line("two", "b")
-                           + QLatin1Char('\n') + line("three", "c");
+    const QString output = showLine("one", "a") + QLatin1Char('\n') + showLine("two", "b")
+                           + QLatin1Char('\n') + showLine("three", "c");
 
     const PotfileShowParser::Result result = PotfileShowParser::parse(output, 2);
     QCOMPARE(result.totalCount, 3);
@@ -145,7 +115,7 @@ void TestPotfileShowParser::emptyOutputIsAValidEmptyAnswer()
 
 void TestPotfileShowParser::malformedLinesAreCounted()
 {
-    const QString output = QStringLiteral("not json\n{}\n") + line("hash", "plain")
+    const QString output = QStringLiteral("not json\n{}\n") + showLine("hash", "plain")
                            + QLatin1Char('\n') + QStringLiteral("\n   \n");
 
     const PotfileShowParser::Result result = PotfileShowParser::parse(output);

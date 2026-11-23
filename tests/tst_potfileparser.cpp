@@ -14,17 +14,10 @@
 #include <atomic>
 #include <memory>
 
+using TestEnvironment::writeFile;
+
 namespace
 {
-
-bool writeFile(const QString &path, const QByteArray &content)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        return false;
-    }
-    return file.write(content) == content.size();
-}
 
 QByteArray goldenPotfile()
 {

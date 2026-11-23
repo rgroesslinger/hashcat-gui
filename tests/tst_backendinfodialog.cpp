@@ -105,9 +105,7 @@ void TestBackendInfoDialog::aTimeoutIsReported()
     QTemporaryDir dir;
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, fakeProgram(dir));
 
-    HashcatResult result;
-    result.timedOut = true;
-    BackendInfoDialog dialog(nullptr, cannedQuery(result));
+    BackendInfoDialog dialog(nullptr, cannedQuery(timedOutResult()));
 
     QTRY_VERIFY(status(dialog)->text().contains(QStringLiteral("timed out")));
 }

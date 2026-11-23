@@ -127,18 +127,6 @@ inline QStringList differingWidgets(const QString &filename, const QJsonObject &
     return names;
 }
 
-// A wordlist the monitor can see. The handle is closed at the end of the
-// scope, so the file can be removed again while the window watches it.
-inline bool writeFile(const QString &path)
-{
-    const QByteArray content = QByteArrayLiteral("password\n");
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        return false;
-    }
-    return file.write(content) == content.size();
-}
-
 // A group box in a row is as tall as its tallest neighbour. Without top
 // alignment Qt spreads the children of the shorter boxes over that height or
 // centers them, so the content would not start at the same height.

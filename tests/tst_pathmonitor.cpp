@@ -12,19 +12,7 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 
-namespace
-{
-
-bool writeFile(const QString &path, const QByteArray &content = QByteArrayLiteral("password\n"))
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        return false;
-    }
-    return file.write(content) == content.size();
-}
-
-} // namespace
+using TestEnvironment::writeFile;
 
 class TestPathMonitor : public QObject
 {

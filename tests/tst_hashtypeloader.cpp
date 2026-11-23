@@ -3,6 +3,7 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "hashcatquerytesthelpers.h"
 #include "hashtypeloader.h"
 #include "testenvironment.h"
 
@@ -34,36 +35,12 @@ private slots:
     void theLoadingStateIsAnnounced();
     void aSupersededQueryDoesNotEmit();
     void aSupersededQueryIsCancelled();
-
-private:
-    static HashcatResult okResult(const QByteArray &output)
-    {
-        HashcatResult result;
-        result.exitStatus = QProcess::NormalExit;
-        result.exitCode = 0;
-        result.standardOutput = QString::fromUtf8(output);
-        return result;
-    }
-
-    // A query that answers with the given result, optionally after a delay.
-    static HashTypeLoader::Query canned(const HashcatResult &result, int delayMs = 0)
-    {
-        return [result, delayMs](const QString &, const QStringList &, int,
-                                 const HashcatRunner::CancelToken &) {
-            return QtConcurrent::run([result, delayMs] {
-                if (delayMs > 0) {
-                    QThread::msleep(delayMs);
-                }
-                return result;
-            });
-        };
-    }
 };
 
 void TestHashTypeLoader::loadedEmitsTheParsedList()
 {
-    HashTypeLoader loader(nullptr,
-                          canned(okResult(R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})")));
+    HashTypeLoader loader(nullptr, cannedQuery(normalResult(QStringLiteral(
+                                       R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})"))));
     QSignalSpy loaded(&loader, &HashTypeLoader::loaded);
     QSignalSpy failed(&loader, &HashTypeLoader::failed);
 
@@ -81,12 +58,8 @@ void TestHashTypeLoader::loadedEmitsTheParsedList()
 
 void TestHashTypeLoader::aProcessFailureIsReported()
 {
-    HashcatResult result;
-    result.exitStatus = QProcess::NormalExit;
-    result.exitCode = -2;
-    result.standardError = QStringLiteral("wrong attack command");
-
-    HashTypeLoader loader(nullptr, canned(result));
+    HashTypeLoader loader(
+        nullptr, cannedQuery(failedResult(-2, QString(), QStringLiteral("wrong attack command"))));
     QSignalSpy failed(&loader, &HashTypeLoader::failed);
     QSignalSpy loaded(&loader, &HashTypeLoader::loaded);
 
@@ -100,11 +73,8 @@ void TestHashTypeLoader::aProcessFailureIsReported()
 
 void TestHashTypeLoader::aTimeoutIsReported()
 {
-    HashcatResult result;
-    result.timedOut = true;
-    result.standardError = QStringLiteral("hashcat timed out");
-
-    HashTypeLoader loader(nullptr, canned(result));
+    HashTypeLoader loader(nullptr,
+                          cannedQuery(timedOutResult(QStringLiteral("hashcat timed out"))));
     QSignalSpy failed(&loader, &HashTypeLoader::failed);
 
     loader.reload(QStringLiteral("hashcat"));
@@ -115,7 +85,8 @@ void TestHashTypeLoader::aTimeoutIsReported()
 
 void TestHashTypeLoader::unparseableOutputIsReported()
 {
-    HashTypeLoader loader(nullptr, canned(okResult("this is not the machine-readable list")));
+    HashTypeLoader loader(nullptr, cannedQuery(normalResult(
+                                       QStringLiteral("this is not the machine-readable list"))));
     QSignalSpy failed(&loader, &HashTypeLoader::failed);
     QSignalSpy loaded(&loader, &HashTypeLoader::loaded);
 
@@ -149,7 +120,9 @@ void TestHashTypeLoader::anEmptyPathStartsNoQuery()
 
 void TestHashTypeLoader::theLoadingStateIsAnnounced()
 {
-    HashTypeLoader loader(nullptr, canned(okResult(R"({"0":{"name":"MD5"}})"), 50));
+    HashTypeLoader loader(
+        nullptr,
+        cannedQuery(normalResult(QStringLiteral(R"({"0":{"name":"MD5"}})")), nullptr, nullptr, 50));
     QSignalSpy loading(&loader, &HashTypeLoader::loadingChanged);
 
     loader.reload(QStringLiteral("hashcat"));
@@ -178,12 +151,8 @@ void TestHashTypeLoader::aSupersededQueryDoesNotEmit()
             if (slow) {
                 QThread::msleep(200);
             }
-            HashcatResult result;
-            result.exitStatus = QProcess::NormalExit;
-            result.exitCode = 0;
-            result.standardOutput = slow ? QStringLiteral(R"({"1000":{"name":"NTLM"}})")
-                                         : QStringLiteral(R"({"1400":{"name":"SHA2-256"}})");
-            return result;
+            return normalResult(slow ? QStringLiteral(R"({"1000":{"name":"NTLM"}})")
+                                     : QStringLiteral(R"({"1400":{"name":"SHA2-256"}})"));
         });
     });
     QSignalSpy loaded(&loader, &HashTypeLoader::loaded);

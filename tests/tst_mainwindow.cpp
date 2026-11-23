@@ -54,6 +54,8 @@
 #include <csignal> // IWYU pragma: keep
 #endif
 
+using TestEnvironment::writeFile;
+
 // The widget half of the main window: defaults, gating, lists, examples
 // and the hash-type query.
 class TestMainWindow : public QObject

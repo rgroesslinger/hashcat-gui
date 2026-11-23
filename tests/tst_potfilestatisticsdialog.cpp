@@ -69,11 +69,7 @@ void TestPotfileStatisticsDialog::showsCountsClassesAndHistogram()
 
 void TestPotfileStatisticsDialog::explainsWhenThereIsNothingToAnalyze()
 {
-    const QList<PotfileExporter::Row> rows{
-        {QStringLiteral("hash-one"), QString(), {}, 0, false, false},
-        {QStringLiteral("hash-two"), QStringLiteral("$HCENC$1$key$cipher"), {}, 0, false, true},
-    };
-    const PotfileStatistics::Result statistics = PotfileStatistics::calculate(rows);
+    const PotfileStatistics::Result statistics = PotfileStatistics::calculate(noPlaintextRows());
     PotfileStatisticsDialog dialog(nullptr, statistics, QStringLiteral("Potfile"), 2);
 
     QVERIFY(label(dialog, QStringLiteral("label_classes"))

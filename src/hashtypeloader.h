@@ -13,7 +13,6 @@
 #include <QObject>
 #include <QString>
 #include <cstdint>
-#include <functional>
 #include <memory>
 
 // Why a hash-type query failed. There is no "not configured": an empty path
@@ -38,8 +37,7 @@ class HashTypeLoader : public QObject
 public:
     // The query is injectable so the tests do not wait for a real process.
     // It receives the token that cancels its process when it is superseded.
-    using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
-                                                       HashcatRunner::CancelToken)>;
+    using Query = HashcatRunner::Query;
 
     explicit HashTypeLoader(QObject *parent, Query query = HashcatRunner::execute);
     ~HashTypeLoader() override;

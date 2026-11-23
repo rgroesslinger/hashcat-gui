@@ -10,8 +10,6 @@
 #include "potfiletesthelpers.h"
 #include "testenvironment.h"
 
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QSignalSpy>
 #include <QTest>
 #include <QThread>
@@ -19,16 +17,6 @@
 
 namespace
 {
-
-QString binaryHashFileShowLine()
-{
-    QJsonObject object;
-    object.insert(QStringLiteral("filename_hex"),
-                  QString::fromLatin1(QByteArrayLiteral("hashes.hc22000").toHex()));
-    object.insert(QStringLiteral("password_hex"),
-                  QString::fromLatin1(QByteArrayLiteral("plain").toHex()));
-    return QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact));
-}
 
 PotfileQueryInput input()
 {
@@ -137,7 +125,7 @@ void TestPotfileCheck::showFailureReportsTheCombinedStreams()
     const HashcatResult failed =
         failedResult(244, QStringLiteral("Hash parsing error in hashfile: x"),
                      QStringLiteral("No hashes loaded."));
-    PotfileCheck check(nullptr, queryFrom(failed, normalResult(QString()), &args));
+    PotfileCheck check(nullptr, queryFrom(failed, normalResult(), &args));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
     check.start(QStringLiteral("hashcat"), input());
@@ -157,7 +145,7 @@ void TestPotfileCheck::identifyTableBecomesChooseAHashType()
                      QStringLiteral("The following 2 hash-modes match the structure of your "
                                     "input hash:\n"),
                      QStringLiteral("Please specify the hash-mode with -m [hash-mode]."));
-    PotfileCheck check(nullptr, queryFrom(failed, normalResult(QString())));
+    PotfileCheck check(nullptr, queryFrom(failed, normalResult()));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
     check.start(QStringLiteral("hashcat"), input());
@@ -221,10 +209,8 @@ void TestPotfileCheck::strayControlAndReplacementCharactersStayText()
 
 void TestPotfileCheck::showTimeoutIsAFailure()
 {
-    HashcatResult timeout;
-    timeout.timedOut = true;
-    timeout.standardError = QStringLiteral("hashcat timed out");
-    PotfileCheck check(nullptr, queryFrom(timeout, normalResult(QString())));
+    const HashcatResult timeout = timedOutResult(QStringLiteral("hashcat timed out"));
+    PotfileCheck check(nullptr, queryFrom(timeout, normalResult()));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
     check.start(QStringLiteral("hashcat"), input());
@@ -237,9 +223,7 @@ void TestPotfileCheck::showTimeoutIsAFailure()
 
 void TestPotfileCheck::leftTimeoutKeepsTheShowCount()
 {
-    HashcatResult timeout;
-    timeout.timedOut = true;
-    timeout.standardError = QStringLiteral("hashcat timed out");
+    const HashcatResult timeout = timedOutResult(QStringLiteral("hashcat timed out"));
     PotfileCheck check(nullptr, queryFrom(normalResult(showLine()), timeout));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
@@ -255,8 +239,8 @@ void TestPotfileCheck::leftTimeoutKeepsTheShowCount()
 void TestPotfileCheck::nonJsonShowOutputIsAFailure()
 {
     QList<QStringList> args;
-    PotfileCheck check(nullptr, queryFrom(normalResult(QStringLiteral("not-json")),
-                                          normalResult(QString()), &args));
+    PotfileCheck check(nullptr,
+                       queryFrom(normalResult(QStringLiteral("not-json")), normalResult(), &args));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
     check.start(QStringLiteral("hashcat"), input());
@@ -269,8 +253,7 @@ void TestPotfileCheck::nonJsonShowOutputIsAFailure()
 
 void TestPotfileCheck::emptyShowOutputIsAnEmptyAnswer()
 {
-    PotfileCheck check(nullptr,
-                       queryFrom(normalResult(QString()), normalResult(QStringLiteral("a\nb\n"))));
+    PotfileCheck check(nullptr, queryFrom(normalResult(), normalResult(QStringLiteral("a\nb\n"))));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
     check.start(QStringLiteral("hashcat"), input());
@@ -285,7 +268,7 @@ void TestPotfileCheck::emptyShowOutputIsAnEmptyAnswer()
 void TestPotfileCheck::cancelStopsTheQuery()
 {
     HashcatRunner::CancelToken token;
-    PotfileCheck check(nullptr, cannedQuery(normalResult(QString()), nullptr, &token, 1000));
+    PotfileCheck check(nullptr, cannedQuery(normalResult(), nullptr, &token, 1000));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
     check.start(QStringLiteral("hashcat"), input());
@@ -300,8 +283,8 @@ void TestPotfileCheck::cancelStopsTheQuery()
 void TestPotfileCheck::destructionCancelsTheToken()
 {
     HashcatRunner::CancelToken token;
-    auto check = std::make_unique<PotfileCheck>(
-        nullptr, cannedQuery(normalResult(QString()), nullptr, &token, 500));
+    auto check =
+        std::make_unique<PotfileCheck>(nullptr, cannedQuery(normalResult(), nullptr, &token, 500));
 
     check->start(QStringLiteral("hashcat"), input());
     QTRY_VERIFY_WITH_TIMEOUT(token != nullptr, 2000);
@@ -338,8 +321,7 @@ void TestPotfileCheck::startingAgainCancelsThePreviousToken()
 void TestPotfileCheck::anEmptyInputStartsNoQuery()
 {
     QList<QStringList> args;
-    PotfileCheck check(nullptr,
-                       queryFrom(normalResult(showLine()), normalResult(QString()), &args));
+    PotfileCheck check(nullptr, queryFrom(normalResult(showLine()), normalResult(), &args));
     QSignalSpy spy(&check, &PotfileCheck::finished);
 
     PotfileQueryInput empty;

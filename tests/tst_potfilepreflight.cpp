@@ -158,7 +158,7 @@ void TestPotfilePreflight::emptyInputIsRefusedWithoutAQuery()
 
     MainWindow window;
     QList<QStringList> args;
-    installCheck(window, normalResult(showLine()), normalResult(QString()), 0, &args);
+    installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
 
     const CapturedUi captured = triggerAndCapture(window, false);
     QVERIFY(captured.message.contains(QStringLiteral("Enter a hash")));
@@ -177,7 +177,7 @@ void TestPotfilePreflight::disabledPotfileIsRefusedWithoutAQuery()
     ui->checkBox_potfile_disable->setChecked(true);
 
     QList<QStringList> args;
-    installCheck(window, normalResult(showLine()), normalResult(QString()), 0, &args);
+    installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
 
     const CapturedUi captured = triggerAndCapture(window, false);
     QVERIFY(captured.message.contains(QStringLiteral("potfile is disabled")));
@@ -199,7 +199,7 @@ void TestPotfilePreflight::invalidHashcatPathIsRefusedWithoutAQuery()
                                        dir.filePath(QStringLiteral("missing-hashcat")));
 
     QList<QStringList> args;
-    installCheck(window, normalResult(showLine()), normalResult(QString()), 0, &args);
+    installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
 
     const CapturedUi captured = triggerAndCapture(window, false);
     QVERIFY(captured.message.contains(QStringLiteral("not found")));
@@ -268,7 +268,7 @@ void TestPotfilePreflight::relativePotfilePathUsesTheHashcatDirectory()
     ui->lineEdit_potfile_path->setText(QStringLiteral("relative.potfile"));
 
     QList<QStringList> args;
-    installCheck(window, normalResult(showLine()), normalResult(QString()), 0, &args);
+    installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
     triggerAndCapture(window, false);
 
     QCOMPARE(args.size(), 2);
@@ -312,7 +312,7 @@ void TestPotfilePreflight::failedQueryShowsTheCombinedDiagnostic()
     installCheck(window,
                  failedResult(244, QStringLiteral("Hash parsing error in hashfile: x"),
                               QStringLiteral("No hashes loaded.")),
-                 normalResult(QString()));
+                 normalResult());
 
     const CapturedUi captured = triggerAndCapture(window, false);
     QVERIFY(!captured.sawResultsDialog);

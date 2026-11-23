@@ -77,12 +77,7 @@ void TestPotfileStatistics::noRowsIsAnEmptyResult()
 
 void TestPotfileStatistics::emptyAndEncryptedEntriesAreCountedButNotAnalyzed()
 {
-    const QList<PotfileExporter::Row> rows{
-        {QStringLiteral("hash-one"), QString(), {}, 0, false, false},
-        {QStringLiteral("hash-two"), QStringLiteral("$HCENC$1$key$cipher"), {}, 0, false, true},
-    };
-
-    const PotfileStatistics::Result result = PotfileStatistics::calculate(rows);
+    const PotfileStatistics::Result result = PotfileStatistics::calculate(noPlaintextRows());
     QCOMPARE(result.entries, 2);
     QCOMPARE(result.analyzed, 0);
     QCOMPARE(result.empty, 1);

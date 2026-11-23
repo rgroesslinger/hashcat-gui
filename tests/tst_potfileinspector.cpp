@@ -23,29 +23,8 @@
 #include <QTest>
 #include <QTreeWidget>
 
-namespace
-{
-
-bool writeFile(const QString &path, const QByteArray &content)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        return false;
-    }
-    return file.write(content) == content.size();
-}
-
-bool appendFile(const QString &path, const QByteArray &content)
-{
-    QFile file(path);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-        return false;
-    }
-    return file.write(content) == content.size();
-}
-
-} // namespace
-
+using TestEnvironment::appendFile;
+using TestEnvironment::writeFile;
 using namespace PotfileDialogTestAccess;
 
 class TestPotfileInspector : public QObject

@@ -17,7 +17,6 @@
 #include <QString>
 
 #include <cstdint>
-#include <functional>
 #include <memory>
 
 struct PotfileCheckResult {
@@ -41,8 +40,7 @@ class PotfileCheck : public QObject
     Q_OBJECT
 
 public:
-    using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
-                                                       HashcatRunner::CancelToken)>;
+    using Query = HashcatRunner::Query;
 
     explicit PotfileCheck(QObject *parent, Query query = HashcatRunner::execute);
     ~PotfileCheck() override;

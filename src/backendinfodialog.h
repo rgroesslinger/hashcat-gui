@@ -10,7 +10,6 @@
 
 #include <QDialog>
 #include <QFutureWatcher>
-#include <functional>
 #include <memory>
 
 namespace Ui
@@ -26,8 +25,7 @@ class BackendInfoDialog : public QDialog
 
 public:
     // Injectable for tests; the caller resolves the path on the GUI thread.
-    using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
-                                                       HashcatRunner::CancelToken)>;
+    using Query = HashcatRunner::Query;
 
     explicit BackendInfoDialog(QWidget *parent = nullptr, Query query = HashcatRunner::execute);
     ~BackendInfoDialog() override;

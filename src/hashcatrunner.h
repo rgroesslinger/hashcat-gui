@@ -14,6 +14,7 @@
 #include <QString>
 #include <QStringList>
 #include <atomic>
+#include <functional>
 #include <memory>
 
 // Result of a single hashcat invocation.
@@ -47,6 +48,10 @@ public:
     // process and ends the query early. QFuture::cancel() alone stops neither
     // the task nor its process.
     using CancelToken = std::shared_ptr<std::atomic_bool>;
+
+    // The injectable query shape shared by the asynchronous callers.
+    using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
+                                                       CancelToken)>;
 
     static QFuture<HashcatResult> execute(const QString &hashcatPath, const QStringList &args,
                                           int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs,

@@ -48,16 +48,13 @@ void TestPotfileResultsDialog::init()
 
 void TestPotfileResultsDialog::showsMaskedRowsAndTheQueriedMode()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 2;
-    result.left = 1;
-    result.totalCount = 2;
-    result.entries = {
-        {QStringLiteral("hash-one"), QStringLiteral("secret"), QString(), false, false},
-        {QStringLiteral("hash-two"), QStringLiteral("hunter2"), QStringLiteral("alice"), false,
-         false},
-    };
+    const PotfileCheckResult result = okCheckResult(
+        {
+            {QStringLiteral("hash-one"), QStringLiteral("secret"), QString(), false, false},
+            {QStringLiteral("hash-two"), QStringLiteral("hunter2"), QStringLiteral("alice"), false,
+             false},
+        },
+        1);
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
@@ -88,14 +85,9 @@ void TestPotfileResultsDialog::headerSizingUsesTheSharedDefaults()
 
 void TestPotfileResultsDialog::usernameColumnFollowsTheEntries()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 1;
-    result.left = 0;
-    result.totalCount = 1;
-    result.entries = {
+    const PotfileCheckResult result = okCheckResult({
         {QStringLiteral("hash-one"), QStringLiteral("secret"), QString(), false, false},
-    };
+    });
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
@@ -104,14 +96,9 @@ void TestPotfileResultsDialog::usernameColumnFollowsTheEntries()
 
 void TestPotfileResultsDialog::revealShowsRealPlaintexts()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 1;
-    result.left = 0;
-    result.totalCount = 1;
-    result.entries = {
+    const PotfileCheckResult result = okCheckResult({
         {QStringLiteral("hash-one"), QStringLiteral("secret"), QString(), false, false},
-    };
+    });
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
@@ -124,15 +111,10 @@ void TestPotfileResultsDialog::revealShowsRealPlaintexts()
 
 void TestPotfileResultsDialog::copyUsesTheRealValues()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 2;
-    result.left = 0;
-    result.totalCount = 2;
-    result.entries = {
+    const PotfileCheckResult result = okCheckResult({
         {QStringLiteral("hash-one"), QStringLiteral("secret"), QString(), false, false},
         {QStringLiteral("hash-two"), QStringLiteral("hunter2"), QString(), false, false},
-    };
+    });
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
@@ -148,15 +130,10 @@ void TestPotfileResultsDialog::copyUsesTheRealValues()
 
 void TestPotfileResultsDialog::copyAllUsesOnlyVisibleRows()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 2;
-    result.left = 0;
-    result.totalCount = 2;
-    result.entries = {
+    const PotfileCheckResult result = okCheckResult({
         {QStringLiteral("hash-one"), QStringLiteral("secret"), QString(), false, false},
         {QStringLiteral("hash-two"), QStringLiteral("hunter2"), QString(), false, false},
-    };
+    });
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
@@ -171,17 +148,12 @@ void TestPotfileResultsDialog::copyAllUsesOnlyVisibleRows()
 
 void TestPotfileResultsDialog::searchMatchesHashAndUsernameWhileMasked()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 2;
-    result.left = 0;
-    result.totalCount = 2;
-    result.entries = {
+    const PotfileCheckResult result = okCheckResult({
         {QStringLiteral("hash-one"), QStringLiteral("secret"), QStringLiteral("alice"), false,
          false},
         {QStringLiteral("hash-two"), QStringLiteral("hunter2"), QStringLiteral("bob"), false,
          false},
-    };
+    });
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
@@ -206,14 +178,9 @@ void TestPotfileResultsDialog::searchMatchesHashAndUsernameWhileMasked()
 
 void TestPotfileResultsDialog::encryptedEntriesStayMaskedAndCopyTheToken()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 1;
-    result.left = 0;
-    result.totalCount = 1;
-    result.entries = {
+    const PotfileCheckResult result = okCheckResult({
         {QStringLiteral("hash-one"), QStringLiteral("$HCENC$1$key$cipher"), QString(), false, true},
-    };
+    });
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
@@ -232,14 +199,9 @@ void TestPotfileResultsDialog::encryptedEntriesStayMaskedAndCopyTheToken()
 
 void TestPotfileResultsDialog::binaryHashFileEntriesAreLabeled()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 1;
-    result.left = 0;
-    result.totalCount = 1;
-    result.entries = {
+    const PotfileCheckResult result = okCheckResult({
         {QStringLiteral("hashes.hc22000"), QStringLiteral("secret"), QString(), false, false, true},
-    };
+    });
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("2500"));
@@ -286,11 +248,7 @@ void TestPotfileResultsDialog::showFailedUsesSetResult()
 
 void TestPotfileResultsDialog::zeroCrackedShowsTheEmptyStateHint()
 {
-    PotfileCheckResult result;
-    result.status = PotfileCheckResult::Status::Ok;
-    result.cracked = 0;
-    result.left = 2;
-    result.totalCount = 0;
+    const PotfileCheckResult result = okCheckResult({}, 2);
 
     PotfileResultsDialog dialog;
     dialog.setResult(result, QStringLiteral("MD5"));
