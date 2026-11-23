@@ -18,7 +18,7 @@
                 "checkBox_optimized_kernel": false,
                 "checkBox_outfile": false,
                 "checkBox_outfile_json": false,
-                "checkBox_potfile_disable": false,
+                "checkBox_potfile_disable": true,
                 "checkBox_remove": false,
                 "checkBox_rules_concat": false,
                 "checkBox_rulesfile_1": false,
