@@ -21,4 +21,11 @@ inline QString escapeRichText(QString text)
     return text.toHtmlEscaped().replace(QLatin1Char('\n'), QStringLiteral("<br>"));
 }
 
+// Picks a singular or plural template. The caller passes already-translated
+// strings, and the plural one carries the count placeholder.
+inline QString countText(int count, const QString &one, const QString &many)
+{
+    return count == 1 ? one : many.arg(count);
+}
+
 #endif // TEXTUTILS_H

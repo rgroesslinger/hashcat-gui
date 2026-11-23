@@ -40,7 +40,9 @@ set(CMAKE_INSTALL_RPATH "")
 # qt_standard_project_setup() covers MOC and UIC, not RCC.
 set(CMAKE_AUTORCC ON)
 # The tests live in tests/ but include ui_*.h generated from src/*.ui
-set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(CMAKE_AUTOUIC_SEARCH_PATHS
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/potfile)
 
 # Everything the application is made of except main().
 set(HASHCAT_GUI_SOURCES
@@ -101,11 +103,39 @@ set(HASHCAT_GUI_SOURCES
     src/widgetstateserializer.cpp
     src/pathmonitor.h
     src/pathmonitor.cpp
+    src/potfile/potfilecheck.h
+    src/potfile/potfilecheck.cpp
+    src/potfile/potfileencoding.h
+    src/potfile/potfileencoding.cpp
+    src/potfile/potfileexporter.h
+    src/potfile/potfileexporter.cpp
+    src/potfile/potfileexportui.h
+    src/potfile/potfileexportui.cpp
+    src/potfile/potfileinspector.h
+    src/potfile/potfileinspector.cpp
+    src/potfile/potfileparser.h
+    src/potfile/potfileparser.cpp
+    src/potfile/potfilestatistics.h
+    src/potfile/potfilestatistics.cpp
+    src/potfile/potfilestatisticsdialog.h
+    src/potfile/potfilestatisticsdialog.cpp
+    src/potfile/potfilequery.h
+    src/potfile/potfilequery.cpp
+    src/potfile/potfileresultsdialog.h
+    src/potfile/potfileresultsdialog.cpp
+    src/potfile/potfileshowparser.h
+    src/potfile/potfileshowparser.cpp
+    src/potfile/potfiletableview.h
+    src/potfile/potfiletableview.cpp
     src/programdirectory.h
     src/resources.qrc
     src/aboutdialog.ui
     src/backendinfodialog.ui
     src/identifydialog.ui
+    src/potfile/potfileinspector.ui
+    src/potfile/potfileresultsdialog.ui
+    src/potfile/potfilestatisticsdialog.ui
+    src/potfile/potfiletableview.ui
     src/mainwindow.ui
     src/settingsdialog.ui
 )
@@ -113,7 +143,8 @@ set(HASHCAT_GUI_SOURCES
 # Object library, not static: a static one would drop the qrc objects and
 # static initializers as unreferenced.
 add_library(hashcat-gui-core OBJECT ${HASHCAT_GUI_SOURCES})
-target_include_directories(hashcat-gui-core PUBLIC src)
+# Subdirs stay on the include path so includes keep their flat names.
+target_include_directories(hashcat-gui-core PUBLIC src src/potfile)
 target_link_libraries(hashcat-gui-core PUBLIC
     Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Concurrent Qt6::Network)
 target_compile_features(hashcat-gui-core PUBLIC cxx_std_20)
@@ -212,6 +243,16 @@ set(HASHCAT_GUI_TESTS
     tst_optioncollector
     tst_pathlistcontroller
     tst_pathmonitor
+    tst_potfilecheck
+    tst_potfileexporter
+    tst_potfileinspector
+    tst_potfileparser
+    tst_potfilepreflight
+    tst_potfilequery
+    tst_potfileresultsdialog
+    tst_potfileshowparser
+    tst_potfilestatistics
+    tst_potfilestatisticsdialog
     tst_session
     tst_sessiontransfer
     tst_settingsdialog
@@ -274,7 +315,7 @@ endif()
 # glob is here so a build without the tool skips CONFIGURE_DEPENDS re-checks.
 find_program(CLANG_FORMAT NAMES clang-format)
 if(CLANG_FORMAT)
-    file(GLOB PROJECT_SOURCES CONFIGURE_DEPENDS
+    file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
         ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp

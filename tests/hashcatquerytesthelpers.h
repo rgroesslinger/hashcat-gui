@@ -48,6 +48,13 @@ inline HashcatResult normalResult(const QString &output, int exitCode = 0)
     return result;
 }
 
+inline HashcatResult failedResult(int exitCode, const QString &output, const QString &error)
+{
+    HashcatResult result = normalResult(output, exitCode);
+    result.standardError = error;
+    return result;
+}
+
 // Answers with the given result after delayMs, recording the argv and token
 // when asked. A cancelled query returns cancelled=true like the real runner,
 // so the dialog's finished handler takes the cancellation path.
@@ -55,7 +62,7 @@ inline HashcatQuery cannedQuery(const HashcatResult &result, QStringList *args =
                                 HashcatRunner::CancelToken *token = nullptr, int delayMs = 0)
 {
     return [result, args, token, delayMs](const QString &, const QStringList &usedArgs, int,
-                                          HashcatRunner::CancelToken usedToken) {
+                                          const HashcatRunner::CancelToken &usedToken) {
         if (args) {
             *args = usedArgs;
         }

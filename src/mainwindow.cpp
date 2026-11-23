@@ -22,6 +22,8 @@
 #include "optioncollector.h"
 #include "pathlistcontroller.h"
 #include "pathmonitor.h"
+#include "potfileinspector.h"
+#include "potfileresultsdialog.h"
 #include "sessiontransfer.h"
 #include "settingsdialog.h"
 #include "settingsmanager.h"
@@ -45,6 +47,7 @@
 #include <QMap>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProgressDialog>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QScreen>
@@ -52,6 +55,7 @@
 #include <QScrollBar>
 #include <QStandardPaths>
 #include <QStyle>
+#include <QTimer>
 #include <QToolTip>
 
 #include <array>
@@ -123,6 +127,16 @@ bool showLaunchCommand()
         AppConstants::SettingsKeys::defaultOf<bool>(AppConstants::SettingsKeys::ShowLaunchCommand));
 }
 
+// Messages that carry a path or hashcat output are plain text: AutoText would
+// read a leading '<' as markup.
+void showPlainMessage(QWidget *parent, QMessageBox::Icon icon, const QString &title,
+                      const QString &text)
+{
+    QMessageBox box(icon, title, text, QMessageBox::Ok, parent);
+    box.setTextFormat(Qt::PlainText);
+    box.exec();
+}
+
 } // namespace
 
 QString MainWindow::fileMenuLabel() const
@@ -139,6 +153,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), m_attackModeView(*ui), m_hashTypeLoader(this)
 {
     ui->setupUi(this);
+    m_potfileCheck = std::make_unique<PotfileCheck>(this);
 
     configureWidgets();
 
@@ -511,6 +526,9 @@ void MainWindow::connectActionSignals()
             &MainWindow::copyPowerShellScript);
     connect(ui->actionIdentifyHash, &QAction::triggered, this, &MainWindow::identifyHashTriggered);
     connect(ui->actionBackendInfo, &QAction::triggered, this, &MainWindow::backendInfoTriggered);
+    connect(ui->actionPotfileCheck, &QAction::triggered, this, &MainWindow::potfileCheckTriggered);
+    connect(ui->actionPotfileInspector, &QAction::triggered, this,
+            &MainWindow::potfileInspectorTriggered);
 
     /* ---------- stand-alone widgets ---------- */
     connect(ui->pushButton_open_hashfile, &QPushButton::clicked, this,
@@ -1108,6 +1126,120 @@ void MainWindow::backendInfoTriggered()
 {
     BackendInfoDialog dialog(this);
     dialog.exec();
+}
+
+bool MainWindow::preparePotfileQuery(const QString &title, PotfileQueryInput &input,
+                                     QString &modeName, QString &hashcatPath)
+{
+    const QString entered = ui->lineEdit_hashfile->text().trimmed();
+    if (entered.isEmpty()) {
+        showPlainMessage(this, QMessageBox::Information, title,
+                         tr("Enter a hash or select a hash file first."));
+        return false;
+    }
+    if (ui->checkBox_potfile_disable->isChecked()) {
+        showPlainMessage(this, QMessageBox::Information, title,
+                         tr("The potfile is disabled for this session. Uncheck \"Do not write the "
+                            "potfile\" before checking it."));
+        return false;
+    }
+
+    const QString configured =
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    if (configured.isEmpty()) {
+        showPlainMessage(this, QMessageBox::Information, title,
+                         tr("No hashcat executable is configured. Set one in Settings."));
+        return false;
+    }
+    hashcatPath = Executable::resolve(configured);
+    if (hashcatPath.isEmpty()) {
+        showPlainMessage(this, QMessageBox::Warning, title,
+                         tr("The configured hashcat executable is not found:\n%1").arg(configured));
+        return false;
+    }
+
+    const QVariant hashTypeData = ui->comboBox_hash_type->currentData();
+    input.hashType =
+        hashTypeData.isValid() ? hashTypeData.toInt() : AppConstants::Hashcat::AutoDetectHashType;
+    input.hashInput = PotfileQuery::resolveHashInput(entered, hashcatPath);
+    // Resolve against the directory hashcat runs in, so the query reads the
+    // same potfile a launch would.
+    input.potfilePath = PotfileQuery::resolvePath(ui->lineEdit_potfile_path->text(), hashcatPath);
+    input.username = ui->checkBox_ignoreusername->isChecked();
+    modeName = ui->comboBox_hash_type->currentText();
+    return true;
+}
+
+void MainWindow::potfileInspectorTriggered()
+{
+    PotfileInspectorDialog dialog(this);
+    dialog.setPotfilePath(ui->lineEdit_potfile_path->text());
+    dialog.exec();
+}
+
+void MainWindow::potfileCheckTriggered()
+{
+    PotfileQueryInput input;
+    QString modeName;
+    QString hashcatPath;
+    if (!preparePotfileQuery(tr("Check Against Potfile"), input, modeName, hashcatPath)) {
+        return;
+    }
+
+    ui->actionPotfileCheck->setEnabled(false);
+
+    std::optional<PotfileCheckResult> result;
+    QProgressDialog progress(tr("Checking potfile…"), tr("Cancel"), 0, 0, this);
+    progress.setWindowTitle(tr("Check Against Potfile"));
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(0);
+    progress.setAutoClose(false);
+    progress.setAutoReset(false);
+
+    const QMetaObject::Connection finishedConnection =
+        connect(m_potfileCheck.get(), &PotfileCheck::finished, &progress,
+                [&result, &progress](const PotfileCheckResult &checkResult) {
+                    result = checkResult;
+                    progress.accept();
+                });
+    connect(&progress, &QProgressDialog::canceled, m_potfileCheck.get(), &PotfileCheck::cancel);
+    connect(&progress, &QDialog::rejected, m_potfileCheck.get(), &PotfileCheck::cancel);
+
+    // Start after exec() has entered its event loop: a reply fast enough to
+    // finish first would otherwise close the dialog before it is shown.
+    QTimer::singleShot(0, m_potfileCheck.get(),
+                       [this, hashcatPath, input] { m_potfileCheck->start(hashcatPath, input); });
+
+    progress.exec();
+    disconnect(finishedConnection);
+    ui->actionPotfileCheck->setEnabled(true);
+
+    if (!result) {
+        // The dialog was closed while the query was still running.
+        m_potfileCheck->cancel();
+        showPlainMessage(this, QMessageBox::Information, tr("Check Against Potfile"),
+                         tr("Check cancelled."));
+        return;
+    }
+
+    switch (result->status) {
+    case PotfileCheckResult::Status::Ok:
+    case PotfileCheckResult::Status::LeftUnknown: {
+        PotfileResultsDialog dialog(this);
+        dialog.setResult(*result, modeName, input.potfilePath);
+        dialog.exec();
+        break;
+    }
+    case PotfileCheckResult::Status::Cancelled:
+        showPlainMessage(this, QMessageBox::Information, tr("Check Against Potfile"),
+                         tr("Check cancelled."));
+        break;
+    case PotfileCheckResult::Status::ShowFailed:
+        showPlainMessage(this, QMessageBox::Warning, tr("Check Against Potfile"),
+                         result->diagnostic.isEmpty() ? tr("hashcat could not query the potfile.")
+                                                      : result->diagnostic);
+        break;
+    }
 }
 
 void MainWindow::applyIdentifiedHashType(int hashTypeId, const QString &input)

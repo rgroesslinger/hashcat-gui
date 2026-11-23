@@ -2795,6 +2795,8 @@
     <addaction name="separator"/>
     <addaction name="actionIdentifyHash"/>
     <addaction name="actionBackendInfo"/>
+    <addaction name="actionPotfileCheck"/>
+    <addaction name="actionPotfileInspector"/>
     <addaction name="separator"/>
     <addaction name="actionResetSession"/>
     <addaction name="separator"/>
@@ -2903,6 +2905,22 @@
    </property>
    <property name="toolTip">
     <string>Show the devices and backends hashcat detected</string>
+   </property>
+  </action>
+  <action name="actionPotfileCheck">
+   <property name="text">
+    <string>Check Against &amp;Potfile…</string>
+   </property>
+   <property name="toolTip">
+    <string>Check whether the hashes in the hash field are already in the potfile</string>
+   </property>
+  </action>
+  <action name="actionPotfileInspector">
+   <property name="text">
+    <string>Potfile &amp;Inspector…</string>
+   </property>
+   <property name="toolTip">
+    <string>Browse an explicit potfile without hash-type verification</string>
    </property>
   </action>
  </widget>

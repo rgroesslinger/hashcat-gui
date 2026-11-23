@@ -12,6 +12,7 @@
 #include "hashtypeloader.h"
 #include "launchvalidator.h"
 #include "pathlistcontroller.h"
+#include "potfilecheck.h"
 #include "statefile.h"
 
 #include <QAbstractButton>
@@ -67,6 +68,8 @@ private slots:
     void aboutTriggered();
     void identifyHashTriggered();
     void backendInfoTriggered();
+    void potfileCheckTriggered();
+    void potfileInspectorTriggered();
     void applyIdentifiedHashType(int hashTypeId, const QString &input);
 
     // main-tab buttons
@@ -188,6 +191,11 @@ private:
     HashcatOptions collectHashcatOptions();
     QStringList generateArguments();
 
+    // Validates the potfile form state and resolves the input and program.
+    // Shows the user-facing error itself and returns false on refusal.
+    bool preparePotfileQuery(const QString &title, PotfileQueryInput &input, QString &modeName,
+                             QString &hashcatPath);
+
     // Presents what LaunchValidator::validate() reported
     void showLaunchError(const LaunchValidator::LaunchProblem &problem,
                          const LaunchValidator::LaunchContext &context);
@@ -284,6 +292,9 @@ private:
     // The asynchronous hash-type query: the watcher, the stale-query guard
     // and the parsed list. The window maps its signals onto the combo.
     HashTypeLoader m_hashTypeLoader;
+
+    // The read-only potfile query.
+    std::unique_ptr<PotfileCheck> m_potfileCheck;
 
     // The binary whose list the combo currently shows. Used to tell a
     // same-binary refresh (keep the list) from a changed binary (clear it).

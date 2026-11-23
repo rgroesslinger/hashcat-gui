@@ -15,6 +15,9 @@
 #include <QSize>
 #include <QStringList>
 
+#include <memory>
+#include <utility>
+
 namespace Ui
 {
 class MainWindow;
@@ -73,6 +76,16 @@ struct MainWindowTestAccess {
     static HashTypeLoader &hashTypeLoader(MainWindow &window)
     {
         return window.m_hashTypeLoader;
+    }
+
+    static PotfileCheck &potfileCheck(MainWindow &window)
+    {
+        return *window.m_potfileCheck;
+    }
+
+    static void setPotfileCheck(MainWindow &window, std::unique_ptr<PotfileCheck> check)
+    {
+        window.m_potfileCheck = std::move(check);
     }
 
     static QString hashTypeBaseToolTip(MainWindow &window)

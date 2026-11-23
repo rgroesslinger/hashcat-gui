@@ -8,6 +8,9 @@
 - New options: `--keep-guessing` to keep attacking a hash after it is cracked, `--potfile-path` to read and write a chosen potfile instead of the default one, and `--increment-inverse` (`-ii`) to grow a mask from right to left
 - Tools → Identify Hash asks hashcat which hash modes match a hash, shows them as candidates and applies the selected one (and the hash input) to the attack
 - Tools → Backend Information shows the devices and backends hashcat detected
+- Tools → Check Against Potfile reports how many hashes in the current hash field are already cracked and opens the cracked hashes with masked plaintexts that can be revealed or copied
+- Tools → Potfile Inspector browses a potfile one entry at a time, masks plaintexts by default, and marks exact duplicate lines
+- Cracked-results and potfile-inspector dialogs can export their retained results as CSV, text or JSON, and show aggregate password statistics
 
 ## 0.9.0 (2026-11-20)
 

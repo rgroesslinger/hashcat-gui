@@ -11,7 +11,9 @@ A graphical user interface for [hashcat](https://github.com/hashcat/hashcat/), t
 
 - **All hashcat attack modes** — straight, combination, brute force, PCFG, table, generic feed and association, plus hybrid modes that pair a character mask with wordlists.
 - **Preview and run** — the live preview shows the exact `hashcat` command, with optional short parameter names. Run it directly in a terminal of your choice, or copy it to the clipboard and take it from there.
-- **A runnable example for each mode** — `Tools → Load Example Session` opens a bundled session with its own wordlist, rules or table, so you can check the setup before running your own data.
+- **A runnable example for each mode** — a bundled session with its own wordlist, rules or table lets you check the setup before running your own data.
+- **Hash identification** — lists the modes matching a hash and applies the chosen one to the attack.
+- **Potfile inspection** — shows cracked hashes and raw entries with masked plaintexts, export and statistics.
 - **Session saving** — the last session is restored automatically; sessions and settings can be exported and imported.
 - **Real list management** — several wordlists, rule slots, PCFG rulesets, tables and feed arguments with per-row include checkboxes.
 - **Native packaging** — packages for openSUSE, Fedora, Debian and Ubuntu, a Windows build, and a Linux AppImage.
@@ -101,7 +103,7 @@ The tests need the Qt6 Test module. If it is missing the build says so and simpl
 
 The catalogs live in `translations/` and are compiled into the executable, so there is nothing to install at run time.
 
-The UI follows the environment's language by default; **Settings → Language** offers an explicit choice instead.
+The UI follows the environment's language by default; an explicit language can be chosen instead.
 
 The catalogs are refreshed with:
 

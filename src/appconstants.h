@@ -349,6 +349,16 @@ inline constexpr QLatin1StringView MachineReadable{"--machine-readable"};
 inline constexpr QLatin1StringView Version{"--version"};
 inline constexpr QLatin1StringView Identify{"--identify"};
 inline constexpr QLatin1StringView BackendInfo{"--backend-info"};
+inline constexpr QLatin1StringView Show{"--show"};
+inline constexpr QLatin1StringView Left{"--left"};
+inline constexpr QLatin1StringView LogfileDisable{"--logfile-disable"};
+inline constexpr QLatin1StringView Json{"--json"};
+inline constexpr QLatin1StringView Username{"--username"};
+inline constexpr QLatin1StringView PotfilePath{"--potfile-path"};
+inline constexpr QLatin1StringView HashTypeShort{"-m"};
+inline constexpr QLatin1StringView PotfileSessionPrefix{"hcgui-pot-"};
+// The show parser retains at most this many entries; the counts stay complete.
+inline constexpr int PotfileMaxEntries = 10000;
 // A value starting with '-' would be read as an option, not as the hash to identify.
 inline constexpr QLatin1StringView OptionTerminator{"--"};
 // Backend init can be slow on a fresh driver; queries that need it get longer.
