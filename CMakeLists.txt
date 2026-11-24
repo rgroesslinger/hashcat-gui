@@ -253,6 +253,7 @@ set(HASHCAT_GUI_TESTS
     tst_potfileshowparser
     tst_potfilestatistics
     tst_potfilestatisticsdialog
+    tst_potfiletableview
     tst_session
     tst_sessiontransfer
     tst_settingsdialog
@@ -294,6 +295,10 @@ elseif(Qt6Test_FOUND)
         list(APPEND ANALYSIS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/tests/${test}.cpp)
         list(APPEND ANALYSIS_DEPS ${test}_autogen)
     endforeach()
+
+    # The .ui ellipsis check needs the source tree, not the generated headers.
+    target_compile_definitions(tst_layout PRIVATE
+        HASHCAT_GUI_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
     # The round-trip test starts both helpers; build them before it runs.
     add_dependencies(tst_terminalcatalog argecho argecho_crt)

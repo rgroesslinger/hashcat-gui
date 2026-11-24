@@ -63,8 +63,10 @@ QByteArray tabular(const QList<PotfileExporter::Row> &rows, QChar delimiter, boo
             appendField(&output, row.username, delimiter, &first);
         }
         if (includeLine) {
-            appendField(&output, boolText(row.duplicate), delimiter, &first);
-            appendField(&output, QString::number(row.lineNumber), delimiter, &first);
+            appendField(&output, row.hasLineInfo ? boolText(row.duplicate) : QString(), delimiter,
+                        &first);
+            appendField(&output, row.hasLineInfo ? QString::number(row.lineNumber) : QString(),
+                        delimiter, &first);
         }
         appendField(&output, boolText(row.encrypted), delimiter, &first);
         output += '\n';
@@ -83,8 +85,13 @@ QByteArray json(const QList<PotfileExporter::Row> &rows, bool includeUsername, b
             object.insert(QStringLiteral("username"), row.username);
         }
         if (includeLine) {
-            object.insert(QStringLiteral("duplicate"), row.duplicate);
-            object.insert(QStringLiteral("line"), row.lineNumber);
+            if (row.hasLineInfo) {
+                object.insert(QStringLiteral("duplicate"), row.duplicate);
+                object.insert(QStringLiteral("line"), row.lineNumber);
+            } else {
+                object.insert(QStringLiteral("duplicate"), QJsonValue::Null);
+                object.insert(QStringLiteral("line"), QJsonValue::Null);
+            }
         }
         object.insert(QStringLiteral("encrypted"), row.encrypted);
         array.append(object);
@@ -103,7 +110,7 @@ QByteArray PotfileExporter::serialize(const QList<Row> &rows, Format format, boo
     switch (format) {
     case Format::Csv:
         return tabular(rows, QLatin1Char(','), includeUsername, includeLine);
-    case Format::Txt:
+    case Format::Tsv:
         return tabular(rows, QLatin1Char('\t'), includeUsername, includeLine);
     case Format::Json:
         return json(rows, includeUsername, includeLine);

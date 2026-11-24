@@ -100,6 +100,7 @@ Connect once to `commandChanged()`; the attack-mode combo uses `attackIndexChang
 ## Conventions
 
 - SPDX `GPL-3.0-or-later` header in every source, header and test.
+- Keep source comments short and concise; let clear code speak for itself.
 - Production defines `QT_NO_CAST_FROM_ASCII`/`QT_NO_CAST_TO_ASCII`: use `QStringLiteral`,
   `QLatin1StringView` or `QString::fromUtf8` (tests exempt).
 - Tokens, keys, defaults, file names go in `src/appconstants.h`. Fixed hashcat help stays
@@ -110,6 +111,7 @@ Connect once to `commandChanged()`; the attack-mode combo uses `attackIndexChang
 - Tests: `TestEnvironment::run` (QStandardPaths test mode), header-declared friends
   (`MainWindowTestAccess`), `QSKIP` shell stubs on Windows. Read-only hashcat dialogs inject
   `HashcatRunner::Query`; stubs in `tests/hashcatquerytesthelpers.h`.
+- Add tests only for meaningful behavior; do not pad suites with low-value cases.
 - Commits: subject <=72 chars, capitalized, imperative, no period; body only for what and why.
 - `FAQ.md` is generated: `mdfaqgen FAQ.yaml FAQ.md`.
 

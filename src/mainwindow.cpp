@@ -1118,7 +1118,9 @@ void MainWindow::identifyHashTriggered()
     // Stack-local like AboutDialog: persistent widgets enter session serialization.
     IdentifyDialog dialog(this);
     dialog.setInput(ui->lineEdit_hashfile->text());
-    connect(&dialog, &IdentifyDialog::applyRequested, this, &MainWindow::applyIdentifiedHashType);
+    dialog.setApplyHandler([this](int hashTypeId, const std::optional<QString> &input) {
+        return applyIdentifiedHashType(hashTypeId, input);
+    });
     dialog.exec();
 }
 
@@ -1135,12 +1137,6 @@ bool MainWindow::preparePotfileQuery(const QString &title, PotfileQueryInput &in
     if (entered.isEmpty()) {
         showPlainMessage(this, QMessageBox::Information, title,
                          tr("Enter a hash or select a hash file first."));
-        return false;
-    }
-    if (ui->checkBox_potfile_disable->isChecked()) {
-        showPlainMessage(this, QMessageBox::Information, title,
-                         tr("The potfile is disabled for this session. Uncheck \"Do not write the "
-                            "potfile\" before checking it."));
         return false;
     }
 
@@ -1161,6 +1157,13 @@ bool MainWindow::preparePotfileQuery(const QString &title, PotfileQueryInput &in
     const QVariant hashTypeData = ui->comboBox_hash_type->currentData();
     input.hashType =
         hashTypeData.isValid() ? hashTypeData.toInt() : AppConstants::Hashcat::AutoDetectHashType;
+    // Auto-detect is best-effort: a wrong mode silently miscounts the potfile.
+    if (input.hashType < 0) {
+        showPlainMessage(this, QMessageBox::Information, title,
+                         PotfileCheck::missingHashTypeMessage());
+        ui->comboBox_hash_type->setFocus();
+        return false;
+    }
     input.hashInput = PotfileQuery::resolveHashInput(entered, hashcatPath);
     // Resolve against the directory hashcat runs in, so the query reads the
     // same potfile a launch would.
@@ -1234,15 +1237,23 @@ void MainWindow::potfileCheckTriggered()
         showPlainMessage(this, QMessageBox::Information, tr("Check Against Potfile"),
                          tr("Check cancelled."));
         break;
-    case PotfileCheckResult::Status::ShowFailed:
-        showPlainMessage(this, QMessageBox::Warning, tr("Check Against Potfile"),
-                         result->diagnostic.isEmpty() ? tr("hashcat could not query the potfile.")
-                                                      : result->diagnostic);
+    case PotfileCheckResult::Status::ShowFailed: {
+        // The combined output can be long: keep it expandable and copyable.
+        const QString summary = result->diagnostic.section(QLatin1Char('\n'), 0, 0).trimmed();
+        QMessageBox box(QMessageBox::Warning, tr("Check Against Potfile"),
+                        summary.isEmpty() ? tr("hashcat could not query the potfile.") : summary,
+                        QMessageBox::Ok, this);
+        box.setTextFormat(Qt::PlainText);
+        if (result->diagnostic != summary) {
+            box.setDetailedText(result->diagnostic);
+        }
+        box.exec();
         break;
+    }
     }
 }
 
-void MainWindow::applyIdentifiedHashType(int hashTypeId, const QString &input)
+bool MainWindow::applyIdentifiedHashType(int hashTypeId, const std::optional<QString> &input)
 {
     // An empty or in-flight list is not the final word from this binary: a
     // reload still shows the previous list, so don't call the id unsupported.
@@ -1252,7 +1263,7 @@ void MainWindow::applyIdentifiedHashType(int hashTypeId, const QString &input)
                                  tr("The hash type list is unavailable or still loading. Nothing "
                                     "was changed. Check the hashcat path in Settings or try again "
                                     "once the list is available."));
-        return;
+        return false;
     }
 
     const int index = ui->comboBox_hash_type->findData(hashTypeId);
@@ -1261,10 +1272,15 @@ void MainWindow::applyIdentifiedHashType(int hashTypeId, const QString &input)
                              tr("Hash mode %1 is not in this hashcat's hash-type list. "
                                 "Nothing was changed.")
                                  .arg(hashTypeId));
-        return;
+        return false;
     }
     ui->comboBox_hash_type->setCurrentIndex(index);
-    ui->lineEdit_hashfile->setText(input);
+    // An unchanged input keeps the form's own text; an edited one is written
+    // back raw, never as a resolved absolute path.
+    if (input.has_value()) {
+        ui->lineEdit_hashfile->setText(input.value());
+    }
+    return true;
 }
 
 QString MainWindow::sessionFile() const

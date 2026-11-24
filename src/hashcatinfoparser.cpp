@@ -60,10 +60,9 @@ bool HashcatInfoParser::parseExampleHashes(const QString &rawOutput,
     return true;
 }
 
-bool HashcatInfoParser::parseIdentify(const QString &rawOutput, QList<IdentifiedHashMode> &matches,
-                                      QString *errorMessage)
+HashcatInfoParser::IdentifyResult HashcatInfoParser::parseIdentify(const QString &rawOutput)
 {
-    setError(errorMessage, QString());
+    IdentifyResult result;
 
     static const QRegularExpression row(
         QStringLiteral(R"(^\s*(\d+)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*$)"));
@@ -75,12 +74,13 @@ bool HashcatInfoParser::parseIdentify(const QString &rawOutput, QList<Identified
     for (const QString &line : lines) {
         const QString text = line.trimmed();
 
+        // Exit 255 with this sentence is an answer, not a failed query.
+        if (text == noMatch) {
+            result.status = IdentifyResult::Status::NoMatch;
+            return result;
+        }
+
         if (!sawHeader) {
-            // Exit 255 with this sentence is an answer, not a failed query.
-            if (text == noMatch) {
-                matches.clear();
-                return true;
-            }
             // Warnings can precede the header.
             if (text.contains(QStringLiteral("| Name"))
                 && text.contains(QStringLiteral("| Category"))) {
@@ -113,11 +113,9 @@ bool HashcatInfoParser::parseIdentify(const QString &rawOutput, QList<Identified
         parsed.append({id, match.captured(2), match.captured(3)});
     }
 
-    if (!sawHeader || parsed.isEmpty()) {
-        setError(errorMessage, tr("hashcat did not report any matching hash modes."));
-        return false;
+    if (sawHeader && !parsed.isEmpty()) {
+        result.status = IdentifyResult::Status::Matched;
+        result.matches = std::move(parsed);
     }
-
-    matches = std::move(parsed);
-    return true;
+    return result;
 }

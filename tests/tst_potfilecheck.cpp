@@ -52,15 +52,22 @@ private slots:
     void initTestCase();
     void okResultAddsShowAndLeft();
     void binaryHashFileShowIsAnOkResult();
-    void showFailureReportsTheCombinedStreams();
+    void noHashesLoadedIsMapped();
+    void unknownFailureReportsTheCombinedStreams();
+    void emptyOutputWithExit255IsMapped();
     void identifyTableBecomesChooseAHashType();
     void leftFailureKeepsTheShowCount();
     void binaryLeftOutputIsNotCountedAsText();
     void strayControlAndReplacementCharactersStayText();
     void showTimeoutIsAFailure();
     void leftTimeoutKeepsTheShowCount();
+    void aSlowShowStillGivesLeftTheFullTimeout();
     void nonJsonShowOutputIsAFailure();
     void emptyShowOutputIsAnEmptyAnswer();
+    void malformedShowLinesAreReported();
+    void leftCountIgnoresLeadingDiagnostics();
+    void leftCountOfDiagnosticsOnlyOutputIsZero();
+    void autoDetectIsRefusedBeforeAnyQuery();
     void cancelStopsTheQuery();
     void destructionCancelsTheToken();
     void startingAgainCancelsThePreviousToken();
@@ -98,8 +105,7 @@ void TestPotfileCheck::okResultAddsShowAndLeft()
     QVERIFY(args.at(1).contains(QStringLiteral("--left")));
     QVERIFY(!args.at(1).contains(QStringLiteral("--json")));
     QCOMPARE(timeouts.at(0), AppConstants::Hashcat::QueryTimeoutMs);
-    QVERIFY(timeouts.at(1) > 0);
-    QVERIFY(timeouts.at(1) <= 2 * AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(timeouts.at(1), AppConstants::Hashcat::QueryTimeoutMs);
 }
 
 void TestPotfileCheck::binaryHashFileShowIsAnOkResult()
@@ -119,7 +125,7 @@ void TestPotfileCheck::binaryHashFileShowIsAnOkResult()
     QVERIFY(result.entries.at(0).hashIsFile);
 }
 
-void TestPotfileCheck::showFailureReportsTheCombinedStreams()
+void TestPotfileCheck::noHashesLoadedIsMapped()
 {
     QList<QStringList> args;
     const HashcatResult failed =
@@ -133,9 +139,38 @@ void TestPotfileCheck::showFailureReportsTheCombinedStreams()
 
     const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
     QCOMPARE(result.status, PotfileCheckResult::Status::ShowFailed);
-    QVERIFY(result.diagnostic.contains(QStringLiteral("Hash parsing error")));
-    QVERIFY(result.diagnostic.contains(QStringLiteral("No hashes loaded.")));
+    QVERIFY(result.diagnostic.contains(QStringLiteral("could not load any hashes")));
     QCOMPARE(args.size(), 1);
+}
+
+void TestPotfileCheck::unknownFailureReportsTheCombinedStreams()
+{
+    const HashcatResult failed =
+        failedResult(244, QStringLiteral("Hash parsing error in hashfile: x"),
+                     QStringLiteral("something unexpected"));
+    PotfileCheck check(nullptr, queryFrom(failed, normalResult()));
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    check.start(QStringLiteral("hashcat"), input());
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+
+    const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
+    QCOMPARE(result.status, PotfileCheckResult::Status::ShowFailed);
+    QVERIFY(result.diagnostic.contains(QStringLiteral("Hash parsing error")));
+    QVERIFY(result.diagnostic.contains(QStringLiteral("something unexpected")));
+}
+
+void TestPotfileCheck::emptyOutputWithExit255IsMapped()
+{
+    PotfileCheck check(nullptr, queryFrom(failedResult(255, QString(), QString()), normalResult()));
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    check.start(QStringLiteral("hashcat"), input());
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+
+    const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
+    QCOMPARE(result.status, PotfileCheckResult::Status::ShowFailed);
+    QVERIFY(result.diagnostic.contains(QStringLiteral("could not parse the input")));
 }
 
 void TestPotfileCheck::identifyTableBecomesChooseAHashType()
@@ -236,6 +271,30 @@ void TestPotfileCheck::leftTimeoutKeepsTheShowCount()
     QCOMPARE(result.left, -1);
 }
 
+void TestPotfileCheck::aSlowShowStillGivesLeftTheFullTimeout()
+{
+    QList<int> timeouts;
+    auto query = [&timeouts](const QString &, const QStringList &used, int timeout,
+                             const HashcatRunner::CancelToken &) {
+        timeouts.append(timeout);
+        const bool isLeft = used.contains(QStringLiteral("--left"));
+        return QtConcurrent::run([isLeft] {
+            if (!isLeft) {
+                QThread::msleep(200);
+            }
+            return isLeft ? normalResult(QStringLiteral("hash-left\n")) : normalResult(showLine());
+        });
+    };
+    PotfileCheck check(nullptr, query);
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    check.start(QStringLiteral("hashcat"), input());
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+
+    QCOMPARE(timeouts.size(), 2);
+    QCOMPARE(timeouts.at(1), AppConstants::Hashcat::QueryTimeoutMs);
+}
+
 void TestPotfileCheck::nonJsonShowOutputIsAFailure()
 {
     QList<QStringList> args;
@@ -263,6 +322,71 @@ void TestPotfileCheck::emptyShowOutputIsAnEmptyAnswer()
     QCOMPARE(result.status, PotfileCheckResult::Status::Ok);
     QCOMPARE(result.cracked, 0);
     QCOMPARE(result.left, 2);
+}
+
+void TestPotfileCheck::malformedShowLinesAreReported()
+{
+    PotfileCheck check(nullptr, queryFrom(normalResult(QStringLiteral("not json\n") + showLine()),
+                                          normalResult()));
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    check.start(QStringLiteral("hashcat"), input());
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+
+    const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
+    QCOMPARE(result.status, PotfileCheckResult::Status::Ok);
+    QCOMPARE(result.cracked, 1);
+    QCOMPARE(result.malformedCount, 1);
+}
+
+void TestPotfileCheck::leftCountIgnoresLeadingDiagnostics()
+{
+    const QString left = QStringLiteral("Hashfile 'hashes.txt': Token length exception\n"
+                                        "Hashfile 'hashes.txt': Token length exception\n"
+                                        "hash-left\n");
+    PotfileCheck check(nullptr, queryFrom(normalResult(showLine()), normalResult(left)));
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    check.start(QStringLiteral("hashcat"), input());
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+
+    const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
+    QCOMPARE(result.status, PotfileCheckResult::Status::Ok);
+    QCOMPARE(result.cracked, 1);
+    QCOMPARE(result.left, 1);
+}
+
+void TestPotfileCheck::leftCountOfDiagnosticsOnlyOutputIsZero()
+{
+    // No trailing newline: the offset scan must stay in range.
+    const QString left = QStringLiteral("Hashfile 'hashes.txt': Token length exception");
+    PotfileCheck check(nullptr, queryFrom(normalResult(showLine()), normalResult(left)));
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    check.start(QStringLiteral("hashcat"), input());
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+
+    const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
+    QCOMPARE(result.status, PotfileCheckResult::Status::Ok);
+    QCOMPARE(result.cracked, 1);
+    QCOMPARE(result.left, 0);
+}
+
+void TestPotfileCheck::autoDetectIsRefusedBeforeAnyQuery()
+{
+    QList<QStringList> args;
+    PotfileCheck check(nullptr, queryFrom(normalResult(showLine()), normalResult(), &args));
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    PotfileQueryInput autodetect = input();
+    autodetect.hashType = AppConstants::Hashcat::AutoDetectHashType;
+    check.start(QStringLiteral("hashcat"), autodetect);
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 2000);
+
+    const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
+    QCOMPARE(result.status, PotfileCheckResult::Status::ShowFailed);
+    QVERIFY(result.diagnostic.contains(QStringLiteral("Choose a hash type")));
+    QVERIFY(args.isEmpty());
 }
 
 void TestPotfileCheck::cancelStopsTheQuery()

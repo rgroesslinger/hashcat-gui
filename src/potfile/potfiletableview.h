@@ -35,6 +35,9 @@ public:
         QStringList extraColumns;
         bool emptyPlain = false;
         bool encrypted = false;
+        bool hashIsFile = false;
+        // Set by the owning dialog: maps the row to its retained entry.
+        int sourceIndex = -1;
     };
 
     explicit PotfileTableView(QWidget *parent = nullptr);
@@ -52,12 +55,25 @@ public:
     // Shown instead of the table when setRows() supplies no rows.
     void setEmptyStateText(const QString &text);
 
-    // Replaces the rows and resets search and reveal.
-    void setRows(const QList<Row> &rows);
-    void clearRows();
+    // Replaces the rows. preserveViewState keeps search, reveal and sorting
+    // (the Inspector's Reload); the default resets them.
+    void setRows(const QList<Row> &rows, bool preserveViewState = false);
+    // Empties the data without the empty-state hint; for no-result paths.
+    void clearRows(bool preserveViewState = false);
 
     [[nodiscard]] bool hasRows() const;
+    [[nodiscard]] int rowCount() const;
     [[nodiscard]] bool canReveal() const;
+    // Visible rows in current view (sort) order.
+    [[nodiscard]] QList<Row> visibleRows() const;
+    [[nodiscard]] int visibleRowCount() const;
+
+signals:
+    // Filter, reveal state or row set changed.
+    void visibleRowsChanged();
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private slots:
     void searchChanged();
@@ -65,22 +81,26 @@ private slots:
     void copySelected();
     void copyAll();
     void updateButtons();
+    void showContextMenu(const QPoint &pos);
 
 private:
-    void applyRows(const QList<Row> &rows, bool showEmptyState);
+    void applyRows(const QList<Row> &rows, bool showEmptyState, bool preserveViewState);
     void populateRows();
     void applyFilter();
     void updateEmptyState();
+    void updateRevealButton();
     [[nodiscard]] bool hasVisibleRows() const;
     [[nodiscard]] bool hasVisibleSelection() const;
     [[nodiscard]] const Row *rowForItem(const QTreeWidgetItem *item) const;
     [[nodiscard]] QString plainTextFor(const Row &row) const;
-    [[nodiscard]] QString copyValueFor(const Row &row) const;
+    [[nodiscard]] QString hashDisplayFor(const Row &row) const;
+    [[nodiscard]] QStringList copyValuesFor(const Row &row) const;
     [[nodiscard]] bool rowMatches(const Row &row) const;
-    [[nodiscard]] QStringList selectedCopyValues() const;
+    void copyRows(const QList<Row> &rows);
 
     Ui::PotfileTableView *ui;
     QList<Row> m_rows;
+    QString m_emptyStateText;
     bool m_revealed = false;
     bool m_showEmptyState = false;
 };

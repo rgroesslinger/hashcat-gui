@@ -11,6 +11,14 @@
 #include <QtConcurrent/QtConcurrentRun>
 #include <algorithm>
 
+QString HashcatRunner::uniqueSession(QLatin1StringView prefix)
+{
+    static std::atomic<quint64> counter{0};
+    return QStringLiteral("%1%2-%3").arg(
+        QString(prefix), QString::number(QCoreApplication::applicationPid()),
+        QString::number(counter.fetch_add(1, std::memory_order_relaxed) + 1));
+}
+
 QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const QStringList &args,
                                               int timeoutMs, CancelToken cancel)
 {

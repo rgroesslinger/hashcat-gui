@@ -15,19 +15,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_header">
-     <property name="text">
-      <string>Cracked hashes</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QLabel" name="label_note">
      <property name="text">
-      <string>Matched against the potfile for the queried mode; -m is advisory.</string>
+      <string/>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -58,7 +48,10 @@
         <string>&amp;Statistics…</string>
        </property>
        <property name="toolTip">
-        <string>Show aggregate password statistics for the retained results</string>
+        <string>Show aggregate password statistics for the visible results</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -71,7 +64,10 @@
         <string>&amp;Export…</string>
        </property>
        <property name="toolTip">
-        <string>Export the retained results as CSV, text or JSON</string>
+        <string>Export the visible results as CSV, TSV or JSON</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -92,6 +88,9 @@
       <widget class="QPushButton" name="pushButton_close">
        <property name="text">
         <string>&amp;Close</string>
+       </property>
+       <property name="default">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

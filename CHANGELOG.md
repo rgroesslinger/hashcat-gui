@@ -3,14 +3,14 @@
 ## Unreleased
 - A Linux x86_64 AppImage is now published on the release page
 - kgx (GNOME Console) is now available as a launch terminal
-- The launch terminal can now print the exact command hashcat receives, so a mangled value (such as a `$` hash expanded a second time by a terminal) is immediately visible instead of going unnoticed; enable it under Settings → General
+- The launch terminal can now print the exact command hashcat receives, so a mangled value (such as a `$` hash expanded a second time by a terminal) is immediately visible instead of going unnoticed; enable it under `Settings → General`
 - The copy-to-clipboard button no longer appears blank on systems without an icon theme
 - New options: `--keep-guessing` to keep attacking a hash after it is cracked, `--potfile-path` to read and write a chosen potfile instead of the default one, and `--increment-inverse` (`-ii`) to grow a mask from right to left
-- Tools → Identify Hash asks hashcat which hash modes match a hash, shows them as candidates and applies the selected one (and the hash input) to the attack
-- Tools → Backend Information shows the devices and backends hashcat detected
-- Tools → Check Against Potfile reports how many hashes in the current hash field are already cracked and opens the cracked hashes with masked plaintexts that can be revealed or copied
-- Tools → Potfile Inspector browses a potfile one entry at a time, masks plaintexts by default, and marks exact duplicate lines
-- Cracked-results and potfile-inspector dialogs can export their retained results as CSV, text or JSON, and show aggregate password statistics
+- `Tools → Identify Hash` asks hashcat which hash modes match a hash, shows them as candidates and applies the selected one (and the hash input) to the attack
+- `Tools → Backend Information` shows the devices and backends hashcat detected
+- `Tools → Check Against Potfile` reports how many hashes in the current hash field are already cracked and opens the cracked hashes with masked plaintexts that must be revealed before they can be copied
+- `Tools → Potfile Inspector` lists a potfile's entries (up to 10,000) in a searchable table, masks plaintexts by default, and marks exact duplicate lines
+- Cracked-results and potfile-inspector dialogs can export the visible results as CSV, TSV or JSON, and show aggregate password statistics for them
 
 ## 0.9.0 (2026-11-20)
 
@@ -18,7 +18,7 @@
 - **Support for hashcat 8.0.0**: the attack mode selector offers all ten modes — PCFG, table, generic feed and hybrid join the existing ones, each with its own options shown only where they apply ([#18](https://github.com/rgroesslinger/hashcat-gui/issues/18))
 - Association mode now supports hashcat 8's account-aware form: without a wordlist, the words come from the hash file, and `phases=…` selects the phases to run
 - The minimum hashcat version is now 8.0.0; the segment size (`-c`) and workload profile (`-w`) options were removed as part of the upgrade
-- Example sessions for every attack mode are available under Tools → Load Example Session, each with a different hash type and test password
+- Example sessions for every attack mode are available under `Tools → Load Example Session`, each with a different hash type and test password
 - Wordlist entries are watched while the window is open: a row whose file does not exist is marked with a warning icon ([#15](https://github.com/rgroesslinger/hashcat-gui/issues/15))
 - The About dialog now checks for updates ([#16](https://github.com/rgroesslinger/hashcat-gui/issues/16))
 - The settings dialog offers the hashcat found on the system PATH when no path is configured ([#17](https://github.com/rgroesslinger/hashcat-gui/issues/17))
@@ -52,7 +52,7 @@
 - **Code quality tools**: Added `clang-format`, `clang-tidy`, and `clazy` tooling
 - **Export and import**: Settings can be exported to a file and imported again
 - **Color scheme**: The application can follow the desktop, or use a light or a dark appearance of its own where the platform supports it
-- **Example session**: A bundled brute-force session to quickly check that the hashcat setup works (Tools → Load Example Session)
+- **Example session**: A bundled brute-force session to quickly check that the hashcat setup works (`Tools → Load Example Session`)
 
 ### Improvements
 - Added new application artwork and improved the XDG `.desktop` file entry
@@ -71,7 +71,7 @@
 - Session save/load errors now reach the main window instead of having the serializer open its own dialog; a failed session load at start-up is now reported as well
 - Hash type saved in a session is now correctly applied after the background query completes (was dropped at start-up)
 - A session that names a hash type the installed hashcat does not know now leaves the hash type unselected and says so, instead of silently selecting another one
-- File → Export Session only announces success when the session was actually written
+- `File → Export Session` only announces success when the session was actually written
 - `--hash-type` omitted when no hash type is selected (empty selector no longer sends `-m 0`)
 - Sorting the word list with nothing selected no longer passes a null item to `insertItem()`
 - The suggested outfile no longer overwrites user-selected or session-chosen file names

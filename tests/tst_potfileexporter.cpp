@@ -7,12 +7,16 @@
 #include "potfileexportui.h"
 #include "testenvironment.h"
 
+#include <QApplication>
 #include <QFile>
+#include <QFileDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMessageBox>
 #include <QTemporaryDir>
 #include <QTest>
+#include <QTimer>
 
 namespace
 {
@@ -24,7 +28,90 @@ PotfileExporter::Row sampleRow()
             QStringLiteral("alice"),
             0,
             false,
+            true,
             true};
+}
+
+// Drives the export modal flow: picks the file and filter, answers the
+// potfile-name question and the plaintext confirmation, records the boxes.
+struct ExportDrive {
+    QString pickPath;
+    QString pickFilter;
+    bool confirmPotfileName = false;
+    QString warningText;
+    QString questionText;
+    QString confirmationText;
+    QString initialPath;
+};
+
+bool driveExportUi(const QString &suggested, const QStringList &protectedPaths, ExportDrive &drive)
+{
+    QTimer timer;
+    timer.setInterval(20);
+    int pickAttempts = 0;
+    bool filterSet = false;
+    QObject::connect(&timer, &QTimer::timeout, &timer, [&] {
+        QWidget *modal = QApplication::activeModalWidget();
+        if (!modal) {
+            return;
+        }
+        if (auto *fileDialog = qobject_cast<QFileDialog *>(modal)) {
+            if (drive.initialPath.isEmpty()) {
+                drive.initialPath = fileDialog->selectedFiles().value(0);
+            }
+            if (QWidget *focused = fileDialog->focusWidget()) {
+                focused->clearFocus();
+            }
+            // Re-applying the filter restores the dialog's remembered file
+            // and undoes selectFile(); set it once.
+            if (!drive.pickFilter.isEmpty() && !filterSet) {
+                fileDialog->selectNameFilter(drive.pickFilter);
+                filterSet = true;
+            }
+            // selectFile loses to the dialog's own focus restoration for a
+            // tick or two, and the dialog may append the filter's suffix.
+            const QStringList selection = fileDialog->selectedFiles();
+            bool matches = selection.contains(drive.pickPath);
+            if (!matches) {
+                for (const QString &selected : selection) {
+                    if (selected.startsWith(drive.pickPath + QLatin1Char('.'))) {
+                        matches = true;
+                        break;
+                    }
+                }
+            }
+            if (!matches && ++pickAttempts < 100) {
+                fileDialog->selectFile(drive.pickPath);
+                return;
+            }
+            static_cast<QDialog *>(fileDialog)->accept();
+            return;
+        }
+        if (auto *box = qobject_cast<QMessageBox *>(modal)) {
+            if (box->button(QMessageBox::Yes) != nullptr) {
+                drive.questionText = box->text();
+                box->button(drive.confirmPotfileName ? QMessageBox::Yes : QMessageBox::No)->click();
+                return;
+            }
+            if (box->button(QMessageBox::Cancel) != nullptr) {
+                drive.confirmationText = box->text();
+                const auto buttons = box->buttons();
+                for (QAbstractButton *b : buttons) {
+                    if (box->buttonRole(b) == QMessageBox::AcceptRole) {
+                        b->click();
+                        return;
+                    }
+                }
+            }
+            drive.warningText = box->text();
+            box->close();
+        }
+    });
+    timer.start();
+    const bool ok = PotfileExportUi::exportRows(nullptr, suggested, {sampleRow()}, true, true, 1,
+                                                protectedPaths);
+    timer.stop();
+    return ok;
 }
 
 } // namespace
@@ -36,11 +123,15 @@ class TestPotfileExporter : public QObject
 private slots:
     void csvEscapesFieldsAndUsesTheExpectedColumns();
     void stepThreeCsvIncludesDuplicateAndLine();
-    void txtUsesTabsAndQuotesTabbedFields();
+    void tsvUsesTabsAndQuotesTabbedFields();
     void jsonUsesObjectsAndOptionalFields();
+    void rowsWithoutLineInfoExportEmptyCells();
     void writeCreatesTheFile();
     void writeReportsAnOpenFailure();
     void protectedDestinationIsDetected();
+    void exportToAProtectedCandidateIsRefused();
+    void unrelatedHashcatPotfileAsksAndDefaultsToNo();
+    void filterAndSuffixCombinations();
 };
 
 void TestPotfileExporter::csvEscapesFieldsAndUsesTheExpectedColumns()
@@ -57,7 +148,7 @@ void TestPotfileExporter::csvEscapesFieldsAndUsesTheExpectedColumns()
 void TestPotfileExporter::stepThreeCsvIncludesDuplicateAndLine()
 {
     const QList<PotfileExporter::Row> rows{
-        {QStringLiteral("hash"), QStringLiteral("plain"), {}, 7, true, false},
+        {QStringLiteral("hash"), QStringLiteral("plain"), {}, 7, true, false, true},
     };
     const QByteArray data =
         PotfileExporter::serialize(rows, PotfileExporter::Format::Csv, false, true);
@@ -66,13 +157,13 @@ void TestPotfileExporter::stepThreeCsvIncludesDuplicateAndLine()
                                                      "hash,plain,true,7,false\n"));
 }
 
-void TestPotfileExporter::txtUsesTabsAndQuotesTabbedFields()
+void TestPotfileExporter::tsvUsesTabsAndQuotesTabbedFields()
 {
     const QList<PotfileExporter::Row> rows{
         {QStringLiteral("hash"), QStringLiteral("plain\ttext"), {}, 0, false, false},
     };
     const QByteArray data =
-        PotfileExporter::serialize(rows, PotfileExporter::Format::Txt, false, false);
+        PotfileExporter::serialize(rows, PotfileExporter::Format::Tsv, false, false);
 
     QCOMPARE(QString::fromUtf8(data), QStringLiteral("hash\tplaintext\tencrypted\n"
                                                      "hash\t\"plain\ttext\"\tfalse\n"));
@@ -96,6 +187,26 @@ void TestPotfileExporter::jsonUsesObjectsAndOptionalFields()
     QCOMPARE(object.value(QStringLiteral("duplicate")).toBool(), false);
     QCOMPARE(object.value(QStringLiteral("line")).toInt(), 0);
     QCOMPARE(object.value(QStringLiteral("encrypted")).toBool(), true);
+}
+
+// --show results carry no line information: the columns stay, the cells empty.
+void TestPotfileExporter::rowsWithoutLineInfoExportEmptyCells()
+{
+    const QList<PotfileExporter::Row> rows{
+        {QStringLiteral("hash"), QStringLiteral("plain"), {}, 7, true, false, false},
+    };
+
+    const QByteArray csv =
+        PotfileExporter::serialize(rows, PotfileExporter::Format::Csv, true, true);
+    QCOMPARE(QString::fromUtf8(csv),
+             QStringLiteral("hash,plaintext,username,duplicate,line,encrypted\n"
+                            "hash,plain,,,,false\n"));
+
+    const QByteArray json =
+        PotfileExporter::serialize(rows, PotfileExporter::Format::Json, true, true);
+    const QJsonObject object = QJsonDocument::fromJson(json).array().at(0).toObject();
+    QVERIFY(object.value(QStringLiteral("duplicate")).isNull());
+    QVERIFY(object.value(QStringLiteral("line")).isNull());
 }
 
 void TestPotfileExporter::writeCreatesTheFile()
@@ -149,10 +260,91 @@ void TestPotfileExporter::writeReportsAnOpenFailure()
     QVERIFY(!error.isEmpty());
 }
 
+void TestPotfileExporter::exportToAProtectedCandidateIsRefused()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("hashcat.potfile"));
+
+    ExportDrive drive;
+    drive.pickPath = path;
+    QVERIFY(!driveExportUi(path, {path}, drive));
+    QVERIFY(drive.warningText.contains(QStringLiteral("other than the potfile")));
+    QVERIFY(!QFile::exists(path));
+}
+
+void TestPotfileExporter::unrelatedHashcatPotfileAsksAndDefaultsToNo()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("hashcat.potfile"));
+
+    // No protected path matches: the name alone triggers the question, and
+    // closing it (the default No) refuses the export.
+    ExportDrive drive;
+    drive.pickPath = path;
+    QVERIFY(!driveExportUi(path, {}, drive));
+    QVERIFY(drive.questionText.contains(QStringLiteral("hashcat.potfile")));
+    QVERIFY(!QFile::exists(path));
+
+    drive.confirmPotfileName = true;
+    QVERIFY(driveExportUi(path, {}, drive));
+    // The unknown suffix gains the filter's suffix; the potfile itself stays.
+    QVERIFY(QFile::exists(path + QStringLiteral(".csv")));
+    QVERIFY(!QFile::exists(path));
+}
+
+void TestPotfileExporter::filterAndSuffixCombinations()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+
+    const auto content = [](const QString &path) {
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly)) {
+            return QByteArray();
+        }
+        return file.readAll();
+    };
+
+    // No suffix: the filter's suffix is appended.
+    ExportDrive drive;
+    drive.pickPath = dir.filePath(QStringLiteral("results"));
+    drive.pickFilter = QStringLiteral("CSV (*.csv)");
+    QVERIFY(driveExportUi(dir.filePath(QStringLiteral("results")), {}, drive));
+    QVERIFY(QFile::exists(dir.filePath(QStringLiteral("results.csv"))));
+    QVERIFY(content(dir.filePath(QStringLiteral("results.csv"))).startsWith("hash,plaintext"));
+    QVERIFY(drive.confirmationText.contains(QStringLiteral("as CSV")));
+    QVERIFY(drive.confirmationText.contains(QStringLiteral("results.csv")));
+
+    // A suffix naming another format: the filter wins, its suffix is appended.
+    ExportDrive cross;
+    cross.pickPath = dir.filePath(QStringLiteral("results.txt"));
+    cross.pickFilter = QStringLiteral("CSV (*.csv)");
+    QVERIFY(driveExportUi(dir.filePath(QStringLiteral("results.txt")), {}, cross));
+    QVERIFY(QFile::exists(dir.filePath(QStringLiteral("results.txt.csv"))));
+
+    // .txt aliases TSV: the name stays.
+    ExportDrive tsv;
+    tsv.pickPath = dir.filePath(QStringLiteral("results.txt"));
+    tsv.pickFilter = QStringLiteral("TSV (*.tsv *.txt)");
+    QVERIFY(driveExportUi(dir.filePath(QStringLiteral("results.txt")), {}, tsv));
+    QVERIFY(content(dir.filePath(QStringLiteral("results.txt"))).startsWith("hash\tplaintext"));
+    QVERIFY(tsv.confirmationText.contains(QStringLiteral("as TSV")));
+
+    // JSON over a .csv name.
+    ExportDrive json;
+    json.pickPath = dir.filePath(QStringLiteral("data.csv"));
+    json.pickFilter = QStringLiteral("JSON (*.json)");
+    QVERIFY(driveExportUi(dir.filePath(QStringLiteral("data.csv")), {}, json));
+    QVERIFY(QFile::exists(dir.filePath(QStringLiteral("data.csv.json"))));
+    QVERIFY(content(dir.filePath(QStringLiteral("data.csv.json"))).startsWith("["));
+}
+
 int main(int argc, char *argv[])
 {
     TestPotfileExporter test;
-    return TestEnvironment::run(&test, argc, argv, /*needsGui=*/false);
+    return TestEnvironment::run(&test, argc, argv, /*needsGui=*/true);
 }
 
 #include "tst_potfileexporter.moc"

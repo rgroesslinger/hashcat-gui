@@ -10,7 +10,6 @@
 #include "potfilequery.h"
 #include "potfileshowparser.h"
 
-#include <QElapsedTimer>
 #include <QFutureWatcher>
 #include <QMetaType>
 #include <QObject>
@@ -28,6 +27,7 @@ struct PotfileCheckResult {
     int left = -1;
     PotfileShowParser::Entries entries; // capped at PotfileMaxEntries
     int totalCount = 0;                 // valid show entries before the cap
+    int malformedCount = 0;             // unknown non-JSON lines, diagnostics excluded
     QString diagnostic;                 // combined streams, timeout, or the mode message
 };
 
@@ -54,6 +54,9 @@ public:
     void cancel();
     [[nodiscard]] bool isRunning() const;
 
+    // Shared with MainWindow's preflight so the two cannot diverge.
+    static QString missingHashTypeMessage();
+
 signals:
     void finished(const PotfileCheckResult &result);
 
@@ -73,7 +76,6 @@ private:
     std::unique_ptr<QFutureWatcher<PotfileShowParser::Result>> m_parseWatcher;
     std::unique_ptr<QFutureWatcher<HashcatResult>> m_leftWatcher;
     HashcatRunner::CancelToken m_cancel;
-    QElapsedTimer m_elapsed;
     PotfileCheckResult m_result;
     bool m_running = false;
 };

@@ -11,7 +11,6 @@
 #include <QStringList>
 #include <QtConcurrent/QtConcurrentRun>
 
-#include <algorithm>
 #include <atomic>
 #include <utility>
 
@@ -72,7 +71,6 @@ void PotfileCheck::start(const QString &hashcatPath, const PotfileQueryInput &in
     m_input = input;
     m_result = {};
     m_running = true;
-    m_elapsed.start();
     m_cancel = std::make_shared<std::atomic_bool>(false);
 
     if (m_hashcatPath.isEmpty()) {
@@ -87,8 +85,22 @@ void PotfileCheck::start(const QString &hashcatPath, const PotfileQueryInput &in
         finish();
         return;
     }
+    // Auto-detect is best-effort: a wrong mode silently miscounts the potfile.
+    if (m_input.hashType < 0) {
+        m_result.status = PotfileCheckResult::Status::ShowFailed;
+        m_result.diagnostic = missingHashTypeMessage();
+        finish();
+        return;
+    }
 
     startShow();
+}
+
+QString PotfileCheck::missingHashTypeMessage()
+{
+    return tr("Choose a hash type. Potfile checks need an explicit hash type; Auto-detect is "
+              "best-effort and can miscount. Use Tools → Identify Hash if you do not know the "
+              "type.");
 }
 
 void PotfileCheck::cancel()
@@ -152,6 +164,7 @@ void PotfileCheck::startParse(HashcatResult showResult)
 
                 m_result.cracked = parsed.totalCount;
                 m_result.totalCount = parsed.totalCount;
+                m_result.malformedCount = parsed.malformedCount;
                 m_result.entries = parsed.entries;
                 startLeft();
             });
@@ -167,9 +180,6 @@ void PotfileCheck::startLeft()
         finish();
         return;
     }
-
-    const qint64 totalBudget = 2LL * AppConstants::Hashcat::QueryTimeoutMs;
-    const int remaining = static_cast<int>(std::max<qint64>(1, totalBudget - m_elapsed.elapsed()));
 
     m_leftWatcher = std::make_unique<QFutureWatcher<HashcatResult>>();
     connect(m_leftWatcher.get(), &QFutureWatcher<HashcatResult>::finished, this, [this] {
@@ -203,8 +213,9 @@ void PotfileCheck::startLeft()
         finish();
     });
 
-    m_leftWatcher->setFuture(
-        m_query(m_hashcatPath, PotfileQuery::leftArgs(m_input), remaining, m_cancel));
+    // Each query gets the full deadline; a slow --show must not eat --left's.
+    m_leftWatcher->setFuture(m_query(m_hashcatPath, PotfileQuery::leftArgs(m_input),
+                                     AppConstants::Hashcat::QueryTimeoutMs, m_cancel));
 }
 
 void PotfileCheck::finish()
@@ -221,6 +232,12 @@ void PotfileCheck::failShow(const HashcatResult &result)
     if (text.contains(QStringLiteral("Please specify the hash-mode"))
         || text.contains(QStringLiteral("hash-modes match the structure of your input hash"))) {
         m_result.diagnostic = tr("Choose a hash type.");
+    } else if (text.contains(QStringLiteral("No hashes loaded"))) {
+        m_result.diagnostic = tr("hashcat could not load any hashes from the input.");
+    } else if (result.exitCode == 255 && result.standardOutput.trimmed().isEmpty()
+               && result.standardError.trimmed().isEmpty()) {
+        m_result.diagnostic = tr("hashcat could not parse the input for the selected hash type. "
+                                 "Check the hash and the hash type.");
     } else {
         m_result.diagnostic = text;
     }
@@ -237,7 +254,8 @@ int PotfileCheck::countLines(const QString &output)
 {
     int count = 0;
     bool hasContent = false;
-    for (const QChar character : output) {
+    for (int i = PotfileShowParser::payloadOffset(output); i < output.size(); ++i) {
+        const QChar character = output.at(i);
         if (character == QLatin1Char('\n')) {
             if (hasContent) {
                 ++count;

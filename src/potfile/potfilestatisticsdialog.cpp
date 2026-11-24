@@ -9,14 +9,18 @@
 #include "ui_potfilestatisticsdialog.h"
 
 #include <QFont>
+#include <QFutureWatcher>
 #include <QHeaderView>
+#include <QProgressDialog>
 #include <QPushButton>
 #include <QStringList>
 #include <QTreeWidgetItem>
+#include <QtConcurrent/QtConcurrentRun>
 
 PotfileStatisticsDialog::PotfileStatisticsDialog(QWidget *parent,
                                                  const PotfileStatistics::Result &statistics,
-                                                 const QString &context, int totalCount)
+                                                 const QString &context, int totalCount,
+                                                 bool duplicateKnown)
     : QDialog(parent), ui(new Ui::PotfileStatisticsDialog)
 {
     ui->setupUi(this);
@@ -32,22 +36,28 @@ PotfileStatisticsDialog::PotfileStatisticsDialog(QWidget *parent,
     const QString entryText = countText(statistics.entries, tr("1 entry"), tr("%1 entries"));
     const QString analyzedText =
         countText(statistics.analyzed, tr("1 password analyzed"), tr("%1 passwords analyzed"));
+    const QString duplicateText =
+        duplicateKnown
+            ? countText(statistics.duplicate, tr("1 duplicate line"), tr("%1 duplicate lines"))
+            : tr("duplicate lines: unknown");
     QString summary = tr("%1 · %2").arg(entryText, analyzedText);
     summary += QStringLiteral("\n")
-               + tr("%1 empty · %2 encrypted · %3 duplicate lines · %4 unique plaintexts")
+               + tr("%1 empty · %2 encrypted · %3 · %4 unique plaintexts")
                      .arg(statistics.empty)
                      .arg(statistics.encrypted)
-                     .arg(statistics.duplicate)
+                     .arg(duplicateText)
                      .arg(statistics.unique);
-    summary += QStringLiteral("\n")
-               + tr("Length: min %1 · max %2 · average %3")
-                     .arg(statistics.minLength)
-                     .arg(statistics.maxLength)
-                     .arg(QString::number(statistics.averageLength, 'f', 1));
+    summary +=
+        QStringLiteral("\n")
+        + (statistics.analyzed == 0 ? tr("Length: —")
+                                    : tr("Length: min %1 · max %2 · average %3")
+                                          .arg(statistics.minLength)
+                                          .arg(statistics.maxLength)
+                                          .arg(QString::number(statistics.averageLength, 'f', 1)));
     if (totalCount > statistics.entries) {
         summary +=
             QStringLiteral("\n")
-            + tr("Based on the retained %1 of %2 entries.").arg(statistics.entries).arg(totalCount);
+            + tr("Based on the visible %1 of %2 entries.").arg(statistics.entries).arg(totalCount);
     }
     ui->label_summary->setText(summary);
 
@@ -88,6 +98,9 @@ PotfileStatisticsDialog::PotfileStatisticsDialog(QWidget *parent,
     }
     ui->treeWidget_lengths->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->treeWidget_lengths->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    ui->treeWidget_lengths->header()->setStretchLastSection(false);
+    ui->treeWidget_lengths->setVisible(!statistics.lengthHistogram.isEmpty());
+    ui->label_histogram->setVisible(!statistics.lengthHistogram.isEmpty());
 
     connect(ui->pushButton_close, &QPushButton::clicked, this, &QDialog::accept);
 }
@@ -95,4 +108,30 @@ PotfileStatisticsDialog::PotfileStatisticsDialog(QWidget *parent,
 PotfileStatisticsDialog::~PotfileStatisticsDialog()
 {
     delete ui;
+}
+
+void PotfileStatisticsDialog::openAsync(QWidget *parent, const QList<PotfileExporter::Row> &rows,
+                                        const QString &context, int totalCount, bool duplicateKnown)
+{
+    auto *progress = new QProgressDialog(tr("Calculating statistics…"), QString(), 0, 0, parent);
+    progress->setWindowTitle(tr("Password statistics"));
+    progress->setWindowModality(Qt::WindowModal);
+    // With at most 10000 rows the calculation is near-instant; do not flash.
+    progress->setMinimumDuration(200);
+    progress->setAutoClose(false);
+    progress->setAutoReset(false);
+    progress->setCancelButton(nullptr);
+
+    auto *watcher = new QFutureWatcher<PotfileStatistics::Result>(parent);
+    connect(watcher, &QFutureWatcher<PotfileStatistics::Result>::finished, parent,
+            [parent, watcher, progress, context, totalCount, duplicateKnown] {
+                const PotfileStatistics::Result statistics = watcher->result();
+                progress->close();
+                progress->deleteLater();
+                watcher->deleteLater();
+                PotfileStatisticsDialog dialog(parent, statistics, context, totalCount,
+                                               duplicateKnown);
+                dialog.exec();
+            });
+    watcher->setFuture(QtConcurrent::run([rows] { return PotfileStatistics::calculate(rows); }));
 }

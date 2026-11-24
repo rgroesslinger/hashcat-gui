@@ -24,7 +24,7 @@ public:
     static bool exportRows(QWidget *parent, const QString &suggestedPath,
                            const QList<PotfileExporter::Row> &rows, bool includeUsername,
                            bool includeLine, int totalCount,
-                           const QString &protectedPath = QString());
+                           const QStringList &protectedPaths = {});
 
     // True when destination names the same file as source, by path or by
     // canonical path (symlinks). An empty source is never a match.

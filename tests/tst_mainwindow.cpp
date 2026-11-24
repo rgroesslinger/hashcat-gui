@@ -118,6 +118,10 @@ private slots:
     void retryingTheSamePathAfterAFailureReQueries();
     void aReloadRebuildsThePreviewOnce();
     void anIdentifyResultDuringAReloadSaysTheListIsStillLoading();
+    void toolsMenuMnemonicsAreUnique();
+    void applyingAKnownModeKeepsAnUnchangedInput();
+    void applyingAnEditedInputWritesTheRawText();
+    void anUnknownModeIsRefused();
 
 private:
     MainWindowFixture m_fixture;
@@ -2130,7 +2134,7 @@ void TestMainWindow::anIdentifyResultDuringAReloadSaysTheListIsStillLoading()
 
     TestEnvironment::ModalRecorder recorder;
     recorder.start();
-    MainWindowTestAccess::applyIdentifiedHashType(window, 1000, QStringLiteral("a-hash"));
+    QVERIFY(!MainWindowTestAccess::applyIdentifiedHashType(window, 1000, QStringLiteral("a-hash")));
 
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("still loading")));
@@ -2140,6 +2144,101 @@ void TestMainWindow::anIdentifyResultDuringAReloadSaysTheListIsStillLoading()
 
     QTRY_VERIFY_WITH_TIMEOUT(!MainWindowTestAccess::hashTypeLoader(window).isLoading(),
                              AppConstants::Hashcat::QueryTimeoutMs);
+}
+
+void TestMainWindow::toolsMenuMnemonicsAreUnique()
+{
+    MainWindow window;
+    QMenu *tools = MainWindowTestAccess::ui(window)->menuTools;
+    QSet<QChar> seen;
+    const QList<QAction *> actions = tools->actions();
+    for (QAction *action : actions) {
+        if (action->isSeparator() || !action->isEnabled()) {
+            continue;
+        }
+        const QString text = action->text();
+        const qsizetype amp = text.indexOf(QLatin1Char('&'));
+        if (amp < 0 || amp + 1 >= text.size()) {
+            continue;
+        }
+        const QChar mnemonic = text.at(amp + 1).toLower();
+        QVERIFY2(!seen.contains(mnemonic),
+                 qPrintable(QStringLiteral("duplicate Tools mnemonic: %1").arg(mnemonic)));
+        seen.insert(mnemonic);
+    }
+}
+
+void TestMainWindow::applyingAKnownModeKeepsAnUnchangedInput()
+{
+    const QString stub = TestEnvironment::writeHashcatStub(
+        QStringLiteral("stub-hashcat-apply"), R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() == 3,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->lineEdit_hashfile->setText(QStringLiteral("some-hash"));
+
+    QVERIFY(MainWindowTestAccess::applyIdentifiedHashType(window, 1000, std::nullopt));
+    QCOMPARE(ui->comboBox_hash_type->currentData().toUInt(), 1000U);
+    QCOMPARE(ui->lineEdit_hashfile->text(), QStringLiteral("some-hash"));
+}
+
+void TestMainWindow::applyingAnEditedInputWritesTheRawText()
+{
+    const QString stub = TestEnvironment::writeHashcatStub(QStringLiteral("stub-hashcat-apply-raw"),
+                                                           R"({"0":{"name":"MD5"}})");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() == 2,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->lineEdit_hashfile->setText(QStringLiteral("original"));
+
+    QVERIFY(MainWindowTestAccess::applyIdentifiedHashType(
+        window, 0, std::optional<QString>(QStringLiteral("edited-hash"))));
+    QCOMPARE(ui->comboBox_hash_type->currentData().toUInt(), 0U);
+    QCOMPARE(ui->lineEdit_hashfile->text(), QStringLiteral("edited-hash"));
+}
+
+void TestMainWindow::anUnknownModeIsRefused()
+{
+    const QString stub = TestEnvironment::writeHashcatStub(
+        QStringLiteral("stub-hashcat-apply-unknown"), R"({"0":{"name":"MD5"}})");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() == 2,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->lineEdit_hashfile->setText(QStringLiteral("some-hash"));
+    const QVariant beforeType = ui->comboBox_hash_type->currentData();
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    QVERIFY(!MainWindowTestAccess::applyIdentifiedHashType(window, 999999, std::nullopt));
+
+    QVERIFY(recorder.messageBoxSeen);
+    QVERIFY(recorder.text.contains(QStringLiteral("not in this hashcat")));
+    QCOMPARE(ui->comboBox_hash_type->currentData(), beforeType);
+    QCOMPARE(ui->lineEdit_hashfile->text(), QStringLiteral("some-hash"));
 }
 
 int main(int argc, char *argv[])

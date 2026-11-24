@@ -31,6 +31,8 @@
 #include <QTreeWidget>
 #include <QtConcurrent/QtConcurrentRun>
 
+#include <utility>
+
 namespace
 {
 
@@ -63,11 +65,22 @@ PotfileCheck *installCheck(MainWindow &window, const HashcatResult &show, const 
 
 struct CapturedUi {
     QString message;
+    QString detailedMessage;
     bool plainTextMessage = false;
     bool sawResultsDialog = false;
     int resultRows = 0;
     QString resultStatus;
 };
+
+// Potfile checks need an explicit hash type; wait for the stub's list and
+// select its first mode.
+void selectExplicitHashType(MainWindow &window)
+{
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() > 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->comboBox_hash_type->setCurrentIndex(1);
+}
 
 // Closes the active modal so a test cannot hang. The progress dialog is left
 // alone unless the test asks to cancel; message boxes and the results dialog
@@ -93,6 +106,7 @@ CapturedUi triggerAndCapture(MainWindow &window, bool cancel, bool *sawDisabled 
         }
         if (auto *box = qobject_cast<QMessageBox *>(modal)) {
             captured.message = box->text();
+            captured.detailedMessage = box->detailedText();
             captured.plainTextMessage = box->textFormat() == Qt::PlainText;
             box->close();
             return;
@@ -123,13 +137,15 @@ private slots:
     void init();
     void cleanup();
     void emptyInputIsRefusedWithoutAQuery();
-    void disabledPotfileIsRefusedWithoutAQuery();
+    void disabledPotfileStillAllowsTheReadOnlyCheck();
+    void autoDetectIsRefusedAndFocusesTheCombo();
     void invalidHashcatPathIsRefusedWithoutAQuery();
     void whitespaceAroundAnInlineHashIsTrimmed();
     void whitespaceAroundAFilePathIsTrimmed();
     void relativePotfilePathUsesTheHashcatDirectory();
     void successOpensTheResultsDialog();
-    void failedQueryShowsTheCombinedDiagnostic();
+    void noHashesLoadedShowsTheMappedDiagnostic();
+    void unknownFailureShowsTheCombinedDiagnostic();
     void leftFailureShowsRemainingUnknown();
     void cancelReenablesTheAction();
 
@@ -165,7 +181,9 @@ void TestPotfilePreflight::emptyInputIsRefusedWithoutAQuery()
     QVERIFY(args.isEmpty());
 }
 
-void TestPotfilePreflight::disabledPotfileIsRefusedWithoutAQuery()
+// --show/--left never write a potfile, so the session's "do not write" flag
+// does not block the read-only check.
+void TestPotfilePreflight::disabledPotfileStillAllowsTheReadOnlyCheck()
 {
     if (m_stub.isEmpty()) {
         QSKIP("A shell stub cannot run on this platform.");
@@ -175,13 +193,41 @@ void TestPotfilePreflight::disabledPotfileIsRefusedWithoutAQuery()
     auto *ui = MainWindowTestAccess::ui(window);
     ui->lineEdit_hashfile->setText(QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     ui->checkBox_potfile_disable->setChecked(true);
+    selectExplicitHashType(window);
 
     QList<QStringList> args;
     installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
 
     const CapturedUi captured = triggerAndCapture(window, false);
-    QVERIFY(captured.message.contains(QStringLiteral("potfile is disabled")));
+    QVERIFY(captured.sawResultsDialog);
+    QCOMPARE(args.size(), 2);
+    for (const QStringList &query : std::as_const(args)) {
+        QVERIFY(!query.contains(QStringLiteral("--potfile-disable")));
+    }
+}
+
+void TestPotfilePreflight::autoDetectIsRefusedAndFocusesTheCombo()
+{
+    if (m_stub.isEmpty()) {
+        QSKIP("A shell stub cannot run on this platform.");
+    }
+
+    MainWindow window;
+    auto *ui = MainWindowTestAccess::ui(window);
+    ui->lineEdit_hashfile->setText(QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
+    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() > 1,
+                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->comboBox_hash_type->setCurrentIndex(0);
+
+    QList<QStringList> args;
+    installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
+
+    const CapturedUi captured = triggerAndCapture(window, false);
+    QVERIFY(captured.message.contains(QStringLiteral("Choose a hash type")));
     QVERIFY(args.isEmpty());
+    // Offscreen never activates the window; focusWidget() still names the
+    // widget setFocus() targeted.
+    QCOMPARE(window.focusWidget(), ui->comboBox_hash_type);
 }
 
 void TestPotfilePreflight::invalidHashcatPathIsRefusedWithoutAQuery()
@@ -216,6 +262,7 @@ void TestPotfilePreflight::whitespaceAroundAnInlineHashIsTrimmed()
     MainWindow window;
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(QStringLiteral("  ") + hash
                                                                  + QStringLiteral("  "));
+    selectExplicitHashType(window);
 
     QList<QStringList> args;
     installCheck(window, normalResult(showLine()), normalResult(QStringLiteral("hash-left\n")), 0,
@@ -245,6 +292,7 @@ void TestPotfilePreflight::whitespaceAroundAFilePathIsTrimmed()
     MainWindow window;
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(QStringLiteral("  ") + path
                                                                  + QStringLiteral("  "));
+    selectExplicitHashType(window);
 
     QList<QStringList> args;
     installCheck(window, normalResult(showLine()), normalResult(QStringLiteral("hash-left\n")), 0,
@@ -266,6 +314,7 @@ void TestPotfilePreflight::relativePotfilePathUsesTheHashcatDirectory()
     auto *ui = MainWindowTestAccess::ui(window);
     ui->lineEdit_hashfile->setText(QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     ui->lineEdit_potfile_path->setText(QStringLiteral("relative.potfile"));
+    selectExplicitHashType(window);
 
     QList<QStringList> args;
     installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
@@ -289,6 +338,7 @@ void TestPotfilePreflight::successOpensTheResultsDialog()
     MainWindow window;
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
+    selectExplicitHashType(window);
     installCheck(window, normalResult(showLine()), normalResult(QStringLiteral("hash-left\n")));
 
     const CapturedUi captured = triggerAndCapture(window, false);
@@ -300,7 +350,7 @@ void TestPotfilePreflight::successOpensTheResultsDialog()
     QVERIFY(!MainWindowTestAccess::potfileCheck(window).isRunning());
 }
 
-void TestPotfilePreflight::failedQueryShowsTheCombinedDiagnostic()
+void TestPotfilePreflight::noHashesLoadedShowsTheMappedDiagnostic()
 {
     if (m_stub.isEmpty()) {
         QSKIP("A shell stub cannot run on this platform.");
@@ -309,6 +359,7 @@ void TestPotfilePreflight::failedQueryShowsTheCombinedDiagnostic()
     MainWindow window;
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
+    selectExplicitHashType(window);
     installCheck(window,
                  failedResult(244, QStringLiteral("Hash parsing error in hashfile: x"),
                               QStringLiteral("No hashes loaded.")),
@@ -316,8 +367,29 @@ void TestPotfilePreflight::failedQueryShowsTheCombinedDiagnostic()
 
     const CapturedUi captured = triggerAndCapture(window, false);
     QVERIFY(!captured.sawResultsDialog);
+    QVERIFY(captured.message.contains(QStringLiteral("could not load any hashes")));
+    QVERIFY(captured.plainTextMessage);
+}
+
+void TestPotfilePreflight::unknownFailureShowsTheCombinedDiagnostic()
+{
+    if (m_stub.isEmpty()) {
+        QSKIP("A shell stub cannot run on this platform.");
+    }
+
+    MainWindow window;
+    MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
+        QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
+    selectExplicitHashType(window);
+    installCheck(window,
+                 failedResult(244, QStringLiteral("Hash parsing error in hashfile: x"),
+                              QStringLiteral("something unexpected")),
+                 normalResult());
+
+    const CapturedUi captured = triggerAndCapture(window, false);
+    QVERIFY(!captured.sawResultsDialog);
     QVERIFY(captured.message.contains(QStringLiteral("Hash parsing error")));
-    QVERIFY(captured.message.contains(QStringLiteral("No hashes loaded.")));
+    QVERIFY(captured.detailedMessage.contains(QStringLiteral("something unexpected")));
     QVERIFY(captured.plainTextMessage);
 }
 
@@ -330,6 +402,7 @@ void TestPotfilePreflight::leftFailureShowsRemainingUnknown()
     MainWindow window;
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
+    selectExplicitHashType(window);
     installCheck(window, normalResult(showLine()),
                  failedResult(1, QString(), QStringLiteral("left failed")));
 
@@ -349,6 +422,7 @@ void TestPotfilePreflight::cancelReenablesTheAction()
     MainWindow window;
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
+    selectExplicitHashType(window);
     installCheck(window, normalResult(showLine()), normalResult(QStringLiteral("hash-left\n")),
                  1000);
 

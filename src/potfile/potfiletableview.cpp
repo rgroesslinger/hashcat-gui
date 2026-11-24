@@ -5,16 +5,22 @@
 
 #include "potfiletableview.h"
 
+#include "textutils.h"
 #include "ui_potfiletableview.h"
 
 #include <QApplication>
 #include <QClipboard>
+#include <QCursor>
 #include <QHeaderView>
+#include <QKeyEvent>
 #include <QLineEdit>
+#include <QMenu>
 #include <QPalette>
 #include <QPushButton>
+#include <QShortcut>
 #include <QSignalBlocker>
 #include <QStackedLayout>
+#include <QToolTip>
 #include <QTreeWidgetItem>
 
 #include <algorithm>
@@ -24,9 +30,22 @@ PotfileTableView::PotfileTableView(QWidget *parent) : QWidget(parent), ui(new Ui
     ui->setupUi(this);
 
     ui->treeWidget_results->setTextElideMode(Qt::ElideMiddle);
+    ui->treeWidget_results->header()->setSortIndicator(0, Qt::AscendingOrder);
     QPalette emptyPalette = ui->label_empty_state->palette();
     emptyPalette.setColor(QPalette::WindowText, emptyPalette.color(QPalette::PlaceholderText));
     ui->label_empty_state->setPalette(emptyPalette);
+
+    // Enter must neither fire a dialog default nor copy.
+    ui->treeWidget_results->installEventFilter(this);
+    ui->treeWidget_results->viewport()->installEventFilter(this);
+    ui->lineEdit_search->installEventFilter(this);
+
+    auto *copyShortcut = new QShortcut(QKeySequence::Copy, ui->treeWidget_results);
+    copyShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(copyShortcut, &QShortcut::activated, this, &PotfileTableView::copySelected);
+    ui->treeWidget_results->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeWidget_results, &QTreeWidget::customContextMenuRequested, this,
+            &PotfileTableView::showContextMenu);
 
     connect(ui->lineEdit_search, &QLineEdit::textChanged, this, &PotfileTableView::searchChanged);
     connect(ui->pushButton_reveal, &QPushButton::toggled, this, &PotfileTableView::revealToggled);
@@ -53,11 +72,13 @@ void PotfileTableView::setExtraColumns(const QStringList &headers)
     ui->treeWidget_results->setHeaderLabels(labels);
 
     QHeaderView *header = ui->treeWidget_results->header();
-    header->setSectionResizeMode(0, QHeaderView::Interactive);
+    for (int column = 0; column < labels.size(); ++column) {
+        header->setSectionResizeMode(column, QHeaderView::Interactive);
+    }
     header->resizeSection(0, 320);
-    header->setSectionResizeMode(1, QHeaderView::Stretch);
+    header->resizeSection(1, 360);
     for (int column = 2; column < labels.size(); ++column) {
-        header->setSectionResizeMode(column, QHeaderView::ResizeToContents);
+        header->resizeSection(column, 90);
     }
 }
 
@@ -73,30 +94,39 @@ void PotfileTableView::setColumnHidden(int column, bool hidden)
 
 void PotfileTableView::setEmptyStateText(const QString &text)
 {
-    ui->label_empty_state->setText(text);
+    m_emptyStateText = text;
     updateEmptyState();
 }
 
-void PotfileTableView::setRows(const QList<Row> &rows)
+void PotfileTableView::setRows(const QList<Row> &rows, bool preserveViewState)
 {
-    applyRows(rows, true);
+    applyRows(rows, true, preserveViewState);
 }
 
-void PotfileTableView::clearRows()
+void PotfileTableView::clearRows(bool preserveViewState)
 {
-    applyRows({}, false);
+    applyRows({}, false, preserveViewState);
 }
 
-void PotfileTableView::applyRows(const QList<Row> &rows, bool showEmptyState)
+void PotfileTableView::applyRows(const QList<Row> &rows, bool showEmptyState,
+                                 bool preserveViewState)
 {
     m_rows = rows;
     m_showEmptyState = showEmptyState;
-    m_revealed = false;
-    const QSignalBlocker searchBlocker(ui->lineEdit_search);
-    const QSignalBlocker revealBlocker(ui->pushButton_reveal);
-    ui->lineEdit_search->clear();
-    ui->pushButton_reveal->setChecked(false);
+    if (!preserveViewState) {
+        m_revealed = false;
+        const QSignalBlocker searchBlocker(ui->lineEdit_search);
+        const QSignalBlocker revealBlocker(ui->pushButton_reveal);
+        ui->lineEdit_search->clear();
+        ui->pushButton_reveal->setChecked(false);
+        ui->treeWidget_results->header()->setSortIndicator(0, Qt::AscendingOrder);
+    }
     populateRows();
+    if (preserveViewState) {
+        ui->treeWidget_results->clearSelection();
+    }
+    updateRevealButton();
+    updateButtons();
 }
 
 bool PotfileTableView::hasRows() const
@@ -104,10 +134,54 @@ bool PotfileTableView::hasRows() const
     return !m_rows.isEmpty();
 }
 
+int PotfileTableView::rowCount() const
+{
+    return static_cast<int>(m_rows.size());
+}
+
 bool PotfileTableView::canReveal() const
 {
     return std::ranges::any_of(m_rows,
                                [](const Row &row) { return !row.emptyPlain && !row.encrypted; });
+}
+
+QList<PotfileTableView::Row> PotfileTableView::visibleRows() const
+{
+    QList<Row> rows;
+    for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
+        const QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
+        if (item->isHidden()) {
+            continue;
+        }
+        if (const Row *row = rowForItem(item)) {
+            rows.append(*row);
+        }
+    }
+    return rows;
+}
+
+int PotfileTableView::visibleRowCount() const
+{
+    int count = 0;
+    for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
+        if (!ui->treeWidget_results->topLevelItem(i)->isHidden()) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+bool PotfileTableView::eventFilter(QObject *watched, QEvent *event)
+{
+    if ((watched == ui->treeWidget_results || watched == ui->treeWidget_results->viewport()
+         || watched == ui->lineEdit_search)
+        && event->type() == QEvent::KeyPress) {
+        const auto *key = dynamic_cast<const QKeyEvent *>(event);
+        if (key != nullptr && (key->key() == Qt::Key_Return || key->key() == Qt::Key_Enter)) {
+            return true;
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 void PotfileTableView::searchChanged()
@@ -120,57 +194,97 @@ void PotfileTableView::revealToggled(bool revealed)
     m_revealed = revealed;
     for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
         QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
-        const Row *row = rowForItem(item);
-        if (row) {
+        if (const Row *row = rowForItem(item)) {
             item->setText(1, plainTextFor(*row));
-            item->setHidden(!rowMatches(*row));
         }
     }
-    updateButtons();
+    updateRevealButton();
+    applyFilter();
 }
 
 void PotfileTableView::copySelected()
 {
-    const QStringList values = selectedCopyValues();
-    if (!values.isEmpty()) {
-        QApplication::clipboard()->setText(values.join(QLatin1Char('\n')));
+    // The button state carries the mask gate; the shortcut shares it.
+    if (!ui->pushButton_copy_selected->isEnabled()) {
+        return;
     }
+    QList<Row> rows;
+    for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
+        const QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
+        if (!item->isSelected() || item->isHidden()) {
+            continue;
+        }
+        if (const Row *row = rowForItem(item)) {
+            rows.append(*row);
+        }
+    }
+    copyRows(rows);
 }
 
 void PotfileTableView::copyAll()
 {
-    QStringList values;
-    for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
-        const QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
-        if (item->isHidden()) {
-            continue;
-        }
-        if (const Row *row = rowForItem(item)) {
-            values << copyValueFor(*row);
-        }
+    if (!ui->pushButton_copy_all->isEnabled()) {
+        return;
     }
-    if (!values.isEmpty()) {
-        QApplication::clipboard()->setText(values.join(QLatin1Char('\n')));
+    copyRows(visibleRows());
+}
+
+void PotfileTableView::copyRows(const QList<Row> &rows)
+{
+    if (rows.isEmpty()) {
+        return;
     }
+    QStringList lines;
+    lines.reserve(rows.size());
+    for (const Row &row : rows) {
+        lines.append(copyValuesFor(row).join(QLatin1Char('\t')));
+    }
+    QApplication::clipboard()->setText(lines.join(QLatin1Char('\n')));
+    QToolTip::showText(
+        QCursor::pos(),
+        countText(static_cast<int>(rows.size()), tr("Copied 1 row"), tr("Copied %1 rows")),
+        ui->treeWidget_results, QRect(), 2000);
+}
+
+void PotfileTableView::showContextMenu(const QPoint &pos)
+{
+    // Right-clicking an unselected row targets that row, as users expect.
+    QTreeWidgetItem *item = ui->treeWidget_results->itemAt(pos);
+    if (item != nullptr && !item->isSelected()) {
+        ui->treeWidget_results->setCurrentItem(item);
+    }
+    QMenu menu(this);
+    QAction *copy = menu.addAction(tr("Copy selected rows"));
+    copy->setEnabled(ui->pushButton_copy_selected->isEnabled());
+    connect(copy, &QAction::triggered, this, &PotfileTableView::copySelected);
+    menu.exec(ui->treeWidget_results->viewport()->mapToGlobal(pos));
 }
 
 void PotfileTableView::updateButtons()
 {
-    const bool hasRows = !m_rows.isEmpty();
     const bool hasVisible = hasVisibleRows();
-    ui->pushButton_copy_all->setEnabled(hasVisible);
-    ui->pushButton_copy_selected->setEnabled(hasVisible && hasVisibleSelection());
-    ui->pushButton_reveal->setEnabled(hasRows && canReveal());
+    // Masked plaintexts must not leak through the clipboard.
+    const bool copyable = m_revealed || !canReveal();
+    ui->pushButton_copy_all->setEnabled(hasVisible && copyable);
+    ui->pushButton_copy_selected->setEnabled(hasVisible && copyable && hasVisibleSelection());
+    ui->pushButton_reveal->setEnabled(hasRows() && canReveal());
+
+    const QString copyToolTip =
+        copyable ? tr("Copies tab-separated rows. Encrypted rows copy the stored $HCENC$ token.")
+                 : tr("Reveal plaintexts to copy the real values.");
+    ui->pushButton_copy_all->setToolTip(copyToolTip);
+    ui->pushButton_copy_selected->setToolTip(copyToolTip);
+}
+
+void PotfileTableView::updateRevealButton()
+{
+    ui->pushButton_reveal->setText(m_revealed ? tr("Hide plaintexts") : tr("Reveal plaintexts"));
+    ui->pushButton_reveal->setToolTip(tr("Show or mask plaintext values."));
 }
 
 bool PotfileTableView::hasVisibleRows() const
 {
-    for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
-        if (!ui->treeWidget_results->topLevelItem(i)->isHidden()) {
-            return true;
-        }
-    }
-    return false;
+    return visibleRowCount() > 0;
 }
 
 bool PotfileTableView::hasVisibleSelection() const
@@ -182,20 +296,22 @@ bool PotfileTableView::hasVisibleSelection() const
 
 void PotfileTableView::populateRows()
 {
+    ui->treeWidget_results->setSortingEnabled(false);
     ui->treeWidget_results->clear();
     for (int i = 0; i < m_rows.size(); ++i) {
         const Row &row = m_rows.at(i);
         auto *item = new QTreeWidgetItem(ui->treeWidget_results);
-        item->setText(0, row.hash);
+        item->setText(0, hashDisplayFor(row));
+        item->setToolTip(0, row.hashIsFile ? tr("Binary hash file; hashcat reports the file name.")
+                                           : row.hash);
         item->setText(1, plainTextFor(row));
         for (int column = 0; column < row.extraColumns.size(); ++column) {
             item->setText(2 + column, row.extraColumns.at(column));
         }
         item->setData(0, Qt::UserRole, i);
     }
-
+    ui->treeWidget_results->setSortingEnabled(true);
     applyFilter();
-    updateEmptyState();
 }
 
 const PotfileTableView::Row *PotfileTableView::rowForItem(const QTreeWidgetItem *item) const
@@ -215,15 +331,27 @@ void PotfileTableView::applyFilter()
             item->setHidden(!rowMatches(*row));
         }
     }
+    updateEmptyState();
     updateButtons();
+    emit visibleRowsChanged();
 }
 
 void PotfileTableView::updateEmptyState()
 {
-    const bool show =
-        m_showEmptyState && m_rows.isEmpty() && !ui->label_empty_state->text().isEmpty();
-    QWidget *page = show ? static_cast<QWidget *>(ui->label_empty_state)
-                         : static_cast<QWidget *>(ui->treeWidget_results);
+    QString text;
+    bool showLabel = false;
+    if (m_showEmptyState && m_rows.isEmpty() && !m_emptyStateText.isEmpty()) {
+        text = m_emptyStateText;
+        showLabel = true;
+    } else if (!m_rows.isEmpty() && !hasVisibleRows()) {
+        text = tr("No rows match the filter.");
+        showLabel = true;
+    }
+    if (showLabel) {
+        ui->label_empty_state->setText(text);
+    }
+    QWidget *page = showLabel ? static_cast<QWidget *>(ui->label_empty_state)
+                              : static_cast<QWidget *>(ui->treeWidget_results);
     ui->table_stack->setCurrentWidget(page);
 }
 
@@ -238,10 +366,17 @@ QString PotfileTableView::plainTextFor(const Row &row) const
     return m_revealed ? row.plain : QStringLiteral("••••••");
 }
 
-QString PotfileTableView::copyValueFor(const Row &row) const
+QString PotfileTableView::hashDisplayFor(const Row &row) const
 {
-    // The encrypted token is not a plaintext, so reveal never changes it.
-    return row.plain;
+    return row.hashIsFile ? tr("(file) %1").arg(row.hash) : row.hash;
+}
+
+QStringList PotfileTableView::copyValuesFor(const Row &row) const
+{
+    // The raw name even for file rows; the encrypted token is not a plaintext.
+    QStringList values{row.hash, row.emptyPlain ? QString() : row.plain};
+    values += row.extraColumns;
+    return values;
 }
 
 bool PotfileTableView::rowMatches(const Row &row) const
@@ -258,19 +393,4 @@ bool PotfileTableView::rowMatches(const Row &row) const
 
     // Matching hidden plaintexts would leak them one guess at a time.
     return m_revealed && !row.encrypted && row.plain.contains(query, Qt::CaseInsensitive);
-}
-
-QStringList PotfileTableView::selectedCopyValues() const
-{
-    QStringList values;
-    for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
-        const QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
-        if (!item->isSelected() || item->isHidden()) {
-            continue;
-        }
-        if (const Row *row = rowForItem(item)) {
-            values << copyValueFor(*row);
-        }
-    }
-    return values;
 }

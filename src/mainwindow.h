@@ -70,7 +70,6 @@ private slots:
     void backendInfoTriggered();
     void potfileCheckTriggered();
     void potfileInspectorTriggered();
-    void applyIdentifiedHashType(int hashTypeId, const QString &input);
 
     // main-tab buttons
     void startClicked();
@@ -195,6 +194,9 @@ private:
     // Shows the user-facing error itself and returns false on refusal.
     bool preparePotfileQuery(const QString &title, PotfileQueryInput &input, QString &modeName,
                              QString &hashcatPath);
+
+    // The Identify dialog's apply handler; false keeps the dialog open.
+    bool applyIdentifiedHashType(int hashTypeId, const std::optional<QString> &input);
 
     // Presents what LaunchValidator::validate() reported
     void showLaunchError(const LaunchValidator::LaunchProblem &problem,

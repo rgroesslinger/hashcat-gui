@@ -53,6 +53,9 @@ public:
     using Query = std::function<QFuture<HashcatResult>(const QString &, const QStringList &, int,
                                                        CancelToken)>;
 
+    // Unique per query: hashcat's pidfile is per session.
+    static QString uniqueSession(QLatin1StringView prefix);
+
     static QFuture<HashcatResult> execute(const QString &hashcatPath, const QStringList &args,
                                           int timeoutMs = AppConstants::Hashcat::QueryTimeoutMs,
                                           CancelToken cancel = {});

@@ -68,9 +68,10 @@ struct MainWindowTestAccess {
         window.reloadHashTypes();
     }
 
-    static void applyIdentifiedHashType(MainWindow &window, int id, const QString &input)
+    static bool applyIdentifiedHashType(MainWindow &window, int id,
+                                        const std::optional<QString> &input)
     {
-        window.applyIdentifiedHashType(id, input);
+        return window.applyIdentifiedHashType(id, input);
     }
 
     static HashTypeLoader &hashTypeLoader(MainWindow &window)

@@ -42,7 +42,8 @@ PotfileShowParser::Result PotfileShowParser::parse(const QString &output, int ma
     Result result;
     const int cap = std::max(0, maxEntries);
 
-    const QStringTokenizer lines(output, QLatin1Char('\n'), Qt::SkipEmptyParts);
+    const QStringView payload = QStringView(output).mid(payloadOffset(output));
+    const QStringTokenizer lines(payload, QLatin1Char('\n'), Qt::SkipEmptyParts);
     for (const QStringView line : lines) {
         const QString text = line.trimmed().toString();
         if (text.isEmpty()) {
@@ -96,4 +97,61 @@ PotfileShowParser::Result PotfileShowParser::parse(const QString &output, int ma
     }
 
     return result;
+}
+
+int PotfileShowParser::payloadOffset(const QString &output)
+{
+    const qsizetype size = output.size();
+    const auto lineEnd = [&output, size](qsizetype start) {
+        const qsizetype newline = output.indexOf(QLatin1Char('\n'), start);
+        return newline < 0 ? size : newline;
+    };
+    // A final line without a trailing newline must not push past the end.
+    const auto nextLine = [&lineEnd, size](qsizetype start) {
+        return std::min(lineEnd(start) + 1, size);
+    };
+    const auto lineAt = [&output, &lineEnd](qsizetype start) {
+        return QStringView(output).mid(start, lineEnd(start) - start).trimmed();
+    };
+    const auto skipThrough = [&](qsizetype start, QLatin1StringView end) {
+        qsizetype pos = start;
+        while (pos < size) {
+            if (lineAt(pos).startsWith(end)) {
+                return nextLine(pos);
+            }
+            pos = nextLine(pos);
+        }
+        return size;
+    };
+
+    qsizetype pos = 0;
+    while (pos < size) {
+        const QStringView text = lineAt(pos);
+        if (text.isEmpty()) {
+            pos = nextLine(pos);
+            continue;
+        }
+        // Auto-detect preamble; defensive, the GUI always passes -m.
+        if (text.startsWith(QLatin1StringView("Hash-mode was not specified with -m"))) {
+            pos = skipThrough(pos, QLatin1StringView("Do NOT report auto-detect issues"));
+            continue;
+        }
+        // Legacy ~/.hashcat block; it contains bare path lines, so skip whole.
+        if (text.startsWith(QLatin1StringView("Found "))
+            && text.contains(QLatin1StringView(", which hashcat no longer uses."))) {
+            pos = skipThrough(pos, QLatin1StringView("Move what you still want across"));
+            continue;
+        }
+        if (text.startsWith(QLatin1StringView("Old potfile detected:"))) {
+            pos = skipThrough(pos, QLatin1StringView("New potfile is:"));
+            continue;
+        }
+        // Per-line parse warnings on mixed-mode input; they can repeat.
+        if (text.startsWith(QLatin1StringView("Hashfile '"))) {
+            pos = nextLine(pos);
+            continue;
+        }
+        break;
+    }
+    return static_cast<int>(pos);
 }

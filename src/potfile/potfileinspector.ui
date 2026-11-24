@@ -15,19 +15,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label_header">
-     <property name="text">
-      <string>Potfile inspector</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QLabel" name="label_note">
      <property name="text">
-      <string>No hash type is recorded; a direct parse does not verify that a plaintext matches its hash. Duplicates are exact repeated lines only. Default ':' separator only.</string>
+      <string>Parsed directly; duplicates are exact repeated lines. Separator: ':'.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -58,6 +48,9 @@
        <property name="text">
         <string>&amp;Browse…</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -65,19 +58,74 @@
        <property name="text">
         <string>&amp;Reload</string>
        </property>
+       <property name="default">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_stop">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>&amp;Stop</string>
+       </property>
+       <property name="accessibleName">
+        <string>Stop reading the potfile</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="label_status">
+    <widget class="QLabel" name="label_heuristic">
+     <property name="visible">
+      <bool>false</bool>
+     </property>
      <property name="text">
-      <string/>
+      <string>The prefilled path is a heuristic; hashcat may use another path.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_status">
+     <item>
+      <widget class="QLabel" name="label_status">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBar_busy">
+       <property name="visible">
+        <bool>false</bool>
+       </property>
+       <property name="accessibleName">
+        <string>Potfile reading progress</string>
+       </property>
+       <property name="maximum">
+        <number>0</number>
+       </property>
+       <property name="value">
+        <number>-1</number>
+       </property>
+       <property name="textVisible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="PotfileTableView" name="table_view"/>
@@ -93,7 +141,10 @@
         <string>&amp;Statistics…</string>
        </property>
        <property name="toolTip">
-        <string>Show aggregate password statistics for the retained entries</string>
+        <string>Show aggregate password statistics for the visible entries</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -106,7 +157,10 @@
         <string>&amp;Export…</string>
        </property>
        <property name="toolTip">
-        <string>Export the retained entries as CSV, text or JSON</string>
+        <string>Export the visible entries as CSV, TSV or JSON</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
@@ -127,6 +181,9 @@
       <widget class="QPushButton" name="pushButton_close">
        <property name="text">
         <string>&amp;Close</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
        </property>
       </widget>
      </item>

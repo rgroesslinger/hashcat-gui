@@ -5,13 +5,14 @@
 
 #include "potfilequery.h"
 
+#include "hashcatrunner.h"
 #include "programdirectory.h"
 
-#include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QStandardPaths>
 
-#include <atomic>
+#include <utility>
 
 namespace
 {
@@ -32,6 +33,7 @@ QStringList queryArgs(QLatin1StringView action, const PotfileQueryInput &input, 
 {
     QStringList args;
     args << action << AppConstants::Hashcat::LogfileDisable
+         << AppConstants::Hashcat::DeprecatedCheckDisable
          << QStringLiteral("--session=%1").arg(PotfileQuery::uniqueSession());
 
     if (json) {
@@ -57,13 +59,7 @@ QStringList queryArgs(QLatin1StringView action, const PotfileQueryInput &input, 
 
 QString PotfileQuery::uniqueSession()
 {
-    // A session name identifies one query. Concurrent queries must not share
-    // it: hashcat's transient pidfile would make the second one fail.
-    static std::atomic<quint64> counter{0};
-    return QStringLiteral("%1%2-%3").arg(
-        QString(AppConstants::Hashcat::PotfileSessionPrefix),
-        QString::number(QCoreApplication::applicationPid()),
-        QString::number(counter.fetch_add(1, std::memory_order_relaxed) + 1));
+    return HashcatRunner::uniqueSession(AppConstants::Hashcat::PotfileSessionPrefix);
 }
 
 QStringList PotfileQuery::showArgs(const PotfileQueryInput &input)
@@ -104,4 +100,34 @@ QString PotfileQuery::resolveHashInput(const QString &entered, const QString &ha
     // resolution matches the working directory a launch gives hashcat.
     const QString resolved = resolvePath(entered, hashcatPath);
     return QFileInfo::exists(resolved) ? resolved : entered;
+}
+
+QStringList PotfileQuery::defaultPotfileCandidates(const QString &hashcatPath)
+{
+    if (hashcatPath.isEmpty()) {
+        return {};
+    }
+
+    QStringList candidates;
+    const QString directory = ProgramDirectory::forProgram(hashcatPath);
+    if (!directory.isEmpty()) {
+        candidates << QDir(directory).filePath(QStringLiteral("hashcat.potfile"));
+    }
+#ifndef Q_OS_WIN
+    const QString dataLocation =
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    if (!dataLocation.isEmpty()) {
+        candidates << QDir(dataLocation).filePath(QStringLiteral("hashcat/hashcat.potfile"));
+    }
+#endif
+
+    QStringList result;
+    for (const QString &candidate : std::as_const(candidates)) {
+        const QString canonical = QFileInfo(candidate).canonicalFilePath();
+        const QString clean = canonical.isEmpty() ? QDir::cleanPath(candidate) : canonical;
+        if (!result.contains(clean)) {
+            result << clean;
+        }
+    }
+    return result;
 }

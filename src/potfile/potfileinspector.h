@@ -47,16 +47,16 @@ protected:
 private slots:
     void browseClicked();
     void reloadClicked();
-    void pathEditingFinished();
+    void stopClicked();
     void exportClicked();
     void statisticsClicked();
 
 private:
-    void loadPath();
+    void loadPath(bool preserveViewState = false);
     void showResult(const PotfileParser::Result &result);
     void clearView();
     void populateRows();
-    void updateNote();
+    void updateHeuristicLabel();
     void updateStatus();
     void updateButtons();
     [[nodiscard]] QList<PotfileExporter::Row> resultRows() const;
@@ -70,6 +70,7 @@ private:
     PotfileParser::Result m_result;
     bool m_heuristic = false;
     bool m_loading = false;
+    bool m_preserveViewState = false;
 };
 
 #endif // POTFILEINSPECTOR_H

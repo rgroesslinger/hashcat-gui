@@ -26,7 +26,7 @@ private slots:
     void utf8NamesArePreserved();
     void identifyTableParses();
     void identifySkipsPreambleAndSeparator();
-    void identifyNoMatchIsAnEmptySuccess();
+    void identifyNoMatchIsItsOwnStatus();
     void identifyNeedsATable();
 };
 
@@ -212,15 +212,15 @@ void TestHashcatInfoParser::identifyTableParses()
 
 )");
 
-    QList<HashcatInfoParser::IdentifiedHashMode> matches;
-    QVERIFY(HashcatInfoParser::parseIdentify(raw, matches));
-    QCOMPARE(matches.size(), 3);
-    QCOMPARE(matches.at(0).id, quint32(40102));
-    QCOMPARE(matches.at(0).name, QStringLiteral("HAVAL-128 (3 passes)"));
-    QCOMPARE(matches.at(0).category, QStringLiteral("Raw Hash"));
-    QCOMPARE(matches.at(1).id, quint32(0));
-    QCOMPARE(matches.at(2).id, quint32(1000));
-    QCOMPARE(matches.at(2).category, QStringLiteral("Operating System"));
+    const HashcatInfoParser::IdentifyResult result = HashcatInfoParser::parseIdentify(raw);
+    QCOMPARE(result.status, HashcatInfoParser::IdentifyResult::Status::Matched);
+    QCOMPARE(result.matches.size(), 3);
+    QCOMPARE(result.matches.at(0).id, quint32(40102));
+    QCOMPARE(result.matches.at(0).name, QStringLiteral("HAVAL-128 (3 passes)"));
+    QCOMPARE(result.matches.at(0).category, QStringLiteral("Raw Hash"));
+    QCOMPARE(result.matches.at(1).id, quint32(0));
+    QCOMPARE(result.matches.at(2).id, quint32(1000));
+    QCOMPARE(result.matches.at(2).category, QStringLiteral("Operating System"));
 }
 
 void TestHashcatInfoParser::identifySkipsPreambleAndSeparator()
@@ -235,38 +235,35 @@ The following 1 hash-modes match the structure of your input hash:
 Started: Sun Nov 22 17:54:08 2026
 )");
 
-    QList<HashcatInfoParser::IdentifiedHashMode> matches;
-    QVERIFY(HashcatInfoParser::parseIdentify(raw, matches));
-    QCOMPARE(matches.size(), 1);
-    QCOMPARE(matches.at(0).name, QStringLiteral("MD5"));
+    const HashcatInfoParser::IdentifyResult result = HashcatInfoParser::parseIdentify(raw);
+    QCOMPARE(result.status, HashcatInfoParser::IdentifyResult::Status::Matched);
+    QCOMPARE(result.matches.size(), 1);
+    QCOMPARE(result.matches.at(0).name, QStringLiteral("MD5"));
 }
 
-void TestHashcatInfoParser::identifyNoMatchIsAnEmptySuccess()
+// The explicit "no match" sentence is an answer of its own, distinct from
+// output that merely failed to parse.
+void TestHashcatInfoParser::identifyNoMatchIsItsOwnStatus()
 {
-    QList<HashcatInfoParser::IdentifiedHashMode> matches{
-        {0, QStringLiteral("MD5"), QStringLiteral("Raw Hash")}};
-    QString error = QStringLiteral("left over from an earlier failure");
-
-    QVERIFY(HashcatInfoParser::parseIdentify(
-        QStringLiteral("No hash-mode matches the structure of the input hash."), matches, &error));
-    QVERIFY(matches.isEmpty());
-    QVERIFY(error.isEmpty());
+    const HashcatInfoParser::IdentifyResult result = HashcatInfoParser::parseIdentify(
+        QStringLiteral("No hash-mode matches the structure of the input hash."));
+    QCOMPARE(result.status, HashcatInfoParser::IdentifyResult::Status::NoMatch);
+    QVERIFY(result.matches.isEmpty());
 }
 
 void TestHashcatInfoParser::identifyNeedsATable()
 {
-    QList<HashcatInfoParser::IdentifiedHashMode> matches;
-    QString error;
-
-    QVERIFY(
-        !HashcatInfoParser::parseIdentify(QStringLiteral("Segmentation fault"), matches, &error));
-    QVERIFY(!error.isEmpty());
+    const HashcatInfoParser::IdentifyResult garbage =
+        HashcatInfoParser::parseIdentify(QStringLiteral("Segmentation fault"));
+    QCOMPARE(garbage.status, HashcatInfoParser::IdentifyResult::Status::ParseError);
+    QVERIFY(garbage.matches.isEmpty());
 
     const QString headerOnly = QStringLiteral(R"(      # | Name | Category
   ======+======+==========
 )");
-    QVERIFY(!HashcatInfoParser::parseIdentify(headerOnly, matches, &error));
-    QVERIFY(!error.isEmpty());
+    const HashcatInfoParser::IdentifyResult empty = HashcatInfoParser::parseIdentify(headerOnly);
+    QCOMPARE(empty.status, HashcatInfoParser::IdentifyResult::Status::ParseError);
+    QVERIFY(empty.matches.isEmpty());
 }
 
 int main(int argc, char *argv[])

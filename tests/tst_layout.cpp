@@ -17,6 +17,7 @@
 #include <QComboBox>
 #include <QCompleter>
 #include <QDir>
+#include <QDirIterator>
 #include <QDoubleSpinBox>
 #include <QFile>
 #include <QFileInfo>
@@ -63,6 +64,7 @@ private slots:
     void windowFitsEveryAttackMode();
     void commandBarStaysVisibleOnEveryTab();
     void noShortcutCombinesControlAndAlt();
+    void noUiFileContainsAsciiEllipsis();
 
 private:
     MainWindowFixture m_fixture;
@@ -368,6 +370,25 @@ void TestLayout::noShortcutCombinesControlAndAlt()
         QVERIFY2(!shortcut.contains(QStringLiteral("Ctrl+Alt")),
                  qPrintable(QStringLiteral("%1: %2").arg(action->objectName(), shortcut)));
     }
+}
+
+// The typographic ellipsis is the house style; ASCII "..." in a .ui file
+// renders three dots and bypasses the translators' punctuation conventions.
+void TestLayout::noUiFileContainsAsciiEllipsis()
+{
+    const QDir sourceDir(QStringLiteral(HASHCAT_GUI_SOURCE_DIR) + QStringLiteral("/src"));
+    QDirIterator it(sourceDir.path(), {QStringLiteral("*.ui")}, QDir::Files,
+                    QDirIterator::Subdirectories);
+    int found = 0;
+    while (it.hasNext()) {
+        const QString path = it.next();
+        ++found;
+        QFile file(path);
+        QVERIFY2(file.open(QIODevice::ReadOnly), qPrintable(path));
+        const QString text = QString::fromUtf8(file.readAll());
+        QVERIFY2(!text.contains(QStringLiteral("...")), qPrintable(path));
+    }
+    QVERIFY(found > 0);
 }
 
 int main(int argc, char *argv[])

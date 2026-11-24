@@ -10,7 +10,6 @@
 #include "potfileexportui.h"
 #include "potfilequery.h"
 #include "potfilestatisticsdialog.h"
-#include "programdirectory.h"
 #include "settingsmanager.h"
 #include "textutils.h"
 #include "ui_potfileinspector.h"
@@ -19,10 +18,8 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
-#include <QFont>
 #include <QLineEdit>
 #include <QPushButton>
-#include <QStandardPaths>
 #include <QStringList>
 #include <QtConcurrent/QtConcurrentRun>
 
@@ -34,22 +31,27 @@ PotfileInspectorDialog::PotfileInspectorDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QFont headerFont = ui->label_header->font();
-    headerFont.setBold(true);
-    ui->label_header->setFont(headerFont);
-    ui->label_header->setTextFormat(Qt::PlainText);
     ui->label_note->setTextFormat(Qt::PlainText);
     ui->label_status->setTextFormat(Qt::PlainText);
+    ui->label_status->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
     ui->table_view->setExtraColumns({tr("Dup"), tr("Line")});
     ui->table_view->setEmptyStateText(tr("This potfile has no entries."));
+    connect(ui->table_view, &PotfileTableView::visibleRowsChanged, this, [this] {
+        updateStatus();
+        updateButtons();
+    });
 
     connect(ui->pushButton_browse, &QPushButton::clicked, this,
             &PotfileInspectorDialog::browseClicked);
     connect(ui->pushButton_reload, &QPushButton::clicked, this,
             &PotfileInspectorDialog::reloadClicked);
-    connect(ui->lineEdit_potfile, &QLineEdit::editingFinished, this,
-            &PotfileInspectorDialog::pathEditingFinished);
+    connect(ui->pushButton_stop, &QPushButton::clicked, this, &PotfileInspectorDialog::stopClicked);
+    // Focus loss must not load; Enter clicks Reload, the dialog default.
+    connect(ui->lineEdit_potfile, &QLineEdit::textEdited, this, [this] {
+        m_heuristic = false;
+        updateHeuristicLabel();
+    });
     connect(ui->pushButton_export, &QPushButton::clicked, this,
             &PotfileInspectorDialog::exportClicked);
     connect(ui->pushButton_statistics, &QPushButton::clicked, this,
@@ -62,7 +64,6 @@ PotfileInspectorDialog::PotfileInspectorDialog(QWidget *parent)
     });
 
     clearView();
-    updateNote();
     ui->label_status->setText(tr("Choose a potfile."));
 }
 
@@ -80,6 +81,7 @@ void PotfileInspectorDialog::setPotfilePath(const QString &path)
     if (!trimmed.isEmpty()) {
         m_heuristic = false;
         ui->lineEdit_potfile->setText(absolutePath(trimmed));
+        updateHeuristicLabel();
         loadPath();
         return;
     }
@@ -88,12 +90,14 @@ void PotfileInspectorDialog::setPotfilePath(const QString &path)
     if (!suggested.isEmpty()) {
         m_heuristic = true;
         ui->lineEdit_potfile->setText(suggested);
+        updateHeuristicLabel();
         loadPath();
         return;
     }
 
     m_heuristic = false;
     ui->lineEdit_potfile->clear();
+    updateHeuristicLabel();
     loadPath();
 }
 
@@ -114,27 +118,41 @@ void PotfileInspectorDialog::browseClicked()
     }
     m_heuristic = false;
     ui->lineEdit_potfile->setText(QFileInfo(path).absoluteFilePath());
+    updateHeuristicLabel();
     loadPath();
 }
 
 void PotfileInspectorDialog::reloadClicked()
 {
-    loadPath();
+    loadPath(/*preserveViewState=*/true);
 }
 
-void PotfileInspectorDialog::pathEditingFinished()
+void PotfileInspectorDialog::stopClicked()
 {
-    m_heuristic = false;
-    loadPath();
+    if (m_cancel) {
+        m_cancel->store(true);
+    }
+    ui->pushButton_stop->setEnabled(false);
+    ui->label_status->setText(tr("Cancelling…"));
 }
 
 QList<PotfileExporter::Row> PotfileInspectorDialog::resultRows() const
 {
     QList<PotfileExporter::Row> rows;
-    rows.reserve(m_result.entries.size());
-    for (const PotfileParser::Entry &entry : m_result.entries) {
-        rows.append(
-            {entry.hash, entry.plain, {}, entry.lineNumber, entry.duplicate, entry.encrypted});
+    const QList<PotfileTableView::Row> visible = ui->table_view->visibleRows();
+    rows.reserve(visible.size());
+    for (const PotfileTableView::Row &row : visible) {
+        if (row.sourceIndex < 0 || row.sourceIndex >= m_result.entries.size()) {
+            continue;
+        }
+        const PotfileParser::Entry &entry = m_result.entries.at(row.sourceIndex);
+        rows.append({entry.hash,
+                     entry.plain,
+                     {},
+                     entry.lineNumber,
+                     entry.duplicate,
+                     entry.encrypted,
+                     true});
     }
     return rows;
 }
@@ -142,15 +160,19 @@ QList<PotfileExporter::Row> PotfileInspectorDialog::resultRows() const
 void PotfileInspectorDialog::exportClicked()
 {
     const QList<PotfileExporter::Row> rows = resultRows();
+    // Never suggest the potfile's own directory: an export next to the live
+    // potfile is one careless click away from overwriting it.
     const QFileInfo source(ui->lineEdit_potfile->text());
-    QString suggested =
-        source.dir().filePath(source.completeBaseName().isEmpty() ? QStringLiteral("potfile")
-                                                                  : source.completeBaseName());
-    if (source.filePath().isEmpty()) {
-        suggested = QDir::homePath() + QStringLiteral("/potfile");
+    const QString base = source.completeBaseName();
+    const QString suggested =
+        QDir::homePath() + QStringLiteral("/")
+        + (base.isEmpty() ? QStringLiteral("potfile-entries") : base + QStringLiteral("-entries"));
+    QStringList protectedPaths = PotfileQuery::defaultPotfileCandidates(resolvedHashcatPath());
+    if (!ui->lineEdit_potfile->text().isEmpty()) {
+        protectedPaths << ui->lineEdit_potfile->text();
     }
-    PotfileExportUi::exportRows(this, suggested, rows, false, true, m_result.totalCount,
-                                ui->lineEdit_potfile->text());
+    PotfileExportUi::exportRows(this, suggested, rows, true, true, m_result.totalCount,
+                                protectedPaths);
 }
 
 void PotfileInspectorDialog::statisticsClicked()
@@ -158,23 +180,23 @@ void PotfileInspectorDialog::statisticsClicked()
     const QList<PotfileExporter::Row> rows = resultRows();
     const QString path = ui->lineEdit_potfile->text();
     const QString context = path.isEmpty() ? tr("Potfile inspector") : tr("Potfile: %1").arg(path);
-    PotfileStatisticsDialog dialog(this, PotfileStatistics::calculate(rows), context,
-                                   m_result.totalCount);
-    dialog.exec();
+    PotfileStatisticsDialog::openAsync(this, rows, context, m_result.totalCount,
+                                       /*duplicateKnown=*/true);
 }
 
-void PotfileInspectorDialog::loadPath()
+void PotfileInspectorDialog::loadPath(bool preserveViewState)
 {
     if (m_cancel) {
         m_cancel->store(true);
     }
     m_watcher.reset();
+    m_preserveViewState = preserveViewState;
     clearView();
-    updateNote();
 
     const QString path = ui->lineEdit_potfile->text().trimmed();
     if (path.isEmpty()) {
         m_loading = false;
+        ui->table_view->clearRows(m_preserveViewState);
         ui->label_status->setText(tr("Choose a potfile."));
         updateButtons();
         return;
@@ -184,6 +206,7 @@ void PotfileInspectorDialog::loadPath()
     ui->lineEdit_potfile->setText(absolute);
     if (!QFileInfo::exists(absolute)) {
         m_loading = false;
+        ui->table_view->clearRows(m_preserveViewState);
         ui->label_status->setText(tr("Potfile not found: %1").arg(absolute));
         updateButtons();
         return;
@@ -209,12 +232,15 @@ void PotfileInspectorDialog::showResult(const PotfileParser::Result &result)
     m_loading = false;
     m_result = result;
 
+    // A failed read must not leave rows whose sourceIndex names no entry.
     if (result.cancelled) {
+        ui->table_view->clearRows(m_preserveViewState);
         ui->label_status->setText(tr("Reading cancelled."));
         updateButtons();
         return;
     }
     if (!result.error.isEmpty()) {
+        ui->table_view->clearRows(m_preserveViewState);
         ui->label_status->setText(result.error);
         updateButtons();
         return;
@@ -226,7 +252,9 @@ void PotfileInspectorDialog::showResult(const PotfileParser::Result &result)
 void PotfileInspectorDialog::clearView()
 {
     m_result = {};
-    ui->table_view->clearRows();
+    if (!m_preserveViewState) {
+        ui->table_view->clearRows();
+    }
     ui->label_status->clear();
     updateButtons();
 }
@@ -235,6 +263,7 @@ void PotfileInspectorDialog::populateRows()
 {
     QList<PotfileTableView::Row> rows;
     rows.reserve(m_result.entries.size());
+    int index = 0;
     for (const PotfileParser::Entry &entry : std::as_const(m_result.entries)) {
         const QString duplicate = entry.duplicate ? tr("dup") : QString();
         rows.append({entry.hash,
@@ -242,28 +271,26 @@ void PotfileInspectorDialog::populateRows()
                      {},
                      {duplicate, QString::number(entry.lineNumber)},
                      entry.emptyPlain,
-                     entry.encrypted});
+                     entry.encrypted,
+                     false,
+                     index++});
     }
 
-    ui->table_view->setRows(rows);
+    ui->table_view->setRows(rows, m_preserveViewState);
     updateStatus();
     updateButtons();
 }
 
-void PotfileInspectorDialog::updateNote()
+void PotfileInspectorDialog::updateHeuristicLabel()
 {
-    QString text = tr("No hash type is recorded; a direct parse does not verify that a "
-                      "plaintext matches its hash. Duplicates are exact repeated lines only. "
-                      "Default ':' separator only.");
-    if (m_heuristic) {
-        text += tr(" The prefilled path is a heuristic; hashcat may use another path.");
-    }
-    ui->label_note->setText(text);
+    ui->label_heuristic->setVisible(m_heuristic);
 }
 
 void PotfileInspectorDialog::updateStatus()
 {
-    QString text = countText(m_result.totalCount, tr("1 entry"), tr("%1 entries"));
+    QString text = m_result.totalCount == 1
+                       ? tr("1 entry")
+                       : tr("%1 entries").arg(formatCount(m_result.totalCount));
     if (m_result.duplicateCount > 0) {
         text +=
             QStringLiteral(" · ")
@@ -290,40 +317,35 @@ void PotfileInspectorDialog::updateStatus()
                             tr("%1 incomplete lines skipped"));
     }
     if (m_result.entries.size() < m_result.totalCount) {
-        text +=
-            tr(" · showing first %1 of %2").arg(m_result.entries.size()).arg(m_result.totalCount);
+        text += tr(" · showing first %1 of %2")
+                    .arg(formatCount(static_cast<int>(m_result.entries.size())),
+                         formatCount(m_result.totalCount));
+    }
+    const int hidden = ui->table_view->rowCount() - ui->table_view->visibleRowCount();
+    if (hidden > 0) {
+        text += tr(" · %1 hidden by filter").arg(hidden);
     }
     ui->label_status->setText(text);
 }
 
 void PotfileInspectorDialog::updateButtons()
 {
-    const bool hasRows = ui->table_view->hasRows();
+    const bool hasRows = !m_loading && ui->table_view->visibleRowCount() > 0;
     ui->pushButton_export->setEnabled(hasRows);
     ui->pushButton_statistics->setEnabled(hasRows);
     ui->pushButton_browse->setEnabled(!m_loading);
     ui->pushButton_reload->setEnabled(!m_loading);
     ui->lineEdit_potfile->setEnabled(!m_loading);
+    ui->pushButton_stop->setEnabled(m_loading);
+    ui->progressBar_busy->setVisible(m_loading);
 }
 
 QString PotfileInspectorDialog::suggestedPotfilePath() const
 {
-    QStringList candidates;
-    const QString resolved = resolvedHashcatPath();
-    if (!resolved.isEmpty()) {
-        const QString directory = ProgramDirectory::forProgram(resolved);
-        candidates << QDir(directory).filePath(QStringLiteral("hashcat.potfile"));
-    }
-
-    const QString dataLocation =
-        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
-    if (!dataLocation.isEmpty()) {
-        candidates << dataLocation + QStringLiteral("/hashcat/hashcat.potfile");
-    }
-
-    for (const QString &candidate : std::as_const(candidates)) {
+    const QStringList candidates = PotfileQuery::defaultPotfileCandidates(resolvedHashcatPath());
+    for (const QString &candidate : candidates) {
         if (QFileInfo::exists(candidate)) {
-            return QDir::cleanPath(candidate);
+            return candidate;
         }
     }
     return {};

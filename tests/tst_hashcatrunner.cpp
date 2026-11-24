@@ -12,6 +12,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
+#include <QSet>
 #include <QTemporaryDir>
 #include <atomic>
 #include <memory>
@@ -37,6 +38,7 @@ private slots:
     void executePutsQuietBeforeAnOptionTerminator();
     void executeFollowsASymlinkedBinaryToItsRealDirectory();
     void executeDecodesUtf8Output();
+    void uniqueSessionHonoursItsPrefixAndNeverRepeats();
 
 private:
     // The stubs only make sense where a #! line does
@@ -291,6 +293,26 @@ void TestHashcatRunner::executeDecodesUtf8Output()
     QCOMPARE(int(result.exitStatus), int(QProcess::NormalExit));
     QCOMPARE(result.exitCode, 0);
     QCOMPARE(result.standardOutput.trimmed(), text);
+}
+
+// Each query family names its own sessions, and no two queries share one:
+// hashcat's transient pidfile is per session.
+void TestHashcatRunner::uniqueSessionHonoursItsPrefixAndNeverRepeats()
+{
+    const QString pot = HashcatRunner::uniqueSession(AppConstants::Hashcat::PotfileSessionPrefix);
+    const QString identify =
+        HashcatRunner::uniqueSession(AppConstants::Hashcat::IdentifySessionPrefix);
+    QVERIFY(pot.startsWith(QString(AppConstants::Hashcat::PotfileSessionPrefix)));
+    QVERIFY(identify.startsWith(QString(AppConstants::Hashcat::IdentifySessionPrefix)));
+    QVERIFY(pot.contains(QString::number(QCoreApplication::applicationPid())));
+
+    QSet<QString> seen;
+    for (int i = 0; i < 100; ++i) {
+        const QString name =
+            HashcatRunner::uniqueSession(AppConstants::Hashcat::PotfileSessionPrefix);
+        QVERIFY(!seen.contains(name));
+        seen.insert(name);
+    }
 }
 
 int main(int argc, char *argv[])

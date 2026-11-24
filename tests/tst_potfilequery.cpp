@@ -9,6 +9,7 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QStandardPaths>
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QTest>
@@ -27,6 +28,7 @@ private slots:
     void resolveOnlyTreatsExistingPathsAsPaths();
     void relativePathsResolveAgainstTheProgramDirectory();
     void driveRelativePathIsNotJoinedOntoTheProgramDirectory();
+    void defaultPotfileCandidatesCoverBothLayouts();
 };
 
 void TestPotfileQuery::showArgsHaveAStableOrder()
@@ -41,6 +43,7 @@ void TestPotfileQuery::showArgsHaveAStableOrder()
     int i = 0;
     QCOMPARE(args.at(i++), QStringLiteral("--show"));
     QCOMPARE(args.at(i++), QStringLiteral("--logfile-disable"));
+    QCOMPARE(args.at(i++), QStringLiteral("--deprecated-check-disable"));
     QVERIFY(args.at(i++).startsWith(QStringLiteral("--session=hcgui-pot-")));
     QCOMPARE(args.at(i++), QStringLiteral("--json"));
     QCOMPARE(args.at(i++), QStringLiteral("-m"));
@@ -61,6 +64,7 @@ void TestPotfileQuery::leftArgsOmitJsonAndTheFormat()
     const QStringList args = PotfileQuery::leftArgs(input);
     QCOMPARE(args.first(), QStringLiteral("--left"));
     QVERIFY(args.contains(QStringLiteral("--logfile-disable")));
+    QVERIFY(args.contains(QStringLiteral("--deprecated-check-disable")));
     QVERIFY(!args.contains(QStringLiteral("--json")));
     QVERIFY(!args.contains(QStringLiteral("--outfile-format")));
     QCOMPARE(args.last(), QStringLiteral("hash"));
@@ -170,6 +174,27 @@ void TestPotfileQuery::driveRelativePathIsNotJoinedOntoTheProgramDirectory()
 #else
     QSKIP("Drive-relative paths are Windows-only.");
 #endif
+}
+
+void TestPotfileQuery::defaultPotfileCandidatesCoverBothLayouts()
+{
+    QVERIFY(PotfileQuery::defaultPotfileCandidates(QString()).isEmpty());
+
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString program = dir.filePath(QStringLiteral("hashcat"));
+    const QStringList candidates = PotfileQuery::defaultPotfileCandidates(program);
+    QVERIFY(candidates.contains(
+        QFileInfo(dir.filePath(QStringLiteral("hashcat.potfile"))).absoluteFilePath()));
+#ifndef Q_OS_WIN
+    const QString xdg = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)
+                        + QStringLiteral("/hashcat/hashcat.potfile");
+    QVERIFY(candidates.contains(QFileInfo(xdg).absoluteFilePath()));
+#endif
+    // Canonical and de-duplicated.
+    QStringList deduped = candidates;
+    deduped.removeDuplicates();
+    QCOMPARE(candidates.size(), deduped.size());
 }
 
 int main(int argc, char *argv[])

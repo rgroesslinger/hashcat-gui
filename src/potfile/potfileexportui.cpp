@@ -30,18 +30,19 @@ bool PotfileExportUi::isSamePath(const QString &destination, const QString &sour
 
 bool PotfileExportUi::exportRows(QWidget *parent, const QString &suggestedPath,
                                  const QList<PotfileExporter::Row> &rows, bool includeUsername,
-                                 bool includeLine, int totalCount, const QString &protectedPath)
+                                 bool includeLine, int totalCount,
+                                 const QStringList &protectedPaths)
 {
     if (rows.isEmpty()) {
         return false;
     }
 
     const QString csvFilter = tr("CSV (*.csv)");
-    const QString txtFilter = tr("Text (*.txt)");
+    const QString tsvFilter = tr("TSV (*.tsv *.txt)");
     const QString jsonFilter = tr("JSON (*.json)");
     QString selectedFilter;
     QString path = QFileDialog::getSaveFileName(parent, tr("Export potfile results"), suggestedPath,
-                                                csvFilter + QStringLiteral(";;") + txtFilter
+                                                csvFilter + QStringLiteral(";;") + tsvFilter
                                                     + QStringLiteral(";;") + jsonFilter,
                                                 &selectedFilter);
     if (path.isEmpty()) {
@@ -49,31 +50,65 @@ bool PotfileExportUi::exportRows(QWidget *parent, const QString &suggestedPath,
     }
     const QString chosenPath = path;
 
+    // The selected filter decides the format; without one, the suffix does.
     PotfileExporter::Format format = PotfileExporter::Format::Csv;
-    const QString suffix = QFileInfo(path).suffix().toLower();
-    if (suffix == QStringLiteral("json")) {
-        format = PotfileExporter::Format::Json;
-    } else if (suffix == QStringLiteral("txt")) {
-        format = PotfileExporter::Format::Txt;
-    } else if (suffix == QStringLiteral("csv")) {
-        format = PotfileExporter::Format::Csv;
+    QString filterSuffix = QStringLiteral(".csv");
+    QString formatName = QStringLiteral("CSV");
+    if (selectedFilter == tsvFilter) {
+        format = PotfileExporter::Format::Tsv;
+        filterSuffix = QStringLiteral(".tsv");
+        formatName = QStringLiteral("TSV");
     } else if (selectedFilter == jsonFilter) {
         format = PotfileExporter::Format::Json;
-        path += QStringLiteral(".json");
-    } else if (selectedFilter == txtFilter) {
-        format = PotfileExporter::Format::Txt;
-        path += QStringLiteral(".txt");
-    } else {
-        format = PotfileExporter::Format::Csv;
-        if (suffix.isEmpty()) {
-            path += QStringLiteral(".csv");
+        filterSuffix = QStringLiteral(".json");
+        formatName = QStringLiteral("JSON");
+    } else if (selectedFilter != csvFilter) {
+        const QString fallback = QFileInfo(path).suffix().toLower();
+        if (fallback == QStringLiteral("json")) {
+            format = PotfileExporter::Format::Json;
+            filterSuffix = QStringLiteral(".json");
+            formatName = QStringLiteral("JSON");
+        } else if (fallback == QStringLiteral("tsv") || fallback == QStringLiteral("txt")) {
+            format = PotfileExporter::Format::Tsv;
+            filterSuffix = QStringLiteral(".tsv");
+            formatName = QStringLiteral("TSV");
         }
     }
 
-    if (isSamePath(path, protectedPath)) {
-        QMessageBox::warning(parent, tr("Export failed"),
-                             tr("Choose a path other than the potfile."));
-        return false;
+    // Keep a suffix that names the selected format (.txt aliases TSV);
+    // otherwise append the filter's suffix so the name matches the content.
+    const QString suffix = QFileInfo(path).suffix().toLower();
+    const bool suffixMatches =
+        (format == PotfileExporter::Format::Csv && suffix == QStringLiteral("csv"))
+        || (format == PotfileExporter::Format::Tsv
+            && (suffix == QStringLiteral("tsv") || suffix == QStringLiteral("txt")))
+        || (format == PotfileExporter::Format::Json && suffix == QStringLiteral("json"));
+    if (!suffixMatches) {
+        path += filterSuffix;
+    }
+
+    // Check the chosen name too: a suffix would hide a picked potfile path.
+    for (const QString &protectedPath : protectedPaths) {
+        if (isSamePath(chosenPath, protectedPath) || isSamePath(path, protectedPath)) {
+            QMessageBox::warning(parent, tr("Export failed"),
+                                 tr("Choose a path other than the potfile."));
+            return false;
+        }
+    }
+
+    // An unmatched hashcat.potfile name may still be the live potfile; ask.
+    if (QFileInfo(chosenPath)
+            .fileName()
+            .compare(QStringLiteral("hashcat.potfile"), Qt::CaseInsensitive)
+        == 0) {
+        const auto answer = QMessageBox::question(
+            parent, tr("Export potfile results"),
+            tr("The destination is named hashcat.potfile. If this is hashcat's live potfile, "
+               "exporting overwrites it.\n\nExport anyway?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (answer != QMessageBox::Yes) {
+            return false;
+        }
     }
 
     if (path != chosenPath && QFileInfo::exists(path)) {
@@ -90,25 +125,14 @@ bool PotfileExportUi::exportRows(QWidget *parent, const QString &suggestedPath,
 
     const QString entriesText =
         countText(static_cast<int>(rows.size()), tr("1 entry"), tr("%1 entries"));
-    QString text = tr("Export %1 to:\n%2\n\nThe file will contain plaintext passwords. "
+    QString text = tr("Export %1 as %2 to:\n%3\n\nThe file will contain plaintext passwords. "
                       "Store it locally and protect it. Spreadsheet applications may "
                       "evaluate cells beginning with =, +, -, or @ as formulas; open the "
                       "file as text or disable formula evaluation.")
-                       .arg(entriesText, path);
+                       .arg(entriesText, formatName, path);
     if (totalCount > rows.size()) {
-        text += tr("\n\nOnly the first %1 of %2 entries are retained.")
-                    .arg(rows.size())
-                    .arg(totalCount);
+        text += tr("\n\nOnly %1 of %2 entries are included.").arg(rows.size()).arg(totalCount);
     }
-    // Without a known source potfile the default location cannot be resolved
-    // reliably, so warn when the export looks like it is the live potfile.
-    if (protectedPath.isEmpty()
-        && QFileInfo(path).fileName().compare(QStringLiteral("hashcat.potfile"),
-                                              Qt::CaseInsensitive)
-               == 0) {
-        text += tr("\n\nWarning: this may be hashcat's live potfile. Choose another path.");
-    }
-
     QMessageBox box(QMessageBox::Warning, tr("Export plaintexts"), text, QMessageBox::Cancel,
                     parent);
     box.setTextFormat(Qt::PlainText);

@@ -2917,7 +2917,7 @@
   </action>
   <action name="actionPotfileInspector">
    <property name="text">
-    <string>Potfile &amp;Inspector…</string>
+    <string>Potfile I&amp;nspector…</string>
    </property>
    <property name="toolTip">
     <string>Browse an explicit potfile without hash-type verification</string>

@@ -6,6 +6,7 @@
 #ifndef TEXTUTILS_H
 #define TEXTUTILS_H
 
+#include <QLocale>
 #include <QString>
 #include <QTextDocument>
 
@@ -26,6 +27,12 @@ inline QString escapeRichText(QString text)
 inline QString countText(int count, const QString &one, const QString &many)
 {
     return count == 1 ? one : many.arg(count);
+}
+
+// A count with the locale's group separators.
+inline QString formatCount(int count)
+{
+    return QLocale().toString(count);
 }
 
 #endif // TEXTUTILS_H

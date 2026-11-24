@@ -88,8 +88,11 @@
        <property name="text">
         <string>Copy selected</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
-        <string>Copies the real values, even while masked</string>
+        <string>Reveal plaintexts to copy the real values.</string>
        </property>
       </widget>
      </item>
@@ -101,8 +104,11 @@
        <property name="text">
         <string>Copy all</string>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
        <property name="toolTip">
-        <string>Copies the real values of the visible rows, even while masked</string>
+        <string>Reveal plaintexts to copy the real values.</string>
        </property>
       </widget>
      </item>
@@ -114,8 +120,14 @@
        <property name="checkable">
         <bool>true</bool>
        </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Reveal plaintexts</string>
+       </property>
+       <property name="toolTip">
+        <string>Show or mask plaintext values.</string>
        </property>
       </widget>
      </item>

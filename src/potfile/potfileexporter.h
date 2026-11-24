@@ -19,7 +19,7 @@ class PotfileExporter
     Q_DECLARE_TR_FUNCTIONS(PotfileExporter)
 
 public:
-    enum class Format : std::uint8_t { Csv, Txt, Json };
+    enum class Format : std::uint8_t { Csv, Tsv, Json };
 
     struct Row {
         QString hash;
@@ -28,6 +28,9 @@ public:
         int lineNumber = 0;
         bool duplicate = false;
         bool encrypted = false;
+        // False leaves duplicate/line empty (null in JSON): --show results
+        // carry no potfile line information.
+        bool hasLineInfo = false;
     };
 
     static QByteArray serialize(const QList<Row> &rows, Format format, bool includeUsername,

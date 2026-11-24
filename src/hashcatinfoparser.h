@@ -10,6 +10,7 @@
 #include <QList>
 #include <QMap>
 #include <QString>
+#include <cstdint>
 
 // Parser for the reply to `hashcat --example-hashes --machine-readable`.
 //
@@ -33,10 +34,16 @@ public:
         QString category;
     };
 
-    // Parses --identify's `# | Name | Category` table; "no match" (exit 255)
-    // is an empty answer, not a failure.
-    static bool parseIdentify(const QString &rawOutput, QList<IdentifiedHashMode> &matches,
-                              QString *errorMessage = nullptr);
+    struct IdentifyResult {
+        enum class Status : std::uint8_t { Matched, NoMatch, ParseError };
+
+        Status status = Status::ParseError;
+        QList<IdentifiedHashMode> matches;
+    };
+
+    // Parses --identify's mode table; the explicit no-match sentence is an
+    // answer (NoMatch), unparsable output a failure (ParseError).
+    static IdentifyResult parseIdentify(const QString &rawOutput);
 };
 
 #endif // HASHCATINFOPARSER_H

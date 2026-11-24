@@ -37,6 +37,10 @@ QString resolvePath(const QString &entered, const QString &hashcatPath);
 // A hash input is treated as a path only when it exists; otherwise it is an
 // inline hash. An existing relative path is resolved like resolvePath().
 QString resolveHashInput(const QString &entered, const QString &hashcatPath = QString());
+
+// hashcat's default potfile locations: next to the binary, and in XDG's data
+// directory on Unix. Canonical, de-duplicated; empty without a hashcat path.
+QStringList defaultPotfileCandidates(const QString &hashcatPath);
 } // namespace PotfileQuery
 
 #endif // POTFILEQUERY_H
