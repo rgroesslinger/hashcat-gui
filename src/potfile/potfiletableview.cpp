@@ -328,7 +328,11 @@ void PotfileTableView::applyFilter()
     for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
         QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
         if (const Row *row = rowForItem(item)) {
-            item->setHidden(!rowMatches(*row));
+            // Qt's first setHidden() per item is costly (~10 µs); skip no-ops.
+            const bool hide = !rowMatches(*row);
+            if (item->isHidden() != hide) {
+                item->setHidden(hide);
+            }
         }
     }
     updateEmptyState();

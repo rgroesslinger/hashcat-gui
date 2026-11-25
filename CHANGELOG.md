@@ -9,7 +9,7 @@
 - `Tools → Identify Hash` asks hashcat which hash modes match a hash, shows them as candidates and applies the selected one (and the hash input) to the attack
 - `Tools → Backend Information` shows the devices and backends hashcat detected
 - `Tools → Check Against Potfile` reports how many hashes in the current hash field are already cracked and opens the cracked hashes with masked plaintexts that must be revealed before they can be copied
-- `Tools → Potfile Inspector` lists a potfile's entries (up to 10,000) in a searchable table, masks plaintexts by default, and marks exact duplicate lines
+- `Tools → Potfile Inspector` lists a potfile's entries (up to 100,000) in a searchable table, masks plaintexts by default, and marks exact duplicate lines
 - Cracked-results and potfile-inspector dialogs can export the visible results as CSV, TSV or JSON, and show aggregate password statistics for them
 
 ## 0.9.0 (2026-11-20)

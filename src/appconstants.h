@@ -361,7 +361,7 @@ inline constexpr QLatin1StringView IdentifySessionPrefix{"hcgui-id-"};
 // Silences the deprecated-mode notice on stdout; no other effect on --show/--left.
 inline constexpr QLatin1StringView DeprecatedCheckDisable{"--deprecated-check-disable"};
 // The show parser retains at most this many entries; the counts stay complete.
-inline constexpr int PotfileMaxEntries = 10000;
+inline constexpr int PotfileMaxEntries = 100000;
 // A value starting with '-' would be read as an option, not as the hash to identify.
 inline constexpr QLatin1StringView OptionTerminator{"--"};
 // Backend init can be slow on a fresh driver; queries that need it get longer.

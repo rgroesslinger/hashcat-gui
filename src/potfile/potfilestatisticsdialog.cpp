@@ -116,7 +116,7 @@ void PotfileStatisticsDialog::openAsync(QWidget *parent, const QList<PotfileExpo
     auto *progress = new QProgressDialog(tr("Calculating statistics…"), QString(), 0, 0, parent);
     progress->setWindowTitle(tr("Password statistics"));
     progress->setWindowModality(Qt::WindowModal);
-    // With at most 10000 rows the calculation is near-instant; do not flash.
+    // With at most 100000 rows the calculation is near-instant; do not flash.
     progress->setMinimumDuration(200);
     progress->setAutoClose(false);
     progress->setAutoReset(false);

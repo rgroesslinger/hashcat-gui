@@ -3,6 +3,7 @@
 - [Where are application settings stored?](#where-are-application-settings-stored)
 - [Where is the session saved?](#where-is-the-session-saved)
 - [Why does loading the hash types take so long on Windows?](#why-does-loading-the-hash-types-take-so-long-on-windows)
+- [Why does the potfile viewer show only the first 100,000 entries?](#why-does-the-potfile-viewer-show-only-the-first-100000-entries)
 - [Why are ptyxis and cmd.exe not supported?](#why-are-ptyxis-and-cmdexe-not-supported)
 
 <a name="where-are-application-settings-stored"></a>
@@ -45,6 +46,20 @@ Add-MpPreference -ExclusionProcess 'C:\path\to\hashcat.exe'
 ```
 
 Alternatively, you can temporarily disable Windows Defender real-time protection.
+
+
+<a name="why-does-the-potfile-viewer-show-only-the-first-100000-entries"></a>
+## Why does the potfile viewer show only the first 100,000 entries?
+
+The file is read in full, so the status line always reports the complete
+counts, including duplicates and malformed lines. Only the rows kept for
+display are capped: at most 100,000 entries are held in memory, and the
+status line says `showing first X of Y` when there are more.
+
+Search, copy, statistics and export work on the displayed rows only;
+the export confirmation and the statistics dialog name the full total.
+The cap keeps the table responsive and memory use bounded — keeping a
+million rows would cost seconds of GUI time and over a gigabyte of RAM.
 
 
 <a name="why-are-ptyxis-and-cmdexe-not-supported"></a>
