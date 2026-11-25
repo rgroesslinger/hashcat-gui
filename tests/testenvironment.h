@@ -6,9 +6,11 @@
 #ifndef TESTENVIRONMENT_H
 #define TESTENVIRONMENT_H
 
+#include "appconstants.h"
 #include "examples.h"
 #include "hashcatoptions.h"
 #include "launchvalidator.h"
+#include "settingsmanager.h"
 
 #include <QAbstractButton>
 #include <QApplication>
@@ -126,10 +128,17 @@ inline bool appendFile(const QString &path, const QByteArray &content)
     return file.write(content) == content.size();
 }
 
+// An unresolvable hashcat path. resolve() fails synchronously, so MainWindow
+// starts with Auto-detect alone, starts no child and shows no error box.
+inline void useMissingHashcatPath()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("hashcat-gui-missing/hashcat"));
+}
+
 // A hashcat stand-in the tests can execute. Returns an empty path where a #!
-// script cannot run (Windows) or be written; callers QSKIP on Windows and
-// treat an empty path as a hard failure elsewhere. An empty directory puts the
-// stub in a scratch directory shared by every caller.
+// script cannot run (Windows); callers needing a child QSKIP there, and treat an
+// empty path as a hard failure elsewhere. An empty directory uses shared scratch.
 inline QString writeShellStub([[maybe_unused]] const QString &name,
                               [[maybe_unused]] const QByteArray &content,
                               [[maybe_unused]] const QString &directory = QString())

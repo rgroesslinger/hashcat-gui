@@ -391,12 +391,9 @@ void TestSettingsDialog::hashcatPathStatusFollowsTheField()
     QVERIFY(!dialog.ui->label_hashcat_status->text().isEmpty());
     QVERIFY(!dialog.ui->label_download->isHidden());
 
-#ifdef Q_OS_WIN
-    QSKIP("Windows does not report the executable bit of the shell stub");
-#else
-    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-status.bin"),
-                                                         "#!/bin/sh\nexit 0\n");
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+    const QString stub =
+        TestEnvironment::writeSearchableExecutable(QStringLiteral("stub-hashcat-status.exe"));
+    QVERIFY2(!stub.isEmpty(), "the stand-in executable could not be written");
 
     dialog.ui->lineEdit_hc_path->setText(stub);
     QVERIFY2(dialog.ui->label_hashcat_status->isHidden(),
@@ -409,7 +406,6 @@ void TestSettingsDialog::hashcatPathStatusFollowsTheField()
              "a path that is not there was not reported");
     QVERIFY2(!dialog.ui->label_download->isHidden(),
              "the download hint did not return for a missing executable");
-#endif
 }
 
 // A fresh install offers the hashcat PATH already finds. Offering it is not

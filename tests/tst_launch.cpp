@@ -340,16 +340,16 @@ void TestLaunch::copyingTheCommandPutsItOnTheClipboard()
 // it follows the command echo setting, and it is in the Tools menu.
 void TestLaunch::copyingThePowerShellScriptPutsItOnTheClipboard()
 {
-    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-script-copy"),
-                                                         "#!/bin/sh\nexit 0\n");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
-
+    // The clipboard only needs a path resolve() accepts. Start with a missing
+    // one so no query runs, then point the built window at a real image.
+    TestEnvironment::useMissingHashcatPath();
     MainWindow window;
+    const QString stub =
+        TestEnvironment::writeSearchableExecutable(QStringLiteral("stub-hashcat-script-copy.exe"));
+    QVERIFY2(!stub.isEmpty(), "the stand-in executable could not be written");
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    QVERIFY(QMetaObject::invokeMethod(&window, "commandChanged"));
+
     Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
     QVERIFY2(ui->menuTools->actions().contains(ui->actionCopyPowerShellScript),
              "the action is not in the Tools menu");

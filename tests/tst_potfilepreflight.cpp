@@ -72,14 +72,27 @@ struct CapturedUi {
     QString resultStatus;
 };
 
-// Potfile checks need an explicit hash type; wait for the stub's list and
-// select its first mode.
+// Potfile checks need an explicit hash type. The combo starts with
+// Auto-detect alone; add a mode without starting a hashcat child.
 void selectExplicitHashType(MainWindow &window)
 {
     Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
-    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() > 1,
-                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
     ui->comboBox_hash_type->setCurrentIndex(1);
+}
+
+// preparePotfileQuery resolves the configured binary. Point it at a real image
+// after construction, so the hash-type query has already ended; the check
+// itself is injected and never starts the image.
+QString configureExecutable()
+{
+    const QString path =
+        TestEnvironment::writeSearchableExecutable(QStringLiteral("hashcat-potfile.exe"));
+    if (path.isEmpty()) {
+        return {};
+    }
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, path);
+    return path;
 }
 
 // Closes the active modal so a test cannot hang. The progress dialog is left
@@ -151,14 +164,14 @@ private slots:
 
 private:
     MainWindowFixture m_fixture;
-    QString m_stub;
 };
 
 void TestPotfilePreflight::init()
 {
     m_fixture.init();
-    m_stub = hashcatStub(QStringLiteral("hashcat-potfile"));
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, m_stub);
+    // The queries are injected below, so the hashcat path only has to be
+    // configured. An unresolvable one starts no child and opens no box.
+    TestEnvironment::useMissingHashcatPath();
 }
 
 void TestPotfilePreflight::cleanup()
@@ -168,10 +181,6 @@ void TestPotfilePreflight::cleanup()
 
 void TestPotfilePreflight::emptyInputIsRefusedWithoutAQuery()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
     QList<QStringList> args;
     installCheck(window, normalResult(showLine()), normalResult(), 0, &args);
@@ -185,11 +194,8 @@ void TestPotfilePreflight::emptyInputIsRefusedWithoutAQuery()
 // does not block the read-only check.
 void TestPotfilePreflight::disabledPotfileStillAllowsTheReadOnlyCheck()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     auto *ui = MainWindowTestAccess::ui(window);
     ui->lineEdit_hashfile->setText(QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     ui->checkBox_potfile_disable->setChecked(true);
@@ -208,15 +214,10 @@ void TestPotfilePreflight::disabledPotfileStillAllowsTheReadOnlyCheck()
 
 void TestPotfilePreflight::autoDetectIsRefusedAndFocusesTheCombo()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     auto *ui = MainWindowTestAccess::ui(window);
     ui->lineEdit_hashfile->setText(QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
-    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() > 1,
-                             AppConstants::Hashcat::QueryTimeoutMs);
     ui->comboBox_hash_type->setCurrentIndex(0);
 
     QList<QStringList> args;
@@ -232,10 +233,6 @@ void TestPotfilePreflight::autoDetectIsRefusedAndFocusesTheCombo()
 
 void TestPotfilePreflight::invalidHashcatPathIsRefusedWithoutAQuery()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
@@ -254,12 +251,9 @@ void TestPotfilePreflight::invalidHashcatPathIsRefusedWithoutAQuery()
 
 void TestPotfilePreflight::whitespaceAroundAnInlineHashIsTrimmed()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     const QString hash = QStringLiteral("5d41402abc4b2a76b9719d911017c592");
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(QStringLiteral("  ") + hash
                                                                  + QStringLiteral("  "));
     selectExplicitHashType(window);
@@ -278,10 +272,6 @@ void TestPotfilePreflight::whitespaceAroundAnInlineHashIsTrimmed()
 
 void TestPotfilePreflight::whitespaceAroundAFilePathIsTrimmed()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     QTemporaryDir dir;
     QVERIFY(dir.isValid());
     const QString path = dir.filePath(QStringLiteral("hashes.txt"));
@@ -290,6 +280,7 @@ void TestPotfilePreflight::whitespaceAroundAFilePathIsTrimmed()
     file.close();
 
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(QStringLiteral("  ") + path
                                                                  + QStringLiteral("  "));
     selectExplicitHashType(window);
@@ -306,11 +297,9 @@ void TestPotfilePreflight::whitespaceAroundAFilePathIsTrimmed()
 
 void TestPotfilePreflight::relativePotfilePathUsesTheHashcatDirectory()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    const QString stub = configureExecutable();
+    QVERIFY2(!stub.isEmpty(), "the stand-in executable could not be written");
     auto *ui = MainWindowTestAccess::ui(window);
     ui->lineEdit_hashfile->setText(QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     ui->lineEdit_potfile_path->setText(QStringLiteral("relative.potfile"));
@@ -324,18 +313,14 @@ void TestPotfilePreflight::relativePotfilePathUsesTheHashcatDirectory()
     const qsizetype index = args.at(0).indexOf(QStringLiteral("--potfile-path"));
     QVERIFY(index >= 0);
     QVERIFY(index + 1 < args.at(0).size());
-    QCOMPARE(
-        args.at(0).at(index + 1),
-        QDir(ProgramDirectory::forProgram(m_stub)).filePath(QStringLiteral("relative.potfile")));
+    QCOMPARE(args.at(0).at(index + 1),
+             QDir(ProgramDirectory::forProgram(stub)).filePath(QStringLiteral("relative.potfile")));
 }
 
 void TestPotfilePreflight::successOpensTheResultsDialog()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     selectExplicitHashType(window);
@@ -352,11 +337,8 @@ void TestPotfilePreflight::successOpensTheResultsDialog()
 
 void TestPotfilePreflight::noHashesLoadedShowsTheMappedDiagnostic()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     selectExplicitHashType(window);
@@ -373,11 +355,8 @@ void TestPotfilePreflight::noHashesLoadedShowsTheMappedDiagnostic()
 
 void TestPotfilePreflight::unknownFailureShowsTheCombinedDiagnostic()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     selectExplicitHashType(window);
@@ -395,11 +374,8 @@ void TestPotfilePreflight::unknownFailureShowsTheCombinedDiagnostic()
 
 void TestPotfilePreflight::leftFailureShowsRemainingUnknown()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     selectExplicitHashType(window);
@@ -415,11 +391,8 @@ void TestPotfilePreflight::leftFailureShowsRemainingUnknown()
 
 void TestPotfilePreflight::cancelReenablesTheAction()
 {
-    if (m_stub.isEmpty()) {
-        QSKIP("A shell stub cannot run on this platform.");
-    }
-
     MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
     MainWindowTestAccess::ui(window)->lineEdit_hashfile->setText(
         QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
     selectExplicitHashType(window);

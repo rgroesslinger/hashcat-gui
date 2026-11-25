@@ -80,7 +80,7 @@ private slots:
     void sessionHashTypeSurvivesTheAsynchronousQuery();
     void aFailedQueryKeepsTheSessionHashTypeOnSave();
     void anInFlightQueryKeepsTheSessionHashTypeOnSave();
-    void exportingWhileTheQueryIsPendingKeepsTheHashType();
+    void exportingWhileTheHashTypeIsPendingKeepsIt();
     void sessionWithAnUnknownHashTypeSelectsAutoDetect();
     void theSettingsAreExportedThroughTheFileMenu();
     void theSettingsAreImportedThroughTheFileMenu();
@@ -357,19 +357,11 @@ void TestSession::aFailedQueryKeepsTheSessionHashTypeOnSave()
              1000);
 }
 
-// A slow query is still on its way when the user quits: the combo is empty,
-// and the save must keep the pending id instead of storing "no selection".
+// An empty combo at quit time, as while a query is still on its way: the save
+// must keep the pending id instead of storing "no selection".
 void TestSession::anInFlightQueryKeepsTheSessionHashTypeOnSave()
 {
-    const QString stub = TestEnvironment::writeShellStub(
-        QStringLiteral("stub-hashcat-slow-save"),
-        "#!/bin/sh\nsleep 1\nprintf '{\"0\":{\"name\":\"MD5\"}}\\n'\n");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     QJsonObject values;
     values.insert(QStringLiteral("comboBox_hash_type"), 1000);
@@ -380,6 +372,7 @@ void TestSession::anInFlightQueryKeepsTheSessionHashTypeOnSave()
     m_fixture.startWatchdog();
     MainWindow window;
     window.restoreSession();
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->clear();
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 0);
     QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
 
@@ -391,20 +384,11 @@ void TestSession::anInFlightQueryKeepsTheSessionHashTypeOnSave()
              1000);
 }
 
-// The export is the session too: while the query is pending it must carry the
-// id the session named, not the empty combo's "no selection".
-void TestSession::exportingWhileTheQueryIsPendingKeepsTheHashType()
+// The export is the session too: while the id from the session is still pending
+// it must be kept, not the combo's "no selection".
+void TestSession::exportingWhileTheHashTypeIsPendingKeepsIt()
 {
-    const QString stub = TestEnvironment::writeShellStub(
-        QStringLiteral("stub-hashcat-slow-export"),
-        "#!/bin/sh\nsleep 1\nprintf "
-        "'{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}\\n'\n");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     QJsonObject values;
     values.insert(QStringLiteral("comboBox_hash_type"), 1000);
@@ -415,9 +399,8 @@ void TestSession::exportingWhileTheQueryIsPendingKeepsTheHashType()
     const QString file =
         TestEnvironment::scratchDir().filePath(QStringLiteral("pending-export.json"));
 
-    // No watchdog here: it would close the file dialog too. The window's
-    // destructor cancels the query, so no reply - and no box - can arrive
-    // after the export is done and the window is gone.
+    // No watchdog here: it would close the file dialog too. With an
+    // unresolvable path no query starts, so no reply or box can interfere.
     MainWindow window;
     window.restoreSession();
     QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), 1000);
@@ -478,18 +461,10 @@ void TestSession::hashTypeWaitsForAWorkingHashcatPath()
 // session round trip like every other combo identifier.
 void TestSession::autoDetectHashTypeRoundTripsThroughASession()
 {
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-autodetect"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow writer;
     writer.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(writer)->comboBox_hash_type->count() == 2,
-                             5000);
     MainWindowTestAccess::ui(writer)->comboBox_hash_type->setCurrentIndex(0);
     QCOMPARE(MainWindowTestAccess::ui(writer)->comboBox_hash_type->itemData(0).toInt(),
              AppConstants::Hashcat::AutoDetectHashType);
@@ -497,8 +472,6 @@ void TestSession::autoDetectHashTypeRoundTripsThroughASession()
 
     MainWindow reader;
     reader.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(reader)->comboBox_hash_type->count() == 2,
-                             5000);
     QCOMPARE(MainWindowTestAccess::ui(reader)->comboBox_hash_type->currentData().toInt(),
              AppConstants::Hashcat::AutoDetectHashType);
     QVERIFY(!MainWindowTestAccess::generateArguments(reader).contains(QStringLiteral("-m")));
@@ -532,7 +505,6 @@ void TestSession::sessionWithAnUnknownHashTypeSelectsAutoDetect()
     MainWindow window;
 
     window.restoreSession();
-
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() > 0,
                              AppConstants::Hashcat::QueryTimeoutMs);
 
@@ -587,16 +559,9 @@ void TestSession::theSettingsAreImportedThroughTheFileMenu()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,
                              AppConstants::Settings::Version, values, nullptr));
 
-    // A configured hashcat, so that the window does not queue the settings
-    // dialog of its own - and one that answers, so that no error box opens
-    // while the test runs.
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-settings-import"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    // A configured but unresolvable hashcat: no settings dialog of its own,
+    // no running child and no error box while the test runs.
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
@@ -616,8 +581,7 @@ void TestSession::theSettingsAreImportedThroughTheFileMenu()
     QCOMPARE(SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath),
              QStringLiteral("/imported/hashcat-from-the-file"));
     // The preview follows the new binary and the new parameter style without
-    // the user touching a widget. The hash type the stub reports is in it
-    // as well.
+    // the user touching a widget.
     const QString preview = MainWindowTestAccess::ui(window)->lineEdit_command->text();
     QVERIFY2(preview.startsWith(QStringLiteral("hashcat-from-the-file")), qPrintable(preview));
     QVERIFY2(preview.contains(QStringLiteral(" -a 0")), qPrintable(preview));
@@ -636,13 +600,7 @@ void TestSession::theImportNamesTheValuesTheSessionDoesNotKnow()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-import"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
@@ -675,13 +633,7 @@ void TestSession::theImportIgnoresRetiredWidgetNames()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-retired"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
@@ -717,13 +669,7 @@ void TestSession::aStartupSessionWithRetiredNamesStaysQuiet()
     QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-retired-startup"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     m_fixture.startWatchdog();
     MainWindow window;
@@ -761,13 +707,7 @@ void TestSession::aNewerSessionIsRefused()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version + 1, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-newer"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
@@ -796,13 +736,7 @@ void TestSession::anOlderSessionIsAppliedWithANote()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version - 1, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-older-import"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
@@ -831,13 +765,7 @@ void TestSession::aNewerSettingsFileIsRefused()
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Settings,
                              AppConstants::Settings::Version + 1, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-settings"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
@@ -871,13 +799,7 @@ void TestSession::anOlderStartupSessionIsAppliedWithANote()
     QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version - 1, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-older"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     TestEnvironment::ModalRecorder recorder;
     recorder.start();
@@ -913,13 +835,7 @@ void TestSession::aNewerStartupSessionIsLeftAlone()
     QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version + 1, values, nullptr));
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-newer-startup"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     m_fixture.startWatchdog();
     MainWindow window;
@@ -944,13 +860,7 @@ void TestSession::aNewerSessionSurvivesTheExit()
                              AppConstants::Sessions::Version + 1, values, nullptr));
     const QJsonObject before = readJsonObject(session);
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-newer-exit"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     m_fixture.startWatchdog();
     MainWindow window;
@@ -992,13 +902,7 @@ void TestSession::aSessionFileThatCannotBeReadIsLeftAlone()
     file.close();
     const QJsonObject before = readJsonObject(session);
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-unreadable"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     m_fixture.startWatchdog();
     MainWindow window;
@@ -1033,13 +937,7 @@ void TestSession::aSessionFileOfAnotherShapeIsLeftAlone()
     file.close();
     const QJsonObject before = readJsonObject(session);
 
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-other-shape"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     m_fixture.startWatchdog();
     MainWindow window;
@@ -1058,16 +956,7 @@ void TestSession::aSessionFileOfAnotherShapeIsLeftAlone()
 // worst kind of noise.
 void TestSession::theStartupShowsNoBox()
 {
-    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-startup"),
-                                                         "#!/bin/sh\n"
-                                                         "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
-                                                         "exit 0\n");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     // A session the application wrote itself.
     MainWindow writer;
@@ -1472,24 +1361,11 @@ void TestSession::theEscapingSessionRoundTrips()
 // golden session changes every serialized widget and still costs one rebuild.
 void TestSession::applyingASessionRebuildsThePreviewOnce()
 {
-    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-once"),
-                                                         "#!/bin/sh\n"
-                                                         "printf '{\"0\":{\"name\":\"MD5\"},"
-                                                         "\"1000\":{\"name\":\"NTLM\"},"
-                                                         "\"4000\":{\"name\":\"recipe\"}}\\n'\n"
-                                                         "exit 0\n");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 4,
-                             5000);
 
     const QString goldenPath =
         QStringLiteral(QT_TESTCASE_SOURCEDIR "/tests/data/golden_session.json");
@@ -1512,19 +1388,11 @@ void TestSession::applyingASessionRebuildsThePreviewOnce()
 // that churn as well.
 void TestSession::aNoOpApplyWithRowsRebuildsThePreviewOnce()
 {
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-noop"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
-                             5000);
     CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_wordlist,
                               {QStringLiteral("/tmp/one.txt")});
     CheckedItemList::addPaths(MainWindowTestAccess::ui(window)->listWidget_feed_arguments,
@@ -1563,19 +1431,11 @@ void TestSession::resettingTheSessionRebuildsThePreviewOnce()
 // defaults the reset restores.
 void TestSession::changingTheSettingsDoesNotChangeTheSnapshot()
 {
-    const QString stub = hashcatStub(QStringLiteral("stub-hashcat-snapshot"));
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
 
     window.restoreSession();
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
-                             5000);
     const QJsonObject before = MainWindowTestAccess::defaultSnapshot(window);
     QVERIFY(!before.isEmpty());
 

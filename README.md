@@ -26,7 +26,7 @@ hashcat 8.0.0 or newer is required.
 
 Packages for openSUSE, Fedora, Debian and Ubuntu are hosted on the [openSUSE Build Service (OBS)](https://build.opensuse.org/package/show/home:rgroesslinger/hashcat-gui). You have the option to download the package directly or configure your package manager to automatically receive updates for future releases by adding the OBS repository. Instructions on how to add the repository can be found on the [download page](https://software.opensuse.org/download.html?project=home:rgroesslinger&package=hashcat-gui). You can verify the fingerprint of the OpenPGP key used for signing these packages on the [Signing keys page](https://build.opensuse.org/projects/home:rgroesslinger/signing_keys).
 
-A Linux x86_64 **AppImage** is also available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/). Download the `.AppImage`, make it executable (`chmod +x hashcat-gui-*.AppImage`) and run it. It needs glibc 2.43 or newer on the host (check with `ldd --version`).
+A Linux x86_64 **AppImage** is also available from the [release page](https://github.com/rgroesslinger/hashcat-gui/releases/). Download the `.AppImage`, make it executable (`chmod +x hashcat-gui-*.AppImage`) and run it. It needs glibc 2.43 or newer.
 
 ### Windows
 

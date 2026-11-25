@@ -108,9 +108,10 @@ Connect once to `commandChanged()`; the attack-mode combo uses `attackIndexChang
 - Catalogs: `lupdate -no-obsolete -locations none`; never run `update_translations` in development.
   New languages update `HASHCAT_GUI_TRANSLATIONS` + `AppConstants::Languages::Available`;
   `tst_translations` enforces the match.
-- Tests: `TestEnvironment::run` (QStandardPaths test mode), header-declared friends
-  (`MainWindowTestAccess`), `QSKIP` shell stubs on Windows. Read-only hashcat dialogs inject
-  `HashcatRunner::Query`; stubs in `tests/hashcatquerytesthelpers.h`.
+- Tests: `TestEnvironment::run` (QStandardPaths test mode), friends (`MainWindowTestAccess`).
+  Prefer `useMissingHashcatPath()`/`writeSearchableExecutable()` over Windows `QSKIP`; inject
+  `HashcatRunner::Query` for read-only dialogs (`hashcatquerytesthelpers.h`). `QSKIP` stays only
+  where a `#!` child or Unix-only behavior is essential.
 - Add tests only for meaningful behavior; do not pad suites with low-value cases.
 - Commits: subject <=72 chars, capitalized, imperative, no period; body only for what and why.
 - `FAQ.md` is generated: `mdfaqgen FAQ.yaml FAQ.md`.

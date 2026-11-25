@@ -1998,21 +1998,11 @@ void TestMainWindow::listRowEventsRebuildThePreviewOnce()
 // Auto-detect; m_hashTypesPath is what lets a changed path re-query.
 void TestMainWindow::aFailedReloadClearsTheHashTypes()
 {
-    const QString stub = TestEnvironment::writeShellStub(QStringLiteral("stub-hashcat-fail-clear"),
-                                                         "#!/bin/sh\n"
-                                                         "printf '{\"0\":{\"name\":\"MD5\"}}\\n'\n"
-                                                         "exit 0\n");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     m_fixture.startWatchdog();
     MainWindow window;
-    QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() == 2,
-                             AppConstants::Hashcat::QueryTimeoutMs);
+    MainWindowTestAccess::ui(window)->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
 
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
                                        QStringLiteral("/nonexistent/hashcat-broken"));
@@ -2170,19 +2160,12 @@ void TestMainWindow::toolsMenuMnemonicsAreUnique()
 
 void TestMainWindow::applyingAKnownModeKeepsAnUnchangedInput()
 {
-    const QString stub = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-apply"), R"({"0":{"name":"MD5"},"1000":{"name":"NTLM"}})");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
     Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
-    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() == 3,
-                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
+    ui->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"), 1000);
     ui->lineEdit_hashfile->setText(QStringLiteral("some-hash"));
 
     QVERIFY(MainWindowTestAccess::applyIdentifiedHashType(window, 1000, std::nullopt));
@@ -2192,19 +2175,11 @@ void TestMainWindow::applyingAKnownModeKeepsAnUnchangedInput()
 
 void TestMainWindow::applyingAnEditedInputWritesTheRawText()
 {
-    const QString stub = TestEnvironment::writeHashcatStub(QStringLiteral("stub-hashcat-apply-raw"),
-                                                           R"({"0":{"name":"MD5"}})");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
     Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
-    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() == 2,
-                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
     ui->lineEdit_hashfile->setText(QStringLiteral("original"));
 
     QVERIFY(MainWindowTestAccess::applyIdentifiedHashType(
@@ -2215,19 +2190,11 @@ void TestMainWindow::applyingAnEditedInputWritesTheRawText()
 
 void TestMainWindow::anUnknownModeIsRefused()
 {
-    const QString stub = TestEnvironment::writeHashcatStub(
-        QStringLiteral("stub-hashcat-apply-unknown"), R"({"0":{"name":"MD5"}})");
-#ifdef Q_OS_WIN
-    QSKIP("no shell stub on this platform");
-#else
-    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
-#endif
-    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+    TestEnvironment::useMissingHashcatPath();
 
     MainWindow window;
     Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
-    QTRY_VERIFY_WITH_TIMEOUT(ui->comboBox_hash_type->count() == 2,
-                             AppConstants::Hashcat::QueryTimeoutMs);
+    ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
     ui->lineEdit_hashfile->setText(QStringLiteral("some-hash"));
     const QVariant beforeType = ui->comboBox_hash_type->currentData();
 
