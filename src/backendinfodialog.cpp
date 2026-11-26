@@ -101,8 +101,13 @@ void BackendInfoDialog::refreshClicked()
         showMessage(tr("Backend information reported by hashcat."));
     });
 
-    m_watcher->setFuture(m_query(resolved, QStringList() << AppConstants::Hashcat::BackendInfo,
-                                 AppConstants::Hashcat::BackendInfoTimeoutMs, m_cancel));
+    // Own session: probes would otherwise collide on hashcat's pidfile.
+    QStringList args;
+    args << AppConstants::Hashcat::BackendInfo << AppConstants::Hashcat::LogfileDisable
+         << QStringLiteral("--session=%1")
+                .arg(HashcatRunner::uniqueSession(AppConstants::Hashcat::BackendInfoSessionPrefix));
+    m_watcher->setFuture(
+        m_query(resolved, args, AppConstants::Hashcat::BackendInfoTimeoutMs, m_cancel));
 }
 
 void BackendInfoDialog::cancelClicked()

@@ -358,6 +358,8 @@ inline constexpr QLatin1StringView PotfilePath{"--potfile-path"};
 inline constexpr QLatin1StringView HashTypeShort{"-m"};
 inline constexpr QLatin1StringView PotfileSessionPrefix{"hcgui-pot-"};
 inline constexpr QLatin1StringView IdentifySessionPrefix{"hcgui-id-"};
+inline constexpr QLatin1StringView HashTypeSessionPrefix{"hcgui-type-"};
+inline constexpr QLatin1StringView BackendInfoSessionPrefix{"hcgui-backend-"};
 // Silences the deprecated-mode notice on stdout; no other effect on --show/--left.
 inline constexpr QLatin1StringView DeprecatedCheckDisable{"--deprecated-check-disable"};
 // The show parser retains at most this many entries; the counts stay complete.

@@ -3,6 +3,7 @@
  * SPDX-FileCopyrightText: Rainer Größlinger
  */
 
+#include "appconstants.h"
 #include "hashcatquerytesthelpers.h"
 #include "hashtypeloader.h"
 #include "testenvironment.h"
@@ -28,6 +29,8 @@ class TestHashTypeLoader : public QObject
 
 private slots:
     void loadedEmitsTheParsedList();
+    void theQueryAsksForTheExampleHashes();
+    void eachQueryUsesItsOwnSession();
     void aProcessFailureIsReported();
     void aTimeoutIsReported();
     void unparseableOutputIsReported();
@@ -54,6 +57,53 @@ void TestHashTypeLoader::loadedEmitsTheParsedList()
     QCOMPARE(types.size(), 2);
     QCOMPARE(types.value(0), QStringLiteral("0 | MD5"));
     QCOMPARE(types.value(1000), QStringLiteral("1000 | NTLM"));
+}
+
+void TestHashTypeLoader::theQueryAsksForTheExampleHashes()
+{
+    QStringList args;
+    HashTypeLoader loader(
+        nullptr, cannedQuery(normalResult(QStringLiteral(R"({"0":{"name":"MD5"}})")), &args));
+    QSignalSpy loaded(&loader, &HashTypeLoader::loaded);
+
+    loader.reload(QStringLiteral("hashcat"));
+    QTRY_COMPARE_WITH_TIMEOUT(loaded.count(), 1, 5000);
+
+    QCOMPARE(args.value(0), QString(AppConstants::Hashcat::ExampleHashes));
+    QVERIFY(args.contains(QString(AppConstants::Hashcat::MachineReadable)));
+    QVERIFY(args.contains(QString(AppConstants::Hashcat::LogfileDisable)));
+    QCOMPARE(args.filter(QStringLiteral("--session=")).size(), 1);
+    QVERIFY(args.join(QLatin1Char(' '))
+                .contains(QStringLiteral("--session=")
+                          + QString(AppConstants::Hashcat::HashTypeSessionPrefix)));
+}
+
+void TestHashTypeLoader::eachQueryUsesItsOwnSession()
+{
+    QStringList first;
+    QStringList second;
+    HashTypeLoader firstLoader(
+        nullptr, cannedQuery(normalResult(QStringLiteral(R"({"0":{"name":"MD5"}})")), &first));
+    HashTypeLoader secondLoader(
+        nullptr, cannedQuery(normalResult(QStringLiteral(R"({"0":{"name":"MD5"}})")), &second));
+    QSignalSpy firstLoaded(&firstLoader, &HashTypeLoader::loaded);
+    QSignalSpy secondLoaded(&secondLoader, &HashTypeLoader::loaded);
+
+    firstLoader.reload(QStringLiteral("hashcat"));
+    secondLoader.reload(QStringLiteral("hashcat"));
+    QTRY_COMPARE_WITH_TIMEOUT(firstLoaded.count(), 1, 5000);
+    QTRY_COMPARE_WITH_TIMEOUT(secondLoaded.count(), 1, 5000);
+
+    const auto session = [](const QStringList &args) {
+        for (const QString &arg : args) {
+            if (arg.startsWith(QStringLiteral("--session="))) {
+                return arg;
+            }
+        }
+        return QString();
+    };
+    QVERIFY(!session(first).isEmpty());
+    QVERIFY(session(first) != session(second));
 }
 
 void TestHashTypeLoader::aProcessFailureIsReported()

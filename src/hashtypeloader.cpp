@@ -70,10 +70,14 @@ void HashTypeLoader::reload(const QString &hashcatPath)
         }
         emit loaded(parsed);
     });
-    m_watcher->setFuture(m_query(hashcatPath,
-                                 QStringList() << AppConstants::Hashcat::ExampleHashes
-                                               << AppConstants::Hashcat::MachineReadable,
-                                 AppConstants::Hashcat::QueryTimeoutMs, m_cancel));
+    // Own session: probes would otherwise collide on hashcat's pidfile.
+    QStringList args;
+    args << AppConstants::Hashcat::ExampleHashes << AppConstants::Hashcat::MachineReadable
+         << AppConstants::Hashcat::LogfileDisable
+         << QStringLiteral("--session=%1")
+                .arg(HashcatRunner::uniqueSession(AppConstants::Hashcat::HashTypeSessionPrefix));
+    m_watcher->setFuture(
+        m_query(hashcatPath, args, AppConstants::Hashcat::QueryTimeoutMs, m_cancel));
 }
 
 void HashTypeLoader::setLoading(bool loading)

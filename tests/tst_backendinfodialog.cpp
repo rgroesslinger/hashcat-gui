@@ -23,6 +23,7 @@ class TestBackendInfoDialog : public QObject
 private slots:
     void init();
     void showsTheRawOutputAndAsksForBackendInfo();
+    void eachQueryUsesItsOwnSession();
     void anUnconfiguredPathStartsNoQuery();
     void aMissingExecutableStartsNoQuery();
     void aProcessFailureIsReported();
@@ -52,8 +53,36 @@ void TestBackendInfoDialog::showsTheRawOutputAndAsksForBackendInfo()
         cannedQuery(normalResult(QStringLiteral("OpenCL Info:\n  Vendor..: test\n")), &args));
     auto *output = dialog.findChild<QPlainTextEdit *>(QStringLiteral("plainTextEdit_output"));
     QTRY_VERIFY(output->toPlainText().contains(QStringLiteral("OpenCL Info")));
-    QCOMPARE(args, QStringList{QString(AppConstants::Hashcat::BackendInfo)});
+    QCOMPARE(args.value(0), QString(AppConstants::Hashcat::BackendInfo));
+    QVERIFY(args.contains(QString(AppConstants::Hashcat::LogfileDisable)));
+    const QStringList sessions = args.filter(QStringLiteral("--session="));
+    QCOMPARE(sessions.size(), 1);
+    QVERIFY(sessions.first().startsWith(
+        QStringLiteral("--session=") + QString(AppConstants::Hashcat::BackendInfoSessionPrefix)));
     QVERIFY(status(dialog)->text().contains(QStringLiteral("reported by hashcat")));
+}
+
+void TestBackendInfoDialog::eachQueryUsesItsOwnSession()
+{
+    QTemporaryDir dir;
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, fakeProgram(dir));
+
+    QStringList first;
+    QStringList second;
+    BackendInfoDialog firstDialog(nullptr, cannedQuery(normalResult(), &first));
+    BackendInfoDialog secondDialog(nullptr, cannedQuery(normalResult(), &second));
+    QTRY_VERIFY_WITH_TIMEOUT(!first.isEmpty() && !second.isEmpty(), 5000);
+
+    const auto session = [](const QStringList &args) {
+        for (const QString &arg : args) {
+            if (arg.startsWith(QStringLiteral("--session="))) {
+                return arg;
+            }
+        }
+        return QString();
+    };
+    QVERIFY(!session(first).isEmpty());
+    QVERIFY(session(first) != session(second));
 }
 
 void TestBackendInfoDialog::anUnconfiguredPathStartsNoQuery()
