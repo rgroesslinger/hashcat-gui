@@ -62,6 +62,7 @@ and tests depend on it.
 - `build()` inserts `--` before the positional tail only when a token starts with `-`; normal argv
   stays byte-identical. `LaunchValidator` rejects NUL and C0/C1 except tab; separates
   `HashcatNotExecutable` from a missing file.
+- `LaunchValidator` refuses canonical path collisions where one role is written.
 - Windows: `TerminalCatalog::powerShellScript()` via `-EncodedCommand` (also Tools -> Copy as
   PowerShell Script); user data never in `-Command`; overlong -> `CommandTooLong`.
 - Unix: one fixed `sh -c` wrapper, hashcat/args as positional parameters, never spliced text; the

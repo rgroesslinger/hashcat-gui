@@ -23,6 +23,29 @@ QString windowsSuffixNote()
                "Windows executable names include their extension, for example hashcat.exe.");
 }
 #endif
+
+QString pathRoleName(LaunchValidator::PathRole role)
+{
+    switch (role) {
+    case LaunchValidator::PathRole::HashFile:
+        return QCoreApplication::translate("LaunchMessage", "hash file");
+    case LaunchValidator::PathRole::Outfile:
+        return QCoreApplication::translate("LaunchMessage", "outfile");
+    case LaunchValidator::PathRole::Potfile:
+        return QCoreApplication::translate("LaunchMessage", "potfile");
+    case LaunchValidator::PathRole::Wordlist:
+        return QCoreApplication::translate("LaunchMessage", "wordlist");
+    case LaunchValidator::PathRole::Ruleset:
+        return QCoreApplication::translate("LaunchMessage", "rules file");
+    case LaunchValidator::PathRole::Table:
+        return QCoreApplication::translate("LaunchMessage", "table");
+    case LaunchValidator::PathRole::Cache:
+        return QCoreApplication::translate("LaunchMessage", "cache folder");
+    case LaunchValidator::PathRole::None:
+        break;
+    }
+    return {};
+}
 } // namespace
 
 // The texts are translated in the LaunchMessage context from the first
@@ -369,6 +392,17 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
             QCoreApplication::translate(
                 "LaunchMessage", "A table has to be a file; hashcat does not read a folder:\n%1")
                 .arg(problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::PathCollision:
+        message.format = Qt::PlainText;
+        message.text =
+            QCoreApplication::translate("LaunchMessage",
+                                        "The %1 and the %2 use the same path:\n%3\n"
+                                        "Hashcat writes one or both of them, so a run could change "
+                                        "the file. Choose different paths.")
+                .arg(pathRoleName(problem.firstRole), pathRoleName(problem.secondRole),
+                     problem.detail);
         break;
 
     case LaunchValidator::LaunchError::IncrementWithSpeedOnly:

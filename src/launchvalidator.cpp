@@ -11,6 +11,7 @@
 
 #include <QDir>
 #include <QFileInfo>
+#include <QList>
 #include <QRegularExpression>
 #include <QStringView>
 #include <algorithm>
@@ -110,6 +111,117 @@ bool unsigned128(const QString &text)
 bool hasShape(const QString &text, QLatin1StringView shape)
 {
     return QRegularExpression(QString(shape)).match(text).hasMatch();
+}
+
+// Canonical path for collision checks; a missing path falls back to the
+// cleaned absolute one. Hard links stay undetected, unlike hashcat's stat().
+QString canonicalLaunchPath(const QString &path, const QString &resolvedHashcatPath)
+{
+    const QString absolute = ProgramPath::forHashcat(path, resolvedHashcatPath);
+    const QString canonical = QFileInfo(absolute).canonicalFilePath();
+    return QDir::cleanPath(canonical.isEmpty() ? absolute : canonical);
+}
+
+bool sameLaunchPath(const QString &first, const QString &second)
+{
+#ifdef Q_OS_WIN
+    return first.compare(second, Qt::CaseInsensitive) == 0;
+#else
+    return first == second;
+#endif
+}
+
+struct LaunchPath {
+    PathRole role;
+    QString path;
+    // hashcat opens this path for writing (append, in-place rewrite or a
+    // directory it fills); a reader on the same path would see it change.
+    bool writes;
+};
+
+// One writer and any other role on the same path would corrupt it;
+// two readers may share one.
+LaunchError findPathCollision(const HashcatOptions &options, const QString &resolvedHashcatPath,
+                              QString *detail, PathRole *firstRole, PathRole *secondRole)
+{
+    QList<LaunchPath> paths;
+    const auto add = [&paths](PathRole role, const QString &path, bool writes) {
+        if (!path.isEmpty()) {
+            paths.append({role, path, writes});
+        }
+    };
+
+    // The hash file is rewritten in place by --remove and is otherwise a
+    // reader; the writer on the other side of a collision makes it unsafe.
+    add(PathRole::HashFile, options.hashFile, options.remove);
+    if (options.outfileEnabled && !options.outfile.isEmpty()) {
+        // The GUI expands the placeholders before launch, so compare the path
+        // hashcat will actually open.
+        add(PathRole::Outfile,
+            CommandBuilder::expandOutfileTemplate(options.outfile, options.hashFile,
+                                                  options.unixTime),
+            true);
+    }
+    // --speed-only turns the potfile off upstream, so its path is no writer.
+    if (options.attackMode != AttackMode::Association && !options.potfileDisable
+        && !options.speedOnly && !options.potfilePath.isEmpty()) {
+        add(PathRole::Potfile, options.potfilePath, true);
+    }
+    if (!options.cachePath.isEmpty()) {
+        add(PathRole::Cache, options.cachePath, true);
+    }
+    if (CommandBuilder::attackUsesWordlists(options.attackMode)) {
+        for (const QString &wordlist : options.wordlists) {
+            add(PathRole::Wordlist, wordlist, false);
+        }
+    }
+    if (CommandBuilder::attackUsesRules(options.attackMode)) {
+        for (const QString &rulesFile : options.rulesFiles) {
+            add(PathRole::Ruleset, rulesFile, false);
+        }
+    }
+    // Mode 4 reads its rulesets as positional inputs, not through -r.
+    if (options.attackMode == AttackMode::Pcfg) {
+        for (const QString &ruleset : options.pcfgRulesets) {
+            add(PathRole::Ruleset, ruleset, false);
+        }
+    }
+    if (options.attackMode == AttackMode::Table) {
+        for (const QString &tableFile : options.tableFiles) {
+            add(PathRole::Table, tableFile, false);
+        }
+    }
+
+    QStringList canonical;
+    canonical.reserve(paths.size());
+    for (const LaunchPath &path : std::as_const(paths)) {
+        canonical << canonicalLaunchPath(path.path, resolvedHashcatPath);
+    }
+
+    for (qsizetype i = 0; i < paths.size(); ++i) {
+        for (qsizetype j = i + 1; j < paths.size(); ++j) {
+            if (paths.at(i).role == paths.at(j).role || (!paths.at(i).writes && !paths.at(j).writes)
+                || !sameLaunchPath(canonical.at(i), canonical.at(j))) {
+                continue;
+            }
+            if (detail) {
+                // Two spellings of one file are shown as both, so the message
+                // explains why they collide.
+                *detail = paths.at(i).path == paths.at(j).path
+                              ? paths.at(i).path
+                              : paths.at(i).path + QLatin1Char('\n') + paths.at(j).path;
+            }
+            if (firstRole) {
+                *firstRole = paths.at(i).role;
+            }
+            if (secondRole) {
+                *secondRole = paths.at(j).role;
+            }
+            return LaunchError::PathCollision;
+        }
+    }
+
+    return LaunchError::None;
 }
 
 // The key of a key=value token: everything before the first '='.
@@ -484,10 +596,16 @@ QString showControlCharacters(const QString &token)
 }
 
 LaunchError validateOptions(const HashcatOptions &options, const QString &resolvedHashcatPath,
-                            QString *detail)
+                            QString *detail, PathRole *firstRole, PathRole *secondRole)
 {
     if (detail) {
         detail->clear();
+    }
+    if (firstRole) {
+        *firstRole = PathRole::None;
+    }
+    if (secondRole) {
+        *secondRole = PathRole::None;
     }
     const CommandBuilder::ModeRequirements requirements =
         CommandBuilder::modeRequirements(options.attackMode);
@@ -773,6 +891,13 @@ LaunchError validateOptions(const HashcatOptions &options, const QString &resolv
         }
     }
 
+    // Checked after the per-field checks, so an invalid value wins.
+    const LaunchError collision =
+        findPathCollision(options, resolvedHashcatPath, detail, firstRole, secondRole);
+    if (collision != LaunchError::None) {
+        return collision;
+    }
+
     // What the builder would hand to hashcat must be the text the user sees.
     // The check uses the built argv, so a value the mode leaves out of the
     // command line is not refused.
@@ -794,7 +919,8 @@ LaunchError validateOptions(const HashcatOptions &options, const QString &resolv
 LaunchProblem validate(const LaunchContext &context)
 {
     LaunchProblem problem;
-    problem.code = validateOptions(context.options, context.resolvedHashcatPath, &problem.detail);
+    problem.code = validateOptions(context.options, context.resolvedHashcatPath, &problem.detail,
+                                   &problem.firstRole, &problem.secondRole);
     if (problem.code != LaunchError::None) {
         return problem;
     }

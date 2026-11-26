@@ -52,7 +52,9 @@ LaunchValidator::LaunchProblem validateOptionsAt(const HashcatOptions &options,
 {
     LaunchValidator::LaunchContext context;
     context.options = options;
-    context.options.hashFile = QStringLiteral("hash.txt");
+    if (context.options.hashFile.isEmpty()) {
+        context.options.hashFile = QStringLiteral("hash.txt");
+    }
     context.hashcatPath = resolvedHashcatPath;
     context.resolvedHashcatPath = resolvedHashcatPath;
     context.configuredTerminal = QStringLiteral("konsole");
@@ -84,6 +86,7 @@ private slots:
     void cachePathNeedsAnExistingDirectory();
     void relativePathsResolveAgainstTheProgramDirectory();
     void sessionSuppliedValuesAreRevalidated();
+    void pathCollisionsAreRefused();
     void controlCharactersAreRefused();
     void outfileFormatIsValidated();
 };
@@ -1176,6 +1179,137 @@ void TestLaunchValidator::sessionSuppliedValuesAreRevalidated()
     expect(options, LaunchValidator::LaunchError::InvalidTablePath, options.tableFiles.first());
     options.tableFiles = QStringList{QStringLiteral("table.txt")};
     expect(options, LaunchValidator::LaunchError::None);
+}
+
+// hashcat opens the potfile and outfile for writing and does not check the
+// potfile against its inputs. Two roles on one path would corrupt each other,
+// so the launch refuses the exact conflict and names both roles.
+void TestLaunchValidator::pathCollisionsAreRefused()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const auto writeFile = [](const QString &path) {
+        QFile file(path);
+        if (!file.open(QIODevice::WriteOnly)) {
+            return false;
+        }
+        file.write("x\n");
+        file.close();
+        return true;
+    };
+
+    const QString program = directory.filePath(QStringLiteral("hashcat"));
+    const QString hashFile = directory.filePath(QStringLiteral("hashes.txt"));
+    const QString wordlist = directory.filePath(QStringLiteral("words.txt"));
+    const QString secondWordlist = directory.filePath(QStringLiteral("words2.txt"));
+    const QString rulesFile = directory.filePath(QStringLiteral("rules.rule"));
+    const QString tableFile = directory.filePath(QStringLiteral("table.txt"));
+    const QString outfile = directory.filePath(QStringLiteral("out.txt"));
+    QVERIFY(writeFile(program));
+    QVERIFY(writeFile(hashFile));
+    QVERIFY(writeFile(wordlist));
+    QVERIFY(writeFile(secondWordlist));
+    QVERIFY(writeFile(rulesFile));
+    QVERIFY(writeFile(tableFile));
+    QVERIFY(QDir(directory.path()).mkpath(QStringLiteral("cache")));
+
+    HashcatOptions options;
+    options.attackMode = AttackMode::Straight;
+    options.hashFile = hashFile;
+    options.wordlists = QStringList{wordlist};
+
+    const auto expectCollision =
+        [&program](const HashcatOptions &checked, LaunchValidator::PathRole first,
+                   LaunchValidator::PathRole second, const QString &expectedDetail) {
+            const LaunchValidator::LaunchProblem problem = validateOptionsAt(checked, program);
+            QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::PathCollision));
+            QCOMPARE(int(problem.firstRole), int(first));
+            QCOMPARE(int(problem.secondRole), int(second));
+            QCOMPARE(problem.detail, expectedDetail);
+        };
+    const auto expectClean = [&program](const HashcatOptions &checked) {
+        QCOMPARE(int(validateOptionsAt(checked, program).code),
+                 int(LaunchValidator::LaunchError::None));
+    };
+
+    // The potfile is the writer that hashcat itself does not check.
+    options.potfilePath = hashFile;
+    expectCollision(options, LaunchValidator::PathRole::HashFile,
+                    LaunchValidator::PathRole::Potfile, hashFile);
+
+    // --speed-only turns the potfile off upstream, so this path is no writer.
+    options.speedOnly = true;
+    expectClean(options);
+    options.speedOnly = false;
+
+    // A relative spelling resolves against the program directory and meets
+    // the absolute one.
+    options.potfilePath = QStringLiteral("hashes.txt");
+    expectCollision(options, LaunchValidator::PathRole::HashFile,
+                    LaunchValidator::PathRole::Potfile,
+                    hashFile + QLatin1Char('\n') + QStringLiteral("hashes.txt"));
+
+    options.potfilePath = wordlist;
+    expectCollision(options, LaunchValidator::PathRole::Potfile,
+                    LaunchValidator::PathRole::Wordlist, wordlist);
+    options.potfilePath.clear();
+
+    // Mode 4 reads its rulesets as positional inputs, not through -r.
+    options.attackMode = AttackMode::Pcfg;
+    options.pcfgRulesets = QStringList{rulesFile};
+    options.potfilePath = rulesFile;
+    expectCollision(options, LaunchValidator::PathRole::Potfile, LaunchValidator::PathRole::Ruleset,
+                    rulesFile);
+    options.pcfgRulesets.clear();
+    options.potfilePath.clear();
+    options.attackMode = AttackMode::Straight;
+
+    options.outfileEnabled = true;
+    options.outfile = hashFile;
+    expectCollision(options, LaunchValidator::PathRole::HashFile,
+                    LaunchValidator::PathRole::Outfile, hashFile);
+    options.outfile = outfile;
+    options.potfilePath = outfile;
+    expectCollision(options, LaunchValidator::PathRole::Outfile, LaunchValidator::PathRole::Potfile,
+                    outfile);
+    options.potfilePath.clear();
+    options.cachePath = QStringLiteral("cache");
+    options.outfile = QStringLiteral("cache");
+    expectCollision(options, LaunchValidator::PathRole::Outfile, LaunchValidator::PathRole::Cache,
+                    QStringLiteral("cache"));
+
+    // A symlink is the same file to hashcat's stat(), so it collides even
+    // though the two spellings differ.
+#ifndef Q_OS_WIN
+    const QString link = directory.filePath(QStringLiteral("words-link.txt"));
+    QVERIFY(QFile::link(wordlist, link));
+    options.outfile = link;
+    expectCollision(options, LaunchValidator::PathRole::Outfile,
+                    LaunchValidator::PathRole::Wordlist, link + QLatin1Char('\n') + wordlist);
+#endif
+
+    // Distinct paths pass, and readers may share one.
+    options.outfile = outfile;
+    options.potfilePath = QStringLiteral("hashcat.potfile");
+    expectClean(options);
+    options.outfileEnabled = false;
+    options.potfilePath.clear();
+    options.wordlists = QStringList{wordlist, wordlist};
+    expectClean(options);
+
+    // The outfile placeholders are expanded before launch, so the collision
+    // check has to use the expanded path and compare case-insensitively.
+    options.hashFile = directory.filePath(QStringLiteral("work/hashes.txt"));
+    options.outfileEnabled = true;
+    options.outfile = QStringLiteral("<HASH>");
+    options.potfilePath = QStringLiteral("hashes.txt");
+    expectCollision(options, LaunchValidator::PathRole::Outfile, LaunchValidator::PathRole::Potfile,
+                    QStringLiteral("hashes.txt"));
+
+    // A template that expands to a distinct path passes.
+    options.outfile = QStringLiteral("<hash>.out");
+    options.potfilePath = QStringLiteral("hashcat.potfile");
+    expectClean(options);
 }
 
 // A NUL would silently end the token at exec, so what hashcat receives would
