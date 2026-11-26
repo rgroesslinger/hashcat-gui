@@ -54,7 +54,7 @@ void SettingsManager::discardPending()
     m_pending.clear();
 }
 
-bool SettingsManager::moveFileAside(QString *backupPath, QString *errorMessage)
+bool SettingsManager::moveFileAside(QString *backupPath, QString *errorMessage) const
 {
     if (backupPath) {
         backupPath->clear();

@@ -26,7 +26,7 @@ namespace
 // Local files only; a remote URL is not a path here.
 bool hasLocalFile(const QMimeData *data)
 {
-    return data && data->hasUrls()
+    return data != nullptr && data->hasUrls()
            && std::ranges::any_of(data->urls(), [](const QUrl &url) { return url.isLocalFile(); });
 }
 } // namespace
@@ -86,17 +86,21 @@ bool PathListController::eventFilter(QObject *watched, QEvent *event)
     switch (event->type()) {
     case QEvent::DragEnter:
     case QEvent::DragMove: {
-        auto *drag = static_cast<QDragMoveEvent *>(event);
-        if (hasLocalFile(drag->mimeData())) {
+        auto *drag = dynamic_cast<QDragMoveEvent *>(event);
+        if (drag && hasLocalFile(drag->mimeData())) {
             drag->acceptProposedAction();
             return true;
         }
         break;
     }
     case QEvent::Drop: {
-        auto *drop = static_cast<QDropEvent *>(event);
+        auto *drop = dynamic_cast<QDropEvent *>(event);
+        if (!drop) {
+            break;
+        }
+        const QList<QUrl> urls = drop->mimeData()->urls();
         QStringList paths;
-        for (const QUrl &url : drop->mimeData()->urls()) {
+        for (const QUrl &url : urls) {
             if (url.isLocalFile()) {
                 paths << url.toLocalFile();
             }

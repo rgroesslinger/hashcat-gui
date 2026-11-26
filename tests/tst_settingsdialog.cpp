@@ -824,7 +824,8 @@ void TestSettingsDialog::aMalformedSaveOffersToMoveTheFileAside()
         if (!box) {
             return;
         }
-        for (QAbstractButton *button : box->buttons()) {
+        const QList<QAbstractButton *> buttons = box->buttons();
+        for (QAbstractButton *button : buttons) {
             QString text = button->text();
             text.remove(QLatin1Char('&'));
             if (text.contains(QStringLiteral("Move File Aside and Save"))) {

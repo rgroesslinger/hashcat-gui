@@ -57,7 +57,7 @@ public:
 
     // Renames the settings file aside to .bak[.N], never deleting it.
     [[nodiscard]] bool moveFileAside(QString *backupPath = nullptr,
-                                     QString *errorMessage = nullptr);
+                                     QString *errorMessage = nullptr) const;
 
     // The result of the last sync(): NoError when the values reached the file.
     [[nodiscard]] QSettings::Status lastStatus() const;

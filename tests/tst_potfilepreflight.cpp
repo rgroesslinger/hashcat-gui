@@ -86,7 +86,7 @@ void selectExplicitHashType(MainWindow &window)
 // itself is injected and never starts the image.
 QString configureExecutable()
 {
-    const QString path =
+    QString path =
         TestEnvironment::writeSearchableExecutable(QStringLiteral("hashcat-potfile.exe"));
     if (path.isEmpty()) {
         return {};

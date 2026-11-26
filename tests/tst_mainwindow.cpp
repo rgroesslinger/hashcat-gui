@@ -1417,7 +1417,7 @@ void TestMainWindow::actionsWaitForThePendingHashType()
     QVERIFY(ui->actionPotfileCheck->isEnabled());
 
     const QStringList arguments = MainWindowTestAccess::generateArguments(window);
-    const int hashType = arguments.indexOf(QStringLiteral("--hash-type"));
+    const qsizetype hashType = arguments.indexOf(QStringLiteral("--hash-type"));
     QVERIFY(hashType >= 0);
     QCOMPARE(arguments.value(hashType + 1), QStringLiteral("1000"));
 }

@@ -873,7 +873,8 @@ void TestSession::anUnusableStartupSessionCanBeMovedAside()
         if (!box) {
             return;
         }
-        for (QAbstractButton *button : box->buttons()) {
+        const QList<QAbstractButton *> buttons = box->buttons();
+        for (QAbstractButton *button : buttons) {
             QString label = button->text();
             label.remove(QLatin1Char('&'));
             if (label.contains(QStringLiteral("Move File Aside"))) {
