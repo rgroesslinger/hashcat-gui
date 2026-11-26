@@ -1225,7 +1225,10 @@ void TestSession::theEscapingSessionRoundTrips()
     QCOMPARE(saved.readAll(), sessionBytes);
 
     const HashcatOptions options = MainWindowTestAccess::collectHashcatOptions(window);
-    QCOMPARE(int(validateOptions(options).code), int(LaunchValidator::LaunchError::None));
+    // The file stores the values a session can carry, not the values the
+    // widgets would accept: the launch check has to refuse them now.
+    QCOMPARE(int(validateOptions(options).code),
+             int(LaunchValidator::LaunchError::InvalidSkipLimit));
 
     const QString recipe = QStringLiteral("md5($p.'x’y')");
     const QString session = QStringLiteral("sess 'one' & two");

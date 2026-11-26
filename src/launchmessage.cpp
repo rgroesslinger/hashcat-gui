@@ -304,6 +304,73 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
                            .arg(problem.detail);
         break;
 
+    case LaunchValidator::LaunchError::InvalidPotfilePath:
+        message.format = Qt::PlainText;
+        message.text =
+            QCoreApplication::translate(
+                "LaunchMessage", "The potfile path must be a writable file, or a new file in an "
+                                 "existing writable folder:\n%1")
+                .arg(problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::InvalidSkipLimit:
+        message.format = Qt::PlainText;
+        message.text =
+            QCoreApplication::translate(
+                "LaunchMessage", "The skip or limit value must be a whole number from 0 to %1:\n%2")
+                .arg(QString(AppConstants::Validation::MaxUnsigned128), problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::InvalidOpenclDeviceTypes:
+        message.format = Qt::PlainText;
+        message.text = QCoreApplication::translate(
+                           "LaunchMessage",
+                           "The device types must be 1 (CPU) or 2 (GPU), separated by commas:\n%1")
+                           .arg(problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::InvalidCpuAffinity:
+        message.format = Qt::PlainText;
+        message.text = QCoreApplication::translate(
+                           "LaunchMessage",
+                           "The CPU affinity must be a comma-separated list of CPU numbers:\n%1")
+                           .arg(problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::InvalidBackendDevices:
+        message.format = Qt::PlainText;
+        message.text = QCoreApplication::translate(
+                           "LaunchMessage",
+                           "The backend devices must be a comma-separated list of device numbers "
+                           "starting at 1:\n%1")
+                           .arg(problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::InvalidSessionName:
+        message.format = Qt::PlainText;
+        message.text =
+            QCoreApplication::translate("LaunchMessage",
+                                        "The session name must not contain a path separator:\n%1")
+                .arg(problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::InvalidRulesetPath:
+        message.format = Qt::PlainText;
+        message.text =
+            QCoreApplication::translate(
+                "LaunchMessage", "A ruleset folder needs Grammar/grammar.txt; choose a rules file "
+                                 "instead:\n%1")
+                .arg(problem.detail);
+        break;
+
+    case LaunchValidator::LaunchError::InvalidTablePath:
+        message.format = Qt::PlainText;
+        message.text =
+            QCoreApplication::translate(
+                "LaunchMessage", "A table has to be a file; hashcat does not read a folder:\n%1")
+                .arg(problem.detail);
+        break;
+
     case LaunchValidator::LaunchError::IncrementWithSpeedOnly:
         message.icon = QMessageBox::Information;
         message.text = QCoreApplication::translate(

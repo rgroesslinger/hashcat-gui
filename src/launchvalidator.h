@@ -60,6 +60,14 @@ enum class LaunchError : std::uint8_t {
     NoHashRecipe,                    // hash mode 4000 without its recipe
     InvalidOutfileFormat,            // --outfile-format is not 1..6 or a list of them
     InvalidCachePath,                // --cache-path is not an existing directory
+    InvalidPotfilePath,              // --potfile-path is a directory or not writable
+    InvalidSkipLimit,                // --skip or --limit is not an unsigned 128-bit number
+    InvalidOpenclDeviceTypes,        // -D is not a list of device types 1 and 2
+    InvalidCpuAffinity,              // --cpu-affinity is not a list of CPU ids
+    InvalidBackendDevices,           // --backend-devices is not a list of ids from 1
+    InvalidSessionName,              // --session contains a path separator
+    InvalidRulesetPath,              // -r names a folder without Grammar/grammar.txt
+    InvalidTablePath,                // a table row names a folder
     // A collected value holds NUL or a C0/DEL/C1 control other than tab.
     // A NUL would silently truncate the token at exec, so the launched command
     // would differ from the preview.

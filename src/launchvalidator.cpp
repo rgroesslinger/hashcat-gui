@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QStringView>
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -83,6 +84,32 @@ bool numberInRange(const QString &text, qlonglong min, qlonglong max)
     bool ok = false;
     const qlonglong value = text.trimmed().toLongLong(&ok);
     return ok && value >= min && value <= max;
+}
+
+// --skip/--limit use hc_strtou128(); u64 is too narrow.
+bool unsigned128(const QString &text)
+{
+    static const QRegularExpression digits{QString(AppConstants::Validation::Digits)};
+    if (!digits.match(text).hasMatch() || text.isEmpty()) {
+        return false;
+    }
+    static const QString maximum(AppConstants::Validation::MaxUnsigned128);
+
+    // Skip the leading zeros in one pass: the field is free text from a
+    // session, so it can be arbitrarily long.
+    qsizetype firstSignificant = 0;
+    while (firstSignificant + 1 < text.size() && text.at(firstSignificant) == QLatin1Char('0')) {
+        ++firstSignificant;
+    }
+    const QStringView significant = QStringView(text).mid(firstSignificant);
+    return significant.size() < maximum.size()
+           || (significant.size() == maximum.size() && significant <= QStringView(maximum));
+}
+
+// A free-text value against a shape from AppConstants::Validation.
+bool hasShape(const QString &text, QLatin1StringView shape)
+{
+    return QRegularExpression(QString(shape)).match(text).hasMatch();
 }
 
 // The key of a key=value token: everything before the first '='.
@@ -658,6 +685,91 @@ LaunchError validateOptions(const HashcatOptions &options, const QString &resolv
                 *detail = options.outfileFormat;
             }
             return LaunchError::InvalidOutfileFormat;
+        }
+    }
+
+    // Values the widget validators would have caught.
+    // Each is checked only when the builder emits it.
+    if (!options.skip.isEmpty() && !unsigned128(options.skip)) {
+        if (detail) {
+            *detail = options.skip;
+        }
+        return LaunchError::InvalidSkipLimit;
+    }
+    if (!options.limit.isEmpty() && !unsigned128(options.limit)) {
+        if (detail) {
+            *detail = options.limit;
+        }
+        return LaunchError::InvalidSkipLimit;
+    }
+    if (!options.openclDeviceTypes.isEmpty()
+        && !hasShape(options.openclDeviceTypes, AppConstants::Validation::DeviceTypes)) {
+        if (detail) {
+            *detail = options.openclDeviceTypes;
+        }
+        return LaunchError::InvalidOpenclDeviceTypes;
+    }
+    if (!options.cpuAffinity.isEmpty()
+        && !hasShape(options.cpuAffinity, AppConstants::Validation::CpuAffinityList)) {
+        if (detail) {
+            *detail = options.cpuAffinity;
+        }
+        return LaunchError::InvalidCpuAffinity;
+    }
+    if (!options.backendDevices.isEmpty()
+        && !hasShape(options.backendDevices, AppConstants::Validation::BackendDeviceList)) {
+        if (detail) {
+            *detail = options.backendDevices;
+        }
+        return LaunchError::InvalidBackendDevices;
+    }
+    if (!options.session.isEmpty()
+        && !hasShape(options.session, AppConstants::Validation::SessionName)) {
+        if (detail) {
+            *detail = options.session;
+        }
+        return LaunchError::InvalidSessionName;
+    }
+
+    // The potfile must be writable; a speed-only run leaves it unused.
+    if (options.attackMode != AttackMode::Association && !options.potfileDisable
+        && !options.speedOnly && !options.potfilePath.isEmpty()) {
+        const QFileInfo potfile(ProgramPath::forHashcat(options.potfilePath, resolvedHashcatPath));
+        const QFileInfo parent(potfile.absolutePath());
+        const bool usable =
+            !potfile.isDir()
+            && (potfile.exists() ? potfile.isWritable() : parent.isDir() && parent.isWritable());
+        if (!usable) {
+            if (detail) {
+                *detail = options.potfilePath;
+            }
+            return LaunchError::InvalidPotfilePath;
+        }
+    }
+
+    // Base wordlists and rulesets may be folders; tables must be files.
+    if (CommandBuilder::attackUsesRules(options.attackMode)) {
+        for (const QString &rulesFile : options.rulesFiles) {
+            const QFileInfo rules(ProgramPath::forHashcat(rulesFile, resolvedHashcatPath));
+            if (rules.isDir()
+                && !QFileInfo(
+                        QDir(rules.filePath()).filePath(QStringLiteral("Grammar/grammar.txt")))
+                        .isFile()) {
+                if (detail) {
+                    *detail = rulesFile;
+                }
+                return LaunchError::InvalidRulesetPath;
+            }
+        }
+    }
+    if (options.attackMode == AttackMode::Table) {
+        for (const QString &tableFile : options.tableFiles) {
+            if (QFileInfo(ProgramPath::forHashcat(tableFile, resolvedHashcatPath)).isDir()) {
+                if (detail) {
+                    *detail = tableFile;
+                }
+                return LaunchError::InvalidTablePath;
+            }
         }
     }
 

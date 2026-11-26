@@ -83,6 +83,7 @@ private slots:
     void hashRecipeIsRequiredFor4000();
     void cachePathNeedsAnExistingDirectory();
     void relativePathsResolveAgainstTheProgramDirectory();
+    void sessionSuppliedValuesAreRevalidated();
     void controlCharactersAreRefused();
     void outfileFormatIsValidated();
 };
@@ -1054,6 +1055,127 @@ void TestLaunchValidator::relativePathsResolveAgainstTheProgramDirectory()
     problem = validateOptionsAt(hybrid, program);
     QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::WordlistMustBeFile));
     QCOMPARE(problem.detail, QStringLiteral("wordfolder"));
+}
+
+// A session file sets widget text directly, so every field the widgets would
+// filter has to be checked again before a launch. Valid and invalid pairs,
+// each against a program directory so the relative paths mean something.
+void TestLaunchValidator::sessionSuppliedValuesAreRevalidated()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString program = directory.filePath(QStringLiteral("hashcat"));
+    QFile binary(program);
+    QVERIFY(binary.open(QIODevice::WriteOnly));
+    binary.close();
+    QVERIFY(QDir(directory.path()).mkpath(QStringLiteral("cache")));
+    QVERIFY(QDir(directory.path()).mkpath(QStringLiteral("empty-rules")));
+    QVERIFY(QDir(directory.path()).mkpath(QStringLiteral("grammar-rules/Grammar")));
+    QFile grammar(directory.filePath(QStringLiteral("grammar-rules/Grammar/grammar.txt")));
+    QVERIFY(grammar.open(QIODevice::WriteOnly));
+    grammar.close();
+    QVERIFY(QDir(directory.path()).mkpath(QStringLiteral("table-folder")));
+
+    HashcatOptions options;
+    options.attackMode = AttackMode::Straight;
+    options.wordlists = QStringList{QStringLiteral("words.txt")};
+
+    const auto expect = [&program](const HashcatOptions &checked,
+                                   LaunchValidator::LaunchError expected,
+                                   const QString &expectedDetail = QString()) {
+        const LaunchValidator::LaunchProblem problem = validateOptionsAt(checked, program);
+        QCOMPARE(int(problem.code), int(expected));
+        QCOMPARE(problem.detail, expectedDetail);
+    };
+
+    // A base wordlist may be a folder; the ?q row is the file-only one.
+    options.wordlists = QStringList{QStringLiteral("cache")};
+    expect(options, LaunchValidator::LaunchError::None);
+    options.wordlists = QStringList{QStringLiteral("words.txt")};
+
+    options.skip = QStringLiteral("0");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.skip = QStringLiteral("18446744073709551615");
+    expect(options, LaunchValidator::LaunchError::None);
+    // hashcat parses both with hc_strtou128(), so the u64 maximum is not the
+    // limit.
+    options.skip = QStringLiteral("18446744073709551616");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.skip = QString(AppConstants::Validation::MaxUnsigned128);
+    expect(options, LaunchValidator::LaunchError::None);
+    options.skip = QStringLiteral("340282366920938463463374607431768211456");
+    expect(options, LaunchValidator::LaunchError::InvalidSkipLimit, options.skip);
+    options.skip = QStringLiteral("000000000000000000000000000000000000000042");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.skip = QStringLiteral("abc");
+    expect(options, LaunchValidator::LaunchError::InvalidSkipLimit, options.skip);
+    options.skip.clear();
+    options.limit = QStringLiteral("-1");
+    expect(options, LaunchValidator::LaunchError::InvalidSkipLimit, options.limit);
+    options.limit = QStringLiteral("18446744073709551616");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.limit.clear();
+
+    options.openclDeviceTypes = QStringLiteral("1,2");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.openclDeviceTypes = QStringLiteral("3");
+    expect(options, LaunchValidator::LaunchError::InvalidOpenclDeviceTypes,
+           options.openclDeviceTypes);
+    options.openclDeviceTypes.clear();
+
+    options.cpuAffinity = QStringLiteral("0,1");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.cpuAffinity = QStringLiteral("1-4");
+    expect(options, LaunchValidator::LaunchError::InvalidCpuAffinity, options.cpuAffinity);
+    options.cpuAffinity.clear();
+
+    options.backendDevices = QStringLiteral("1,2");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.backendDevices = QStringLiteral("0");
+    expect(options, LaunchValidator::LaunchError::InvalidBackendDevices, options.backendDevices);
+    options.backendDevices.clear();
+
+    options.session = QStringLiteral("attack one");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.session = QStringLiteral("sub/attack");
+    expect(options, LaunchValidator::LaunchError::InvalidSessionName, options.session);
+    options.session = QStringLiteral("sub\\attack");
+    expect(options, LaunchValidator::LaunchError::InvalidSessionName, options.session);
+    options.session.clear();
+
+    options.potfilePath = QStringLiteral("hashcat.potfile");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.potfilePath = QStringLiteral("cache");
+    expect(options, LaunchValidator::LaunchError::InvalidPotfilePath, options.potfilePath);
+    options.potfilePath = QStringLiteral("missing-dir/hashcat.potfile");
+    expect(options, LaunchValidator::LaunchError::InvalidPotfilePath, options.potfilePath);
+    // The checkbox keeps the path out of the command, so it is not checked.
+    options.potfileDisable = true;
+    options.potfilePath = QStringLiteral("cache");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.potfileDisable = false;
+    options.potfilePath.clear();
+
+    // --speed-only turns the potfile off upstream; a path there is unused.
+    options.speedOnly = true;
+    options.potfilePath = QStringLiteral("cache");
+    expect(options, LaunchValidator::LaunchError::None);
+    options.speedOnly = false;
+    options.potfilePath.clear();
+
+    options.rulesFiles = QStringList{QStringLiteral("hashcat.rules")};
+    expect(options, LaunchValidator::LaunchError::None);
+    options.rulesFiles = QStringList{QStringLiteral("empty-rules")};
+    expect(options, LaunchValidator::LaunchError::InvalidRulesetPath, options.rulesFiles.first());
+    options.rulesFiles = QStringList{QStringLiteral("grammar-rules")};
+    expect(options, LaunchValidator::LaunchError::None);
+    options.rulesFiles.clear();
+
+    options.attackMode = AttackMode::Table;
+    options.tableFiles = QStringList{QStringLiteral("table-folder")};
+    expect(options, LaunchValidator::LaunchError::InvalidTablePath, options.tableFiles.first());
+    options.tableFiles = QStringList{QStringLiteral("table.txt")};
+    expect(options, LaunchValidator::LaunchError::None);
 }
 
 // A NUL would silently end the token at exec, so what hashcat receives would

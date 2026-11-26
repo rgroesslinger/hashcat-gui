@@ -213,6 +213,8 @@ inline constexpr QLatin1StringView Digits{"^[0-9]*$"};
 // accelerators, is gone with hashcat 8.0.0. Spaces around the numbers are
 // fine, as in hashcat's own number list.
 inline constexpr QLatin1StringView DeviceTypes{R"(^\s*([12]\s*(,\s*[12]\s*)*)?$)"};
+// The largest value hc_strtou128() accepts.
+inline constexpr QLatin1StringView MaxUnsigned128{"340282366920938463463374607431768211455"};
 // The shapes the feeds of the attack modes 4 and 5 parse themselves and a
 // plain integer validator cannot hold: the colon separated weights list,
 // maxword's multiple of 16, the dot separated decimal and the boolean flags.
@@ -228,6 +230,14 @@ inline constexpr QLatin1StringView BinaryFlag{"^([01]|yes|no|true|false|on|off)?
 // --outfile-format: one or more comma-separated format numbers from 1 to 6.
 // Empty is not valid: hashcat answers --outfile-format '' with an error.
 inline constexpr QLatin1StringView OutfileFormatList{"^[1-6](,[1-6])*$"};
+// --cpu-affinity: hashcat reads a comma-separated list of CPU ids; 0 clears
+// the affinity mask (its own convention for "no pinning").
+inline constexpr QLatin1StringView CpuAffinityList{R"(^\s*[0-9]+\s*(,\s*[0-9]+\s*)*$)"};
+// --backend-devices: device ids start at 1; hashcat refuses 0.
+inline constexpr QLatin1StringView BackendDeviceList{R"(^\s*[1-9][0-9]*\s*(,\s*[1-9][0-9]*\s*)*$)"};
+// --session: hashcat writes <session>.pid/.log/.restore beside its working
+// directory, so a separator would take those files somewhere else.
+inline constexpr QLatin1StringView SessionName{"^[^/\\\\]*$"};
 // The shape upstream calls a setting (feed_param_is_setting(), deliberately
 // shape based: a misspelled key has to be reported as an unknown setting, not
 // as a filename). A mode 9 token that fails this shape would be read as a
