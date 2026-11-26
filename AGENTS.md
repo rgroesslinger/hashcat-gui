@@ -48,7 +48,8 @@ and tests depend on it.
 - Unchecked wordlist/ruleset/table/feed rows stay in the session but are omitted from command and
   launch validation.
 - Hash types load asynchronously: never block the GUI thread on hashcat; read `QSettings` on the
-  calling thread only (reentrant). `m_pendingHashTypeId` applies a session's type later.
+  calling thread only (reentrant). `m_pendingHashTypeId` applies a session's type later; command
+  actions stay disabled until the list has loaded.
 - Hash type `-2` = GUI-only Auto-detect sentinel (`AppConstants::Hashcat::AutoDetectHashType`); any
   negative `hashType` omits `-m`, the only autodetect trigger. Unknown session ids fall back to
   Auto-detect with a warning.

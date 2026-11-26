@@ -163,6 +163,7 @@ MainWindow::MainWindow(QWidget *parent)
     // the first reload, so the loading state is not missed.
     connect(&m_hashTypeLoader, &HashTypeLoader::loadingChanged, this, [this](bool loading) {
         ui->comboBox_hash_type->setEnabled(!loading);
+        setHashTypeActionsBlocked(loading);
         if (loading) {
             ui->comboBox_hash_type->setToolTip(tr("Updating…"));
         }
@@ -303,6 +304,12 @@ void MainWindow::configureWidgets()
         tr("The hash algorithm (-m). Auto-detect omits -m and lets hashcat identify the type. "
            "Type to search the list.");
     ui->comboBox_hash_type->setToolTip(m_hashTypeBaseToolTip);
+
+    // Keep the .ui tooltips for the restore after loading.
+    m_startToolTip = ui->pushButton_start->toolTip();
+    m_copyToolTip = ui->pushButton_copy_clipboard->toolTip();
+    m_copyPowerShellToolTip = ui->actionCopyPowerShellScript->toolTip();
+    m_potfileCheckToolTip = ui->actionPotfileCheck->toolTip();
 
     // The path rows say what they are at a glance: a file, a folder, or the
     // warning of a path hashcat cannot use. The style owns the pixmaps, and
@@ -1182,6 +1189,9 @@ void MainWindow::potfileInspectorTriggered()
 
 void MainWindow::potfileCheckTriggered()
 {
+    if (refuseWhileHashTypesLoad(tr("Check Against Potfile"))) {
+        return;
+    }
     PotfileQueryInput input;
     QString modeName;
     QString hashcatPath;
@@ -1813,6 +1823,9 @@ void MainWindow::hashFileTextChanged(const QString &text)
 
 void MainWindow::copyCommandToClipboard()
 {
+    if (refuseWhileHashTypesLoad(tr("Copy command"))) {
+        return;
+    }
     QString text = ui->lineEdit_command->text();
     // QApplication::clipboard() is null on platforms without clipboard support
     QClipboard *clipboard = QApplication::clipboard();
@@ -1827,6 +1840,9 @@ void MainWindow::copyCommandToClipboard()
 // clipboard is exactly what a PowerShell terminal would run, only readable.
 void MainWindow::copyPowerShellScript()
 {
+    if (refuseWhileHashTypesLoad(tr("Copy as PowerShell Script"))) {
+        return;
+    }
     auto &settings = SettingsManager::instance();
     const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     const QString resolved = Executable::resolve(hashcatPath);
@@ -1857,6 +1873,9 @@ void MainWindow::copyPowerShellScript()
 
 void MainWindow::startClicked()
 {
+    if (refuseWhileHashTypesLoad(tr("Start"))) {
+        return;
+    }
     // Everything the validation reads is collected here, on the GUI thread;
     // the validator itself looks at no settings. The option checks run first:
     // they are what the user has just configured, and hashcat would only
@@ -1918,6 +1937,38 @@ void MainWindow::showLaunchMessage(const LaunchMessage &message)
     box.setTextFormat(message.format);
     box.setText(message.text);
     box.exec();
+}
+
+void MainWindow::setHashTypeActionsBlocked(bool blocked)
+{
+    const QString reason = tr("Wait until the hash type list has loaded.");
+    const QList<QPair<QWidget *, QString>> widgets{
+        {ui->pushButton_start, m_startToolTip},
+        {ui->pushButton_copy_clipboard, m_copyToolTip},
+    };
+    for (const auto &[widget, toolTip] : widgets) {
+        widget->setEnabled(!blocked);
+        widget->setToolTip(blocked ? reason : toolTip);
+    }
+    const QList<QPair<QAction *, QString>> actions{
+        {ui->actionCopyPowerShellScript, m_copyPowerShellToolTip},
+        {ui->actionPotfileCheck, m_potfileCheckToolTip},
+    };
+    for (const auto &[action, toolTip] : actions) {
+        action->setEnabled(!blocked);
+        action->setToolTip(blocked ? reason : toolTip);
+    }
+}
+
+bool MainWindow::refuseWhileHashTypesLoad(const QString &title)
+{
+    if (!m_hashTypeLoader.isLoading()) {
+        return false;
+    }
+    showPlainMessage(this, QMessageBox::Information, title,
+                     tr("The hash type list is still loading. Wait until it has loaded and try "
+                        "again."));
+    return true;
 }
 
 /*************** Helper ***************/

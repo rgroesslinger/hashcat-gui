@@ -202,6 +202,10 @@ private:
     void showLaunchError(const LaunchValidator::LaunchProblem &problem,
                          const LaunchValidator::LaunchContext &context);
     void showLaunchMessage(const LaunchMessage &message);
+    // Actions that build or run a command wait while the hash-type list loads.
+    void setHashTypeActionsBlocked(bool blocked);
+    // Refuses a guarded action with a message while the list loads.
+    [[nodiscard]] bool refuseWhileHashTypesLoad(const QString &title);
     // The menu names as shown, for tooltips and messages that point to Settings.
     [[nodiscard]] QString fileMenuLabel() const;
     [[nodiscard]] QString settingsMenuLabel() const;
@@ -305,6 +309,12 @@ private:
     // The combo's explanatory tooltip in its normal state. The loading and
     // error paths override it temporarily; a successful load restores it.
     QString m_hashTypeBaseToolTip;
+
+    // Tooltips restored after the hash-type load.
+    QString m_startToolTip;
+    QString m_copyToolTip;
+    QString m_copyPowerShellToolTip;
+    QString m_potfileCheckToolTip;
 
     // A same-binary unparseable reply kept the old list; accepting Settings
     // again with that path must re-run the query, there is no other retry.

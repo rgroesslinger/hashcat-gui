@@ -98,6 +98,7 @@ private slots:
     void folderPathsAreMarked();
     void hashTypeComesFromTheItemData();
     void hashTypesAreFilledFromHashcat();
+    void actionsWaitForThePendingHashType();
     void failedQueryReenablesTheHashTypeCombo_data();
     void failedQueryReenablesTheHashTypeCombo();
     void failedQueryKeepsThePreviousListOnTheSameBinary();
@@ -1329,6 +1330,15 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip(),
              QStringLiteral("Updating…"));
 
+    // The actions that build or run a command from the list wait for it too,
+    // and say why while they do.
+    QVERIFY(!MainWindowTestAccess::ui(window)->pushButton_start->isEnabled());
+    QVERIFY(!MainWindowTestAccess::ui(window)->pushButton_copy_clipboard->isEnabled());
+    QVERIFY(!MainWindowTestAccess::ui(window)->actionCopyPowerShellScript->isEnabled());
+    QVERIFY(!MainWindowTestAccess::ui(window)->actionPotfileCheck->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->pushButton_start->toolTip().contains(
+        QStringLiteral("hash type list")));
+
     // Wait at least as long as the query's own deadline: giving up earlier
     // would fail the test while hashcat could still have answered
     QTRY_VERIFY_WITH_TIMEOUT(MainWindowTestAccess::ui(window)->comboBox_hash_type->count() > 0,
@@ -1337,6 +1347,12 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     // Auto-detect is the permanent first entry and the working default.
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 3);
     QVERIFY(MainWindowTestAccess::ui(window)->comboBox_hash_type->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->pushButton_start->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->pushButton_copy_clipboard->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->actionCopyPowerShellScript->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->actionPotfileCheck->isEnabled());
+    QCOMPARE(MainWindowTestAccess::ui(window)->pushButton_start->toolTip(),
+             QStringLiteral("Run hashcat in a terminal with these options."));
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->toolTip(),
              MainWindowTestAccess::hashTypeBaseToolTip(window));
     // Comparing against the member alone would also pass if both were empty;
@@ -1355,6 +1371,54 @@ void TestMainWindow::hashTypesAreFilledFromHashcat()
     const QStringList arguments = MainWindowTestAccess::generateArguments(window);
     QVERIFY(!arguments.contains(QStringLiteral("--hash-type")));
     QVERIFY(!arguments.contains(QStringLiteral("-m")));
+}
+
+// A session that names a hash type while the list is still loading must not
+// offer Start or a copy based on the empty combo: the actions stay blocked
+// until the list has arrived and the type is applied.
+void TestMainWindow::actionsWaitForThePendingHashType()
+{
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-slow"),
+        "#!/bin/sh\n"
+        "sleep 0.3\n"
+        "printf '{\"0\":{\"name\":\"MD5\"},\"1000\":{\"name\":\"NTLM\"}}'\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    QJsonObject values;
+    values.insert(QStringLiteral("comboBox_hash_type"), 1000);
+    QVERIFY(QDir().mkpath(QFileInfo(StateFile::sessionFilePath()).absolutePath()));
+    QVERIFY(StateFile::write(StateFile::sessionFilePath(), AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version, values, nullptr));
+
+    m_fixture.startWatchdog();
+    MainWindow window;
+    window.restoreSession();
+
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QVERIFY(!ui->pushButton_start->isEnabled());
+    QVERIFY(!ui->pushButton_copy_clipboard->isEnabled());
+    QVERIFY(!ui->actionCopyPowerShellScript->isEnabled());
+    QVERIFY(!ui->actionPotfileCheck->isEnabled());
+
+    QTRY_COMPARE_WITH_TIMEOUT(ui->comboBox_hash_type->currentData().toInt(), 1000,
+                              AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(MainWindowTestAccess::pendingHashTypeId(window), -1);
+
+    QVERIFY(ui->pushButton_start->isEnabled());
+    QVERIFY(ui->pushButton_copy_clipboard->isEnabled());
+    QVERIFY(ui->actionCopyPowerShellScript->isEnabled());
+    QVERIFY(ui->actionPotfileCheck->isEnabled());
+
+    const QStringList arguments = MainWindowTestAccess::generateArguments(window);
+    const int hashType = arguments.indexOf(QStringLiteral("--hash-type"));
+    QVERIFY(hashType >= 0);
+    QCOMPARE(arguments.value(hashType + 1), QStringLiteral("1000"));
 }
 
 // Every failure path owes the user the state the success path leaves behind:
@@ -1409,6 +1473,15 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->count(), 1);
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(0).toInt(),
              AppConstants::Hashcat::AutoDetectHashType);
+
+    // The actions that waited for the list come back with their own tooltip,
+    // not the busy one: Auto-detect is usable again.
+    QVERIFY(MainWindowTestAccess::ui(window)->pushButton_start->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->pushButton_copy_clipboard->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->actionCopyPowerShellScript->isEnabled());
+    QVERIFY(MainWindowTestAccess::ui(window)->actionPotfileCheck->isEnabled());
+    QCOMPARE(MainWindowTestAccess::ui(window)->pushButton_start->toolTip(),
+             QStringLiteral("Run hashcat in a terminal with these options."));
 }
 
 // An unparseable reply from the same binary must not throw away a list that
