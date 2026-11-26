@@ -24,6 +24,30 @@
 #include <QToolTip>
 #include <QTreeWidgetItem>
 
+namespace
+{
+// Role of a cell's numeric sort value. Only the column marked numeric by
+// setNumericSortColumn() carries it; every other column sorts as text.
+constexpr int SortValueRole = Qt::UserRole + 1;
+
+class SortableTreeItem : public QTreeWidgetItem
+{
+public:
+    using QTreeWidgetItem::QTreeWidgetItem;
+
+    bool operator<(const QTreeWidgetItem &other) const override
+    {
+        const int column = treeWidget() ? treeWidget()->sortColumn() : 0;
+        const QVariant left = data(column, SortValueRole);
+        const QVariant right = other.data(column, SortValueRole);
+        if (left.isValid() && right.isValid()) {
+            return left.toLongLong() < right.toLongLong();
+        }
+        return QTreeWidgetItem::operator<(other);
+    }
+};
+} // namespace
+
 #include <algorithm>
 
 PotfileTableView::PotfileTableView(QWidget *parent) : QWidget(parent), ui(new Ui::PotfileTableView)
@@ -85,6 +109,11 @@ void PotfileTableView::setExtraColumns(const QStringList &headers)
     for (int column = 2; column < labels.size(); ++column) {
         header->resizeSection(column, 90);
     }
+}
+
+void PotfileTableView::setNumericSortColumn(int column)
+{
+    m_numericColumn = column;
 }
 
 void PotfileTableView::setSearchPlaceholder(const QString &text)
@@ -320,13 +349,20 @@ void PotfileTableView::populateRows()
     ui->treeWidget_results->clear();
     for (int i = 0; i < m_rows.size(); ++i) {
         const Row &row = m_rows.at(i);
-        auto *item = new QTreeWidgetItem(ui->treeWidget_results);
+        auto *item = new SortableTreeItem(ui->treeWidget_results);
         item->setText(0, hashDisplayFor(row));
         item->setToolTip(0, row.hashIsFile ? tr("Binary hash file; hashcat reports the file name.")
                                            : row.hash);
         item->setText(1, plainTextFor(row));
         for (int column = 0; column < row.extraColumns.size(); ++column) {
-            item->setText(2 + column, row.extraColumns.at(column));
+            const QString text = row.extraColumns.at(column);
+            item->setText(2 + column, text);
+            if (2 + column == m_numericColumn) {
+                // Only the marked column sorts by value: 10 follows 9, not 1.
+                bool numeric = false;
+                const qlonglong value = text.toLongLong(&numeric);
+                item->setData(2 + column, SortValueRole, numeric ? value : 0);
+            }
         }
         item->setData(0, Qt::UserRole, i);
     }

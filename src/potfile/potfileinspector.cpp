@@ -37,6 +37,7 @@ PotfileInspectorDialog::PotfileInspectorDialog(QWidget *parent)
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
     ui->table_view->setExtraColumns({tr("Dup"), tr("Line")});
+    ui->table_view->setNumericSortColumn(3);
     ui->table_view->setEmptyStateText(tr("This potfile has no entries."));
     connect(ui->table_view, &PotfileTableView::visibleRowsChanged, this, [this] {
         updateStatus();

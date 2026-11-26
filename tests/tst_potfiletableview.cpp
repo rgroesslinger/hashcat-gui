@@ -58,6 +58,8 @@ class TestPotfileTableView : public QObject
 private slots:
     void init();
     void rowsSortByHashAndHeaderClickToggles();
+    void lineColumnSortsNumerically();
+    void unmarkedNumericExtrasSortAsText();
     void fileRowsAreLabeledButCopyTheRawName();
     void filterEmptyStateAndVisibleRowsSignal();
     void largeRowSetsDebounceTheFilter();
@@ -92,6 +94,46 @@ void TestPotfileTableView::rowsSortByHashAndHeaderClickToggles()
                       QPoint(header->sectionViewportPosition(0) + (header->sectionSize(0) / 2),
                              header->height() / 2));
     QCOMPARE(tree(view)->topLevelItem(0)->text(0), QStringLiteral("c"));
+}
+
+// The inspector's Line column is a number, so 10 follows 9 instead of 1.
+void TestPotfileTableView::lineColumnSortsNumerically()
+{
+    PotfileTableView view;
+    view.setExtraColumns({QStringLiteral("Dup"), QStringLiteral("Line")});
+    view.setNumericSortColumn(3);
+    view.setRows(
+        {row(QStringLiteral("hash-a"), QStringLiteral("a"), {QString(), QStringLiteral("9")}),
+         row(QStringLiteral("hash-b"), QStringLiteral("b"),
+             {QStringLiteral("dup"), QStringLiteral("10")}),
+         row(QStringLiteral("hash-c"), QStringLiteral("c"), {QString(), QStringLiteral("2")})});
+
+    QTreeWidget *table = tree(view);
+    QCOMPARE(table->topLevelItemCount(), 3);
+    table->sortItems(3, Qt::AscendingOrder);
+    QCOMPARE(table->topLevelItem(0)->text(3), QStringLiteral("2"));
+    QCOMPARE(table->topLevelItem(1)->text(3), QStringLiteral("9"));
+    QCOMPARE(table->topLevelItem(2)->text(3), QStringLiteral("10"));
+
+    table->sortItems(3, Qt::DescendingOrder);
+    QCOMPARE(table->topLevelItem(0)->text(3), QStringLiteral("10"));
+}
+
+// Values that merely look numeric stay text unless their column was marked:
+// usernames such as "10", "9" and "1zzz" keep one consistent text order.
+void TestPotfileTableView::unmarkedNumericExtrasSortAsText()
+{
+    PotfileTableView view;
+    view.setExtraColumns({QStringLiteral("Username")});
+    view.setRows({row(QStringLiteral("hash-a"), QStringLiteral("a"), {QStringLiteral("10")}),
+                  row(QStringLiteral("hash-b"), QStringLiteral("b"), {QStringLiteral("9")}),
+                  row(QStringLiteral("hash-c"), QStringLiteral("c"), {QStringLiteral("1zzz")})});
+
+    QTreeWidget *table = tree(view);
+    table->sortItems(2, Qt::AscendingOrder);
+    QCOMPARE(table->topLevelItem(0)->text(2), QStringLiteral("10"));
+    QCOMPARE(table->topLevelItem(1)->text(2), QStringLiteral("1zzz"));
+    QCOMPARE(table->topLevelItem(2)->text(2), QStringLiteral("9"));
 }
 
 void TestPotfileTableView::fileRowsAreLabeledButCopyTheRawName()

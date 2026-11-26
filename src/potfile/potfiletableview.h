@@ -51,6 +51,9 @@ public:
 
     // Headers after Hash and Plaintext; the owning dialog chooses them.
     void setExtraColumns(const QStringList &headers);
+    // The extra column whose cells are numbers and sort by value; -1 keeps
+    // text order. Call before setRows().
+    void setNumericSortColumn(int column);
     void setSearchPlaceholder(const QString &text);
     void setColumnHidden(int column, bool hidden);
     // Shown instead of the table when setRows() supplies no rows.
@@ -113,6 +116,7 @@ private:
     bool m_revealed = false;
     bool m_showEmptyState = false;
     QString m_appliedFilter;
+    int m_numericColumn = -1;
 };
 
 #endif // POTFILETABLEVIEW_H
