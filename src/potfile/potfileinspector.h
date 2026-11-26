@@ -68,6 +68,7 @@ private:
     std::unique_ptr<QFutureWatcher<PotfileParser::Result>> m_watcher;
     HashcatRunner::CancelToken m_cancel;
     PotfileParser::Result m_result;
+    QString m_exportToolTip;
     bool m_heuristic = false;
     bool m_loading = false;
     bool m_preserveViewState = false;

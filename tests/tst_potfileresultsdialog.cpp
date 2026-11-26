@@ -115,7 +115,11 @@ void TestPotfileResultsDialog::showsMaskedRowsAndTheQueriedMode()
         label(dialog, QStringLiteral("label_status"))->text().contains(QStringLiteral("2 of 3")));
     QCOMPARE(label(dialog, QStringLiteral("label_status"))->textFormat(), Qt::PlainText);
     QCOMPARE(tree(dialog)->topLevelItemCount(), 2);
-    QVERIFY(button(dialog, QStringLiteral("pushButton_export"))->isEnabled());
+    // Export would write the real plaintexts while the table still masks them.
+    QVERIFY(!button(dialog, QStringLiteral("pushButton_export"))->isEnabled());
+    QVERIFY(button(dialog, QStringLiteral("pushButton_export"))
+                ->toolTip()
+                .contains(QStringLiteral("Reveal")));
     QVERIFY(button(dialog, QStringLiteral("pushButton_statistics"))->isEnabled());
     QVERIFY(tree(dialog)->topLevelItem(0)->text(1) != QStringLiteral("secret"));
     QVERIFY(tree(dialog)->topLevelItem(0)->text(1).contains(QStringLiteral("•")));
@@ -417,6 +421,7 @@ void TestPotfileResultsDialog::filterHidesRowsFromExportAndStatistics()
                 .contains(QStringLiteral("1 hidden by filter")));
 
     const QString path = dir.filePath(QStringLiteral("results.csv"));
+    button(dialog, QStringLiteral("pushButton_reveal"))->click();
     driveExport(dialog, path);
     QFile file(path);
     QVERIFY(file.open(QIODevice::ReadOnly));

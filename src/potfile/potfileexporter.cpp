@@ -19,6 +19,21 @@ QString boolText(bool value)
     return value ? QStringLiteral("true") : QStringLiteral("false");
 }
 
+// Prefix formula-leading cells with an apostrophe for spreadsheets; an
+// existing leading apostrophe stays. JSON keeps the literal value.
+QString neutralizeFormula(const QString &field)
+{
+    if (field.isEmpty()) {
+        return field;
+    }
+    const QChar first = field.front();
+    if (first == QLatin1Char('=') || first == QLatin1Char('+') || first == QLatin1Char('-')
+        || first == QLatin1Char('@')) {
+        return QLatin1Char('\'') + field;
+    }
+    return field;
+}
+
 void appendField(QByteArray *line, const QString &field, QChar delimiter, bool *first)
 {
     if (!*first) {
@@ -26,7 +41,7 @@ void appendField(QByteArray *line, const QString &field, QChar delimiter, bool *
     }
     *first = false;
 
-    QByteArray bytes = field.toUtf8();
+    QByteArray bytes = neutralizeFormula(field).toUtf8();
     if (bytes.contains(delimiter.toLatin1()) || bytes.contains('"') || bytes.contains('\n')
         || bytes.contains('\r')) {
         bytes.replace("\"", "\"\"");

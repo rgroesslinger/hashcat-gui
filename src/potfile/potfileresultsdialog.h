@@ -53,6 +53,7 @@ private:
     PotfileCheckResult m_result;
     QString m_modeName;
     QString m_potfilePath;
+    QString m_exportToolTip;
     bool m_showUsername = false;
 };
 

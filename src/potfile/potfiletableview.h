@@ -64,6 +64,11 @@ public:
     [[nodiscard]] bool hasRows() const;
     [[nodiscard]] int rowCount() const;
     [[nodiscard]] bool canReveal() const;
+    // Whether the user has revealed the plaintexts; exports need this.
+    [[nodiscard]] bool isRevealed() const
+    {
+        return m_revealed;
+    }
     // Visible rows in current view (sort) order.
     [[nodiscard]] QList<Row> visibleRows() const;
     [[nodiscard]] int visibleRowCount() const;

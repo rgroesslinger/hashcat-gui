@@ -77,7 +77,11 @@ void TestPotfileInspector::loadsAndMasksThePotfile()
         label(dialog, QStringLiteral("label_status"))->text().contains(QStringLiteral("2 entries")),
         5000);
     QCOMPARE(tree(dialog)->topLevelItemCount(), 2);
-    QVERIFY(button(dialog, QStringLiteral("pushButton_export"))->isEnabled());
+    // Export would write the real plaintexts while the table still masks them.
+    QVERIFY(!button(dialog, QStringLiteral("pushButton_export"))->isEnabled());
+    QVERIFY(button(dialog, QStringLiteral("pushButton_export"))
+                ->toolTip()
+                .contains(QStringLiteral("Reveal")));
     QVERIFY(button(dialog, QStringLiteral("pushButton_statistics"))->isEnabled());
     QVERIFY(tree(dialog)->topLevelItem(0)->text(1) != QStringLiteral("secret"));
     QVERIFY(tree(dialog)->topLevelItem(0)->text(1).contains(QStringLiteral("•")));
@@ -88,6 +92,7 @@ void TestPotfileInspector::loadsAndMasksThePotfile()
 
     button(dialog, QStringLiteral("pushButton_reveal"))->click();
     QCOMPARE(tree(dialog)->topLevelItem(0)->text(1), QStringLiteral("secret"));
+    QVERIFY(button(dialog, QStringLiteral("pushButton_export"))->isEnabled());
 }
 
 void TestPotfileInspector::emptyPotfileShowsItsEmptyStateHint()
@@ -356,6 +361,7 @@ void TestPotfileInspector::failedReloadClearsTheRows()
     PotfileInspectorDialog dialog;
     dialog.setPotfilePath(path);
     QTRY_COMPARE_WITH_TIMEOUT(tree(dialog)->topLevelItemCount(), 2, 5000);
+    button(dialog, QStringLiteral("pushButton_reveal"))->click();
     QVERIFY(button(dialog, QStringLiteral("pushButton_export"))->isEnabled());
 
     QVERIFY(QFile::remove(path));
@@ -455,6 +461,7 @@ void TestPotfileInspector::exportSuggestionIsUnderHome()
     PotfileInspectorDialog dialog;
     dialog.setPotfilePath(path);
     QTRY_COMPARE_WITH_TIMEOUT(tree(dialog)->topLevelItemCount(), 1, 5000);
+    button(dialog, QStringLiteral("pushButton_reveal"))->click();
 
     QString initial;
     QTimer timer;

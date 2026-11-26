@@ -125,6 +125,7 @@ private slots:
     void stepThreeCsvIncludesDuplicateAndLine();
     void tsvUsesTabsAndQuotesTabbedFields();
     void jsonUsesObjectsAndOptionalFields();
+    void formulaLeadingCellsAreNeutralized();
     void rowsWithoutLineInfoExportEmptyCells();
     void writeCreatesTheFile();
     void writeReportsAnOpenFailure();
@@ -187,6 +188,40 @@ void TestPotfileExporter::jsonUsesObjectsAndOptionalFields()
     QCOMPARE(object.value(QStringLiteral("duplicate")).toBool(), false);
     QCOMPARE(object.value(QStringLiteral("line")).toInt(), 0);
     QCOMPARE(object.value(QStringLiteral("encrypted")).toBool(), true);
+}
+
+// A spreadsheet evaluates a cell that starts with = + - or @ as a formula,
+// so the tabular exports prefix an apostrophe. A leading apostrophe of the
+// value itself is kept as it is, and JSON stays the literal value.
+void TestPotfileExporter::formulaLeadingCellsAreNeutralized()
+{
+    const QList<PotfileExporter::Row> rows{
+        {QStringLiteral("hash"), QStringLiteral("=1+1"), QStringLiteral("+user"), 0, false, false,
+         true},
+        {QStringLiteral("hash"), QStringLiteral("-cmd"), QStringLiteral("@name"), 0, false, false,
+         true},
+        {QStringLiteral("hash"), QStringLiteral("'quoted"), QStringLiteral("plain"), 0, false,
+         false, true},
+        {QStringLiteral("hash"), QStringLiteral("safe"), QStringLiteral("plain"), 0, false, false,
+         true},
+    };
+
+    const QByteArray csv =
+        PotfileExporter::serialize(rows, PotfileExporter::Format::Csv, true, false);
+    QCOMPARE(QString::fromUtf8(csv), QStringLiteral("hash,plaintext,username,encrypted\n"
+                                                    "hash,'=1+1,'+user,false\n"
+                                                    "hash,'-cmd,'@name,false\n"
+                                                    "hash,'quoted,plain,false\n"
+                                                    "hash,safe,plain,false\n"));
+
+    const QByteArray tsv =
+        PotfileExporter::serialize(rows, PotfileExporter::Format::Tsv, true, false);
+    QVERIFY(QString::fromUtf8(tsv).contains(QStringLiteral("\t'=1+1\t")));
+
+    const QByteArray json =
+        PotfileExporter::serialize(rows, PotfileExporter::Format::Json, true, false);
+    const QJsonObject object = QJsonDocument::fromJson(json).array().at(0).toObject();
+    QCOMPARE(object.value(QStringLiteral("plaintext")).toString(), QStringLiteral("=1+1"));
 }
 
 // --show results carry no line information: the columns stay, the cells empty.

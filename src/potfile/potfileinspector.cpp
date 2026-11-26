@@ -31,6 +31,7 @@ PotfileInspectorDialog::PotfileInspectorDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
+    m_exportToolTip = ui->pushButton_export->toolTip();
     ui->label_note->setTextFormat(Qt::PlainText);
     ui->label_status->setTextFormat(Qt::PlainText);
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByMouse);
@@ -159,6 +160,10 @@ QList<PotfileExporter::Row> PotfileInspectorDialog::resultRows() const
 
 void PotfileInspectorDialog::exportClicked()
 {
+    // The button is disabled while masked; do not bypass it programmatically.
+    if (!ui->table_view->isRevealed() && ui->table_view->canReveal()) {
+        return;
+    }
     const QList<PotfileExporter::Row> rows = resultRows();
     // Never suggest the potfile's own directory: an export next to the live
     // potfile is one careless click away from overwriting it.
@@ -331,7 +336,12 @@ void PotfileInspectorDialog::updateStatus()
 void PotfileInspectorDialog::updateButtons()
 {
     const bool hasRows = !m_loading && ui->table_view->visibleRowCount() > 0;
-    ui->pushButton_export->setEnabled(hasRows);
+    // Export writes the real plaintexts even while the table masks them.
+    const bool exportable =
+        hasRows && (ui->table_view->isRevealed() || !ui->table_view->canReveal());
+    ui->pushButton_export->setEnabled(exportable);
+    ui->pushButton_export->setToolTip(
+        exportable ? m_exportToolTip : tr("Reveal plaintexts to export the real values."));
     ui->pushButton_statistics->setEnabled(hasRows);
     ui->pushButton_browse->setEnabled(!m_loading);
     ui->pushButton_reload->setEnabled(!m_loading);
