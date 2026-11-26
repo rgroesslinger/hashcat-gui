@@ -38,9 +38,10 @@ and tests depend on it.
 - `src/potfile/` self-contained: `PotfileCheck` runs read-only `--show` (JSON) / `--left` through
   injectable `HashcatRunner::Query`, each with a unique `hcgui-pot-` session and `--logfile-disable`
   (shared pidfile).
-- Potfile entries cap at `Hashcat::PotfileMaxEntries` (100000), totals stay complete; plaintexts
-  masked until revealed, search never matches hidden values. Query paths resolve against hashcat's
-  cwd; a hash input is a path only if it exists, else inline.
+- Potfile entries cap at `Hashcat::PotfileMaxEntries` (100000), duplicate detection at
+  `Hashcat::PotfileMaxFingerprints`; totals stay complete. Plaintexts masked until revealed,
+  search never matches hidden values. Query paths resolve against hashcat's cwd; a hash input is a
+  path only if it exists, else inline.
 - `QGroupBox` alignment `AlignLeft|AlignVCenter`; General/Attack tab boxes and PCFG/table grids need
   `AlignTop`. `tst_layout` enforces both.
 - `PathMonitor`: wordlists/PCFG rulesets may be folders (wordlist needs a file; ruleset needs

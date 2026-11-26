@@ -186,7 +186,7 @@ void PotfileInspectorDialog::statisticsClicked()
     const QString path = ui->lineEdit_potfile->text();
     const QString context = path.isEmpty() ? tr("Potfile inspector") : tr("Potfile: %1").arg(path);
     PotfileStatisticsDialog::openAsync(this, rows, context, m_result.totalCount,
-                                       /*duplicateKnown=*/true);
+                                       m_result.duplicateCountComplete);
 }
 
 void PotfileInspectorDialog::loadPath(bool preserveViewState)
@@ -297,9 +297,14 @@ void PotfileInspectorDialog::updateStatus()
                        ? tr("1 entry")
                        : tr("%1 entries").arg(formatCount(m_result.totalCount));
     if (m_result.duplicateCount > 0) {
-        text +=
-            QStringLiteral(" · ")
-            + countText(m_result.duplicateCount, tr("1 duplicate line"), tr("%1 duplicate lines"));
+        text += QStringLiteral(" · ")
+                + countText(m_result.duplicateCount,
+                            m_result.duplicateCountComplete ? tr("1 duplicate line")
+                                                            : tr("1 duplicate line (at least)"),
+                            m_result.duplicateCountComplete ? tr("%1 duplicate lines")
+                                                            : tr("%1 duplicate lines (at least)"));
+    } else if (!m_result.duplicateCountComplete) {
+        text += QStringLiteral(" · ") + tr("duplicate count incomplete");
     }
     if (m_result.malformedCount > 0) {
         text +=

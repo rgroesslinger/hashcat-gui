@@ -59,6 +59,9 @@ public:
         int encryptedCount = 0;
         int noPasswordCount = 0;
         int duplicateCount = 0;
+        // False once the fingerprint cap stopped tracking new lines: the
+        // count then is a lower bound, not the exact number.
+        bool duplicateCountComplete = true;
         int truncatedCount = 0;
         bool cancelled = false;
         QString error;
@@ -73,9 +76,10 @@ private:
     using FingerprintFunction = LineFingerprint (*)(const QByteArray &line);
 
     // The fingerprint provider is a test seam; production always uses
-    // LineFingerprint::of().
-    static Result parseFile(const QString &path, int maxEntries, QChar separator,
-                            const HashcatRunner::CancelToken &cancel,
+    // LineFingerprint::of(). Fingerprints are bounded independently of the
+    // display cap: the counters stay exact, duplicate detection stops there.
+    static Result parseFile(const QString &path, int maxEntries, int maxFingerprints,
+                            QChar separator, const HashcatRunner::CancelToken &cancel,
                             FingerprintFunction fingerprint);
 
     friend class TestPotfileParser;

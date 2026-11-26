@@ -58,10 +58,12 @@ PotfileParser::LineFingerprint PotfileParser::LineFingerprint::of(const QByteArr
 PotfileParser::Result PotfileParser::parseFile(const QString &path, int maxEntries, QChar separator,
                                                const HashcatRunner::CancelToken &cancel)
 {
-    return parseFile(path, maxEntries, separator, cancel, LineFingerprint::of);
+    return parseFile(path, maxEntries, AppConstants::Hashcat::PotfileMaxFingerprints, separator,
+                     cancel, LineFingerprint::of);
 }
 
-PotfileParser::Result PotfileParser::parseFile(const QString &path, int maxEntries, QChar separator,
+PotfileParser::Result PotfileParser::parseFile(const QString &path, int maxEntries,
+                                               int maxFingerprints, QChar separator,
                                                const HashcatRunner::CancelToken &cancel,
                                                FingerprintFunction fingerprint)
 {
@@ -78,6 +80,7 @@ PotfileParser::Result PotfileParser::parseFile(const QString &path, int maxEntri
     }
 
     const int cap = std::max(0, maxEntries);
+    const int fingerprintCap = std::max(0, maxFingerprints);
     QSet<LineFingerprint> seenFingerprints;
     int lineNumber = 0;
 
@@ -128,7 +131,15 @@ PotfileParser::Result PotfileParser::parseFile(const QString &path, int maxEntri
         entry.encrypted = entry.plain.startsWith(QStringLiteral("$HCENC$"));
         const LineFingerprint lineFingerprint = fingerprint(line);
         entry.duplicate = seenFingerprints.contains(lineFingerprint);
-        seenFingerprints.insert(lineFingerprint);
+        if (!entry.duplicate) {
+            if (seenFingerprints.size() < fingerprintCap) {
+                seenFingerprints.insert(lineFingerprint);
+            } else {
+                // Past the cap a repeated line can no longer be recognized:
+                // the count stays a lower bound from here on.
+                result.duplicateCountComplete = false;
+            }
+        }
 
         ++result.totalCount;
         if (entry.encrypted) {

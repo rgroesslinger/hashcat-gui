@@ -52,9 +52,14 @@ Alternatively, you can temporarily disable Windows Defender real-time protection
 ## Why does the potfile viewer show only the first 100,000 entries?
 
 The file is read in full, so the status line always reports the complete
-counts, including duplicates and malformed lines. Only the rows kept for
-display are capped: at most 100,000 entries are held in memory, and the
-status line says `showing first X of Y` when there are more.
+totals and malformed-line count. Only the rows kept for display are
+capped: at most 100,000 entries are held in memory, and the status line
+says `showing first X of Y` when there are more.
+
+Duplicate detection remembers at most 1,000,000 distinct lines. A larger
+file keeps the exact totals, but its duplicate count becomes a lower
+bound; the status line marks it as `at least`, or says the count is
+incomplete when no duplicate was found in the tracked part.
 
 Search, copy, statistics and export work on the displayed rows only;
 the export confirmation and the statistics dialog name the full total.

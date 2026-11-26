@@ -60,6 +60,7 @@ private slots:
     void anEmptyFileIsAnEmptyResult();
     void aCancelledParseStopsBeforeReading();
     void aMatchingFirstFingerprintAloneIsNotADuplicate();
+    void duplicateTrackingIsBounded();
 };
 
 void TestPotfileParser::parsesTheGoldenPotfile()
@@ -194,13 +195,45 @@ void TestPotfileParser::aMatchingFirstFingerprintAloneIsNotADuplicate()
                                               "collision-two:plain-two\n")));
 
     const PotfileParser::Result result = PotfileParser::parseFile(
-        path, AppConstants::Hashcat::PotfileMaxEntries, QLatin1Char(':'), {}, collisionFingerprint);
+        path, AppConstants::Hashcat::PotfileMaxEntries,
+        AppConstants::Hashcat::PotfileMaxFingerprints, QLatin1Char(':'), {}, collisionFingerprint);
 
     QCOMPARE(result.totalCount, 2);
     QCOMPARE(result.entries.size(), 2);
     QVERIFY(!result.entries.at(0).duplicate);
     QVERIFY(!result.entries.at(1).duplicate);
     QCOMPARE(result.duplicateCount, 0);
+}
+
+// The duplicate detector is bounded: past a configurable fingerprint cap a
+// repeated line can no longer be recognized, so the count is a lower bound
+// while every total stays exact.
+void TestPotfileParser::duplicateTrackingIsBounded()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("large.potfile"));
+    QVERIFY(writeFile(path, QByteArrayLiteral("hash-a:one\n"
+                                              "hash-b:two\n"
+                                              "hash-c:three\n"
+                                              "hash-d:four\n"
+                                              "hash-a:one\n")));
+
+    const PotfileParser::Result bounded =
+        PotfileParser::parseFile(path, AppConstants::Hashcat::PotfileMaxEntries, 2,
+                                 QLatin1Char(':'), {}, PotfileParser::LineFingerprint::of);
+
+    QCOMPARE(bounded.totalCount, 5);
+    QCOMPARE(bounded.duplicateCount, 1); // hash-a was tracked before the cap
+    QVERIFY(!bounded.duplicateCountComplete);
+    QVERIFY(bounded.entries.at(4).duplicate);
+
+    const PotfileParser::Result complete =
+        PotfileParser::parseFile(path, AppConstants::Hashcat::PotfileMaxEntries,
+                                 AppConstants::Hashcat::PotfileMaxFingerprints, QLatin1Char(':'),
+                                 {}, PotfileParser::LineFingerprint::of);
+    QCOMPARE(complete.duplicateCount, 1);
+    QVERIFY(complete.duplicateCountComplete);
 }
 
 void TestPotfileParser::aCancelledParseStopsBeforeReading()

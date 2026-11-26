@@ -374,6 +374,9 @@ inline constexpr QLatin1StringView BackendInfoSessionPrefix{"hcgui-backend-"};
 inline constexpr QLatin1StringView DeprecatedCheckDisable{"--deprecated-check-disable"};
 // The show parser retains at most this many entries; the counts stay complete.
 inline constexpr int PotfileMaxEntries = 100000;
+// The duplicate detector remembers at most this many distinct lines. A larger
+// file keeps exact totals, but the duplicate count becomes a lower bound.
+inline constexpr int PotfileMaxFingerprints = 1000000;
 // A value starting with '-' would be read as an option, not as the hash to identify.
 inline constexpr QLatin1StringView OptionTerminator{"--"};
 // Backend init can be slow on a fresh driver; queries that need it get longer.
