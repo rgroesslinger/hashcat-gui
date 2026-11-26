@@ -135,7 +135,7 @@ void PotfileCheck::startShow()
     });
 
     m_showWatcher->setFuture(m_query(m_hashcatPath, PotfileQuery::showArgs(m_input),
-                                     AppConstants::Hashcat::QueryTimeoutMs, m_cancel));
+                                     AppConstants::Hashcat::ShowTimeoutMs, m_cancel));
 }
 
 void PotfileCheck::startParse(HashcatResult showResult)
@@ -215,7 +215,7 @@ void PotfileCheck::startLeft()
 
     // Each query gets the full deadline; a slow --show must not eat --left's.
     m_leftWatcher->setFuture(m_query(m_hashcatPath, PotfileQuery::leftArgs(m_input),
-                                     AppConstants::Hashcat::QueryTimeoutMs, m_cancel));
+                                     AppConstants::Hashcat::LeftTimeoutMs, m_cancel));
 }
 
 void PotfileCheck::finish()

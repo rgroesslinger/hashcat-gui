@@ -105,8 +105,8 @@ void TestPotfileCheck::okResultAddsShowAndLeft()
     QVERIFY(args.at(0).contains(QStringLiteral("--json")));
     QVERIFY(args.at(1).contains(QStringLiteral("--left")));
     QVERIFY(!args.at(1).contains(QStringLiteral("--json")));
-    QCOMPARE(timeouts.at(0), AppConstants::Hashcat::QueryTimeoutMs);
-    QCOMPARE(timeouts.at(1), AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(timeouts.at(0), AppConstants::Hashcat::ShowTimeoutMs);
+    QCOMPARE(timeouts.at(1), AppConstants::Hashcat::LeftTimeoutMs);
 }
 
 void TestPotfileCheck::binaryHashFileShowIsAnOkResult()
@@ -293,7 +293,7 @@ void TestPotfileCheck::aSlowShowStillGivesLeftTheFullTimeout()
     QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
 
     QCOMPARE(timeouts.size(), 2);
-    QCOMPARE(timeouts.at(1), AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(timeouts.at(1), AppConstants::Hashcat::LeftTimeoutMs);
 }
 
 void TestPotfileCheck::nonJsonShowOutputIsAFailure()

@@ -224,7 +224,8 @@ void IdentifyDialog::identifyClicked()
         showMessage(queryErrorMessage(result.standardError));
     });
 
-    m_watcher->setFuture(m_query(resolved, args, AppConstants::Hashcat::QueryTimeoutMs, m_cancel));
+    m_watcher->setFuture(
+        m_query(resolved, args, AppConstants::Hashcat::IdentifyTimeoutMs, m_cancel));
 }
 
 void IdentifyDialog::showResults(const QList<HashcatInfoParser::IdentifiedHashMode> &matches)

@@ -385,6 +385,10 @@ inline constexpr int PotfileFilterDebounceMs = 150;
 inline constexpr QLatin1StringView OptionTerminator{"--"};
 // Backend init can be slow on a fresh driver; queries that need it get longer.
 inline constexpr int BackendInfoTimeoutMs = 60000;
+// --identify reads one input; --show and --left can scan a whole potfile.
+inline constexpr int IdentifyTimeoutMs = 20000;
+inline constexpr int ShowTimeoutMs = 60000;
+inline constexpr int LeftTimeoutMs = 60000;
 // The flag that carries the recipe of hash mode 4000. Both the builder and
 // the preview need the token: the preview quotes the value that follows it.
 inline constexpr QLatin1StringView HashRecipe{"--hash-recipe"};
@@ -398,7 +402,7 @@ inline constexpr int MaxPcfgRulesets = 16;
 // what CommandBuilder does for any hash type below zero. Never pass this to
 // hashcat.
 inline constexpr int AutoDetectHashType = -2;
-// How long hashcat is given to answer a query such as --example-hashes
+// How long hashcat is given to answer the startup hash-type probe
 inline constexpr int QueryTimeoutMs = 20000;
 } // namespace Hashcat
 
