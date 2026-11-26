@@ -9,11 +9,27 @@
 #include "textutils.h"
 
 #include <QAbstractItemModel>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QFileInfo>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QMimeData>
 #include <QSignalBlocker>
+#include <QUrl>
+
+#include <algorithm>
 #include <utility>
+
+namespace
+{
+// Local files only; a remote URL is not a path here.
+bool hasLocalFile(const QMimeData *data)
+{
+    return data && data->hasUrls()
+           && std::ranges::any_of(data->urls(), [](const QUrl &url) { return url.isLocalFile(); });
+}
+} // namespace
 
 PathListController::PathListController(QListWidget *list, QObject *parent)
     : QObject(parent), m_list(list)
@@ -45,6 +61,8 @@ PathListController::PathListController(QListWidget *list, PathMonitor::Kind kind
 
 void PathListController::connectChanges()
 {
+    // The .ui accepts drops; a local file becomes a checked row.
+    m_list->viewport()->installEventFilter(this);
     connect(m_list->model(), &QAbstractItemModel::rowsInserted, this, &PathListController::changed);
     connect(m_list->model(), &QAbstractItemModel::rowsRemoved, this, &PathListController::changed);
     // A move emits rowsMoved as its single notification (see
@@ -57,6 +75,44 @@ void PathListController::connectChanges()
 void PathListController::addPaths(const QStringList &paths)
 {
     CheckedItemList::addPaths(m_list, paths);
+}
+
+bool PathListController::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched != m_list->viewport()) {
+        return QObject::eventFilter(watched, event);
+    }
+
+    switch (event->type()) {
+    case QEvent::DragEnter:
+    case QEvent::DragMove: {
+        auto *drag = static_cast<QDragMoveEvent *>(event);
+        if (hasLocalFile(drag->mimeData())) {
+            drag->acceptProposedAction();
+            return true;
+        }
+        break;
+    }
+    case QEvent::Drop: {
+        auto *drop = static_cast<QDropEvent *>(event);
+        QStringList paths;
+        for (const QUrl &url : drop->mimeData()->urls()) {
+            if (url.isLocalFile()) {
+                paths << url.toLocalFile();
+            }
+        }
+        if (!paths.isEmpty()) {
+            addPaths(paths);
+            drop->acceptProposedAction();
+            return true;
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return QObject::eventFilter(watched, event);
 }
 
 QStringList PathListController::checkedItems() const

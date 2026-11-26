@@ -8,10 +8,15 @@
 
 #include <QApplication>
 #include <QDir>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QFile>
 #include <QListWidget>
+#include <QMimeData>
 #include <QSignalSpy>
 #include <QStyle>
 #include <QTemporaryDir>
+#include <QUrl>
 
 // The list controller: paths in, checked rows out, the monitor decoration,
 // and the changed signal the preview rebuilds from.
@@ -26,6 +31,7 @@ private slots:
     void theDecorationIsNotACommandChange();
     void aModelResetRefreshesTheMonitor();
     void anUnmonitoredListStillAnnouncesChanges();
+    void aDropAddsTheLocalFilesOnce();
 
 private:
     struct Icons {
@@ -168,6 +174,42 @@ void TestPathListController::anUnmonitoredListStillAnnouncesChanges()
     QVERIFY(spy.count() > 0);
     // No monitor: no decoration, the row keeps its default icon.
     QCOMPARE(list.item(0)->icon().cacheKey(), QIcon().cacheKey());
+}
+
+// The wordlist list accepts drops in the .ui; a local URL becomes a checked
+// row, a remote URL is ignored.
+void TestPathListController::aDropAddsTheLocalFilesOnce()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString first = directory.filePath(QStringLiteral("first.txt"));
+    const QString second = directory.filePath(QStringLiteral("second.txt"));
+    QFile firstFile(first);
+    QVERIFY(firstFile.open(QIODevice::WriteOnly));
+    firstFile.close();
+    QFile secondFile(second);
+    QVERIFY(secondFile.open(QIODevice::WriteOnly));
+    secondFile.close();
+
+    QListWidget list;
+    list.setAcceptDrops(true);
+    list.setDragDropMode(QAbstractItemView::DropOnly);
+    PathListController controller(&list, nullptr);
+
+    QMimeData mime;
+    mime.setUrls({QUrl::fromLocalFile(first), QUrl::fromLocalFile(second),
+                  QUrl(QStringLiteral("https://example.com/wordlist.txt"))});
+
+    QDragEnterEvent enter(QPoint(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &enter);
+    QVERIFY(enter.isAccepted());
+
+    QDropEvent drop(QPointF(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &drop);
+    QVERIFY(drop.isAccepted());
+
+    const QStringList expected{QDir::toNativeSeparators(first), QDir::toNativeSeparators(second)};
+    QCOMPARE(controller.checkedItems(), expected);
 }
 
 int main(int argc, char *argv[])

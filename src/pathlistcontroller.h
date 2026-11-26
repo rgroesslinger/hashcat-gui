@@ -43,6 +43,9 @@ signals:
     // The rows changed in a way that reaches the command.
     void changed();
 
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
     void connectChanges();
     void refreshMonitor();
