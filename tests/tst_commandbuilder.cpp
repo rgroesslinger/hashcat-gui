@@ -291,6 +291,7 @@ void TestCommandBuilder::uiDefaultsAreNotRepeated()
     QCOMPARE(CommandBuilder::build(options), bare);
 
     // ... and are passed as soon as they differ
+    options.outfileEnabled = true;
     options.outfileFormat = QStringLiteral("1");
     options.backendDevices = QStringLiteral("1,2");
 
@@ -702,6 +703,14 @@ void TestCommandBuilder::outfileIsOptInAndExpanded()
     arguments = CommandBuilder::build(options);
     QCOMPARE(arguments.value(arguments.indexOf(QStringLiteral("--outfile")) + 1),
              QStringLiteral("out/1700000000-example.hash.txt"));
+
+    // The format and JSON shapes follow the same outfile opt-in.
+    options.outfileEnabled = false;
+    options.outfileFormat = QStringLiteral("1,2,3");
+    options.outfileJson = true;
+    arguments = CommandBuilder::build(options);
+    QVERIFY(!arguments.contains(QStringLiteral("--outfile-format")));
+    QVERIFY(!arguments.contains(QStringLiteral("--outfile-json")));
 }
 
 void TestCommandBuilder::expandOutfileTemplateSubstitutesUnixTimeAndHash()

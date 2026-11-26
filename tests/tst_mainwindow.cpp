@@ -578,6 +578,7 @@ void TestMainWindow::outfileJsonTakesOverFromTheFormatField()
 {
     MainWindow window;
 
+    MainWindowTestAccess::ui(window)->checkBox_outfile->setChecked(true);
     MainWindowTestAccess::ui(window)->lineEdit_outfile_format->setText(QStringLiteral("1,2,3"));
     QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_outfile_format->isEnabled());
 

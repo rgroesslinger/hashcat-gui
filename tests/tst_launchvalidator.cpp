@@ -1367,6 +1367,7 @@ void TestLaunchValidator::outfileFormatIsValidated()
     const auto withWordlist = [] {
         HashcatOptions options;
         options.wordlists = QStringList{QStringLiteral("/tmp/a.txt")};
+        options.outfileEnabled = true;
         return options;
     };
 
@@ -1394,6 +1395,13 @@ void TestLaunchValidator::outfileFormatIsValidated()
     stale.outfileFormat = QStringLiteral("9");
     stale.outfileJson = true;
     QCOMPARE(int(::validateOptions(stale).code), int(LaunchValidator::LaunchError::None));
+
+    // With the outfile off the builder emits neither shape, so a bad value
+    // left in the field cannot block the launch.
+    HashcatOptions disabled = withWordlist();
+    disabled.outfileEnabled = false;
+    disabled.outfileFormat = QStringLiteral("9");
+    QCOMPARE(int(::validateOptions(disabled).code), int(LaunchValidator::LaunchError::None));
 }
 
 int main(int argc, char *argv[])

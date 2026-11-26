@@ -477,12 +477,14 @@ QStringList CommandBuilder::build(const HashcatOptions &options)
                   << expandOutfileTemplate(options.outfile, options.hashFile, options.unixTime);
     }
 
-    // The two outfile shapes are exclusive; JSON wins, so a session that
-    // holds both still produces a valid command.
-    if (options.outfileJson) {
-        arguments << parameterName(Parameter::OutfileJson, useShort);
-    } else if (options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
-        arguments << parameterName(Parameter::OutfileFormat, useShort) << options.outfileFormat;
+    // The two outfile shapes are exclusive and only exist while it is on;
+    // JSON wins when a session holds both.
+    if (options.outfileEnabled) {
+        if (options.outfileJson) {
+            arguments << parameterName(Parameter::OutfileJson, useShort);
+        } else if (options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
+            arguments << parameterName(Parameter::OutfileFormat, useShort) << options.outfileFormat;
+        }
     }
 
     if (!options.cachePath.isEmpty()) {

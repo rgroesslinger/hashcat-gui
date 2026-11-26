@@ -792,11 +792,10 @@ LaunchError validateOptions(const HashcatOptions &options, const QString &resolv
         return LaunchError::InvalidCachePath;
     }
 
-    // The format field is free text and reaches hashcat whenever the builder
-    // emits --outfile-format (i.e. not with JSON and not at its default). The
-    // widget's validator can be bypassed by a session, so check here too;
-    // empty is invalid as well.
-    if (!options.outfileJson && options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
+    // Free text that only reaches hashcat when enabled; a session can bypass
+    // the widget validator.
+    if (options.outfileEnabled && !options.outfileJson
+        && options.outfileFormat != AppConstants::Defaults::OutfileFormat) {
         const QRegularExpression format{QString(AppConstants::Validation::OutfileFormatList)};
         if (!format.match(options.outfileFormat).hasMatch()) {
             if (detail) {

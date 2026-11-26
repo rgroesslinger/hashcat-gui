@@ -652,10 +652,18 @@ void MainWindow::connectDependencySignals()
     bindEnabled(ui->checkBox_custom_charset3, {ui->lineEdit_custom_charset3});
     bindEnabled(ui->checkBox_custom_charset4, {ui->lineEdit_custom_charset4});
 
-    // The outfile is opt-in; JSON and the format field are exclusive, and the
-    // value stays in the field so switching back restores what was typed.
-    bindEnabled(ui->checkBox_outfile, {ui->lineEdit_outfile, ui->pushButton_open_outfile});
-    bindDisabled(ui->checkBox_outfile_json, {ui->lineEdit_outfile_format});
+    // JSON and the format field depend on the outfile itself.
+    const auto updateOutfileFields = [this] {
+        const bool outfile = ui->checkBox_outfile->isChecked();
+        const bool json = ui->checkBox_outfile_json->isChecked();
+        ui->lineEdit_outfile->setEnabled(outfile);
+        ui->pushButton_open_outfile->setEnabled(outfile);
+        ui->checkBox_outfile_json->setEnabled(outfile);
+        ui->lineEdit_outfile_format->setEnabled(outfile && !json);
+    };
+    connect(ui->checkBox_outfile, &QAbstractButton::toggled, this, updateOutfileFields);
+    connect(ui->checkBox_outfile_json, &QAbstractButton::toggled, this, updateOutfileFields);
+    updateOutfileFields();
     // Exclusive like JSON and the format; the builder drops the path.
     bindDisabled(ui->checkBox_potfile_disable, {ui->label_potfile_path, ui->lineEdit_potfile_path,
                                                 ui->pushButton_open_potfile_path});
