@@ -48,6 +48,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QPushButton>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
 #include <QScreen>
@@ -1343,22 +1344,17 @@ void MainWindow::loadSession()
     const StateFile::Document document = StateFile::readDocument(
         file, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
     if (document.status == StateFile::Status::Unreadable) {
-        // A file this version cannot read is not thrown away: it may belong
-        // to a version that can read it, or the user may want to look at it.
-        // The start goes on without the session.
-        QMessageBox::warning(
-            this, tr("Session warning"),
-            tr("The session file could not be read, so the session was not restored. The file "
-               "was left in place.\n\n%1")
-                .arg(document.error));
+        // Keep an unreadable file; the user may move it aside.
+        offerSessionFileRecovery(
+            file, tr("The session file could not be read, so the session was not restored.\n\n%1")
+                      .arg(document.error));
         return;
     }
 
     // A session with a newer format version is left in place: it is what that
     // version saved, and the user may go back to it.
     if (document.status == StateFile::Status::Newer) {
-        QMessageBox::warning(this, tr("Session warning"),
-                             SessionTransfer::newerSessionNote(document.version));
+        offerSessionFileRecovery(file, SessionTransfer::newerSessionNote(document.version));
         return;
     }
 
@@ -1369,6 +1365,41 @@ void MainWindow::loadSession()
     if (!notes.isEmpty()) {
         QMessageBox::warning(this, tr("Session warning"), notes.join(QLatin1Char('\n')));
     }
+}
+
+void MainWindow::offerSessionFileRecovery(const QString &file, const QString &message)
+{
+    QMessageBox box(QMessageBox::Warning, tr("Session warning"), message, QMessageBox::NoButton,
+                    this);
+    box.setTextFormat(Qt::PlainText);
+    box.setInformativeText(
+        tr("Move the file aside to start with a fresh session? It is renamed, never deleted."));
+    QPushButton *move = box.addButton(tr("Move File Aside"), QMessageBox::ActionRole);
+    QPushButton *keep = box.addButton(tr("Keep File"), QMessageBox::RejectRole);
+    box.setDefaultButton(keep);
+    box.setEscapeButton(keep);
+    box.exec();
+    if (box.clickedButton() != move) {
+        return;
+    }
+
+    // Bump the suffix until the backup name is free.
+    QString backup = file + QStringLiteral(".bak");
+    for (int suffix = 1; QFile::exists(backup); ++suffix) {
+        backup = file + QStringLiteral(".bak.%1").arg(suffix);
+    }
+    if (!QFile::rename(file, backup)) {
+        QMessageBox warning(QMessageBox::Warning, tr("Session warning"),
+                            tr("The session file could not be moved to:\n%1").arg(backup),
+                            QMessageBox::Ok, this);
+        warning.setTextFormat(Qt::PlainText);
+        warning.exec();
+        return;
+    }
+    QMessageBox moved(QMessageBox::Information, tr("Session warning"),
+                      tr("The session file was moved to:\n%1").arg(backup), QMessageBox::Ok, this);
+    moved.setTextFormat(Qt::PlainText);
+    moved.exec();
 }
 
 // Whether the hash type a restored session named is still waiting for the

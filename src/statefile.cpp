@@ -170,11 +170,17 @@ bool StateFile::read(const QString &filename, QLatin1StringView section, QJsonOb
         *values = sectionObject.value(QStringLiteral("values")).toObject();
     }
     const QJsonValue versionValue = sectionObject.value(QStringLiteral("version"));
+    if (versionPresent) {
+        *versionPresent = sectionObject.contains(QStringLiteral("version"));
+        if (*versionPresent && !versionValue.isDouble()) {
+            setError(
+                errorMessage,
+                tr("The “%1” section names a version that is not a number.").arg(QString(section)));
+            return false;
+        }
+    }
     if (version) {
         *version = versionValue.toInt(-1);
-    }
-    if (versionPresent) {
-        *versionPresent = versionValue.isDouble();
     }
 
     setError(errorMessage, QString());

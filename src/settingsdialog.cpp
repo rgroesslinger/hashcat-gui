@@ -570,6 +570,40 @@ void SettingsDialog::saveClicked()
         }
     }
 
+    // QSettings reports write errors only on sync(); a malformed file is
+    // refused before it can be rewritten.
+    QString syncError;
+    if (!settings.sync(&syncError)) {
+        if (settings.lastStatus() != QSettings::FormatError) {
+            settings.discardPending();
+            QMessageBox box(QMessageBox::Warning, tr("Settings not saved"), syncError,
+                            QMessageBox::Ok, this);
+            box.setTextFormat(Qt::PlainText);
+            box.exec();
+            return;
+        }
+
+        QMessageBox box(QMessageBox::Warning, tr("Settings not saved"), syncError,
+                        QMessageBox::NoButton, this);
+        box.setTextFormat(Qt::PlainText);
+        box.setInformativeText(
+            tr("Move the file aside and save these values? It is renamed, never deleted."));
+        QPushButton *move = box.addButton(tr("Move File Aside and Save"), QMessageBox::ActionRole);
+        QPushButton *keep = box.addButton(tr("Keep File"), QMessageBox::RejectRole);
+        box.setDefaultButton(keep);
+        box.setEscapeButton(keep);
+        box.exec();
+        if (box.clickedButton() != move) {
+            // The application keeps the settings it was started with, not
+            // values that were never stored.
+            settings.discardPending();
+            return;
+        }
+        if (!recoverMalformedSettingsFile()) {
+            return;
+        }
+    }
+
     // The color scheme takes effect right away, no restart needed.
     const QString colorScheme = ui->comboBox_color_scheme->currentData().toString();
     Appearance::applyColorScheme(colorScheme);
@@ -585,6 +619,38 @@ void SettingsDialog::saveClicked()
 
     // accept() signals our parent that settings might have changed
     accept();
+}
+
+bool SettingsDialog::recoverMalformedSettingsFile()
+{
+    auto &settings = SettingsManager::instance();
+    QString backup;
+    QString error;
+    if (!settings.moveFileAside(&backup, &error)) {
+        settings.discardPending();
+        QMessageBox box(QMessageBox::Warning, tr("Settings not saved"), error, QMessageBox::Ok,
+                        this);
+        box.setTextFormat(Qt::PlainText);
+        box.exec();
+        return false;
+    }
+
+    QString syncError;
+    if (!settings.sync(&syncError)) {
+        settings.discardPending();
+        QMessageBox box(QMessageBox::Warning, tr("Settings not saved"), syncError, QMessageBox::Ok,
+                        this);
+        box.setTextFormat(Qt::PlainText);
+        box.exec();
+        return false;
+    }
+
+    QMessageBox moved(QMessageBox::Information, tr("Settings saved"),
+                      tr("The old settings file was moved to:\n%1").arg(backup), QMessageBox::Ok,
+                      this);
+    moved.setTextFormat(Qt::PlainText);
+    moved.exec();
+    return true;
 }
 
 void SettingsDialog::cancelClicked()

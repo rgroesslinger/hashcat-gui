@@ -98,8 +98,9 @@ Connect once to `commandChanged()`; the attack-mode combo uses `attackIndexChang
   `SettingsManager::getKey` rejects wrong-typed or non-canonical values.
 - `restoreSession()` runs once between construction and `show()`; `saveSession()` refuses before
   it, so a blank form cannot overwrite the stored session.
-- `SettingsManager`: `QSettings::IniFormat`; keys/defaults in `AppConstants::SettingsKeys::All`.
-  Never set the application organization name — it moves `AppDataLocation` and the session file.
+- `SettingsManager`: `QSettings::IniFormat`; `setKey()` buffers until `sync()`, which never rewrites
+  a malformed file; `discardPending()` keeps the running values. Keys/defaults in
+  `AppConstants::SettingsKeys::All`; never set the organization name (it moves `AppDataLocation`).
 
 ## Conventions
 

@@ -22,7 +22,9 @@
 #include "ui_mainwindow.h"
 #include "widgetstateserializer.h"
 
+#include <QAbstractButton>
 #include <QAction>
+#include <QApplication>
 #include <QClipboard>
 #include <QComboBox>
 #include <QCompleter>
@@ -40,6 +42,7 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPointer>
 #include <QRadioButton>
 #include <QScreen>
@@ -93,6 +96,7 @@ private slots:
     void aNewerSettingsFileIsRefused();
     void anOlderStartupSessionIsAppliedWithANote();
     void aNewerStartupSessionIsLeftAlone();
+    void anUnusableStartupSessionCanBeMovedAside();
     void aNewerSessionSurvivesTheExit();
     void theNewerSessionWarningSaysWhatIsLost();
     void aSessionFileThatCannotBeReadIsLeftAlone();
@@ -843,6 +847,57 @@ void TestSession::aNewerStartupSessionIsLeftAlone()
 
     QCOMPARE(m_fixture.closedModals(), 1);
     QVERIFY(MainWindowTestAccess::ui(window)->spinBox_runtime->value() != 64);
+    QVERIFY(QFile::exists(session));
+}
+
+// A startup session this version cannot use blocks every later save unless
+// the user gets a way out. The offered move renames the file, so the newer
+// file (or the unreadable one) is preserved and a fresh session can be stored.
+void TestSession::anUnusableStartupSessionCanBeMovedAside()
+{
+    const QString session = StateFile::sessionFilePath();
+    QVERIFY(QFileInfo(session).dir().mkpath(QStringLiteral(".")));
+
+    QJsonObject values;
+    values.insert(QStringLiteral("spinBox_runtime"), 64);
+    QVERIFY(StateFile::write(session, AppConstants::FileSections::Session,
+                             AppConstants::Sessions::Version + 1, values, nullptr));
+    const QJsonObject before = readJsonObject(session);
+
+    TestEnvironment::useMissingHashcatPath();
+
+    QTimer timer;
+    timer.setInterval(20);
+    QObject::connect(&timer, &QTimer::timeout, &timer, [&] {
+        auto *box = qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
+        if (!box) {
+            return;
+        }
+        for (QAbstractButton *button : box->buttons()) {
+            QString label = button->text();
+            label.remove(QLatin1Char('&'));
+            if (label.contains(QStringLiteral("Move File Aside"))) {
+                button->click();
+                return;
+            }
+        }
+        // The information that follows the move, or a box the test does not
+        // drive itself.
+        box->close();
+    });
+    timer.start();
+
+    MainWindow window;
+    window.restoreSession();
+    timer.stop();
+
+    const QString backup = session + QStringLiteral(".bak");
+    QVERIFY(QFile::exists(backup));
+    QCOMPARE(readJsonObject(backup), before);
+    QVERIFY(!QFile::exists(session));
+
+    // The fresh session is stored under the usual name again.
+    MainWindowTestAccess::saveSession(window);
     QVERIFY(QFile::exists(session));
 }
 

@@ -74,6 +74,9 @@ private:
     void updateHashcatStatus();
     void updateTerminalStatus();
 
+    // Renames a malformed settings file aside and retries the save.
+    [[nodiscard]] bool recoverMalformedSettingsFile();
+
     static QString shortenPath(const QString &path);
 
     Ui::SettingsDialog *ui;

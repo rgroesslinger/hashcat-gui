@@ -12,19 +12,34 @@
 #include "testenvironment.h"
 #include "ui_settingsdialog.h"
 
+#include <QAbstractButton>
+#include <QApplication>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QGroupBox>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStandardItemModel>
 #include <QStandardPaths>
+#include <QTimer>
 #include <iterator>
 
 namespace
 {
+
+// The bytes of a file the test needs to prove unchanged.
+QByteArray fileContents(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return {};
+    }
+    return file.readAll();
+}
 
 // The value an imported setting takes in the dialog, and the value the dialog
 // shows for it. A key that neither knows is a key the dialog does not have a
@@ -122,6 +137,10 @@ private slots:
     void anImportedEmptyTerminalStillSavesEmpty();
     void saveIsTheDefaultButton();
     void savedSettingsHoldTheKnownSettings();
+    void syncRefusesToOverwriteAMalformedFile();
+    void moveFileAsidePreservesTheFileAndSaves();
+    void aFailedSaveKeepsTheStoredValues();
+    void aMalformedSaveOffersToMoveTheFileAside();
     void savedSettingsCoverEveryKnownKey();
     void everyKnownKeyIsTypeChecked();
     void wrongTypedSettingFallsBackToDefault();
@@ -682,6 +701,156 @@ void TestSettingsDialog::savedSettingsHoldTheKnownSettings()
     QVERIFY(stored.contains(QStringLiteral("restoreSession")));
     QVERIFY(stored.contains(QStringLiteral("language")));
     QVERIFY(stored.contains(QStringLiteral("colorScheme")));
+}
+
+// sync() must not rewrite a file it cannot parse: QSettings would keep only
+// the parsed part and report the error after the loss.
+void TestSettingsDialog::syncRefusesToOverwriteAMalformedFile()
+{
+    auto &settings = SettingsManager::instance();
+    const QString file = settings.fileName();
+    QVERIFY(QDir().mkpath(QFileInfo(file).absolutePath()));
+
+    const QByteArray malformed("[General]\nkeep=old\n\xff\xfe garbage\n");
+    QVERIFY(TestEnvironment::writeFile(file, malformed));
+
+    settings.setKey(AppConstants::SettingsKeys::Language, QStringLiteral("de"));
+    QString error;
+    QVERIFY(!settings.sync(&error));
+    QVERIFY(!error.isEmpty());
+    QCOMPARE(settings.lastStatus(), QSettings::FormatError);
+    QCOMPARE(fileContents(file), malformed);
+
+    settings.discardPending();
+    QFile::remove(file);
+}
+
+// The recovery path preserves the malformed file under a backup name, then
+// writes the pending values into a fresh file.
+void TestSettingsDialog::moveFileAsidePreservesTheFileAndSaves()
+{
+    auto &settings = SettingsManager::instance();
+    const QString file = settings.fileName();
+    QVERIFY(QDir().mkpath(QFileInfo(file).absolutePath()));
+
+    const QByteArray malformed("[General]\nkeep=old\n\xff\xfe garbage\n");
+    QVERIFY(TestEnvironment::writeFile(file, malformed));
+    settings.setKey(AppConstants::SettingsKeys::Language, QStringLiteral("de"));
+
+    QString error;
+    QVERIFY(!settings.sync(&error));
+    QString backup;
+    QVERIFY2(settings.moveFileAside(&backup, &error), qPrintable(error));
+    QCOMPARE(fileContents(backup), malformed);
+    QVERIFY(!QFile::exists(file));
+
+    QVERIFY2(settings.sync(&error), qPrintable(error));
+    QVERIFY(QFile::exists(file));
+    QCOMPARE(settings.getKey<QString>(AppConstants::SettingsKeys::Language), QStringLiteral("de"));
+
+    settings.setKey(AppConstants::SettingsKeys::Language, QString());
+    QVERIFY(settings.sync(&error));
+    QFile::remove(file);
+    QFile::remove(backup);
+}
+
+// A failed save keeps the values the application already runs with: the
+// dialog's unsaved values are dropped, not left in the in-memory settings.
+void TestSettingsDialog::aFailedSaveKeepsTheStoredValues()
+{
+    auto &settings = SettingsManager::instance();
+    const QString file = settings.fileName();
+    QVERIFY(QDir().mkpath(QFileInfo(file).absolutePath()));
+    settings.setKey(AppConstants::SettingsKeys::Language, QStringLiteral("xx"));
+    QString error;
+    QVERIFY(settings.sync(&error));
+
+    // Values only exist while pending; a discard restores the stored one.
+    settings.setKey(AppConstants::SettingsKeys::Language, QStringLiteral("de"));
+    settings.discardPending();
+    QCOMPARE(settings.getKey<QString>(AppConstants::SettingsKeys::Language), QStringLiteral("xx"));
+
+    const QByteArray malformed("[General]\nkeep=old\n\xff\xfe garbage\n");
+    QVERIFY(TestEnvironment::writeFile(file, malformed));
+
+    SettingsDialog dialog;
+    const int de = dialog.ui->comboBox_language->findData(QStringLiteral("de"));
+    QVERIFY(de >= 0);
+    dialog.ui->comboBox_language->setCurrentIndex(de);
+
+    QTimer timer;
+    timer.setInterval(20);
+    QObject::connect(&timer, &QTimer::timeout, &timer, [] {
+        if (QWidget *modal = QApplication::activeModalWidget()) {
+            // Closing keeps the file; closing the restart note ends the flow.
+            modal->close();
+        }
+    });
+    timer.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+    timer.stop();
+
+    QCOMPARE(int(dialog.result()), int(QDialog::Rejected));
+    // The unsaved value did not survive the failed save.
+    QVERIFY(settings.getKey<QString>(AppConstants::SettingsKeys::Language) != QStringLiteral("de"));
+    QCOMPARE(fileContents(file), malformed);
+
+    QFile::remove(file);
+    settings.setKey(AppConstants::SettingsKeys::Language, QString());
+    QVERIFY(settings.sync(&error));
+    QFile::remove(file);
+}
+
+// Choosing the move-aside action renames the malformed file, saves the
+// dialog's values and accepts.
+void TestSettingsDialog::aMalformedSaveOffersToMoveTheFileAside()
+{
+    auto &settings = SettingsManager::instance();
+    const QString file = settings.fileName();
+    QVERIFY(QDir().mkpath(QFileInfo(file).absolutePath()));
+
+    const QByteArray malformed("[General]\nkeep=old\n\xff\xfe garbage\n");
+    QVERIFY(TestEnvironment::writeFile(file, malformed));
+
+    SettingsDialog dialog;
+    const int de = dialog.ui->comboBox_language->findData(QStringLiteral("de"));
+    QVERIFY(de >= 0);
+    dialog.ui->comboBox_language->setCurrentIndex(de);
+
+    QTimer timer;
+    timer.setInterval(20);
+    QObject::connect(&timer, &QTimer::timeout, &timer, [] {
+        auto *box = qobject_cast<QMessageBox *>(QApplication::activeModalWidget());
+        if (!box) {
+            return;
+        }
+        for (QAbstractButton *button : box->buttons()) {
+            QString text = button->text();
+            text.remove(QLatin1Char('&'));
+            if (text.contains(QStringLiteral("Move File Aside and Save"))) {
+                button->click();
+                return;
+            }
+        }
+        // The moved-to information and the restart note.
+        box->close();
+    });
+    timer.start();
+    QVERIFY(QMetaObject::invokeMethod(&dialog, "saveClicked"));
+    timer.stop();
+
+    QCOMPARE(int(dialog.result()), int(QDialog::Accepted));
+    const QString backup = file + QStringLiteral(".bak");
+    QVERIFY(QFile::exists(backup));
+    QCOMPARE(fileContents(backup), malformed);
+    QVERIFY(QFile::exists(file));
+    QCOMPARE(settings.getKey<QString>(AppConstants::SettingsKeys::Language), QStringLiteral("de"));
+
+    settings.setKey(AppConstants::SettingsKeys::Language, QString());
+    QString error;
+    QVERIFY(settings.sync(&error));
+    QFile::remove(file);
+    QFile::remove(backup);
 }
 
 // Every key of the table reaches the export. Adding a setting means adding an

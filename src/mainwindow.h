@@ -224,6 +224,8 @@ private:
 
     void loadSession();
     void saveSession();
+    // Reports an unusable session file and offers to rename it aside.
+    void offerSessionFileRecovery(const QString &file, const QString &message);
 
     // The session as the widgets hold it, with the hash type a pending query
     // still owes corrected to the id the session named, see the definition.

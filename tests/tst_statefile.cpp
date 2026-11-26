@@ -31,6 +31,7 @@ private slots:
     void aJsonArrayIsRefused();
     void aMissingFileIsRefused();
     void aNegativeVersionIsRefused();
+    void aStringVersionIsRefused();
     void aWriteThatFailsIsReported();
     void theErrorIsClearedOnSuccess();
     void nameListFormatsTheNames();
@@ -282,6 +283,28 @@ void TestStateFile::aNegativeVersionIsRefused()
         path, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
     QCOMPARE(document.status, StateFile::Status::Unreadable);
     QVERIFY(!document.error.isEmpty());
+}
+
+// A version has to be a number. A string was silently read as "no version",
+// which applied a file of an unknown shape as if it were a hand-edited one.
+void TestStateFile::aStringVersionIsRefused()
+{
+    const QString path = scratchFile(QStringLiteral("string-version.json"));
+    QVERIFY(writeFile(path, R"({"sections": {"session": {"version": "99", "values": {}}}})"));
+
+    const StateFile::Document document = StateFile::readDocument(
+        path, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
+    QCOMPARE(document.status, StateFile::Status::Unreadable);
+    QVERIFY(!document.error.isEmpty());
+
+    // A section without a version key is still the hand-edited form that is
+    // applied like an older file.
+    const QString unversioned = scratchFile(QStringLiteral("no-version.json"));
+    QVERIFY(writeFile(unversioned, R"({"sections": {"session": {"values": {}}}})"));
+    QCOMPARE(StateFile::readDocument(unversioned, AppConstants::FileSections::Session,
+                                     AppConstants::Sessions::Version)
+                 .status,
+             StateFile::Status::Read);
 }
 
 // A write that cannot succeed is reported, and a nullptr errorMessage is the

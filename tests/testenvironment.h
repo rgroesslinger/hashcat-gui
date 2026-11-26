@@ -105,6 +105,8 @@ inline void resetSettings()
                        QCoreApplication::applicationName(), QStringLiteral("settings"));
     settings.clear();
     settings.sync();
+    // A save that failed leaves values pending for a retry; tests start clean.
+    SettingsManager::instance().discardPending();
 }
 
 // Writes a file the tests can inspect, replacing its content.
