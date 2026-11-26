@@ -1235,13 +1235,22 @@ void MainWindow::potfileCheckTriggered()
                     result = checkResult;
                     progress.accept();
                 });
+    auto cancelled = std::make_shared<bool>(false);
+    const auto markCancelled = [cancelled] { *cancelled = true; };
     connect(&progress, &QProgressDialog::canceled, m_potfileCheck.get(), &PotfileCheck::cancel);
     connect(&progress, &QDialog::rejected, m_potfileCheck.get(), &PotfileCheck::cancel);
+    connect(&progress, &QProgressDialog::canceled, &progress, markCancelled);
+    connect(&progress, &QDialog::rejected, &progress, markCancelled);
 
     // Start after exec() has entered its event loop: a reply fast enough to
-    // finish first would otherwise close the dialog before it is shown.
-    QTimer::singleShot(0, m_potfileCheck.get(),
-                       [this, hashcatPath, input] { m_potfileCheck->start(hashcatPath, input); });
+    // finish first would otherwise close the dialog before it is shown. A
+    // dialog cancelled before this fires must not start a query at all.
+    QTimer::singleShot(0, m_potfileCheck.get(), [this, hashcatPath, input, cancelled] {
+        if (*cancelled) {
+            return;
+        }
+        m_potfileCheck->start(hashcatPath, input);
+    });
 
     progress.exec();
     disconnect(finishedConnection);
