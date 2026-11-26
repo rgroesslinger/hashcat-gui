@@ -9,6 +9,7 @@
 #include <QList>
 #include <QString>
 #include <QStringList>
+#include <QTimer>
 #include <QWidget>
 
 namespace Ui
@@ -106,6 +107,7 @@ private:
     Ui::PotfileTableView *ui;
     QList<Row> m_rows;
     QString m_emptyStateText;
+    QTimer m_filterTimer;
     bool m_revealed = false;
     bool m_showEmptyState = false;
 };

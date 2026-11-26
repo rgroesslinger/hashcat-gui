@@ -377,6 +377,10 @@ inline constexpr int PotfileMaxEntries = 100000;
 // The duplicate detector remembers at most this many distinct lines. A larger
 // file keeps exact totals, but the duplicate count becomes a lower bound.
 inline constexpr int PotfileMaxFingerprints = 1000000;
+// Above this many rows, typed search text filters on a short timer instead of
+// re-scanning the whole table on every keystroke. Small tables stay immediate.
+inline constexpr int PotfileFilterDebounceThreshold = 5000;
+inline constexpr int PotfileFilterDebounceMs = 150;
 // A value starting with '-' would be read as an option, not as the hash to identify.
 inline constexpr QLatin1StringView OptionTerminator{"--"};
 // Backend init can be slow on a fresh driver; queries that need it get longer.

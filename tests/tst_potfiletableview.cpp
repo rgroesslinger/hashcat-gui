@@ -6,6 +6,8 @@
 #include "potfiletableview.h"
 #include "testenvironment.h"
 
+#include "appconstants.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QDialog>
@@ -58,6 +60,7 @@ private slots:
     void rowsSortByHashAndHeaderClickToggles();
     void fileRowsAreLabeledButCopyTheRawName();
     void filterEmptyStateAndVisibleRowsSignal();
+    void largeRowSetsDebounceTheFilter();
     void revealTogglesTextAndMasks();
     void maskedCopyIsDisabledUnlessNothingIsRevealable();
     void ctrlCCopiesSelectedVisibleRows();
@@ -131,6 +134,39 @@ void TestPotfileTableView::filterEmptyStateAndVisibleRowsSignal()
 
     search(view)->clear();
     QCOMPARE(stack->currentWidget(), static_cast<QWidget *>(tree(view)));
+}
+
+// A 100k-row table cannot synchronously rescan on every keystroke. Above the
+// threshold the filter waits for a pause; typing again restarts the wait, so
+// one pass runs for the final text.
+void TestPotfileTableView::largeRowSetsDebounceTheFilter()
+{
+    QList<PotfileTableView::Row> rows;
+    const int count = AppConstants::Hashcat::PotfileFilterDebounceThreshold + 1000;
+    rows.reserve(count);
+    for (int i = 0; i < count; ++i) {
+        rows.append(row(QStringLiteral("hash-%1").arg(i), QStringLiteral("plain")));
+    }
+
+    PotfileTableView view;
+    view.setRows(rows);
+    QCOMPARE(view.visibleRowCount(), count);
+
+    QSignalSpy spy(&view, &PotfileTableView::visibleRowsChanged);
+    search(view)->setText(QStringLiteral("hash-4999"));
+    // The keystroke itself does not filter; the table is unchanged.
+    QCOMPARE(spy.count(), 0);
+    QCOMPARE(view.visibleRowCount(), count);
+
+    QTRY_COMPARE_WITH_TIMEOUT(view.visibleRowCount(), 1, 2000);
+    QCOMPARE(spy.count(), 1);
+
+    // A second keystroke before the timer fires restarts it: still one pass.
+    spy.clear();
+    search(view)->setText(QStringLiteral("hash-3999"));
+    search(view)->setText(QStringLiteral("hash-"));
+    QTRY_COMPARE_WITH_TIMEOUT(view.visibleRowCount(), count, 2000);
+    QCOMPARE(spy.count(), 1);
 }
 
 void TestPotfileTableView::revealTogglesTextAndMasks()

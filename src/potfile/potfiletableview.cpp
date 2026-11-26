@@ -5,6 +5,7 @@
 
 #include "potfiletableview.h"
 
+#include "appconstants.h"
 #include "textutils.h"
 #include "ui_potfiletableview.h"
 
@@ -54,6 +55,10 @@ PotfileTableView::PotfileTableView(QWidget *parent) : QWidget(parent), ui(new Ui
     connect(ui->pushButton_copy_all, &QPushButton::clicked, this, &PotfileTableView::copyAll);
     connect(ui->treeWidget_results, &QTreeWidget::itemSelectionChanged, this,
             &PotfileTableView::updateButtons);
+
+    m_filterTimer.setSingleShot(true);
+    m_filterTimer.setInterval(AppConstants::Hashcat::PotfileFilterDebounceMs);
+    connect(&m_filterTimer, &QTimer::timeout, this, &PotfileTableView::applyFilter);
 
     setExtraColumns({});
     clearRows();
@@ -186,6 +191,12 @@ bool PotfileTableView::eventFilter(QObject *watched, QEvent *event)
 
 void PotfileTableView::searchChanged()
 {
+    // At 100k rows a synchronous pass per keystroke is visible; wait for a
+    // pause instead. Small tables filter at once, as they always have.
+    if (m_rows.size() > AppConstants::Hashcat::PotfileFilterDebounceThreshold) {
+        m_filterTimer.start();
+        return;
+    }
     applyFilter();
 }
 
@@ -325,6 +336,7 @@ const PotfileTableView::Row *PotfileTableView::rowForItem(const QTreeWidgetItem 
 
 void PotfileTableView::applyFilter()
 {
+    m_filterTimer.stop();
     for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
         QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
         if (const Row *row = rowForItem(item)) {
