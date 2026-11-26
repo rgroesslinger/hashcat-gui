@@ -6,6 +6,7 @@
 #include "appconstants.h"
 #include "hashcatquerytesthelpers.h"
 #include "potfileinspector.h"
+#include "potfilestatisticsdialog.h"
 #include "potfiletesthelpers.h"
 #include "programdirectory.h"
 #include "settingsmanager.h"
@@ -14,6 +15,8 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QDir>
+#include <QElapsedTimer>
+#include <QEventLoop>
 #include <QFile>
 #include <QFileDialog>
 #include <QLabel>
@@ -29,6 +32,38 @@
 using TestEnvironment::appendFile;
 using TestEnvironment::writeFile;
 using namespace PotfileDialogTestAccess;
+
+namespace
+{
+// Opens the statistics dialog, records the summary and closes it. The dialog
+// runs asynchronously, so the caller gets the text only after the event loop
+// has run.
+QString statisticsSummary(PotfileInspectorDialog &dialog)
+{
+    QString text;
+    QTimer timer;
+    timer.setInterval(20);
+    QObject::connect(&timer, &QTimer::timeout, &timer, [&] {
+        auto *stats = qobject_cast<PotfileStatisticsDialog *>(QApplication::activeModalWidget());
+        if (!stats) {
+            return;
+        }
+        if (auto *label = stats->findChild<QLabel *>(QStringLiteral("label_summary"))) {
+            text = label->text();
+        }
+        stats->close();
+    });
+    timer.start();
+    button(dialog, QStringLiteral("pushButton_statistics"))->click();
+    QElapsedTimer elapsed;
+    elapsed.start();
+    while (text.isEmpty() && elapsed.elapsed() < 5000) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+    }
+    timer.stop();
+    return text;
+}
+} // namespace
 
 class TestPotfileInspector : public QObject
 {
@@ -54,6 +89,8 @@ private slots:
     void reloadPreservesFilterAndReveal();
     void exportSuggestionIsUnderHome();
     void filterWithNoMatchesShowsItsEmptyState();
+    void statisticsMarkFilteredDuplicateCountsUnknown();
+    void statisticsDuringAStaleFilterStayUnknown();
 };
 
 void TestPotfileInspector::init()
@@ -500,6 +537,57 @@ void TestPotfileInspector::filterWithNoMatchesShowsItsEmptyState()
                 ->text()
                 .contains(QStringLiteral("No rows match the filter.")));
     QVERIFY(!button(dialog, QStringLiteral("pushButton_export"))->isEnabled());
+}
+
+// Statistics run over the visible, retained rows. An unfiltered potfile that
+// fits the display cap gives the exact duplicate count; a search filter (or
+// the cap) must not let the dialog claim the same certainty.
+void TestPotfileInspector::statisticsMarkFilteredDuplicateCountsUnknown()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("hashcat.potfile"));
+    QVERIFY(writeFile(path, QByteArrayLiteral("hash-one:secret\n"
+                                              "hash-one:secret\n"
+                                              "hash-two:hunter2\n")));
+
+    PotfileInspectorDialog dialog;
+    dialog.setPotfilePath(path);
+    QTRY_COMPARE_WITH_TIMEOUT(tree(dialog)->topLevelItemCount(), 3, 5000);
+
+    QVERIFY(statisticsSummary(dialog).contains(QStringLiteral("1 duplicate line")));
+
+    search(dialog)->setText(QStringLiteral("hash-two"));
+    QVERIFY(statisticsSummary(dialog).contains(QStringLiteral("duplicate lines: unknown")));
+}
+
+// Above the debounce threshold, clearing the search leaves the old filter
+// applied for a moment. Statistics over that stale subset must not claim to
+// cover the whole file.
+void TestPotfileInspector::statisticsDuringAStaleFilterStayUnknown()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("hashcat.potfile"));
+    const int count = AppConstants::Hashcat::PotfileFilterDebounceThreshold + 1;
+    QByteArray content;
+    for (int i = 0; i < count; ++i) {
+        content += "hash-" + QByteArray::number(i) + ":plain\n";
+    }
+    QVERIFY(writeFile(path, content));
+
+    PotfileInspectorDialog dialog;
+    dialog.setPotfilePath(path);
+    QTRY_COMPARE_WITH_TIMEOUT(tree(dialog)->topLevelItemCount(), count, 5000);
+
+    // Let the debounced filter run and hide the rows the query does not match.
+    search(dialog)->setText(QStringLiteral("hash-1"));
+    QTRY_VERIFY_WITH_TIMEOUT(tree(dialog)->topLevelItem(count - 1)->isHidden(), 2000);
+
+    // Clear the field and ask for statistics before the timer applies the
+    // empty filter: the visible rows are still the old subset.
+    search(dialog)->clear();
+    QVERIFY(statisticsSummary(dialog).contains(QStringLiteral("duplicate lines: unknown")));
 }
 
 int main(int argc, char *argv[])

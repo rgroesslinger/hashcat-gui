@@ -70,6 +70,8 @@ public:
     {
         return m_revealed;
     }
+    // Whether an applied filter narrows the rows.
+    [[nodiscard]] bool isFiltered() const;
     // Visible rows in current view (sort) order.
     [[nodiscard]] QList<Row> visibleRows() const;
     [[nodiscard]] int visibleRowCount() const;
@@ -110,6 +112,7 @@ private:
     QTimer m_filterTimer;
     bool m_revealed = false;
     bool m_showEmptyState = false;
+    QString m_appliedFilter;
 };
 
 #endif // POTFILETABLEVIEW_H

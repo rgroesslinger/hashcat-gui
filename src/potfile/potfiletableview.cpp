@@ -150,6 +150,12 @@ bool PotfileTableView::canReveal() const
                                [](const Row &row) { return !row.emptyPlain && !row.encrypted; });
 }
 
+bool PotfileTableView::isFiltered() const
+{
+    // The applied filter can lag the field during the debounce.
+    return !m_appliedFilter.isEmpty();
+}
+
 QList<PotfileTableView::Row> PotfileTableView::visibleRows() const
 {
     QList<Row> rows;
@@ -340,6 +346,7 @@ const PotfileTableView::Row *PotfileTableView::rowForItem(const QTreeWidgetItem 
 void PotfileTableView::applyFilter()
 {
     m_filterTimer.stop();
+    m_appliedFilter = ui->lineEdit_search->text();
     for (int i = 0; i < ui->treeWidget_results->topLevelItemCount(); ++i) {
         QTreeWidgetItem *item = ui->treeWidget_results->topLevelItem(i);
         if (const Row *row = rowForItem(item)) {

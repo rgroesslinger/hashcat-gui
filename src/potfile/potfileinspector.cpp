@@ -185,8 +185,12 @@ void PotfileInspectorDialog::statisticsClicked()
     const QList<PotfileExporter::Row> rows = resultRows();
     const QString path = ui->lineEdit_potfile->text();
     const QString context = path.isEmpty() ? tr("Potfile inspector") : tr("Potfile: %1").arg(path);
-    PotfileStatisticsDialog::openAsync(this, rows, context, m_result.totalCount,
-                                       m_result.duplicateCountComplete);
+    // Statistics cover the visible retained rows; claim exact duplicates
+    // only for the whole file.
+    const bool duplicateKnown = m_result.duplicateCountComplete
+                                && m_result.entries.size() == m_result.totalCount
+                                && !ui->table_view->isFiltered();
+    PotfileStatisticsDialog::openAsync(this, rows, context, m_result.totalCount, duplicateKnown);
 }
 
 void PotfileInspectorDialog::loadPath(bool preserveViewState)
