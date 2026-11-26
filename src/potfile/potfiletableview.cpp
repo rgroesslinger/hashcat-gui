@@ -250,11 +250,14 @@ void PotfileTableView::copyRows(const QList<Row> &rows)
     for (const Row &row : rows) {
         lines.append(copyValuesFor(row).join(QLatin1Char('\t')));
     }
-    QApplication::clipboard()->setText(lines.join(QLatin1Char('\n')));
-    QToolTip::showText(
-        QCursor::pos(),
-        countText(static_cast<int>(rows.size()), tr("Copied 1 row"), tr("Copied %1 rows")),
-        ui->treeWidget_results, QRect(), 2000);
+    // QApplication::clipboard() is null on platforms without clipboard support.
+    if (QClipboard *clipboard = QApplication::clipboard()) {
+        clipboard->setText(lines.join(QLatin1Char('\n')));
+        QToolTip::showText(
+            QCursor::pos(),
+            countText(static_cast<int>(rows.size()), tr("Copied 1 row"), tr("Copied %1 rows")),
+            ui->treeWidget_results, QRect(), 2000);
+    }
 }
 
 void PotfileTableView::showContextMenu(const QPoint &pos)
