@@ -7,6 +7,7 @@
 
 #include "appconstants.h"
 #include "commandbuilder.h"
+#include "programdirectory.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -455,7 +456,8 @@ QString showControlCharacters(const QString &token)
     return shown;
 }
 
-LaunchError validateOptions(const HashcatOptions &options, QString *detail)
+LaunchError validateOptions(const HashcatOptions &options, const QString &resolvedHashcatPath,
+                            QString *detail)
 {
     if (detail) {
         detail->clear();
@@ -594,7 +596,8 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
     const int amplifier = amplifierWordlistRow(options.attackMode);
     if (amplifier >= 0 && amplifier < wordlistCount) {
         const QString &path = options.wordlists.at(amplifier);
-        if (!path.isEmpty() && QFileInfo(path).isDir()) {
+        if (!path.isEmpty()
+            && QFileInfo(ProgramPath::forHashcat(path, resolvedHashcatPath)).isDir()) {
             if (detail) {
                 *detail = path;
             }
@@ -636,7 +639,8 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
     // browse dialog only offers directories, so this one is a hand edit or
     // a directory that has gone away. Raw like the builder: whitespace is
     // emitted too.
-    if (!options.cachePath.isEmpty() && !QFileInfo(options.cachePath).isDir()) {
+    if (!options.cachePath.isEmpty()
+        && !QFileInfo(ProgramPath::forHashcat(options.cachePath, resolvedHashcatPath)).isDir()) {
         if (detail) {
             *detail = options.cachePath;
         }
@@ -678,7 +682,7 @@ LaunchError validateOptions(const HashcatOptions &options, QString *detail)
 LaunchProblem validate(const LaunchContext &context)
 {
     LaunchProblem problem;
-    problem.code = validateOptions(context.options, &problem.detail);
+    problem.code = validateOptions(context.options, context.resolvedHashcatPath, &problem.detail);
     if (problem.code != LaunchError::None) {
         return problem;
     }

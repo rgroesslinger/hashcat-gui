@@ -5,6 +5,8 @@
 
 #include "pathmonitor.h"
 
+#include "programdirectory.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <algorithm>
@@ -66,15 +68,35 @@ bool PathMonitor::isAvailable(const QString &path) const
     return m_available.value(path, false);
 }
 
+QString PathMonitor::resolvePath(const QString &path) const
+{
+    // Bundled ruleset names are hashcat's own lookup, not a filesystem path.
+    if (m_kind == Kind::Pcfg && isBundledName(path)) {
+        return path;
+    }
+    return ProgramPath::forHashcat(path, m_hashcatPath);
+}
+
+void PathMonitor::setHashcatPath(const QString &hashcatPath)
+{
+    if (m_hashcatPath == hashcatPath) {
+        return;
+    }
+    m_hashcatPath = hashcatPath;
+    // The rows keep their text; what they point at may have changed.
+    updateWatches();
+    recheck();
+}
+
 bool PathMonitor::isUsable(const QString &path) const
 {
-    const QFileInfo info(path);
+    const QFileInfo info(resolvePath(path));
 
     switch (m_kind) {
     case Kind::Wordlist:
         // Since hashcat 8.0.0 a folder is a base wordlist input; it has to hold
         // at least one file, because the feed skips subdirectories and dotfiles.
-        return info.isFile() || (info.isDir() && hasWordlistFiles(path));
+        return info.isFile() || (info.isDir() && hasWordlistFiles(info.filePath()));
     case Kind::Table:
         // The table feed opens every argument as a file; it never scans a
         // folder, so a folder is unusable whatever it contains.
@@ -86,7 +108,8 @@ bool PathMonitor::isUsable(const QString &path) const
         }
         if (info.isDir()) {
             // The other form: a folder named by its grammar.
-            return QFileInfo(QDir(path).filePath(QStringLiteral("Grammar/grammar.txt"))).isFile();
+            return QFileInfo(QDir(info.filePath()).filePath(QStringLiteral("Grammar/grammar.txt")))
+                .isFile();
         }
         return isBundledName(path);
     }
@@ -109,13 +132,19 @@ void PathMonitor::recheck()
 
 QStringList PathMonitor::watchDirectories(const QString &path) const
 {
+    if (m_kind == Kind::Pcfg && isBundledName(path)) {
+        // hashcat's own lookup; there is no path to watch.
+        return {};
+    }
+
+    const QString resolved = resolvePath(path);
     QStringList directories;
 
     // The parent is gone: watch the nearest existing ancestor, so that a
     // recreated directory produces an event and the next update can follow it
     // down again. The walk stops at the root - and at a drive or share that is
     // not available at all.
-    QString directory = QFileInfo(path).absolutePath();
+    QString directory = QFileInfo(resolved).absolutePath();
     while (!QFileInfo(directory).isDir()) {
         const QString parent = QFileInfo(directory).absolutePath();
         if (parent.isEmpty() || parent == directory) {
@@ -132,7 +161,7 @@ QStringList PathMonitor::watchDirectories(const QString &path) const
     // folder becomes usable when a file arrives, and a ruleset folder becomes
     // usable when its grammar arrives. A table folder is unusable whatever is
     // inside it, so its parent is enough there.
-    const QFileInfo info(path);
+    const QFileInfo info(resolved);
     if (info.isDir() && m_kind != Kind::Table) {
         const QString folder = info.absoluteFilePath();
         if (!directories.contains(folder)) {

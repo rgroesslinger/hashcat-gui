@@ -64,6 +64,13 @@ QStringList PathListController::checkedItems() const
     return CheckedItemList::checkedItems(m_list);
 }
 
+void PathListController::setHashcatPath(const QString &hashcatPath)
+{
+    if (m_monitor) {
+        m_monitor->setHashcatPath(hashcatPath);
+    }
+}
+
 void PathListController::removeSelected()
 {
     CheckedItemList::removeSelected(m_list);
@@ -89,7 +96,7 @@ void PathListController::refreshMonitor()
 // tooltip.
 QString PathListController::unavailableTooltip(const QString &path) const
 {
-    const bool folder = QFileInfo(path).isDir();
+    const bool folder = QFileInfo(m_monitor->resolvePath(path)).isDir();
 
     switch (m_monitor->kind()) {
     case PathMonitor::Kind::Wordlist:
@@ -125,7 +132,7 @@ void PathListController::setRowAvailability(const QString &path, bool available)
     // A usable path shows what it is; an unusable one cannot be trusted with
     // a type, so the warning takes the icon's place. A bundled ruleset name
     // has neither a file nor a folder behind it and stays without one.
-    const QFileInfo info(path);
+    const QFileInfo info(m_monitor->resolvePath(path));
     QIcon icon;
     if (!available) {
         icon = m_warningIcon;

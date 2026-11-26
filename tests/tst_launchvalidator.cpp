@@ -44,6 +44,21 @@ LaunchValidator::LaunchError validateOptionsWithDetail(const HashcatOptions &opt
     }
     return problem.code;
 }
+
+// The option checks against an explicit program, for the paths that hashcat
+// reads relative to its own directory.
+LaunchValidator::LaunchProblem validateOptionsAt(const HashcatOptions &options,
+                                                 const QString &resolvedHashcatPath)
+{
+    LaunchValidator::LaunchContext context;
+    context.options = options;
+    context.options.hashFile = QStringLiteral("hash.txt");
+    context.hashcatPath = resolvedHashcatPath;
+    context.resolvedHashcatPath = resolvedHashcatPath;
+    context.configuredTerminal = QStringLiteral("konsole");
+    context.availableTerminals = QStringList{QStringLiteral("konsole")};
+    return LaunchValidator::validate(context);
+}
 } // namespace
 
 // The conditions that keep Execute from starting anything: the launch and
@@ -67,6 +82,7 @@ private slots:
     void maskMarkersAreValidated();
     void hashRecipeIsRequiredFor4000();
     void cachePathNeedsAnExistingDirectory();
+    void relativePathsResolveAgainstTheProgramDirectory();
     void controlCharactersAreRefused();
     void outfileFormatIsValidated();
 };
@@ -995,6 +1011,49 @@ void TestLaunchValidator::cachePathNeedsAnExistingDirectory()
     problem = ::validateOptions(options);
     QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCachePath));
     QCOMPARE(problem.detail, options.cachePath);
+}
+
+// The paths hashcat reads are relative to the directory it runs in, so a
+// relative cache path or ?q wordlist must be checked there, not against the
+// GUI process's current directory.
+void TestLaunchValidator::relativePathsResolveAgainstTheProgramDirectory()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString program = directory.filePath(QStringLiteral("hashcat"));
+    QFile binary(program);
+    QVERIFY(binary.open(QIODevice::WriteOnly));
+    binary.close();
+    QVERIFY(QDir(directory.path()).mkpath(QStringLiteral("cache")));
+
+    HashcatOptions options;
+    options.attackMode = AttackMode::Straight;
+    options.wordlists = QStringList{QStringLiteral("words.txt")};
+
+    options.cachePath = QStringLiteral("cache");
+    QCOMPARE(int(validateOptionsAt(options, program).code),
+             int(LaunchValidator::LaunchError::None));
+
+    // A relative name that is a file, not a directory, is refused; the detail
+    // stays the raw value the user typed.
+    QFile notADirectory(directory.filePath(QStringLiteral("notadir")));
+    QVERIFY(notADirectory.open(QIODevice::WriteOnly));
+    notADirectory.close();
+    options.cachePath = QStringLiteral("notadir");
+    LaunchValidator::LaunchProblem problem = validateOptionsAt(options, program);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::InvalidCachePath));
+    QCOMPARE(problem.detail, QStringLiteral("notadir"));
+
+    // The ?q wordlist is the row that must be a file; a folder next to the
+    // program is refused just like an absolute one.
+    QVERIFY(QDir(directory.path()).mkpath(QStringLiteral("wordfolder")));
+    HashcatOptions hybrid;
+    hybrid.attackMode = AttackMode::Hybrid;
+    hybrid.mask = QStringLiteral("?w?q");
+    hybrid.wordlists = {QStringLiteral("words.txt"), QStringLiteral("wordfolder")};
+    problem = validateOptionsAt(hybrid, program);
+    QCOMPARE(int(problem.code), int(LaunchValidator::LaunchError::WordlistMustBeFile));
+    QCOMPARE(problem.detail, QStringLiteral("wordfolder"));
 }
 
 // A NUL would silently end the token at exec, so what hashcat receives would

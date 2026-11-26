@@ -29,7 +29,58 @@ private slots:
     void tableFolderIsRefused();
     void pcfgFolderNeedsItsGrammar();
     void pcfgArchiveAndBundledNamesAreAvailable();
+    void relativePathsResolveAgainstTheProgramDirectory();
+    void aNewProgramDirectoryRebasesThePaths();
 };
+
+// hashcat reads a relative path from the program directory, not from wherever
+// the GUI happens to run. The row keeps the text the user typed; only what it
+// is checked against changes.
+void TestPathMonitor::relativePathsResolveAgainstTheProgramDirectory()
+{
+    QTemporaryDir hashcatDirectory;
+    QVERIFY(hashcatDirectory.isValid());
+    QVERIFY(writeFile(hashcatDirectory.filePath(QStringLiteral("hashcat"))));
+    QVERIFY(writeFile(hashcatDirectory.filePath(QStringLiteral("words.txt"))));
+    QVERIFY(QDir(hashcatDirectory.path()).mkpath(QStringLiteral("empty-folder")));
+
+    PathMonitor monitor(PathMonitor::Kind::Wordlist);
+    monitor.setHashcatPath(hashcatDirectory.filePath(QStringLiteral("hashcat")));
+    QSignalSpy spy(&monitor, &PathMonitor::availabilityChanged);
+
+    monitor.setPaths({QStringLiteral("words.txt"), QStringLiteral("empty-folder"),
+                      QStringLiteral("missing.txt")});
+
+    QCOMPARE(spy.count(), 3);
+    QCOMPARE(spy.at(0).at(0).toString(), QStringLiteral("words.txt"));
+    QCOMPARE(spy.at(0).at(1).toBool(), true);
+    QCOMPARE(spy.at(1).at(1).toBool(), false);
+    QCOMPARE(spy.at(2).at(1).toBool(), false);
+}
+
+// A settings change that points at another binary moves the directory the
+// rows are read from; the same relative row can change its answer.
+void TestPathMonitor::aNewProgramDirectoryRebasesThePaths()
+{
+    QTemporaryDir first;
+    QTemporaryDir second;
+    QVERIFY(first.isValid() && second.isValid());
+    QVERIFY(writeFile(first.filePath(QStringLiteral("hashcat"))));
+    QVERIFY(writeFile(second.filePath(QStringLiteral("hashcat"))));
+    QVERIFY(writeFile(second.filePath(QStringLiteral("words.txt"))));
+
+    PathMonitor monitor(PathMonitor::Kind::Wordlist);
+    monitor.setHashcatPath(first.filePath(QStringLiteral("hashcat")));
+    QSignalSpy spy(&monitor, &PathMonitor::availabilityChanged);
+    monitor.setPaths({QStringLiteral("words.txt")});
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(1).toBool(), false);
+
+    monitor.setHashcatPath(second.filePath(QStringLiteral("hashcat")));
+    QCOMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(0).toString(), QStringLiteral("words.txt"));
+    QCOMPARE(spy.at(1).at(1).toBool(), true);
+}
 
 // The caller reports the state of the rows it just built, so even a path that
 // was watched before has to be reported again - and only once, even if it is

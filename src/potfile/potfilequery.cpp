@@ -17,18 +17,6 @@
 namespace
 {
 
-// "C:hashes.txt" has a drive but no root. QDir::isAbsolutePath() calls it
-// relative, and joining it onto another directory would corrupt it.
-bool isDriveRelativePath(const QString &path)
-{
-#ifdef Q_OS_WIN
-    return path.size() >= 2 && path.at(1) == QLatin1Char(':') && !QDir::isAbsolutePath(path);
-#else
-    Q_UNUSED(path);
-    return false;
-#endif
-}
-
 QStringList queryArgs(QLatin1StringView action, const PotfileQueryInput &input, bool json)
 {
     QStringList args;
@@ -74,24 +62,8 @@ QStringList PotfileQuery::leftArgs(const PotfileQueryInput &input)
 
 QString PotfileQuery::resolvePath(const QString &entered, const QString &hashcatPath)
 {
-    if (entered.isEmpty() || QDir::isAbsolutePath(entered)) {
-        return entered;
-    }
-
-    if (isDriveRelativePath(entered)) {
-        // Let Windows resolve its per-drive current directory; the old
-        // QFileInfo() conversion did the same.
-        return QFileInfo(entered).absoluteFilePath();
-    }
-
-    if (!hashcatPath.isEmpty()) {
-        const QString base = ProgramDirectory::forProgram(hashcatPath);
-        if (!base.isEmpty()) {
-            return QDir::cleanPath(QDir(base).filePath(entered));
-        }
-    }
-
-    return QFileInfo(entered).absoluteFilePath();
+    // The same resolution the launch and every path check use.
+    return ProgramPath::forHashcat(entered, hashcatPath);
 }
 
 QString PotfileQuery::resolveHashInput(const QString &entered, const QString &hashcatPath)

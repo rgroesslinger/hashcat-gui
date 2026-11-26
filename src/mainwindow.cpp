@@ -472,6 +472,17 @@ void MainWindow::configureWidgets()
     // symbol where there is an icon theme, and a text document everywhere else.
     ui->pushButton_copy_clipboard->setIcon(QIcon::fromTheme(
         QStringLiteral("edit-copy"), style()->standardIcon(QStyle::SP_FileDialogDetailedView)));
+
+    updatePathMonitorBasePaths();
+}
+
+void MainWindow::updatePathMonitorBasePaths()
+{
+    const QString hashcatPath = Executable::resolve(
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath));
+    m_wordlistList->setHashcatPath(hashcatPath);
+    m_pcfgRulesetList->setHashcatPath(hashcatPath);
+    m_tableList->setHashcatPath(hashcatPath);
 }
 
 // Every widget whose value reaches the command line is connected here, once.
@@ -1566,12 +1577,16 @@ void MainWindow::resetHashTypeCombo()
 // the one the loader records.
 void MainWindow::refreshAfterSettingsChange()
 {
+    // The refresh after the settings were saved or imported: ...
     const QString hashcatPath =
         SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
     if (Executable::resolve(hashcatPath) != m_hashTypeLoader.queriedPath() || m_hashTypesNeedsRetry
         || (m_hashTypesPath.isEmpty() && !m_hashTypeLoader.isLoading())) {
         reloadHashTypes();
     }
+    // Relative wordlists, rulesets, tables and the cache path follow the
+    // program directory, so a new binary changes what they point at.
+    updatePathMonitorBasePaths();
     commandChanged();
 }
 

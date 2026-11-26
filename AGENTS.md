@@ -45,6 +45,7 @@ and tests depend on it.
   `AlignTop`. `tst_layout` enforces both.
 - `PathMonitor`: wordlists/PCFG rulesets may be folders (wordlist needs a file; ruleset needs
   `Grammar/grammar.txt`); tables file-only; bare names like `default-passwords` resolve via hashcat.
+- Option paths resolve like hashcat via `ProgramPath::forHashcat()`; argv keeps raw values.
 - Unchecked wordlist/ruleset/table/feed rows stay in the session but are omitted from command and
   launch validation.
 - Hash types load asynchronously: never block the GUI thread on hashcat; read `QSettings` on the

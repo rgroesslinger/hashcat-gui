@@ -6,6 +6,7 @@
 #ifndef PROGRAMDIRECTORY_H
 #define PROGRAMDIRECTORY_H
 
+#include <QDir>
 #include <QFileInfo>
 #include <QString>
 
@@ -28,5 +29,29 @@ inline QString forProgram(const QString &programPath)
     return QFileInfo(canonical).absolutePath();
 }
 } // namespace ProgramDirectory
+
+// How hashcat reads a path: relative to the program directory above.
+// Absolute and Windows drive-relative paths are left alone.
+namespace ProgramPath
+{
+inline QString forHashcat(const QString &path, const QString &hashcatPath)
+{
+    if (path.isEmpty() || QDir::isAbsolutePath(path)) {
+        return path;
+    }
+#ifdef Q_OS_WIN
+    if (path.size() >= 2 && path.at(1) == QLatin1Char(':') && !QDir::isAbsolutePath(path)) {
+        return QFileInfo(path).absoluteFilePath();
+    }
+#endif
+    if (!hashcatPath.isEmpty()) {
+        const QString base = ProgramDirectory::forProgram(hashcatPath);
+        if (!base.isEmpty()) {
+            return QDir::cleanPath(QDir(base).filePath(path));
+        }
+    }
+    return QFileInfo(path).absoluteFilePath();
+}
+} // namespace ProgramPath
 
 #endif // PROGRAMDIRECTORY_H

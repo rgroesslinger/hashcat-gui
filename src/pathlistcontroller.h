@@ -33,6 +33,8 @@ public:
                        QIcon warningIcon, QObject *parent);
 
     void addPaths(const QStringList &paths);
+    // The program whose working directory relative rows are read from.
+    void setHashcatPath(const QString &hashcatPath);
     [[nodiscard]] QStringList checkedItems() const;
     void removeSelected();
     void moveSelected(int delta);

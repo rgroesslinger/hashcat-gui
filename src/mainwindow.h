@@ -206,6 +206,9 @@ private:
     void setHashTypeActionsBlocked(bool blocked);
     // Refuses a guarded action with a message while the list loads.
     [[nodiscard]] bool refuseWhileHashTypesLoad(const QString &title);
+
+    // The wordlist, ruleset and table rows follow hashcat's working directory.
+    void updatePathMonitorBasePaths();
     // The menu names as shown, for tooltips and messages that point to Settings.
     [[nodiscard]] QString fileMenuLabel() const;
     [[nodiscard]] QString settingsMenuLabel() const;

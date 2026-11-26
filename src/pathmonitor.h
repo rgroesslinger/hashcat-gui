@@ -40,6 +40,12 @@ public:
     // inserted receives its state even when the path was watched before.
     void setPaths(const QStringList &paths);
 
+    // Sets the program directory for relative paths and rechecks them.
+    void setHashcatPath(const QString &hashcatPath);
+
+    // The path as hashcat reads it; bundled ruleset names stay names.
+    [[nodiscard]] QString resolvePath(const QString &path) const;
+
     [[nodiscard]] bool isAvailable(const QString &path) const;
 
 signals:
@@ -54,6 +60,7 @@ private:
     Kind m_kind;
     QFileSystemWatcher m_watcher;
     QStringList m_paths;
+    QString m_hashcatPath;
     QHash<QString, bool> m_available;
 };
 
