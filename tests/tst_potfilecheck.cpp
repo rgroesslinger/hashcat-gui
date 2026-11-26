@@ -64,6 +64,7 @@ private slots:
     void aSlowShowStillGivesLeftTheFullTimeout();
     void nonJsonShowOutputIsAFailure();
     void emptyShowOutputIsAnEmptyAnswer();
+    void diagnosticsOnlyShowOutputIsAnEmptyAnswer();
     void malformedShowLinesAreReported();
     void leftCountIgnoresLeadingDiagnostics();
     void leftCountOfDiagnosticsOnlyOutputIsZero();
@@ -322,6 +323,28 @@ void TestPotfileCheck::emptyShowOutputIsAnEmptyAnswer()
     QCOMPARE(result.status, PotfileCheckResult::Status::Ok);
     QCOMPARE(result.cracked, 0);
     QCOMPARE(result.left, 2);
+}
+
+// A reply that carries only a known diagnostic block is an empty answer:
+// hashcat had nothing in the potfile for these hashes, and `--left` still
+// has to run. Only lines the parser cannot recognize make the query fail.
+void TestPotfileCheck::diagnosticsOnlyShowOutputIsAnEmptyAnswer()
+{
+    const QString show =
+        QStringLiteral("Old potfile detected: /home/user/.local/share/hashcat/hashcat.pot\n"
+                       "New potfile is: /home/user/.local/share/hashcat/hashcat.potfile \n\n");
+    PotfileCheck check(nullptr,
+                       queryFrom(normalResult(show), normalResult(QStringLiteral("a\nb\n"))));
+    QSignalSpy spy(&check, &PotfileCheck::finished);
+
+    check.start(QStringLiteral("hashcat"), input());
+    QTRY_COMPARE_WITH_TIMEOUT(spy.count(), 1, 5000);
+
+    const PotfileCheckResult result = spy.at(0).at(0).value<PotfileCheckResult>();
+    QCOMPARE(result.status, PotfileCheckResult::Status::Ok);
+    QCOMPARE(result.cracked, 0);
+    QCOMPARE(result.left, 2);
+    QCOMPARE(result.malformedCount, 0);
 }
 
 void TestPotfileCheck::malformedShowLinesAreReported()

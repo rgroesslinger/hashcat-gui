@@ -155,9 +155,9 @@ void PotfileCheck::startParse(HashcatResult showResult)
                     finish();
                     return;
                 }
-                if (!sharedResult->standardOutput.trimmed().isEmpty() && parsed.totalCount == 0) {
-                    // A reply that is not the JSON we expect is a failed
-                    // query, not an answer with zero cracked hashes.
+                if (parsed.totalCount == 0 && parsed.malformedCount > 0) {
+                    // No entries and only unrecognized lines is a failed query; known
+                    // diagnostics alone are an empty answer.
                     failShow(*sharedResult);
                     return;
                 }
