@@ -541,7 +541,12 @@ void SettingsDialog::selectPathClicked()
     fileDialog.setNameFilter(tr("Executable Files (*.exe *.bin hashcat);;All Files (*)"));
 
     if (fileDialog.exec() == QDialog::Accepted) {
-        QString fileName = fileDialog.selectedFiles().constFirst();
+        // An accepted dialog can still have no selection; constFirst() on an
+        // empty list would be undefined.
+        const QString fileName = fileDialog.selectedFiles().value(0);
+        if (fileName.isEmpty()) {
+            return;
+        }
         QFileInfo file(fileName);
         if (!file.isFile() || !file.isExecutable()) {
             QMessageBox::warning(this, tr("Invalid file"),
