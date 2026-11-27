@@ -20,6 +20,13 @@
 
 namespace
 {
+// Qt 6.12 adds the QPointF constructor and deprecates QPoint.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 12, 0)
+using DragPoint = QPointF;
+#else
+using DragPoint = QPoint;
+#endif
+
 // Events that propose a move while still allowing a copy.
 class MoveProposedDragEnterEvent : public QDragEnterEvent
 {
@@ -228,7 +235,7 @@ void TestPathListController::aDropAddsTheLocalFilesOnce()
     mime.setUrls({QUrl::fromLocalFile(first), QUrl::fromLocalFile(second),
                   QUrl(QStringLiteral("https://example.com/wordlist.txt"))});
 
-    QDragEnterEvent enter(QPoint(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QDragEnterEvent enter(DragPoint(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
     QApplication::sendEvent(list.viewport(), &enter);
     QVERIFY(enter.isAccepted());
 
@@ -262,7 +269,7 @@ void TestPathListController::aRulesetDropAcceptsFilesAndFolders()
     QMimeData mime;
     mime.setUrls({QUrl::fromLocalFile(ruleset), QUrl::fromLocalFile(folder)});
 
-    QDragEnterEvent enter(QPoint(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QDragEnterEvent enter(DragPoint(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
     QApplication::sendEvent(list.viewport(), &enter);
     QVERIFY(enter.isAccepted());
 
@@ -295,7 +302,7 @@ void TestPathListController::aTableDropIgnoresFolders()
 
     QMimeData folderOnly;
     folderOnly.setUrls({QUrl::fromLocalFile(folder)});
-    QDragEnterEvent folderEnter(QPoint(5, 5), Qt::CopyAction, &folderOnly, Qt::LeftButton,
+    QDragEnterEvent folderEnter(DragPoint(5, 5), Qt::CopyAction, &folderOnly, Qt::LeftButton,
                                 Qt::NoModifier);
     QApplication::sendEvent(list.viewport(), &folderEnter);
     QDropEvent folderDrop(QPointF(5, 5), Qt::CopyAction, &folderOnly, Qt::LeftButton,
@@ -306,7 +313,7 @@ void TestPathListController::aTableDropIgnoresFolders()
     // A mixed drop keeps the file and skips the folder.
     QMimeData mixed;
     mixed.setUrls({QUrl::fromLocalFile(table), QUrl::fromLocalFile(folder)});
-    QDragEnterEvent enter(QPoint(5, 5), Qt::CopyAction, &mixed, Qt::LeftButton, Qt::NoModifier);
+    QDragEnterEvent enter(DragPoint(5, 5), Qt::CopyAction, &mixed, Qt::LeftButton, Qt::NoModifier);
     QApplication::sendEvent(list.viewport(), &enter);
     QVERIFY(enter.isAccepted());
     QDropEvent drop(QPointF(5, 5), Qt::CopyAction, &mixed, Qt::LeftButton, Qt::NoModifier);
@@ -336,7 +343,7 @@ void TestPathListController::aDropNeverMovesTheSource()
     mime.setUrls({QUrl::fromLocalFile(wordlist)});
 
     // Copy is possible: the proposed move is overridden.
-    MoveProposedDragEnterEvent enter(QPoint(5, 5), Qt::MoveAction | Qt::CopyAction, &mime,
+    MoveProposedDragEnterEvent enter(DragPoint(5, 5), Qt::MoveAction | Qt::CopyAction, &mime,
                                      Qt::LeftButton, Qt::NoModifier);
     enter.proposeMove();
     QApplication::sendEvent(list.viewport(), &enter);
@@ -353,7 +360,8 @@ void TestPathListController::aDropNeverMovesTheSource()
 
     // Move only: refusing the drag leaves the file with its source.
     list.clear();
-    QDragEnterEvent moveEnter(QPoint(5, 5), Qt::MoveAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QDragEnterEvent moveEnter(DragPoint(5, 5), Qt::MoveAction, &mime, Qt::LeftButton,
+                              Qt::NoModifier);
     QApplication::sendEvent(list.viewport(), &moveEnter);
     QVERIFY(!moveEnter.isAccepted());
     QDropEvent moveDrop(QPointF(5, 5), Qt::MoveAction, &mime, Qt::LeftButton, Qt::NoModifier);
