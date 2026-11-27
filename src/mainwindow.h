@@ -115,6 +115,7 @@ private slots:
 
     // combobox
     void attackIndexChanged(int index);
+    void hashTypeEditingFinished();
 
     void commandChanged();
     // The recipe row belongs to hash mode 4000 alone; the hash type combo
@@ -202,6 +203,8 @@ private:
     void showLaunchError(const LaunchValidator::LaunchProblem &problem,
                          const LaunchValidator::LaunchContext &context);
     void showLaunchMessage(const LaunchMessage &message);
+    // Puts focus on the field a validation error names, when there is one.
+    void focusProblemField(const LaunchValidator::LaunchProblem &problem);
     // Actions that build or run a command wait while the hash-type list loads.
     void setHashTypeActionsBlocked(bool blocked);
     // Refuses a guarded action with a message while the list loads.

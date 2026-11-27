@@ -413,6 +413,8 @@ void TestSession::exportingWhileTheHashTypeIsPendingKeepsIt()
     recorder.pickFile = file;
     recorder.start();
     QVERIFY(QMetaObject::invokeMethod(&window, "exportTriggered"));
+    QVERIFY(recorder.messageBoxSeen);
+    QCOMPARE(recorder.textFormat, Qt::PlainText);
 
     QVERIFY(QFile::exists(file));
     QJsonObject exported;
@@ -601,6 +603,7 @@ void TestSession::theImportNamesTheValuesTheSessionDoesNotKnow()
     QJsonObject values;
     values.insert(QStringLiteral("spinBox_runtime"), 64);
     values.insert(QStringLiteral("aWidgetFromTheFuture"), QStringLiteral("something"));
+    values.insert(QStringLiteral("<b>not-markup</b>"), QStringLiteral("value"));
     QVERIFY(StateFile::write(file, AppConstants::FileSections::Session,
                              AppConstants::Sessions::Version, values, nullptr));
 
@@ -619,6 +622,9 @@ void TestSession::theImportNamesTheValuesTheSessionDoesNotKnow()
     // The name that was never ours is named in the notes.
     QVERIFY(recorder.messageBoxSeen);
     QVERIFY(recorder.text.contains(QStringLiteral("aWidgetFromTheFuture")));
+    // A name read from the file is literal text, not markup to interpret.
+    QCOMPARE(recorder.textFormat, Qt::PlainText);
+    QVERIFY(recorder.text.contains(QStringLiteral("<b>not-markup</b>")));
 }
 
 // A session written before a widget was removed still names it. The retired

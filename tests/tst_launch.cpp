@@ -16,6 +16,7 @@
 #include "ui_mainwindow.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QClipboard>
 #include <QComboBox>
 #include <QCompleter>
@@ -32,6 +33,7 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMenu>
+#include <QMessageBox>
 #include <QPointer>
 #include <QRadioButton>
 #include <QScreen>
@@ -64,6 +66,7 @@ private slots:
     }
     void commandPreviewFollowsWidgetChanges();
     void launchValidationFollowsTheWidgets();
+    void aLaunchErrorFocusesItsField();
     void pcfgCharsetNeedsAMask();
     void commandPreviewCarriesTheBinaryName();
     void previewUsesTheConfiguredTerminalsDialect();
@@ -219,6 +222,52 @@ void TestLaunch::launchValidationFollowsTheWidgets()
     MainWindowTestAccess::ui(window)->checkBox_remove->setChecked(false);
     QCOMPARE(int(validateOptions(MainWindowTestAccess::collectHashcatOptions(window)).code),
              int(LaunchValidator::LaunchError::None));
+}
+
+// A refused launch focuses the field to change, on its own tab if needed.
+void TestLaunch::aLaunchErrorFocusesItsField()
+{
+    TestEnvironment::useMissingHashcatPath();
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    QVERIFY(ui->pushButton_start->isEnabled());
+
+    // Validation stops before a hashcat child starts; only the box is closed.
+    const auto startWithBox = [&] {
+        bool sawBox = false;
+        QTimer timer;
+        timer.setInterval(10);
+        QObject::connect(&timer, &QTimer::timeout, &timer, [&] {
+            if (auto *box = qobject_cast<QMessageBox *>(QApplication::activeModalWidget())) {
+                sawBox = true;
+                box->close();
+            }
+        });
+        timer.start();
+        ui->pushButton_start->click();
+        timer.stop();
+        return sawBox;
+    };
+
+    // A fresh form has no wordlist; the error points at the Attack tab.
+    ui->tabWidget_main->setCurrentWidget(ui->tab_general);
+    QVERIFY(startWithBox());
+    QCOMPARE(ui->tabWidget_main->currentWidget(), ui->tab_attack);
+    QCOMPARE(window.focusWidget(), qobject_cast<QWidget *>(ui->listWidget_wordlist));
+
+    auto *wordlist = new QListWidgetItem(QStringLiteral("/tmp/a.txt"), ui->listWidget_wordlist);
+    wordlist->setCheckState(Qt::Checked);
+    ui->lineEdit_session->setText(QStringLiteral("bad/name"));
+    ui->tabWidget_main->setCurrentWidget(ui->tab_general);
+    QVERIFY(startWithBox());
+    QCOMPARE(ui->tabWidget_main->currentWidget(), ui->tab_general);
+    QCOMPARE(window.focusWidget(), qobject_cast<QWidget *>(ui->lineEdit_session));
+
+    // One error covers skip and limit; the offending value picks the field.
+    ui->lineEdit_session->clear();
+    ui->lineEdit_limit->setText(QStringLiteral("not-a-number"));
+    QVERIFY(startWithBox());
+    QCOMPARE(window.focusWidget(), qobject_cast<QWidget *>(ui->lineEdit_limit));
 }
 
 // A custom charset is used only inside a mask. PCFG takes its mask from the

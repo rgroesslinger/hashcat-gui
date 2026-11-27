@@ -527,6 +527,12 @@ void TestSettingsDialog::terminalStatusFollowsTheCombo()
     QVERIFY(!missing.ui->label_terminal_status->isHidden());
     QVERIFY(missing.ui->label_terminal_status->text().contains(
         QStringLiteral("a-terminal-that-is-gone")));
+    QCOMPARE(missing.ui->label_terminal_status->textFormat(), Qt::PlainText);
+
+    // A change that leaves the row invalid sends focus back to the row.
+    missing.ui->comboBox_terminal->setCurrentIndex(selectable);
+    missing.ui->comboBox_terminal->setCurrentIndex(-1);
+    QCOMPARE(missing.focusWidget(), missing.ui->comboBox_terminal);
 }
 
 // The combo lists every terminal this platform supports, installed or not,

@@ -33,15 +33,17 @@ PotfileExporter::Row sampleRow()
 }
 
 // Drives the export modal flow: picks the file and filter, answers the
-// potfile-name question and the plaintext confirmation, records the boxes.
+// Yes/No questions and the plaintext confirmation, records the boxes.
 struct ExportDrive {
     QString pickPath;
     QString pickFilter;
-    bool confirmPotfileName = false;
+    bool confirmQuestion = false;
     QString warningText;
     QString questionText;
     QString confirmationText;
     QString initialPath;
+    Qt::TextFormat questionFormat = Qt::AutoText;
+    Qt::TextFormat warningFormat = Qt::AutoText;
 };
 
 bool driveExportUi(const QString &suggested, const QStringList &protectedPaths, ExportDrive &drive)
@@ -90,7 +92,8 @@ bool driveExportUi(const QString &suggested, const QStringList &protectedPaths, 
         if (auto *box = qobject_cast<QMessageBox *>(modal)) {
             if (box->button(QMessageBox::Yes) != nullptr) {
                 drive.questionText = box->text();
-                box->button(drive.confirmPotfileName ? QMessageBox::Yes : QMessageBox::No)->click();
+                drive.questionFormat = box->textFormat();
+                box->button(drive.confirmQuestion ? QMessageBox::Yes : QMessageBox::No)->click();
                 return;
             }
             if (box->button(QMessageBox::Cancel) != nullptr) {
@@ -104,6 +107,7 @@ bool driveExportUi(const QString &suggested, const QStringList &protectedPaths, 
                 }
             }
             drive.warningText = box->text();
+            drive.warningFormat = box->textFormat();
             box->close();
         }
     });
@@ -133,6 +137,7 @@ private slots:
     void exportToAProtectedCandidateIsRefused();
     void unrelatedHashcatPotfileAsksAndDefaultsToNo();
     void filterAndSuffixCombinations();
+    void markupLikeFileNamesStayLiteral();
 };
 
 void TestPotfileExporter::csvEscapesFieldsAndUsesTheExpectedColumns()
@@ -322,7 +327,7 @@ void TestPotfileExporter::unrelatedHashcatPotfileAsksAndDefaultsToNo()
     QVERIFY(drive.questionText.contains(QStringLiteral("hashcat.potfile")));
     QVERIFY(!QFile::exists(path));
 
-    drive.confirmPotfileName = true;
+    drive.confirmQuestion = true;
     QVERIFY(driveExportUi(path, {}, drive));
     // The unknown suffix gains the filter's suffix; the potfile itself stays.
     QVERIFY(QFile::exists(path + QStringLiteral(".csv")));
@@ -374,6 +379,40 @@ void TestPotfileExporter::filterAndSuffixCombinations()
     QVERIFY(driveExportUi(dir.filePath(QStringLiteral("data.csv")), {}, json));
     QVERIFY(QFile::exists(dir.filePath(QStringLiteral("data.csv.json"))));
     QVERIFY(content(dir.filePath(QStringLiteral("data.csv.json"))).startsWith("["));
+}
+
+// Plain-text boxes keep markup-like file names literal. Windows uses '&amp;'
+// in place of illegal '<br>'.
+void TestPotfileExporter::markupLikeFileNamesStayLiteral()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+#ifdef Q_OS_WIN
+    const QString name = QStringLiteral("my &amp;notes");
+#else
+    const QString name = QStringLiteral("my <br>notes");
+#endif
+    const QString path = dir.filePath(name + QStringLiteral(".csv"));
+
+    ExportDrive drive;
+    drive.pickPath = path;
+    QVERIFY(driveExportUi(path, {}, drive));
+    QVERIFY(QFile::exists(path));
+    QCOMPARE(drive.warningFormat, Qt::PlainText);
+    QVERIFY(drive.warningText.contains(name + QStringLiteral(".csv")));
+
+    // The overwrite question covers the suffix-appended name; the default No
+    // refuses, a Yes exports and the completion names the file literally too.
+    ExportDrive again;
+    again.pickPath = dir.filePath(name);
+    QVERIFY(!driveExportUi(dir.filePath(name), {}, again));
+    QCOMPARE(again.questionFormat, Qt::PlainText);
+    QVERIFY(again.questionText.contains(name + QStringLiteral(".csv")));
+
+    again.confirmQuestion = true;
+    QVERIFY(driveExportUi(dir.filePath(name), {}, again));
+    QCOMPARE(again.warningFormat, Qt::PlainText);
+    QVERIFY(again.warningText.contains(name + QStringLiteral(".csv")));
 }
 
 int main(int argc, char *argv[])

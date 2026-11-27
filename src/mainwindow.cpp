@@ -239,20 +239,27 @@ MainWindow::MainWindow(QWidget *parent)
             // Exit codes changed in hashcat 8.0.0, but this only wants
             // "did it work"; the GUI has no per-cause message, and a
             // reader must not turn this into per-code handling.
-            QString error =
+            const QString error =
                 tr("Failed to obtain supported hash types.\nError: %1").arg(failure.detail);
 #ifdef Q_OS_WIN
             if (failure.kind == HashTypeFailure::Kind::Timeout) {
-                // The FAQ names Windows Defender as the usual cause of a
-                // query that runs into its deadline; on other platforms a
-                // timeout has no such explanation to offer.
-                error += tr("\n\nThis can be caused by Windows Defender or other "
-                            "antivirus software. See the <a href=\"%1\">FAQ entry</a> "
-                            "for a remedy.")
-                             .arg(QString(AppConstants::Urls::FaqHashTypesTimeout));
+                // Escape stderr: the FAQ link is the only intended markup.
+                // <br> keeps line breaks that rich text would collapse.
+                QString rich = tr("Failed to obtain supported hash types.\nError: %1")
+                                   .arg(failure.detail.toHtmlEscaped());
+                rich += tr("\n\nThis can be caused by Windows Defender or other "
+                           "antivirus software. See the <a href=\"%1\">FAQ entry</a> "
+                           "for a remedy.")
+                            .arg(QString(AppConstants::Urls::FaqHashTypesTimeout));
+                rich.replace(QLatin1Char('\n'), QStringLiteral("<br>"));
+                QMessageBox box(QMessageBox::Warning, tr("Failed to load hash types"), rich,
+                                QMessageBox::Ok, this);
+                box.setTextFormat(Qt::RichText);
+                box.exec();
+                return;
             }
 #endif
-            QMessageBox::warning(this, tr("Failed to load hash types"), error);
+            showPlainMessage(this, QMessageBox::Warning, tr("Failed to load hash types"), error);
         });
 
     initAttackModes();
@@ -297,6 +304,11 @@ void MainWindow::configureWidgets()
     hashTypeCompleter->setCompletionMode(QCompleter::PopupCompletion);
     hashTypeCompleter->setFilterMode(Qt::MatchContains);
     hashTypeCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+
+    // NoInsert leaves an unmatched name in the editor but not as a selection.
+    // Reset it so the visible mode matches the id the command uses.
+    connect(ui->comboBox_hash_type->lineEdit(), &QLineEdit::editingFinished, this,
+            &MainWindow::hashTypeEditingFinished);
 
     // The combo's normal-state tooltip: what Auto-detect does and that the
     // list is searchable. The loading and error paths override it temporarily;
@@ -715,6 +727,9 @@ MainWindow::~MainWindow()
     m_pcfgRulesetList.reset();
     m_tableList.reset();
     m_feedArgumentList.reset();
+    // ~QWidget emits editingFinished after delete ui; disconnect first.
+    disconnect(ui->comboBox_hash_type->lineEdit(), &QLineEdit::editingFinished, this,
+               &MainWindow::hashTypeEditingFinished);
     delete ui;
 }
 
@@ -895,9 +910,10 @@ void MainWindow::exportTriggered()
     const QJsonObject values = sessionValues();
     if (StateFile::write(file, AppConstants::FileSections::Session, AppConstants::Sessions::Version,
                          values, &error)) {
-        QMessageBox::information(this, tr("Exported"), tr("Session exported to “%1”.").arg(file));
+        showPlainMessage(this, QMessageBox::Information, tr("Exported"),
+                         tr("Session exported to “%1”.").arg(file));
     } else {
-        QMessageBox::warning(this, tr("Export failed"), error);
+        showPlainMessage(this, QMessageBox::Warning, tr("Export failed"), error);
     }
 }
 
@@ -913,13 +929,13 @@ void MainWindow::importTriggered()
     const StateFile::Document document = StateFile::readDocument(
         file, AppConstants::FileSections::Session, AppConstants::Sessions::Version);
     if (document.status == StateFile::Status::Unreadable) {
-        QMessageBox::warning(this, tr("Import failed"), document.error);
+        showPlainMessage(this, QMessageBox::Warning, tr("Import failed"), document.error);
         return;
     }
 
     if (document.status == StateFile::Status::Newer) {
-        QMessageBox::warning(
-            this, tr("Import failed"),
+        showPlainMessage(
+            this, QMessageBox::Warning, tr("Import failed"),
             SessionTransfer::newerFileNote(document.version, AppConstants::Sessions::Version));
         return;
     }
@@ -929,10 +945,11 @@ void MainWindow::importTriggered()
     const QStringList notes = applySessionFile(document);
 
     if (notes.isEmpty()) {
-        QMessageBox::information(this, tr("Imported"), tr("Session imported from “%1”.").arg(file));
+        showPlainMessage(this, QMessageBox::Information, tr("Imported"),
+                         tr("Session imported from “%1”.").arg(file));
     } else {
-        QMessageBox::warning(
-            this, tr("Imported"),
+        showPlainMessage(
+            this, QMessageBox::Warning, tr("Imported"),
             tr("Session imported from “%1”.\n\n%2").arg(file, notes.join(QLatin1Char('\n'))));
     }
 }
@@ -977,9 +994,10 @@ void MainWindow::exportSettingsTriggered()
     if (StateFile::write(file, AppConstants::FileSections::Settings,
                          AppConstants::Settings::Version, SettingsDialog::savedSettings(),
                          &error)) {
-        QMessageBox::information(this, tr("Exported"), tr("Settings exported to “%1”.").arg(file));
+        showPlainMessage(this, QMessageBox::Information, tr("Exported"),
+                         tr("Settings exported to “%1”.").arg(file));
     } else {
-        QMessageBox::warning(this, tr("Export failed"), error);
+        showPlainMessage(this, QMessageBox::Warning, tr("Export failed"), error);
     }
 }
 
@@ -995,13 +1013,13 @@ void MainWindow::importSettingsTriggered()
     const StateFile::Document document = StateFile::readDocument(
         file, AppConstants::FileSections::Settings, AppConstants::Settings::Version);
     if (document.status == StateFile::Status::Unreadable) {
-        QMessageBox::warning(this, tr("Import failed"), document.error);
+        showPlainMessage(this, QMessageBox::Warning, tr("Import failed"), document.error);
         return;
     }
 
     if (document.status == StateFile::Status::Newer) {
-        QMessageBox::warning(
-            this, tr("Import failed"),
+        showPlainMessage(
+            this, QMessageBox::Warning, tr("Import failed"),
             SessionTransfer::newerFileNote(document.version, AppConstants::Settings::Version));
         return;
     }
@@ -1019,9 +1037,11 @@ void MainWindow::importSettingsTriggered()
     message << notes;
 
     if (notes.isEmpty()) {
-        QMessageBox::information(this, tr("Imported"), message.join(QLatin1Char('\n')));
+        showPlainMessage(this, QMessageBox::Information, tr("Imported"),
+                         message.join(QLatin1Char('\n')));
     } else {
-        QMessageBox::warning(this, tr("Imported"), message.join(QLatin1Char('\n')));
+        showPlainMessage(this, QMessageBox::Warning, tr("Imported"),
+                         message.join(QLatin1Char('\n')));
     }
 
     if (settingsDialog.exec() == QDialog::Accepted) {
@@ -1056,7 +1076,7 @@ void MainWindow::loadExampleSession(AttackMode mode)
         StateFile::readDocument(QString(entry->resource), AppConstants::FileSections::Session,
                                 AppConstants::Sessions::Version);
     if (document.status == StateFile::Status::Unreadable) {
-        QMessageBox::warning(this, tr("Load example session"), document.error);
+        showPlainMessage(this, QMessageBox::Warning, tr("Load example session"), document.error);
         return;
     }
 
@@ -1067,7 +1087,7 @@ void MainWindow::loadExampleSession(AttackMode mode)
     if (ExampleSession::containsExamplePrefix(document.values)) {
         QString directory;
         if (!ExampleSession::materialize(&directory, &error)) {
-            QMessageBox::warning(this, tr("Load example session"), error);
+            showPlainMessage(this, QMessageBox::Warning, tr("Load example session"), error);
             return;
         }
         document.values = ExampleSession::withExamplePaths(document.values, directory).toObject();
@@ -1075,7 +1095,8 @@ void MainWindow::loadExampleSession(AttackMode mode)
 
     const QStringList notes = applySessionFile(document);
     if (!notes.isEmpty()) {
-        QMessageBox::warning(this, tr("Load example session"), notes.join(QLatin1Char('\n')));
+        showPlainMessage(this, QMessageBox::Warning, tr("Load example session"),
+                         notes.join(QLatin1Char('\n')));
     }
 }
 
@@ -1196,7 +1217,10 @@ bool MainWindow::preparePotfileQuery(const QString &title, PotfileQueryInput &in
     // same potfile a launch would.
     input.potfilePath = PotfileQuery::resolvePath(ui->lineEdit_potfile_path->text(), hashcatPath);
     input.username = ui->checkBox_ignoreusername->isChecked();
-    modeName = ui->comboBox_hash_type->currentText();
+    // The editor may hold a name that was never selected; the results title
+    // must name the mode the query uses.
+    const int typeIndex = ui->comboBox_hash_type->currentIndex();
+    modeName = typeIndex >= 0 ? ui->comboBox_hash_type->itemText(typeIndex) : QString();
     return true;
 }
 
@@ -1380,7 +1404,8 @@ void MainWindow::loadSession()
     const QStringList notes = applySessionFile(document);
 
     if (!notes.isEmpty()) {
-        QMessageBox::warning(this, tr("Session warning"), notes.join(QLatin1Char('\n')));
+        showPlainMessage(this, QMessageBox::Warning, tr("Session warning"),
+                         notes.join(QLatin1Char('\n')));
     }
 }
 
@@ -1473,6 +1498,22 @@ void MainWindow::updateHashTypeDependencies()
     ui->lineEdit_hash_recipe->setVisible(recipe);
 }
 
+void MainWindow::hashTypeEditingFinished()
+{
+    QComboBox *combo = ui->comboBox_hash_type;
+    QLineEdit *editor = combo->lineEdit();
+
+    // A complete typed name selects its id, case-insensitively like the
+    // completer; anything else falls back to the selection.
+    const int typed = combo->findText(editor->text(), Qt::MatchFixedString);
+    if (typed >= 0) {
+        combo->setCurrentIndex(typed);
+    }
+
+    const int current = combo->currentIndex();
+    editor->setText(current >= 0 ? combo->itemText(current) : QString());
+}
+
 QString MainWindow::applyPendingHashType(int fallbackId, bool fromSession)
 {
     const int pending = m_pendingHashTypeId;
@@ -1550,7 +1591,7 @@ void MainWindow::saveSession()
     const QJsonObject values = sessionValues();
     if (!StateFile::write(file, AppConstants::FileSections::Session,
                           AppConstants::Sessions::Version, values, &error)) {
-        QMessageBox::warning(this, tr("Save failed"), error);
+        showPlainMessage(this, QMessageBox::Warning, tr("Save failed"), error);
     }
 }
 
@@ -1975,8 +2016,8 @@ void MainWindow::startClicked()
 
     QString launchError;
     if (!TerminalCatalog::launchDetached(command, context.resolvedHashcatPath, &launchError)) {
-        QMessageBox::warning(
-            this, tr("Launch failed"),
+        showPlainMessage(
+            this, QMessageBox::Warning, tr("Launch failed"),
             tr("Could not start “%1”: %2").arg(context.configuredTerminal, launchError));
     }
 }
@@ -1991,6 +2032,100 @@ void MainWindow::showLaunchError(const LaunchValidator::LaunchProblem &problem,
         return;
     }
     showLaunchMessage(message);
+    focusProblemField(problem);
+}
+
+void MainWindow::focusProblemField(const LaunchValidator::LaunchProblem &problem)
+{
+    using Error = LaunchValidator::LaunchError;
+
+    QWidget *field = nullptr;
+    switch (problem.code) {
+    case Error::NoHashFile:
+        field = ui->lineEdit_hashfile;
+        break;
+    case Error::NoWordlist:
+    case Error::TooManyWordlists:
+    case Error::WrongWordlistCount:
+    case Error::WordlistMustBeFile:
+        field = ui->listWidget_wordlist;
+        break;
+    case Error::NoTable:
+    case Error::InvalidTablePath:
+        field = ui->listWidget_tables;
+        break;
+    case Error::NoMask:
+    case Error::MaskNeedsWordMarker:
+    case Error::MaskMultipleWordMarkers:
+    case Error::MaskQBeforeWord:
+    case Error::MaskMultipleQMarks:
+    case Error::MaskQWithoutWordlist:
+    case Error::SecondWordlistWithoutQ:
+    case Error::MaskMarkersNotAllowed:
+    case Error::PcfgCharsetWithoutMask:
+        field = ui->lineEdit_mask;
+        break;
+    case Error::NoFeed:
+        field = ui->lineEdit_feed;
+        break;
+    case Error::NoHashRecipe:
+        field = ui->lineEdit_hash_recipe;
+        break;
+    case Error::InvalidOutfileFormat:
+        field = ui->lineEdit_outfile_format;
+        break;
+    case Error::InvalidCachePath:
+        field = ui->lineEdit_cache_path;
+        break;
+    case Error::InvalidPotfilePath:
+        field = ui->lineEdit_potfile_path;
+        break;
+    case Error::InvalidSkipLimit:
+        // One error covers two fields; the detail is the offending value.
+        field =
+            problem.detail == ui->lineEdit_skip->text() ? ui->lineEdit_skip : ui->lineEdit_limit;
+        break;
+    case Error::InvalidOpenclDeviceTypes:
+        field = ui->lineEdit_opencl_device_types;
+        break;
+    case Error::InvalidCpuAffinity:
+        field = ui->lineEdit_cpu_affinity;
+        break;
+    case Error::InvalidBackendDevices:
+        field = ui->lineEdit_backend_devices;
+        break;
+    case Error::InvalidSessionName:
+        field = ui->lineEdit_session;
+        break;
+    case Error::InvalidRulesetPath:
+        for (QLineEdit *rules :
+             {ui->lineEdit_rulesfile_1, ui->lineEdit_rulesfile_2, ui->lineEdit_rulesfile_3}) {
+            if (rules->text() == problem.detail) {
+                field = rules;
+                break;
+            }
+        }
+        break;
+    // The rest point into Settings or name fields left unfocused here.
+    default:
+        break;
+    }
+
+    if (field == nullptr) {
+        return;
+    }
+    // Focus cannot reach a widget on another tab; show its page first.
+    for (int i = 0; i < ui->tabWidget_main->count(); ++i) {
+        QWidget *page = ui->tabWidget_main->widget(i);
+        if (page != nullptr && page->isAncestorOf(field)) {
+            ui->tabWidget_main->setCurrentIndex(i);
+            break;
+        }
+    }
+    field->setFocus();
+    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(field)) {
+        lineEdit->selectAll();
+    }
 }
 
 void MainWindow::showLaunchMessage(const LaunchMessage &message)

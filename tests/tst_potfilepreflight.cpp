@@ -70,6 +70,7 @@ struct CapturedUi {
     bool sawResultsDialog = false;
     int resultRows = 0;
     QString resultStatus;
+    QString resultTitle;
 };
 
 // Potfile checks need an explicit hash type. The combo starts with
@@ -126,6 +127,7 @@ CapturedUi triggerAndCapture(MainWindow &window, bool cancel, bool *sawDisabled 
         }
         if (auto *results = qobject_cast<PotfileResultsDialog *>(modal)) {
             captured.sawResultsDialog = true;
+            captured.resultTitle = results->windowTitle();
             auto *tree = results->findChild<QTreeWidget *>(QStringLiteral("treeWidget_results"));
             captured.resultRows = tree ? tree->topLevelItemCount() : 0;
             auto *label = results->findChild<QLabel *>(QStringLiteral("label_status"));
@@ -157,6 +159,7 @@ private slots:
     void whitespaceAroundAFilePathIsTrimmed();
     void relativePotfilePathUsesTheHashcatDirectory();
     void successOpensTheResultsDialog();
+    void theResultsNameTheSelectedHashType();
     void noHashesLoadedShowsTheMappedDiagnostic();
     void unknownFailureShowsTheCombinedDiagnostic();
     void leftFailureShowsRemainingUnknown();
@@ -333,6 +336,28 @@ void TestPotfilePreflight::successOpensTheResultsDialog()
     QVERIFY(captured.resultStatus.contains(QStringLiteral("1 of 2")));
     QVERIFY(MainWindowTestAccess::ui(window)->actionPotfileCheck->isEnabled());
     QVERIFY(!MainWindowTestAccess::potfileCheck(window).isRunning());
+}
+
+void TestPotfilePreflight::theResultsNameTheSelectedHashType()
+{
+    MainWindow window;
+    QVERIFY2(!configureExecutable().isEmpty(), "the stand-in executable could not be written");
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    ui->lineEdit_hashfile->setText(QStringLiteral("5d41402abc4b2a76b9719d911017c592"));
+    selectExplicitHashType(window);
+
+    // A menu-triggered check gets no focus-out, so the editor still holds an
+    // unselected name; the results must name the id, not the typed text.
+    ui->comboBox_hash_type->lineEdit()->setText(QStringLiteral("9999 | Bogus"));
+    QCOMPARE(ui->comboBox_hash_type->currentText(), QStringLiteral("9999 | Bogus"));
+
+    installCheck(window, normalResult(showLine()), normalResult(QStringLiteral("hash-left\n")));
+    const CapturedUi captured = triggerAndCapture(window, false);
+    QVERIFY(captured.sawResultsDialog);
+    QVERIFY2(captured.resultTitle.contains(QStringLiteral("0 | MD5")),
+             qPrintable(captured.resultTitle));
+    QVERIFY2(!captured.resultTitle.contains(QStringLiteral("Bogus")),
+             qPrintable(captured.resultTitle));
 }
 
 void TestPotfilePreflight::noHashesLoadedShowsTheMappedDiagnostic()

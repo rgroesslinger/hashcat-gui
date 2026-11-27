@@ -115,6 +115,10 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
     ui->label_download->setText(tr("Download from %1").arg(downloadLink));
     ui->label_download->setOpenExternalLinks(true);
 
+    // The status names a configured terminal from settings, which may contain
+    // markup characters. Keep it literal, like the other dialog labels.
+    ui->label_terminal_status->setTextFormat(Qt::PlainText);
+
     ui->label_terminal->setBuddy(ui->comboBox_terminal);
     ui->label_language->setBuddy(ui->comboBox_language);
     ui->label_color_scheme->setBuddy(ui->comboBox_color_scheme);
@@ -154,7 +158,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent), ui(new Ui::Se
     connect(ui->lineEdit_hc_path, &QLineEdit::textChanged, this,
             &SettingsDialog::updateHashcatStatus);
     connect(ui->comboBox_terminal, qOverload<int>(&QComboBox::currentIndexChanged), this,
-            &SettingsDialog::updateTerminalStatus);
+            [this](int) {
+                updateTerminalStatus();
+                // After a user change that leaves the row invalid, focus it.
+                if (!ui->label_terminal_status->isHidden()) {
+                    ui->comboBox_terminal->setFocus();
+                }
+            });
 }
 
 SettingsDialog::~SettingsDialog()

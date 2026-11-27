@@ -113,12 +113,15 @@ bool PotfileExportUi::exportRows(QWidget *parent, const QString &suggestedPath,
 
     if (path != chosenPath && QFileInfo::exists(path)) {
         // The suffix came from the selected filter, after the file dialog's
-        // own overwrite check.
-        const auto answer =
-            QMessageBox::question(parent, tr("Export potfile results"),
-                                  tr("The file already exists:\n%1\n\nOverwrite it?").arg(path),
-                                  QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (answer != QMessageBox::Yes) {
+        // own overwrite check. The name is literal text: a file name may
+        // contain what AutoText would read as markup.
+        QMessageBox overwrite(QMessageBox::Question, tr("Export potfile results"),
+                              tr("The file already exists:\n%1\n\nOverwrite it?").arg(path),
+                              QMessageBox::Yes | QMessageBox::No, parent);
+        overwrite.setTextFormat(Qt::PlainText);
+        overwrite.setDefaultButton(QMessageBox::No);
+        overwrite.setEscapeButton(QMessageBox::No);
+        if (overwrite.exec() != QMessageBox::Yes) {
             return false;
         }
     }
@@ -145,11 +148,16 @@ bool PotfileExportUi::exportRows(QWidget *parent, const QString &suggestedPath,
 
     QString error;
     if (!PotfileExporter::write(path, rows, format, includeUsername, includeLine, &error)) {
-        QMessageBox::warning(parent, tr("Export failed"), error);
+        QMessageBox failed(QMessageBox::Warning, tr("Export failed"), error, QMessageBox::Ok,
+                           parent);
+        failed.setTextFormat(Qt::PlainText);
+        failed.exec();
         return false;
     }
 
-    QMessageBox::information(parent, tr("Export complete"),
-                             tr("Exported %1 to:\n%2").arg(entriesText, path));
+    QMessageBox complete(QMessageBox::Information, tr("Export complete"),
+                         tr("Exported %1 to:\n%2").arg(entriesText, path), QMessageBox::Ok, parent);
+    complete.setTextFormat(Qt::PlainText);
+    complete.exec();
     return true;
 }

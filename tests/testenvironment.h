@@ -241,6 +241,7 @@ public:
     bool messageBoxSeen = false;
     QString title;
     QString text;
+    Qt::TextFormat textFormat = Qt::AutoText;
 
     void start()
     {
@@ -255,6 +256,7 @@ public:
                 messageBoxSeen = true;
                 title = box->windowTitle();
                 text = box->text();
+                textFormat = box->textFormat();
                 if (acceptConfirmation) {
                     if (QAbstractButton *yes = box->button(QMessageBox::Yes)) {
                         yes->click();

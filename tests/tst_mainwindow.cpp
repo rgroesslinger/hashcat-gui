@@ -74,6 +74,7 @@ private slots:
     void freshWindowMatchesTheDefaultOptions();
     void copyButtonHasAnIconWithoutATheme();
     void hashTypeComboIsSearchable();
+    void hashTypeEditingFinishedRestoresTheSelectedName();
     void attackModeIdsTravelAsItemData();
     void widgetsFollowTheBuilderPredicates();
     void exampleSessionsCoverEveryAttackMode();
@@ -101,6 +102,7 @@ private slots:
     void actionsWaitForThePendingHashType();
     void failedQueryReenablesTheHashTypeCombo_data();
     void failedQueryReenablesTheHashTypeCombo();
+    void failedQueryShowsTheStderrLiterally();
     void failedQueryKeepsThePreviousListOnTheSameBinary();
     void changingTheBinaryReRunsTheQuery();
     void staleQueryDoesNotReplaceTheNewerList_data();
@@ -184,6 +186,41 @@ void TestMainWindow::hashTypeComboIsSearchable()
 
     completer->setCompletionPrefix(QStringLiteral("nope"));
     QCOMPARE(completer->completionCount(), 0);
+}
+
+void TestMainWindow::hashTypeEditingFinishedRestoresTheSelectedName()
+{
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    ui->comboBox_hash_type->clear();
+    ui->comboBox_hash_type->addItem(QStringLiteral("1000 | NTLM"), 1000);
+    ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
+    ui->comboBox_hash_type->setCurrentIndex(0);
+    QLineEdit *editor = ui->comboBox_hash_type->lineEdit();
+
+    // NoInsert leaves an unmatched name in the editor; leaving the field
+    // restores the selected item and the command keeps its id.
+    editor->setText(QStringLiteral("9999 | Bogus"));
+    QVERIFY(QMetaObject::invokeMethod(editor, "editingFinished"));
+    QCOMPARE(editor->text(), QStringLiteral("1000 | NTLM"));
+    QCOMPARE(ui->comboBox_hash_type->currentData().toInt(), 1000);
+    const QStringList withNtlm{"--hash-type", "1000", "--attack-mode", "0"};
+    QCOMPARE(MainWindowTestAccess::generateArguments(window), withNtlm);
+
+    // A fully typed name is an intentional choice and selects its id.
+    editor->setText(QStringLiteral("0 | MD5"));
+    QVERIFY(QMetaObject::invokeMethod(editor, "editingFinished"));
+    QCOMPARE(editor->text(), QStringLiteral("0 | MD5"));
+    QCOMPARE(ui->comboBox_hash_type->currentData().toInt(), 0);
+    const QStringList withMd5{"--hash-type", "0", "--attack-mode", "0"};
+    QCOMPARE(MainWindowTestAccess::generateArguments(window), withMd5);
+
+    // Case-insensitive, like the completer.
+    editor->setText(QStringLiteral("1000 | ntlm"));
+    QVERIFY(QMetaObject::invokeMethod(editor, "editingFinished"));
+    QCOMPARE(editor->text(), QStringLiteral("1000 | NTLM"));
+    QCOMPARE(ui->comboBox_hash_type->currentData().toInt(), 1000);
+    QCOMPARE(MainWindowTestAccess::generateArguments(window), withNtlm);
 }
 
 void TestMainWindow::attackModeIdsTravelAsItemData()
@@ -1483,6 +1520,30 @@ void TestMainWindow::failedQueryReenablesTheHashTypeCombo()
     QVERIFY(MainWindowTestAccess::ui(window)->actionPotfileCheck->isEnabled());
     QCOMPARE(MainWindowTestAccess::ui(window)->pushButton_start->toolTip(),
              QStringLiteral("Run hashcat in a terminal with these options."));
+}
+
+// The failure box carries hashcat's stderr verbatim: markup-like text in it
+// is diagnostic content, not HTML to interpret.
+void TestMainWindow::failedQueryShowsTheStderrLiterally()
+{
+    const QString stub = TestEnvironment::writeShellStub(
+        QStringLiteral("stub-hashcat-markup-stderr"), "#!/bin/sh\n"
+                                                      "printf 'usage: <b>hashfile</b>\\n' >&2\n"
+                                                      "exit 1\n");
+#ifdef Q_OS_WIN
+    QSKIP("no shell stub on this platform");
+#else
+    QVERIFY2(!stub.isEmpty(), "the shell stub could not be written");
+#endif
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, stub);
+
+    TestEnvironment::ModalRecorder recorder;
+    recorder.start();
+    MainWindow window;
+    QTRY_VERIFY_WITH_TIMEOUT(recorder.messageBoxSeen, AppConstants::Hashcat::QueryTimeoutMs);
+    QCOMPARE(recorder.title, QStringLiteral("Failed to load hash types"));
+    QCOMPARE(recorder.textFormat, Qt::PlainText);
+    QVERIFY(recorder.text.contains(QStringLiteral("usage: <b>hashfile</b>")));
 }
 
 // An unparseable reply from the same binary must not throw away a list that
