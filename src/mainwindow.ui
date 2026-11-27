@@ -626,6 +626,12 @@
                    </item>
                    <item>
              <widget class="QListWidget" name="listWidget_pcfg_rulesets">
+              <property name="acceptDrops">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DragDropMode::DropOnly</enum>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>420</width>
@@ -1021,6 +1027,12 @@
                    </property>
                    <item>
              <widget class="QListWidget" name="listWidget_tables">
+              <property name="acceptDrops">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DragDropMode::DropOnly</enum>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>420</width>

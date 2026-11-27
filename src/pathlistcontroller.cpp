@@ -23,11 +23,29 @@
 
 namespace
 {
-// Local files only; a remote URL is not a path here.
-bool hasLocalFile(const QMimeData *data)
+// A remote URL is not a path; an unmonitored list takes any local path.
+bool isDroppable(const QUrl &url, const PathMonitor *monitor)
+{
+    return url.isLocalFile()
+           && (monitor == nullptr || monitor->acceptsDroppedPath(url.toLocalFile()));
+}
+
+bool hasDroppableUrl(const QMimeData *data, const PathMonitor *monitor)
 {
     return data != nullptr && data->hasUrls()
-           && std::ranges::any_of(data->urls(), [](const QUrl &url) { return url.isLocalFile(); });
+           && std::ranges::any_of(data->urls(),
+                                  [monitor](const QUrl &url) { return isDroppable(url, monitor); });
+}
+
+// Rows only record the path, so a drop must copy: a move can delete the source.
+bool acceptDropAsCopy(QDropEvent *event)
+{
+    if (!event->possibleActions().testFlag(Qt::CopyAction)) {
+        return false;
+    }
+    event->setDropAction(Qt::CopyAction);
+    event->accept();
+    return true;
 }
 } // namespace
 
@@ -61,7 +79,7 @@ PathListController::PathListController(QListWidget *list, PathMonitor::Kind kind
 
 void PathListController::connectChanges()
 {
-    // The .ui accepts drops; a local file becomes a checked row.
+    // The .ui accepts drops; a local path becomes a checked row.
     m_list->viewport()->installEventFilter(this);
     connect(m_list->model(), &QAbstractItemModel::rowsInserted, this, &PathListController::changed);
     connect(m_list->model(), &QAbstractItemModel::rowsRemoved, this, &PathListController::changed);
@@ -87,8 +105,11 @@ bool PathListController::eventFilter(QObject *watched, QEvent *event)
     case QEvent::DragEnter:
     case QEvent::DragMove: {
         auto *drag = dynamic_cast<QDragMoveEvent *>(event);
-        if (drag && hasLocalFile(drag->mimeData())) {
-            drag->acceptProposedAction();
+        if (drag && hasDroppableUrl(drag->mimeData(), m_monitor.get())) {
+            if (acceptDropAsCopy(drag)) {
+                return true;
+            }
+            drag->ignore();
             return true;
         }
         break;
@@ -101,13 +122,16 @@ bool PathListController::eventFilter(QObject *watched, QEvent *event)
         const QList<QUrl> urls = drop->mimeData()->urls();
         QStringList paths;
         for (const QUrl &url : urls) {
-            if (url.isLocalFile()) {
+            if (isDroppable(url, m_monitor.get())) {
                 paths << url.toLocalFile();
             }
         }
         if (!paths.isEmpty()) {
-            addPaths(paths);
-            drop->acceptProposedAction();
+            if (acceptDropAsCopy(drop)) {
+                addPaths(paths);
+            } else {
+                drop->ignore();
+            }
             return true;
         }
         break;

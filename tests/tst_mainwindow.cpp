@@ -18,6 +18,7 @@
 #include "ui_mainwindow.h"
 #include "widgetstateserializer.h"
 
+#include <QAbstractItemView>
 #include <QAction>
 #include <QButtonGroup>
 #include <QClipboard>
@@ -73,6 +74,7 @@ private slots:
     }
     void freshWindowMatchesTheDefaultOptions();
     void copyButtonHasAnIconWithoutATheme();
+    void pathListsAcceptDrops();
     void hashTypeComboIsSearchable();
     void hashTypeEditingFinishedRestoresTheSelectedName();
     void attackModeIdsTravelAsItemData();
@@ -159,6 +161,22 @@ void TestMainWindow::copyButtonHasAnIconWithoutATheme()
     QVERIFY(!icon.pixmap(16, 16).isNull());
 
     QIcon::setThemeName(theme);
+}
+
+// The path lists accept drops; feed arguments are typed values, not paths.
+void TestMainWindow::pathListsAcceptDrops()
+{
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+
+    for (QListWidget *list :
+         {ui->listWidget_wordlist, ui->listWidget_pcfg_rulesets, ui->listWidget_tables}) {
+        QVERIFY2(list->acceptDrops(), qPrintable(list->objectName()));
+        QVERIFY2(list->viewport()->acceptDrops(), qPrintable(list->objectName()));
+        QCOMPARE(list->dragDropMode(), QAbstractItemView::DropOnly);
+    }
+    QVERIFY(!ui->listWidget_feed_arguments->acceptDrops());
+    QVERIFY(!ui->listWidget_feed_arguments->viewport()->acceptDrops());
 }
 
 void TestMainWindow::hashTypeComboIsSearchable()

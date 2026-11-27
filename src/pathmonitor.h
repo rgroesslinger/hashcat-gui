@@ -48,6 +48,10 @@ public:
 
     [[nodiscard]] bool isAvailable(const QString &path) const;
 
+    // Whether a dropped path can become a row. A table is a file only, so its
+    // folders would just be unusable.
+    [[nodiscard]] bool acceptsDroppedPath(const QString &path) const;
+
 signals:
     void availabilityChanged(const QString &path, bool available);
 

@@ -3,14 +3,15 @@
 ## Unreleased
 - A Linux x86_64 AppImage is now published on the release page
 - kgx (GNOME Console) is now available as a launch terminal
-- The launch terminal can now print the exact command hashcat receives, so a mangled value (such as a `$` hash expanded a second time by a terminal) is immediately visible instead of going unnoticed; enable it under `Settings → General`
+- The launch terminal can now print the exact command hashcat receives, so mangled values such as a `$` hash expanded twice are visible; enable it under `Settings → General`
 - The copy-to-clipboard button no longer appears blank on systems without an icon theme
 - New options: `--keep-guessing` to keep attacking a hash after it is cracked, `--potfile-path` to read and write a chosen potfile instead of the default one, and `--increment-inverse` (`-ii`) to grow a mask from right to left
 - `Tools → Identify Hash` asks hashcat which hash modes match a hash, shows them as candidates and applies the selected one (and the hash input) to the attack
 - `Tools → Backend Information` shows the devices and backends hashcat detected
-- `Tools → Check Against Potfile` reports how many hashes in the current hash field are already cracked and opens the cracked hashes with masked plaintexts that must be revealed before they can be copied
+- `Tools → Check Against Potfile` reports how many hashes in the hash field are already cracked and opens the results with masked plaintexts that must be revealed before copying
 - `Tools → Potfile Inspector` lists a potfile's entries (up to 100,000) in a searchable table, masks plaintexts by default, and marks exact duplicate lines
 - Cracked-results and potfile-inspector dialogs can export the visible results as CSV, TSV or JSON, and show aggregate password statistics for them
+- The wordlist, PCFG ruleset and table lists now support drag&drop for local files and folders; tables accept files only
 
 ## 0.9.0 (2026-11-20)
 

@@ -68,6 +68,11 @@ bool PathMonitor::isAvailable(const QString &path) const
     return m_available.value(path, false);
 }
 
+bool PathMonitor::acceptsDroppedPath(const QString &path) const
+{
+    return m_kind != Kind::Table || !QFileInfo(path).isDir();
+}
+
 QString PathMonitor::resolvePath(const QString &path) const
 {
     // Bundled ruleset names are hashcat's own lookup, not a filesystem path.

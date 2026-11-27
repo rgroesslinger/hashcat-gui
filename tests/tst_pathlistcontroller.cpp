@@ -18,6 +18,32 @@
 #include <QTemporaryDir>
 #include <QUrl>
 
+namespace
+{
+// Events that propose a move while still allowing a copy.
+class MoveProposedDragEnterEvent : public QDragEnterEvent
+{
+public:
+    using QDragEnterEvent::QDragEnterEvent;
+
+    void proposeMove()
+    {
+        m_defaultAction = Qt::MoveAction;
+    }
+};
+
+class MoveProposedDropEvent : public QDropEvent
+{
+public:
+    using QDropEvent::QDropEvent;
+
+    void proposeMove()
+    {
+        m_defaultAction = Qt::MoveAction;
+    }
+};
+} // namespace
+
 // The list controller: paths in, checked rows out, the monitor decoration,
 // and the changed signal the preview rebuilds from.
 class TestPathListController : public QObject
@@ -32,6 +58,9 @@ private slots:
     void aModelResetRefreshesTheMonitor();
     void anUnmonitoredListStillAnnouncesChanges();
     void aDropAddsTheLocalFilesOnce();
+    void aRulesetDropAcceptsFilesAndFolders();
+    void aTableDropIgnoresFolders();
+    void aDropNeverMovesTheSource();
 
 private:
     struct Icons {
@@ -176,8 +205,7 @@ void TestPathListController::anUnmonitoredListStillAnnouncesChanges()
     QCOMPARE(list.item(0)->icon().cacheKey(), QIcon().cacheKey());
 }
 
-// The wordlist list accepts drops in the .ui; a local URL becomes a checked
-// row, a remote URL is ignored.
+// A local URL becomes a checked row; a remote URL is ignored.
 void TestPathListController::aDropAddsTheLocalFilesOnce()
 {
     QTemporaryDir directory;
@@ -210,6 +238,128 @@ void TestPathListController::aDropAddsTheLocalFilesOnce()
 
     const QStringList expected{QDir::toNativeSeparators(first), QDir::toNativeSeparators(second)};
     QCOMPARE(controller.checkedItems(), expected);
+}
+
+// A ruleset may be a file or a folder with a grammar; both can be dropped.
+void TestPathListController::aRulesetDropAcceptsFilesAndFolders()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString ruleset = directory.filePath(QStringLiteral("rules.rule"));
+    QFile file(ruleset);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+    const QString folder = directory.filePath(QStringLiteral("grammar"));
+    QVERIFY(QDir().mkpath(folder));
+
+    QListWidget list;
+    list.setAcceptDrops(true);
+    list.setDragDropMode(QAbstractItemView::DropOnly);
+    const Icons icons;
+    PathListController controller(&list, PathMonitor::Kind::Pcfg, icons.file, icons.folder,
+                                  icons.warning, nullptr);
+
+    QMimeData mime;
+    mime.setUrls({QUrl::fromLocalFile(ruleset), QUrl::fromLocalFile(folder)});
+
+    QDragEnterEvent enter(QPoint(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &enter);
+    QVERIFY(enter.isAccepted());
+
+    QDropEvent drop(QPointF(5, 5), Qt::CopyAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &drop);
+    QVERIFY(drop.isAccepted());
+
+    const QStringList expected{QDir::toNativeSeparators(ruleset), QDir::toNativeSeparators(folder)};
+    QCOMPARE(controller.checkedItems(), expected);
+}
+
+// A table is a file only, so a folder drag cannot add a row.
+void TestPathListController::aTableDropIgnoresFolders()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString table = directory.filePath(QStringLiteral("table.txt"));
+    QFile file(table);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+    const QString folder = directory.filePath(QStringLiteral("folder"));
+    QVERIFY(QDir().mkpath(folder));
+
+    QListWidget list;
+    list.setAcceptDrops(true);
+    list.setDragDropMode(QAbstractItemView::DropOnly);
+    const Icons icons;
+    PathListController controller(&list, PathMonitor::Kind::Table, icons.file, icons.folder,
+                                  icons.warning, nullptr);
+
+    QMimeData folderOnly;
+    folderOnly.setUrls({QUrl::fromLocalFile(folder)});
+    QDragEnterEvent folderEnter(QPoint(5, 5), Qt::CopyAction, &folderOnly, Qt::LeftButton,
+                                Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &folderEnter);
+    QDropEvent folderDrop(QPointF(5, 5), Qt::CopyAction, &folderOnly, Qt::LeftButton,
+                          Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &folderDrop);
+    QCOMPARE(list.count(), 0);
+
+    // A mixed drop keeps the file and skips the folder.
+    QMimeData mixed;
+    mixed.setUrls({QUrl::fromLocalFile(table), QUrl::fromLocalFile(folder)});
+    QDragEnterEvent enter(QPoint(5, 5), Qt::CopyAction, &mixed, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &enter);
+    QVERIFY(enter.isAccepted());
+    QDropEvent drop(QPointF(5, 5), Qt::CopyAction, &mixed, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &drop);
+    QVERIFY(drop.isAccepted());
+    QCOMPARE(controller.checkedItems(), QStringList{QDir::toNativeSeparators(table)});
+}
+
+// Drops must copy; a move-only drag could make the source remove the file.
+void TestPathListController::aDropNeverMovesTheSource()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    const QString wordlist = directory.filePath(QStringLiteral("words.txt"));
+    QFile file(wordlist);
+    QVERIFY(file.open(QIODevice::WriteOnly));
+    file.close();
+
+    QListWidget list;
+    list.setAcceptDrops(true);
+    list.setDragDropMode(QAbstractItemView::DropOnly);
+    const Icons icons;
+    PathListController controller(&list, PathMonitor::Kind::Wordlist, icons.file, icons.folder,
+                                  icons.warning, nullptr);
+
+    QMimeData mime;
+    mime.setUrls({QUrl::fromLocalFile(wordlist)});
+
+    // Copy is possible: the proposed move is overridden.
+    MoveProposedDragEnterEvent enter(QPoint(5, 5), Qt::MoveAction | Qt::CopyAction, &mime,
+                                     Qt::LeftButton, Qt::NoModifier);
+    enter.proposeMove();
+    QApplication::sendEvent(list.viewport(), &enter);
+    QVERIFY(enter.isAccepted());
+    QCOMPARE(enter.dropAction(), Qt::CopyAction);
+
+    MoveProposedDropEvent drop(QPointF(5, 5), Qt::MoveAction | Qt::CopyAction, &mime,
+                               Qt::LeftButton, Qt::NoModifier);
+    drop.proposeMove();
+    QApplication::sendEvent(list.viewport(), &drop);
+    QVERIFY(drop.isAccepted());
+    QCOMPARE(drop.dropAction(), Qt::CopyAction);
+    QCOMPARE(controller.checkedItems(), QStringList{QDir::toNativeSeparators(wordlist)});
+
+    // Move only: refusing the drag leaves the file with its source.
+    list.clear();
+    QDragEnterEvent moveEnter(QPoint(5, 5), Qt::MoveAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &moveEnter);
+    QVERIFY(!moveEnter.isAccepted());
+    QDropEvent moveDrop(QPointF(5, 5), Qt::MoveAction, &mime, Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(list.viewport(), &moveDrop);
+    QVERIFY(!moveDrop.isAccepted());
+    QCOMPARE(list.count(), 0);
 }
 
 int main(int argc, char *argv[])
