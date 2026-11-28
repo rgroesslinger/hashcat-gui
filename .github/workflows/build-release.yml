@@ -57,8 +57,7 @@ jobs:
           (see LICENSE).
           EOF
           cd "hashcat-gui-$REF_NAME/"
-          ldd hashcat-gui.exe | grep /ucrt64 | awk '{print $3}' | xargs -I{} cp {} .
-          windeployqt6.exe hashcat-gui.exe --release
+          windeployqt6.exe hashcat-gui.exe --release --compiler-runtime
 
       - name: Zip release artifacts
         shell: msys2 {0}
