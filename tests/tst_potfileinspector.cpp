@@ -92,7 +92,8 @@ private slots:
     void filterWithNoMatchesShowsItsEmptyState();
     void statisticsMarkFilteredDuplicateCountsUnknown();
     void statisticsDuringAStaleFilterStayUnknown();
-void reloadHasTheF5Shortcut();
+    void destroyWhileReadingIsSafe();
+    void reloadHasTheF5Shortcut();
 };
 
 void TestPotfileInspector::init()
@@ -590,6 +591,24 @@ void TestPotfileInspector::statisticsDuringAStaleFilterStayUnknown()
     // empty filter: the visible rows are still the old subset.
     search(dialog)->clear();
     QVERIFY(statisticsSummary(dialog).contains(QStringLiteral("duplicate lines: unknown")));
+}
+
+void TestPotfileInspector::destroyWhileReadingIsSafe()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString path = dir.filePath(QStringLiteral("big.potfile"));
+    QByteArray big;
+    for (int i = 0; i < 300000; ++i) {
+        big += QByteArrayLiteral("hash:plain\n");
+    }
+    QVERIFY(writeFile(path, big));
+
+    {
+        PotfileInspectorDialog dialog;
+        dialog.setPotfilePath(path);
+    }
+    QCoreApplication::processEvents();
 }
 
 void TestPotfileInspector::reloadHasTheF5Shortcut()

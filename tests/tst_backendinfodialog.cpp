@@ -30,7 +30,8 @@ private slots:
     void aProcessFailureIsReported();
     void aTimeoutIsReported();
     void cancelStopsTheQuery();
-void refreshHasTheF5Shortcut();
+    void destructionCancelsTheQuery();
+    void refreshHasTheF5Shortcut();
 
 private:
     static QLabel *status(BackendInfoDialog &dialog)
@@ -162,6 +163,22 @@ void TestBackendInfoDialog::cancelStopsTheQuery()
     QVERIFY(!status(dialog)->text().contains(QStringLiteral("cancelled")));
     QTRY_VERIFY_WITH_TIMEOUT(status(dialog)->text().contains(QStringLiteral("cancelled")), 3000);
     QVERIFY(refresh->isEnabled());
+}
+
+void TestBackendInfoDialog::destructionCancelsTheQuery()
+{
+    QTemporaryDir dir;
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath, fakeProgram(dir));
+
+    HashcatRunner::CancelToken token;
+    {
+        BackendInfoDialog dialog(
+            nullptr, cannedQuery(normalResult(QStringLiteral("too late")), nullptr, &token, 1000));
+        QVERIFY(token);
+        QVERIFY(!token->load());
+    }
+
+    QVERIFY(token->load());
 }
 
 void TestBackendInfoDialog::refreshHasTheF5Shortcut()

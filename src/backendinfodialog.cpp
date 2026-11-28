@@ -47,9 +47,7 @@ BackendInfoDialog::BackendInfoDialog(QWidget *parent, Query query)
 
 BackendInfoDialog::~BackendInfoDialog()
 {
-    if (m_cancel) {
-        m_cancel->store(true);
-    }
+    resetHashcatQuery(m_cancel, m_watcher);
     delete ui;
 }
 
@@ -68,9 +66,7 @@ void BackendInfoDialog::refreshClicked()
     }
 
     // A second refresh kills the earlier query's process, not just its reply.
-    if (m_cancel) {
-        m_cancel->store(true);
-    }
+    resetHashcatQuery(m_cancel, m_watcher);
     m_watcher = std::make_unique<QFutureWatcher<HashcatResult>>(this);
     m_cancel = std::make_shared<std::atomic_bool>(false);
 

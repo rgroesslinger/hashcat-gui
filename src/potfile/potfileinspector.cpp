@@ -73,9 +73,7 @@ PotfileInspectorDialog::PotfileInspectorDialog(QWidget *parent)
 
 PotfileInspectorDialog::~PotfileInspectorDialog()
 {
-    if (m_cancel) {
-        m_cancel->store(true);
-    }
+    resetHashcatQuery(m_cancel, m_watcher);
     delete ui;
 }
 
@@ -198,10 +196,7 @@ void PotfileInspectorDialog::statisticsClicked()
 
 void PotfileInspectorDialog::loadPath(bool preserveViewState)
 {
-    if (m_cancel) {
-        m_cancel->store(true);
-    }
-    m_watcher.reset();
+    resetHashcatQuery(m_cancel, m_watcher);
     m_preserveViewState = preserveViewState;
     clearView();
 

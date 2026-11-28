@@ -38,7 +38,11 @@ QFuture<HashcatResult> HashcatRunner::execute(const QString &hashcatPath, const 
         // process that is still running.
         const auto stop = [&proc] {
             proc.kill();
-            proc.waitForFinished(5000);
+            // SIGKILL normally lands at once. Keep the old five-second budget
+            // as a fallback for a slow or wedged CI host.
+            if (!proc.waitForFinished(1000)) {
+                proc.waitForFinished(4000);
+            }
         };
 
         if (cancelled()) {

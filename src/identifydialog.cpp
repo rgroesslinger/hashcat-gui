@@ -129,7 +129,7 @@ IdentifyDialog::IdentifyDialog(QWidget *parent, Query query)
 
 IdentifyDialog::~IdentifyDialog()
 {
-    cancelQuery();
+    resetHashcatQuery(m_cancel, m_watcher);
     delete ui;
 }
 
@@ -187,7 +187,7 @@ void IdentifyDialog::identifyClicked()
     }
     args << input;
 
-    cancelQuery();
+    resetHashcatQuery(m_cancel, m_watcher);
     m_watcher = std::make_unique<QFutureWatcher<HashcatResult>>(this);
     m_cancel = std::make_shared<std::atomic_bool>(false);
 

@@ -38,6 +38,7 @@ private slots:
     void theLoadingStateIsAnnounced();
     void aSupersededQueryDoesNotEmit();
     void aSupersededQueryIsCancelled();
+    void destructionCancelsTheQuery();
 };
 
 void TestHashTypeLoader::loadedEmitsTheParsedList()
@@ -221,6 +222,25 @@ void TestHashTypeLoader::aSupersededQueryDoesNotEmit()
     QTest::qWait(400);
     QCOMPARE(loaded.count(), 1);
     QCOMPARE(loader.queriedPath(), QStringLiteral("fast"));
+}
+
+void TestHashTypeLoader::destructionCancelsTheQuery()
+{
+    HashcatRunner::CancelToken token;
+    {
+        HashTypeLoader loader(nullptr, [&token](const QString &, const QStringList &, int,
+                                                const HashcatRunner::CancelToken &cancelToken) {
+            token = cancelToken;
+            return QtConcurrent::run([] {
+                QThread::msleep(200);
+                return normalResult(QStringLiteral(R"({"0":{"name":"MD5"}})"));
+            });
+        });
+        loader.reload(QStringLiteral("slow"));
+        QVERIFY(token);
+        QVERIFY(!token->load());
+    }
+    QVERIFY(token->load());
 }
 
 // Against the real runner: a superseded query's hashcat process is killed,

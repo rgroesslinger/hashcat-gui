@@ -61,4 +61,15 @@ public:
                                           CancelToken cancel = {});
 };
 
+// Cancels and clears the token, then releases the watchers it guarded.
+template <typename... Watchers>
+void resetHashcatQuery(HashcatRunner::CancelToken &cancel, Watchers &...watchers)
+{
+    if (cancel) {
+        cancel->store(true);
+    }
+    cancel.reset();
+    (watchers.reset(), ...);
+}
+
 #endif // HASHCATRUNNER_H

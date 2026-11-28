@@ -17,9 +17,7 @@ HashTypeLoader::~HashTypeLoader()
 {
     // A query still on its way must not keep hashcat running after the GUI
     // is gone; the thread pool would wait for it at exit.
-    if (m_cancel) {
-        m_cancel->store(true);
-    }
+    resetHashcatQuery(m_cancel, m_watcher);
 }
 
 void HashTypeLoader::reload(const QString &hashcatPath)
@@ -30,11 +28,7 @@ void HashTypeLoader::reload(const QString &hashcatPath)
     // Stop the earlier query's process, not just its reply: left running, it
     // would hold a hashcat --example-hashes until its timeout, and several
     // reconfigurations in a row would stack them up.
-    if (m_cancel) {
-        m_cancel->store(true);
-    }
-    m_cancel.reset();
-    m_watcher.reset();
+    resetHashcatQuery(m_cancel, m_watcher);
 
     if (hashcatPath.isEmpty()) {
         // No query: the list no longer comes from any path.

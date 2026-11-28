@@ -52,20 +52,14 @@ PotfileCheck::PotfileCheck(QObject *parent, Query query)
 
 PotfileCheck::~PotfileCheck()
 {
-    cancel();
-    m_showWatcher.reset();
-    m_parseWatcher.reset();
-    m_leftWatcher.reset();
+    resetHashcatQuery(m_cancel, m_showWatcher, m_parseWatcher, m_leftWatcher);
 }
 
 void PotfileCheck::start(const QString &hashcatPath, const PotfileQueryInput &input)
 {
     // A new check supersedes an in-flight one, the way a reload does for the
     // hash-type list. MainWindow also disables the action while busy.
-    cancel();
-    m_showWatcher.reset();
-    m_parseWatcher.reset();
-    m_leftWatcher.reset();
+    resetHashcatQuery(m_cancel, m_showWatcher, m_parseWatcher, m_leftWatcher);
 
     m_hashcatPath = hashcatPath;
     m_input = input;
