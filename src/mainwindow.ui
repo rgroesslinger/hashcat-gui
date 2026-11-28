@@ -93,7 +93,7 @@
               <item>
                <widget class="QLabel" name="label_hashfile">
                 <property name="text">
-                 <string>Hash file or hash:</string>
+                 <string>H&amp;ash file or hash:</string>
                 </property>
                </widget>
               </item>
@@ -193,7 +193,7 @@
               <item>
                <widget class="QLabel" name="label_attack_mode">
                 <property name="text">
-                 <string>Mode:</string>
+                 <string>&amp;Mode:</string>
                 </property>
                </widget>
               </item>
@@ -235,7 +235,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Hash type:</string>
+                 <string>Hash t&amp;ype:</string>
                 </property>
                </widget>
               </item>
@@ -280,7 +280,7 @@
                <bool>false</bool>
                 </property>
                 <property name="text">
-               <string>Hash recipe:</string>
+               <string>Hash &amp;recipe:</string>
                 </property>
                </widget>
               </item>
@@ -348,7 +348,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Move item up</string>
+                        <string>Move selected wordlist up</string>
                        </property>
                        <property name="autoRaise">
                         <bool>true</bool>
@@ -367,7 +367,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Move item down</string>
+                        <string>Move selected wordlist down</string>
                        </property>
                        <property name="autoRaise">
                         <bool>true</bool>
@@ -410,7 +410,7 @@
                       </sizepolicy>
                      </property>
                      <property name="toolTip">
-                      <string>hashcat reads every file directly inside the folder as one wordlist.</string>
+                      <string>Add a folder; hashcat reads every file directly inside it as one wordlist.</string>
                      </property>
                      <property name="accessibleName">
                       <string>Add wordlist folder</string>
@@ -446,6 +446,9 @@
                  </item>
                  <item>
                   <widget class="QListWidget" name="listWidget_wordlist">
+                   <property name="accessibleName">
+                    <string>Wordlists</string>
+                   </property>
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                      <horstretch>0</horstretch>
@@ -495,7 +498,7 @@
                  <item>
                   <widget class="QLabel" name="label_encoding_from">
                    <property name="text">
-                    <string>Encoding from:</string>
+                    <string>&amp;Encoding from:</string>
                    </property>
                   </widget>
                  </item>
@@ -505,7 +508,7 @@
                  <item>
                   <widget class="QLabel" name="label_encoding_to">
                    <property name="text">
-                    <string>Encoding to:</string>
+                    <string>Enc&amp;oding to:</string>
                    </property>
                   </widget>
                  </item>
@@ -626,6 +629,9 @@
                    </item>
                    <item>
              <widget class="QListWidget" name="listWidget_pcfg_rulesets">
+              <property name="accessibleName">
+               <string>PCFG rulesets</string>
+              </property>
               <property name="acceptDrops">
                <bool>true</bool>
               </property>
@@ -702,7 +708,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_pcfg_ruleset_up">
               <property name="toolTip">
-               <string>Move item up</string>
+               <string>Move selected ruleset up</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -718,7 +724,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_pcfg_ruleset_down">
               <property name="toolTip">
-               <string>Move item down</string>
+               <string>Move selected ruleset down</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -759,7 +765,7 @@
                  <item row="0" column="0">
              <widget class="QLabel" name="label_pcfg_scale">
               <property name="text">
-               <string>Scale:</string>
+               <string>Sca&amp;le:</string>
               </property>
              </widget>
                  </item>
@@ -782,7 +788,7 @@
                  <item row="0" column="1">
              <widget class="QLabel" name="label_pcfg_costmax">
               <property name="text">
-               <string>Costmax:</string>
+               <string>&amp;Costmax:</string>
               </property>
              </widget>
                  </item>
@@ -805,7 +811,7 @@
                  <item row="0" column="2">
              <widget class="QLabel" name="label_pcfg_weights">
               <property name="text">
-               <string>Weights:</string>
+               <string>&amp;Weights:</string>
               </property>
              </widget>
                  </item>
@@ -851,7 +857,7 @@
                  <item row="2" column="1">
              <widget class="QLabel" name="label_pcfg_kbits">
               <property name="text">
-               <string>Kbits:</string>
+               <string>&amp;Kbits:</string>
               </property>
              </widget>
                  </item>
@@ -874,7 +880,7 @@
                  <item row="2" column="2">
              <widget class="QLabel" name="label_pcfg_maxword">
               <property name="text">
-               <string>Maxword:</string>
+               <string>Ma&amp;xword:</string>
               </property>
              </widget>
                  </item>
@@ -897,7 +903,7 @@
                  <item row="4" column="0">
              <widget class="QLabel" name="label_pcfg_maxgain">
               <property name="text">
-               <string>Maxgain:</string>
+               <string>Max&amp;gain:</string>
               </property>
              </widget>
                  </item>
@@ -1027,6 +1033,9 @@
                    </property>
                    <item>
              <widget class="QListWidget" name="listWidget_tables">
+              <property name="accessibleName">
+               <string>Tables</string>
+              </property>
               <property name="acceptDrops">
                <bool>true</bool>
               </property>
@@ -1066,6 +1075,9 @@
               <property name="toolTip">
                <string>Add one or more table files.</string>
               </property>
+              <property name="accessibleName">
+               <string>Add table</string>
+              </property>
               <property name="text">
                <string>Add tables…</string>
               </property>
@@ -1087,7 +1099,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_table_up">
               <property name="toolTip">
-               <string>Move item up</string>
+               <string>Move selected table up</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -1103,7 +1115,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_table_down">
               <property name="toolTip">
-               <string>Move item down</string>
+               <string>Move selected table down</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -1366,6 +1378,9 @@
               <property name="toolTip">
                <string>Add an argument for the feed, in order.</string>
               </property>
+              <property name="accessibleName">
+               <string>Add feed argument</string>
+              </property>
               <property name="text">
                <string>Add</string>
               </property>
@@ -1375,6 +1390,9 @@
                </item>
                <item>
              <widget class="QListWidget" name="listWidget_feed_arguments">
+              <property name="accessibleName">
+               <string>Feed arguments</string>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>420</width>
@@ -1419,7 +1437,7 @@
                  <item>
              <widget class="QToolButton" name="toolButton_feed_argument_up">
               <property name="toolTip">
-               <string>Move item up</string>
+               <string>Move selected feed argument up</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -1435,7 +1453,7 @@
                  <item>
              <widget class="QToolButton" name="toolButton_feed_argument_down">
               <property name="toolTip">
-               <string>Move item down</string>
+               <string>Move selected feed argument down</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -2197,7 +2215,7 @@
                  <item row="0" column="0">
                   <widget class="QLabel" name="label_session">
                    <property name="text">
-                    <string>Session name:</string>
+                    <string>&amp;Session name:</string>
                    </property>
                   </widget>
                  </item>
@@ -2211,7 +2229,7 @@
                  <item row="1" column="0">
                   <widget class="QLabel" name="label_runtime">
                    <property name="text">
-                    <string>Runtime limit:</string>
+                    <string>R&amp;untime limit:</string>
                    </property>
                   </widget>
                  </item>
@@ -2454,7 +2472,7 @@
                      <item>
                       <widget class="QLabel" name="label_opencl_device_types">
                        <property name="text">
-                        <string>Device types:</string>
+                        <string>&amp;Device types:</string>
                        </property>
                       </widget>
                      </item>

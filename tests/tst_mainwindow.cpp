@@ -34,6 +34,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QKeySequence>
+#include <QLabel>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QListWidgetItem>
@@ -124,6 +126,8 @@ private slots:
     void aReloadRebuildsThePreviewOnce();
     void anIdentifyResultDuringAReloadSaysTheListIsStillLoading();
     void toolsMenuMnemonicsAreUnique();
+    void labelMnemonicsAreUnique();
+    void primaryShortcutsAreSet();
     void applyingAKnownModeKeepsAnUnchangedInput();
     void applyingAnEditedInputWritesTheRawText();
     void anUnknownModeIsRefused();
@@ -158,9 +162,25 @@ void TestMainWindow::copyButtonHasAnIconWithoutATheme()
     MainWindow window;
     const QIcon icon = MainWindowTestAccess::ui(window)->pushButton_copy_clipboard->icon();
     QVERIFY(!icon.isNull());
-    QVERIFY(!icon.pixmap(16, 16).isNull());
+    const QPixmap pixmap = icon.pixmap(16, 16);
+    QVERIFY(!pixmap.isNull());
+
+    const QSize minimum =
+        MainWindowTestAccess::ui(window)->pushButton_copy_clipboard->minimumSize();
+    QVERIFY(minimum.width() >= pixmap.width());
+    QCOMPARE(minimum.width(), minimum.height());
 
     QIcon::setThemeName(theme);
+}
+
+void TestMainWindow::primaryShortcutsAreSet()
+{
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+
+    QCOMPARE(ui->pushButton_start->shortcut(), QKeySequence(QStringLiteral("Ctrl+Return")));
+    QCOMPARE(ui->pushButton_copy_clipboard->shortcut(),
+             QKeySequence(QStringLiteral("Ctrl+Shift+C")));
 }
 
 // The path lists accept drops; feed arguments are typed values, not paths.
@@ -2309,6 +2329,38 @@ void TestMainWindow::toolsMenuMnemonicsAreUnique()
                  qPrintable(QStringLiteral("duplicate Tools mnemonic: %1").arg(mnemonic)));
         seen.insert(mnemonic);
     }
+}
+
+// Duplicate label mnemonics make Alt+letter cycle; the menu bar has its own test.
+void TestMainWindow::labelMnemonicsAreUnique()
+{
+    MainWindow window;
+    QSet<QChar> seen;
+    int mnemonics = 0;
+
+    for (const QLabel *label : window.findChildren<QLabel *>()) {
+        const QString text = label->text();
+        for (qsizetype i = 0; i < text.size(); ++i) {
+            if (text.at(i) != QLatin1Char('&')) {
+                continue;
+            }
+            if (i + 1 >= text.size()) {
+                break;
+            }
+            if (text.at(i + 1) == QLatin1Char('&')) {
+                ++i;
+                continue;
+            }
+            const QChar mnemonic = text.at(i + 1).toLower();
+            QVERIFY2(!seen.contains(mnemonic),
+                     qPrintable(QStringLiteral("duplicate label mnemonic: %1").arg(mnemonic)));
+            seen.insert(mnemonic);
+            ++mnemonics;
+            break;
+        }
+    }
+
+    QVERIFY(mnemonics >= 10);
 }
 
 void TestMainWindow::applyingAKnownModeKeepsAnUnchangedInput()

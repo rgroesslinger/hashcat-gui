@@ -19,6 +19,7 @@
 #include <QEventLoop>
 #include <QFile>
 #include <QFileDialog>
+#include <QKeySequence>
 #include <QLabel>
 #include <QLineEdit>
 #include <QProgressBar>
@@ -91,6 +92,7 @@ private slots:
     void filterWithNoMatchesShowsItsEmptyState();
     void statisticsMarkFilteredDuplicateCountsUnknown();
     void statisticsDuringAStaleFilterStayUnknown();
+void reloadHasTheF5Shortcut();
 };
 
 void TestPotfileInspector::init()
@@ -588,6 +590,15 @@ void TestPotfileInspector::statisticsDuringAStaleFilterStayUnknown()
     // empty filter: the visible rows are still the old subset.
     search(dialog)->clear();
     QVERIFY(statisticsSummary(dialog).contains(QStringLiteral("duplicate lines: unknown")));
+}
+
+void TestPotfileInspector::reloadHasTheF5Shortcut()
+{
+    PotfileInspectorDialog dialog;
+
+    QPushButton *reload = button(dialog, QStringLiteral("pushButton_reload"));
+    QVERIFY(reload != nullptr);
+    QCOMPARE(reload->shortcut(), QKeySequence(QStringLiteral("F5")));
 }
 
 int main(int argc, char *argv[])

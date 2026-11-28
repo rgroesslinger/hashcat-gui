@@ -38,6 +38,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_buttons">
      <item>
       <widget class="QPushButton" name="pushButton_refresh">
+       <property name="toolTip">
+        <string>Query hashcat again for backend information.</string>
+       </property>
        <property name="text">
         <string>&amp;Refresh</string>
        </property>
@@ -45,6 +48,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_cancel">
+       <property name="toolTip">
+        <string>Stop the running query.</string>
+       </property>
        <property name="text">
         <string>C&amp;ancel</string>
        </property>
@@ -68,6 +74,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_copy">
+       <property name="toolTip">
+        <string>Copy the backend information to the clipboard.</string>
+       </property>
        <property name="text">
         <string>&amp;Copy</string>
        </property>
@@ -75,6 +84,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_close">
+       <property name="toolTip">
+        <string>Close the dialog.</string>
+       </property>
        <property name="text">
         <string>&amp;Close</string>
        </property>

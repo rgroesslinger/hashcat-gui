@@ -10,6 +10,7 @@
 #include "settingsmanager.h"
 #include "testenvironment.h"
 
+#include <QKeySequence>
 #include <QLabel>
 #include <QPlainTextEdit>
 #include <QProcess>
@@ -29,6 +30,7 @@ private slots:
     void aProcessFailureIsReported();
     void aTimeoutIsReported();
     void cancelStopsTheQuery();
+void refreshHasTheF5Shortcut();
 
 private:
     static QLabel *status(BackendInfoDialog &dialog)
@@ -160,6 +162,16 @@ void TestBackendInfoDialog::cancelStopsTheQuery()
     QVERIFY(!status(dialog)->text().contains(QStringLiteral("cancelled")));
     QTRY_VERIFY_WITH_TIMEOUT(status(dialog)->text().contains(QStringLiteral("cancelled")), 3000);
     QVERIFY(refresh->isEnabled());
+}
+
+void TestBackendInfoDialog::refreshHasTheF5Shortcut()
+{
+    TestEnvironment::useMissingHashcatPath();
+    BackendInfoDialog dialog;
+
+    auto *refresh = dialog.findChild<QPushButton *>(QStringLiteral("pushButton_refresh"));
+    QVERIFY(refresh != nullptr);
+    QCOMPARE(refresh->shortcut(), QKeySequence(QStringLiteral("F5")));
 }
 
 int main(int argc, char *argv[])

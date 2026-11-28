@@ -28,6 +28,9 @@
     <layout class="QHBoxLayout" name="horizontalLayout_input">
      <item>
       <widget class="HashInputLineEdit" name="lineEdit_input">
+       <property name="toolTip">
+        <string>Paste a hash or select a hash file to identify.</string>
+       </property>
        <property name="placeholderText">
         <string>Paste a hash or select a hash file</string>
        </property>
@@ -35,6 +38,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_browse">
+       <property name="toolTip">
+        <string>Choose a hash file.</string>
+       </property>
        <property name="text">
         <string>&amp;Browse…</string>
        </property>
@@ -45,6 +51,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_identify">
+       <property name="toolTip">
+        <string>Identify the hash type of the entered hash.</string>
+       </property>
        <property name="text">
         <string>&amp;Identify</string>
        </property>
@@ -103,6 +112,9 @@
    </item>
    <item>
     <widget class="QTreeWidget" name="treeWidget_results">
+     <property name="toolTip">
+      <string>Matching hash types; select one and apply it to the attack.</string>
+     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
@@ -139,6 +151,9 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="toolTip">
+        <string>Use the selected hash type in the attack.</string>
+       </property>
        <property name="text">
         <string>Apply mode to attack</string>
        </property>
@@ -149,8 +164,11 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_cancel">
+       <property name="toolTip">
+        <string>Stop the running identification.</string>
+       </property>
        <property name="text">
-        <string>&amp;Stop</string>
+        <string>&amp;Cancel</string>
        </property>
        <property name="enabled">
         <bool>false</bool>
@@ -175,8 +193,11 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_close">
+       <property name="toolTip">
+        <string>Close the dialog.</string>
+       </property>
        <property name="text">
-        <string>&amp;Close</string>
+        <string>Cl&amp;ose</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>

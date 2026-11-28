@@ -130,6 +130,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QComboBox" name="comboBox_language">
+        <property name="toolTip">
+         <string>Interface language. Takes effect after a restart.</string>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -186,6 +189,9 @@
      <layout class="QVBoxLayout" name="verticalLayout_session">
       <item>
        <widget class="QCheckBox" name="checkBox_restore_session">
+        <property name="toolTip">
+         <string>Restore the session saved when the application last closed.</string>
+        </property>
         <property name="text">
          <string>&amp;Restore the last session at startup</string>
         </property>

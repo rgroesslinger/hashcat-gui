@@ -18,6 +18,7 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QKeySequence>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QStringList>
@@ -46,6 +47,7 @@ PotfileInspectorDialog::PotfileInspectorDialog(QWidget *parent)
 
     connect(ui->pushButton_browse, &QPushButton::clicked, this,
             &PotfileInspectorDialog::browseClicked);
+    ui->pushButton_reload->setShortcut(QKeySequence(QStringLiteral("F5")));
     connect(ui->pushButton_reload, &QPushButton::clicked, this,
             &PotfileInspectorDialog::reloadClicked);
     connect(ui->pushButton_stop, &QPushButton::clicked, this, &PotfileInspectorDialog::stopClicked);

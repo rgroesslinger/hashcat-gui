@@ -43,6 +43,7 @@
 #include <QFileInfo>
 #include <QIcon>
 #include <QIntValidator>
+#include <QKeySequence>
 #include <QLayout>
 #include <QMap>
 #include <QMenu>
@@ -485,6 +486,15 @@ void MainWindow::configureWidgets()
     // symbol where there is an icon theme, and a text document everywhere else.
     ui->pushButton_copy_clipboard->setIcon(QIcon::fromTheme(
         QStringLiteral("edit-copy"), style()->standardIcon(QStyle::SP_FileDialogDetailedView)));
+
+    // An icon-only button collapses below the icon on some styles; keep a
+    // square that holds the fallback document icon.
+    const int copySide = style()->pixelMetric(QStyle::PM_SmallIconSize)
+                         + 2 * style()->pixelMetric(QStyle::PM_ButtonMargin);
+    ui->pushButton_copy_clipboard->setMinimumSize(copySide, copySide);
+
+    ui->pushButton_start->setShortcut(QKeySequence(QStringLiteral("Ctrl+Return")));
+    ui->pushButton_copy_clipboard->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+C")));
 
     updatePathMonitorBasePaths();
 }

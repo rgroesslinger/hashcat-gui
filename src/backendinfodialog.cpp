@@ -13,6 +13,7 @@
 
 #include <QFontDatabase>
 #include <QFutureWatcher>
+#include <QKeySequence>
 #include <QProcess>
 #include <QPushButton>
 #include <QStringList>
@@ -28,6 +29,7 @@ BackendInfoDialog::BackendInfoDialog(QWidget *parent, Query query)
     ui->label_status->setTextFormat(Qt::PlainText);
     ui->plainTextEdit_output->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
+    ui->pushButton_refresh->setShortcut(QKeySequence(QStringLiteral("F5")));
     connect(ui->pushButton_refresh, &QPushButton::clicked, this,
             &BackendInfoDialog::refreshClicked);
     connect(ui->pushButton_cancel, &QPushButton::clicked, this, &BackendInfoDialog::cancelClicked);

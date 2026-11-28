@@ -19,6 +19,7 @@
 #include <QProcess>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QSet>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTreeWidget>
@@ -117,6 +118,7 @@ private slots:
     void initialStatusGuidesTheUser();
     void pidfileCollisionIsMapped();
     void noHashesLoadedIsMapped();
+    void buttonMnemonicsAreUnique();
     void tokenEncodingIsMapped();
     void unknownStderrIsShownRaw();
     void anUnparsableReplyWithoutStderrSaysSo();
@@ -773,6 +775,24 @@ void TestIdentifyDialog::anUnparsableReplyWithoutStderrSaysSo()
     button(dialog, "pushButton_identify")->click();
 
     QTRY_VERIFY(status(dialog)->text().contains(QStringLiteral("could not be parsed")));
+}
+
+void TestIdentifyDialog::buttonMnemonicsAreUnique()
+{
+    IdentifyDialog dialog;
+    QSet<QChar> seen;
+
+    for (const QPushButton *button : dialog.findChildren<QPushButton *>()) {
+        const QString text = button->text();
+        const qsizetype amp = text.indexOf(QLatin1Char('&'));
+        if (amp < 0 || amp + 1 >= text.size()) {
+            continue;
+        }
+        const QChar mnemonic = text.at(amp + 1).toLower();
+        QVERIFY2(!seen.contains(mnemonic),
+                 qPrintable(QStringLiteral("duplicate button mnemonic: %1").arg(mnemonic)));
+        seen.insert(mnemonic);
+    }
 }
 
 int main(int argc, char *argv[])

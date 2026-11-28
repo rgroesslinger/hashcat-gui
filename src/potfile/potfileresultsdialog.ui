@@ -86,6 +86,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_close">
+       <property name="toolTip">
+        <string>Close the dialog.</string>
+       </property>
        <property name="text">
         <string>&amp;Close</string>
        </property>

@@ -55,6 +55,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_reload">
+       <property name="toolTip">
+        <string>Read the selected potfile again.</string>
+       </property>
        <property name="text">
         <string>&amp;Reload</string>
        </property>
@@ -67,6 +70,9 @@
       <widget class="QPushButton" name="pushButton_stop">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Stop reading the potfile.</string>
        </property>
        <property name="text">
         <string>&amp;Stop</string>
@@ -179,6 +185,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_close">
+       <property name="toolTip">
+        <string>Close the dialog.</string>
+       </property>
        <property name="text">
         <string>&amp;Close</string>
        </property>
