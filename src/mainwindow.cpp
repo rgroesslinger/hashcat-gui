@@ -690,6 +690,19 @@ void MainWindow::connectDependencySignals()
     bindDisabled(ui->checkBox_potfile_disable, {ui->label_potfile_path, ui->lineEdit_potfile_path,
                                                 ui->pushButton_open_potfile_path});
 
+    // hashcat refuses --remove with --keep-guessing. Disable the other box; a
+    // restored pair stays enabled so one can be cleared. Validation is the guard.
+    const auto updateRemoveKeepGuessing = [this] {
+        const bool remove = ui->checkBox_remove->isChecked();
+        const bool keep = ui->checkBox_keep_guessing->isChecked();
+        const bool both = remove && keep;
+        ui->checkBox_remove->setEnabled(!keep || both);
+        ui->checkBox_keep_guessing->setEnabled(!remove || both);
+    };
+    connect(ui->checkBox_remove, &QCheckBox::toggled, this, updateRemoveKeepGuessing);
+    connect(ui->checkBox_keep_guessing, &QCheckBox::toggled, this, updateRemoveKeepGuessing);
+    updateRemoveKeepGuessing();
+
     // The option dependencies that follow a checkbox, not the attack mode.
     bindEnabled(ui->checkBox_increment,
                 {ui->label_increment_min, ui->spinBox_increment_min, ui->label_increment_max,

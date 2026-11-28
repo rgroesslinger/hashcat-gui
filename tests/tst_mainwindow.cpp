@@ -87,6 +87,7 @@ private slots:
     void loadExampleSessionAppliesTheBundledSession();
     void loadExampleSessionUnpacksItsDataFiles();
     void optionDependenciesFollowTheirCheckboxes();
+    void removeAndKeepGuessingExcludeEachOther();
     void outfileJsonTakesOverFromTheFormatField();
     void potfileDisableTakesOverFromThePathField();
     void rulesFileFieldsObeyTheGeneratedSide();
@@ -645,6 +646,33 @@ void TestMainWindow::optionDependenciesFollowTheirCheckboxes()
     MainWindowTestAccess::ui(window)->checkBox_potfile_disable->setChecked(false);
     QVERIFY(MainWindowTestAccess::ui(window)->lineEdit_potfile_path->isEnabled());
     QVERIFY(MainWindowTestAccess::ui(window)->pushButton_open_potfile_path->isEnabled());
+}
+
+void TestMainWindow::removeAndKeepGuessingExcludeEachOther()
+{
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+
+    QVERIFY(ui->checkBox_remove->isEnabled());
+    QVERIFY(ui->checkBox_keep_guessing->isEnabled());
+
+    ui->checkBox_remove->setChecked(true);
+    QVERIFY(ui->checkBox_remove->isEnabled());
+    QVERIFY(!ui->checkBox_keep_guessing->isEnabled());
+
+    // A restored session can carry both; both stay enabled so one can be
+    // cleared instead of leaving the pair stuck.
+    ui->checkBox_keep_guessing->setChecked(true);
+    QVERIFY(ui->checkBox_remove->isEnabled());
+    QVERIFY(ui->checkBox_keep_guessing->isEnabled());
+
+    ui->checkBox_remove->setChecked(false);
+    QVERIFY(!ui->checkBox_remove->isEnabled());
+    QVERIFY(ui->checkBox_keep_guessing->isEnabled());
+
+    ui->checkBox_keep_guessing->setChecked(false);
+    QVERIFY(ui->checkBox_remove->isEnabled());
+    QVERIFY(ui->checkBox_keep_guessing->isEnabled());
 }
 
 // JSON and the format field are exclusive: the box takes the field over,
