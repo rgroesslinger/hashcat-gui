@@ -23,6 +23,7 @@
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -62,6 +63,7 @@ private slots:
     void attackTabGroupBoxesAlignTheirContentToTheTop();
     void windowFitsItsContent();
     void windowFitsEveryAttackMode();
+    void hiddenRowsCollapse();
     void commandBarStaysVisibleOnEveryTab();
     void noShortcutCombinesControlAndAlt();
     void noUiFileContainsAsciiEllipsis();
@@ -312,6 +314,59 @@ void TestLayout::windowFitsEveryAttackMode()
         QTRY_VERIFY(!attackArea->verticalScrollBar()->isVisible());
         QTRY_VERIFY(!attackArea->horizontalScrollBar()->isVisible());
     }
+}
+
+// The recipe and association rows hide their label and field together. The
+// row layout has to collapse, not leave an empty strip between its neighbours.
+void TestLayout::hiddenRowsCollapse()
+{
+    // A configured path keeps the constructor from queueing the settings
+    // dialog, which would otherwise block processEvents() below.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+
+    MainWindow window;
+    window.show();
+    QCoreApplication::processEvents();
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+
+    ui->comboBox_hash_type->addItem(QStringLiteral("0 | MD5"), 0);
+    ui->comboBox_hash_type->addItem(QStringLiteral("4000 | phpass"), 4000);
+
+    auto *recipeRow =
+        window.findChild<QHBoxLayout *>(QStringLiteral("horizontalLayout_hash_recipe"));
+    auto *associationRow =
+        window.findChild<QHBoxLayout *>(QStringLiteral("horizontalLayout_association_settings"));
+    QVERIFY(recipeRow != nullptr);
+    QVERIFY(associationRow != nullptr);
+
+    const auto rowHeight = [](const QHBoxLayout *row) { return row->geometry().height(); };
+
+    ui->comboBox_hash_type->setCurrentIndex(ui->comboBox_hash_type->findData(0));
+    QCoreApplication::processEvents();
+    QVERIFY(ui->label_hash_recipe->isHidden());
+    QCOMPARE(rowHeight(recipeRow), 0);
+
+    ui->comboBox_hash_type->setCurrentIndex(ui->comboBox_hash_type->findData(4000));
+    QCoreApplication::processEvents();
+    QVERIFY(!ui->label_hash_recipe->isHidden());
+    QVERIFY(rowHeight(recipeRow) > 0);
+
+    const int association =
+        ui->comboBox_attack->findData(static_cast<int>(AttackMode::Association));
+    const int straight = ui->comboBox_attack->findData(static_cast<int>(AttackMode::Straight));
+    QVERIFY(association >= 0);
+    QVERIFY(straight >= 0);
+
+    ui->comboBox_attack->setCurrentIndex(association);
+    QCoreApplication::processEvents();
+    QVERIFY(!ui->label_association_settings->isHidden());
+    QVERIFY(rowHeight(associationRow) > 0);
+
+    ui->comboBox_attack->setCurrentIndex(straight);
+    QCoreApplication::processEvents();
+    QVERIFY(ui->label_association_settings->isHidden());
+    QCOMPARE(rowHeight(associationRow), 0);
 }
 
 // The command bar belongs to the window, not to one tab: switching tabs must
