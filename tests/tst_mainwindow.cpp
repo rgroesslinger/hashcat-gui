@@ -117,6 +117,7 @@ private slots:
     void tableMoveButtonsReorderRows();
     void theDefaultsMatchTheUiFiles();
     void switchingTheAttackModeRebuildsThePreviewOnce();
+    void textEditsDebounceButTogglesAreImmediate();
     void destroyingTheWindowWithListRowsIsSafe();
     void everyCommandWidgetReachesThePreview();
     void listRowEventsRebuildThePreviewOnce();
@@ -861,6 +862,7 @@ void TestMainWindow::hashRecipeRowFollowsTheHashType()
     // and the preview quotes it for display and for the clipboard.
     MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->setText(
         QStringLiteral("md5(md5(salt) . pass)"));
+    MainWindowTestAccess::flushCommandPreview(window);
 
     const QStringList arguments = MainWindowTestAccess::generateArguments(window);
     const qsizetype flag = arguments.indexOf(QStringLiteral("--hash-recipe"));
@@ -2087,11 +2089,39 @@ void TestMainWindow::importingSettingsReRunsTheQueryWhenTheBinaryChanged()
     QCOMPARE(MainWindowTestAccess::ui(window)->comboBox_hash_type->itemData(1).toUInt(), 1400U);
 }
 
+// Typed text settles on a short timer; a check box rebuilds at once.
+void TestMainWindow::textEditsDebounceButTogglesAreImmediate()
+{
+    // A configured path keeps the constructor from queueing the settings
+    // dialog; QTRY spins the event loop and would open it.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+
+    MainWindow window;
+    Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
+    const auto rebuilds = [&window] { return MainWindowTestAccess::previewRebuilds(window); };
+
+    const int start = rebuilds();
+    ui->lineEdit_session->setText(QStringLiteral("a"));
+    ui->lineEdit_session->setText(QStringLiteral("ab"));
+    QCOMPARE(rebuilds(), start);
+    QTRY_COMPARE(rebuilds(), start + 1);
+
+    const int afterText = rebuilds();
+    ui->checkBox_force->setChecked(true);
+    QCOMPARE(rebuilds(), afterText + 1);
+}
+
 // The wiring loop and the serializer share one walk: every command widget
 // it connects has to reach the preview, and the excluded ones are the
 // preview itself, the two staging fields and the attack combo's own slot.
 void TestMainWindow::everyCommandWidgetReachesThePreview()
 {
+    // A configured path keeps the constructor from queueing the settings
+    // dialog; QTRY spins the event loop below.
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+
     MainWindow window;
     Ui::MainWindow *ui = MainWindowTestAccess::ui(window);
     // The hash combo is filled asynchronously in the application; fill it by
@@ -2110,7 +2140,8 @@ void TestMainWindow::everyCommandWidgetReachesThePreview()
         }
         const int before = rebuilds();
         edit->setText(edit->text() + QStringLiteral("x"));
-        QVERIFY2(rebuilds() > before, qPrintable(edit->objectName()));
+        // Wait for the real timer; a flush would hide a missing connection.
+        QTRY_COMPARE_WITH_TIMEOUT(rebuilds(), before + 1, 2000);
         ++touched;
     }
     for (QCheckBox *checkBox : widgets.checkBoxes) {

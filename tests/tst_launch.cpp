@@ -72,6 +72,7 @@ private slots:
     void previewUsesTheConfiguredTerminalsDialect();
     void thePreviewTooltipHoldsTheWholeCommand();
     void copyingTheCommandPutsItOnTheClipboard();
+    void copyingFlushesAPendingTextEdit();
     void copyingThePowerShellScriptPutsItOnTheClipboard();
 
 private:
@@ -82,6 +83,7 @@ void TestLaunch::commandPreviewFollowsWidgetChanges()
 {
     MainWindow window;
     QLineEdit *preview = MainWindowTestAccess::ui(window)->lineEdit_command;
+    const auto flush = [&window] { MainWindowTestAccess::flushCommandPreview(window); };
 
     QCOMPARE(preview->text(), QStringLiteral("--attack-mode 0"));
 
@@ -93,6 +95,7 @@ void TestLaunch::commandPreviewFollowsWidgetChanges()
     QVERIFY(preview->text().contains(QStringLiteral("--username")));
 
     MainWindowTestAccess::ui(window)->lineEdit_backend_devices->setText(QStringLiteral("1,2"));
+    flush();
     QVERIFY(preview->text().contains(QStringLiteral("--backend-devices 1,2")));
 
     MainWindowTestAccess::ui(window)->checkBox_hwmon_temp_abort->setChecked(true);
@@ -100,6 +103,7 @@ void TestLaunch::commandPreviewFollowsWidgetChanges()
     QVERIFY(preview->text().contains(QStringLiteral("--hwmon-temp-abort 85")));
 
     MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("job"));
+    flush();
     QVERIFY(preview->text().contains(QStringLiteral("--session job")));
 
     MainWindowTestAccess::ui(window)->checkBox_force->setChecked(true);
@@ -127,6 +131,7 @@ void TestLaunch::commandPreviewFollowsWidgetChanges()
     MainWindowTestAccess::ui(window)->comboBox_hash_type->setCurrentIndex(
         MainWindowTestAccess::ui(window)->comboBox_hash_type->findData(4000));
     MainWindowTestAccess::ui(window)->lineEdit_hash_recipe->setText(QStringLiteral("md5($p)"));
+    flush();
     QVERIFY(preview->text().contains(QStringLiteral("--hash-recipe")));
     QVERIFY(preview->text().contains(QStringLiteral("md5($p)")));
 
@@ -136,6 +141,7 @@ void TestLaunch::commandPreviewFollowsWidgetChanges()
     QVERIFY(preview->text().contains(QStringLiteral("--attack-mode 3")));
 
     MainWindowTestAccess::ui(window)->lineEdit_mask->setText(QStringLiteral("?d?d"));
+    flush();
     QVERIFY(preview->text().contains(QStringLiteral("?d?d")));
 
     MainWindowTestAccess::ui(window)->checkBox_increment->setChecked(true);
@@ -334,12 +340,14 @@ void TestLaunch::previewUsesTheConfiguredTerminalsDialect()
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
                                        QStringLiteral("pwsh"));
     MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("job"));
+    MainWindowTestAccess::flushCommandPreview(window);
     QCOMPARE(preview->text(), QStringLiteral("& hashcat --attack-mode 0 --session job"));
 
     // A POSIX terminal brings the other dialect back.
     SettingsManager::instance().setKey(AppConstants::SettingsKeys::Terminal,
                                        QStringLiteral("konsole"));
     MainWindowTestAccess::ui(window)->lineEdit_session->setText(QStringLiteral("job2"));
+    MainWindowTestAccess::flushCommandPreview(window);
     QCOMPARE(preview->text(), QStringLiteral("hashcat --attack-mode 0 --session job2"));
 }
 
@@ -383,6 +391,23 @@ void TestLaunch::copyingTheCommandPutsItOnTheClipboard()
     // The confirmation is a one-shot tooltip at the pointer.
     QVERIFY(QToolTip::text().contains(QStringLiteral("Copied")));
     QToolTip::hideText();
+}
+
+// Copy is not a preview refresh: an unsettled text edit must still reach it.
+void TestLaunch::copyingFlushesAPendingTextEdit()
+{
+    SettingsManager::instance().setKey(AppConstants::SettingsKeys::HashcatPath,
+                                       QStringLiteral("/nonexistent/hashcat"));
+
+    MainWindow window;
+    auto *ui = MainWindowTestAccess::ui(window);
+
+    ui->lineEdit_session->setText(QStringLiteral("pending"));
+    QVERIFY(QMetaObject::invokeMethod(&window, "copyCommandToClipboard"));
+
+    QVERIFY2(QApplication::clipboard()->text().contains(QStringLiteral("--session pending")),
+             qPrintable(QApplication::clipboard()->text()));
+    QApplication::clipboard()->clear();
 }
 
 // The Tools action copies the readable script the PowerShell launch encodes,

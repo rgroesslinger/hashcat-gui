@@ -381,6 +381,8 @@ inline constexpr int PotfileMaxFingerprints = 1000000;
 // re-scanning the whole table on every keystroke. Small tables stay immediate.
 inline constexpr int PotfileFilterDebounceThreshold = 5000;
 inline constexpr int PotfileFilterDebounceMs = 150;
+// Typed text settles for this long before the command preview rebuilds.
+inline constexpr int CommandPreviewDebounceMs = 50;
 // A value starting with '-' would be read as an option, not as the hash to identify.
 inline constexpr QLatin1StringView OptionTerminator{"--"};
 // Backend init can be slow on a fresh driver; queries that need it get longer.

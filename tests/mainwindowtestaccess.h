@@ -114,6 +114,12 @@ struct MainWindowTestAccess {
         return window.m_previewRebuilds;
     }
 
+    static void flushCommandPreview(MainWindow &window)
+    {
+        window.m_commandTimer.stop();
+        window.commandChanged();
+    }
+
     static QJsonObject defaultSnapshot(MainWindow &window)
     {
         return window.m_defaultSnapshot.value_or(QJsonObject{});

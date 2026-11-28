@@ -21,6 +21,7 @@
 #include <QListWidgetItem>
 #include <QMainWindow>
 #include <QShowEvent>
+#include <QTimer>
 #include <memory>
 #include <optional>
 
@@ -117,6 +118,7 @@ private slots:
     void attackIndexChanged(int index);
     void hashTypeEditingFinished();
 
+    void scheduleCommandChanged();
     void commandChanged();
     // The recipe row belongs to hash mode 4000 alone; the hash type combo
     // decides whether it exists.
@@ -190,6 +192,8 @@ private:
     // widgets.
     HashcatOptions collectHashcatOptions();
     QStringList generateArguments();
+    // The command line as the preview shows it, built from the current widgets.
+    QString commandPreviewText();
 
     // Validates the potfile form state and resolves the input and program.
     // Shows the user-facing error itself and returns false on refusal.
@@ -270,6 +274,8 @@ private:
         explicit CommandSilence(MainWindow &window) : m_window(window)
         {
             ++m_window.m_commandSilenceDepth;
+            // A text edit queued before the bulk write must not fire after it.
+            m_window.m_commandTimer.stop();
         }
         ~CommandSilence()
         {
@@ -293,6 +299,8 @@ private:
     bool m_sessionRestored = false;
 
     int m_commandSilenceDepth = 0;
+    // Text edits settle here; checks, radios, spins and combos rebuild at once.
+    QTimer m_commandTimer;
     // The rebuilds commandChanged() actually performed; the tests pin the
     // bulk writes to exactly one.
     int m_previewRebuilds = 0;

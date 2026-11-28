@@ -513,6 +513,10 @@ void MainWindow::updatePathMonitorBasePaths()
 // connection; the attack combo refreshes the preview via attackIndexChanged().
 void MainWindow::connectCommandSignals()
 {
+    m_commandTimer.setSingleShot(true);
+    m_commandTimer.setInterval(AppConstants::Hashcat::CommandPreviewDebounceMs);
+    connect(&m_commandTimer, &QTimer::timeout, this, &MainWindow::commandChanged);
+
     const StateWidgetLists widgets = collectStateWidgets(this);
 
     for (QLineEdit *edit : widgets.lineEdits) {
@@ -522,7 +526,7 @@ void MainWindow::connectCommandSignals()
             || edit == ui->lineEdit_pcfg_ruleset_name) {
             continue;
         }
-        connect(edit, &QLineEdit::textChanged, this, &MainWindow::commandChanged);
+        connect(edit, &QLineEdit::textChanged, this, &MainWindow::scheduleCommandChanged);
     }
     for (QCheckBox *checkBox : widgets.checkBoxes) {
         connect(checkBox, &QAbstractButton::toggled, this, &MainWindow::commandChanged);
@@ -1953,7 +1957,8 @@ void MainWindow::copyCommandToClipboard()
     if (refuseWhileHashTypesLoad(tr("Copy command"))) {
         return;
     }
-    QString text = ui->lineEdit_command->text();
+    // A pending text edit must not leave the clipboard with the previous command.
+    const QString text = commandPreviewText();
     // QApplication::clipboard() is null on platforms without clipboard support
     QClipboard *clipboard = QApplication::clipboard();
     if (clipboard) {
@@ -2194,27 +2199,44 @@ bool MainWindow::refuseWhileHashTypesLoad(const QString &title)
 
 /*************** Helper ***************/
 
+void MainWindow::scheduleCommandChanged()
+{
+    // A bulk write is in progress: it rebuilds the preview once, at its end.
+    if (m_commandSilenceDepth > 0) {
+        return;
+    }
+    m_commandTimer.start();
+}
+
 void MainWindow::commandChanged()
 {
+    // An explicit rebuild supersedes a queued text edit.
+    m_commandTimer.stop();
     // A bulk write is in progress: it rebuilds the preview once, at its end.
     if (m_commandSilenceDepth > 0) {
         return;
     }
     ++m_previewRebuilds;
 
-    auto &settings = SettingsManager::instance();
-    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
-    const QString binary = hashcatPath.isEmpty() ? QString() : QFileInfo(hashcatPath).fileName();
-    const CommandPreview::Dialect dialect =
-        previewDialect(settings.getKey<QString>(AppConstants::SettingsKeys::Terminal));
-
-    const QString command = CommandPreview::format(binary, generateArguments(), dialect);
+    const QString command = commandPreviewText();
     ui->lineEdit_command->setText(command);
     ui->lineEdit_command->setCursorPosition(0);
 
     // The line edit shows the beginning of the command only - it is as wide as
     // the window and the command is not. The tooltip carries all of it.
+    const CommandPreview::Dialect dialect = previewDialect(
+        SettingsManager::instance().getKey<QString>(AppConstants::SettingsKeys::Terminal));
     ui->lineEdit_command->setToolTip(CommandPreview::tooltip(command, dialect));
+}
+
+QString MainWindow::commandPreviewText()
+{
+    auto &settings = SettingsManager::instance();
+    const QString hashcatPath = settings.getKey<QString>(AppConstants::SettingsKeys::HashcatPath);
+    const QString binary = hashcatPath.isEmpty() ? QString() : QFileInfo(hashcatPath).fileName();
+    const CommandPreview::Dialect dialect =
+        previewDialect(settings.getKey<QString>(AppConstants::SettingsKeys::Terminal));
+    return CommandPreview::format(binary, generateArguments(), dialect);
 }
 
 HashcatOptions MainWindow::collectHashcatOptions()
