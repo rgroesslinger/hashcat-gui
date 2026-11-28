@@ -129,6 +129,12 @@ bool showLaunchCommand()
         AppConstants::SettingsKeys::defaultOf<bool>(AppConstants::SettingsKeys::ShowLaunchCommand));
 }
 
+// Shared construction for the repeated option shapes.
+QRegularExpressionValidator *makeValidator(QLatin1StringView shape, QWidget *parent)
+{
+    return new QRegularExpressionValidator(QRegularExpression(QString(shape)), parent);
+}
+
 // Messages that carry a path or hashcat output are plain text: AutoText would
 // read a leading '<' as markup.
 void showPlainMessage(QWidget *parent, QMessageBox::Icon icon, const QString &title,
@@ -349,22 +355,21 @@ void MainWindow::configureWidgets()
 
     // -s and -l take a plain number; a digit-only validator keeps a value
     // hashcat would refuse to start from ever reaching the command line.
-    const QRegularExpression digits{QString(AppConstants::Validation::Digits)};
-    ui->lineEdit_skip->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_skip));
-    ui->lineEdit_limit->setValidator(new QRegularExpressionValidator(digits, ui->lineEdit_limit));
+    ui->lineEdit_skip->setValidator(
+        makeValidator(AppConstants::Validation::Digits, ui->lineEdit_skip));
+    ui->lineEdit_limit->setValidator(
+        makeValidator(AppConstants::Validation::Digits, ui->lineEdit_limit));
 
     // -D 3 (the accelerators) is gone with hashcat 8.0.0. The field was free
     // text, so a 3 typed here only failed after the launch, in the terminal;
     // the validator keeps the accepted device types where the user sees it.
-    const QRegularExpression deviceTypes{QString(AppConstants::Validation::DeviceTypes)};
     ui->lineEdit_opencl_device_types->setValidator(
-        new QRegularExpressionValidator(deviceTypes, ui->lineEdit_opencl_device_types));
+        makeValidator(AppConstants::Validation::DeviceTypes, ui->lineEdit_opencl_device_types));
 
     // --outfile-format is free text, but hashcat takes only 1..6 in a comma
     // separated list. The launch check repeats this for values a session set.
-    const QRegularExpression outfileFormat{QString(AppConstants::Validation::OutfileFormatList)};
     ui->lineEdit_outfile_format->setValidator(
-        new QRegularExpressionValidator(outfileFormat, ui->lineEdit_outfile_format));
+        makeValidator(AppConstants::Validation::OutfileFormatList, ui->lineEdit_outfile_format));
 
     // The settings of the PCFG and table feeds, which hashcat parses itself
     // - and only after it has set up the backend devices, long after the
@@ -389,15 +394,14 @@ void MainWindow::configureWidgets()
         {ui->lineEdit_table_single, AppConstants::Validation::BinaryFlag},
     });
     for (const auto &[edit, shape] : feedShapes) {
-        edit->setValidator(
-            new QRegularExpressionValidator(QRegularExpression(QString(shape)), edit));
+        edit->setValidator(makeValidator(shape, edit));
     }
     // cap and maxperm reach beyond every Qt integer type (0…0xffffffff and a
     // full u64); the digits are filtered here, the bounds in validateOptions.
     ui->lineEdit_table_cap->setValidator(
-        new QRegularExpressionValidator(digits, ui->lineEdit_table_cap));
+        makeValidator(AppConstants::Validation::Digits, ui->lineEdit_table_cap));
     ui->lineEdit_table_maxperm->setValidator(
-        new QRegularExpressionValidator(digits, ui->lineEdit_table_maxperm));
+        makeValidator(AppConstants::Validation::Digits, ui->lineEdit_table_maxperm));
 
     /* ---------- help tooltips: translatable label + fixed reference tables -- */
     const QString charsetTip =
