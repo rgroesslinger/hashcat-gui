@@ -44,7 +44,7 @@ public:
 
     static Result parse(const QString &output,
                         int maxEntries = AppConstants::Hashcat::PotfileMaxEntries,
-                        HashcatRunner::CancelToken cancel = {});
+                        const HashcatRunner::CancelToken &cancel = {});
 
     // hashcat prints diagnostics to stdout before the payload. Returns the
     // offset of the first payload character, skipping known leading blocks.

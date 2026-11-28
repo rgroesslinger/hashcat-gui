@@ -28,8 +28,12 @@
         <translation>正在检查更新…</translation>
     </message>
     <message>
-        <source>Ask GitHub whether a newer release is available</source>
-        <translation>询问 GitHub 是否有较新的版本可用</translation>
+        <source>Ask GitHub whether a newer release is available.</source>
+        <translation>询问 GitHub 是否有更新版本。</translation>
+    </message>
+    <message>
+        <source>Copy the application, toolkit, system and hashcat versions to the clipboard.</source>
+        <translation>将应用程序、工具包、系统和 hashcat 的版本复制到剪贴板。</translation>
     </message>
     <message>
         <source>Check for updates</source>
@@ -50,10 +54,6 @@
     <message>
         <source>License</source>
         <translation>许可证</translation>
-    </message>
-    <message>
-        <source>Copy the application, toolkit, system and hashcat versions to the clipboard</source>
-        <translation>将应用程序、工具包、系统和 hashcat 的版本复制到剪贴板</translation>
     </message>
     <message>
         <source>Copy details</source>
@@ -204,6 +204,81 @@
     </message>
 </context>
 <context>
+    <name>BackendInfoDialog</name>
+    <message>
+        <source>Backend information</source>
+        <translation>后端信息</translation>
+    </message>
+    <message>
+        <source>Query hashcat again for backend information.</source>
+        <translation>再次向 hashcat 查询后端信息。</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>刷新(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Stop the running query.</source>
+        <translation>停止正在运行的查询。</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>取消(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Copy the backend information to the clipboard.</source>
+        <translation>将后端信息复制到剪贴板。</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>复制(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>关闭对话框。</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>关闭(&amp;O)</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>未配置 hashcat 可执行文件。请在设置中指定。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>未找到已配置的 hashcat 可执行文件：
+%1</translation>
+    </message>
+    <message>
+        <source>Reading backend information…</source>
+        <translation>正在读取后端信息…</translation>
+    </message>
+    <message>
+        <source>Backend query cancelled.</source>
+        <translation>后端查询已取消。</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while reading backend information.</source>
+        <translation>hashcat 读取后端信息时超时。</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information.</source>
+        <translation>hashcat 无法读取后端信息。</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information:
+%1</source>
+        <translation>hashcat 无法读取后端信息：
+%1</translation>
+    </message>
+    <message>
+        <source>Backend information reported by hashcat.</source>
+        <translation>hashcat 报告的后端信息。</translation>
+    </message>
+</context>
+<context>
     <name>ExampleSession</name>
     <message>
         <source>Could not create the example directory “%1”.</source>
@@ -255,10 +330,217 @@
     </message>
 </context>
 <context>
+    <name>IdentifyDialog</name>
+    <message>
+        <source>Identify hash</source>
+        <translation>识别哈希</translation>
+    </message>
+    <message>
+        <source>&amp;Hash or hash file:</source>
+        <translation>哈希或哈希文件(&amp;H)：</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file to identify.</source>
+        <translation>粘贴哈希或选择哈希文件以进行识别。</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file</source>
+        <translation>粘贴哈希或选择哈希文件</translation>
+    </message>
+    <message>
+        <source>Choose a hash file.</source>
+        <translation>选择一个哈希文件。</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>浏览(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Identify the hash type of the entered hash.</source>
+        <translation>识别所输入哈希的哈希类型。</translation>
+    </message>
+    <message>
+        <source>&amp;Identify</source>
+        <translation>识别(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Paste a hash or choose a hash file, then select Identify.</source>
+        <translation>粘贴哈希或选择哈希文件，然后选择“识别”。</translation>
+    </message>
+    <message>
+        <source>Identification progress</source>
+        <translation>识别进度</translation>
+    </message>
+    <message>
+        <source>Elapsed time</source>
+        <translation>已用时间</translation>
+    </message>
+    <message>
+        <source>Matching hash types; select one and apply it to the attack.</source>
+        <translation>匹配的哈希类型；选择一个并应用到攻击。</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>模式</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名称</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>类别</translation>
+    </message>
+    <message>
+        <source>Use the selected hash type in the attack.</source>
+        <translation>在攻击中使用所选的哈希类型。</translation>
+    </message>
+    <message>
+        <source>Apply mode to attack</source>
+        <translation>将模式应用到攻击</translation>
+    </message>
+    <message>
+        <source>Stop the running identification.</source>
+        <translation>停止正在运行的识别。</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>取消(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>关闭对话框。</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>关闭(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Elapsed: %1 s</source>
+        <translation>已用时间：%1 秒</translation>
+    </message>
+    <message>
+        <source>Multiple lines pasted. Use Browse to select a hash file, or paste one hash.</source>
+        <translation>粘贴了多行内容。请使用“浏览”选择哈希文件，或只粘贴一个哈希。</translation>
+    </message>
+    <message>
+        <source>Input changed. Identify it again.</source>
+        <translation>输入已更改。请重新识别。</translation>
+    </message>
+    <message>
+        <source>Select a hash file</source>
+        <translation>选择哈希文件</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>请先输入哈希或选择哈希文件。</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>未配置 hashcat 可执行文件。请在设置中指定。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>未找到已配置的 hashcat 可执行文件：
+%1</translation>
+    </message>
+    <message>
+        <source>Identifying hash…</source>
+        <translation>正在识别哈希…</translation>
+    </message>
+    <message>
+        <source>Identification cancelled.</source>
+        <translation>识别已取消。</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while identifying the hash.</source>
+        <translation>hashcat 识别哈希时超时。</translation>
+    </message>
+    <message>
+        <source>No hash modes match this structure.</source>
+        <translation>没有哈希模式与此结构匹配。</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode and hash to the attack.</source>
+        <translation>有 1 种哈希模式与此结构匹配。请选择它，并将模式和哈希应用到攻击。</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode to the attack.</source>
+        <translation>有 1 种哈希模式与此结构匹配。请选择它，并将模式应用到攻击。</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode and hash to the attack.</source>
+        <translation>有 %1 种哈希模式与此结构匹配。请选择一种，并将模式和哈希应用到攻击。</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode to the attack.</source>
+        <translation>有 %1 种哈希模式与此结构匹配。请选择一种，并将模式应用到攻击。</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>正在取消…</translation>
+    </message>
+    <message>
+        <source>Apply mode and hash to attack</source>
+        <translation>将模式和哈希应用到攻击</translation>
+    </message>
+    <message>
+        <source>Another hashcat instance is using this session. Close it and try again.</source>
+        <translation>另一个 hashcat 实例正在使用此会话。请关闭它后重试。</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat 无法从输入中加载任何哈希。</translation>
+    </message>
+    <message>
+        <source>The input contains characters hashcat cannot encode.</source>
+        <translation>输入包含 hashcat 无法编码的字符。</translation>
+    </message>
+    <message>
+        <source>hashcat reported:
+%1</source>
+        <translation>hashcat 报告：
+%1</translation>
+    </message>
+    <message>
+        <source>hashcat’s output could not be parsed. Check the hashcat version or report a bug.</source>
+        <translation>无法解析 hashcat 的输出。请检查 hashcat 版本或报告错误。</translation>
+    </message>
+</context>
+<context>
     <name>LaunchMessage</name>
     <message>
         <source>Windows executable names include their extension, for example hashcat.exe.</source>
         <translation>Windows 可执行文件名包含其扩展名，例如 hashcat.exe。</translation>
+    </message>
+    <message>
+        <source>hash file</source>
+        <translation>哈希文件</translation>
+    </message>
+    <message>
+        <source>outfile</source>
+        <translation>输出文件</translation>
+    </message>
+    <message>
+        <source>potfile</source>
+        <translation>potfile</translation>
+    </message>
+    <message>
+        <source>wordlist</source>
+        <translation>字典</translation>
+    </message>
+    <message>
+        <source>rules file</source>
+        <translation>规则文件</translation>
+    </message>
+    <message>
+        <source>table</source>
+        <translation>表</translation>
+    </message>
+    <message>
+        <source>cache folder</source>
+        <translation>缓存文件夹</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -413,12 +695,72 @@ md5(md5(salt) . pass)。请在哈希配方字段中输入。</translation>
 %1</translation>
     </message>
     <message>
+        <source>The potfile path must be a writable file, or a new file in an existing writable folder:
+%1</source>
+        <translation>potfile 路径必须是可写文件，或已存在可写文件夹中的新文件：
+%1</translation>
+    </message>
+    <message>
+        <source>The skip or limit value must be a whole number from 0 to %1:
+%2</source>
+        <translation>跳过或限制值必须是 0 到 %1 的整数：
+%2</translation>
+    </message>
+    <message>
+        <source>The device types must be 1 (CPU) or 2 (GPU), separated by commas:
+%1</source>
+        <translation>设备类型必须是 1（CPU）或 2（GPU），以逗号分隔：
+%1</translation>
+    </message>
+    <message>
+        <source>The CPU affinity must be a comma-separated list of CPU numbers:
+%1</source>
+        <translation>CPU 亲和性必须是以逗号分隔的 CPU 编号列表：
+%1</translation>
+    </message>
+    <message>
+        <source>The backend devices must be a comma-separated list of device numbers starting at 1:
+%1</source>
+        <translation>后端设备必须是以逗号分隔、从 1 开始的设备编号列表：
+%1</translation>
+    </message>
+    <message>
+        <source>The session name must not contain a path separator:
+%1</source>
+        <translation>会话名称不能包含路径分隔符：
+%1</translation>
+    </message>
+    <message>
+        <source>A ruleset folder needs Grammar/grammar.txt; choose a rules file instead:
+%1</source>
+        <translation>规则集文件夹需要 Grammar/grammar.txt；请改为选择规则文件：
+%1</translation>
+    </message>
+    <message>
+        <source>A table has to be a file; hashcat does not read a folder:
+%1</source>
+        <translation>表必须是文件；hashcat 不读取文件夹：
+%1</translation>
+    </message>
+    <message>
+        <source>The %1 and the %2 use the same path:
+%3
+hashcat writes one or both of them, so a run could change the file. Choose different paths.</source>
+        <translation>%1 和 %2 使用了相同的路径：
+%3
+hashcat 会写入其中之一或两者，因此运行可能会改变文件。请选择不同的路径。</translation>
+    </message>
+    <message>
         <source>The increment cannot be combined with the speed-only option.</source>
         <translation>递增不能与仅测速选项同时使用。</translation>
     </message>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>在“关联”攻击模式下无法移除已破解的哈希。</translation>
+    </message>
+    <message>
+        <source>Keep guessing cannot be combined with removing cracked hashes from the hash file. Clear either option.</source>
+        <translation>持续猜测不能与从哈希文件中移除已破解的哈希同时使用。请清除其中一个选项。</translation>
     </message>
     <message>
         <source>This value contains a control character that cannot be passed to hashcat:
@@ -439,10 +781,6 @@ Remove the character and try again.</source>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Hash file or hash:</source>
-        <translation>哈希文件或哈希：</translation>
-    </message>
     <message>
         <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
         <translation>哈希、哈希文件，或 .hc22000/.hccapx 格式的 WPA 抓包文件。</translation>
@@ -472,16 +810,8 @@ Remove the character and try again.</source>
         <translation>哈希配方，例如“md5(md5(salt) . pass)”。请用 Shell 的外层引号包住整个配方，内部字符串则使用另一种引号；PowerShell 需要在 $ 前加反引号。</translation>
     </message>
     <message>
-        <source>Move item up</source>
-        <translation>上移</translation>
-    </message>
-    <message>
         <source>Move selected wordlist up</source>
         <translation>上移所选字典</translation>
-    </message>
-    <message>
-        <source>Move item down</source>
-        <translation>下移</translation>
     </message>
     <message>
         <source>Move selected wordlist down</source>
@@ -508,14 +838,6 @@ Remove the character and try again.</source>
         <translation>字典为十六进制</translation>
     </message>
     <message>
-        <source>Encoding from:</source>
-        <translation>源编码：</translation>
-    </message>
-    <message>
-        <source>Encoding to:</source>
-        <translation>目标编码：</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>规则集文件、包含 Grammar/grammar.txt 的文件夹，或内置名称。未勾选的行会被跳过；若一行都未勾选，则运行 default-passwords。</translation>
     </message>
@@ -536,24 +858,76 @@ Remove the character and try again.</source>
         <translation>移除规则集</translation>
     </message>
     <message>
+        <source>Move selected ruleset up.</source>
+        <translation>上移所选规则集。</translation>
+    </message>
+    <message>
         <source>Move selected ruleset up</source>
         <translation>上移所选规则集</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down.</source>
+        <translation>下移所选规则集。</translation>
     </message>
     <message>
         <source>Move selected ruleset down</source>
         <translation>下移所选规则集</translation>
     </message>
     <message>
+        <source>Sca&amp;le:</source>
+        <translation>缩放(&amp;L)：</translation>
+    </message>
+    <message>
+        <source>Quantization steps per bit (1–64).</source>
+        <translation>每位的量化步数（1–64）。</translation>
+    </message>
+    <message>
+        <source>&amp;Costmax:</source>
+        <translation>成本上限(&amp;C)：</translation>
+    </message>
+    <message>
+        <source>Highest cost level to enumerate (1–64).</source>
+        <translation>要枚举的最高层级成本（1–64）。</translation>
+    </message>
+    <message>
+        <source>&amp;Weights:</source>
+        <translation>权重(&amp;W)：</translation>
+    </message>
+    <message>
+        <source>&amp;Kbits:</source>
+        <translation>Kbits(&amp;K)：</translation>
+    </message>
+    <message>
+        <source>Bits one inner loop may span (0–27).</source>
+        <translation>一次内层循环可能跨越的位数（0–27）。</translation>
+    </message>
+    <message>
+        <source>Ma&amp;xword:</source>
+        <translation>Maxword(&amp;X)：</translation>
+    </message>
+    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>内核构建的候选最大长度，以 4 字节字为单位：0（自动）、16 或 32。</translation>
+    </message>
+    <message>
+        <source>Max&amp;gain:</source>
+        <translation>Maxgain(&amp;G)：</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>以空格分隔的 key=value 设置：omen、cache、lookup、pwmin、pwmax、hintaccount、hintwords、hintfile、hintrank、hintrepeat。规则集放在最前面。</translation>
     </message>
     <message>
+        <source>Tables</source>
+        <translation>表</translation>
+    </message>
+    <message>
         <source>Add one or more table files.</source>
         <translation>添加一个或多个表文件。</translation>
+    </message>
+    <message>
+        <source>Add table</source>
+        <translation>添加表</translation>
     </message>
     <message>
         <source>Remove the selected tables.</source>
@@ -562,6 +936,14 @@ Remove the character and try again.</source>
     <message>
         <source>Remove tables</source>
         <translation>移除表</translation>
+    </message>
+    <message>
+        <source>Move selected table up.</source>
+        <translation>上移所选表。</translation>
+    </message>
+    <message>
+        <source>Move selected table down.</source>
+        <translation>下移所选表。</translation>
     </message>
     <message>
         <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
@@ -608,6 +990,14 @@ Remove the character and try again.</source>
         <translation>为 feed 按顺序添加一个参数。</translation>
     </message>
     <message>
+        <source>Add feed argument</source>
+        <translation>添加 feed 参数</translation>
+    </message>
+    <message>
+        <source>Feed arguments</source>
+        <translation>feed 参数</translation>
+    </message>
+    <message>
         <source>Remove the selected feed arguments.</source>
         <translation>移除所选 feed 参数。</translation>
     </message>
@@ -616,8 +1006,16 @@ Remove the character and try again.</source>
         <translation>移除 feed 参数</translation>
     </message>
     <message>
+        <source>Move selected feed argument up.</source>
+        <translation>上移所选 feed 参数。</translation>
+    </message>
+    <message>
         <source>Move selected feed argument up</source>
         <translation>上移所选 feed 参数</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down.</source>
+        <translation>下移所选 feed 参数。</translation>
     </message>
     <message>
         <source>Move selected feed argument down</source>
@@ -692,6 +1090,14 @@ Remove the character and try again.</source>
         <translation>掩码最大长度；0 表示省略该选项并使用 hashcat 的默认值（掩码长度）。</translation>
     </message>
     <message>
+        <source>Grow the mask from the right end instead of the left (hashcat -ii).</source>
+        <translation>从右端而非左端增长掩码（hashcat -ii）。</translation>
+    </message>
+    <message>
+        <source>Right-to-left</source>
+        <translation>从右到左</translation>
+    </message>
+    <message>
         <source>Use ?1 in the mask to insert this charset.</source>
         <translation>在掩码中使用 ?1 以插入此字符集。</translation>
     </message>
@@ -716,12 +1122,80 @@ Remove the character and try again.</source>
         <translation>字符集为十六进制</translation>
     </message>
     <message>
+        <source>&amp;Session name:</source>
+        <translation>会话名称(&amp;S)：</translation>
+    </message>
+    <message>
+        <source>R&amp;untime limit:</source>
+        <translation>运行时限(&amp;U)：</translation>
+    </message>
+    <message>
+        <source>&amp;Device types:</source>
+        <translation>设备类型(&amp;D)：</translation>
+    </message>
+    <message>
+        <source>Potfile:</source>
+        <translation>potfile：</translation>
+    </message>
+    <message>
+        <source>Read and write recovered hashes in this potfile instead of the default one.</source>
+        <translation>在此 potfile（而非默认 potfile）中读写已恢复的哈希。</translation>
+    </message>
+    <message>
+        <source>Choose the potfile path.</source>
+        <translation>选择 potfile 路径。</translation>
+    </message>
+    <message>
+        <source>Choose potfile</source>
+        <translation>选择 potfile</translation>
+    </message>
+    <message>
+        <source>Copy command to clipboard.</source>
+        <translation>将命令复制到剪贴板。</translation>
+    </message>
+    <message>
         <source>Command preview</source>
         <translation>命令预览</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat.</source>
+        <translation>复制用于启动 hashcat 的未编码 PowerShell 脚本。</translation>
+    </message>
+    <message>
+        <source>&amp;Identify Hash…</source>
+        <translation>识别哈希(&amp;I)…</translation>
+    </message>
+    <message>
+        <source>Ask hashcat which hash modes match a hash.</source>
+        <translation>询问 hashcat 哪些哈希模式与哈希匹配。</translation>
+    </message>
+    <message>
+        <source>&amp;Backend Information…</source>
+        <translation>后端信息(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Show the devices and backends hashcat detected.</source>
+        <translation>显示 hashcat 检测到的设备和后端。</translation>
+    </message>
+    <message>
+        <source>Check Against &amp;Potfile…</source>
+        <translation>对照 potfile 检查(&amp;P)…</translation>
+    </message>
+    <message>
+        <source>Check whether the hashes in the hash field are already in the potfile.</source>
+        <translation>检查哈希字段中的哈希是否已存在于 potfile 中。</translation>
+    </message>
+    <message>
+        <source>Potfile I&amp;nspector…</source>
+        <translation>potfile 检查器(&amp;N)…</translation>
+    </message>
+    <message>
+        <source>Browse an explicit potfile without hash-type verification.</source>
+        <translation>浏览指定的 potfile，无需验证哈希类型。</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -780,10 +1254,6 @@ Remove the character and try again.</source>
         <translation>重置会话</translation>
     </message>
     <message>
-        <source>Mode:</source>
-        <translation>模式：</translation>
-    </message>
-    <message>
         <source>Attack</source>
         <translation>攻击</translation>
     </message>
@@ -800,20 +1270,8 @@ Remove the character and try again.</source>
         <translation>攻击模式。每个选项会在下方显示各自的选项。</translation>
     </message>
     <message>
-        <source>Hash type:</source>
-        <translation>哈希类型：</translation>
-    </message>
-    <message>
-        <source>Hash recipe:</source>
-        <translation>哈希配方：</translation>
-    </message>
-    <message>
         <source>Add files…</source>
         <translation>添加文件…</translation>
-    </message>
-    <message>
-        <source>hashcat reads every file directly inside the folder as one wordlist.</source>
-        <translation>hashcat 会将文件夹中直接包含的每个文件作为一个字典读取。</translation>
     </message>
     <message>
         <source>Add folder…</source>
@@ -864,26 +1322,6 @@ Remove the character and try again.</source>
         <translation>规则集文件夹需要包含 Grammar/grammar.txt。</translation>
     </message>
     <message>
-        <source>Scale:</source>
-        <translation>Scale:</translation>
-    </message>
-    <message>
-        <source>Quantization steps per bit (1–64)</source>
-        <translation>每比特的量化步数（1–64）</translation>
-    </message>
-    <message>
-        <source>Costmax:</source>
-        <translation>Costmax:</translation>
-    </message>
-    <message>
-        <source>Highest cost level to enumerate (1–64)</source>
-        <translation>要枚举的最高开销级别（1–64）</translation>
-    </message>
-    <message>
-        <source>Weights:</source>
-        <translation>Weights:</translation>
-    </message>
-    <message>
         <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
         <translation>每个规则集一个正数，以冒号分隔，例如 2:1；数量必须与规则集的数量一致。</translation>
     </message>
@@ -898,22 +1336,6 @@ Remove the character and try again.</source>
     <message>
         <source>auto</source>
         <translation>自动</translation>
-    </message>
-    <message>
-        <source>Kbits:</source>
-        <translation>Kbits:</translation>
-    </message>
-    <message>
-        <source>Bits one inner loop may span (0–27)</source>
-        <translation>一个内层循环可跨越的位数（0–27）</translation>
-    </message>
-    <message>
-        <source>Maxword:</source>
-        <translation>Maxword:</translation>
-    </message>
-    <message>
-        <source>Maxgain:</source>
-        <translation>Maxgain:</translation>
     </message>
     <message>
         <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
@@ -1002,10 +1424,6 @@ Remove the character and try again.</source>
     <message>
         <source>Copy as PowerShell Script</source>
         <translation>复制为 PowerShell 脚本</translation>
-    </message>
-    <message>
-        <source>Copy the unencoded PowerShell script that starts hashcat</source>
-        <translation>复制启动 hashcat 的未编码 PowerShell 脚本</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1100,16 +1518,8 @@ Remove the character and try again.</source>
         <translation>会话和限制</translation>
     </message>
     <message>
-        <source>Session name:</source>
-        <translation>会话名称：</translation>
-    </message>
-    <message>
         <source>Name hashcat uses for its restore file and status output.</source>
         <translation>hashcat 用于其恢复文件和状态输出的名称。</translation>
-    </message>
-    <message>
-        <source>Runtime limit:</source>
-        <translation>运行时间限制：</translation>
     </message>
     <message>
         <source>unlimited</source>
@@ -1176,10 +1586,6 @@ Remove the character and try again.</source>
         <translation>后端设备：</translation>
     </message>
     <message>
-        <source>Device types:</source>
-        <translation>设备类型：</translation>
-    </message>
-    <message>
         <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
         <translation>当任一后端设备超过此温度（°C）时中止；0 表示禁用。</translation>
     </message>
@@ -1226,10 +1632,6 @@ Remove the character and try again.</source>
         <translation>开始</translation>
     </message>
     <message>
-        <source>Copy command to clipboard</source>
-        <translation>将命令复制到剪贴板</translation>
-    </message>
-    <message>
         <source>General</source>
         <translation>常规</translation>
     </message>
@@ -1238,8 +1640,56 @@ Remove the character and try again.</source>
         <translation>忽略哈希文件中的用户名</translation>
     </message>
     <message>
+        <source>H&amp;ash file or hash:</source>
+        <translation>哈希文件或哈希(&amp;A)：</translation>
+    </message>
+    <message>
+        <source>Keep attacking a hash after it is cracked, to find further plaintexts such as collisions. Cannot be combined with removing cracked hashes.</source>
+        <translation>哈希被破解后仍继续攻击，以找到更多明文（如碰撞）。不能与移除已破解的哈希同时使用。</translation>
+    </message>
+    <message>
+        <source>Keep guessing</source>
+        <translation>持续猜测</translation>
+    </message>
+    <message>
+        <source>&amp;Mode:</source>
+        <translation>模式(&amp;M)：</translation>
+    </message>
+    <message>
+        <source>Hash t&amp;ype:</source>
+        <translation>哈希类型(&amp;Y)：</translation>
+    </message>
+    <message>
+        <source>Hash &amp;recipe:</source>
+        <translation>哈希配方(&amp;R)：</translation>
+    </message>
+    <message>
         <source>Wordlists</source>
         <translation>字典</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist up.</source>
+        <translation>上移所选字典。</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down.</source>
+        <translation>下移所选字典。</translation>
+    </message>
+    <message>
+        <source>Add a folder; hashcat reads every file directly inside it as one wordlist.</source>
+        <translation>添加文件夹；hashcat 会将其直接包含的每个文件视为一个字典。</translation>
+    </message>
+    <message>
+        <source>&amp;Encoding from:</source>
+        <translation>源编码(&amp;E)：</translation>
+    </message>
+    <message>
+        <source>Enc&amp;oding to:</source>
+        <translation>目标编码(&amp;O)：</translation>
+    </message>
+    <message>
+        <source>PCFG rulesets</source>
+        <translation>PCFG 规则集</translation>
     </message>
     <message>
         <source>Increment the mask length from the minimum to the maximum.</source>
@@ -1348,14 +1798,6 @@ Remove the character and try again.</source>
     <message>
         <source>JSON Files (*.json)</source>
         <translation>JSON 文件 (*.json)</translation>
-    </message>
-    <message>
-        <source>The session file could not be read, so the session was not restored. The file was left in place.
-
-%1</source>
-        <translation>无法读取会话文件，因此未恢复会话。文件已保持原样。
-
-%1</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1538,6 +1980,78 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 这可能是由 Windows Defender 或其他杀毒软件引起的。解决方法请参阅&lt;a href=&quot;%1&quot;&gt;常见问题条目&lt;/a&gt;。</translation>
     </message>
     <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>请先输入哈希或选择哈希文件。</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>未配置 hashcat 可执行文件。请在设置中指定。</translation>
+    </message>
+    <message>
+        <source>Check Against Potfile</source>
+        <translation>对照 potfile 检查</translation>
+    </message>
+    <message>
+        <source>Checking potfile…</source>
+        <translation>正在检查 potfile…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>检查已取消。</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat 无法查询 potfile。</translation>
+    </message>
+    <message>
+        <source>Identify hash</source>
+        <translation>识别哈希</translation>
+    </message>
+    <message>
+        <source>The hash type list is unavailable or still loading. Nothing was changed. Check the hashcat path in Settings or try again once the list is available.</source>
+        <translation>哈希类型列表不可用或仍在加载。未做任何更改。请在设置中检查 hashcat 路径，或等列表可用后重试。</translation>
+    </message>
+    <message>
+        <source>Hash mode %1 is not in this hashcat’s hash-type list. Nothing was changed.</source>
+        <translation>哈希模式 %1 不在此 hashcat 的哈希类型列表中。未做任何更改。</translation>
+    </message>
+    <message>
+        <source>The session file could not be read, so the session was not restored.
+
+%1</source>
+        <translation>无法读取会话文件，因此未恢复会话。
+
+%1</translation>
+    </message>
+    <message>
+        <source>Move the file aside to start with a fresh session? It is renamed, never deleted.</source>
+        <translation>要将该文件移开以启动全新会话吗？文件只会被重命名，不会被删除。</translation>
+    </message>
+    <message>
+        <source>Move File Aside</source>
+        <translation>移开文件</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>保留文件</translation>
+    </message>
+    <message>
+        <source>The session file could not be moved to:
+%1</source>
+        <translation>无法将会话文件移动到：
+%1</translation>
+    </message>
+    <message>
+        <source>The session file was moved to:
+%1</source>
+        <translation>会话文件已移动到：
+%1</translation>
+    </message>
+    <message>
         <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
         <translation>会话指定了哈希类型 %1，此版本的 hashcat 不支持该类型。已选择“自动检测”。</translation>
     </message>
@@ -1560,6 +2074,14 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>Open cache directory</source>
         <translation>打开缓存目录</translation>
+    </message>
+    <message>
+        <source>Wait until the hash type list has loaded.</source>
+        <translation>请等待哈希类型列表加载完成。</translation>
+    </message>
+    <message>
+        <source>The hash type list is still loading. Wait until it has loaded and try again.</source>
+        <translation>哈希类型列表仍在加载。请等待加载完成后重试。</translation>
     </message>
     <message>
         <source>Add wordlist folder</source>
@@ -1642,6 +2164,616 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     </message>
 </context>
 <context>
+    <name>PotfileCheck</name>
+    <message>
+        <source>The hashcat path is not configured.</source>
+        <translation>尚未配置 hashcat 的路径。</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>请先输入哈希或选择哈希文件。</translation>
+    </message>
+    <message>
+        <source>Choose a hash type. Potfile checks need an explicit hash type; Auto-detect is best-effort and can miscount. Use Tools → Identify Hash if you do not know the type.</source>
+        <translation>请选择哈希类型。potfile 检查需要明确的哈希类型；“自动检测”只是尽力而为，可能计数不准。如果不知道类型，请使用“工具 → 识别哈希”。</translation>
+    </message>
+    <message>
+        <source>The remaining hashes are binary data; the count is unknown.</source>
+        <translation>剩余的哈希为二进制数据；数量未知。</translation>
+    </message>
+    <message>
+        <source>Choose a hash type.</source>
+        <translation>请选择哈希类型。</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat 无法从输入中加载任何哈希。</translation>
+    </message>
+    <message>
+        <source>hashcat could not parse the input for the selected hash type. Check the hash and the hash type.</source>
+        <translation>hashcat 无法按所选哈希类型解析输入。请检查哈希和哈希类型。</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat 无法查询 potfile。</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExportUi</name>
+    <message>
+        <source>CSV (*.csv)</source>
+        <translation>CSV (*.csv)</translation>
+    </message>
+    <message>
+        <source>TSV (*.tsv *.txt)</source>
+        <translation>TSV (*.tsv *.txt)</translation>
+    </message>
+    <message>
+        <source>JSON (*.json)</source>
+        <translation>JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Export potfile results</source>
+        <translation>导出 potfile 结果</translation>
+    </message>
+    <message>
+        <source>Export failed</source>
+        <translation>导出失败</translation>
+    </message>
+    <message>
+        <source>Choose a path other than the potfile.</source>
+        <translation>请选择 potfile 以外的路径。</translation>
+    </message>
+    <message>
+        <source>The destination is named hashcat.potfile. If this is hashcat’s live potfile, exporting overwrites it.
+
+Export anyway?</source>
+        <translation>目标文件名为 hashcat.potfile。如果这是 hashcat 正在使用的 potfile，导出会覆盖它。
+
+仍要导出吗？</translation>
+    </message>
+    <message>
+        <source>The file already exists:
+%1
+
+Overwrite it?</source>
+        <translation>文件已存在：
+%1
+
+要覆盖吗？</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 条记录</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 条记录</translation>
+    </message>
+    <message>
+        <source>Export %1 as %2 to:
+%3
+
+The file will contain plaintext passwords. Store it locally and protect it. Spreadsheet applications may evaluate cells beginning with =, +, -, or @ as formulas; open the file as text or disable formula evaluation.</source>
+        <translation>将 %1 以 %2 格式导出到：
+%3
+
+该文件将包含明文密码。请将其存储在本地并加以保护。电子表格程序可能会将以 =、+、- 或 @ 开头的单元格当作公式；请以文本形式打开该文件，或禁用公式计算。</translation>
+    </message>
+    <message>
+        <source>
+
+Only %1 of %2 entries are included.</source>
+        <translation>
+
+仅包含 %1 条（共 %2 条）。</translation>
+    </message>
+    <message>
+        <source>Export plaintexts</source>
+        <translation>导出明文</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>导出</translation>
+    </message>
+    <message>
+        <source>Export complete</source>
+        <translation>导出完成</translation>
+    </message>
+    <message>
+        <source>Exported %1 to:
+%2</source>
+        <translation>已将 %1 导出到：
+%2</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExporter</name>
+    <message>
+        <source>Could not open the export file: %1</source>
+        <translation>无法打开导出文件：%1</translation>
+    </message>
+    <message>
+        <source>Could not write the export file: %1</source>
+        <translation>无法写入导出文件：%1</translation>
+    </message>
+    <message>
+        <source>Could not save the export file: %1</source>
+        <translation>无法保存导出文件：%1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileInspectorDialog</name>
+    <message>
+        <source>Potfile inspector</source>
+        <translation>potfile 检查器</translation>
+    </message>
+    <message>
+        <source>Parsed directly; duplicates are exact repeated lines. Separator: ‘:’.</source>
+        <translation>直接解析；重复项是完全相同的行。分隔符：“:”。</translation>
+    </message>
+    <message>
+        <source>&amp;Potfile:</source>
+        <translation>potfile(&amp;P)：</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>浏览(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Read the selected potfile again.</source>
+        <translation>再次读取所选 potfile。</translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation>重新加载(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Stop reading the potfile.</source>
+        <translation>停止读取 potfile。</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>取消(&amp;A)</translation>
+    </message>
+    <message>
+        <source>The prefilled path is a heuristic; hashcat may use another path.</source>
+        <translation>预填的路径只是推测；hashcat 可能使用其他路径。</translation>
+    </message>
+    <message>
+        <source>Potfile reading progress</source>
+        <translation>potfile 读取进度</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>统计信息(&amp;S)…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible entries.</source>
+        <translation>显示可见记录的汇总密码统计信息。</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>导出(&amp;E)…</translation>
+    </message>
+    <message>
+        <source>Export the visible entries as CSV, TSV or JSON.</source>
+        <translation>将可见记录导出为 CSV、TSV 或 JSON。</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>关闭对话框。</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>关闭(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Dup</source>
+        <translation>重复</translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation>行</translation>
+    </message>
+    <message>
+        <source>This potfile has no entries.</source>
+        <translation>此 potfile 没有记录。</translation>
+    </message>
+    <message>
+        <source>Choose a potfile.</source>
+        <translation>请选择一个 potfile。</translation>
+    </message>
+    <message>
+        <source>Select a potfile</source>
+        <translation>选择 potfile</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>正在取消…</translation>
+    </message>
+    <message>
+        <source>Potfile: %1</source>
+        <translation>potfile：%1</translation>
+    </message>
+    <message>
+        <source>Potfile not found: %1</source>
+        <translation>找不到 potfile：%1</translation>
+    </message>
+    <message>
+        <source>Reading potfile…</source>
+        <translation>正在读取 potfile…</translation>
+    </message>
+    <message>
+        <source>Reading cancelled.</source>
+        <translation>读取已取消。</translation>
+    </message>
+    <message>
+        <source>dup</source>
+        <translation>重复</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 条记录</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 条记录</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>1 行重复</translation>
+    </message>
+    <message>
+        <source>1 duplicate line (at least)</source>
+        <translation>1 行重复（至少）</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>%1 行重复</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines (at least)</source>
+        <translation>%1 行重复（至少）</translation>
+    </message>
+    <message>
+        <source>duplicate count incomplete</source>
+        <translation>重复计数不完整</translation>
+    </message>
+    <message>
+        <source>1 malformed line</source>
+        <translation>1 行格式错误</translation>
+    </message>
+    <message>
+        <source>%1 malformed lines</source>
+        <translation>%1 行格式错误</translation>
+    </message>
+    <message>
+        <source>1 encrypted entry</source>
+        <translation>1 条加密记录</translation>
+    </message>
+    <message>
+        <source>%1 encrypted entries</source>
+        <translation>%1 条加密记录</translation>
+    </message>
+    <message>
+        <source>1 entry without a password</source>
+        <translation>1 条无密码的记录</translation>
+    </message>
+    <message>
+        <source>%1 entries without a password</source>
+        <translation>%1 条无密码的记录</translation>
+    </message>
+    <message>
+        <source>1 incomplete line skipped</source>
+        <translation>已跳过 1 行不完整内容</translation>
+    </message>
+    <message>
+        <source>%1 incomplete lines skipped</source>
+        <translation>已跳过 %1 行不完整内容</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · 仅显示前 %1 条（共 %2 条）</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 条被筛选隐藏</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>显示明文以导出真实值。</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileParser</name>
+    <message>
+        <source>Could not open the potfile: %1</source>
+        <translation>无法打开 potfile：%1</translation>
+    </message>
+    <message>
+        <source>Could not read the potfile: %1</source>
+        <translation>无法读取 potfile：%1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileResultsDialog</name>
+    <message>
+        <source>Cracked hashes</source>
+        <translation>已破解的哈希</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>统计信息(&amp;S)…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible results.</source>
+        <translation>显示可见结果的汇总密码统计信息。</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>导出(&amp;E)…</translation>
+    </message>
+    <message>
+        <source>Export the visible results as CSV, TSV or JSON.</source>
+        <translation>将可见结果导出为 CSV、TSV 或 JSON。</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>关闭对话框。</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>关闭(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>用户名</translation>
+    </message>
+    <message>
+        <source>Filter hash or username (plaintext after Reveal)</source>
+        <translation>筛选哈希或用户名（显示明文后）</translation>
+    </message>
+    <message>
+        <source>No cracked hashes for this input.</source>
+        <translation>此输入没有已破解的哈希。</translation>
+    </message>
+    <message>
+        <source>Cracked hashes — mode %1</source>
+        <translation>已破解的哈希 — 模式 %1</translation>
+    </message>
+    <message>
+        <source>Potfile: hashcat’s default potfile. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>potfile：hashcat 的默认 potfile。hashcat 按哈希匹配 potfile 条目；所选哈希类型会缩小搜索范围。</translation>
+    </message>
+    <message>
+        <source>Potfile: %1. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>potfile：%1。hashcat 按哈希匹配 potfile 条目；所选哈希类型会缩小搜索范围。</translation>
+    </message>
+    <message>
+        <source>%1 of %2 cracked</source>
+        <translation>已破解 %1 条（共 %2 条）</translation>
+    </message>
+    <message>
+        <source>%1 cracked (remaining unknown)</source>
+        <translation>已破解 %1 个（剩余数量未知）</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>检查已取消。</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat 无法查询 potfile。</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · 仅显示前 %1 条（共 %2 条）</translation>
+    </message>
+    <message>
+        <source>1 unreadable result line skipped.</source>
+        <translation>已跳过 1 行无法读取的结果。</translation>
+    </message>
+    <message>
+        <source>%1 unreadable result lines skipped.</source>
+        <translation>已跳过 %1 行无法读取的结果。</translation>
+    </message>
+    <message>
+        <source> · %1 encrypted</source>
+        <translation> · %1 个加密</translation>
+    </message>
+    <message>
+        <source> · includes a binary hash file</source>
+        <translation> · 包含一个二进制哈希文件</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 条被筛选隐藏</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>显示明文以导出真实值。</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileStatisticsDialog</name>
+    <message>
+        <source>Password statistics</source>
+        <translation>密码统计信息</translation>
+    </message>
+    <message>
+        <source>Password length distribution</source>
+        <translation>密码长度分布</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>长度</translation>
+    </message>
+    <message>
+        <source>Passwords</source>
+        <translation>密码</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>关闭对话框。</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>关闭(&amp;C)</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 条记录</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 条记录</translation>
+    </message>
+    <message>
+        <source>1 password analyzed</source>
+        <translation>已分析 1 个密码</translation>
+    </message>
+    <message>
+        <source>%1 passwords analyzed</source>
+        <translation>已分析 %1 个密码</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>1 行重复</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>%1 行重复</translation>
+    </message>
+    <message>
+        <source>duplicate lines: unknown</source>
+        <translation>重复行：未知</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>%1 empty · %2 encrypted · %3 · %4 unique plaintexts</source>
+        <translation>%1 个空密码 · %2 个加密 · %3 · %4 个唯一明文</translation>
+    </message>
+    <message>
+        <source>Length: —</source>
+        <translation>长度：—</translation>
+    </message>
+    <message>
+        <source>Length: min %1 · max %2 · average %3</source>
+        <translation>长度：最小 %1 · 最大 %2 · 平均 %3</translation>
+    </message>
+    <message>
+        <source>Based on the visible %1 of %2 entries.</source>
+        <translation>基于可见记录中的 %1 条（共 %2 条）。</translation>
+    </message>
+    <message>
+        <source>No plaintext passwords to analyze.</source>
+        <translation>没有可分析的明文密码。</translation>
+    </message>
+    <message>
+        <source>Passwords containing:
+lowercase: %1 (%2%)
+uppercase: %3 (%4%)
+digits: %5 (%6%)
+symbols: %7 (%8%)
+whitespace: %9 (%10%)
+non-ASCII: %11 (%12%)</source>
+        <translation>密码中包含：
+小写字母：%1 (%2%)
+大写字母：%3 (%4%)
+数字：%5 (%6%)
+符号：%7 (%8%)
+空白：%9 (%10%)
+非 ASCII：%11 (%12%)</translation>
+    </message>
+    <message>
+        <source>Calculating statistics…</source>
+        <translation>正在计算统计信息…</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileTableView</name>
+    <message>
+        <source>Filter hash (plaintext after Reveal)</source>
+        <translation>筛选哈希（显示明文后）</translation>
+    </message>
+    <message>
+        <source>Plaintext is searched only after Reveal plaintexts is enabled.</source>
+        <translation>只有在启用“显示明文”后才会搜索明文。</translation>
+    </message>
+    <message>
+        <source>Copy selected</source>
+        <translation>复制所选内容</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to copy the real values.</source>
+        <translation>显示明文以复制真实值。</translation>
+    </message>
+    <message>
+        <source>Copy all</source>
+        <translation>复制全部</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts</source>
+        <translation>显示明文</translation>
+    </message>
+    <message>
+        <source>Show or mask plaintext values.</source>
+        <translation>显示或屏蔽明文值。</translation>
+    </message>
+    <message>
+        <source>Hash</source>
+        <translation>哈希</translation>
+    </message>
+    <message>
+        <source>Plaintext</source>
+        <translation>明文</translation>
+    </message>
+    <message>
+        <source>Copied 1 row</source>
+        <translation>已复制 1 行</translation>
+    </message>
+    <message>
+        <source>Copied %1 rows</source>
+        <translation>已复制 %1 行</translation>
+    </message>
+    <message>
+        <source>Copy selected rows</source>
+        <translation>复制所选行</translation>
+    </message>
+    <message>
+        <source>Copies tab-separated rows. Encrypted rows copy the stored $HCENC$ token.</source>
+        <translation>复制以制表符分隔的行。加密行复制存储的 $HCENC$ 标记。</translation>
+    </message>
+    <message>
+        <source>Hide plaintexts</source>
+        <translation>隐藏明文</translation>
+    </message>
+    <message>
+        <source>Binary hash file; hashcat reports the file name.</source>
+        <translation>二进制哈希文件；hashcat 会报告文件名。</translation>
+    </message>
+    <message>
+        <source>No rows match the filter.</source>
+        <translation>没有符合筛选条件的行。</translation>
+    </message>
+    <message>
+        <source>(encrypted)</source>
+        <translation>（已加密）</translation>
+    </message>
+    <message>
+        <source>(empty)</source>
+        <translation>（空）</translation>
+    </message>
+    <message>
+        <source>(file) %1</source>
+        <translation>（文件）%1</translation>
+    </message>
+</context>
+<context>
     <name>SessionTransfer</name>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -1699,24 +2831,52 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>语言(&amp;L)</translation>
     </message>
     <message>
+        <source>Interface language. Takes effect after a restart.</source>
+        <translation>界面语言。重启后生效。</translation>
+    </message>
+    <message>
         <source>&amp;Color scheme</source>
         <translation>配色方案(&amp;C)</translation>
+    </message>
+    <message>
+        <source>The file the last session is stored in.</source>
+        <translation>上次会话保存到的文件。</translation>
+    </message>
+    <message>
+        <source>Open the folder the session is stored in.</source>
+        <translation>打开保存会话的文件夹。</translation>
+    </message>
+    <message>
+        <source>The file the settings are stored in.</source>
+        <translation>设置保存到的文件。</translation>
+    </message>
+    <message>
+        <source>Open the folder the settings are stored in.</source>
+        <translation>打开保存设置的文件夹。</translation>
     </message>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>并非所有配色方案在所有平台上都可用。</translation>
     </message>
     <message>
-        <source>&amp;Parameters</source>
-        <translation>参数(&amp;P)</translation>
-    </message>
-    <message>
         <source>&amp;Use short parameters</source>
         <translation>使用短参数(&amp;U)</translation>
     </message>
     <message>
+        <source>Sho&amp;w the exact command in the terminal</source>
+        <translation>在终端中显示确切命令(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Print the exact command hashcat receives in the launch terminal, so a mangled value is visible.</source>
+        <translation>在启动终端中打印 hashcat 收到的确切命令，以便发现被破坏的值。</translation>
+    </message>
+    <message>
         <source>Session and files</source>
         <translation>会话和文件</translation>
+    </message>
+    <message>
+        <source>Restore the session saved when the application last closed.</source>
+        <translation>恢复应用程序上次关闭时保存的会话。</translation>
     </message>
     <message>
         <source>&amp;Restore the last session at startup</source>
@@ -1727,28 +2887,12 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>会话文件(&amp;S)</translation>
     </message>
     <message>
-        <source>The file the last session is stored in</source>
-        <translation>保存上次会话的文件</translation>
-    </message>
-    <message>
         <source>Open folder</source>
         <translation>打开文件夹</translation>
     </message>
     <message>
-        <source>Open the folder the session is stored in</source>
-        <translation>打开保存会话的文件夹</translation>
-    </message>
-    <message>
         <source>Settings &amp;file</source>
         <translation>设置文件(&amp;F)</translation>
-    </message>
-    <message>
-        <source>The file the settings are stored in</source>
-        <translation>保存设置的文件</translation>
-    </message>
-    <message>
-        <source>Open the folder the settings are stored in</source>
-        <translation>打开保存设置的文件夹</translation>
     </message>
     <message>
         <source>General</source>
@@ -1815,6 +2959,16 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>可执行文件 (*.exe *.bin hashcat);;所有文件 (*)</translation>
     </message>
     <message>
+        <source>Settings saved</source>
+        <translation>设置已保存</translation>
+    </message>
+    <message>
+        <source>The old settings file was moved to:
+%1</source>
+        <translation>旧的设置文件已移动到：
+%1</translation>
+    </message>
+    <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
         <translation>未配置 hashcat 可执行文件，无法启动 hashcat。</translation>
     </message>
@@ -1839,12 +2993,43 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>所选文件不是可执行文件。</translation>
     </message>
     <message>
+        <source>Settings not saved</source>
+        <translation>设置未保存</translation>
+    </message>
+    <message>
+        <source>Move the file aside and save these values? It is renamed, never deleted.</source>
+        <translation>要将该文件移开并保存这些值吗？文件只会被重命名，不会被删除。</translation>
+    </message>
+    <message>
+        <source>Move File Aside and Save</source>
+        <translation>移开文件并保存</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>保留文件</translation>
+    </message>
+    <message>
         <source>Restart required</source>
         <translation>需要重启</translation>
     </message>
     <message>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>请重启 hashcat-gui 以应用新语言。</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsManager</name>
+    <message>
+        <source>The settings could not be written to “%1”. Check the file permissions.</source>
+        <translation>无法将设置写入“%1”。请检查文件权限。</translation>
+    </message>
+    <message>
+        <source>The settings file “%1” is not in a readable format.</source>
+        <translation>设置文件“%1”的格式无法读取。</translation>
+    </message>
+    <message>
+        <source>The settings file could not be moved to “%1”.</source>
+        <translation>无法将设置文件移动到“%1”。</translation>
     </message>
 </context>
 <context>
@@ -1888,6 +3073,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>The “%1” section does not contain any values.</source>
         <translation>“%1”部分不包含任何值。</translation>
+    </message>
+    <message>
+        <source>The “%1” section names a version that is not a number.</source>
+        <translation>“%1”部分指定的版本不是数字。</translation>
     </message>
     <message>
         <source> and </source>

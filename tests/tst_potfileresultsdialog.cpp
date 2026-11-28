@@ -144,7 +144,7 @@ void TestPotfileResultsDialog::noteNamesThePotfileAndTheTitleTheMode()
     dialog.setResult(result, QString());
     QVERIFY(label(dialog, QStringLiteral("label_note"))
                 ->text()
-                .contains(QStringLiteral("hashcat's default potfile")));
+                .contains(QStringLiteral("hashcat’s default potfile")));
     QCOMPARE(dialog.windowTitle(), QStringLiteral("Cracked hashes"));
 }
 

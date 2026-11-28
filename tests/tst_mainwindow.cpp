@@ -2397,7 +2397,8 @@ void TestMainWindow::labelMnemonicsAreUnique()
     QSet<QChar> seen;
     int mnemonics = 0;
 
-    for (const QLabel *label : window.findChildren<QLabel *>()) {
+    const QList<QLabel *> labels = window.findChildren<QLabel *>();
+    for (const QLabel *label : labels) {
         const QString text = label->text();
         for (qsizetype i = 0; i < text.size(); ++i) {
             if (text.at(i) != QLatin1Char('&')) {

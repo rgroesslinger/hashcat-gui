@@ -162,9 +162,9 @@ void PotfileResultsDialog::updateHeader()
                                         : tr("Cracked hashes — mode %1").arg(m_modeName));
     ui->label_note->setText(
         m_potfilePath.isEmpty()
-            ? tr("Potfile: hashcat's default potfile. Hashcat matches potfile entries by hash; "
+            ? tr("Potfile: hashcat’s default potfile. hashcat matches potfile entries by hash; "
                  "the selected hash type narrows the search.")
-            : tr("Potfile: %1. Hashcat matches potfile entries by hash; the selected hash type "
+            : tr("Potfile: %1. hashcat matches potfile entries by hash; the selected hash type "
                  "narrows the search.")
                   .arg(m_potfilePath));
 }

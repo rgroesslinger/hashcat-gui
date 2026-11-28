@@ -28,8 +28,12 @@
         <translation>アップデートを確認しています…</translation>
     </message>
     <message>
-        <source>Ask GitHub whether a newer release is available</source>
-        <translation>新しいリリースが利用可能かどうかを GitHub に問い合わせます</translation>
+        <source>Ask GitHub whether a newer release is available.</source>
+        <translation>GitHub に新しいリリースが利用可能か確認します。</translation>
+    </message>
+    <message>
+        <source>Copy the application, toolkit, system and hashcat versions to the clipboard.</source>
+        <translation>アプリケーション、ツールキット、システム、hashcat のバージョンをクリップボードにコピーします。</translation>
     </message>
     <message>
         <source>Check for updates</source>
@@ -50,10 +54,6 @@
     <message>
         <source>License</source>
         <translation>ライセンス</translation>
-    </message>
-    <message>
-        <source>Copy the application, toolkit, system and hashcat versions to the clipboard</source>
-        <translation>アプリケーション、ツールキット、システム、hashcat のバージョンをクリップボードにコピーします</translation>
     </message>
     <message>
         <source>Copy details</source>
@@ -204,6 +204,81 @@
     </message>
 </context>
 <context>
+    <name>BackendInfoDialog</name>
+    <message>
+        <source>Backend information</source>
+        <translation>バックエンド情報</translation>
+    </message>
+    <message>
+        <source>Query hashcat again for backend information.</source>
+        <translation>hashcat にバックエンド情報を再度照会します。</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>更新(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Stop the running query.</source>
+        <translation>実行中の照会を停止します。</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>キャンセル(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Copy the backend information to the clipboard.</source>
+        <translation>バックエンド情報をクリップボードにコピーします。</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>コピー(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>ダイアログを閉じます。</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>閉じる(&amp;O)</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>hashcat 実行ファイルが設定されていません。設定で指定してください。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>設定された hashcat 実行ファイルが見つかりません:
+%1</translation>
+    </message>
+    <message>
+        <source>Reading backend information…</source>
+        <translation>バックエンド情報を読み込んでいます…</translation>
+    </message>
+    <message>
+        <source>Backend query cancelled.</source>
+        <translation>バックエンドの照会をキャンセルしました。</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while reading backend information.</source>
+        <translation>hashcat がバックエンド情報の読み込み中にタイムアウトしました。</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information.</source>
+        <translation>hashcat がバックエンド情報を読み込めませんでした。</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information:
+%1</source>
+        <translation>hashcat がバックエンド情報を読み込めませんでした:
+%1</translation>
+    </message>
+    <message>
+        <source>Backend information reported by hashcat.</source>
+        <translation>hashcat が報告したバックエンド情報。</translation>
+    </message>
+</context>
+<context>
     <name>ExampleSession</name>
     <message>
         <source>Could not create the example directory “%1”.</source>
@@ -255,10 +330,217 @@
     </message>
 </context>
 <context>
+    <name>IdentifyDialog</name>
+    <message>
+        <source>Identify hash</source>
+        <translation>ハッシュを識別</translation>
+    </message>
+    <message>
+        <source>&amp;Hash or hash file:</source>
+        <translation>ハッシュまたはハッシュファイル(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file to identify.</source>
+        <translation>ハッシュを貼り付けるか、ハッシュファイルを選択して識別します。</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file</source>
+        <translation>ハッシュを貼り付けるか、ハッシュファイルを選択</translation>
+    </message>
+    <message>
+        <source>Choose a hash file.</source>
+        <translation>ハッシュファイルを選択します。</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>参照(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Identify the hash type of the entered hash.</source>
+        <translation>入力したハッシュのハッシュタイプを識別します。</translation>
+    </message>
+    <message>
+        <source>&amp;Identify</source>
+        <translation>識別(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Paste a hash or choose a hash file, then select Identify.</source>
+        <translation>ハッシュを貼り付けるかハッシュファイルを選択してから、「識別」を選択してください。</translation>
+    </message>
+    <message>
+        <source>Identification progress</source>
+        <translation>識別の進捗</translation>
+    </message>
+    <message>
+        <source>Elapsed time</source>
+        <translation>経過時間</translation>
+    </message>
+    <message>
+        <source>Matching hash types; select one and apply it to the attack.</source>
+        <translation>一致したハッシュタイプ。1 つ選択して攻撃に適用します。</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>モード</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>名前</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>カテゴリ</translation>
+    </message>
+    <message>
+        <source>Use the selected hash type in the attack.</source>
+        <translation>選択したハッシュタイプを攻撃に使用します。</translation>
+    </message>
+    <message>
+        <source>Apply mode to attack</source>
+        <translation>モードを攻撃に適用</translation>
+    </message>
+    <message>
+        <source>Stop the running identification.</source>
+        <translation>実行中の識別を停止します。</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>キャンセル(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>ダイアログを閉じます。</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>閉じる(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Elapsed: %1 s</source>
+        <translation>経過: %1 秒</translation>
+    </message>
+    <message>
+        <source>Multiple lines pasted. Use Browse to select a hash file, or paste one hash.</source>
+        <translation>複数行が貼り付けられました。「参照」でハッシュファイルを選択するか、ハッシュを 1 つだけ貼り付けてください。</translation>
+    </message>
+    <message>
+        <source>Input changed. Identify it again.</source>
+        <translation>入力が変更されました。もう一度識別してください。</translation>
+    </message>
+    <message>
+        <source>Select a hash file</source>
+        <translation>ハッシュファイルを選択</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>ハッシュを入力するか、ハッシュファイルを選択してください。</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>hashcat 実行ファイルが設定されていません。設定で指定してください。</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>設定された hashcat 実行ファイルが見つかりません:
+%1</translation>
+    </message>
+    <message>
+        <source>Identifying hash…</source>
+        <translation>ハッシュを識別しています…</translation>
+    </message>
+    <message>
+        <source>Identification cancelled.</source>
+        <translation>識別をキャンセルしました。</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while identifying the hash.</source>
+        <translation>hashcat がハッシュの識別中にタイムアウトしました。</translation>
+    </message>
+    <message>
+        <source>No hash modes match this structure.</source>
+        <translation>この構造に一致するハッシュモードはありません。</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode and hash to the attack.</source>
+        <translation>この構造に一致するハッシュモードが 1 つあります。選択して、モードとハッシュを攻撃に適用してください。</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode to the attack.</source>
+        <translation>この構造に一致するハッシュモードが 1 つあります。選択して、モードを攻撃に適用してください。</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode and hash to the attack.</source>
+        <translation>この構造に一致するハッシュモードが %1 個あります。1 つ選択して、モードとハッシュを攻撃に適用してください。</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode to the attack.</source>
+        <translation>この構造に一致するハッシュモードが %1 個あります。1 つ選択して、モードを攻撃に適用してください。</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>キャンセルしています…</translation>
+    </message>
+    <message>
+        <source>Apply mode and hash to attack</source>
+        <translation>モードとハッシュを攻撃に適用</translation>
+    </message>
+    <message>
+        <source>Another hashcat instance is using this session. Close it and try again.</source>
+        <translation>別の hashcat インスタンスがこのセッションを使用しています。閉じてからもう一度お試しください。</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat が入力からハッシュを読み込めませんでした。</translation>
+    </message>
+    <message>
+        <source>The input contains characters hashcat cannot encode.</source>
+        <translation>入力に hashcat がエンコードできない文字が含まれています。</translation>
+    </message>
+    <message>
+        <source>hashcat reported:
+%1</source>
+        <translation>hashcat の出力:
+%1</translation>
+    </message>
+    <message>
+        <source>hashcat’s output could not be parsed. Check the hashcat version or report a bug.</source>
+        <translation>hashcat の出力を解析できませんでした。hashcat のバージョンを確認するか、バグを報告してください。</translation>
+    </message>
+</context>
+<context>
     <name>LaunchMessage</name>
     <message>
         <source>Windows executable names include their extension, for example hashcat.exe.</source>
         <translation>Windows の実行ファイル名には拡張子が含まれます (例: hashcat.exe)。</translation>
+    </message>
+    <message>
+        <source>hash file</source>
+        <translation>ハッシュファイル</translation>
+    </message>
+    <message>
+        <source>outfile</source>
+        <translation>出力ファイル</translation>
+    </message>
+    <message>
+        <source>potfile</source>
+        <translation>potfile</translation>
+    </message>
+    <message>
+        <source>wordlist</source>
+        <translation>ワードリスト</translation>
+    </message>
+    <message>
+        <source>rules file</source>
+        <translation>ルールファイル</translation>
+    </message>
+    <message>
+        <source>table</source>
+        <translation>テーブル</translation>
+    </message>
+    <message>
+        <source>cache folder</source>
+        <translation>キャッシュフォルダー</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -413,12 +695,72 @@ md5(md5(salt) . pass)。これをハッシュレシピ欄に入力してくだ�
 %1</translation>
     </message>
     <message>
+        <source>The potfile path must be a writable file, or a new file in an existing writable folder:
+%1</source>
+        <translation>potfile のパスは書き込み可能なファイル、または書き込み可能な既存フォルダー内の新しいファイルである必要があります:
+%1</translation>
+    </message>
+    <message>
+        <source>The skip or limit value must be a whole number from 0 to %1:
+%2</source>
+        <translation>スキップまたは上限の値は 0 から %1 までの整数である必要があります:
+%2</translation>
+    </message>
+    <message>
+        <source>The device types must be 1 (CPU) or 2 (GPU), separated by commas:
+%1</source>
+        <translation>デバイスタイプは 1 (CPU) または 2 (GPU) をカンマ区切りで指定する必要があります:
+%1</translation>
+    </message>
+    <message>
+        <source>The CPU affinity must be a comma-separated list of CPU numbers:
+%1</source>
+        <translation>CPU アフィニティは CPU 番号をカンマ区切りで指定する必要があります:
+%1</translation>
+    </message>
+    <message>
+        <source>The backend devices must be a comma-separated list of device numbers starting at 1:
+%1</source>
+        <translation>バックエンドデバイスは 1 から始まるデバイス番号をカンマ区切りで指定する必要があります:
+%1</translation>
+    </message>
+    <message>
+        <source>The session name must not contain a path separator:
+%1</source>
+        <translation>セッション名にパスの区切り文字を含めることはできません:
+%1</translation>
+    </message>
+    <message>
+        <source>A ruleset folder needs Grammar/grammar.txt; choose a rules file instead:
+%1</source>
+        <translation>ルールセットのフォルダーには Grammar/grammar.txt が必要です。代わりにルールファイルを選択してください:
+%1</translation>
+    </message>
+    <message>
+        <source>A table has to be a file; hashcat does not read a folder:
+%1</source>
+        <translation>テーブルはファイルである必要があります。hashcat はフォルダーを読み込みません:
+%1</translation>
+    </message>
+    <message>
+        <source>The %1 and the %2 use the same path:
+%3
+hashcat writes one or both of them, so a run could change the file. Choose different paths.</source>
+        <translation>%1 と %2 に同じパスが指定されています:
+%3
+hashcat はどちらか一方または両方に書き込むため、実行中にファイルが変更される可能性があります。別のパスを指定してください。</translation>
+    </message>
+    <message>
         <source>The increment cannot be combined with the speed-only option.</source>
         <translation>インクリメントは速度のみのオプションと併用できません。</translation>
     </message>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>「関連付け」攻撃モードでは、解読済みのハッシュを削除できません。</translation>
+    </message>
+    <message>
+        <source>Keep guessing cannot be combined with removing cracked hashes from the hash file. Clear either option.</source>
+        <translation>「推測を継続」は、解読済みハッシュをハッシュファイルから削除するオプションと併用できません。どちらか一方を解除してください。</translation>
     </message>
     <message>
         <source>This value contains a control character that cannot be passed to hashcat:
@@ -439,10 +781,6 @@ Remove the character and try again.</source>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Hash file or hash:</source>
-        <translation>ハッシュファイルまたはハッシュ:</translation>
-    </message>
     <message>
         <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
         <translation>ハッシュ、ハッシュのファイル、または .hc22000/.hccapx 形式の WPA キャプチャ。</translation>
@@ -472,16 +810,8 @@ Remove the character and try again.</source>
         <translation>ハッシュレシピ (例: 「md5(md5(salt) . pass)」)。シェルの外側の引用符でレシピ全体を囲み、内側の文字列にはもう一方の引用符を使います。PowerShell では $ の前にバッククォートが必要です。</translation>
     </message>
     <message>
-        <source>Move item up</source>
-        <translation>項目を上へ移動</translation>
-    </message>
-    <message>
         <source>Move selected wordlist up</source>
         <translation>選択したワードリストを上へ移動</translation>
-    </message>
-    <message>
-        <source>Move item down</source>
-        <translation>項目を下へ移動</translation>
     </message>
     <message>
         <source>Move selected wordlist down</source>
@@ -508,14 +838,6 @@ Remove the character and try again.</source>
         <translation>ワードリストは 16 進数</translation>
     </message>
     <message>
-        <source>Encoding from:</source>
-        <translation>エンコード元:</translation>
-    </message>
-    <message>
-        <source>Encoding to:</source>
-        <translation>エンコード先:</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>ルールセットのファイル、Grammar/grammar.txt を含むフォルダー、または同梱の名前。チェックされていない行はスキップされ、1 つもチェックされていない場合は default-passwords が実行されます。</translation>
     </message>
@@ -536,24 +858,76 @@ Remove the character and try again.</source>
         <translation>ルールセットを削除</translation>
     </message>
     <message>
+        <source>Move selected ruleset up.</source>
+        <translation>選択したルールセットを上へ移動します。</translation>
+    </message>
+    <message>
         <source>Move selected ruleset up</source>
         <translation>選択したルールセットを上へ移動</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down.</source>
+        <translation>選択したルールセットを下へ移動します。</translation>
     </message>
     <message>
         <source>Move selected ruleset down</source>
         <translation>選択したルールセットを下へ移動</translation>
     </message>
     <message>
+        <source>Sca&amp;le:</source>
+        <translation>スケール(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Quantization steps per bit (1–64).</source>
+        <translation>ビットごとの量子化ステップ (1–64)。</translation>
+    </message>
+    <message>
+        <source>&amp;Costmax:</source>
+        <translation>コスト上限(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Highest cost level to enumerate (1–64).</source>
+        <translation>列挙する最大コストレベル (1–64)。</translation>
+    </message>
+    <message>
+        <source>&amp;Weights:</source>
+        <translation>重み(&amp;W):</translation>
+    </message>
+    <message>
+        <source>&amp;Kbits:</source>
+        <translation>Kbits(&amp;K):</translation>
+    </message>
+    <message>
+        <source>Bits one inner loop may span (0–27).</source>
+        <translation>1 回の内側ループがまたぐことのできるビット数 (0–27)。</translation>
+    </message>
+    <message>
+        <source>Ma&amp;xword:</source>
+        <translation>最大単語(&amp;X):</translation>
+    </message>
+    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>カーネルが構築する候補の最大長 (4 バイトワード単位): 0 (自動)、16、または 32。</translation>
+    </message>
+    <message>
+        <source>Max&amp;gain:</source>
+        <translation>最大ゲイン(&amp;G):</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>スペース区切りの key=value 設定: omen、cache、lookup、pwmin、pwmax、hintaccount、hintwords、hintfile、hintrank、hintrepeat。ルールセットは先頭に指定します。</translation>
     </message>
     <message>
+        <source>Tables</source>
+        <translation>テーブル</translation>
+    </message>
+    <message>
         <source>Add one or more table files.</source>
         <translation>テーブルのファイルを 1 つ以上追加します。</translation>
+    </message>
+    <message>
+        <source>Add table</source>
+        <translation>テーブルを追加</translation>
     </message>
     <message>
         <source>Remove the selected tables.</source>
@@ -562,6 +936,14 @@ Remove the character and try again.</source>
     <message>
         <source>Remove tables</source>
         <translation>テーブルを削除</translation>
+    </message>
+    <message>
+        <source>Move selected table up.</source>
+        <translation>選択したテーブルを上へ移動します。</translation>
+    </message>
+    <message>
+        <source>Move selected table down.</source>
+        <translation>選択したテーブルを下へ移動します。</translation>
     </message>
     <message>
         <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
@@ -608,6 +990,14 @@ Remove the character and try again.</source>
         <translation>フィードの引数を順番に追加します。</translation>
     </message>
     <message>
+        <source>Add feed argument</source>
+        <translation>フィード引数を追加</translation>
+    </message>
+    <message>
+        <source>Feed arguments</source>
+        <translation>フィード引数</translation>
+    </message>
+    <message>
         <source>Remove the selected feed arguments.</source>
         <translation>選択したフィード引数を削除します。</translation>
     </message>
@@ -616,8 +1006,16 @@ Remove the character and try again.</source>
         <translation>フィード引数を削除</translation>
     </message>
     <message>
+        <source>Move selected feed argument up.</source>
+        <translation>選択したフィード引数を上へ移動します。</translation>
+    </message>
+    <message>
         <source>Move selected feed argument up</source>
         <translation>選択したフィード引数を上へ移動</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down.</source>
+        <translation>選択したフィード引数を下へ移動します。</translation>
     </message>
     <message>
         <source>Move selected feed argument down</source>
@@ -692,6 +1090,14 @@ Remove the character and try again.</source>
         <translation>マスクの最大長。0 の場合はオプションを省略し、hashcat の既定値 (マスク長) を使用します。</translation>
     </message>
     <message>
+        <source>Grow the mask from the right end instead of the left (hashcat -ii).</source>
+        <translation>左端ではなく右端からマスクを伸長します (hashcat -ii)。</translation>
+    </message>
+    <message>
+        <source>Right-to-left</source>
+        <translation>右から左へ</translation>
+    </message>
+    <message>
         <source>Use ?1 in the mask to insert this charset.</source>
         <translation>マスク内で ?1 を使用すると、この文字セットが挿入されます。</translation>
     </message>
@@ -716,12 +1122,80 @@ Remove the character and try again.</source>
         <translation>文字セットは 16 進数</translation>
     </message>
     <message>
+        <source>&amp;Session name:</source>
+        <translation>セッション名(&amp;S):</translation>
+    </message>
+    <message>
+        <source>R&amp;untime limit:</source>
+        <translation>実行時間制限(&amp;U):</translation>
+    </message>
+    <message>
+        <source>&amp;Device types:</source>
+        <translation>デバイスタイプ(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Potfile:</source>
+        <translation>potfile:</translation>
+    </message>
+    <message>
+        <source>Read and write recovered hashes in this potfile instead of the default one.</source>
+        <translation>既定の potfile ではなく、この potfile で解読済みハッシュの読み書きを行います。</translation>
+    </message>
+    <message>
+        <source>Choose the potfile path.</source>
+        <translation>potfile のパスを選択します。</translation>
+    </message>
+    <message>
+        <source>Choose potfile</source>
+        <translation>potfile を選択</translation>
+    </message>
+    <message>
+        <source>Copy command to clipboard.</source>
+        <translation>コマンドをクリップボードにコピーします。</translation>
+    </message>
+    <message>
         <source>Command preview</source>
         <translation>コマンドのプレビュー</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat.</source>
+        <translation>hashcat を起動する、エンコードされていない PowerShell スクリプトをコピーします。</translation>
+    </message>
+    <message>
+        <source>&amp;Identify Hash…</source>
+        <translation>ハッシュを識別(&amp;I)…</translation>
+    </message>
+    <message>
+        <source>Ask hashcat which hash modes match a hash.</source>
+        <translation>hashcat に、ハッシュに一致するハッシュモードを尋ねます。</translation>
+    </message>
+    <message>
+        <source>&amp;Backend Information…</source>
+        <translation>バックエンド情報(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Show the devices and backends hashcat detected.</source>
+        <translation>hashcat が検出したデバイスとバックエンドを表示します。</translation>
+    </message>
+    <message>
+        <source>Check Against &amp;Potfile…</source>
+        <translation>potfile と照合(&amp;P)…</translation>
+    </message>
+    <message>
+        <source>Check whether the hashes in the hash field are already in the potfile.</source>
+        <translation>ハッシュ欄のハッシュが potfile に存在するか確認します。</translation>
+    </message>
+    <message>
+        <source>Potfile I&amp;nspector…</source>
+        <translation>potfile インスペクター(&amp;N)…</translation>
+    </message>
+    <message>
+        <source>Browse an explicit potfile without hash-type verification.</source>
+        <translation>ハッシュタイプの検証なしで、指定した potfile を参照します。</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -780,10 +1254,6 @@ Remove the character and try again.</source>
         <translation>セッションをリセット</translation>
     </message>
     <message>
-        <source>Mode:</source>
-        <translation>モード:</translation>
-    </message>
-    <message>
         <source>Attack</source>
         <translation>攻撃</translation>
     </message>
@@ -800,20 +1270,8 @@ Remove the character and try again.</source>
         <translation>攻撃モード。選択に応じて、下に固有のオプションが表示されます。</translation>
     </message>
     <message>
-        <source>Hash type:</source>
-        <translation>ハッシュタイプ:</translation>
-    </message>
-    <message>
-        <source>Hash recipe:</source>
-        <translation>ハッシュレシピ:</translation>
-    </message>
-    <message>
         <source>Add files…</source>
         <translation>ファイルを追加…</translation>
-    </message>
-    <message>
-        <source>hashcat reads every file directly inside the folder as one wordlist.</source>
-        <translation>hashcat は、フォルダー直下のすべてのファイルを 1 つのワードリストとして読み込みます。</translation>
     </message>
     <message>
         <source>Add folder…</source>
@@ -864,26 +1322,6 @@ Remove the character and try again.</source>
         <translation>ルールセットフォルダーには Grammar/grammar.txt が必要です。</translation>
     </message>
     <message>
-        <source>Scale:</source>
-        <translation>Scale:</translation>
-    </message>
-    <message>
-        <source>Quantization steps per bit (1–64)</source>
-        <translation>ビットあたりの量子化ステップ数 (1–64)</translation>
-    </message>
-    <message>
-        <source>Costmax:</source>
-        <translation>Costmax:</translation>
-    </message>
-    <message>
-        <source>Highest cost level to enumerate (1–64)</source>
-        <translation>列挙するコストレベルの上限 (1–64)</translation>
-    </message>
-    <message>
-        <source>Weights:</source>
-        <translation>Weights:</translation>
-    </message>
-    <message>
         <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
         <translation>ルールセットごとに 1 つの正の数をコロン区切りで指定します (例: 2:1)。個数はルールセットの数と一致する必要があります。</translation>
     </message>
@@ -893,27 +1331,11 @@ Remove the character and try again.</source>
     </message>
     <message>
         <source>Cores that generate base words (0–16); 0 runs on the calling thread.</source>
-        <translation>基本ワードを生成するコア数 (0–16)。0 の場合は呼び出し元のスレッドで実行します。</translation>
+        <translation>ベースワードを生成するコア数 (0–16)。0 の場合は呼び出し元のスレッドで実行します。</translation>
     </message>
     <message>
         <source>auto</source>
         <translation>自動</translation>
-    </message>
-    <message>
-        <source>Kbits:</source>
-        <translation>Kbits:</translation>
-    </message>
-    <message>
-        <source>Bits one inner loop may span (0–27)</source>
-        <translation>内部ループがまたがることのできるビット数 (0–27)</translation>
-    </message>
-    <message>
-        <source>Maxword:</source>
-        <translation>Maxword:</translation>
-    </message>
-    <message>
-        <source>Maxgain:</source>
-        <translation>Maxgain:</translation>
     </message>
     <message>
         <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
@@ -1002,10 +1424,6 @@ Remove the character and try again.</source>
     <message>
         <source>Copy as PowerShell Script</source>
         <translation>PowerShell スクリプトとしてコピー</translation>
-    </message>
-    <message>
-        <source>Copy the unencoded PowerShell script that starts hashcat</source>
-        <translation>hashcat を起動する、エンコードされていない PowerShell スクリプトをコピーします</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1100,16 +1518,8 @@ Remove the character and try again.</source>
         <translation>セッションと制限</translation>
     </message>
     <message>
-        <source>Session name:</source>
-        <translation>セッション名:</translation>
-    </message>
-    <message>
         <source>Name hashcat uses for its restore file and status output.</source>
         <translation>hashcat が復元ファイルとステータス出力に使用する名前です。</translation>
-    </message>
-    <message>
-        <source>Runtime limit:</source>
-        <translation>実行時間の上限:</translation>
     </message>
     <message>
         <source>unlimited</source>
@@ -1176,10 +1586,6 @@ Remove the character and try again.</source>
         <translation>バックエンドデバイス:</translation>
     </message>
     <message>
-        <source>Device types:</source>
-        <translation>デバイスタイプ:</translation>
-    </message>
-    <message>
         <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
         <translation>いずれかのバックエンドデバイスがこの温度 (°C) を超えたら中止します。0 で無効になります。</translation>
     </message>
@@ -1226,10 +1632,6 @@ Remove the character and try again.</source>
         <translation>開始</translation>
     </message>
     <message>
-        <source>Copy command to clipboard</source>
-        <translation>コマンドをクリップボードにコピー</translation>
-    </message>
-    <message>
         <source>General</source>
         <translation>全般</translation>
     </message>
@@ -1238,8 +1640,56 @@ Remove the character and try again.</source>
         <translation>ハッシュファイル内のユーザー名を無視する</translation>
     </message>
     <message>
+        <source>H&amp;ash file or hash:</source>
+        <translation>ハッシュファイルまたはハッシュ(&amp;A):</translation>
+    </message>
+    <message>
+        <source>Keep attacking a hash after it is cracked, to find further plaintexts such as collisions. Cannot be combined with removing cracked hashes.</source>
+        <translation>ハッシュが解読された後も攻撃を継続し、衝突などの別の平文を探します。解読済みハッシュの削除とは併用できません。</translation>
+    </message>
+    <message>
+        <source>Keep guessing</source>
+        <translation>推測を継続</translation>
+    </message>
+    <message>
+        <source>&amp;Mode:</source>
+        <translation>モード(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Hash t&amp;ype:</source>
+        <translation>ハッシュタイプ(&amp;Y):</translation>
+    </message>
+    <message>
+        <source>Hash &amp;recipe:</source>
+        <translation>ハッシュレシピ(&amp;R):</translation>
+    </message>
+    <message>
         <source>Wordlists</source>
         <translation>ワードリスト</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist up.</source>
+        <translation>選択したワードリストを上へ移動します。</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down.</source>
+        <translation>選択したワードリストを下へ移動します。</translation>
+    </message>
+    <message>
+        <source>Add a folder; hashcat reads every file directly inside it as one wordlist.</source>
+        <translation>フォルダーを追加します。hashcat はその直下のファイルをそれぞれ 1 つのワードリストとして読み込みます。</translation>
+    </message>
+    <message>
+        <source>&amp;Encoding from:</source>
+        <translation>エンコード元(&amp;E):</translation>
+    </message>
+    <message>
+        <source>Enc&amp;oding to:</source>
+        <translation>エンコード先(&amp;O):</translation>
+    </message>
+    <message>
+        <source>PCFG rulesets</source>
+        <translation>PCFG ルールセット</translation>
     </message>
     <message>
         <source>Increment the mask length from the minimum to the maximum.</source>
@@ -1348,14 +1798,6 @@ Remove the character and try again.</source>
     <message>
         <source>JSON Files (*.json)</source>
         <translation>JSON ファイル (*.json)</translation>
-    </message>
-    <message>
-        <source>The session file could not be read, so the session was not restored. The file was left in place.
-
-%1</source>
-        <translation>セッションファイルを読み込めなかったため、セッションは復元されませんでした。ファイルはそのまま残されています。
-
-%1</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1538,6 +1980,78 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 これは Windows Defender などのウイルス対策ソフトが原因の場合があります。対処方法は&lt;a href=&quot;%1&quot;&gt;FAQ の項目&lt;/a&gt;を参照してください。</translation>
     </message>
     <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>ハッシュを入力するか、ハッシュファイルを選択してください。</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>hashcat 実行ファイルが設定されていません。設定で指定してください。</translation>
+    </message>
+    <message>
+        <source>Check Against Potfile</source>
+        <translation>potfile と照合</translation>
+    </message>
+    <message>
+        <source>Checking potfile…</source>
+        <translation>potfile を確認しています…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>キャンセル</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>確認をキャンセルしました。</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat が potfile を照会できませんでした。</translation>
+    </message>
+    <message>
+        <source>Identify hash</source>
+        <translation>ハッシュを識別</translation>
+    </message>
+    <message>
+        <source>The hash type list is unavailable or still loading. Nothing was changed. Check the hashcat path in Settings or try again once the list is available.</source>
+        <translation>ハッシュタイプ一覧が利用できない、またはまだ読み込み中です。変更は行われていません。設定で hashcat のパスを確認するか、一覧が利用可能になってからもう一度お試しください。</translation>
+    </message>
+    <message>
+        <source>Hash mode %1 is not in this hashcat’s hash-type list. Nothing was changed.</source>
+        <translation>ハッシュモード %1 は、この hashcat のハッシュタイプ一覧にありません。変更は行われていません。</translation>
+    </message>
+    <message>
+        <source>The session file could not be read, so the session was not restored.
+
+%1</source>
+        <translation>セッションファイルを読み込めなかったため、セッションは復元されませんでした。
+
+%1</translation>
+    </message>
+    <message>
+        <source>Move the file aside to start with a fresh session? It is renamed, never deleted.</source>
+        <translation>ファイルを退けて新しいセッションを開始しますか? ファイルは削除されず、名前が変更されます。</translation>
+    </message>
+    <message>
+        <source>Move File Aside</source>
+        <translation>ファイルを退ける</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>ファイルを保持</translation>
+    </message>
+    <message>
+        <source>The session file could not be moved to:
+%1</source>
+        <translation>セッションファイルを次の場所に移動できませんでした:
+%1</translation>
+    </message>
+    <message>
+        <source>The session file was moved to:
+%1</source>
+        <translation>セッションファイルを次の場所に移動しました:
+%1</translation>
+    </message>
+    <message>
         <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
         <translation>セッションがハッシュタイプ %1 を指定していますが、この hashcat のバージョンはサポートしていません。「自動検出」が選択されました。</translation>
     </message>
@@ -1560,6 +2074,14 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>Open cache directory</source>
         <translation>キャッシュディレクトリを開く</translation>
+    </message>
+    <message>
+        <source>Wait until the hash type list has loaded.</source>
+        <translation>ハッシュタイプ一覧の読み込みが完了するまでお待ちください。</translation>
+    </message>
+    <message>
+        <source>The hash type list is still loading. Wait until it has loaded and try again.</source>
+        <translation>ハッシュタイプ一覧はまだ読み込み中です。完了してからもう一度お試しください。</translation>
     </message>
     <message>
         <source>Add wordlist folder</source>
@@ -1642,6 +2164,616 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     </message>
 </context>
 <context>
+    <name>PotfileCheck</name>
+    <message>
+        <source>The hashcat path is not configured.</source>
+        <translation>hashcat のパスが設定されていません。</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>ハッシュを入力するか、ハッシュファイルを選択してください。</translation>
+    </message>
+    <message>
+        <source>Choose a hash type. Potfile checks need an explicit hash type; Auto-detect is best-effort and can miscount. Use Tools → Identify Hash if you do not know the type.</source>
+        <translation>ハッシュタイプを選択してください。potfile の照合には明示的なハッシュタイプが必要です。「自動検出」では最善を尽くすだけで、件数が正確でない可能性があります。タイプが不明な場合は「ツール」→「ハッシュを識別」を使用してください。</translation>
+    </message>
+    <message>
+        <source>The remaining hashes are binary data; the count is unknown.</source>
+        <translation>残りのハッシュはバイナリデータのため、件数は不明です。</translation>
+    </message>
+    <message>
+        <source>Choose a hash type.</source>
+        <translation>ハッシュタイプを選択してください。</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat が入力からハッシュを読み込めませんでした。</translation>
+    </message>
+    <message>
+        <source>hashcat could not parse the input for the selected hash type. Check the hash and the hash type.</source>
+        <translation>hashcat が選択されたハッシュタイプで入力を解析できませんでした。ハッシュとハッシュタイプを確認してください。</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat が potfile を照会できませんでした。</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExportUi</name>
+    <message>
+        <source>CSV (*.csv)</source>
+        <translation>CSV (*.csv)</translation>
+    </message>
+    <message>
+        <source>TSV (*.tsv *.txt)</source>
+        <translation>TSV (*.tsv *.txt)</translation>
+    </message>
+    <message>
+        <source>JSON (*.json)</source>
+        <translation>JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Export potfile results</source>
+        <translation>potfile の結果をエクスポート</translation>
+    </message>
+    <message>
+        <source>Export failed</source>
+        <translation>エクスポートに失敗しました</translation>
+    </message>
+    <message>
+        <source>Choose a path other than the potfile.</source>
+        <translation>potfile 以外のパスを選択してください。</translation>
+    </message>
+    <message>
+        <source>The destination is named hashcat.potfile. If this is hashcat’s live potfile, exporting overwrites it.
+
+Export anyway?</source>
+        <translation>出力先のファイル名は hashcat.potfile です。これが hashcat の実際の potfile の場合、エクスポートで上書きされます。
+
+エクスポートしますか?</translation>
+    </message>
+    <message>
+        <source>The file already exists:
+%1
+
+Overwrite it?</source>
+        <translation>ファイルは既に存在します:
+%1
+
+上書きしますか?</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 件</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 件</translation>
+    </message>
+    <message>
+        <source>Export %1 as %2 to:
+%3
+
+The file will contain plaintext passwords. Store it locally and protect it. Spreadsheet applications may evaluate cells beginning with =, +, -, or @ as formulas; open the file as text or disable formula evaluation.</source>
+        <translation>%1 を %2 形式で次にエクスポートします:
+%3
+
+このファイルには平文のパスワードが含まれます。ローカルに保存して保護してください。表計算ソフトは「=」「+」「-」「@」で始まるセルを数式として評価することがあります。ファイルをテキストとして開くか、数式の評価を無効にしてください。</translation>
+    </message>
+    <message>
+        <source>
+
+Only %1 of %2 entries are included.</source>
+        <translation>
+
+%2 件のうち %1 件のみが含まれます。</translation>
+    </message>
+    <message>
+        <source>Export plaintexts</source>
+        <translation>平文をエクスポート</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>エクスポート</translation>
+    </message>
+    <message>
+        <source>Export complete</source>
+        <translation>エクスポート完了</translation>
+    </message>
+    <message>
+        <source>Exported %1 to:
+%2</source>
+        <translation>%1 を次にエクスポートしました:
+%2</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExporter</name>
+    <message>
+        <source>Could not open the export file: %1</source>
+        <translation>エクスポートファイルを開けませんでした: %1</translation>
+    </message>
+    <message>
+        <source>Could not write the export file: %1</source>
+        <translation>エクスポートファイルに書き込めませんでした: %1</translation>
+    </message>
+    <message>
+        <source>Could not save the export file: %1</source>
+        <translation>エクスポートファイルを保存できませんでした: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileInspectorDialog</name>
+    <message>
+        <source>Potfile inspector</source>
+        <translation>potfile インスペクター</translation>
+    </message>
+    <message>
+        <source>Parsed directly; duplicates are exact repeated lines. Separator: ‘:’.</source>
+        <translation>直接解析します。重複は完全に同一の行です。区切り文字は「:」です。</translation>
+    </message>
+    <message>
+        <source>&amp;Potfile:</source>
+        <translation>potfile(&amp;P):</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>参照(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Read the selected potfile again.</source>
+        <translation>選択した potfile を再度読み込みます。</translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation>再読み込み(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Stop reading the potfile.</source>
+        <translation>potfile の読み込みを停止します。</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>キャンセル(&amp;A)</translation>
+    </message>
+    <message>
+        <source>The prefilled path is a heuristic; hashcat may use another path.</source>
+        <translation>入力済みのパスは推定値です。hashcat が別のパスを使用する場合があります。</translation>
+    </message>
+    <message>
+        <source>Potfile reading progress</source>
+        <translation>potfile の読み込み進捗</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>統計(&amp;S)…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible entries.</source>
+        <translation>表示されている項目のパスワードの集計統計を表示します。</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>エクスポート(&amp;E)…</translation>
+    </message>
+    <message>
+        <source>Export the visible entries as CSV, TSV or JSON.</source>
+        <translation>表示されている項目を CSV、TSV、または JSON でエクスポートします。</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>ダイアログを閉じます。</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>閉じる(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Dup</source>
+        <translation>重複</translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation>行</translation>
+    </message>
+    <message>
+        <source>This potfile has no entries.</source>
+        <translation>この potfile には項目がありません。</translation>
+    </message>
+    <message>
+        <source>Choose a potfile.</source>
+        <translation>potfile を選択してください。</translation>
+    </message>
+    <message>
+        <source>Select a potfile</source>
+        <translation>potfile を選択</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>キャンセルしています…</translation>
+    </message>
+    <message>
+        <source>Potfile: %1</source>
+        <translation>potfile: %1</translation>
+    </message>
+    <message>
+        <source>Potfile not found: %1</source>
+        <translation>potfile が見つかりません: %1</translation>
+    </message>
+    <message>
+        <source>Reading potfile…</source>
+        <translation>potfile を読み込んでいます…</translation>
+    </message>
+    <message>
+        <source>Reading cancelled.</source>
+        <translation>読み込みをキャンセルしました。</translation>
+    </message>
+    <message>
+        <source>dup</source>
+        <translation>重複</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 件</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 件</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>重複行 1 件</translation>
+    </message>
+    <message>
+        <source>1 duplicate line (at least)</source>
+        <translation>重複行 1 件以上</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>重複行 %1 件</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines (at least)</source>
+        <translation>重複行 %1 件以上</translation>
+    </message>
+    <message>
+        <source>duplicate count incomplete</source>
+        <translation>重複件数は不完全です</translation>
+    </message>
+    <message>
+        <source>1 malformed line</source>
+        <translation>不正な形式の行が 1 件</translation>
+    </message>
+    <message>
+        <source>%1 malformed lines</source>
+        <translation>不正な形式の行が %1 件</translation>
+    </message>
+    <message>
+        <source>1 encrypted entry</source>
+        <translation>暗号化された項目が 1 件</translation>
+    </message>
+    <message>
+        <source>%1 encrypted entries</source>
+        <translation>暗号化された項目が %1 件</translation>
+    </message>
+    <message>
+        <source>1 entry without a password</source>
+        <translation>パスワードのない項目が 1 件</translation>
+    </message>
+    <message>
+        <source>%1 entries without a password</source>
+        <translation>パスワードのない項目が %1 件</translation>
+    </message>
+    <message>
+        <source>1 incomplete line skipped</source>
+        <translation>不完全な行を 1 件スキップしました</translation>
+    </message>
+    <message>
+        <source>%1 incomplete lines skipped</source>
+        <translation>不完全な行を %1 件スキップしました</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · 最初の %1 / %2 件を表示</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 件をフィルターで非表示</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>平文をエクスポートするには、平文を表示してください。</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileParser</name>
+    <message>
+        <source>Could not open the potfile: %1</source>
+        <translation>potfile を開けませんでした: %1</translation>
+    </message>
+    <message>
+        <source>Could not read the potfile: %1</source>
+        <translation>potfile を読み込めませんでした: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileResultsDialog</name>
+    <message>
+        <source>Cracked hashes</source>
+        <translation>解読済みのハッシュ</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>統計(&amp;S)…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible results.</source>
+        <translation>表示されている結果のパスワードの集計統計を表示します。</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>エクスポート(&amp;E)…</translation>
+    </message>
+    <message>
+        <source>Export the visible results as CSV, TSV or JSON.</source>
+        <translation>表示されている結果を CSV、TSV、または JSON でエクスポートします。</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>ダイアログを閉じます。</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>閉じる(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>ユーザー名</translation>
+    </message>
+    <message>
+        <source>Filter hash or username (plaintext after Reveal)</source>
+        <translation>ハッシュまたはユーザー名でフィルター (表示後に平文)</translation>
+    </message>
+    <message>
+        <source>No cracked hashes for this input.</source>
+        <translation>この入力に一致する解読済みハッシュはありません。</translation>
+    </message>
+    <message>
+        <source>Cracked hashes — mode %1</source>
+        <translation>解読済みのハッシュ — モード %1</translation>
+    </message>
+    <message>
+        <source>Potfile: hashcat’s default potfile. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>potfile: hashcat の既定の potfile。hashcat はハッシュで potfile の項目を照合します。選択したハッシュタイプで検索が絞り込まれます。</translation>
+    </message>
+    <message>
+        <source>Potfile: %1. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>potfile: %1。hashcat はハッシュで potfile の項目を照合します。選択したハッシュタイプで検索が絞り込まれます。</translation>
+    </message>
+    <message>
+        <source>%1 of %2 cracked</source>
+        <translation>%1 / %2 件を解読</translation>
+    </message>
+    <message>
+        <source>%1 cracked (remaining unknown)</source>
+        <translation>%1 件を解読 (残りは不明)</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>確認をキャンセルしました。</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat が potfile を照会できませんでした。</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · 最初の %1 / %2 件を表示</translation>
+    </message>
+    <message>
+        <source>1 unreadable result line skipped.</source>
+        <translation>読み取れない結果行を 1 件スキップしました。</translation>
+    </message>
+    <message>
+        <source>%1 unreadable result lines skipped.</source>
+        <translation>読み取れない結果行を %1 件スキップしました。</translation>
+    </message>
+    <message>
+        <source> · %1 encrypted</source>
+        <translation> · %1 件が暗号化済み</translation>
+    </message>
+    <message>
+        <source> · includes a binary hash file</source>
+        <translation> · バイナリのハッシュファイルを含みます</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 件をフィルターで非表示</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>平文をエクスポートするには、平文を表示してください。</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileStatisticsDialog</name>
+    <message>
+        <source>Password statistics</source>
+        <translation>パスワード統計</translation>
+    </message>
+    <message>
+        <source>Password length distribution</source>
+        <translation>パスワード長の分布</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>長さ</translation>
+    </message>
+    <message>
+        <source>Passwords</source>
+        <translation>パスワード</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>ダイアログを閉じます。</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>閉じる(&amp;C)</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 件</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 件</translation>
+    </message>
+    <message>
+        <source>1 password analyzed</source>
+        <translation>パスワード 1 件を解析</translation>
+    </message>
+    <message>
+        <source>%1 passwords analyzed</source>
+        <translation>パスワード %1 件を解析</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>重複行 1 件</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>重複行 %1 件</translation>
+    </message>
+    <message>
+        <source>duplicate lines: unknown</source>
+        <translation>重複行: 不明</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>%1 empty · %2 encrypted · %3 · %4 unique plaintexts</source>
+        <translation>%1 件が空 · %2 件が暗号化済み · %3 · 固有の平文 %4 件</translation>
+    </message>
+    <message>
+        <source>Length: —</source>
+        <translation>長さ: —</translation>
+    </message>
+    <message>
+        <source>Length: min %1 · max %2 · average %3</source>
+        <translation>長さ: 最小 %1 · 最大 %2 · 平均 %3</translation>
+    </message>
+    <message>
+        <source>Based on the visible %1 of %2 entries.</source>
+        <translation>表示されている %1 / %2 件に基づきます。</translation>
+    </message>
+    <message>
+        <source>No plaintext passwords to analyze.</source>
+        <translation>解析できる平文のパスワードがありません。</translation>
+    </message>
+    <message>
+        <source>Passwords containing:
+lowercase: %1 (%2%)
+uppercase: %3 (%4%)
+digits: %5 (%6%)
+symbols: %7 (%8%)
+whitespace: %9 (%10%)
+non-ASCII: %11 (%12%)</source>
+        <translation>含まれる文字:
+小文字: %1 (%2%)
+大文字: %3 (%4%)
+数字: %5 (%6%)
+記号: %7 (%8%)
+空白: %9 (%10%)
+非 ASCII: %11 (%12%)</translation>
+    </message>
+    <message>
+        <source>Calculating statistics…</source>
+        <translation>統計を計算しています…</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileTableView</name>
+    <message>
+        <source>Filter hash (plaintext after Reveal)</source>
+        <translation>ハッシュをフィルター (表示後に平文)</translation>
+    </message>
+    <message>
+        <source>Plaintext is searched only after Reveal plaintexts is enabled.</source>
+        <translation>平文は「平文を表示」を有効にした後でのみ検索されます。</translation>
+    </message>
+    <message>
+        <source>Copy selected</source>
+        <translation>選択をコピー</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to copy the real values.</source>
+        <translation>実際の値をコピーするには、平文を表示してください。</translation>
+    </message>
+    <message>
+        <source>Copy all</source>
+        <translation>すべてコピー</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts</source>
+        <translation>平文を表示</translation>
+    </message>
+    <message>
+        <source>Show or mask plaintext values.</source>
+        <translation>平文の値を表示またはマスクします。</translation>
+    </message>
+    <message>
+        <source>Hash</source>
+        <translation>ハッシュ</translation>
+    </message>
+    <message>
+        <source>Plaintext</source>
+        <translation>平文</translation>
+    </message>
+    <message>
+        <source>Copied 1 row</source>
+        <translation>1 行をコピーしました</translation>
+    </message>
+    <message>
+        <source>Copied %1 rows</source>
+        <translation>%1 行をコピーしました</translation>
+    </message>
+    <message>
+        <source>Copy selected rows</source>
+        <translation>選択した行をコピー</translation>
+    </message>
+    <message>
+        <source>Copies tab-separated rows. Encrypted rows copy the stored $HCENC$ token.</source>
+        <translation>タブ区切りの行をコピーします。暗号化された行は保存されている $HCENC$ トークンをコピーします。</translation>
+    </message>
+    <message>
+        <source>Hide plaintexts</source>
+        <translation>平文を非表示</translation>
+    </message>
+    <message>
+        <source>Binary hash file; hashcat reports the file name.</source>
+        <translation>バイナリのハッシュファイルです。hashcat がファイル名を報告します。</translation>
+    </message>
+    <message>
+        <source>No rows match the filter.</source>
+        <translation>フィルターに一致する行がありません。</translation>
+    </message>
+    <message>
+        <source>(encrypted)</source>
+        <translation>(暗号化済み)</translation>
+    </message>
+    <message>
+        <source>(empty)</source>
+        <translation>(空)</translation>
+    </message>
+    <message>
+        <source>(file) %1</source>
+        <translation>(ファイル) %1</translation>
+    </message>
+</context>
+<context>
     <name>SessionTransfer</name>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -1699,24 +2831,52 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>言語(&amp;L)</translation>
     </message>
     <message>
+        <source>Interface language. Takes effect after a restart.</source>
+        <translation>インターフェースの言語。再起動後に適用されます。</translation>
+    </message>
+    <message>
         <source>&amp;Color scheme</source>
         <translation>カラースキーム(&amp;C)</translation>
+    </message>
+    <message>
+        <source>The file the last session is stored in.</source>
+        <translation>最後のセッションが保存されるファイル。</translation>
+    </message>
+    <message>
+        <source>Open the folder the session is stored in.</source>
+        <translation>セッションが保存されているフォルダーを開きます。</translation>
+    </message>
+    <message>
+        <source>The file the settings are stored in.</source>
+        <translation>設定が保存されるファイル。</translation>
+    </message>
+    <message>
+        <source>Open the folder the settings are stored in.</source>
+        <translation>設定が保存されているフォルダーを開きます。</translation>
     </message>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>すべてのカラースキームがすべてのプラットフォームで利用できるわけではありません。</translation>
     </message>
     <message>
-        <source>&amp;Parameters</source>
-        <translation>パラメーター(&amp;P)</translation>
-    </message>
-    <message>
         <source>&amp;Use short parameters</source>
         <translation>短いパラメーターを使用する(&amp;U)</translation>
     </message>
     <message>
+        <source>Sho&amp;w the exact command in the terminal</source>
+        <translation>起動ターミナルに正確なコマンドを表示する(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Print the exact command hashcat receives in the launch terminal, so a mangled value is visible.</source>
+        <translation>hashcat が受け取る正確なコマンドを起動用ターミナルに出力します。値が壊れている場合に確認できます。</translation>
+    </message>
+    <message>
         <source>Session and files</source>
         <translation>セッションとファイル</translation>
+    </message>
+    <message>
+        <source>Restore the session saved when the application last closed.</source>
+        <translation>アプリケーションの前回終了時に保存されたセッションを復元します。</translation>
     </message>
     <message>
         <source>&amp;Restore the last session at startup</source>
@@ -1727,28 +2887,12 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>セッションファイル(&amp;S)</translation>
     </message>
     <message>
-        <source>The file the last session is stored in</source>
-        <translation>前回のセッションの保存先ファイル</translation>
-    </message>
-    <message>
         <source>Open folder</source>
         <translation>フォルダーを開く</translation>
     </message>
     <message>
-        <source>Open the folder the session is stored in</source>
-        <translation>セッションの保存先フォルダーを開きます</translation>
-    </message>
-    <message>
         <source>Settings &amp;file</source>
         <translation>設定ファイル(&amp;F)</translation>
-    </message>
-    <message>
-        <source>The file the settings are stored in</source>
-        <translation>設定の保存先ファイル</translation>
-    </message>
-    <message>
-        <source>Open the folder the settings are stored in</source>
-        <translation>設定の保存先フォルダーを開きます</translation>
     </message>
     <message>
         <source>General</source>
@@ -1815,6 +2959,16 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>実行ファイル (*.exe *.bin hashcat);;すべてのファイル (*)</translation>
     </message>
     <message>
+        <source>Settings saved</source>
+        <translation>設定を保存しました</translation>
+    </message>
+    <message>
+        <source>The old settings file was moved to:
+%1</source>
+        <translation>古い設定ファイルを次の場所に移動しました:
+%1</translation>
+    </message>
+    <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
         <translation>hashcat 実行ファイルが設定されていないため、hashcat を起動できません。</translation>
     </message>
@@ -1839,12 +2993,43 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>選択したファイルは実行ファイルではありません。</translation>
     </message>
     <message>
+        <source>Settings not saved</source>
+        <translation>設定が保存されませんでした</translation>
+    </message>
+    <message>
+        <source>Move the file aside and save these values? It is renamed, never deleted.</source>
+        <translation>ファイルを退けてこれらの値を保存しますか? ファイルは削除されず、名前が変更されます。</translation>
+    </message>
+    <message>
+        <source>Move File Aside and Save</source>
+        <translation>退けて保存</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>ファイルを保持</translation>
+    </message>
+    <message>
         <source>Restart required</source>
         <translation>再起動が必要です</translation>
     </message>
     <message>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>新しい言語を適用するには hashcat-gui を再起動してください。</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsManager</name>
+    <message>
+        <source>The settings could not be written to “%1”. Check the file permissions.</source>
+        <translation>設定を「%1」に書き込めませんでした。ファイルの権限を確認してください。</translation>
+    </message>
+    <message>
+        <source>The settings file “%1” is not in a readable format.</source>
+        <translation>設定ファイル「%1」は読み取り可能な形式ではありません。</translation>
+    </message>
+    <message>
+        <source>The settings file could not be moved to “%1”.</source>
+        <translation>設定ファイルを「%1」に移動できませんでした。</translation>
     </message>
 </context>
 <context>
@@ -1888,6 +3073,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>The “%1” section does not contain any values.</source>
         <translation>「%1」セクションに値が含まれていません。</translation>
+    </message>
+    <message>
+        <source>The “%1” section names a version that is not a number.</source>
+        <translation>「%1」セクションに、数値ではないバージョンが指定されています。</translation>
     </message>
     <message>
         <source> and </source>

@@ -194,7 +194,7 @@ void IdentifyDialog::identifyClicked()
     m_hasResults = false;
     ui->treeWidget_results->clear();
     ui->pushButton_apply->setEnabled(false);
-    showMessage(tr("Identifying hash..."));
+    showMessage(tr("Identifying hash…"));
     setBusy(true);
 
     connect(m_watcher.get(), &QFutureWatcher<HashcatResult>::finished, this, [this] {
@@ -387,5 +387,5 @@ QString IdentifyDialog::queryErrorMessage(const QString &standardError)
     if (!detail.isEmpty()) {
         return tr("hashcat reported:\n%1").arg(detail);
     }
-    return tr("hashcat's output could not be parsed. Check the hashcat version or report a bug.");
+    return tr("hashcat’s output could not be parsed. Check the hashcat version or report a bug.");
 }

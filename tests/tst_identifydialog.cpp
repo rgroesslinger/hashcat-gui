@@ -782,7 +782,8 @@ void TestIdentifyDialog::buttonMnemonicsAreUnique()
     IdentifyDialog dialog;
     QSet<QChar> seen;
 
-    for (const QPushButton *button : dialog.findChildren<QPushButton *>()) {
+    const QList<QPushButton *> buttons = dialog.findChildren<QPushButton *>();
+    for (const QPushButton *button : buttons) {
         const QString text = button->text();
         const qsizetype amp = text.indexOf(QLatin1Char('&'));
         if (amp < 0 || amp + 1 >= text.size()) {

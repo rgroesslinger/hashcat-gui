@@ -71,7 +71,7 @@ void BackendInfoDialog::refreshClicked()
     m_cancel = std::make_shared<std::atomic_bool>(false);
 
     ui->plainTextEdit_output->clear();
-    showMessage(tr("Reading backend information..."));
+    showMessage(tr("Reading backend information…"));
     setBusy(true);
 
     connect(m_watcher.get(), &QFutureWatcher<HashcatResult>::finished, this, [this] {

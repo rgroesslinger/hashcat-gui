@@ -28,8 +28,12 @@
         <translation>업데이트를 확인하는 중…</translation>
     </message>
     <message>
-        <source>Ask GitHub whether a newer release is available</source>
-        <translation>새 릴리스를 사용할 수 있는지 GitHub에 확인합니다</translation>
+        <source>Ask GitHub whether a newer release is available.</source>
+        <translation>GitHub에 새 릴리스가 있는지 확인합니다.</translation>
+    </message>
+    <message>
+        <source>Copy the application, toolkit, system and hashcat versions to the clipboard.</source>
+        <translation>애플리케이션, 툴킷, 시스템 및 hashcat 버전을 클립보드에 복사합니다.</translation>
     </message>
     <message>
         <source>Check for updates</source>
@@ -50,10 +54,6 @@
     <message>
         <source>License</source>
         <translation>라이선스</translation>
-    </message>
-    <message>
-        <source>Copy the application, toolkit, system and hashcat versions to the clipboard</source>
-        <translation>애플리케이션, 툴킷, 시스템, hashcat 버전을 클립보드에 복사</translation>
     </message>
     <message>
         <source>Copy details</source>
@@ -204,6 +204,81 @@
     </message>
 </context>
 <context>
+    <name>BackendInfoDialog</name>
+    <message>
+        <source>Backend information</source>
+        <translation>백엔드 정보</translation>
+    </message>
+    <message>
+        <source>Query hashcat again for backend information.</source>
+        <translation>hashcat에 백엔드 정보를 다시 조회합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>새로 고침(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Stop the running query.</source>
+        <translation>실행 중인 조회를 중지합니다.</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>취소(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Copy the backend information to the clipboard.</source>
+        <translation>백엔드 정보를 클립보드에 복사합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>복사(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>대화상자를 닫습니다.</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>닫기(&amp;O)</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>hashcat 실행 파일이 설정되지 않았습니다. 설정에서 지정하세요.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>설정된 hashcat 실행 파일을 찾을 수 없습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>Reading backend information…</source>
+        <translation>백엔드 정보를 읽는 중…</translation>
+    </message>
+    <message>
+        <source>Backend query cancelled.</source>
+        <translation>백엔드 조회가 취소되었습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while reading backend information.</source>
+        <translation>hashcat이 백엔드 정보를 읽는 동안 시간이 초과되었습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information.</source>
+        <translation>hashcat이 백엔드 정보를 읽을 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information:
+%1</source>
+        <translation>hashcat이 백엔드 정보를 읽을 수 없습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>Backend information reported by hashcat.</source>
+        <translation>hashcat이 보고한 백엔드 정보입니다.</translation>
+    </message>
+</context>
+<context>
     <name>ExampleSession</name>
     <message>
         <source>Could not create the example directory “%1”.</source>
@@ -255,10 +330,217 @@
     </message>
 </context>
 <context>
+    <name>IdentifyDialog</name>
+    <message>
+        <source>Identify hash</source>
+        <translation>해시 식별</translation>
+    </message>
+    <message>
+        <source>&amp;Hash or hash file:</source>
+        <translation>해시 또는 해시 파일(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file to identify.</source>
+        <translation>해시를 붙여넣거나 해시 파일을 선택하여 식별합니다.</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file</source>
+        <translation>해시를 붙여넣거나 해시 파일 선택</translation>
+    </message>
+    <message>
+        <source>Choose a hash file.</source>
+        <translation>해시 파일을 선택합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>찾아보기(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Identify the hash type of the entered hash.</source>
+        <translation>입력한 해시의 해시 유형을 식별합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Identify</source>
+        <translation>식별(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Paste a hash or choose a hash file, then select Identify.</source>
+        <translation>해시를 붙여넣거나 해시 파일을 선택한 후 “식별”을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>Identification progress</source>
+        <translation>식별 진행 상태</translation>
+    </message>
+    <message>
+        <source>Elapsed time</source>
+        <translation>경과 시간</translation>
+    </message>
+    <message>
+        <source>Matching hash types; select one and apply it to the attack.</source>
+        <translation>일치하는 해시 유형입니다. 하나를 선택하여 공격에 적용하세요.</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>모드</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>이름</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>범주</translation>
+    </message>
+    <message>
+        <source>Use the selected hash type in the attack.</source>
+        <translation>선택한 해시 유형을 공격에 사용합니다.</translation>
+    </message>
+    <message>
+        <source>Apply mode to attack</source>
+        <translation>모드를 공격에 적용</translation>
+    </message>
+    <message>
+        <source>Stop the running identification.</source>
+        <translation>실행 중인 식별을 중지합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>취소(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>대화상자를 닫습니다.</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>닫기(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Elapsed: %1 s</source>
+        <translation>경과: %1초</translation>
+    </message>
+    <message>
+        <source>Multiple lines pasted. Use Browse to select a hash file, or paste one hash.</source>
+        <translation>여러 줄이 붙여넣어졌습니다. “찾아보기”로 해시 파일을 선택하거나 해시를 하나만 붙여넣으세요.</translation>
+    </message>
+    <message>
+        <source>Input changed. Identify it again.</source>
+        <translation>입력이 변경되었습니다. 다시 식별하세요.</translation>
+    </message>
+    <message>
+        <source>Select a hash file</source>
+        <translation>해시 파일 선택</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>해시를 입력하거나 해시 파일을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>hashcat 실행 파일이 설정되지 않았습니다. 설정에서 지정하세요.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>설정된 hashcat 실행 파일을 찾을 수 없습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>Identifying hash…</source>
+        <translation>해시를 식별하는 중…</translation>
+    </message>
+    <message>
+        <source>Identification cancelled.</source>
+        <translation>식별이 취소되었습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while identifying the hash.</source>
+        <translation>hashcat이 해시를 식별하는 동안 시간이 초과되었습니다.</translation>
+    </message>
+    <message>
+        <source>No hash modes match this structure.</source>
+        <translation>이 구조와 일치하는 해시 모드가 없습니다.</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode and hash to the attack.</source>
+        <translation>이 구조와 일치하는 해시 모드가 하나 있습니다. 선택한 후 모드와 해시를 공격에 적용하세요.</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode to the attack.</source>
+        <translation>이 구조와 일치하는 해시 모드가 하나 있습니다. 선택한 후 모드를 공격에 적용하세요.</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode and hash to the attack.</source>
+        <translation>이 구조와 일치하는 해시 모드가 %1개 있습니다. 하나를 선택한 후 모드와 해시를 공격에 적용하세요.</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode to the attack.</source>
+        <translation>이 구조와 일치하는 해시 모드가 %1개 있습니다. 하나를 선택한 후 모드를 공격에 적용하세요.</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>취소하는 중…</translation>
+    </message>
+    <message>
+        <source>Apply mode and hash to attack</source>
+        <translation>모드와 해시를 공격에 적용</translation>
+    </message>
+    <message>
+        <source>Another hashcat instance is using this session. Close it and try again.</source>
+        <translation>다른 hashcat 인스턴스가 이 세션을 사용 중입니다. 닫은 후 다시 시도하세요.</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat이 입력에서 해시를 하나도 읽지 못했습니다.</translation>
+    </message>
+    <message>
+        <source>The input contains characters hashcat cannot encode.</source>
+        <translation>입력에 hashcat이 인코딩할 수 없는 문자가 포함되어 있습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat reported:
+%1</source>
+        <translation>hashcat 보고:
+%1</translation>
+    </message>
+    <message>
+        <source>hashcat’s output could not be parsed. Check the hashcat version or report a bug.</source>
+        <translation>hashcat의 출력을 구문 분석할 수 없습니다. hashcat 버전을 확인하거나 버그를 보고하세요.</translation>
+    </message>
+</context>
+<context>
     <name>LaunchMessage</name>
     <message>
         <source>Windows executable names include their extension, for example hashcat.exe.</source>
         <translation>Windows 실행 파일 이름에는 확장자가 포함됩니다(예: hashcat.exe).</translation>
+    </message>
+    <message>
+        <source>hash file</source>
+        <translation>해시 파일</translation>
+    </message>
+    <message>
+        <source>outfile</source>
+        <translation>출력 파일</translation>
+    </message>
+    <message>
+        <source>potfile</source>
+        <translation>potfile</translation>
+    </message>
+    <message>
+        <source>wordlist</source>
+        <translation>단어 목록</translation>
+    </message>
+    <message>
+        <source>rules file</source>
+        <translation>규칙 파일</translation>
+    </message>
+    <message>
+        <source>table</source>
+        <translation>테이블</translation>
+    </message>
+    <message>
+        <source>cache folder</source>
+        <translation>캐시 폴더</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -413,12 +695,72 @@ md5(md5(salt) . pass). 이를 해시 레시피 필드에 입력하세요.</trans
 %1</translation>
     </message>
     <message>
+        <source>The potfile path must be a writable file, or a new file in an existing writable folder:
+%1</source>
+        <translation>potfile 경로는 쓰기 가능한 파일이거나 쓰기 가능한 기존 폴더 안의 새 파일이어야 합니다:
+%1</translation>
+    </message>
+    <message>
+        <source>The skip or limit value must be a whole number from 0 to %1:
+%2</source>
+        <translation>건너뛰기 또는 제한 값은 0부터 %1까지의 정수여야 합니다:
+%2</translation>
+    </message>
+    <message>
+        <source>The device types must be 1 (CPU) or 2 (GPU), separated by commas:
+%1</source>
+        <translation>장치 유형은 1(CPU) 또는 2(GPU)를 쉼표로 구분해 지정해야 합니다:
+%1</translation>
+    </message>
+    <message>
+        <source>The CPU affinity must be a comma-separated list of CPU numbers:
+%1</source>
+        <translation>CPU 선호도는 CPU 번호를 쉼표로 구분한 목록이어야 합니다:
+%1</translation>
+    </message>
+    <message>
+        <source>The backend devices must be a comma-separated list of device numbers starting at 1:
+%1</source>
+        <translation>백엔드 장치는 1부터 시작하는 장치 번호를 쉼표로 구분한 목록이어야 합니다:
+%1</translation>
+    </message>
+    <message>
+        <source>The session name must not contain a path separator:
+%1</source>
+        <translation>세션 이름에는 경로 구분자를 사용할 수 없습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>A ruleset folder needs Grammar/grammar.txt; choose a rules file instead:
+%1</source>
+        <translation>규칙 세트 폴더에는 Grammar/grammar.txt가 필요합니다. 대신 규칙 파일을 선택하세요:
+%1</translation>
+    </message>
+    <message>
+        <source>A table has to be a file; hashcat does not read a folder:
+%1</source>
+        <translation>테이블은 파일이어야 합니다. hashcat은 폴더를 읽지 않습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>The %1 and the %2 use the same path:
+%3
+hashcat writes one or both of them, so a run could change the file. Choose different paths.</source>
+        <translation>%1와 %2에 같은 경로가 지정되었습니다:
+%3
+hashcat이 둘 중 하나 또는 모두에 쓰므로 실행 중 파일이 변경될 수 있습니다. 서로 다른 경로를 선택하세요.</translation>
+    </message>
+    <message>
         <source>The increment cannot be combined with the speed-only option.</source>
         <translation>증가는 속도 전용 옵션과 함께 사용할 수 없습니다.</translation>
     </message>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>연관 공격 모드에서는 크래킹한 해시를 제거할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Keep guessing cannot be combined with removing cracked hashes from the hash file. Clear either option.</source>
+        <translation>“계속 추측”은 해시 파일에서 크래킹된 해시를 제거하는 옵션과 함께 사용할 수 없습니다. 두 옵션 중 하나를 해제하세요.</translation>
     </message>
     <message>
         <source>This value contains a control character that cannot be passed to hashcat:
@@ -439,10 +781,6 @@ Remove the character and try again.</source>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Hash file or hash:</source>
-        <translation>해시 파일 또는 해시:</translation>
-    </message>
     <message>
         <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
         <translation>해시, 해시 파일, 또는 .hc22000/.hccapx WPA 캡처입니다.</translation>
@@ -472,16 +810,8 @@ Remove the character and try again.</source>
         <translation>해시 레시피(예: “md5(md5(salt) . pass)”). 레시피 전체는 셸의 바깥쪽 따옴표로 감싸고, 안쪽 문자열에는 다른 종류의 따옴표를 사용합니다. PowerShell에서는 $ 앞에 백틱이 필요합니다.</translation>
     </message>
     <message>
-        <source>Move item up</source>
-        <translation>항목 위로 이동</translation>
-    </message>
-    <message>
         <source>Move selected wordlist up</source>
         <translation>선택한 단어 목록 위로 이동</translation>
-    </message>
-    <message>
-        <source>Move item down</source>
-        <translation>항목 아래로 이동</translation>
     </message>
     <message>
         <source>Move selected wordlist down</source>
@@ -508,14 +838,6 @@ Remove the character and try again.</source>
         <translation>단어 목록이 16진수</translation>
     </message>
     <message>
-        <source>Encoding from:</source>
-        <translation>인코딩 원본:</translation>
-    </message>
-    <message>
-        <source>Encoding to:</source>
-        <translation>인코딩 대상:</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>규칙 세트 파일, Grammar/grammar.txt가 있는 폴더, 또는 내장 이름. 체크되지 않은 행은 건너뛰며, 하나도 체크되지 않으면 default-passwords가 실행됩니다.</translation>
     </message>
@@ -536,24 +858,76 @@ Remove the character and try again.</source>
         <translation>규칙 세트 제거</translation>
     </message>
     <message>
+        <source>Move selected ruleset up.</source>
+        <translation>선택한 규칙 세트를 위로 이동합니다.</translation>
+    </message>
+    <message>
         <source>Move selected ruleset up</source>
         <translation>선택한 규칙 세트 위로 이동</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down.</source>
+        <translation>선택한 규칙 세트를 아래로 이동합니다.</translation>
     </message>
     <message>
         <source>Move selected ruleset down</source>
         <translation>선택한 규칙 세트 아래로 이동</translation>
     </message>
     <message>
+        <source>Sca&amp;le:</source>
+        <translation>배율(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Quantization steps per bit (1–64).</source>
+        <translation>비트당 양자화 단계(1–64).</translation>
+    </message>
+    <message>
+        <source>&amp;Costmax:</source>
+        <translation>최대 비용(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Highest cost level to enumerate (1–64).</source>
+        <translation>열거할 최대 비용 수준(1–64).</translation>
+    </message>
+    <message>
+        <source>&amp;Weights:</source>
+        <translation>가중치(&amp;W):</translation>
+    </message>
+    <message>
+        <source>&amp;Kbits:</source>
+        <translation>Kbits(&amp;K):</translation>
+    </message>
+    <message>
+        <source>Bits one inner loop may span (0–27).</source>
+        <translation>내부 루프 한 번이 다룰 수 있는 비트 수(0–27).</translation>
+    </message>
+    <message>
+        <source>Ma&amp;xword:</source>
+        <translation>최대 단어(&amp;X):</translation>
+    </message>
+    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>커널이 만드는 후보의 최대 길이(4바이트 단어 단위): 0(자동), 16 또는 32.</translation>
+    </message>
+    <message>
+        <source>Max&amp;gain:</source>
+        <translation>최대 이득(&amp;G):</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>공백으로 구분된 key=value 설정: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. 규칙 세트가 먼저 와야 합니다.</translation>
     </message>
     <message>
+        <source>Tables</source>
+        <translation>테이블</translation>
+    </message>
+    <message>
         <source>Add one or more table files.</source>
         <translation>테이블 파일을 하나 이상 추가합니다.</translation>
+    </message>
+    <message>
+        <source>Add table</source>
+        <translation>테이블 추가</translation>
     </message>
     <message>
         <source>Remove the selected tables.</source>
@@ -562,6 +936,14 @@ Remove the character and try again.</source>
     <message>
         <source>Remove tables</source>
         <translation>테이블 제거</translation>
+    </message>
+    <message>
+        <source>Move selected table up.</source>
+        <translation>선택한 테이블을 위로 이동합니다.</translation>
+    </message>
+    <message>
+        <source>Move selected table down.</source>
+        <translation>선택한 테이블을 아래로 이동합니다.</translation>
     </message>
     <message>
         <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
@@ -608,6 +990,14 @@ Remove the character and try again.</source>
         <translation>피드에 전달할 인수를 순서대로 추가합니다.</translation>
     </message>
     <message>
+        <source>Add feed argument</source>
+        <translation>피드 인수 추가</translation>
+    </message>
+    <message>
+        <source>Feed arguments</source>
+        <translation>피드 인수</translation>
+    </message>
+    <message>
         <source>Remove the selected feed arguments.</source>
         <translation>선택한 피드 인수를 제거합니다.</translation>
     </message>
@@ -616,8 +1006,16 @@ Remove the character and try again.</source>
         <translation>피드 인수 제거</translation>
     </message>
     <message>
+        <source>Move selected feed argument up.</source>
+        <translation>선택한 피드 인수를 위로 이동합니다.</translation>
+    </message>
+    <message>
         <source>Move selected feed argument up</source>
         <translation>선택한 피드 인수 위로 이동</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down.</source>
+        <translation>선택한 피드 인수를 아래로 이동합니다.</translation>
     </message>
     <message>
         <source>Move selected feed argument down</source>
@@ -692,6 +1090,14 @@ Remove the character and try again.</source>
         <translation>마스크 최대 길이입니다. 0이면 옵션을 생략하고 hashcat의 기본값(마스크 길이)을 사용합니다.</translation>
     </message>
     <message>
+        <source>Grow the mask from the right end instead of the left (hashcat -ii).</source>
+        <translation>왼쪽 끝 대신 오른쪽 끝에서 마스크를 늘립니다(hashcat -ii).</translation>
+    </message>
+    <message>
+        <source>Right-to-left</source>
+        <translation>오른쪽에서 왼쪽으로</translation>
+    </message>
+    <message>
         <source>Use ?1 in the mask to insert this charset.</source>
         <translation>마스크에서 ?1을 사용하면 이 문자 집합이 삽입됩니다.</translation>
     </message>
@@ -716,12 +1122,80 @@ Remove the character and try again.</source>
         <translation>문자 집합이 16진수</translation>
     </message>
     <message>
+        <source>&amp;Session name:</source>
+        <translation>세션 이름(&amp;S):</translation>
+    </message>
+    <message>
+        <source>R&amp;untime limit:</source>
+        <translation>실행 시간 제한(&amp;U):</translation>
+    </message>
+    <message>
+        <source>&amp;Device types:</source>
+        <translation>장치 유형(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Potfile:</source>
+        <translation>potfile:</translation>
+    </message>
+    <message>
+        <source>Read and write recovered hashes in this potfile instead of the default one.</source>
+        <translation>기본 potfile 대신 이 potfile에서 복구한 해시를 읽고 씁니다.</translation>
+    </message>
+    <message>
+        <source>Choose the potfile path.</source>
+        <translation>potfile 경로를 선택합니다.</translation>
+    </message>
+    <message>
+        <source>Choose potfile</source>
+        <translation>potfile 선택</translation>
+    </message>
+    <message>
+        <source>Copy command to clipboard.</source>
+        <translation>명령을 클립보드에 복사합니다.</translation>
+    </message>
+    <message>
         <source>Command preview</source>
         <translation>명령 미리보기</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat.</source>
+        <translation>hashcat을 시작하는 인코딩되지 않은 PowerShell 스크립트를 복사합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Identify Hash…</source>
+        <translation>해시 식별(&amp;I)…</translation>
+    </message>
+    <message>
+        <source>Ask hashcat which hash modes match a hash.</source>
+        <translation>hashcat에 해시와 일치하는 해시 모드를 확인합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Backend Information…</source>
+        <translation>백엔드 정보(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Show the devices and backends hashcat detected.</source>
+        <translation>hashcat이 감지한 장치와 백엔드를 표시합니다.</translation>
+    </message>
+    <message>
+        <source>Check Against &amp;Potfile…</source>
+        <translation>potfile과 비교(&amp;P)…</translation>
+    </message>
+    <message>
+        <source>Check whether the hashes in the hash field are already in the potfile.</source>
+        <translation>해시 필드의 해시가 potfile에 있는지 확인합니다.</translation>
+    </message>
+    <message>
+        <source>Potfile I&amp;nspector…</source>
+        <translation>potfile 검사기(&amp;N)…</translation>
+    </message>
+    <message>
+        <source>Browse an explicit potfile without hash-type verification.</source>
+        <translation>해시 유형 확인 없이 지정된 potfile을 찾아봅니다.</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -780,10 +1254,6 @@ Remove the character and try again.</source>
         <translation>세션 초기화</translation>
     </message>
     <message>
-        <source>Mode:</source>
-        <translation>모드:</translation>
-    </message>
-    <message>
         <source>Attack</source>
         <translation>공격</translation>
     </message>
@@ -800,20 +1270,8 @@ Remove the character and try again.</source>
         <translation>공격 모드입니다. 선택한 항목에 따라 아래에 해당 옵션이 표시됩니다.</translation>
     </message>
     <message>
-        <source>Hash type:</source>
-        <translation>해시 유형:</translation>
-    </message>
-    <message>
-        <source>Hash recipe:</source>
-        <translation>해시 레시피:</translation>
-    </message>
-    <message>
         <source>Add files…</source>
         <translation>파일 추가…</translation>
-    </message>
-    <message>
-        <source>hashcat reads every file directly inside the folder as one wordlist.</source>
-        <translation>hashcat은 폴더 바로 안의 모든 파일을 하나의 단어 목록으로 읽습니다.</translation>
     </message>
     <message>
         <source>Add folder…</source>
@@ -864,26 +1322,6 @@ Remove the character and try again.</source>
         <translation>규칙 세트 폴더에는 Grammar/grammar.txt가 필요합니다.</translation>
     </message>
     <message>
-        <source>Scale:</source>
-        <translation>Scale:</translation>
-    </message>
-    <message>
-        <source>Quantization steps per bit (1–64)</source>
-        <translation>비트당 양자화 단계 수(1–64)</translation>
-    </message>
-    <message>
-        <source>Costmax:</source>
-        <translation>Costmax:</translation>
-    </message>
-    <message>
-        <source>Highest cost level to enumerate (1–64)</source>
-        <translation>열거할 최대 비용 수준(1–64)</translation>
-    </message>
-    <message>
-        <source>Weights:</source>
-        <translation>Weights:</translation>
-    </message>
-    <message>
         <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
         <translation>규칙 세트마다 양수 하나를 콜론으로 구분하여 입력합니다(예: 2:1). 개수는 규칙 세트 수와 일치해야 합니다.</translation>
     </message>
@@ -898,22 +1336,6 @@ Remove the character and try again.</source>
     <message>
         <source>auto</source>
         <translation>자동</translation>
-    </message>
-    <message>
-        <source>Kbits:</source>
-        <translation>Kbits:</translation>
-    </message>
-    <message>
-        <source>Bits one inner loop may span (0–27)</source>
-        <translation>내부 루프 하나가 포괄할 수 있는 비트 수(0–27)</translation>
-    </message>
-    <message>
-        <source>Maxword:</source>
-        <translation>Maxword:</translation>
-    </message>
-    <message>
-        <source>Maxgain:</source>
-        <translation>Maxgain:</translation>
     </message>
     <message>
         <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
@@ -1002,10 +1424,6 @@ Remove the character and try again.</source>
     <message>
         <source>Copy as PowerShell Script</source>
         <translation>PowerShell 스크립트로 복사</translation>
-    </message>
-    <message>
-        <source>Copy the unencoded PowerShell script that starts hashcat</source>
-        <translation>hashcat을 시작하는 인코딩되지 않은 PowerShell 스크립트를 복사합니다</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1100,16 +1518,8 @@ Remove the character and try again.</source>
         <translation>세션 및 제한</translation>
     </message>
     <message>
-        <source>Session name:</source>
-        <translation>세션 이름:</translation>
-    </message>
-    <message>
         <source>Name hashcat uses for its restore file and status output.</source>
         <translation>hashcat이 복원 파일과 상태 출력에 사용하는 이름입니다.</translation>
-    </message>
-    <message>
-        <source>Runtime limit:</source>
-        <translation>실행 시간 제한:</translation>
     </message>
     <message>
         <source>unlimited</source>
@@ -1176,10 +1586,6 @@ Remove the character and try again.</source>
         <translation>백엔드 장치:</translation>
     </message>
     <message>
-        <source>Device types:</source>
-        <translation>장치 유형:</translation>
-    </message>
-    <message>
         <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
         <translation>백엔드 장치 중 하나라도 이 온도(°C)를 초과하면 중단합니다. 0이면 비활성화됩니다.</translation>
     </message>
@@ -1226,10 +1632,6 @@ Remove the character and try again.</source>
         <translation>시작</translation>
     </message>
     <message>
-        <source>Copy command to clipboard</source>
-        <translation>명령을 클립보드에 복사</translation>
-    </message>
-    <message>
         <source>General</source>
         <translation>일반</translation>
     </message>
@@ -1238,8 +1640,56 @@ Remove the character and try again.</source>
         <translation>해시 파일의 사용자 이름 무시</translation>
     </message>
     <message>
+        <source>H&amp;ash file or hash:</source>
+        <translation>해시 파일 또는 해시(&amp;A):</translation>
+    </message>
+    <message>
+        <source>Keep attacking a hash after it is cracked, to find further plaintexts such as collisions. Cannot be combined with removing cracked hashes.</source>
+        <translation>해시가 크래킹된 후에도 공격을 계속하여 충돌 같은 다른 평문을 찾습니다. 크래킹된 해시 제거와 함께 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Keep guessing</source>
+        <translation>추측 계속</translation>
+    </message>
+    <message>
+        <source>&amp;Mode:</source>
+        <translation>모드(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Hash t&amp;ype:</source>
+        <translation>해시 유형(&amp;Y):</translation>
+    </message>
+    <message>
+        <source>Hash &amp;recipe:</source>
+        <translation>해시 레시피(&amp;R):</translation>
+    </message>
+    <message>
         <source>Wordlists</source>
         <translation>단어 목록</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist up.</source>
+        <translation>선택한 단어 목록을 위로 이동합니다.</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down.</source>
+        <translation>선택한 단어 목록을 아래로 이동합니다.</translation>
+    </message>
+    <message>
+        <source>Add a folder; hashcat reads every file directly inside it as one wordlist.</source>
+        <translation>폴더를 추가합니다. hashcat은 폴더 바로 안의 각 파일을 하나의 단어 목록으로 읽습니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Encoding from:</source>
+        <translation>인코딩 원본(&amp;E):</translation>
+    </message>
+    <message>
+        <source>Enc&amp;oding to:</source>
+        <translation>인코딩 대상(&amp;O):</translation>
+    </message>
+    <message>
+        <source>PCFG rulesets</source>
+        <translation>PCFG 규칙 세트</translation>
     </message>
     <message>
         <source>Increment the mask length from the minimum to the maximum.</source>
@@ -1348,14 +1798,6 @@ Remove the character and try again.</source>
     <message>
         <source>JSON Files (*.json)</source>
         <translation>JSON 파일 (*.json)</translation>
-    </message>
-    <message>
-        <source>The session file could not be read, so the session was not restored. The file was left in place.
-
-%1</source>
-        <translation>세션 파일을 읽을 수 없어 세션이 복원되지 않았습니다. 파일은 그대로 두었습니다.
-
-%1</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1538,6 +1980,78 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니다. 해결 방법은 &lt;a href=&quot;%1&quot;&gt;FAQ 항목&lt;/a&gt;을 참조하세요.</translation>
     </message>
     <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>해시를 입력하거나 해시 파일을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>hashcat 실행 파일이 설정되지 않았습니다. 설정에서 지정하세요.</translation>
+    </message>
+    <message>
+        <source>Check Against Potfile</source>
+        <translation>potfile과 비교</translation>
+    </message>
+    <message>
+        <source>Checking potfile…</source>
+        <translation>potfile을 확인하는 중…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>취소</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>확인이 취소되었습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat이 potfile을 조회할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Identify hash</source>
+        <translation>해시 식별</translation>
+    </message>
+    <message>
+        <source>The hash type list is unavailable or still loading. Nothing was changed. Check the hashcat path in Settings or try again once the list is available.</source>
+        <translation>해시 유형 목록을 사용할 수 없거나 아직 로드 중입니다. 변경된 내용이 없습니다. 설정에서 hashcat 경로를 확인하거나 목록이 준비된 후 다시 시도하세요.</translation>
+    </message>
+    <message>
+        <source>Hash mode %1 is not in this hashcat’s hash-type list. Nothing was changed.</source>
+        <translation>해시 모드 %1은(는) 이 hashcat의 해시 유형 목록에 없습니다. 변경된 내용이 없습니다.</translation>
+    </message>
+    <message>
+        <source>The session file could not be read, so the session was not restored.
+
+%1</source>
+        <translation>세션 파일을 읽을 수 없어 세션이 복원되지 않았습니다.
+
+%1</translation>
+    </message>
+    <message>
+        <source>Move the file aside to start with a fresh session? It is renamed, never deleted.</source>
+        <translation>파일을 옆으로 옮기고 새 세션으로 시작할까요? 파일은 삭제되지 않고 이름만 바뀝니다.</translation>
+    </message>
+    <message>
+        <source>Move File Aside</source>
+        <translation>파일 옮기기</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>파일 유지</translation>
+    </message>
+    <message>
+        <source>The session file could not be moved to:
+%1</source>
+        <translation>세션 파일을 다음 위치로 옮길 수 없습니다:
+%1</translation>
+    </message>
+    <message>
+        <source>The session file was moved to:
+%1</source>
+        <translation>세션 파일을 다음 위치로 옮겼습니다:
+%1</translation>
+    </message>
+    <message>
         <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
         <translation>세션에 지정된 해시 유형 %1은(는) 이 hashcat 버전에서 지원되지 않습니다. “자동 감지”가 선택되었습니다.</translation>
     </message>
@@ -1560,6 +2074,14 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
     <message>
         <source>Open cache directory</source>
         <translation>캐시 디렉터리 열기</translation>
+    </message>
+    <message>
+        <source>Wait until the hash type list has loaded.</source>
+        <translation>해시 유형 목록이 로드될 때까지 기다리세요.</translation>
+    </message>
+    <message>
+        <source>The hash type list is still loading. Wait until it has loaded and try again.</source>
+        <translation>해시 유형 목록이 아직 로드 중입니다. 로드가 끝난 후 다시 시도하세요.</translation>
     </message>
     <message>
         <source>Add wordlist folder</source>
@@ -1642,6 +2164,616 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
     </message>
 </context>
 <context>
+    <name>PotfileCheck</name>
+    <message>
+        <source>The hashcat path is not configured.</source>
+        <translation>hashcat 경로가 설정되지 않았습니다.</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>해시를 입력하거나 해시 파일을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>Choose a hash type. Potfile checks need an explicit hash type; Auto-detect is best-effort and can miscount. Use Tools → Identify Hash if you do not know the type.</source>
+        <translation>해시 유형을 선택하세요. potfile 확인에는 명시적인 해시 유형이 필요합니다. “자동 감지”는 최선을 다할 뿐 개수가 정확하지 않을 수 있습니다. 유형을 모를 경우 “도구” → “해시 식별”을 사용하세요.</translation>
+    </message>
+    <message>
+        <source>The remaining hashes are binary data; the count is unknown.</source>
+        <translation>남은 해시는 이진 데이터이므로 개수를 알 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Choose a hash type.</source>
+        <translation>해시 유형을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat이 입력에서 해시를 하나도 읽지 못했습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat could not parse the input for the selected hash type. Check the hash and the hash type.</source>
+        <translation>hashcat이 선택한 해시 유형으로 입력을 구문 분석할 수 없습니다. 해시와 해시 유형을 확인하세요.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat이 potfile을 조회할 수 없습니다.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExportUi</name>
+    <message>
+        <source>CSV (*.csv)</source>
+        <translation>CSV (*.csv)</translation>
+    </message>
+    <message>
+        <source>TSV (*.tsv *.txt)</source>
+        <translation>TSV (*.tsv *.txt)</translation>
+    </message>
+    <message>
+        <source>JSON (*.json)</source>
+        <translation>JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Export potfile results</source>
+        <translation>potfile 결과 내보내기</translation>
+    </message>
+    <message>
+        <source>Export failed</source>
+        <translation>내보내기 실패</translation>
+    </message>
+    <message>
+        <source>Choose a path other than the potfile.</source>
+        <translation>potfile 이외의 경로를 선택하세요.</translation>
+    </message>
+    <message>
+        <source>The destination is named hashcat.potfile. If this is hashcat’s live potfile, exporting overwrites it.
+
+Export anyway?</source>
+        <translation>대상 파일 이름이 hashcat.potfile입니다. hashcat의 실제 potfile이라면 내보내기로 덮어씁니다.
+
+계속 내보낼까요?</translation>
+    </message>
+    <message>
+        <source>The file already exists:
+%1
+
+Overwrite it?</source>
+        <translation>파일이 이미 존재합니다:
+%1
+
+덮어쓸까요?</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>항목 1개</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>항목 %1개</translation>
+    </message>
+    <message>
+        <source>Export %1 as %2 to:
+%3
+
+The file will contain plaintext passwords. Store it locally and protect it. Spreadsheet applications may evaluate cells beginning with =, +, -, or @ as formulas; open the file as text or disable formula evaluation.</source>
+        <translation>%1을(를) %2 형식으로 다음 위치에 내보냅니다:
+%3
+
+이 파일에는 평문 비밀번호가 포함됩니다. 로컬에 저장하고 보호하세요. 스프레드시트 프로그램은 =, +, -, @로 시작하는 셀을 수식으로 계산할 수 있으므로 파일을 텍스트로 열거나 수식 계산을 비활성화하세요.</translation>
+    </message>
+    <message>
+        <source>
+
+Only %1 of %2 entries are included.</source>
+        <translation>
+
+%2개 중 %1개만 포함됩니다.</translation>
+    </message>
+    <message>
+        <source>Export plaintexts</source>
+        <translation>평문 내보내기</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>내보내기</translation>
+    </message>
+    <message>
+        <source>Export complete</source>
+        <translation>내보내기 완료</translation>
+    </message>
+    <message>
+        <source>Exported %1 to:
+%2</source>
+        <translation>%1을(를) 다음 위치에 내보냈습니다:
+%2</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExporter</name>
+    <message>
+        <source>Could not open the export file: %1</source>
+        <translation>내보내기 파일을 열 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Could not write the export file: %1</source>
+        <translation>내보내기 파일에 쓸 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Could not save the export file: %1</source>
+        <translation>내보내기 파일을 저장할 수 없습니다: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileInspectorDialog</name>
+    <message>
+        <source>Potfile inspector</source>
+        <translation>potfile 검사기</translation>
+    </message>
+    <message>
+        <source>Parsed directly; duplicates are exact repeated lines. Separator: ‘:’.</source>
+        <translation>직접 구문 분석하며, 중복은 완전히 동일한 줄입니다. 구분자는 “:”입니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Potfile:</source>
+        <translation>potfile(&amp;P):</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>찾아보기(&amp;B)…</translation>
+    </message>
+    <message>
+        <source>Read the selected potfile again.</source>
+        <translation>선택한 potfile을 다시 읽습니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation>다시 불러오기(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Stop reading the potfile.</source>
+        <translation>potfile 읽기를 중지합니다.</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>취소(&amp;A)</translation>
+    </message>
+    <message>
+        <source>The prefilled path is a heuristic; hashcat may use another path.</source>
+        <translation>미리 채워진 경로는 추정값이며 hashcat이 다른 경로를 사용할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Potfile reading progress</source>
+        <translation>potfile 읽기 진행 상태</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>통계(&amp;S)…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible entries.</source>
+        <translation>표시된 항목의 비밀번호 집계 통계를 표시합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>내보내기(&amp;E)…</translation>
+    </message>
+    <message>
+        <source>Export the visible entries as CSV, TSV or JSON.</source>
+        <translation>표시된 항목을 CSV, TSV 또는 JSON으로 내보냅니다.</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>대화상자를 닫습니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>닫기(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Dup</source>
+        <translation>중복</translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation>줄</translation>
+    </message>
+    <message>
+        <source>This potfile has no entries.</source>
+        <translation>이 potfile에는 항목이 없습니다.</translation>
+    </message>
+    <message>
+        <source>Choose a potfile.</source>
+        <translation>potfile을 선택하세요.</translation>
+    </message>
+    <message>
+        <source>Select a potfile</source>
+        <translation>potfile 선택</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>취소하는 중…</translation>
+    </message>
+    <message>
+        <source>Potfile: %1</source>
+        <translation>potfile: %1</translation>
+    </message>
+    <message>
+        <source>Potfile not found: %1</source>
+        <translation>potfile을 찾을 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Reading potfile…</source>
+        <translation>potfile을 읽는 중…</translation>
+    </message>
+    <message>
+        <source>Reading cancelled.</source>
+        <translation>읽기가 취소되었습니다.</translation>
+    </message>
+    <message>
+        <source>dup</source>
+        <translation>중복</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>항목 1개</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>항목 %1개</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>중복 줄 1개</translation>
+    </message>
+    <message>
+        <source>1 duplicate line (at least)</source>
+        <translation>중복 줄 1개 이상</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>중복 줄 %1개</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines (at least)</source>
+        <translation>중복 줄 %1개 이상</translation>
+    </message>
+    <message>
+        <source>duplicate count incomplete</source>
+        <translation>중복 개수 불완전</translation>
+    </message>
+    <message>
+        <source>1 malformed line</source>
+        <translation>잘못된 형식의 줄 1개</translation>
+    </message>
+    <message>
+        <source>%1 malformed lines</source>
+        <translation>잘못된 형식의 줄 %1개</translation>
+    </message>
+    <message>
+        <source>1 encrypted entry</source>
+        <translation>암호화된 항목 1개</translation>
+    </message>
+    <message>
+        <source>%1 encrypted entries</source>
+        <translation>암호화된 항목 %1개</translation>
+    </message>
+    <message>
+        <source>1 entry without a password</source>
+        <translation>비밀번호가 없는 항목 1개</translation>
+    </message>
+    <message>
+        <source>%1 entries without a password</source>
+        <translation>비밀번호가 없는 항목 %1개</translation>
+    </message>
+    <message>
+        <source>1 incomplete line skipped</source>
+        <translation>불완전한 줄 1개 건너뜀</translation>
+    </message>
+    <message>
+        <source>%1 incomplete lines skipped</source>
+        <translation>불완전한 줄 %1개 건너뜀</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · 처음 %1/%2개 표시</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1개 필터로 숨김</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>실제 값을 내보내려면 평문을 표시하세요.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileParser</name>
+    <message>
+        <source>Could not open the potfile: %1</source>
+        <translation>potfile을 열 수 없습니다: %1</translation>
+    </message>
+    <message>
+        <source>Could not read the potfile: %1</source>
+        <translation>potfile을 읽을 수 없습니다: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileResultsDialog</name>
+    <message>
+        <source>Cracked hashes</source>
+        <translation>크래킹된 해시</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>통계(&amp;S)…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible results.</source>
+        <translation>표시된 결과의 비밀번호 집계 통계를 표시합니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>내보내기(&amp;E)…</translation>
+    </message>
+    <message>
+        <source>Export the visible results as CSV, TSV or JSON.</source>
+        <translation>표시된 결과를 CSV, TSV 또는 JSON으로 내보냅니다.</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>대화상자를 닫습니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>닫기(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>사용자 이름</translation>
+    </message>
+    <message>
+        <source>Filter hash or username (plaintext after Reveal)</source>
+        <translation>해시 또는 사용자 이름 필터(표시 후 평문)</translation>
+    </message>
+    <message>
+        <source>No cracked hashes for this input.</source>
+        <translation>이 입력에 대해 크래킹된 해시가 없습니다.</translation>
+    </message>
+    <message>
+        <source>Cracked hashes — mode %1</source>
+        <translation>크래킹된 해시 — 모드 %1</translation>
+    </message>
+    <message>
+        <source>Potfile: hashcat’s default potfile. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>potfile: hashcat의 기본 potfile입니다. hashcat은 해시로 potfile 항목을 찾으며 선택한 해시 유형으로 검색 범위가 좁혀집니다.</translation>
+    </message>
+    <message>
+        <source>Potfile: %1. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>potfile: %1. hashcat은 해시로 potfile 항목을 찾으며 선택한 해시 유형으로 검색 범위가 좁혀집니다.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 cracked</source>
+        <translation>%1/%2개 크래킹됨</translation>
+    </message>
+    <message>
+        <source>%1 cracked (remaining unknown)</source>
+        <translation>%1개 크래킹됨(나머지는 알 수 없음)</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>확인이 취소되었습니다.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat이 potfile을 조회할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · 처음 %1/%2개 표시</translation>
+    </message>
+    <message>
+        <source>1 unreadable result line skipped.</source>
+        <translation>읽을 수 없는 결과 줄 1개를 건너뛰었습니다.</translation>
+    </message>
+    <message>
+        <source>%1 unreadable result lines skipped.</source>
+        <translation>읽을 수 없는 결과 줄 %1개를 건너뛰었습니다.</translation>
+    </message>
+    <message>
+        <source> · %1 encrypted</source>
+        <translation> · %1개 암호화됨</translation>
+    </message>
+    <message>
+        <source> · includes a binary hash file</source>
+        <translation> · 이진 해시 파일 포함</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1개 필터로 숨김</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>실제 값을 내보내려면 평문을 표시하세요.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileStatisticsDialog</name>
+    <message>
+        <source>Password statistics</source>
+        <translation>비밀번호 통계</translation>
+    </message>
+    <message>
+        <source>Password length distribution</source>
+        <translation>비밀번호 길이 분포</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>길이</translation>
+    </message>
+    <message>
+        <source>Passwords</source>
+        <translation>비밀번호</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>대화상자를 닫습니다.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>닫기(&amp;C)</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>항목 1개</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>항목 %1개</translation>
+    </message>
+    <message>
+        <source>1 password analyzed</source>
+        <translation>비밀번호 1개 분석</translation>
+    </message>
+    <message>
+        <source>%1 passwords analyzed</source>
+        <translation>비밀번호 %1개 분석</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>중복 줄 1개</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>중복 줄 %1개</translation>
+    </message>
+    <message>
+        <source>duplicate lines: unknown</source>
+        <translation>중복 줄: 알 수 없음</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>%1 empty · %2 encrypted · %3 · %4 unique plaintexts</source>
+        <translation>비어 있음 %1개 · 암호화됨 %2개 · %3 · 고유 평문 %4개</translation>
+    </message>
+    <message>
+        <source>Length: —</source>
+        <translation>길이: —</translation>
+    </message>
+    <message>
+        <source>Length: min %1 · max %2 · average %3</source>
+        <translation>길이: 최소 %1 · 최대 %2 · 평균 %3</translation>
+    </message>
+    <message>
+        <source>Based on the visible %1 of %2 entries.</source>
+        <translation>표시된 %1/%2개 항목을 기준으로 합니다.</translation>
+    </message>
+    <message>
+        <source>No plaintext passwords to analyze.</source>
+        <translation>분석할 평문 비밀번호가 없습니다.</translation>
+    </message>
+    <message>
+        <source>Passwords containing:
+lowercase: %1 (%2%)
+uppercase: %3 (%4%)
+digits: %5 (%6%)
+symbols: %7 (%8%)
+whitespace: %9 (%10%)
+non-ASCII: %11 (%12%)</source>
+        <translation>포함된 문자:
+소문자: %1 (%2%)
+대문자: %3 (%4%)
+숫자: %5 (%6%)
+기호: %7 (%8%)
+공백: %9 (%10%)
+비 ASCII: %11 (%12%)</translation>
+    </message>
+    <message>
+        <source>Calculating statistics…</source>
+        <translation>통계를 계산하는 중…</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileTableView</name>
+    <message>
+        <source>Filter hash (plaintext after Reveal)</source>
+        <translation>해시 필터(표시 후 평문)</translation>
+    </message>
+    <message>
+        <source>Plaintext is searched only after Reveal plaintexts is enabled.</source>
+        <translation>평문은 “평문 표시”를 켠 후에만 검색됩니다.</translation>
+    </message>
+    <message>
+        <source>Copy selected</source>
+        <translation>선택 항목 복사</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to copy the real values.</source>
+        <translation>실제 값을 복사하려면 평문을 표시하세요.</translation>
+    </message>
+    <message>
+        <source>Copy all</source>
+        <translation>모두 복사</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts</source>
+        <translation>평문 표시</translation>
+    </message>
+    <message>
+        <source>Show or mask plaintext values.</source>
+        <translation>평문 값을 표시하거나 가립니다.</translation>
+    </message>
+    <message>
+        <source>Hash</source>
+        <translation>해시</translation>
+    </message>
+    <message>
+        <source>Plaintext</source>
+        <translation>평문</translation>
+    </message>
+    <message>
+        <source>Copied 1 row</source>
+        <translation>줄 1개 복사됨</translation>
+    </message>
+    <message>
+        <source>Copied %1 rows</source>
+        <translation>줄 %1개 복사됨</translation>
+    </message>
+    <message>
+        <source>Copy selected rows</source>
+        <translation>선택한 줄 복사</translation>
+    </message>
+    <message>
+        <source>Copies tab-separated rows. Encrypted rows copy the stored $HCENC$ token.</source>
+        <translation>탭으로 구분된 줄을 복사합니다. 암호화된 줄은 저장된 $HCENC$ 토큰을 복사합니다.</translation>
+    </message>
+    <message>
+        <source>Hide plaintexts</source>
+        <translation>평문 숨기기</translation>
+    </message>
+    <message>
+        <source>Binary hash file; hashcat reports the file name.</source>
+        <translation>이진 해시 파일입니다. hashcat이 파일 이름을 보고합니다.</translation>
+    </message>
+    <message>
+        <source>No rows match the filter.</source>
+        <translation>필터와 일치하는 줄이 없습니다.</translation>
+    </message>
+    <message>
+        <source>(encrypted)</source>
+        <translation>(암호화됨)</translation>
+    </message>
+    <message>
+        <source>(empty)</source>
+        <translation>(비어 있음)</translation>
+    </message>
+    <message>
+        <source>(file) %1</source>
+        <translation>(파일) %1</translation>
+    </message>
+</context>
+<context>
     <name>SessionTransfer</name>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -1699,24 +2831,52 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>언어(&amp;L)</translation>
     </message>
     <message>
+        <source>Interface language. Takes effect after a restart.</source>
+        <translation>인터페이스 언어입니다. 다시 시작한 후 적용됩니다.</translation>
+    </message>
+    <message>
         <source>&amp;Color scheme</source>
         <translation>색상 테마(&amp;C)</translation>
+    </message>
+    <message>
+        <source>The file the last session is stored in.</source>
+        <translation>마지막 세션이 저장되는 파일입니다.</translation>
+    </message>
+    <message>
+        <source>Open the folder the session is stored in.</source>
+        <translation>세션이 저장된 폴더를 엽니다.</translation>
+    </message>
+    <message>
+        <source>The file the settings are stored in.</source>
+        <translation>설정이 저장되는 파일입니다.</translation>
+    </message>
+    <message>
+        <source>Open the folder the settings are stored in.</source>
+        <translation>설정이 저장된 폴더를 엽니다.</translation>
     </message>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>모든 색상 테마를 모든 플랫폼에서 사용할 수 있는 것은 아닙니다.</translation>
     </message>
     <message>
-        <source>&amp;Parameters</source>
-        <translation>매개변수(&amp;P)</translation>
-    </message>
-    <message>
         <source>&amp;Use short parameters</source>
         <translation>짧은 매개변수 사용(&amp;U)</translation>
     </message>
     <message>
+        <source>Sho&amp;w the exact command in the terminal</source>
+        <translation>터미널에 정확한 명령 표시(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Print the exact command hashcat receives in the launch terminal, so a mangled value is visible.</source>
+        <translation>hashcat이 받는 정확한 명령을 실행 터미널에 출력합니다. 값이 잘못 전달된 경우 확인할 수 있습니다.</translation>
+    </message>
+    <message>
         <source>Session and files</source>
         <translation>세션 및 파일</translation>
+    </message>
+    <message>
+        <source>Restore the session saved when the application last closed.</source>
+        <translation>애플리케이션을 마지막으로 닫았을 때 저장된 세션을 복원합니다.</translation>
     </message>
     <message>
         <source>&amp;Restore the last session at startup</source>
@@ -1727,28 +2887,12 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>세션 파일(&amp;S)</translation>
     </message>
     <message>
-        <source>The file the last session is stored in</source>
-        <translation>마지막 세션이 저장되는 파일</translation>
-    </message>
-    <message>
         <source>Open folder</source>
         <translation>폴더 열기</translation>
     </message>
     <message>
-        <source>Open the folder the session is stored in</source>
-        <translation>세션이 저장되는 폴더 열기</translation>
-    </message>
-    <message>
         <source>Settings &amp;file</source>
         <translation>설정 파일(&amp;F)</translation>
-    </message>
-    <message>
-        <source>The file the settings are stored in</source>
-        <translation>설정이 저장되는 파일</translation>
-    </message>
-    <message>
-        <source>Open the folder the settings are stored in</source>
-        <translation>설정이 저장되는 폴더 열기</translation>
     </message>
     <message>
         <source>General</source>
@@ -1815,6 +2959,16 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>실행 파일 (*.exe *.bin hashcat);;모든 파일 (*)</translation>
     </message>
     <message>
+        <source>Settings saved</source>
+        <translation>설정 저장됨</translation>
+    </message>
+    <message>
+        <source>The old settings file was moved to:
+%1</source>
+        <translation>이전 설정 파일을 다음 위치로 옮겼습니다:
+%1</translation>
+    </message>
+    <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
         <translation>hashcat 실행 파일이 설정되어 있지 않아 hashcat을 시작할 수 없습니다.</translation>
     </message>
@@ -1839,12 +2993,43 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
         <translation>선택한 파일은 실행 파일이 아닙니다.</translation>
     </message>
     <message>
+        <source>Settings not saved</source>
+        <translation>설정이 저장되지 않았습니다</translation>
+    </message>
+    <message>
+        <source>Move the file aside and save these values? It is renamed, never deleted.</source>
+        <translation>파일을 옆으로 옮기고 이 값들을 저장할까요? 파일은 삭제되지 않고 이름만 바뀝니다.</translation>
+    </message>
+    <message>
+        <source>Move File Aside and Save</source>
+        <translation>옮기고 저장</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>파일 유지</translation>
+    </message>
+    <message>
         <source>Restart required</source>
         <translation>다시 시작 필요</translation>
     </message>
     <message>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>새 언어를 적용하려면 hashcat-gui를 다시 시작하세요.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsManager</name>
+    <message>
+        <source>The settings could not be written to “%1”. Check the file permissions.</source>
+        <translation>설정을 “%1”에 쓸 수 없습니다. 파일 권한을 확인하세요.</translation>
+    </message>
+    <message>
+        <source>The settings file “%1” is not in a readable format.</source>
+        <translation>설정 파일 “%1”이(가) 읽을 수 있는 형식이 아닙니다.</translation>
+    </message>
+    <message>
+        <source>The settings file could not be moved to “%1”.</source>
+        <translation>설정 파일을 “%1”로 옮길 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -1888,6 +3073,10 @@ Windows Defender 또는 다른 백신 소프트웨어가 원인일 수 있습니
     <message>
         <source>The “%1” section does not contain any values.</source>
         <translation>“%1” 섹션에 값이 없습니다.</translation>
+    </message>
+    <message>
+        <source>The “%1” section names a version that is not a number.</source>
+        <translation>“%1” 섹션에 숫자가 아닌 버전이 지정되어 있습니다.</translation>
     </message>
     <message>
         <source> and </source>

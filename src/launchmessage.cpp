@@ -399,7 +399,7 @@ LaunchMessage messageFor(const LaunchValidator::LaunchProblem &problem,
         message.text =
             QCoreApplication::translate("LaunchMessage",
                                         "The %1 and the %2 use the same path:\n%3\n"
-                                        "Hashcat writes one or both of them, so a run could change "
+                                        "hashcat writes one or both of them, so a run could change "
                                         "the file. Choose different paths.")
                 .arg(pathRoleName(problem.firstRole), pathRoleName(problem.secondRole),
                      problem.detail);

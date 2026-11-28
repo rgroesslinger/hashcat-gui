@@ -103,7 +103,7 @@ bool PotfileExportUi::exportRows(QWidget *parent, const QString &suggestedPath,
         == 0) {
         const auto answer = QMessageBox::question(
             parent, tr("Export potfile results"),
-            tr("The destination is named hashcat.potfile. If this is hashcat's live potfile, "
+            tr("The destination is named hashcat.potfile. If this is hashcat’s live potfile, "
                "exporting overwrites it.\n\nExport anyway?"),
             QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (answer != QMessageBox::Yes) {

@@ -163,7 +163,7 @@
               <item>
                <widget class="QCheckBox" name="checkBox_keep_guessing">
                 <property name="toolTip">
-                 <string>Keep attacking a hash after it is cracked, to find further plains such as collisions. Cannot be combined with removing cracked hashes.</string>
+                 <string>Keep attacking a hash after it is cracked, to find further plaintexts such as collisions. Cannot be combined with removing cracked hashes.</string>
                 </property>
                 <property name="text">
                  <string>Keep guessing</string>

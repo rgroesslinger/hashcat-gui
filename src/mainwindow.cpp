@@ -494,7 +494,7 @@ void MainWindow::configureWidgets()
     // An icon-only button collapses below the icon on some styles; keep a
     // square that holds the fallback document icon.
     const int copySide = style()->pixelMetric(QStyle::PM_SmallIconSize)
-                         + 2 * style()->pixelMetric(QStyle::PM_ButtonMargin);
+                         + (2 * style()->pixelMetric(QStyle::PM_ButtonMargin));
     ui->pushButton_copy_clipboard->setMinimumSize(copySide, copySide);
 
     ui->pushButton_start->setShortcut(QKeySequence(QStringLiteral("Ctrl+Return")));
@@ -1363,7 +1363,7 @@ bool MainWindow::applyIdentifiedHashType(int hashTypeId, const std::optional<QSt
     const int index = ui->comboBox_hash_type->findData(hashTypeId);
     if (index < 0) {
         QMessageBox::warning(this, tr("Identify hash"),
-                             tr("Hash mode %1 is not in this hashcat's hash-type list. "
+                             tr("Hash mode %1 is not in this hashcat’s hash-type list. "
                                 "Nothing was changed.")
                                  .arg(hashTypeId));
         return false;

@@ -38,7 +38,7 @@ QString stringField(const QJsonObject &object, const QString &key)
 } // namespace
 
 PotfileShowParser::Result PotfileShowParser::parse(const QString &output, int maxEntries,
-                                                   HashcatRunner::CancelToken cancel)
+                                                   const HashcatRunner::CancelToken &cancel)
 {
     Result result;
     const int cap = std::max(0, maxEntries);

@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label_note">
      <property name="text">
-      <string>Parsed directly; duplicates are exact repeated lines. Separator: ':'.</string>
+      <string>Parsed directly; duplicates are exact repeated lines. Separator: ‘:’.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -75,10 +75,7 @@
         <string>Stop reading the potfile.</string>
        </property>
        <property name="text">
-        <string>&amp;Stop</string>
-       </property>
-       <property name="accessibleName">
-        <string>Stop reading the potfile</string>
+        <string>C&amp;ancel</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>

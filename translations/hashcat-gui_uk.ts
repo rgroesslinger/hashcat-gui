@@ -28,8 +28,12 @@
         <translation>Перевірка оновлень…</translation>
     </message>
     <message>
-        <source>Ask GitHub whether a newer release is available</source>
-        <translation>Запитати в GitHub, чи доступний новіший випуск</translation>
+        <source>Ask GitHub whether a newer release is available.</source>
+        <translation>Дізнатися в GitHub, чи доступний новіший випуск.</translation>
+    </message>
+    <message>
+        <source>Copy the application, toolkit, system and hashcat versions to the clipboard.</source>
+        <translation>Скопіювати версії програми, інструментарію, системи та hashcat до буфера обміну.</translation>
     </message>
     <message>
         <source>Check for updates</source>
@@ -50,10 +54,6 @@
     <message>
         <source>License</source>
         <translation>Ліцензія</translation>
-    </message>
-    <message>
-        <source>Copy the application, toolkit, system and hashcat versions to the clipboard</source>
-        <translation>Скопіювати до буфера обміну версії застосунку, бібліотеки, системи та hashcat</translation>
     </message>
     <message>
         <source>Copy details</source>
@@ -204,6 +204,81 @@
     </message>
 </context>
 <context>
+    <name>BackendInfoDialog</name>
+    <message>
+        <source>Backend information</source>
+        <translation>Відомості про бекенди</translation>
+    </message>
+    <message>
+        <source>Query hashcat again for backend information.</source>
+        <translation>Знову запросити в hashcat відомості про бекенди.</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>&amp;Оновити</translation>
+    </message>
+    <message>
+        <source>Stop the running query.</source>
+        <translation>Зупинити поточний запит.</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>Ск&amp;асувати</translation>
+    </message>
+    <message>
+        <source>Copy the backend information to the clipboard.</source>
+        <translation>Скопіювати відомості про бекенди до буфера обміну.</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Копіювати</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Закрити діалог.</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>&amp;Закрити</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>Виконуваний файл hashcat не налаштовано. Укажіть його в налаштуваннях.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>Налаштований виконуваний файл hashcat не знайдено:
+%1</translation>
+    </message>
+    <message>
+        <source>Reading backend information…</source>
+        <translation>Отримання відомостей про бекенди…</translation>
+    </message>
+    <message>
+        <source>Backend query cancelled.</source>
+        <translation>Запит до бекендів скасовано.</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while reading backend information.</source>
+        <translation>Вичерпано час очікування hashcat під час читання відомостей про бекенди.</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information.</source>
+        <translation>hashcat не вдалося прочитати відомості про бекенди.</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information:
+%1</source>
+        <translation>hashcat не вдалося прочитати відомості про бекенди:
+%1</translation>
+    </message>
+    <message>
+        <source>Backend information reported by hashcat.</source>
+        <translation>Відомості про бекенди, надані hashcat.</translation>
+    </message>
+</context>
+<context>
     <name>ExampleSession</name>
     <message>
         <source>Could not create the example directory “%1”.</source>
@@ -255,10 +330,217 @@
     </message>
 </context>
 <context>
+    <name>IdentifyDialog</name>
+    <message>
+        <source>Identify hash</source>
+        <translation>Визначення геша</translation>
+    </message>
+    <message>
+        <source>&amp;Hash or hash file:</source>
+        <translation>&amp;Геш або файл гешів:</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file to identify.</source>
+        <translation>Вставте геш або виберіть файл гешів для визначення.</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file</source>
+        <translation>Вставте геш або виберіть файл гешів</translation>
+    </message>
+    <message>
+        <source>Choose a hash file.</source>
+        <translation>Виберіть файл гешів.</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>&amp;Огляд…</translation>
+    </message>
+    <message>
+        <source>Identify the hash type of the entered hash.</source>
+        <translation>Визначити тип введеного геша.</translation>
+    </message>
+    <message>
+        <source>&amp;Identify</source>
+        <translation>Визнач&amp;ити</translation>
+    </message>
+    <message>
+        <source>Paste a hash or choose a hash file, then select Identify.</source>
+        <translation>Вставте геш або виберіть файл гешів, потім натисніть «Визначити».</translation>
+    </message>
+    <message>
+        <source>Identification progress</source>
+        <translation>Перебіг визначення</translation>
+    </message>
+    <message>
+        <source>Elapsed time</source>
+        <translation>Минулий час</translation>
+    </message>
+    <message>
+        <source>Matching hash types; select one and apply it to the attack.</source>
+        <translation>Відповідні типи гешів; виберіть один і застосуйте його до атаки.</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Режим</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Назва</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Категорія</translation>
+    </message>
+    <message>
+        <source>Use the selected hash type in the attack.</source>
+        <translation>Використовувати вибраний тип геша в атаці.</translation>
+    </message>
+    <message>
+        <source>Apply mode to attack</source>
+        <translation>Застосувати режим до атаки</translation>
+    </message>
+    <message>
+        <source>Stop the running identification.</source>
+        <translation>Зупинити поточне визначення.</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>Ск&amp;асувати</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Закрити діалог.</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>&amp;Закрити</translation>
+    </message>
+    <message>
+        <source>Elapsed: %1 s</source>
+        <translation>Минуло: %1 с</translation>
+    </message>
+    <message>
+        <source>Multiple lines pasted. Use Browse to select a hash file, or paste one hash.</source>
+        <translation>Вставлено кілька рядків. Скористайтеся «Огляд», щоб вибрати файл гешів, або вставте один геш.</translation>
+    </message>
+    <message>
+        <source>Input changed. Identify it again.</source>
+        <translation>Введені дані змінено. Визначте геш знову.</translation>
+    </message>
+    <message>
+        <source>Select a hash file</source>
+        <translation>Вибрати файл гешів</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>Спочатку введіть геш або виберіть файл гешів.</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>Виконуваний файл hashcat не налаштовано. Укажіть його в налаштуваннях.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>Налаштований виконуваний файл hashcat не знайдено:
+%1</translation>
+    </message>
+    <message>
+        <source>Identifying hash…</source>
+        <translation>Визначення геша…</translation>
+    </message>
+    <message>
+        <source>Identification cancelled.</source>
+        <translation>Визначення скасовано.</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while identifying the hash.</source>
+        <translation>Вичерпано час очікування hashcat під час визначення геша.</translation>
+    </message>
+    <message>
+        <source>No hash modes match this structure.</source>
+        <translation>Жоден режим геша не відповідає цій структурі.</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode and hash to the attack.</source>
+        <translation>1 режим геша відповідає цій структурі. Виберіть його й застосуйте режим і геш до атаки.</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode to the attack.</source>
+        <translation>1 режим геша відповідає цій структурі. Виберіть його й застосуйте режим до атаки.</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode and hash to the attack.</source>
+        <translation>%1 режимів гешів відповідають цій структурі. Виберіть один і застосуйте режим і геш до атаки.</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode to the attack.</source>
+        <translation>%1 режимів гешів відповідають цій структурі. Виберіть один і застосуйте режим до атаки.</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>Скасування…</translation>
+    </message>
+    <message>
+        <source>Apply mode and hash to attack</source>
+        <translation>Застосувати режим і геш до атаки</translation>
+    </message>
+    <message>
+        <source>Another hashcat instance is using this session. Close it and try again.</source>
+        <translation>Інший екземпляр hashcat використовує цей сеанс. Закрийте його й повторіть спробу.</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat не вдалося завантажити жодного геша з введених даних.</translation>
+    </message>
+    <message>
+        <source>The input contains characters hashcat cannot encode.</source>
+        <translation>Введені дані містять символи, яких hashcat не може закодувати.</translation>
+    </message>
+    <message>
+        <source>hashcat reported:
+%1</source>
+        <translation>hashcat повідомив:
+%1</translation>
+    </message>
+    <message>
+        <source>hashcat’s output could not be parsed. Check the hashcat version or report a bug.</source>
+        <translation>Не вдалося розібрати вивід hashcat. Перевірте версію hashcat або повідомте про помилку.</translation>
+    </message>
+</context>
+<context>
     <name>LaunchMessage</name>
     <message>
         <source>Windows executable names include their extension, for example hashcat.exe.</source>
         <translation>Імена виконуваних файлів Windows містять розширення, наприклад hashcat.exe.</translation>
+    </message>
+    <message>
+        <source>hash file</source>
+        <translation>файл гешів</translation>
+    </message>
+    <message>
+        <source>outfile</source>
+        <translation>вихідний файл</translation>
+    </message>
+    <message>
+        <source>potfile</source>
+        <translation>potfile</translation>
+    </message>
+    <message>
+        <source>wordlist</source>
+        <translation>словник</translation>
+    </message>
+    <message>
+        <source>rules file</source>
+        <translation>файл правил</translation>
+    </message>
+    <message>
+        <source>table</source>
+        <translation>таблиця</translation>
+    </message>
+    <message>
+        <source>cache folder</source>
+        <translation>тека кешу</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -413,12 +695,72 @@ md5(md5(salt) . pass). Введіть його в поле рецепта геш
 %1</translation>
     </message>
     <message>
+        <source>The potfile path must be a writable file, or a new file in an existing writable folder:
+%1</source>
+        <translation>Шлях до potfile має вказувати на доступний для запису файл або на новий файл у наявній доступній для запису теці:
+%1</translation>
+    </message>
+    <message>
+        <source>The skip or limit value must be a whole number from 0 to %1:
+%2</source>
+        <translation>Значення пропуску або ліміту має бути цілим числом від 0 до %1:
+%2</translation>
+    </message>
+    <message>
+        <source>The device types must be 1 (CPU) or 2 (GPU), separated by commas:
+%1</source>
+        <translation>Типи пристроїв мають бути 1 (CPU) або 2 (GPU), через кому:
+%1</translation>
+    </message>
+    <message>
+        <source>The CPU affinity must be a comma-separated list of CPU numbers:
+%1</source>
+        <translation>Прив’язка до ЦП має бути списком номерів ЦП через кому:
+%1</translation>
+    </message>
+    <message>
+        <source>The backend devices must be a comma-separated list of device numbers starting at 1:
+%1</source>
+        <translation>Пристрої бекенда мають бути списком номерів пристроїв через кому, починаючи з 1:
+%1</translation>
+    </message>
+    <message>
+        <source>The session name must not contain a path separator:
+%1</source>
+        <translation>Назва сеансу не повинна містити роздільник шляхів:
+%1</translation>
+    </message>
+    <message>
+        <source>A ruleset folder needs Grammar/grammar.txt; choose a rules file instead:
+%1</source>
+        <translation>Тека набору правил потребує Grammar/grammar.txt; виберіть натомість файл правил:
+%1</translation>
+    </message>
+    <message>
+        <source>A table has to be a file; hashcat does not read a folder:
+%1</source>
+        <translation>Таблиця має бути файлом; hashcat не читає теки:
+%1</translation>
+    </message>
+    <message>
+        <source>The %1 and the %2 use the same path:
+%3
+hashcat writes one or both of them, so a run could change the file. Choose different paths.</source>
+        <translation>%1 і %2 використовують один і той самий шлях:
+%3
+hashcat записує один або обидва з них, тому запуск може змінити файл. Виберіть різні шляхи.</translation>
+    </message>
+    <message>
         <source>The increment cannot be combined with the speed-only option.</source>
         <translation>Приріст не можна поєднувати з параметром «лише швидкість».</translation>
     </message>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>Вилучення зламаних гешів неможливе в асоціативному режимі атаки.</translation>
+    </message>
+    <message>
+        <source>Keep guessing cannot be combined with removing cracked hashes from the hash file. Clear either option.</source>
+        <translation>«Продовжувати підбір» не можна поєднувати з вилученням зламаних гешів із файлу гешів. Скиньте одну з опцій.</translation>
     </message>
     <message>
         <source>This value contains a control character that cannot be passed to hashcat:
@@ -444,10 +786,6 @@ Remove the character and try again.</source>
         <translation>Атака</translation>
     </message>
     <message>
-        <source>Hash file or hash:</source>
-        <translation>Файл гешів або геш:</translation>
-    </message>
-    <message>
         <source>Salt is hex</source>
         <translation>Сіль у hex</translation>
     </message>
@@ -460,36 +798,12 @@ Remove the character and try again.</source>
         <translation>Ігнорувати ім’я користувача у файлі гешів</translation>
     </message>
     <message>
-        <source>Mode:</source>
-        <translation>Режим:</translation>
-    </message>
-    <message>
         <source>Attack mode. Each choice reveals its own options below.</source>
         <translation>Режим атаки. Кожен варіант показує нижче власні параметри.</translation>
     </message>
     <message>
-        <source>Hash type:</source>
-        <translation>Тип геша:</translation>
-    </message>
-    <message>
-        <source>Hash recipe:</source>
-        <translation>Рецепт геша:</translation>
-    </message>
-    <message>
         <source>Wordlists</source>
         <translation>Словники</translation>
-    </message>
-    <message>
-        <source>Move item up</source>
-        <translation>Перемістити елемент угору</translation>
-    </message>
-    <message>
-        <source>Move item down</source>
-        <translation>Перемістити елемент униз</translation>
-    </message>
-    <message>
-        <source>hashcat reads every file directly inside the folder as one wordlist.</source>
-        <translation>hashcat читає кожен файл, що лежить безпосередньо в теці, як один словник.</translation>
     </message>
     <message>
         <source>Add folder…</source>
@@ -506,14 +820,6 @@ Remove the character and try again.</source>
     <message>
         <source>Wordlist is hex</source>
         <translation>Словник у hex</translation>
-    </message>
-    <message>
-        <source>Encoding from:</source>
-        <translation>Кодування з:</translation>
-    </message>
-    <message>
-        <source>Encoding to:</source>
-        <translation>Кодування в:</translation>
     </message>
     <message>
         <source>Settings (no wordlist):</source>
@@ -552,26 +858,6 @@ Remove the character and try again.</source>
         <translation>Теці набору правил потрібен файл Grammar/grammar.txt.</translation>
     </message>
     <message>
-        <source>Scale:</source>
-        <translation>Scale:</translation>
-    </message>
-    <message>
-        <source>Quantization steps per bit (1–64)</source>
-        <translation>Кроків квантування на біт (1–64)</translation>
-    </message>
-    <message>
-        <source>Costmax:</source>
-        <translation>Costmax:</translation>
-    </message>
-    <message>
-        <source>Highest cost level to enumerate (1–64)</source>
-        <translation>Найвищий рівень вартості для перебору (1–64)</translation>
-    </message>
-    <message>
-        <source>Weights:</source>
-        <translation>Weights:</translation>
-    </message>
-    <message>
         <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
         <translation>Одне додатне число на набір правил через двокрапку, наприклад 2:1; кількість чисел має збігатися з кількістю наборів правил.</translation>
     </message>
@@ -586,22 +872,6 @@ Remove the character and try again.</source>
     <message>
         <source>auto</source>
         <translation>авто</translation>
-    </message>
-    <message>
-        <source>Kbits:</source>
-        <translation>Kbits:</translation>
-    </message>
-    <message>
-        <source>Bits one inner loop may span (0–27)</source>
-        <translation>Кількість бітів, яку може охопити один внутрішній цикл (0–27)</translation>
-    </message>
-    <message>
-        <source>Maxword:</source>
-        <translation>Maxword:</translation>
-    </message>
-    <message>
-        <source>Maxgain:</source>
-        <translation>Maxgain:</translation>
     </message>
     <message>
         <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
@@ -688,12 +958,40 @@ Remove the character and try again.</source>
         <translation>Аргумент:</translation>
     </message>
     <message>
-        <source>Copy as PowerShell Script</source>
-        <translation>Копіювати як скрипт PowerShell</translation>
+        <source>&amp;Session name:</source>
+        <translation>&amp;Назва сеансу:</translation>
     </message>
     <message>
-        <source>Copy the unencoded PowerShell script that starts hashcat</source>
-        <translation>Копіювати незакодований скрипт PowerShell, що запускає hashcat</translation>
+        <source>R&amp;untime limit:</source>
+        <translation>Обмеження &amp;часу:</translation>
+    </message>
+    <message>
+        <source>&amp;Device types:</source>
+        <translation>&amp;Типи пристроїв:</translation>
+    </message>
+    <message>
+        <source>Potfile:</source>
+        <translation>Potfile:</translation>
+    </message>
+    <message>
+        <source>Read and write recovered hashes in this potfile instead of the default one.</source>
+        <translation>Читати й записувати відновлені геші в цьому potfile замість типового.</translation>
+    </message>
+    <message>
+        <source>Choose the potfile path.</source>
+        <translation>Вибрати шлях до potfile.</translation>
+    </message>
+    <message>
+        <source>Choose potfile</source>
+        <translation>Вибрати potfile</translation>
+    </message>
+    <message>
+        <source>Copy command to clipboard.</source>
+        <translation>Скопіювати команду до буфера обміну.</translation>
+    </message>
+    <message>
+        <source>Copy as PowerShell Script</source>
+        <translation>Копіювати як скрипт PowerShell</translation>
     </message>
     <message>
         <source>Add</source>
@@ -768,6 +1066,10 @@ Remove the character and try again.</source>
         <translation>Маска</translation>
     </message>
     <message>
+        <source>H&amp;ash file or hash:</source>
+        <translation>Файл &amp;гешів або геш:</translation>
+    </message>
+    <message>
         <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
         <translation>Геш, файл гешів або WPA-захоплення .hc22000/.hccapx.</translation>
     </message>
@@ -784,12 +1086,40 @@ Remove the character and try again.</source>
         <translation>Ігнорувати ім’я користувача перед роздільником режиму (зазвичай «:»), щоб облікові записи зі спільним гешем ламалися один раз.</translation>
     </message>
     <message>
+        <source>Keep attacking a hash after it is cracked, to find further plaintexts such as collisions. Cannot be combined with removing cracked hashes.</source>
+        <translation>Продовжувати атаку на геш після його злому, щоб знайти інші паролі, наприклад колізії. Не можна поєднувати з вилученням зламаних гешів.</translation>
+    </message>
+    <message>
+        <source>Keep guessing</source>
+        <translation>Продовжувати підбір</translation>
+    </message>
+    <message>
+        <source>&amp;Mode:</source>
+        <translation>&amp;Режим:</translation>
+    </message>
+    <message>
+        <source>Hash t&amp;ype:</source>
+        <translation>Тип ге&amp;ша:</translation>
+    </message>
+    <message>
+        <source>Hash &amp;recipe:</source>
+        <translation>Ре&amp;цепт геша:</translation>
+    </message>
+    <message>
         <source>Hash recipe, e.g. “md5(md5(salt) . pass)”. Wrap it in the shell’s outer quotes and put any inner strings in the other kind of quotes; PowerShell needs a backtick before $.</source>
         <translation>Рецепт геша, наприклад «md5(md5(salt) . pass)». Візьміть його у зовнішні лапки оболонки, а внутрішні рядки — у лапки іншого виду; PowerShell потребує зворотного апострофа перед $.</translation>
     </message>
     <message>
+        <source>Move selected wordlist up.</source>
+        <translation>Перемістити вибраний словник угору.</translation>
+    </message>
+    <message>
         <source>Move selected wordlist up</source>
         <translation>Перемістити вибраний словник угору</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down.</source>
+        <translation>Перемістити вибраний словник униз.</translation>
     </message>
     <message>
         <source>Move selected wordlist down</source>
@@ -800,12 +1130,28 @@ Remove the character and try again.</source>
         <translation>Додати один або кілька файлів словників. Кожен позначений рядок передається до hashcat.</translation>
     </message>
     <message>
+        <source>Add a folder; hashcat reads every file directly inside it as one wordlist.</source>
+        <translation>Додати теку; hashcat читає кожен файл безпосередньо в ній як один словник.</translation>
+    </message>
+    <message>
         <source>Remove the selected wordlists.</source>
         <translation>Вилучити вибрані словники.</translation>
     </message>
     <message>
         <source>Remove wordlists</source>
         <translation>Вилучити словники</translation>
+    </message>
+    <message>
+        <source>&amp;Encoding from:</source>
+        <translation>Кодування &amp;з:</translation>
+    </message>
+    <message>
+        <source>Enc&amp;oding to:</source>
+        <translation>&amp;Кодування до:</translation>
+    </message>
+    <message>
+        <source>PCFG rulesets</source>
+        <translation>Набори правил PCFG</translation>
     </message>
     <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
@@ -828,24 +1174,76 @@ Remove the character and try again.</source>
         <translation>Вилучити набори правил</translation>
     </message>
     <message>
+        <source>Move selected ruleset up.</source>
+        <translation>Перемістити вибраний набір правил угору.</translation>
+    </message>
+    <message>
         <source>Move selected ruleset up</source>
         <translation>Перемістити вибраний набір правил угору</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down.</source>
+        <translation>Перемістити вибраний набір правил униз.</translation>
     </message>
     <message>
         <source>Move selected ruleset down</source>
         <translation>Перемістити вибраний набір правил униз</translation>
     </message>
     <message>
+        <source>Sca&amp;le:</source>
+        <translation>&amp;Масштаб:</translation>
+    </message>
+    <message>
+        <source>Quantization steps per bit (1–64).</source>
+        <translation>Кроки квантування на біт (1–64).</translation>
+    </message>
+    <message>
+        <source>&amp;Costmax:</source>
+        <translation>Верхня межа варт&amp;ості:</translation>
+    </message>
+    <message>
+        <source>Highest cost level to enumerate (1–64).</source>
+        <translation>Найвищий рівень вартості для перебору (1–64).</translation>
+    </message>
+    <message>
+        <source>&amp;Weights:</source>
+        <translation>В&amp;ага:</translation>
+    </message>
+    <message>
+        <source>&amp;Kbits:</source>
+        <translation>Кі&amp;лобіти:</translation>
+    </message>
+    <message>
+        <source>Bits one inner loop may span (0–27).</source>
+        <translation>Біти, які може охоплювати один внутрішній цикл (0–27).</translation>
+    </message>
+    <message>
+        <source>Ma&amp;xword:</source>
+        <translation>Максимальна довж&amp;ина слова:</translation>
+    </message>
+    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>Максимальна довжина кандидата, яку будує ядро, у 4-байтових словах: 0 (авто), 16 або 32.</translation>
+    </message>
+    <message>
+        <source>Max&amp;gain:</source>
+        <translation>Максимальне підсил&amp;ення:</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>Налаштування key=value через пробіл: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Набори правил ідуть першими.</translation>
     </message>
     <message>
+        <source>Tables</source>
+        <translation>Таблиці</translation>
+    </message>
+    <message>
         <source>Add one or more table files.</source>
         <translation>Додати один або кілька файлів таблиць.</translation>
+    </message>
+    <message>
+        <source>Add table</source>
+        <translation>Додати таблицю</translation>
     </message>
     <message>
         <source>Remove the selected tables.</source>
@@ -854,6 +1252,14 @@ Remove the character and try again.</source>
     <message>
         <source>Remove tables</source>
         <translation>Вилучити таблиці</translation>
+    </message>
+    <message>
+        <source>Move selected table up.</source>
+        <translation>Перемістити вибрану таблицю угору.</translation>
+    </message>
+    <message>
+        <source>Move selected table down.</source>
+        <translation>Перемістити вибрану таблицю униз.</translation>
     </message>
     <message>
         <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
@@ -900,6 +1306,14 @@ Remove the character and try again.</source>
         <translation>Додати аргумент для feed за порядком.</translation>
     </message>
     <message>
+        <source>Add feed argument</source>
+        <translation>Додати аргумент feed</translation>
+    </message>
+    <message>
+        <source>Feed arguments</source>
+        <translation>Аргументи feed</translation>
+    </message>
+    <message>
         <source>Remove the selected feed arguments.</source>
         <translation>Вилучити вибрані аргументи feed.</translation>
     </message>
@@ -908,8 +1322,16 @@ Remove the character and try again.</source>
         <translation>Вилучити аргументи feed</translation>
     </message>
     <message>
+        <source>Move selected feed argument up.</source>
+        <translation>Перемістити вибраний аргумент feed угору.</translation>
+    </message>
+    <message>
         <source>Move selected feed argument up</source>
         <translation>Перемістити вибраний аргумент feed угору</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down.</source>
+        <translation>Перемістити вибраний аргумент feed униз.</translation>
     </message>
     <message>
         <source>Move selected feed argument down</source>
@@ -984,6 +1406,14 @@ Remove the character and try again.</source>
         <translation>Максимальна довжина маски; 0 пропускає параметр і використовує типове значення hashcat (довжина маски).</translation>
     </message>
     <message>
+        <source>Grow the mask from the right end instead of the left (hashcat -ii).</source>
+        <translation>Збільшувати маску з правого кінця, а не з лівого (hashcat -ii).</translation>
+    </message>
+    <message>
+        <source>Right-to-left</source>
+        <translation>Справа наліво</translation>
+    </message>
+    <message>
         <source>Custom charsets</source>
         <translation>Власні набори символів</translation>
     </message>
@@ -1032,16 +1462,44 @@ Remove the character and try again.</source>
         <translation>Сеанс і обмеження</translation>
     </message>
     <message>
-        <source>Session name:</source>
-        <translation>Назва сеансу:</translation>
+        <source>Copy the unencoded PowerShell script that starts hashcat.</source>
+        <translation>Скопіювати незакодований скрипт PowerShell, який запускає hashcat.</translation>
+    </message>
+    <message>
+        <source>&amp;Identify Hash…</source>
+        <translation>&amp;Визначити геш…</translation>
+    </message>
+    <message>
+        <source>Ask hashcat which hash modes match a hash.</source>
+        <translation>Запитати в hashcat, які режими гешів відповідають гешу.</translation>
+    </message>
+    <message>
+        <source>&amp;Backend Information…</source>
+        <translation>Відомості про &amp;бекенди…</translation>
+    </message>
+    <message>
+        <source>Show the devices and backends hashcat detected.</source>
+        <translation>Показати пристрої та бекенди, виявлені hashcat.</translation>
+    </message>
+    <message>
+        <source>Check Against &amp;Potfile…</source>
+        <translation>Перевірити за &amp;potfile…</translation>
+    </message>
+    <message>
+        <source>Check whether the hashes in the hash field are already in the potfile.</source>
+        <translation>Перевірити, чи є геші з поля гешів уже в potfile.</translation>
+    </message>
+    <message>
+        <source>Potfile I&amp;nspector…</source>
+        <translation>Potfile-інс&amp;пектор…</translation>
+    </message>
+    <message>
+        <source>Browse an explicit potfile without hash-type verification.</source>
+        <translation>Переглянути вказаний potfile без перевірки типу геша.</translation>
     </message>
     <message>
         <source>Name hashcat uses for its restore file and status output.</source>
         <translation>Назва, яку hashcat використовує для файлу відновлення та виведення стану.</translation>
-    </message>
-    <message>
-        <source>Runtime limit:</source>
-        <translation>Обмеження часу роботи:</translation>
     </message>
     <message>
         <source>unlimited</source>
@@ -1154,10 +1612,6 @@ Remove the character and try again.</source>
     <message>
         <source>Backend devices:</source>
         <translation>Пристрої бекенда:</translation>
-    </message>
-    <message>
-        <source>Device types:</source>
-        <translation>Типи пристроїв:</translation>
     </message>
     <message>
         <source>Pin hashcat to these CPU devices, separated by commas. Leave empty to let hashcat decide.</source>
@@ -1304,10 +1758,6 @@ Remove the character and try again.</source>
     <message>
         <source>Start</source>
         <translation>Пуск</translation>
-    </message>
-    <message>
-        <source>Copy command to clipboard</source>
-        <translation>Копіювати команду до буфера обміну</translation>
     </message>
     <message>
         <source>About</source>
@@ -1464,14 +1914,6 @@ Default: 1,2</source>
         <translation>Попередження щодо сеансу</translation>
     </message>
     <message>
-        <source>The session file could not be read, so the session was not restored. The file was left in place.
-
-%1</source>
-        <translation>Не вдалося прочитати файл сеансу, тому сеанс не було відновлено. Файл залишено без змін.
-
-%1</translation>
-    </message>
-    <message>
         <source>The session names the hash type %1, which this hashcat version does not support.</source>
         <translation>Сеанс указує тип геша %1, який ця версія hashcat не підтримує.</translation>
     </message>
@@ -1574,6 +2016,78 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 Це може бути спричинено Windows Defender або іншим антивірусним ПЗ. Спосіб усунення див. у &lt;a href=&quot;%1&quot;&gt;записі ЧаП&lt;/a&gt;.</translation>
     </message>
     <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>Спочатку введіть геш або виберіть файл гешів.</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>Виконуваний файл hashcat не налаштовано. Укажіть його в налаштуваннях.</translation>
+    </message>
+    <message>
+        <source>Check Against Potfile</source>
+        <translation>Перевірка за potfile</translation>
+    </message>
+    <message>
+        <source>Checking potfile…</source>
+        <translation>Перевірка potfile…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>Перевірку скасовано.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat не вдалося запросити potfile.</translation>
+    </message>
+    <message>
+        <source>Identify hash</source>
+        <translation>Визначення геша</translation>
+    </message>
+    <message>
+        <source>The hash type list is unavailable or still loading. Nothing was changed. Check the hashcat path in Settings or try again once the list is available.</source>
+        <translation>Список типів гешів недоступний або ще завантажується. Нічого не змінено. Перевірте шлях до hashcat у налаштуваннях або повторіть спробу, коли список стане доступним.</translation>
+    </message>
+    <message>
+        <source>Hash mode %1 is not in this hashcat’s hash-type list. Nothing was changed.</source>
+        <translation>Режим геша %1 відсутній у списку типів гешів цієї версії hashcat. Нічого не змінено.</translation>
+    </message>
+    <message>
+        <source>The session file could not be read, so the session was not restored.
+
+%1</source>
+        <translation>Не вдалося прочитати файл сеансу, тому сеанс не було відновлено.
+
+%1</translation>
+    </message>
+    <message>
+        <source>Move the file aside to start with a fresh session? It is renamed, never deleted.</source>
+        <translation>Відкласти файл убік, щоб почати з нового сеансу? Його буде перейменовано, але не видалено.</translation>
+    </message>
+    <message>
+        <source>Move File Aside</source>
+        <translation>Відкласти файл</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>Залишити файл</translation>
+    </message>
+    <message>
+        <source>The session file could not be moved to:
+%1</source>
+        <translation>Не вдалося перемістити файл сеансу до:
+%1</translation>
+    </message>
+    <message>
+        <source>The session file was moved to:
+%1</source>
+        <translation>Файл сеансу переміщено до:
+%1</translation>
+    </message>
+    <message>
         <source>The configured hashcat executable is not found: %1</source>
         <translation>Налаштований виконуваний файл hashcat не знайдено: %1</translation>
     </message>
@@ -1588,6 +2102,14 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>Select the hashcat executable under %1 → %2 first.</source>
         <translation>Спочатку виберіть виконуваний файл hashcat у %1 → %2.</translation>
+    </message>
+    <message>
+        <source>Wait until the hash type list has loaded.</source>
+        <translation>Зачекайте, поки список типів гешів завантажиться.</translation>
+    </message>
+    <message>
+        <source>The hash type list is still loading. Wait until it has loaded and try again.</source>
+        <translation>Список типів гешів ще завантажується. Зачекайте завершення завантаження й повторіть спробу.</translation>
     </message>
     <message>
         <source>The configured hashcat executable is not found:
@@ -1639,6 +2161,616 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 %1</source>
         <translation>Ця таблиця не існує:
 %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileCheck</name>
+    <message>
+        <source>The hashcat path is not configured.</source>
+        <translation>Шлях до hashcat не налаштовано.</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>Спочатку введіть геш або виберіть файл гешів.</translation>
+    </message>
+    <message>
+        <source>Choose a hash type. Potfile checks need an explicit hash type; Auto-detect is best-effort and can miscount. Use Tools → Identify Hash if you do not know the type.</source>
+        <translation>Виберіть тип геша. Для перевірки potfile потрібен явний тип геша; «Автовизначення» працює наскільки можливо й може порахувати неправильно. Якщо тип невідомий, скористайтеся «Інструменти → Визначення геша».</translation>
+    </message>
+    <message>
+        <source>The remaining hashes are binary data; the count is unknown.</source>
+        <translation>Решта гешів — двійкові дані; їх кількість невідома.</translation>
+    </message>
+    <message>
+        <source>Choose a hash type.</source>
+        <translation>Виберіть тип геша.</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat не вдалося завантажити жодного геша з введених даних.</translation>
+    </message>
+    <message>
+        <source>hashcat could not parse the input for the selected hash type. Check the hash and the hash type.</source>
+        <translation>hashcat не вдалося розібрати введені дані для вибраного типу геша. Перевірте геш і його тип.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat не вдалося запросити potfile.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExportUi</name>
+    <message>
+        <source>CSV (*.csv)</source>
+        <translation>CSV (*.csv)</translation>
+    </message>
+    <message>
+        <source>TSV (*.tsv *.txt)</source>
+        <translation>TSV (*.tsv *.txt)</translation>
+    </message>
+    <message>
+        <source>JSON (*.json)</source>
+        <translation>JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Export potfile results</source>
+        <translation>Експорт результатів potfile</translation>
+    </message>
+    <message>
+        <source>Export failed</source>
+        <translation>Не вдалося експортувати</translation>
+    </message>
+    <message>
+        <source>Choose a path other than the potfile.</source>
+        <translation>Виберіть шлях, відмінний від шляху potfile.</translation>
+    </message>
+    <message>
+        <source>The destination is named hashcat.potfile. If this is hashcat’s live potfile, exporting overwrites it.
+
+Export anyway?</source>
+        <translation>Файл призначення має назву hashcat.potfile. Якщо це робочий potfile hashcat, експорт перезапише його.
+
+Усе одно експортувати?</translation>
+    </message>
+    <message>
+        <source>The file already exists:
+%1
+
+Overwrite it?</source>
+        <translation>Файл уже існує:
+%1
+
+Перезаписати його?</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 запис</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 записів</translation>
+    </message>
+    <message>
+        <source>Export %1 as %2 to:
+%3
+
+The file will contain plaintext passwords. Store it locally and protect it. Spreadsheet applications may evaluate cells beginning with =, +, -, or @ as formulas; open the file as text or disable formula evaluation.</source>
+        <translation>Експортувати %1 у форматі %2 до:
+%3
+
+Файл міститиме паролі у відкритому вигляді. Зберігайте його локально й захищайте. Табличні програми можуть сприймати комірки, що починаються з =, +, - або @, як формули; відкрийте файл як текст або вимкніть обчислення формул.</translation>
+    </message>
+    <message>
+        <source>
+
+Only %1 of %2 entries are included.</source>
+        <translation>
+
+Включено лише %1 із %2 записів.</translation>
+    </message>
+    <message>
+        <source>Export plaintexts</source>
+        <translation>Експортувати паролі у відкритому вигляді</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Експорт</translation>
+    </message>
+    <message>
+        <source>Export complete</source>
+        <translation>Експорт завершено</translation>
+    </message>
+    <message>
+        <source>Exported %1 to:
+%2</source>
+        <translation>Експортовано %1 до:
+%2</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExporter</name>
+    <message>
+        <source>Could not open the export file: %1</source>
+        <translation>Не вдалося відкрити файл експорту: %1</translation>
+    </message>
+    <message>
+        <source>Could not write the export file: %1</source>
+        <translation>Не вдалося записати файл експорту: %1</translation>
+    </message>
+    <message>
+        <source>Could not save the export file: %1</source>
+        <translation>Не вдалося зберегти файл експорту: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileInspectorDialog</name>
+    <message>
+        <source>Potfile inspector</source>
+        <translation>Інспектор potfile</translation>
+    </message>
+    <message>
+        <source>Parsed directly; duplicates are exact repeated lines. Separator: ‘:’.</source>
+        <translation>Розбирається безпосередньо; дублікати — це точні повторювані рядки. Роздільник: «:».</translation>
+    </message>
+    <message>
+        <source>&amp;Potfile:</source>
+        <translation>&amp;Potfile:</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>&amp;Огляд…</translation>
+    </message>
+    <message>
+        <source>Read the selected potfile again.</source>
+        <translation>Знову прочитати вибраний potfile.</translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation>&amp;Перезавантажити</translation>
+    </message>
+    <message>
+        <source>Stop reading the potfile.</source>
+        <translation>Зупинити читання potfile.</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>Ск&amp;асувати</translation>
+    </message>
+    <message>
+        <source>The prefilled path is a heuristic; hashcat may use another path.</source>
+        <translation>Попередньо заповнений шлях — евристика; hashcat може використовувати інший шлях.</translation>
+    </message>
+    <message>
+        <source>Potfile reading progress</source>
+        <translation>Перебіг читання potfile</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>&amp;Статистика…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible entries.</source>
+        <translation>Показати загальну статистику паролів для видимих записів.</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>&amp;Експорт…</translation>
+    </message>
+    <message>
+        <source>Export the visible entries as CSV, TSV or JSON.</source>
+        <translation>Експортувати видимі записи у CSV, TSV або JSON.</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Закрити діалог.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Закрити</translation>
+    </message>
+    <message>
+        <source>Dup</source>
+        <translation>Дубл.</translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation>Рядок</translation>
+    </message>
+    <message>
+        <source>This potfile has no entries.</source>
+        <translation>У цьому potfile немає записів.</translation>
+    </message>
+    <message>
+        <source>Choose a potfile.</source>
+        <translation>Виберіть potfile.</translation>
+    </message>
+    <message>
+        <source>Select a potfile</source>
+        <translation>Вибрати potfile</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>Скасування…</translation>
+    </message>
+    <message>
+        <source>Potfile: %1</source>
+        <translation>Potfile: %1</translation>
+    </message>
+    <message>
+        <source>Potfile not found: %1</source>
+        <translation>Potfile не знайдено: %1</translation>
+    </message>
+    <message>
+        <source>Reading potfile…</source>
+        <translation>Читання potfile…</translation>
+    </message>
+    <message>
+        <source>Reading cancelled.</source>
+        <translation>Читання скасовано.</translation>
+    </message>
+    <message>
+        <source>dup</source>
+        <translation>дубл.</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 запис</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 записів</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>1 повторюваний рядок</translation>
+    </message>
+    <message>
+        <source>1 duplicate line (at least)</source>
+        <translation>1 повторюваний рядок (щонайменше)</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>%1 повторюваних рядків</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines (at least)</source>
+        <translation>%1 повторюваних рядків (щонайменше)</translation>
+    </message>
+    <message>
+        <source>duplicate count incomplete</source>
+        <translation>кількість дублікатів неповна</translation>
+    </message>
+    <message>
+        <source>1 malformed line</source>
+        <translation>1 некоректний рядок</translation>
+    </message>
+    <message>
+        <source>%1 malformed lines</source>
+        <translation>%1 некоректних рядків</translation>
+    </message>
+    <message>
+        <source>1 encrypted entry</source>
+        <translation>1 зашифрований запис</translation>
+    </message>
+    <message>
+        <source>%1 encrypted entries</source>
+        <translation>%1 зашифрованих записів</translation>
+    </message>
+    <message>
+        <source>1 entry without a password</source>
+        <translation>1 запис без пароля</translation>
+    </message>
+    <message>
+        <source>%1 entries without a password</source>
+        <translation>%1 записів без пароля</translation>
+    </message>
+    <message>
+        <source>1 incomplete line skipped</source>
+        <translation>1 неповний рядок пропущено</translation>
+    </message>
+    <message>
+        <source>%1 incomplete lines skipped</source>
+        <translation>%1 неповних рядків пропущено</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · показано перші %1 із %2</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 приховано фільтром</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>Покажіть паролі у відкритому вигляді, щоб експортувати справжні значення.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileParser</name>
+    <message>
+        <source>Could not open the potfile: %1</source>
+        <translation>Не вдалося відкрити potfile: %1</translation>
+    </message>
+    <message>
+        <source>Could not read the potfile: %1</source>
+        <translation>Не вдалося прочитати potfile: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileResultsDialog</name>
+    <message>
+        <source>Cracked hashes</source>
+        <translation>Зламані геші</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>&amp;Статистика…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible results.</source>
+        <translation>Показати загальну статистику паролів для видимих результатів.</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>&amp;Експорт…</translation>
+    </message>
+    <message>
+        <source>Export the visible results as CSV, TSV or JSON.</source>
+        <translation>Експортувати видимі результати у CSV, TSV або JSON.</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Закрити діалог.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Закрити</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>Ім’я користувача</translation>
+    </message>
+    <message>
+        <source>Filter hash or username (plaintext after Reveal)</source>
+        <translation>Фільтр геша або імені користувача (відкритий текст після показу)</translation>
+    </message>
+    <message>
+        <source>No cracked hashes for this input.</source>
+        <translation>Для цих даних немає зламаних гешів.</translation>
+    </message>
+    <message>
+        <source>Cracked hashes — mode %1</source>
+        <translation>Зламані геші — режим %1</translation>
+    </message>
+    <message>
+        <source>Potfile: hashcat’s default potfile. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>Potfile: типовий potfile hashcat. hashcat зіставляє записи potfile за гешем; вибраний тип геша звужує пошук.</translation>
+    </message>
+    <message>
+        <source>Potfile: %1. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>Potfile: %1. hashcat зіставляє записи potfile за гешем; вибраний тип геша звужує пошук.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 cracked</source>
+        <translation>%1 із %2 зламано</translation>
+    </message>
+    <message>
+        <source>%1 cracked (remaining unknown)</source>
+        <translation>%1 зламано (решта невідома)</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>Перевірку скасовано.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat не вдалося запросити potfile.</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · показано перші %1 із %2</translation>
+    </message>
+    <message>
+        <source>1 unreadable result line skipped.</source>
+        <translation>1 нечитальний рядок результату пропущено.</translation>
+    </message>
+    <message>
+        <source>%1 unreadable result lines skipped.</source>
+        <translation>%1 нечитальних рядків результату пропущено.</translation>
+    </message>
+    <message>
+        <source> · %1 encrypted</source>
+        <translation> · %1 зашифровано</translation>
+    </message>
+    <message>
+        <source> · includes a binary hash file</source>
+        <translation> · містить двійковий файл гешів</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 приховано фільтром</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>Покажіть паролі у відкритому вигляді, щоб експортувати справжні значення.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileStatisticsDialog</name>
+    <message>
+        <source>Password statistics</source>
+        <translation>Статистика паролів</translation>
+    </message>
+    <message>
+        <source>Password length distribution</source>
+        <translation>Розподіл довжини паролів</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>Довжина</translation>
+    </message>
+    <message>
+        <source>Passwords</source>
+        <translation>Паролі</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Закрити діалог.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Закрити</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 запис</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 записів</translation>
+    </message>
+    <message>
+        <source>1 password analyzed</source>
+        <translation>1 пароль проаналізовано</translation>
+    </message>
+    <message>
+        <source>%1 passwords analyzed</source>
+        <translation>%1 паролів проаналізовано</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>1 повторюваний рядок</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>%1 повторюваних рядків</translation>
+    </message>
+    <message>
+        <source>duplicate lines: unknown</source>
+        <translation>повторювані рядки: невідомо</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>%1 empty · %2 encrypted · %3 · %4 unique plaintexts</source>
+        <translation>%1 порожніх · %2 зашифровано · %3 · %4 унікальних паролів у відкритому вигляді</translation>
+    </message>
+    <message>
+        <source>Length: —</source>
+        <translation>Довжина: —</translation>
+    </message>
+    <message>
+        <source>Length: min %1 · max %2 · average %3</source>
+        <translation>Довжина: мін. %1 · макс. %2 · середня %3</translation>
+    </message>
+    <message>
+        <source>Based on the visible %1 of %2 entries.</source>
+        <translation>На основі видимих %1 із %2 записів.</translation>
+    </message>
+    <message>
+        <source>No plaintext passwords to analyze.</source>
+        <translation>Немає паролів у відкритому вигляді для аналізу.</translation>
+    </message>
+    <message>
+        <source>Passwords containing:
+lowercase: %1 (%2%)
+uppercase: %3 (%4%)
+digits: %5 (%6%)
+symbols: %7 (%8%)
+whitespace: %9 (%10%)
+non-ASCII: %11 (%12%)</source>
+        <translation>Паролі, що містять:
+малі літери: %1 (%2%)
+великі літери: %3 (%4%)
+цифри: %5 (%6%)
+символи: %7 (%8%)
+пробільні символи: %9 (%10%)
+не-ASCII: %11 (%12%)</translation>
+    </message>
+    <message>
+        <source>Calculating statistics…</source>
+        <translation>Обчислення статистики…</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileTableView</name>
+    <message>
+        <source>Filter hash (plaintext after Reveal)</source>
+        <translation>Фільтр геша (відкритий текст після показу)</translation>
+    </message>
+    <message>
+        <source>Plaintext is searched only after Reveal plaintexts is enabled.</source>
+        <translation>Відкритий текст шукається лише після ввімкнення «Показати відкритий текст».</translation>
+    </message>
+    <message>
+        <source>Copy selected</source>
+        <translation>Копіювати вибране</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to copy the real values.</source>
+        <translation>Покажіть відкритий текст, щоб скопіювати справжні значення.</translation>
+    </message>
+    <message>
+        <source>Copy all</source>
+        <translation>Копіювати все</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts</source>
+        <translation>Показати відкритий текст</translation>
+    </message>
+    <message>
+        <source>Show or mask plaintext values.</source>
+        <translation>Показувати або приховувати значення відкритого тексту.</translation>
+    </message>
+    <message>
+        <source>Hash</source>
+        <translation>Геш</translation>
+    </message>
+    <message>
+        <source>Plaintext</source>
+        <translation>Відкритий текст</translation>
+    </message>
+    <message>
+        <source>Copied 1 row</source>
+        <translation>Скопійовано 1 рядок</translation>
+    </message>
+    <message>
+        <source>Copied %1 rows</source>
+        <translation>Скопійовано %1 рядків</translation>
+    </message>
+    <message>
+        <source>Copy selected rows</source>
+        <translation>Копіювати вибрані рядки</translation>
+    </message>
+    <message>
+        <source>Copies tab-separated rows. Encrypted rows copy the stored $HCENC$ token.</source>
+        <translation>Копіює рядки, розділені табуляцією. Для зашифрованих рядків копіюється збережений токен $HCENC$.</translation>
+    </message>
+    <message>
+        <source>Hide plaintexts</source>
+        <translation>Приховати відкритий текст</translation>
+    </message>
+    <message>
+        <source>Binary hash file; hashcat reports the file name.</source>
+        <translation>Двійковий файл гешів; hashcat повідомляє ім’я файлу.</translation>
+    </message>
+    <message>
+        <source>No rows match the filter.</source>
+        <translation>Жоден рядок не відповідає фільтру.</translation>
+    </message>
+    <message>
+        <source>(encrypted)</source>
+        <translation>(зашифровано)</translation>
+    </message>
+    <message>
+        <source>(empty)</source>
+        <translation>(порожньо)</translation>
+    </message>
+    <message>
+        <source>(file) %1</source>
+        <translation>(файл) %1</translation>
     </message>
 </context>
 <context>
@@ -1703,24 +2835,52 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>&amp;Мова</translation>
     </message>
     <message>
+        <source>Interface language. Takes effect after a restart.</source>
+        <translation>Мова інтерфейсу. Набуває чинності після перезапуску.</translation>
+    </message>
+    <message>
         <source>&amp;Color scheme</source>
         <translation>&amp;Кольорова схема</translation>
+    </message>
+    <message>
+        <source>The file the last session is stored in.</source>
+        <translation>Файл, у якому зберігається останній сеанс.</translation>
+    </message>
+    <message>
+        <source>Open the folder the session is stored in.</source>
+        <translation>Відкрити теку, у якій зберігається сеанс.</translation>
+    </message>
+    <message>
+        <source>The file the settings are stored in.</source>
+        <translation>Файл, у якому зберігаються налаштування.</translation>
+    </message>
+    <message>
+        <source>Open the folder the settings are stored in.</source>
+        <translation>Відкрити теку, у якій зберігаються налаштування.</translation>
     </message>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>Не всі кольорові схеми доступні на всіх платформах.</translation>
     </message>
     <message>
-        <source>&amp;Parameters</source>
-        <translation>&amp;Параметри</translation>
-    </message>
-    <message>
         <source>&amp;Use short parameters</source>
         <translation>Використовувати ко&amp;роткі параметри</translation>
     </message>
     <message>
+        <source>Sho&amp;w the exact command in the terminal</source>
+        <translation>&amp;Показувати точну команду в терміналі</translation>
+    </message>
+    <message>
+        <source>Print the exact command hashcat receives in the launch terminal, so a mangled value is visible.</source>
+        <translation>Виводити в терміналі запуску точну команду, яку отримує hashcat, щоб були видні спотворені значення.</translation>
+    </message>
+    <message>
         <source>Session and files</source>
         <translation>Сеанс і файли</translation>
+    </message>
+    <message>
+        <source>Restore the session saved when the application last closed.</source>
+        <translation>Відновлювати сеанс, збережений під час останнього закриття програми.</translation>
     </message>
     <message>
         <source>&amp;Restore the last session at startup</source>
@@ -1731,28 +2891,12 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>Файл &amp;сеансу</translation>
     </message>
     <message>
-        <source>The file the last session is stored in</source>
-        <translation>Файл, у якому зберігається останній сеанс</translation>
-    </message>
-    <message>
         <source>Open folder</source>
         <translation>Відкрити теку</translation>
     </message>
     <message>
-        <source>Open the folder the session is stored in</source>
-        <translation>Відкрити теку, у якій зберігається сеанс</translation>
-    </message>
-    <message>
         <source>Settings &amp;file</source>
         <translation>Файл &amp;налаштувань</translation>
-    </message>
-    <message>
-        <source>The file the settings are stored in</source>
-        <translation>Файл, у якому зберігаються налаштування</translation>
-    </message>
-    <message>
-        <source>Open the folder the settings are stored in</source>
-        <translation>Відкрити теку, у якій зберігаються налаштування</translation>
     </message>
     <message>
         <source>Download from %1</source>
@@ -1815,6 +2959,16 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>Виконувані файли (*.exe *.bin hashcat);;Усі файли (*)</translation>
     </message>
     <message>
+        <source>Settings saved</source>
+        <translation>Налаштування збережено</translation>
+    </message>
+    <message>
+        <source>The old settings file was moved to:
+%1</source>
+        <translation>Старий файл налаштувань було переміщено до:
+%1</translation>
+    </message>
+    <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
         <translation>Виконуваний файл hashcat не налаштовано; запустити hashcat неможливо.</translation>
     </message>
@@ -1839,12 +2993,43 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
         <translation>Вибраний файл не є виконуваним.</translation>
     </message>
     <message>
+        <source>Settings not saved</source>
+        <translation>Налаштування не збережено</translation>
+    </message>
+    <message>
+        <source>Move the file aside and save these values? It is renamed, never deleted.</source>
+        <translation>Відкласти файл убік і зберегти ці значення? Його буде перейменовано, але не видалено.</translation>
+    </message>
+    <message>
+        <source>Move File Aside and Save</source>
+        <translation>Відкласти файл і зберегти</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>Залишити файл</translation>
+    </message>
+    <message>
         <source>Restart required</source>
         <translation>Потрібен перезапуск</translation>
     </message>
     <message>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>Перезапустіть hashcat-gui, щоб застосувати нову мову.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsManager</name>
+    <message>
+        <source>The settings could not be written to “%1”. Check the file permissions.</source>
+        <translation>Не вдалося записати налаштування до «%1». Перевірте права доступу до файлу.</translation>
+    </message>
+    <message>
+        <source>The settings file “%1” is not in a readable format.</source>
+        <translation>Файл налаштувань «%1» має нечитальний формат.</translation>
+    </message>
+    <message>
+        <source>The settings file could not be moved to “%1”.</source>
+        <translation>Не вдалося перемістити файл налаштувань до «%1».</translation>
     </message>
 </context>
 <context>
@@ -1888,6 +3073,10 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
     <message>
         <source>The “%1” section does not contain any values.</source>
         <translation>Розділ «%1» не містить жодних значень.</translation>
+    </message>
+    <message>
+        <source>The “%1” section names a version that is not a number.</source>
+        <translation>Розділ «%1» указує версію, яка не є числом.</translation>
     </message>
     <message>
         <source> and </source>

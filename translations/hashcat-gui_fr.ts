@@ -28,8 +28,12 @@
         <translation>Recherche de mises à jour…</translation>
     </message>
     <message>
-        <source>Ask GitHub whether a newer release is available</source>
-        <translation>Demander à GitHub si une version plus récente est disponible</translation>
+        <source>Ask GitHub whether a newer release is available.</source>
+        <translation>Demander à GitHub si une version plus récente est disponible.</translation>
+    </message>
+    <message>
+        <source>Copy the application, toolkit, system and hashcat versions to the clipboard.</source>
+        <translation>Copier les versions de l’application, de la boîte à outils, du système et de hashcat dans le presse-papiers.</translation>
     </message>
     <message>
         <source>Check for updates</source>
@@ -50,10 +54,6 @@
     <message>
         <source>License</source>
         <translation>Licence</translation>
-    </message>
-    <message>
-        <source>Copy the application, toolkit, system and hashcat versions to the clipboard</source>
-        <translation>Copier dans le presse-papiers les versions de l’application, du toolkit, du système et de hashcat</translation>
     </message>
     <message>
         <source>Copy details</source>
@@ -204,6 +204,81 @@
     </message>
 </context>
 <context>
+    <name>BackendInfoDialog</name>
+    <message>
+        <source>Backend information</source>
+        <translation>Informations sur le backend</translation>
+    </message>
+    <message>
+        <source>Query hashcat again for backend information.</source>
+        <translation>Interroger à nouveau hashcat pour obtenir les informations sur le backend.</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>&amp;Rafraîchir</translation>
+    </message>
+    <message>
+        <source>Stop the running query.</source>
+        <translation>Arrêter la requête en cours.</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>&amp;Annuler</translation>
+    </message>
+    <message>
+        <source>Copy the backend information to the clipboard.</source>
+        <translation>Copier les informations sur le backend dans le presse-papiers.</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copier</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Fermer la boîte de dialogue.</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>&amp;Fermer</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>Aucun exécutable hashcat n’est configuré. Définissez-en un dans les réglages.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>L’exécutable hashcat configuré est introuvable&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>Reading backend information…</source>
+        <translation>Lecture des informations sur le backend…</translation>
+    </message>
+    <message>
+        <source>Backend query cancelled.</source>
+        <translation>Requête sur le backend annulée.</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while reading backend information.</source>
+        <translation>hashcat a dépassé le délai d’attente lors de la lecture des informations sur le backend.</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information.</source>
+        <translation>hashcat n’a pas pu lire les informations sur le backend.</translation>
+    </message>
+    <message>
+        <source>hashcat could not read backend information:
+%1</source>
+        <translation>hashcat n’a pas pu lire les informations sur le backend&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>Backend information reported by hashcat.</source>
+        <translation>Informations sur le backend signalées par hashcat.</translation>
+    </message>
+</context>
+<context>
     <name>ExampleSession</name>
     <message>
         <source>Could not create the example directory “%1”.</source>
@@ -255,10 +330,217 @@
     </message>
 </context>
 <context>
+    <name>IdentifyDialog</name>
+    <message>
+        <source>Identify hash</source>
+        <translation>Identifier le hash</translation>
+    </message>
+    <message>
+        <source>&amp;Hash or hash file:</source>
+        <translation>&amp;Hash ou fichier de hash&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file to identify.</source>
+        <translation>Collez un hash ou sélectionnez un fichier de hashes à identifier.</translation>
+    </message>
+    <message>
+        <source>Paste a hash or select a hash file</source>
+        <translation>Coller un hash ou sélectionner un fichier de hashes</translation>
+    </message>
+    <message>
+        <source>Choose a hash file.</source>
+        <translation>Choisir un fichier de hashes.</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>&amp;Parcourir…</translation>
+    </message>
+    <message>
+        <source>Identify the hash type of the entered hash.</source>
+        <translation>Identifier le type du hash saisi.</translation>
+    </message>
+    <message>
+        <source>&amp;Identify</source>
+        <translation>&amp;Identifier</translation>
+    </message>
+    <message>
+        <source>Paste a hash or choose a hash file, then select Identify.</source>
+        <translation>Collez un hash ou choisissez un fichier de hashes, puis sélectionnez Identifier.</translation>
+    </message>
+    <message>
+        <source>Identification progress</source>
+        <translation>Progression de l’identification</translation>
+    </message>
+    <message>
+        <source>Elapsed time</source>
+        <translation>Temps écoulé</translation>
+    </message>
+    <message>
+        <source>Matching hash types; select one and apply it to the attack.</source>
+        <translation>Types de hash correspondants&#xa0;; sélectionnez-en un et appliquez-le à l’attaque.</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Mode</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Catégorie</translation>
+    </message>
+    <message>
+        <source>Use the selected hash type in the attack.</source>
+        <translation>Utiliser le type de hash sélectionné dans l’attaque.</translation>
+    </message>
+    <message>
+        <source>Apply mode to attack</source>
+        <translation>Appliquer le mode à l’attaque</translation>
+    </message>
+    <message>
+        <source>Stop the running identification.</source>
+        <translation>Arrêter l’identification en cours.</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Annuler</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Fermer la boîte de dialogue.</translation>
+    </message>
+    <message>
+        <source>Cl&amp;ose</source>
+        <translation>&amp;Fermer</translation>
+    </message>
+    <message>
+        <source>Elapsed: %1 s</source>
+        <translation>Écoulé&#xa0;: %1 s</translation>
+    </message>
+    <message>
+        <source>Multiple lines pasted. Use Browse to select a hash file, or paste one hash.</source>
+        <translation>Plusieurs lignes ont été collées. Utilisez Parcourir pour sélectionner un fichier de hashes, ou collez un seul hash.</translation>
+    </message>
+    <message>
+        <source>Input changed. Identify it again.</source>
+        <translation>L’entrée a changé. Identifiez-la à nouveau.</translation>
+    </message>
+    <message>
+        <source>Select a hash file</source>
+        <translation>Sélectionner un fichier de hashes</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>Saisissez d’abord un hash ou sélectionnez un fichier de hashes.</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>Aucun exécutable hashcat n’est configuré. Définissez-en un dans les réglages.</translation>
+    </message>
+    <message>
+        <source>The configured hashcat executable is not found:
+%1</source>
+        <translation>L’exécutable hashcat configuré est introuvable&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>Identifying hash…</source>
+        <translation>Identification du hash…</translation>
+    </message>
+    <message>
+        <source>Identification cancelled.</source>
+        <translation>Identification annulée.</translation>
+    </message>
+    <message>
+        <source>hashcat timed out while identifying the hash.</source>
+        <translation>hashcat a dépassé le délai d’attente lors de l’identification du hash.</translation>
+    </message>
+    <message>
+        <source>No hash modes match this structure.</source>
+        <translation>Aucun mode de hash ne correspond à cette structure.</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode and hash to the attack.</source>
+        <translation>1 mode de hash correspond à cette structure. Sélectionnez-le et appliquez le mode et le hash à l’attaque.</translation>
+    </message>
+    <message>
+        <source>1 hash mode matches this structure. Select it and apply the mode to the attack.</source>
+        <translation>1 mode de hash correspond à cette structure. Sélectionnez-le et appliquez le mode à l’attaque.</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode and hash to the attack.</source>
+        <translation>%1 modes de hash correspondent à cette structure. Sélectionnez-en un et appliquez le mode et le hash à l’attaque.</translation>
+    </message>
+    <message>
+        <source>%1 hash modes match this structure. Select one and apply the mode to the attack.</source>
+        <translation>%1 modes de hash correspondent à cette structure. Sélectionnez-en un et appliquez le mode à l’attaque.</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>Annulation…</translation>
+    </message>
+    <message>
+        <source>Apply mode and hash to attack</source>
+        <translation>Appliquer le mode et le hash à l’attaque</translation>
+    </message>
+    <message>
+        <source>Another hashcat instance is using this session. Close it and try again.</source>
+        <translation>Une autre instance de hashcat utilise cette session. Fermez-la et réessayez.</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat n’a pu charger aucun hash depuis l’entrée.</translation>
+    </message>
+    <message>
+        <source>The input contains characters hashcat cannot encode.</source>
+        <translation>L’entrée contient des caractères que hashcat ne peut pas encoder.</translation>
+    </message>
+    <message>
+        <source>hashcat reported:
+%1</source>
+        <translation>hashcat a signalé&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>hashcat’s output could not be parsed. Check the hashcat version or report a bug.</source>
+        <translation>La sortie de hashcat n’a pas pu être analysée. Vérifiez la version de hashcat ou signalez un bug.</translation>
+    </message>
+</context>
+<context>
     <name>LaunchMessage</name>
     <message>
         <source>Windows executable names include their extension, for example hashcat.exe.</source>
         <translation>Les noms d’exécutables Windows incluent leur extension, par exemple hashcat.exe.</translation>
+    </message>
+    <message>
+        <source>hash file</source>
+        <translation>fichier de hashes</translation>
+    </message>
+    <message>
+        <source>outfile</source>
+        <translation>fichier de sortie</translation>
+    </message>
+    <message>
+        <source>potfile</source>
+        <translation>potfile</translation>
+    </message>
+    <message>
+        <source>wordlist</source>
+        <translation>liste de mots</translation>
+    </message>
+    <message>
+        <source>rules file</source>
+        <translation>fichier de règles</translation>
+    </message>
+    <message>
+        <source>table</source>
+        <translation>table</translation>
+    </message>
+    <message>
+        <source>cache folder</source>
+        <translation>dossier du cache</translation>
     </message>
     <message>
         <source>Please choose a hash file.</source>
@@ -413,12 +695,72 @@ md5(md5(salt) . pass). Saisissez-la dans le champ de recette de hash.</translati
 %1</translation>
     </message>
     <message>
+        <source>The potfile path must be a writable file, or a new file in an existing writable folder:
+%1</source>
+        <translation>Le chemin du potfile doit être un fichier accessible en écriture, ou un nouveau fichier dans un dossier existant accessible en écriture&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>The skip or limit value must be a whole number from 0 to %1:
+%2</source>
+        <translation>La valeur de saut ou de limite doit être un nombre entier compris entre 0 et %1&#xa0;:
+%2</translation>
+    </message>
+    <message>
+        <source>The device types must be 1 (CPU) or 2 (GPU), separated by commas:
+%1</source>
+        <translation>Les types de périphériques doivent être 1 (CPU) ou 2 (GPU), séparés par des virgules&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>The CPU affinity must be a comma-separated list of CPU numbers:
+%1</source>
+        <translation>L’affinité CPU doit être une liste de numéros de CPU séparés par des virgules&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>The backend devices must be a comma-separated list of device numbers starting at 1:
+%1</source>
+        <translation>Les périphériques backend doivent être une liste de numéros de périphériques séparés par des virgules, à partir de 1&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>The session name must not contain a path separator:
+%1</source>
+        <translation>Le nom de session ne doit pas contenir de séparateur de chemin&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>A ruleset folder needs Grammar/grammar.txt; choose a rules file instead:
+%1</source>
+        <translation>Un dossier de jeu de règles nécessite Grammar/grammar.txt&#xa0;; choisissez plutôt un fichier de règles&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>A table has to be a file; hashcat does not read a folder:
+%1</source>
+        <translation>Une table doit être un fichier&#xa0;; hashcat ne lit pas un dossier&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>The %1 and the %2 use the same path:
+%3
+hashcat writes one or both of them, so a run could change the file. Choose different paths.</source>
+        <translation>Le %1 et le %2 utilisent le même chemin&#xa0;:
+%3
+hashcat écrit l’un ou l’autre, voire les deux, donc une exécution pourrait modifier le fichier. Choisissez des chemins différents.</translation>
+    </message>
+    <message>
         <source>The increment cannot be combined with the speed-only option.</source>
         <translation>L’incrément ne peut pas être combiné avec l’option de vitesse seule.</translation>
     </message>
     <message>
         <source>Removing cracked hashes is not possible in the association attack mode.</source>
         <translation>Retirer les hashes craqués n’est pas possible dans le mode d’attaque par association.</translation>
+    </message>
+    <message>
+        <source>Keep guessing cannot be combined with removing cracked hashes from the hash file. Clear either option.</source>
+        <translation>«&#xa0;Continuer à deviner&#xa0;» ne peut pas être combiné avec le retrait des hashes craqués du fichier de hashes. Décochez l’une des deux options.</translation>
     </message>
     <message>
         <source>This value contains a control character that cannot be passed to hashcat:
@@ -439,10 +781,6 @@ Supprimez ce caractère et réessayez.</translation>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>Hash file or hash:</source>
-        <translation>Fichier de hashes ou hash&#xa0;:</translation>
-    </message>
     <message>
         <source>The hash, a file of hashes, or a .hc22000/.hccapx WPA capture.</source>
         <translation>Le hash, un fichier de hashes ou une capture WPA .hc22000/.hccapx.</translation>
@@ -472,16 +810,8 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Recette de hash, p. ex. «&#xa0;md5(md5(salt) . pass)&#xa0;». Entourez-la des guillemets extérieurs du shell et placez les chaînes internes entre l’autre type de guillemets&#xa0;; PowerShell exige un accent grave avant $.</translation>
     </message>
     <message>
-        <source>Move item up</source>
-        <translation>Monter l’élément</translation>
-    </message>
-    <message>
         <source>Move selected wordlist up</source>
         <translation>Monter la liste de mots sélectionnée</translation>
-    </message>
-    <message>
-        <source>Move item down</source>
-        <translation>Descendre l’élément</translation>
     </message>
     <message>
         <source>Move selected wordlist down</source>
@@ -508,14 +838,6 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Liste de mots en hexadécimal</translation>
     </message>
     <message>
-        <source>Encoding from:</source>
-        <translation>Encodage source&#xa0;:</translation>
-    </message>
-    <message>
-        <source>Encoding to:</source>
-        <translation>Encodage cible&#xa0;:</translation>
-    </message>
-    <message>
         <source>A ruleset file, a folder with Grammar/grammar.txt, or a bundled name. Unchecked rows are skipped; none runs default-passwords.</source>
         <translation>Un fichier de jeu de règles, un dossier contenant Grammar/grammar.txt ou un nom fourni. Les lignes non cochées sont ignorées&#xa0;; si aucune n’est cochée, default-passwords est exécuté.</translation>
     </message>
@@ -536,24 +858,76 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Retirer les jeux de règles</translation>
     </message>
     <message>
+        <source>Move selected ruleset up.</source>
+        <translation>Monter le jeu de règles sélectionné.</translation>
+    </message>
+    <message>
         <source>Move selected ruleset up</source>
         <translation>Monter le jeu de règles sélectionné</translation>
+    </message>
+    <message>
+        <source>Move selected ruleset down.</source>
+        <translation>Descendre le jeu de règles sélectionné.</translation>
     </message>
     <message>
         <source>Move selected ruleset down</source>
         <translation>Descendre le jeu de règles sélectionné</translation>
     </message>
     <message>
+        <source>Sca&amp;le:</source>
+        <translation>Éche&amp;lle&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Quantization steps per bit (1–64).</source>
+        <translation>Pas de quantification par bit (1–64).</translation>
+    </message>
+    <message>
+        <source>&amp;Costmax:</source>
+        <translation>&amp;Coût maximal&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Highest cost level to enumerate (1–64).</source>
+        <translation>Niveau de coût maximal à énumérer (1–64).</translation>
+    </message>
+    <message>
+        <source>&amp;Weights:</source>
+        <translation>Pondéra&amp;tion&#xa0;:</translation>
+    </message>
+    <message>
+        <source>&amp;Kbits:</source>
+        <translation>&amp;Kilobits&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Bits one inner loop may span (0–27).</source>
+        <translation>Nombre de bits que peut couvrir une boucle interne (0–27).</translation>
+    </message>
+    <message>
+        <source>Ma&amp;xword:</source>
+        <translation>Mot ma&amp;ximal&#xa0;:</translation>
+    </message>
+    <message>
         <source>Maximum candidate length the kernel builds, in 4-byte words: 0 (auto), 16 or 32.</source>
         <translation>Longueur maximale des candidats que construit le kernel, en mots de 4 octets&#xa0;: 0 (auto), 16 ou 32.</translation>
+    </message>
+    <message>
+        <source>Max&amp;gain:</source>
+        <translation>&amp;Gain maximal&#xa0;:</translation>
     </message>
     <message>
         <source>Space-separated key=value settings: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Rulesets go first.</source>
         <translation>Réglages key=value séparés par des espaces&#xa0;: omen, cache, lookup, pwmin, pwmax, hintaccount, hintwords, hintfile, hintrank, hintrepeat. Les jeux de règles viennent en premier.</translation>
     </message>
     <message>
+        <source>Tables</source>
+        <translation>Tables</translation>
+    </message>
+    <message>
         <source>Add one or more table files.</source>
         <translation>Ajouter un ou plusieurs fichiers de tables.</translation>
+    </message>
+    <message>
+        <source>Add table</source>
+        <translation>Ajouter une table</translation>
     </message>
     <message>
         <source>Remove the selected tables.</source>
@@ -562,6 +936,14 @@ Supprimez ce caractère et réessayez.</translation>
     <message>
         <source>Remove tables</source>
         <translation>Retirer les tables</translation>
+    </message>
+    <message>
+        <source>Move selected table up.</source>
+        <translation>Monter la table sélectionnée.</translation>
+    </message>
+    <message>
+        <source>Move selected table down.</source>
+        <translation>Descendre la table sélectionnée.</translation>
     </message>
     <message>
         <source>1 (default) keeps a token unchanged as a choice, 0 drops it so the table only yields variations. identity=0 excludes single=1.</source>
@@ -608,6 +990,14 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Ajouter un argument pour le feed, dans l’ordre.</translation>
     </message>
     <message>
+        <source>Add feed argument</source>
+        <translation>Ajouter un argument de feed</translation>
+    </message>
+    <message>
+        <source>Feed arguments</source>
+        <translation>Arguments du feed</translation>
+    </message>
+    <message>
         <source>Remove the selected feed arguments.</source>
         <translation>Retirer les arguments de feed sélectionnés.</translation>
     </message>
@@ -616,8 +1006,16 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Retirer les arguments de feed</translation>
     </message>
     <message>
+        <source>Move selected feed argument up.</source>
+        <translation>Monter l’argument de feed sélectionné.</translation>
+    </message>
+    <message>
         <source>Move selected feed argument up</source>
         <translation>Monter l’argument de feed sélectionné</translation>
+    </message>
+    <message>
+        <source>Move selected feed argument down.</source>
+        <translation>Descendre l’argument de feed sélectionné.</translation>
     </message>
     <message>
         <source>Move selected feed argument down</source>
@@ -692,6 +1090,14 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Longueur maximale du masque&#xa0;; 0 omet l’option et utilise la valeur par défaut de hashcat (la longueur du masque).</translation>
     </message>
     <message>
+        <source>Grow the mask from the right end instead of the left (hashcat -ii).</source>
+        <translation>Développer le masque depuis l’extrémité droite plutôt que gauche (hashcat -ii).</translation>
+    </message>
+    <message>
+        <source>Right-to-left</source>
+        <translation>De droite à gauche</translation>
+    </message>
+    <message>
         <source>Use ?1 in the mask to insert this charset.</source>
         <translation>Utiliser ?1 dans le masque pour insérer ce jeu de caractères.</translation>
     </message>
@@ -716,12 +1122,80 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Jeu de caractères en hexadécimal</translation>
     </message>
     <message>
+        <source>&amp;Session name:</source>
+        <translation>Nom de &amp;session&#xa0;:</translation>
+    </message>
+    <message>
+        <source>R&amp;untime limit:</source>
+        <translation>D&amp;urée d’exécution&#xa0;:</translation>
+    </message>
+    <message>
+        <source>&amp;Device types:</source>
+        <translation>Types de &amp;dispositifs&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Potfile:</source>
+        <translation>Potfile&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Read and write recovered hashes in this potfile instead of the default one.</source>
+        <translation>Lire et écrire les hashes retrouvés dans ce potfile au lieu du potfile par défaut.</translation>
+    </message>
+    <message>
+        <source>Choose the potfile path.</source>
+        <translation>Choisir le chemin du potfile.</translation>
+    </message>
+    <message>
+        <source>Choose potfile</source>
+        <translation>Choisir le potfile</translation>
+    </message>
+    <message>
+        <source>Copy command to clipboard.</source>
+        <translation>Copier la commande dans le presse-papiers.</translation>
+    </message>
+    <message>
         <source>Command preview</source>
         <translation>Aperçu de la commande</translation>
     </message>
     <message>
         <source>Ctrl+Shift+I</source>
         <translation>Ctrl+Shift+I</translation>
+    </message>
+    <message>
+        <source>Copy the unencoded PowerShell script that starts hashcat.</source>
+        <translation>Copier le script PowerShell non encodé qui lance hashcat.</translation>
+    </message>
+    <message>
+        <source>&amp;Identify Hash…</source>
+        <translation>&amp;Identifier un hash…</translation>
+    </message>
+    <message>
+        <source>Ask hashcat which hash modes match a hash.</source>
+        <translation>Demander à hashcat quels modes de hash correspondent à un hash.</translation>
+    </message>
+    <message>
+        <source>&amp;Backend Information…</source>
+        <translation>Informations &amp;backend…</translation>
+    </message>
+    <message>
+        <source>Show the devices and backends hashcat detected.</source>
+        <translation>Afficher les périphériques et backends détectés par hashcat.</translation>
+    </message>
+    <message>
+        <source>Check Against &amp;Potfile…</source>
+        <translation>Vérifier dans le &amp;potfile…</translation>
+    </message>
+    <message>
+        <source>Check whether the hashes in the hash field are already in the potfile.</source>
+        <translation>Vérifier si les hashes du champ sont déjà présents dans le potfile.</translation>
+    </message>
+    <message>
+        <source>Potfile I&amp;nspector…</source>
+        <translation>I&amp;nspecteur du potfile…</translation>
+    </message>
+    <message>
+        <source>Browse an explicit potfile without hash-type verification.</source>
+        <translation>Parcourir un potfile explicite sans vérification du type de hash.</translation>
     </message>
     <message>
         <source>Increment mask length</source>
@@ -780,10 +1254,6 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Réinitialiser la session</translation>
     </message>
     <message>
-        <source>Mode:</source>
-        <translation>Mode&#xa0;:</translation>
-    </message>
-    <message>
         <source>Attack</source>
         <translation>Attaque</translation>
     </message>
@@ -800,20 +1270,8 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Mode d’attaque. Chaque choix affiche ses propres options ci-dessous.</translation>
     </message>
     <message>
-        <source>Hash type:</source>
-        <translation>Type de hash&#xa0;:</translation>
-    </message>
-    <message>
-        <source>Hash recipe:</source>
-        <translation>Recette de hash&#xa0;:</translation>
-    </message>
-    <message>
         <source>Add files…</source>
         <translation>Ajouter des fichiers…</translation>
-    </message>
-    <message>
-        <source>hashcat reads every file directly inside the folder as one wordlist.</source>
-        <translation>hashcat lit chaque fichier situé directement dans le dossier comme une liste de mots.</translation>
     </message>
     <message>
         <source>Add folder…</source>
@@ -864,26 +1322,6 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Un dossier de jeu de règles nécessite un Grammar/grammar.txt.</translation>
     </message>
     <message>
-        <source>Scale:</source>
-        <translation>Scale&#xa0;:</translation>
-    </message>
-    <message>
-        <source>Quantization steps per bit (1–64)</source>
-        <translation>Pas de quantification par bit (1–64)</translation>
-    </message>
-    <message>
-        <source>Costmax:</source>
-        <translation>Costmax&#xa0;:</translation>
-    </message>
-    <message>
-        <source>Highest cost level to enumerate (1–64)</source>
-        <translation>Niveau de coût le plus élevé à énumérer (1–64)</translation>
-    </message>
-    <message>
-        <source>Weights:</source>
-        <translation>Weights&#xa0;:</translation>
-    </message>
-    <message>
         <source>One positive number per ruleset, colon-separated, e.g. 2:1; the count must match the number of rulesets.</source>
         <translation>Un nombre positif par jeu de règles, séparés par des deux-points, p. ex. 2:1&#xa0;; le nombre de valeurs doit correspondre au nombre de jeux de règles.</translation>
     </message>
@@ -898,22 +1336,6 @@ Supprimez ce caractère et réessayez.</translation>
     <message>
         <source>auto</source>
         <translation>auto</translation>
-    </message>
-    <message>
-        <source>Kbits:</source>
-        <translation>Kbits&#xa0;:</translation>
-    </message>
-    <message>
-        <source>Bits one inner loop may span (0–27)</source>
-        <translation>Bits qu’une boucle interne peut couvrir (0–27)</translation>
-    </message>
-    <message>
-        <source>Maxword:</source>
-        <translation>Maxword&#xa0;:</translation>
-    </message>
-    <message>
-        <source>Maxgain:</source>
-        <translation>Maxgain&#xa0;:</translation>
     </message>
     <message>
         <source>1.0–64.0; decimal point is a dot, not the locale separator.</source>
@@ -1002,10 +1424,6 @@ Supprimez ce caractère et réessayez.</translation>
     <message>
         <source>Copy as PowerShell Script</source>
         <translation>Copier comme script PowerShell</translation>
-    </message>
-    <message>
-        <source>Copy the unencoded PowerShell script that starts hashcat</source>
-        <translation>Copier le script PowerShell non encodé qui lance hashcat</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1100,16 +1518,8 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Session et limites</translation>
     </message>
     <message>
-        <source>Session name:</source>
-        <translation>Nom de la session&#xa0;:</translation>
-    </message>
-    <message>
         <source>Name hashcat uses for its restore file and status output.</source>
         <translation>Nom que hashcat utilise pour son fichier de restauration et sa sortie d’état.</translation>
-    </message>
-    <message>
-        <source>Runtime limit:</source>
-        <translation>Durée maximale&#xa0;:</translation>
     </message>
     <message>
         <source>unlimited</source>
@@ -1176,10 +1586,6 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Périphériques backend&#xa0;:</translation>
     </message>
     <message>
-        <source>Device types:</source>
-        <translation>Types de périphériques&#xa0;:</translation>
-    </message>
-    <message>
         <source>Abort when any backend device exceeds this temperature in °C; 0 disables it.</source>
         <translation>Interrompre lorsqu’un périphérique backend dépasse cette température en °C&#xa0;; 0 désactive cette limite.</translation>
     </message>
@@ -1226,10 +1632,6 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <source>Copy command to clipboard</source>
-        <translation>Copier la commande dans le presse-papiers</translation>
-    </message>
-    <message>
         <source>General</source>
         <translation>Général</translation>
     </message>
@@ -1238,8 +1640,56 @@ Supprimez ce caractère et réessayez.</translation>
         <translation>Ignorer le nom d’utilisateur dans le fichier de hashes</translation>
     </message>
     <message>
+        <source>H&amp;ash file or hash:</source>
+        <translation>Fichier de &amp;hashes ou hash&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Keep attacking a hash after it is cracked, to find further plaintexts such as collisions. Cannot be combined with removing cracked hashes.</source>
+        <translation>Continuer à attaquer un hash après qu’il a été craqué, pour trouver d’autres mots de passe tels que des collisions. Ne peut pas être combiné avec le retrait des hashes craqués.</translation>
+    </message>
+    <message>
+        <source>Keep guessing</source>
+        <translation>Continuer à deviner</translation>
+    </message>
+    <message>
+        <source>&amp;Mode:</source>
+        <translation>&amp;Mode&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Hash t&amp;ype:</source>
+        <translation>T&amp;ype de hash&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Hash &amp;recipe:</source>
+        <translation>&amp;Recette de hash&#xa0;:</translation>
+    </message>
+    <message>
         <source>Wordlists</source>
         <translation>Listes de mots</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist up.</source>
+        <translation>Monter la liste de mots sélectionnée.</translation>
+    </message>
+    <message>
+        <source>Move selected wordlist down.</source>
+        <translation>Descendre la liste de mots sélectionnée.</translation>
+    </message>
+    <message>
+        <source>Add a folder; hashcat reads every file directly inside it as one wordlist.</source>
+        <translation>Ajouter un dossier&#xa0;; hashcat lit chaque fichier situé directement dedans comme une seule liste de mots.</translation>
+    </message>
+    <message>
+        <source>&amp;Encoding from:</source>
+        <translation>&amp;Encodage depuis&#xa0;:</translation>
+    </message>
+    <message>
+        <source>Enc&amp;oding to:</source>
+        <translation>Encodage &amp;vers&#xa0;:</translation>
+    </message>
+    <message>
+        <source>PCFG rulesets</source>
+        <translation>Jeux de règles PCFG</translation>
     </message>
     <message>
         <source>Increment the mask length from the minimum to the maximum.</source>
@@ -1348,14 +1798,6 @@ Supprimez ce caractère et réessayez.</translation>
     <message>
         <source>JSON Files (*.json)</source>
         <translation>Fichiers JSON (*.json)</translation>
-    </message>
-    <message>
-        <source>The session file could not be read, so the session was not restored. The file was left in place.
-
-%1</source>
-        <translation>Le fichier de session n’a pas pu être lu, la session n’a donc pas été restaurée. Le fichier a été laissé tel quel.
-
-%1</translation>
     </message>
     <message>
         <source>Save failed</source>
@@ -1538,12 +1980,84 @@ This can be caused by Windows Defender or other antivirus software. See the &lt;
 Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Consultez &lt;a href=&quot;%1&quot;&gt;l’entrée de la FAQ&lt;/a&gt; pour y remédier.</translation>
     </message>
     <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>Saisissez d’abord un hash ou sélectionnez un fichier de hashes.</translation>
+    </message>
+    <message>
+        <source>No hashcat executable is configured. Set one in Settings.</source>
+        <translation>Aucun exécutable hashcat n’est configuré. Définissez-en un dans les réglages.</translation>
+    </message>
+    <message>
+        <source>Check Against Potfile</source>
+        <translation>Vérifier dans le potfile</translation>
+    </message>
+    <message>
+        <source>Checking potfile…</source>
+        <translation>Vérification du potfile…</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>Vérification annulée.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat n’a pas pu interroger le potfile.</translation>
+    </message>
+    <message>
+        <source>Identify hash</source>
+        <translation>Identifier le hash</translation>
+    </message>
+    <message>
+        <source>The hash type list is unavailable or still loading. Nothing was changed. Check the hashcat path in Settings or try again once the list is available.</source>
+        <translation>La liste des types de hash est indisponible ou encore en cours de chargement. Rien n’a été modifié. Vérifiez le chemin de hashcat dans les réglages ou réessayez lorsque la liste est disponible.</translation>
+    </message>
+    <message>
+        <source>Hash mode %1 is not in this hashcat’s hash-type list. Nothing was changed.</source>
+        <translation>Le mode de hash %1 ne figure pas dans la liste des types de hash de ce hashcat. Rien n’a été modifié.</translation>
+    </message>
+    <message>
+        <source>The session file could not be read, so the session was not restored.
+
+%1</source>
+        <translation>Le fichier de session n’a pas pu être lu, la session n’a donc pas été restaurée.
+
+%1</translation>
+    </message>
+    <message>
+        <source>Move the file aside to start with a fresh session? It is renamed, never deleted.</source>
+        <translation>Déplacer le fichier pour démarrer avec une session vierge&#xa0;? Il est renommé, jamais supprimé.</translation>
+    </message>
+    <message>
+        <source>Move File Aside</source>
+        <translation>Déplacer le fichier</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>Conserver le fichier</translation>
+    </message>
+    <message>
+        <source>The session file could not be moved to:
+%1</source>
+        <translation>Le fichier de session n’a pas pu être déplacé vers&#xa0;:
+%1</translation>
+    </message>
+    <message>
+        <source>The session file was moved to:
+%1</source>
+        <translation>Le fichier de session a été déplacé vers&#xa0;:
+%1</translation>
+    </message>
+    <message>
         <source>The session names the hash type %1, which this hashcat version does not support. Auto-detect was selected.</source>
-        <translation>La session désigne le type de hash %1, que cette version de hashcat ne prend pas en charge. «&#xa0;Détection automatique&#xa0;» a été sélectionné.</translation>
+        <translation>La session désigne le type de hash %1, que cette version de hashcat ne prend pas en charge. «&#xa0;Détection automatique&#xa0;» a été sélectionnée.</translation>
     </message>
     <message>
         <source>The selected hash type %1 is not offered by this hashcat version. Auto-detect was selected.</source>
-        <translation>Le type de hash sélectionné %1 n’est pas proposé par cette version de hashcat. «&#xa0;Détection automatique&#xa0;» a été sélectionné.</translation>
+        <translation>Le type de hash sélectionné %1 n’est pas proposé par cette version de hashcat. «&#xa0;Détection automatique&#xa0;» a été sélectionnée.</translation>
     </message>
     <message>
         <source>Set the hashcat path under %1 → %2 to load the available hash types.</source>
@@ -1560,6 +2074,14 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     <message>
         <source>Open cache directory</source>
         <translation>Ouvrir le répertoire du cache</translation>
+    </message>
+    <message>
+        <source>Wait until the hash type list has loaded.</source>
+        <translation>Attendez que la liste des types de hash soit chargée.</translation>
+    </message>
+    <message>
+        <source>The hash type list is still loading. Wait until it has loaded and try again.</source>
+        <translation>La liste des types de hash est encore en cours de chargement. Attendez qu’elle soit chargée, puis réessayez.</translation>
     </message>
     <message>
         <source>Add wordlist folder</source>
@@ -1642,6 +2164,616 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     </message>
 </context>
 <context>
+    <name>PotfileCheck</name>
+    <message>
+        <source>The hashcat path is not configured.</source>
+        <translation>Le chemin de hashcat n’est pas configuré.</translation>
+    </message>
+    <message>
+        <source>Enter a hash or select a hash file first.</source>
+        <translation>Saisissez d’abord un hash ou sélectionnez un fichier de hashes.</translation>
+    </message>
+    <message>
+        <source>Choose a hash type. Potfile checks need an explicit hash type; Auto-detect is best-effort and can miscount. Use Tools → Identify Hash if you do not know the type.</source>
+        <translation>Choisissez un type de hash. Les vérifications du potfile nécessitent un type explicite&#xa0;; la détection automatique est approximative et peut donner un compte erroné. Utilisez Outils → Identifier le hash si vous ne connaissez pas le type.</translation>
+    </message>
+    <message>
+        <source>The remaining hashes are binary data; the count is unknown.</source>
+        <translation>Les hashes restants sont des données binaires&#xa0;; leur nombre est inconnu.</translation>
+    </message>
+    <message>
+        <source>Choose a hash type.</source>
+        <translation>Choisissez un type de hash.</translation>
+    </message>
+    <message>
+        <source>hashcat could not load any hashes from the input.</source>
+        <translation>hashcat n’a pu charger aucun hash depuis l’entrée.</translation>
+    </message>
+    <message>
+        <source>hashcat could not parse the input for the selected hash type. Check the hash and the hash type.</source>
+        <translation>hashcat n’a pas pu analyser l’entrée pour le type de hash sélectionné. Vérifiez le hash et le type de hash.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat n’a pas pu interroger le potfile.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExportUi</name>
+    <message>
+        <source>CSV (*.csv)</source>
+        <translation>CSV (*.csv)</translation>
+    </message>
+    <message>
+        <source>TSV (*.tsv *.txt)</source>
+        <translation>TSV (*.tsv *.txt)</translation>
+    </message>
+    <message>
+        <source>JSON (*.json)</source>
+        <translation>JSON (*.json)</translation>
+    </message>
+    <message>
+        <source>Export potfile results</source>
+        <translation>Exporter les résultats du potfile</translation>
+    </message>
+    <message>
+        <source>Export failed</source>
+        <translation>Échec de l’exportation</translation>
+    </message>
+    <message>
+        <source>Choose a path other than the potfile.</source>
+        <translation>Choisissez un chemin autre que celui du potfile.</translation>
+    </message>
+    <message>
+        <source>The destination is named hashcat.potfile. If this is hashcat’s live potfile, exporting overwrites it.
+
+Export anyway?</source>
+        <translation>Le fichier de destination s’appelle hashcat.potfile. S’il s’agit du potfile actif de hashcat, l’exportation l’écrasera.
+
+Exporter quand même&#xa0;?</translation>
+    </message>
+    <message>
+        <source>The file already exists:
+%1
+
+Overwrite it?</source>
+        <translation>Le fichier existe déjà&#xa0;:
+%1
+
+L’écraser&#xa0;?</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 entrée</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 entrées</translation>
+    </message>
+    <message>
+        <source>Export %1 as %2 to:
+%3
+
+The file will contain plaintext passwords. Store it locally and protect it. Spreadsheet applications may evaluate cells beginning with =, +, -, or @ as formulas; open the file as text or disable formula evaluation.</source>
+        <translation>Exporter %1 au format %2 vers&#xa0;:
+%3
+
+Le fichier contiendra des mots de passe en clair. Enregistrez-le localement et protégez-le. Les applications de tableur peuvent interpréter comme des formules les cellules commençant par =, +, - ou @&#xa0;; ouvrez le fichier comme texte ou désactivez l’évaluation des formules.</translation>
+    </message>
+    <message>
+        <source>
+
+Only %1 of %2 entries are included.</source>
+        <translation>
+
+Seules %1 entrées sur %2 sont incluses.</translation>
+    </message>
+    <message>
+        <source>Export plaintexts</source>
+        <translation>Exporter les mots de passe en clair</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Exporter</translation>
+    </message>
+    <message>
+        <source>Export complete</source>
+        <translation>Exportation terminée</translation>
+    </message>
+    <message>
+        <source>Exported %1 to:
+%2</source>
+        <translation>%1 exporté vers&#xa0;:
+%2</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileExporter</name>
+    <message>
+        <source>Could not open the export file: %1</source>
+        <translation>Impossible d’ouvrir le fichier d’export&#xa0;: %1</translation>
+    </message>
+    <message>
+        <source>Could not write the export file: %1</source>
+        <translation>Impossible d’écrire le fichier d’export&#xa0;: %1</translation>
+    </message>
+    <message>
+        <source>Could not save the export file: %1</source>
+        <translation>Impossible d’enregistrer le fichier d’export&#xa0;: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileInspectorDialog</name>
+    <message>
+        <source>Potfile inspector</source>
+        <translation>Inspecteur de potfile</translation>
+    </message>
+    <message>
+        <source>Parsed directly; duplicates are exact repeated lines. Separator: ‘:’.</source>
+        <translation>Analysé directement&#xa0;; les doublons sont des lignes exactement répétées. Séparateur&#xa0;: «&#xa0;:&#xa0;».</translation>
+    </message>
+    <message>
+        <source>&amp;Potfile:</source>
+        <translation>&amp;Potfile&#xa0;:</translation>
+    </message>
+    <message>
+        <source>&amp;Browse…</source>
+        <translation>Parco&amp;urir…</translation>
+    </message>
+    <message>
+        <source>Read the selected potfile again.</source>
+        <translation>Relire le potfile sélectionné.</translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation>&amp;Recharger</translation>
+    </message>
+    <message>
+        <source>Stop reading the potfile.</source>
+        <translation>Arrêter la lecture du potfile.</translation>
+    </message>
+    <message>
+        <source>C&amp;ancel</source>
+        <translation>&amp;Annuler</translation>
+    </message>
+    <message>
+        <source>The prefilled path is a heuristic; hashcat may use another path.</source>
+        <translation>Le chemin prérempli est une estimation&#xa0;; hashcat peut utiliser un autre chemin.</translation>
+    </message>
+    <message>
+        <source>Potfile reading progress</source>
+        <translation>Progression de la lecture du potfile</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>&amp;Statistiques…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible entries.</source>
+        <translation>Afficher les statistiques agrégées des mots de passe pour les entrées visibles.</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>&amp;Exporter…</translation>
+    </message>
+    <message>
+        <source>Export the visible entries as CSV, TSV or JSON.</source>
+        <translation>Exporter les entrées visibles au format CSV, TSV ou JSON.</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Fermer la boîte de dialogue.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Fermer</translation>
+    </message>
+    <message>
+        <source>Dup</source>
+        <translation>Dup</translation>
+    </message>
+    <message>
+        <source>Line</source>
+        <translation>Ligne</translation>
+    </message>
+    <message>
+        <source>This potfile has no entries.</source>
+        <translation>Ce potfile ne contient aucune entrée.</translation>
+    </message>
+    <message>
+        <source>Choose a potfile.</source>
+        <translation>Choisissez un potfile.</translation>
+    </message>
+    <message>
+        <source>Select a potfile</source>
+        <translation>Sélectionner un potfile</translation>
+    </message>
+    <message>
+        <source>Cancelling…</source>
+        <translation>Annulation…</translation>
+    </message>
+    <message>
+        <source>Potfile: %1</source>
+        <translation>Potfile&#xa0;: %1</translation>
+    </message>
+    <message>
+        <source>Potfile not found: %1</source>
+        <translation>Potfile introuvable&#xa0;: %1</translation>
+    </message>
+    <message>
+        <source>Reading potfile…</source>
+        <translation>Lecture du potfile…</translation>
+    </message>
+    <message>
+        <source>Reading cancelled.</source>
+        <translation>Lecture annulée.</translation>
+    </message>
+    <message>
+        <source>dup</source>
+        <translation>dup</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 entrée</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 entrées</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>1 ligne en double</translation>
+    </message>
+    <message>
+        <source>1 duplicate line (at least)</source>
+        <translation>1 ligne en double (au moins)</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>%1 lignes en double</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines (at least)</source>
+        <translation>%1 lignes en double (au moins)</translation>
+    </message>
+    <message>
+        <source>duplicate count incomplete</source>
+        <translation>nombre de doublons incomplet</translation>
+    </message>
+    <message>
+        <source>1 malformed line</source>
+        <translation>1 ligne mal formée</translation>
+    </message>
+    <message>
+        <source>%1 malformed lines</source>
+        <translation>%1 lignes mal formées</translation>
+    </message>
+    <message>
+        <source>1 encrypted entry</source>
+        <translation>1 entrée chiffrée</translation>
+    </message>
+    <message>
+        <source>%1 encrypted entries</source>
+        <translation>%1 entrées chiffrées</translation>
+    </message>
+    <message>
+        <source>1 entry without a password</source>
+        <translation>1 entrée sans mot de passe</translation>
+    </message>
+    <message>
+        <source>%1 entries without a password</source>
+        <translation>%1 entrées sans mot de passe</translation>
+    </message>
+    <message>
+        <source>1 incomplete line skipped</source>
+        <translation>1 ligne incomplète ignorée</translation>
+    </message>
+    <message>
+        <source>%1 incomplete lines skipped</source>
+        <translation>%1 lignes incomplètes ignorées</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · %1 premiers affichés sur %2</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 masquées par le filtre</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>Révélez les mots de passe en clair pour exporter les valeurs réelles.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileParser</name>
+    <message>
+        <source>Could not open the potfile: %1</source>
+        <translation>Impossible d’ouvrir le potfile&#xa0;: %1</translation>
+    </message>
+    <message>
+        <source>Could not read the potfile: %1</source>
+        <translation>Impossible de lire le potfile&#xa0;: %1</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileResultsDialog</name>
+    <message>
+        <source>Cracked hashes</source>
+        <translation>Hashes craqués</translation>
+    </message>
+    <message>
+        <source>&amp;Statistics…</source>
+        <translation>&amp;Statistiques…</translation>
+    </message>
+    <message>
+        <source>Show aggregate password statistics for the visible results.</source>
+        <translation>Afficher les statistiques agrégées des mots de passe pour les résultats visibles.</translation>
+    </message>
+    <message>
+        <source>&amp;Export…</source>
+        <translation>&amp;Exporter…</translation>
+    </message>
+    <message>
+        <source>Export the visible results as CSV, TSV or JSON.</source>
+        <translation>Exporter les résultats visibles au format CSV, TSV ou JSON.</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Fermer la boîte de dialogue.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Fermer</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>Nom d’utilisateur</translation>
+    </message>
+    <message>
+        <source>Filter hash or username (plaintext after Reveal)</source>
+        <translation>Filtrer le hash ou le nom d’utilisateur (mot de passe en clair après Révéler)</translation>
+    </message>
+    <message>
+        <source>No cracked hashes for this input.</source>
+        <translation>Aucun hash craqué pour cette entrée.</translation>
+    </message>
+    <message>
+        <source>Cracked hashes — mode %1</source>
+        <translation>Hashes craqués — mode %1</translation>
+    </message>
+    <message>
+        <source>Potfile: hashcat’s default potfile. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>Potfile&#xa0;: potfile par défaut de hashcat. hashcat fait correspondre les entrées du potfile par hash&#xa0;; le type de hash sélectionné affine la recherche.</translation>
+    </message>
+    <message>
+        <source>Potfile: %1. hashcat matches potfile entries by hash; the selected hash type narrows the search.</source>
+        <translation>Potfile&#xa0;: %1. hashcat fait correspondre les entrées du potfile par hash&#xa0;; le type de hash sélectionné affine la recherche.</translation>
+    </message>
+    <message>
+        <source>%1 of %2 cracked</source>
+        <translation>%1 sur %2 craqués</translation>
+    </message>
+    <message>
+        <source>%1 cracked (remaining unknown)</source>
+        <translation>%1 craqués (reste inconnu)</translation>
+    </message>
+    <message>
+        <source>Check cancelled.</source>
+        <translation>Vérification annulée.</translation>
+    </message>
+    <message>
+        <source>hashcat could not query the potfile.</source>
+        <translation>hashcat n’a pas pu interroger le potfile.</translation>
+    </message>
+    <message>
+        <source> · showing first %1 of %2</source>
+        <translation> · %1 premiers affichés sur %2</translation>
+    </message>
+    <message>
+        <source>1 unreadable result line skipped.</source>
+        <translation>1 ligne de résultat illisible ignorée.</translation>
+    </message>
+    <message>
+        <source>%1 unreadable result lines skipped.</source>
+        <translation>%1 lignes de résultat illisibles ignorées.</translation>
+    </message>
+    <message>
+        <source> · %1 encrypted</source>
+        <translation> · %1 chiffrés</translation>
+    </message>
+    <message>
+        <source> · includes a binary hash file</source>
+        <translation> · comprend un fichier de hashes binaire</translation>
+    </message>
+    <message>
+        <source> · %1 hidden by filter</source>
+        <translation> · %1 masqués par le filtre</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to export the real values.</source>
+        <translation>Révélez les mots de passe en clair pour exporter les valeurs réelles.</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileStatisticsDialog</name>
+    <message>
+        <source>Password statistics</source>
+        <translation>Statistiques des mots de passe</translation>
+    </message>
+    <message>
+        <source>Password length distribution</source>
+        <translation>Distribution de la longueur des mots de passe</translation>
+    </message>
+    <message>
+        <source>Length</source>
+        <translation>Longueur</translation>
+    </message>
+    <message>
+        <source>Passwords</source>
+        <translation>Mots de passe</translation>
+    </message>
+    <message>
+        <source>Close the dialog.</source>
+        <translation>Fermer la boîte de dialogue.</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Fermer</translation>
+    </message>
+    <message>
+        <source>1 entry</source>
+        <translation>1 entrée</translation>
+    </message>
+    <message>
+        <source>%1 entries</source>
+        <translation>%1 entrées</translation>
+    </message>
+    <message>
+        <source>1 password analyzed</source>
+        <translation>1 mot de passe analysé</translation>
+    </message>
+    <message>
+        <source>%1 passwords analyzed</source>
+        <translation>%1 mots de passe analysés</translation>
+    </message>
+    <message>
+        <source>1 duplicate line</source>
+        <translation>1 ligne en double</translation>
+    </message>
+    <message>
+        <source>%1 duplicate lines</source>
+        <translation>%1 lignes en double</translation>
+    </message>
+    <message>
+        <source>duplicate lines: unknown</source>
+        <translation>lignes en double&#xa0;: inconnu</translation>
+    </message>
+    <message>
+        <source>%1 · %2</source>
+        <translation>%1 · %2</translation>
+    </message>
+    <message>
+        <source>%1 empty · %2 encrypted · %3 · %4 unique plaintexts</source>
+        <translation>%1 vides · %2 chiffrés · %3 · %4 mots de passe en clair uniques</translation>
+    </message>
+    <message>
+        <source>Length: —</source>
+        <translation>Longueur&#xa0;: —</translation>
+    </message>
+    <message>
+        <source>Length: min %1 · max %2 · average %3</source>
+        <translation>Longueur&#xa0;: min %1 · max %2 · moyenne %3</translation>
+    </message>
+    <message>
+        <source>Based on the visible %1 of %2 entries.</source>
+        <translation>Basé sur les %1 entrées visibles sur %2.</translation>
+    </message>
+    <message>
+        <source>No plaintext passwords to analyze.</source>
+        <translation>Aucun mot de passe en clair à analyser.</translation>
+    </message>
+    <message>
+        <source>Passwords containing:
+lowercase: %1 (%2%)
+uppercase: %3 (%4%)
+digits: %5 (%6%)
+symbols: %7 (%8%)
+whitespace: %9 (%10%)
+non-ASCII: %11 (%12%)</source>
+        <translation>Mots de passe contenant&#xa0;:
+minuscules&#xa0;: %1 (%2&#xa0;%)
+majuscules&#xa0;: %3 (%4&#xa0;%)
+chiffres&#xa0;: %5 (%6&#xa0;%)
+symboles&#xa0;: %7 (%8&#xa0;%)
+espaces&#xa0;: %9 (%10&#xa0;%)
+non-ASCII&#xa0;: %11 (%12&#xa0;%)</translation>
+    </message>
+    <message>
+        <source>Calculating statistics…</source>
+        <translation>Calcul des statistiques…</translation>
+    </message>
+</context>
+<context>
+    <name>PotfileTableView</name>
+    <message>
+        <source>Filter hash (plaintext after Reveal)</source>
+        <translation>Filtrer le hash (mot de passe en clair après Révéler)</translation>
+    </message>
+    <message>
+        <source>Plaintext is searched only after Reveal plaintexts is enabled.</source>
+        <translation>Le mot de passe en clair n’est recherché qu’après activation de «&#xa0;Révéler les mots de passe en clair&#xa0;».</translation>
+    </message>
+    <message>
+        <source>Copy selected</source>
+        <translation>Copier la sélection</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts to copy the real values.</source>
+        <translation>Révélez les mots de passe en clair pour copier les valeurs réelles.</translation>
+    </message>
+    <message>
+        <source>Copy all</source>
+        <translation>Tout copier</translation>
+    </message>
+    <message>
+        <source>Reveal plaintexts</source>
+        <translation>Révéler les mots de passe en clair</translation>
+    </message>
+    <message>
+        <source>Show or mask plaintext values.</source>
+        <translation>Afficher ou masquer les valeurs en clair.</translation>
+    </message>
+    <message>
+        <source>Hash</source>
+        <translation>Hash</translation>
+    </message>
+    <message>
+        <source>Plaintext</source>
+        <translation>Mot de passe en clair</translation>
+    </message>
+    <message>
+        <source>Copied 1 row</source>
+        <translation>1 ligne copiée</translation>
+    </message>
+    <message>
+        <source>Copied %1 rows</source>
+        <translation>%1 lignes copiées</translation>
+    </message>
+    <message>
+        <source>Copy selected rows</source>
+        <translation>Copier les lignes sélectionnées</translation>
+    </message>
+    <message>
+        <source>Copies tab-separated rows. Encrypted rows copy the stored $HCENC$ token.</source>
+        <translation>Copie les lignes séparées par des tabulations. Pour les lignes chiffrées, copie le jeton $HCENC$ enregistré.</translation>
+    </message>
+    <message>
+        <source>Hide plaintexts</source>
+        <translation>Masquer les mots de passe en clair</translation>
+    </message>
+    <message>
+        <source>Binary hash file; hashcat reports the file name.</source>
+        <translation>Fichier de hashes binaire&#xa0;; hashcat indique le nom du fichier.</translation>
+    </message>
+    <message>
+        <source>No rows match the filter.</source>
+        <translation>Aucune ligne ne correspond au filtre.</translation>
+    </message>
+    <message>
+        <source>(encrypted)</source>
+        <translation>(chiffré)</translation>
+    </message>
+    <message>
+        <source>(empty)</source>
+        <translation>(vide)</translation>
+    </message>
+    <message>
+        <source>(file) %1</source>
+        <translation>(fichier) %1</translation>
+    </message>
+</context>
+<context>
     <name>SessionTransfer</name>
     <message>
         <source>The file was made by an older version of hashcat-gui (format version %1; this version reads format version %2).</source>
@@ -1699,24 +2831,52 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
         <translation>&amp;Langue</translation>
     </message>
     <message>
+        <source>Interface language. Takes effect after a restart.</source>
+        <translation>Langue de l’interface. Prend effet après un redémarrage.</translation>
+    </message>
+    <message>
         <source>&amp;Color scheme</source>
         <translation>S&amp;chéma de couleurs</translation>
+    </message>
+    <message>
+        <source>The file the last session is stored in.</source>
+        <translation>Fichier dans lequel la dernière session est enregistrée.</translation>
+    </message>
+    <message>
+        <source>Open the folder the session is stored in.</source>
+        <translation>Ouvrir le dossier dans lequel la session est enregistrée.</translation>
+    </message>
+    <message>
+        <source>The file the settings are stored in.</source>
+        <translation>Fichier dans lequel les réglages sont enregistrés.</translation>
+    </message>
+    <message>
+        <source>Open the folder the settings are stored in.</source>
+        <translation>Ouvrir le dossier dans lequel les réglages sont enregistrés.</translation>
     </message>
     <message>
         <source>Not all color schemes are available on all platforms.</source>
         <translation>Tous les schémas de couleurs ne sont pas disponibles sur toutes les plateformes.</translation>
     </message>
     <message>
-        <source>&amp;Parameters</source>
-        <translation>&amp;Paramètres</translation>
-    </message>
-    <message>
         <source>&amp;Use short parameters</source>
         <translation>&amp;Utiliser les paramètres courts</translation>
     </message>
     <message>
+        <source>Sho&amp;w the exact command in the terminal</source>
+        <translation>&amp;Afficher la commande exacte dans le terminal</translation>
+    </message>
+    <message>
+        <source>Print the exact command hashcat receives in the launch terminal, so a mangled value is visible.</source>
+        <translation>Afficher dans le terminal de lancement la commande exacte reçue par hashcat, afin de voir une valeur altérée.</translation>
+    </message>
+    <message>
         <source>Session and files</source>
         <translation>Session et fichiers</translation>
+    </message>
+    <message>
+        <source>Restore the session saved when the application last closed.</source>
+        <translation>Restaurer la session enregistrée lors de la dernière fermeture de l’application.</translation>
     </message>
     <message>
         <source>&amp;Restore the last session at startup</source>
@@ -1727,28 +2887,12 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
         <translation>Fichier de &amp;session</translation>
     </message>
     <message>
-        <source>The file the last session is stored in</source>
-        <translation>Le fichier dans lequel la dernière session est enregistrée</translation>
-    </message>
-    <message>
         <source>Open folder</source>
         <translation>Ouvrir le dossier</translation>
     </message>
     <message>
-        <source>Open the folder the session is stored in</source>
-        <translation>Ouvrir le dossier dans lequel la session est enregistrée</translation>
-    </message>
-    <message>
         <source>Settings &amp;file</source>
         <translation>Fichier des ré&amp;glages</translation>
-    </message>
-    <message>
-        <source>The file the settings are stored in</source>
-        <translation>Le fichier dans lequel les réglages sont enregistrés</translation>
-    </message>
-    <message>
-        <source>Open the folder the settings are stored in</source>
-        <translation>Ouvrir le dossier dans lequel les réglages sont enregistrés</translation>
     </message>
     <message>
         <source>General</source>
@@ -1815,6 +2959,16 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
         <translation>Fichiers exécutables (*.exe *.bin hashcat);;Tous les fichiers (*)</translation>
     </message>
     <message>
+        <source>Settings saved</source>
+        <translation>Réglages enregistrés</translation>
+    </message>
+    <message>
+        <source>The old settings file was moved to:
+%1</source>
+        <translation>L’ancien fichier de réglages a été déplacé vers&#xa0;:
+%1</translation>
+    </message>
+    <message>
         <source>No hashcat executable is configured; hashcat cannot be started.</source>
         <translation>Aucun exécutable hashcat n’est configuré&#xa0;; hashcat ne peut pas être lancé.</translation>
     </message>
@@ -1839,12 +2993,43 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
         <translation>Le fichier sélectionné n’est pas un exécutable.</translation>
     </message>
     <message>
+        <source>Settings not saved</source>
+        <translation>Réglages non enregistrés</translation>
+    </message>
+    <message>
+        <source>Move the file aside and save these values? It is renamed, never deleted.</source>
+        <translation>Déplacer le fichier et enregistrer ces valeurs&#xa0;? Il est renommé, jamais supprimé.</translation>
+    </message>
+    <message>
+        <source>Move File Aside and Save</source>
+        <translation>Déplacer le fichier et enregistrer</translation>
+    </message>
+    <message>
+        <source>Keep File</source>
+        <translation>Conserver le fichier</translation>
+    </message>
+    <message>
         <source>Restart required</source>
         <translation>Redémarrage requis</translation>
     </message>
     <message>
         <source>Restart hashcat-gui to apply the new language.</source>
         <translation>Redémarrez hashcat-gui pour appliquer la nouvelle langue.</translation>
+    </message>
+</context>
+<context>
+    <name>SettingsManager</name>
+    <message>
+        <source>The settings could not be written to “%1”. Check the file permissions.</source>
+        <translation>Les réglages n’ont pas pu être écrits dans «&#xa0;%1&#xa0;». Vérifiez les permissions du fichier.</translation>
+    </message>
+    <message>
+        <source>The settings file “%1” is not in a readable format.</source>
+        <translation>Le fichier de réglages «&#xa0;%1&#xa0;» n’est pas dans un format lisible.</translation>
+    </message>
+    <message>
+        <source>The settings file could not be moved to “%1”.</source>
+        <translation>Le fichier de réglages n’a pas pu être déplacé vers «&#xa0;%1&#xa0;».</translation>
     </message>
 </context>
 <context>
@@ -1888,6 +3073,10 @@ Cela peut être causé par Windows Defender ou un autre logiciel antivirus. Cons
     <message>
         <source>The “%1” section does not contain any values.</source>
         <translation>La section «&#xa0;%1&#xa0;» ne contient aucune valeur.</translation>
+    </message>
+    <message>
+        <source>The “%1” section names a version that is not a number.</source>
+        <translation>La section «&#xa0;%1&#xa0;» désigne une version qui n’est pas un nombre.</translation>
     </message>
     <message>
         <source> and </source>
