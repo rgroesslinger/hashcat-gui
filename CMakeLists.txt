@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(hashcat-gui
-    VERSION 0.9.0
+    VERSION 0.9.1
     DESCRIPTION "Graphical user interface for hashcat"
     HOMEPAGE_URL "https://github.com/rgroesslinger/hashcat-gui/"
     LANGUAGES C CXX
