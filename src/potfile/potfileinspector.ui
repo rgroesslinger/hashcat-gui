@@ -147,7 +147,7 @@
         <string>&amp;Statistics…</string>
        </property>
        <property name="toolTip">
-        <string>Show aggregate password statistics for the visible entries</string>
+        <string>Show aggregate password statistics for the visible entries.</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>
@@ -163,7 +163,7 @@
         <string>&amp;Export…</string>
        </property>
        <property name="toolTip">
-        <string>Export the visible entries as CSV, TSV or JSON</string>
+        <string>Export the visible entries as CSV, TSV or JSON.</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>

@@ -220,7 +220,7 @@
              <bool>true</bool>
             </property>
             <property name="toolTip">
-             <string>The file the last session is stored in</string>
+             <string>The file the last session is stored in.</string>
             </property>
            </widget>
           </item>
@@ -230,7 +230,7 @@
              <string>Open folder</string>
             </property>
             <property name="toolTip">
-             <string>Open the folder the session is stored in</string>
+             <string>Open the folder the session is stored in.</string>
             </property>
            </widget>
           </item>
@@ -257,7 +257,7 @@
              <bool>true</bool>
             </property>
             <property name="toolTip">
-             <string>The file the settings are stored in</string>
+             <string>The file the settings are stored in.</string>
             </property>
            </widget>
           </item>
@@ -267,7 +267,7 @@
              <string>Open folder</string>
             </property>
             <property name="toolTip">
-             <string>Open the folder the settings are stored in</string>
+             <string>Open the folder the settings are stored in.</string>
             </property>
            </widget>
           </item>

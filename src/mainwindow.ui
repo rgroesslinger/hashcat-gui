@@ -348,7 +348,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Move selected wordlist up</string>
+                        <string>Move selected wordlist up.</string>
                        </property>
                        <property name="autoRaise">
                         <bool>true</bool>
@@ -367,7 +367,7 @@
                         <bool>false</bool>
                        </property>
                        <property name="toolTip">
-                        <string>Move selected wordlist down</string>
+                        <string>Move selected wordlist down.</string>
                        </property>
                        <property name="autoRaise">
                         <bool>true</bool>
@@ -708,7 +708,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_pcfg_ruleset_up">
               <property name="toolTip">
-               <string>Move selected ruleset up</string>
+               <string>Move selected ruleset up.</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -724,7 +724,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_pcfg_ruleset_down">
               <property name="toolTip">
-               <string>Move selected ruleset down</string>
+               <string>Move selected ruleset down.</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -778,7 +778,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Quantization steps per bit (1–64)</string>
+               <string>Quantization steps per bit (1–64).</string>
               </property>
               <property name="placeholderText">
                <string notr="true">1</string>
@@ -801,7 +801,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Highest cost level to enumerate (1–64)</string>
+               <string>Highest cost level to enumerate (1–64).</string>
               </property>
               <property name="placeholderText">
                <string notr="true">64</string>
@@ -870,7 +870,7 @@
                </size>
               </property>
               <property name="toolTip">
-               <string>Bits one inner loop may span (0–27)</string>
+               <string>Bits one inner loop may span (0–27).</string>
               </property>
               <property name="placeholderText">
                <string>auto</string>
@@ -1099,7 +1099,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_table_up">
               <property name="toolTip">
-               <string>Move selected table up</string>
+               <string>Move selected table up.</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -1115,7 +1115,7 @@
                      <item>
              <widget class="QToolButton" name="toolButton_table_down">
               <property name="toolTip">
-               <string>Move selected table down</string>
+               <string>Move selected table down.</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -1437,7 +1437,7 @@
                  <item>
              <widget class="QToolButton" name="toolButton_feed_argument_up">
               <property name="toolTip">
-               <string>Move selected feed argument up</string>
+               <string>Move selected feed argument up.</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -1453,7 +1453,7 @@
                  <item>
              <widget class="QToolButton" name="toolButton_feed_argument_down">
               <property name="toolTip">
-               <string>Move selected feed argument down</string>
+               <string>Move selected feed argument down.</string>
               </property>
               <property name="autoRaise">
                <bool>true</bool>
@@ -2772,7 +2772,7 @@
       <item>
        <widget class="QPushButton" name="pushButton_copy_clipboard">
         <property name="toolTip">
-         <string>Copy command to clipboard</string>
+         <string>Copy command to clipboard.</string>
         </property>
         <property name="text">
          <string/>
@@ -2918,7 +2918,7 @@
     <string>Copy as PowerShell Script</string>
    </property>
    <property name="toolTip">
-    <string>Copy the unencoded PowerShell script that starts hashcat</string>
+    <string>Copy the unencoded PowerShell script that starts hashcat.</string>
    </property>
   </action>
   <action name="actionIdentifyHash">
@@ -2926,7 +2926,7 @@
     <string>&amp;Identify Hash…</string>
    </property>
    <property name="toolTip">
-    <string>Ask hashcat which hash modes match a hash</string>
+    <string>Ask hashcat which hash modes match a hash.</string>
    </property>
   </action>
   <action name="actionBackendInfo">
@@ -2934,7 +2934,7 @@
     <string>&amp;Backend Information…</string>
    </property>
    <property name="toolTip">
-    <string>Show the devices and backends hashcat detected</string>
+    <string>Show the devices and backends hashcat detected.</string>
    </property>
   </action>
   <action name="actionPotfileCheck">
@@ -2942,7 +2942,7 @@
     <string>Check Against &amp;Potfile…</string>
    </property>
    <property name="toolTip">
-    <string>Check whether the hashes in the hash field are already in the potfile</string>
+    <string>Check whether the hashes in the hash field are already in the potfile.</string>
    </property>
   </action>
   <action name="actionPotfileInspector">
@@ -2950,7 +2950,7 @@
     <string>Potfile I&amp;nspector…</string>
    </property>
    <property name="toolTip">
-    <string>Browse an explicit potfile without hash-type verification</string>
+    <string>Browse an explicit potfile without hash-type verification.</string>
    </property>
   </action>
  </widget>

@@ -247,7 +247,7 @@
             </sizepolicy>
            </property>
            <property name="toolTip">
-            <string>Ask GitHub whether a newer release is available</string>
+            <string>Ask GitHub whether a newer release is available.</string>
            </property>
            <property name="text">
             <string>Check for updates</string>
@@ -518,7 +518,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_copy_details">
        <property name="toolTip">
-        <string>Copy the application, toolkit, system and hashcat versions to the clipboard</string>
+        <string>Copy the application, toolkit, system and hashcat versions to the clipboard.</string>
        </property>
        <property name="text">
         <string>Copy details</string>
