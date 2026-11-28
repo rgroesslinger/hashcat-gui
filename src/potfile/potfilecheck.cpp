@@ -144,7 +144,7 @@ void PotfileCheck::startParse(HashcatResult showResult)
             [this, sharedResult] {
                 const PotfileShowParser::Result parsed = m_parseWatcher->result();
 
-                if (m_cancel && m_cancel->load()) {
+                if ((m_cancel && m_cancel->load()) || parsed.cancelled) {
                     m_result.status = PotfileCheckResult::Status::Cancelled;
                     finish();
                     return;
@@ -163,8 +163,10 @@ void PotfileCheck::startParse(HashcatResult showResult)
                 startLeft();
             });
 
-    m_parseWatcher->setFuture(QtConcurrent::run(
-        [sharedResult] { return PotfileShowParser::parse(sharedResult->standardOutput); }));
+    m_parseWatcher->setFuture(QtConcurrent::run([sharedResult, cancel = m_cancel] {
+        return PotfileShowParser::parse(sharedResult->standardOutput,
+                                        AppConstants::Hashcat::PotfileMaxEntries, cancel);
+    }));
 }
 
 void PotfileCheck::startLeft()

@@ -7,6 +7,7 @@
 #define POTFILESHOWPARSER_H
 
 #include "appconstants.h"
+#include "hashcatrunner.h"
 
 #include <QCoreApplication>
 #include <QList>
@@ -37,10 +38,13 @@ public:
         int totalCount = 0;
         // Lines that are not a JSON object carrying a usable hash_hex.
         int malformedCount = 0;
+        // The scan stopped early because the caller cancelled the query.
+        bool cancelled = false;
     };
 
     static Result parse(const QString &output,
-                        int maxEntries = AppConstants::Hashcat::PotfileMaxEntries);
+                        int maxEntries = AppConstants::Hashcat::PotfileMaxEntries,
+                        HashcatRunner::CancelToken cancel = {});
 
     // hashcat prints diagnostics to stdout before the payload. Returns the
     // offset of the first payload character, skipping known leading blocks.

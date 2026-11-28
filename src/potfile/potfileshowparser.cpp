@@ -37,7 +37,8 @@ QString stringField(const QJsonObject &object, const QString &key)
 
 } // namespace
 
-PotfileShowParser::Result PotfileShowParser::parse(const QString &output, int maxEntries)
+PotfileShowParser::Result PotfileShowParser::parse(const QString &output, int maxEntries,
+                                                   HashcatRunner::CancelToken cancel)
 {
     Result result;
     const int cap = std::max(0, maxEntries);
@@ -45,6 +46,10 @@ PotfileShowParser::Result PotfileShowParser::parse(const QString &output, int ma
     const QStringView payload = QStringView(output).mid(payloadOffset(output));
     const QStringTokenizer lines(payload, QLatin1Char('\n'), Qt::SkipEmptyParts);
     for (const QStringView line : lines) {
+        if (cancel && cancel->load()) {
+            result.cancelled = true;
+            return result;
+        }
         const QString text = line.trimmed().toString();
         if (text.isEmpty()) {
             continue;

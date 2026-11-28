@@ -9,6 +9,9 @@
 
 #include <QTest>
 
+#include <atomic>
+#include <memory>
+
 class TestPotfileShowParser : public QObject
 {
     Q_OBJECT
@@ -30,6 +33,7 @@ private slots:
     void diagnosticsOnlyOutputHasNoEntries();
     void diagnosticsWithoutTrailingNewlineStayInRange();
     void noiseAfterThePayloadIsStillMalformed();
+    void aCancelledTokenStopsTheScan();
 };
 
 void TestPotfileShowParser::parsesEntriesAndFlags()
@@ -245,6 +249,19 @@ void TestPotfileShowParser::noiseAfterThePayloadIsStillMalformed()
     const PotfileShowParser::Result result = PotfileShowParser::parse(output);
     QCOMPARE(result.totalCount, 1);
     QCOMPARE(result.malformedCount, 1);
+}
+
+void TestPotfileShowParser::aCancelledTokenStopsTheScan()
+{
+    const auto cancel = std::make_shared<std::atomic_bool>(true);
+    const QString output = showLine("hash", "plain");
+
+    const PotfileShowParser::Result result =
+        PotfileShowParser::parse(output, AppConstants::Hashcat::PotfileMaxEntries, cancel);
+
+    QVERIFY(result.cancelled);
+    QCOMPARE(result.totalCount, 0);
+    QCOMPARE(result.entries.size(), 0);
 }
 
 int main(int argc, char *argv[])
